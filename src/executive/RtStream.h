@@ -54,7 +54,7 @@ private:
   //*** private data members  ***//
 
   // vector of components objects
-  vector<RtStreamComponent&> components;
+  //  vector<RtStreamComponent&> components;
 
   // here we need a way to represent serial dependencies in processing
   

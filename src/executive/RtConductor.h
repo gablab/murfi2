@@ -1,6 +1,6 @@
 /******************************************************************************
- * Conductor.h is the header for a class that oversees and coordinates
- * all operations during a real-time fMRI session.
+ * RtConductor.h is the header for a class that oversees and coordinates all
+ * operations during a real-time fMRI session.
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
@@ -13,9 +13,11 @@
 
 #include"RtConfig.h"
 #include"RtInput.h"
+#include"RtInputScannerImages.h"
+#include"RtInputUSBKb.h"
 #include"RtOutput.h"
+#include"RtOutputFile.h"
 #include"RtStream.h"
-#include"RtMRIParams.h"
 
 using namespace std;
 
@@ -37,13 +39,6 @@ public:
 
   //*** initialization routines  ***//
   
-  // adds a configuration method
-  //  in:
-  //   conf: configuration object 
-  //  out:
-  //   true (for success) or false
-  bool addConfig(RtConfig &conf);
-
   // adds a processing stream to the pipeline
   //  in:
   //   stream: stream object
@@ -70,11 +65,6 @@ public:
   //   true (for success) or false
   bool init();
 
-  // sets the logfile name
-  //  in:
-  //   logname: filename for log
-  void setLogfileName(string logname);
-
   //*** operation routines  ***//
   
   // begins execution of a realtime fMRI session
@@ -86,23 +76,26 @@ private:
 
   //*** private data members  ***//
 
+  // input object that handles reception of scanner images
+  RtInputScannerImages scannerImageInput;
+
   // input object that handles reception of scanner triggers for external sync
-  RtInputUSB &scannerInput;
+  RtInputUSBKb scannerTriggerInput;
 
   // output object to log 
-  RtOutputFile &logOutput;
+  RtOutputFile logOutput;
 
   // configuration object
   RtConfig config;
 
   // vector of input objects
-  vector<RtInput&> inputs;
+  vector<RtInput> inputs;
 
   // vector of stream objects
-  vector<RtStream&> streams;
+  vector<RtStream> streams;
 
   // vector of output objects
-  vector<RtOutput&> outputs;
+  vector<RtOutput> outputs;
 
 };
 

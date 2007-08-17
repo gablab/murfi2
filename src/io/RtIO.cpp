@@ -1,40 +1,37 @@
 /******************************************************************************
- * RtOutput.h declares a class that implements output operations 
+ * RtIO.cpp defines a base class for input and output operations 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTOUTPUT_H
-#define RTOUTPUT_H
+#include<RtIO.h>
 
-#include"RtIO.h"
-#include"RtConfig.h"
+//*** constructors/destructors  ***//
 
-// class declaration
-class RtOutput : public RtIO {
+// default constructor
+RtIO::RtIO() : isOpen(false) {
 
-public:
+}
 
-  //*** constructors/destructors  ***//
-  
-  // default constructor
-  RtOutput(); 
+// destructor
+RtIO::~RtIO() {
+}
 
-  // destructor
-  virtual ~RtOutput();
+// open and start accepting input
+bool RtIO::open() {
+  isOpen = true;
 
-  // init
-  virtual bool init(const RtConfig &config);
+  return true;
+}
 
-private:
+// close and clean up
+bool RtIO::close() {
+  isOpen = false;
 
-  //*** private data members  ***//
+  return true;
+}
 
-
-};
-
-#endif
 
 /*****************************************************************************
  * $Source$

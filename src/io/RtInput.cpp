@@ -1,40 +1,32 @@
 /******************************************************************************
- * RtOutput.h declares a class that implements output operations 
+ * RtInput.cpp defines a class that implements input operations 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTOUTPUT_H
-#define RTOUTPUT_H
+#include"RtInput.h"
 
-#include"RtIO.h"
-#include"RtConfig.h"
+// default constructor
+RtInput::RtInput() {
 
-// class declaration
-class RtOutput : public RtIO {
+}
 
-public:
+// destructor
+RtInput::~RtInput() {
 
-  //*** constructors/destructors  ***//
+}
+
+// init
+bool RtInput::init(const RtConfig &config) {
+  // set up the callback
   
-  // default constructor
-  RtOutput(); 
+  return true;
+}
 
-  // destructor
-  virtual ~RtOutput();
-
-  // init
-  virtual bool init(const RtConfig &config);
-
-private:
-
-  //*** private data members  ***//
-
-
-};
-
-#endif
+// callback to receive the input
+// sigc::signal<void, RtData&> callback;
+  
 
 /*****************************************************************************
  * $Source$

@@ -1,40 +1,27 @@
 /******************************************************************************
- * RtOutput.h declares a class that implements output operations 
+ * RtOutput.cpp defines a class that implements output operations 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTOUTPUT_H
-#define RTOUTPUT_H
+#include"RtOutput.h"
 
-#include"RtIO.h"
-#include"RtConfig.h"
+// default constructor
+RtOutput::RtOutput() {
 
-// class declaration
-class RtOutput : public RtIO {
+} 
 
-public:
+// destructor
+RtOutput::~RtOutput() {
 
-  //*** constructors/destructors  ***//
-  
-  // default constructor
-  RtOutput(); 
+}
 
-  // destructor
-  virtual ~RtOutput();
+// init
+bool RtOutput::init(const RtConfig &config) {
 
-  // init
-  virtual bool init(const RtConfig &config);
-
-private:
-
-  //*** private data members  ***//
-
-
-};
-
-#endif
+  return true;
+}
 
 /*****************************************************************************
  * $Source$

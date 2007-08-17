@@ -8,6 +8,8 @@
 
 #include"RtConductor.h"
 
+#include<iostream>
+
 //*** constructors/destructors  ***//
 
 // default constructor
@@ -24,45 +26,23 @@ RtConductor::RtConductor(int argc, char **argv) {
     cerr << "config failed... exit" << endl;
   }
 
-  // open the default io objects
+  scannerImageInput.init(config);
+  scannerTriggerInput.init(config);
+  logOutput.init(config);    
 
-  if(config.getImagesFromScanner) {
-    scannerInput = new RtScannerInput(config.dataTcpIpPortNum,
-				      config.mosaic);
-  }
-
-  if(!config.noLogging) {
-    logOutput = new RtLogOutput(config.logFilename);    
-  }
 }
 
 // destructor
 RtConductor::~RtConductor() {
 
   // tell evryone that we're done
-  scannerInput.close();
+  scannerTriggerInput.close();
+  scannerImageInput.close();
   logOutput.close();
 
-  for(int i=0; i < inputs.len
-
-  // delete private data
-  delete scannerInput;
-  delete logOutput;
-  delete inputs;
-  delete streams;
-  delete outputs;
 }
 
 //*** initialization routines  ***//
-
-// adds a configuration method
-//  in:
-//   conf: configuration object 
-//  out:
-//   true (for success) or false
-bool RtConductor::addConfig(RtConfig &conf) {
-
-}
 
 // adds a processing stream to the pipeline
 //  in:
@@ -70,7 +50,8 @@ bool RtConductor::addConfig(RtConfig &conf) {
 //  out:
 //   true (for success) or false
 bool RtConductor::addStream(RtStream &stream) {
-
+  
+  return true;
 }
 
 // adds input mode
@@ -80,6 +61,7 @@ bool RtConductor::addStream(RtStream &stream) {
 //   true (for success) or false
 bool RtConductor::addInput(RtInput &in) {
 
+  return true;
 }
 
 // adds output mode
@@ -89,20 +71,15 @@ bool RtConductor::addInput(RtInput &in) {
 //   true (for success) or false
 bool RtConductor::addOutput(RtOutput &out) {
 
+  return true;
 }
 
 // initialize config and prepare to run
 //  out:
 //   true (for success) or false
 bool RtConductor::init() {
-  
-}
 
-// sets the logfile name
-//  in:
-//   logname: filename for log
-void RtConductor::setLogfileName(string logname) {
-
+  return true;
 }
 
 //*** operation routines  ***//
@@ -112,36 +89,14 @@ void RtConductor::setLogfileName(string logname) {
 //   true (for success) or false
 bool RtConductor::run() {
 
+  return true;
 }
-
-//private:
-//
-//  //*** private data members  ***//
-//
-//  // input object that handles reception of scanner triggers for external sync
-//  RtInputUSB &scannerInput;
-//
-//  // output object to log 
-//  RtOutputFile &logOutput;
-//
-//  // configuration object
-//  RtConfig config;
-//
-//  // vector of input objects
-//  vector<RtInput&> inputs;
-//
-//  // vector of stream objects
-//  vector<RtStream&> streams;
-//
-//  // vector of output objects
-//  vector<RtOutput&> outputs;
-//
 
 // main function for the realtime system
 // very simple
 int main(int argc, char **args) {
 
-  RtConductor conductor(argc,argv);
+  RtConductor conductor(argc,args);
   
   conductor.init();
   conductor.run();

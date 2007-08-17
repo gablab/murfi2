@@ -10,17 +10,20 @@
 
 #include<sstream>
 #include<iostream>
+#include<iomanip>
 #include<fstream>
 
   //*** constructors/destructors  ***//
   
+RtConfigVal unset;
+
 // default constructor
 RtConfig::RtConfig() {
   // nothing to do here
 }
 
 // destructor
-RtConductor::~RtConfig() {
+RtConfig::~RtConfig() {
   // nothing to do here
 }
 
@@ -28,7 +31,8 @@ RtConductor::~RtConfig() {
 
 // parse command line args
 bool RtConfig::parseArgs(int argc, char **args) {
-  int i, eqind;
+  int i;
+  unsigned int eqind;
   string pair, name, val;
 
   // get the executable name
@@ -42,20 +46,18 @@ bool RtConfig::parseArgs(int argc, char **args) {
     eqind = pair.find("=");
 
     // equals not found, error
-    if(eqind == string::npos) {
-      RtConductor::usage();
+    if(eqind == string::npos || eqind == 0) {
+      printUsage();
       exit(1);
     }
 
     // split the string into name and val and assign it
-    name = pair.substr(1,eqind-1);
-    val  = pair.substr(eqind+1);
+    set(pair.substr(0,eqind), pair.substr(eqind+1));
+  }
 
-    parms[name] = value;
-
-    if(VERBOSE) {
-      cout << name << "=" << value << endl;
-    }
+  // dump config to screen if verbose
+  if(get("verbose")==true) {
+    dumpConfig();
   }
 
   return true;
@@ -69,48 +71,46 @@ bool RtConfig::parseConfigFile() {
 //*** config get/set parms ***/
 
 // get a parm value
-string RtConfig::getParm(string name) {
-  map<string,string>::iterator p = parms.find(name);
+RtConfigVal &RtConfig::get(string name) {
+  map<string,RtConfigVal>::iterator p = parms.find(name);
   
   if(p == parms.end()) {
-    return "";
+    //    return RtConfigVal::UNSET;
+    return unset;
   }
 
   return p->second; 
 }
 
-// set a parm value (string)
-void RtConfig::setParm(string name, string val) {
-  stringstream ss;
-  string s;
-  ss << val;
-  ss >> parms[name];
+// set a parm value
+template<class T>
+void RtConfig::set(string name, T tval) {
+  parms[name] = tval;
 }
 
-// set a parm value (int)
-void RtConfig::setParm(string name, int val) {
-  stringstream ss;
-  string s;
-  ss << val;
-  ss >> parms[name];
+//*** private functions ***//
+
+// prints the usage info for the realtime system
+void RtConfig::printUsage() {
+  int w = 15;
+
+  cout << "usage: " << endl << get("execName") 
+       << " [name1=val1 name2=val2 ...]" << endl << endl
+       << "---------------------------------------------" << endl
+       << "some useful flags:" << endl
+       << setiosflags(ios::left) 
+       << setw(w) << "conf:"     << "configuration filename" << endl
+       << setw(w) << "verbose:"  << "enable/disable verbose mode" << endl
+       << "---------------------------------------------" << endl;
 }
 
-// set a parm value (double)
-void RtConfig::setParm(string name, double val) {
-  stringstream ss;
-  string s;
-  ss << val;
-  ss >> parms[name];
+// print the name/value pairs to the screen
+void RtConfig::dumpConfig() {
+  map<string,RtConfigVal>::iterator i;
+  for(i=parms.begin(); i != parms.end(); i++) {
+    cout << i->first << "=" << i->second << endl;
+  }
 }
-
-// set a parm value (bool)
-void RtConfig::setParm(string name, bool val) {
-  stringstream ss;
-  string s;
-  ss << val;
-  ss >> parms[name];  
-}
-
 
 /*****************************************************************************
  * $Source$

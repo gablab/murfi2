@@ -27,19 +27,19 @@ public:
   // opens an io object and initialize it
   //  out:
   //   true (for success) or false
-  virtual bool open() = 0;
+  virtual bool open();
 
   // closes an io object
   //  out:
   //   true (for success) or false
-  virtual bool close() = 0;
+  virtual bool close();
   
 private:
 
 
   //*** private data members  ***//
 
-  bool open;
+  bool isOpen;
 
 };
 

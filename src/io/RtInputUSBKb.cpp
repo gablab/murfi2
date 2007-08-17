@@ -1,40 +1,34 @@
 /******************************************************************************
- * RtOutput.h declares a class that implements output operations 
+ * RtInputUSB.cpp defines a class that implements usb keyboard input
+ * operations
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTOUTPUT_H
-#define RTOUTPUT_H
+#include"RtInputUSBKb.h"
 
-#include"RtIO.h"
-#include"RtConfig.h"
+//*** constructors/destructors  ***//
 
-// class declaration
-class RtOutput : public RtIO {
+// default constructor
+RtInputUSBKb::RtInputUSBKb() {
 
-public:
+}
 
-  //*** constructors/destructors  ***//
-  
-  // default constructor
-  RtOutput(); 
+// destructor
+RtInputUSBKb::~RtInputUSBKb() {
 
-  // destructor
-  virtual ~RtOutput();
+}
 
-  // init
-  virtual bool init(const RtConfig &config);
+// open and start accepting input
+bool RtInputUSBKb::open() {
+  return true;
+}
 
-private:
-
-  //*** private data members  ***//
-
-
-};
-
-#endif
+// close and clean up
+bool RtInputUSBKb::close() {
+  return true;
+}
 
 /*****************************************************************************
  * $Source$

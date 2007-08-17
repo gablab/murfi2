@@ -1,42 +1,39 @@
 /******************************************************************************
- * RtInput.h declares a class that implements input operations 
+ * RtOutputfile.h declares a class that implements output operations 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTINPUT_H
-#define RTINPUT_H
+#ifndef RTOUTPUTFILE_H
+#define RTOUTPUTFILE_H
 
-#include <sigc++/sigc++.h>
-
-#include"RtIO.h"
-#include"RtData.h"
-#include"RtConfig.h"
+#include"RtOutput.h"
 
 // class declaration
-class RtInput : public RtIO {
+class RtOutputFile : public RtOutput {
 
 public:
 
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtInput(); 
+  RtOutputFile(); 
 
   // destructor
-  virtual ~RtInput();
+  virtual ~RtOutputFile();
 
-  // init
-  virtual bool init(const RtConfig &config);
+  // open and start accepting input
+  bool open();
+
+  // close and clean up
+  bool close();
+
 
 private:
 
   //*** private data members  ***//
 
-  // callback to receive the input
-  sigc::signal<void, RtData&> callback;
-  
 
 };
 

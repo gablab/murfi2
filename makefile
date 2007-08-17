@@ -6,6 +6,9 @@
 #
 ##########################################################################
 
+# os we build for
+OS=linux
+
 # project name
 export PROJECT = realtime
 
@@ -59,8 +62,9 @@ ifeq ($(MTRACE),1)
 	MTRACE_FLAG = -DMTRACE
 endif
 
+SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/analysis -I$(SRC_DIR)/display
 
-export C_INCS = -I/usr/include/$(SIGC_HOME) -I$(SRC_DIR)
+export C_INCS = -I$(SIGC_HOME) -I$(SRC_DIR) $(SUB_DIRS)
 export C_LIBS = -lm
 
 export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
@@ -68,15 +72,14 @@ export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)
 
 export C_FLAGS = -Werror -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
-	$(CINCL) `$(PKGCONFIG_CMD)`
+	$(C_INCS) `$(PKGCONFIG_CMD)`
 
-export LDFLAGS = $(PROF_FLAG) -lm
+export LDFLAGS = $(PROF_FLAG) -lm -lsigc-2.0
 
 
 ############################### SUFFIXES ##############################
 
 OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
-
 
 ############################## TARGETS ###############################
 

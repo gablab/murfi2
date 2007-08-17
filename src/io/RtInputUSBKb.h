@@ -1,42 +1,39 @@
 /******************************************************************************
- * RtInput.h declares a class that implements input operations 
+ * RtInputUSB.h declares a class that implements usb keyboard input operations 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTINPUT_H
-#define RTINPUT_H
+#ifndef RTINPUTUSBKB_H
+#define RTINPUTUSBKB_H
 
-#include <sigc++/sigc++.h>
-
-#include"RtIO.h"
-#include"RtData.h"
-#include"RtConfig.h"
+#include"RtInput.h"
 
 // class declaration
-class RtInput : public RtIO {
+class RtInputUSBKb : public RtInput {
 
 public:
 
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtInput(); 
+  RtInputUSBKb(); 
 
   // destructor
-  virtual ~RtInput();
+  virtual ~RtInputUSBKb();
 
-  // init
-  virtual bool init(const RtConfig &config);
+  // open and start accepting input
+  bool open();
+
+  // close and clean up
+  bool close();
+
 
 private:
 
   //*** private data members  ***//
 
-  // callback to receive the input
-  sigc::signal<void, RtData&> callback;
-  
 
 };
 

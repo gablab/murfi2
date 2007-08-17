@@ -1,42 +1,47 @@
 /******************************************************************************
- * RtInput.h declares a class that implements input operations 
+ * RtInputScannerImages.h declares a class that implements scanner
+ * image communication operations
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTINPUT_H
-#define RTINPUT_H
+#ifndef RTINPUTSCANNERIMAGES_H
+#define RTINPUTSCANNERIMAGES_H
 
-#include <sigc++/sigc++.h>
-
-#include"RtIO.h"
-#include"RtData.h"
+#include"RtInput.h"
 #include"RtConfig.h"
 
 // class declaration
-class RtInput : public RtIO {
+class RtInputScannerImages : public RtInput {
 
 public:
 
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtInput(); 
+  RtInputScannerImages(); 
 
   // destructor
-  virtual ~RtInput();
+  virtual ~RtInputScannerImages();
 
-  // init
-  virtual bool init(const RtConfig &config);
+  // configure
+  virtual bool init(RtConfig &config);
+
+  // open and start accepting input
+  bool open();
+
+  // close and clean up
+  bool close();
 
 private:
 
   //*** private data members  ***//
 
-  // callback to receive the input
-  sigc::signal<void, RtData&> callback;
-  
+  string tcpPort;
+  bool   saveImagesToFile;
+  string saveDirectory;
+  string saveFilestem;
 
 };
 

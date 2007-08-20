@@ -27,8 +27,14 @@ public:
   // destructor
   virtual ~RtInput();
 
-  // init
-  virtual bool init(const RtConfig &config);
+  // opens an io object and initialize it
+  //  out:
+  //   true (for success) or false
+  virtual bool open(const RtConfig &config);
+
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
 private:
 

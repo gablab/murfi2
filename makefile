@@ -65,16 +65,23 @@ endif
 SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/analysis -I$(SRC_DIR)/display
 
 export C_INCS = -I$(SIGC_HOME) -I$(SRC_DIR) $(SUB_DIRS)
-export C_LIBS = -lm
-
-export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
-export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)
 
 export C_FLAGS = -Werror -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
 	$(C_INCS) `$(PKGCONFIG_CMD)`
 
-export LDFLAGS = $(PROF_FLAG) -lm -lsigc-2.0
+# required library flags
+MATH_LIB = -lm
+DATETIME_LIB = -lboost_date_time
+THREAD_LIB = -lboost_thread
+SIGNALS_LIB = -lboost_signals -lsigc-2.0 
+
+export C_LIBS = $(MATH_LIB) $(DATETIME_LIB) $(THREAD_LIB) $(SIGNALS_LIB)
+
+export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
+export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)
+
+export LDFLAGS = $(PROF_FLAG) $(C_LIBS)
 
 
 ############################### SUFFIXES ##############################

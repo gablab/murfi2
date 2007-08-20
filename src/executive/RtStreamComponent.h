@@ -39,6 +39,11 @@ public:
   //   true (for success) or false
   virtual bool run(RtData &data) = 0;
 
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
+
+
 private:
 
   //*** private data members  ***//

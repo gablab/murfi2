@@ -24,8 +24,13 @@ public:
   // destructor
   virtual ~RtOutput();
 
-  // init
-  virtual bool init(const RtConfig &config);
+
+  // open and start accepting input
+  virtual bool open(const RtConfig &config);
+
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
 private:
 

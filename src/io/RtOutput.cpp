@@ -5,6 +5,8 @@
  * 
  *****************************************************************************/
 
+static char *VERSION = "$Id$";
+
 #include"RtOutput.h"
 
 // default constructor
@@ -18,9 +20,19 @@ RtOutput::~RtOutput() {
 }
 
 // init
-bool RtOutput::init(const RtConfig &config) {
+bool RtOutput::open(const RtConfig &config) {
+  if(!RtIO::open(config)) {
+    return false;
+  }
 
   return true;
+}
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtOutput::getVersionString() {
+  return VERSION;
 }
 
 /*****************************************************************************

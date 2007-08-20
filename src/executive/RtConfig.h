@@ -23,6 +23,7 @@ using namespace std;
 
 // class to wrap string for a single parm value
 class RtConfigVal;
+class RtConductor;
 
 // class declaration
 class RtConfig {
@@ -34,11 +35,12 @@ public:
   // default constructor
   RtConfig(); 
 
-  // constructor for bool assignment
-  RtConfig(bool b); 
+  // constructor with conductor reference
+  RtConfig(RtConductor &_conductor); 
 
   // destructor
-  ~RtConfig();
+  virtual ~RtConfig();
+
 
   //*** config loading routines ***//
 
@@ -47,6 +49,7 @@ public:
 
   // parse config file
   bool parseConfigFile();
+
 
   //*** config get/set parms ***/
 
@@ -57,17 +60,35 @@ public:
   template<class T>
   void set(string name, T tval);
 
+
+  //*** general ***//
+
+  // set the conductor
+  //  in: _conductor is a pointer to a conductor
+  void setConductor(RtConductor *_conductor);
+
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
+
+  // get the version string for the conductor reference
+  //  out: char array that represents the cvs version for the conductor
+  char *getConductorVersionString();
+
+
+  // print the name/value pairs to the screen
+  void dumpConfig(ostream &os);
+
 private:
 
   // map of config params
   map<string,RtConfigVal> parms;
 
+  // pointer to the conductor
+  RtConductor *conductor;
+
   // prints the usage info for the realtime system
   void printUsage();
-
-  // print the name/value pairs to the screen
-  void dumpConfig();
-
 };
 
 
@@ -102,13 +123,28 @@ public:
     return false;
   }
 
-  // assignment
+  // assignment lvalue
   template<class T>
   RtConfigVal &operator=(const T t) {
     stringstream ss;
     ss << t;
     ss >> val;
     return *this;
+  }
+
+  // assignment rvalue
+  template<class T>
+  operator T()  {
+    T t;
+    convert<T>(t,val);
+    return t;
+  }
+
+  // string assignment rvalue
+  operator string()  {
+    string s;
+    convert<string>(s,val);
+    return s;
   }
 
   // comparison 

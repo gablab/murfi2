@@ -8,6 +8,7 @@
 #ifndef RTIO_H
 #define RTIO_H
 
+#include"RtConfig.h"
 
 // class declaration
 class RtIO {
@@ -27,14 +28,19 @@ public:
   // opens an io object and initialize it
   //  out:
   //   true (for success) or false
-  virtual bool open();
+  virtual bool open(const RtConfig &config);
 
   // closes an io object
   //  out:
   //   true (for success) or false
   virtual bool close();
   
-private:
+  // gets the version
+  //  out:
+  //   cvs version string for this class
+  virtual char *getVersionString();
+  
+protected:
 
 
   //*** private data members  ***//

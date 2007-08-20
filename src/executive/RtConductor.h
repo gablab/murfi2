@@ -35,7 +35,7 @@ public:
   RtConductor(int argc, char **argv); 
 
   // destructor
-  ~RtConductor();
+  virtual ~RtConductor();
 
   //*** initialization routines  ***//
   
@@ -71,6 +71,10 @@ public:
   //  out:
   //   true (for success) or false
   bool run();
+
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
 private:
 

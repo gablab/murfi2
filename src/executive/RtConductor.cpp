@@ -6,6 +6,8 @@
  * 
  *****************************************************************************/
 
+static char *VERSION = "$Id$";
+
 #include"RtConductor.h"
 
 #include<iostream>
@@ -21,14 +23,31 @@ RtConductor::RtConductor() {
 
 // constructor with command line args
 RtConductor::RtConductor(int argc, char **argv) {
+  // set us as the conductor for the config
+  config.setConductor(this);
+
   // send the arguments to the configuration, check that it was okay
   if(!config.parseArgs(argc,argv)) {
     cerr << "config failed... exit" << endl;
   }
 
-  scannerImageInput.init(config);
-  scannerTriggerInput.init(config);
-  logOutput.init(config);    
+
+  // open io 
+  if(!scannerImageInput.open(config)) {
+    cerr << "ERROR: could not establish scanner image listener" << endl;
+    exit(1);
+  }
+
+  if(!scannerTriggerInput.open(config)) {
+    cerr << "ERROR: could not establish scanner trigger listener" << endl;
+    exit(1);
+  }
+  
+  if(!logOutput.open(config)) {
+    cerr << "ERROR: could not open logfile \"" 
+	 << config.get("filename") << "\"" << endl;
+    exit(1);
+  }
 
 }
 
@@ -79,6 +98,12 @@ bool RtConductor::addOutput(RtOutput &out) {
 //   true (for success) or false
 bool RtConductor::init() {
 
+  logOutput.writeConfig(config);
+
+  logOutput << "initialization completed at ";
+  logOutput.printNow();
+  logOutput << "\n";
+
   return true;
 }
 
@@ -89,7 +114,29 @@ bool RtConductor::init() {
 //   true (for success) or false
 bool RtConductor::run() {
 
+  // print start time to log file
+  logOutput << "began running at ";
+  logOutput.printNow();
+  logOutput << "\n";
+
+  
+  
+
+
+  // print end time to log file
+  logOutput << "done running at ";
+  logOutput.printNow();
+  logOutput << "\n";
+
   return true;
+}
+
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtConductor::getVersionString() {
+  return VERSION;
 }
 
 // main function for the realtime system

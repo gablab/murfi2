@@ -4,6 +4,7 @@
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
+static char *VERSION = "$Id$";
 
 #include<RtIO.h>
 
@@ -19,7 +20,7 @@ RtIO::~RtIO() {
 }
 
 // open and start accepting input
-bool RtIO::open() {
+bool RtIO::open(const RtConfig &config) {
   isOpen = true;
 
   return true;
@@ -32,6 +33,14 @@ bool RtIO::close() {
   return true;
 }
 
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtIO::getVersionString() {
+  return VERSION;
+}
+  
 
 /*****************************************************************************
  * $Source$

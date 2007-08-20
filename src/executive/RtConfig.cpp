@@ -6,19 +6,29 @@
  * 
  *****************************************************************************/
 
+static char *VERSION = "$Id$";
+
 #include"RtConfig.h"
+#include"RtConductor.h"
+
 
 #include<sstream>
 #include<iostream>
 #include<iomanip>
 #include<fstream>
+#include<cstdlib>
 
   //*** constructors/destructors  ***//
   
 RtConfigVal unset;
 
 // default constructor
-RtConfig::RtConfig() {
+RtConfig::RtConfig() : conductor(NULL){
+  // nothing to do here
+}
+
+// default constructor
+RtConfig::RtConfig(RtConductor &_conductor) : conductor(&_conductor) {
   // nothing to do here
 }
 
@@ -32,11 +42,22 @@ RtConfig::~RtConfig() {
 // parse command line args
 bool RtConfig::parseArgs(int argc, char **args) {
   int i;
-  unsigned int eqind;
+  string::size_type eqind;
   string pair, name, val;
 
   // get the executable name
   parms["execName"] = args[0];
+
+  if(argc > 1 &&
+     (  !strcmp(args[1],"-h") 
+     || !strcmp(args[1],"-help")
+     || !strcmp(args[1],"--help")
+     || !strcmp(args[1],"-?")
+     )
+     ) {
+    printUsage();
+    exit(1);    
+  }
 
   // loop over args and parse them into name/value pairs
   for(i = 1; i < argc; i++) {
@@ -57,7 +78,7 @@ bool RtConfig::parseArgs(int argc, char **args) {
 
   // dump config to screen if verbose
   if(get("verbose")==true) {
-    dumpConfig();
+    dumpConfig(cout);
   }
 
   return true;
@@ -88,6 +109,14 @@ void RtConfig::set(string name, T tval) {
   parms[name] = tval;
 }
 
+// set the conductor
+//  in: _conductor is a pointer to a conductor
+void RtConfig::setConductor(RtConductor *_conductor) {
+  conductor = _conductor;
+}
+
+
+
 //*** private functions ***//
 
 // prints the usage info for the realtime system
@@ -105,11 +134,29 @@ void RtConfig::printUsage() {
 }
 
 // print the name/value pairs to the screen
-void RtConfig::dumpConfig() {
+void RtConfig::dumpConfig(ostream &os) {
   map<string,RtConfigVal>::iterator i;
   for(i=parms.begin(); i != parms.end(); i++) {
-    cout << i->first << "=" << i->second << endl;
+    os << i->first << "=" << i->second << endl;
   }
+}
+
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtConfig::getVersionString() {
+  return VERSION;
+}
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtConfig::getConductorVersionString() {
+  if(conductor == NULL) {
+    return "null";
+  }
+  return conductor->getVersionString();
 }
 
 /*****************************************************************************

@@ -24,10 +24,14 @@ public:
   virtual ~RtInputUSBKb();
 
   // open and start accepting input
-  bool open();
+  bool init(const RtConfig &config);
 
   // close and clean up
   bool close();
+
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
 
 private:

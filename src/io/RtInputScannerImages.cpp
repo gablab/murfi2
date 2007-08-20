@@ -5,6 +5,7 @@
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
+static char *VERSION = "$Id$";
 
 #include"RtInputScannerImages.h"
   
@@ -18,16 +19,9 @@ RtInputScannerImages::~RtInputScannerImages() {
 
 }
 
-// configure
-bool RtInputScannerImages::init(RtConfig &config) {
-  RtInput::init(config);
-
-  return true;
-}
-
-// open and start accepting input
-bool RtInputScannerImages::open() {
-  RtInput::open();
+// configure and open
+bool RtInputScannerImages::open(const RtConfig &config) {
+  RtInput::open(config);
 
   return true;
 }
@@ -37,6 +31,13 @@ bool RtInputScannerImages::close() {
   RtInput::close();  
 
   return true;
+}
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtInputScannerImages::getVersionString() {
+  return VERSION;
 }
 
 

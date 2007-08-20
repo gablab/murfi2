@@ -6,6 +6,8 @@
  * 
  *****************************************************************************/
 
+static char *VERSION = "$Id$";
+
 #include"RtInputUSBKb.h"
 
 //*** constructors/destructors  ***//
@@ -21,7 +23,11 @@ RtInputUSBKb::~RtInputUSBKb() {
 }
 
 // open and start accepting input
-bool RtInputUSBKb::open() {
+bool RtInputUSBKb::init(const RtConfig &config) {
+  if(!RtInputUSBKb::init(config)) {
+    return false;
+  }
+
   return true;
 }
 
@@ -29,6 +35,14 @@ bool RtInputUSBKb::open() {
 bool RtInputUSBKb::close() {
   return true;
 }
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtInputUSBKb::getVersionString() {
+  return VERSION;
+}
+
 
 /*****************************************************************************
  * $Source$

@@ -6,6 +6,8 @@
  * 
  *****************************************************************************/
 
+static char *VERSION = "$Id$";
+
 #include"RtStream.h"
 
 // default constructor
@@ -50,6 +52,15 @@ bool RtStream::run(RtData &data) {
 
   return true;
 }
+
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtStream::getVersionString() {
+  return VERSION;
+}
+
 
 
 /*****************************************************************************

@@ -5,6 +5,8 @@
  * 
  *****************************************************************************/
 
+static char *VERSION = "$Id$";
+
 #include"RtInput.h"
 
 // default constructor
@@ -18,10 +20,18 @@ RtInput::~RtInput() {
 }
 
 // init
-bool RtInput::init(const RtConfig &config) {
+bool RtInput::open(const RtConfig &config) {
   // set up the callback
   
   return true;
+}
+
+
+// gets the version
+//  out:
+//   cvs version string for this class
+char *RtInput::getVersionString() {
+  return VERSION;
 }
 
 // callback to receive the input

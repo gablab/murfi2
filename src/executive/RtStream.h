@@ -26,7 +26,7 @@ public:
   RtStream(); 
 
   // destructor
-  ~RtStream();
+  virtual ~RtStream();
 
   //*** initialization routines  ***//
   
@@ -40,24 +40,28 @@ public:
   // initialize stream and prepare to run
   //  out:
   //   true (for success) or false
-  bool init();
+  virtual bool init();
 
   //*** operation routines  ***//
   
   // begins stream processing
   //  out:
   //   true (for success) or false
-  bool run(RtData &data);
+  virtual bool run(RtData &data);
+
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
 private:
 
   //*** private data members  ***//
 
   // vector of components objects
-  //  vector<RtStreamComponent&> components;
+  vector<RtStreamComponent> components;
 
   // here we need a way to represent serial dependencies in processing
-  
+  // maybe a graph?
 
 };
 

@@ -25,14 +25,15 @@ public:
   // destructor
   virtual ~RtInputScannerImages();
 
-  // configure
-  virtual bool init(RtConfig &config);
-
   // open and start accepting input
-  bool open();
+  bool open(const RtConfig &config);
 
   // close and clean up
   bool close();
+  
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
 private:
 

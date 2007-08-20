@@ -2,8 +2,8 @@
  * RtConfig.cpp defines a class that controls configuration of a a
  * real-time fMRI session.
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
+ * Oliver Hinds <ohinds@mit.edu> 2007-08-14
+ *
  *****************************************************************************/
 
 static char *VERSION = "$Id$";
@@ -18,8 +18,10 @@ static char *VERSION = "$Id$";
 #include<fstream>
 #include<cstdlib>
 
-  //*** constructors/destructors  ***//
-  
+#define MAX_LINE_CHARS 1000
+
+//*** constructors/destructors  ***//
+
 RtConfigVal unset;
 
 // default constructor
@@ -49,19 +51,19 @@ bool RtConfig::parseArgs(int argc, char **args) {
   parms["execName"] = args[0];
 
   if(argc > 1 &&
-     (  !strcmp(args[1],"-h") 
+     (  !strcmp(args[1],"-h")
      || !strcmp(args[1],"-help")
      || !strcmp(args[1],"--help")
      || !strcmp(args[1],"-?")
      )
      ) {
     printUsage();
-    exit(1);    
+    exit(1);
   }
 
   // loop over args and parse them into name/value pairs
   for(i = 1; i < argc; i++) {
-    
+
     // make it a string and find the equals sign delimiter
     pair.assign(args[i]);
     eqind = pair.find("=");
@@ -75,6 +77,10 @@ bool RtConfig::parseArgs(int argc, char **args) {
     // split the string into name and val and assign it
     set(pair.substr(0,eqind), pair.substr(eqind+1));
   }
+  
+  if(!parseConfigFile()) {
+    return false;
+  }
 
   // dump config to screen if verbose
   if(get("verbose")==true) {
@@ -85,7 +91,40 @@ bool RtConfig::parseArgs(int argc, char **args) {
 }
 
 // parse config file
+//  out: true (success) or false
 bool RtConfig::parseConfigFile() {
+
+  string name, val;
+  string fn = get("confFilename");
+  char trash[MAX_LINE_CHARS];
+
+  if(fn.empty()) {
+    return false;
+  }
+
+  // try to open the config file for reading
+  ifstream cf;
+  if(cf.fail()) {
+    return false;
+  }
+
+  while(!cf.eof()) {
+    // check for comments
+    if(cf.peek() == '#') {
+      cf.getline(trash,MAX_LINE_CHARS);
+      continue;
+    }
+
+    // get the name/value pair
+    cf >> name;
+    cf >> val;
+    cf.getline(trash,MAX_LINE_CHARS);
+
+    parms[name] = val;
+  }
+
+  cf.close();
+
   return true;
 }
 
@@ -94,13 +133,13 @@ bool RtConfig::parseConfigFile() {
 // get a parm value
 RtConfigVal &RtConfig::get(string name) {
   map<string,RtConfigVal>::iterator p = parms.find(name);
-  
+
   if(p == parms.end()) {
     //    return RtConfigVal::UNSET;
     return unset;
   }
 
-  return p->second; 
+  return p->second;
 }
 
 // set a parm value
@@ -123,11 +162,11 @@ void RtConfig::setConductor(RtConductor *_conductor) {
 void RtConfig::printUsage() {
   int w = 15;
 
-  cout << "usage: " << endl << get("execName") 
+  cout << "usage: " << endl << get("execName")
        << " [name1=val1 name2=val2 ...]" << endl << endl
        << "---------------------------------------------" << endl
        << "some useful flags:" << endl
-       << setiosflags(ios::left) 
+       << setiosflags(ios::left)
        << setw(w) << "conf:"     << "configuration filename" << endl
        << setw(w) << "verbose:"  << "enable/disable verbose mode" << endl
        << "---------------------------------------------" << endl;

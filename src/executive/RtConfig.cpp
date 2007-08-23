@@ -97,20 +97,23 @@ bool RtConfig::parseConfigFile() {
   string name, val;
   string fn = get("confFilename");
   char trash[MAX_LINE_CHARS];
+  char next;
 
   if(fn.empty()) {
     return false;
   }
 
   // try to open the config file for reading
-  ifstream cf;
+  ifstream cf(fn.c_str());
   if(cf.fail()) {
     return false;
   }
 
   while(!cf.eof()) {
+    next = cf.peek();
+
     // check for comments
-    if(cf.peek() == '#') {
+    if(next == '#' || next == '\n') {
       cf.getline(trash,MAX_LINE_CHARS);
       continue;
     }
@@ -118,6 +121,8 @@ bool RtConfig::parseConfigFile() {
     // get the name/value pair
     cf >> name;
     cf >> val;
+
+    // discard the rest of the line
     cf.getline(trash,MAX_LINE_CHARS);
 
     parms[name] = val;

@@ -133,10 +133,45 @@ bool RtConfig::parseConfigFile() {
   return true;
 }
 
+// validate the configuration
+// checks for valid setup of different parts of the program
+bool RtConfig::validateConfig() {
+  
+  bool valid = true;
+
+  // check logfile name
+  set("logOutput",true);
+  if(get("logFilename")==false) {
+    cerr << "WARNING: no logfile name specified" << endl;
+    set("logOutput",false);
+  }
+
+  // check scanner IP and port
+  set("receiveScannerImages",true);
+  if(get("scannerHost")==false) {
+    cerr << "WARNING: no hostname specified for receiving scanner images" 
+	 << endl;
+    set("receiveScannerImages",false);
+  } 
+
+  set("logOutput",true);
+  if((int) get("scannerPort") < 1 || (int) get("scannerPort") > 65535) {
+    cerr << "WARNING: invalid port number for receiving scanner images" 
+	 << endl;
+    set("receiveScannerImages",false);
+  }
+
+  return valid;
+}
+
 //*** config get/set parms ***/
 
 // get a parm value
-RtConfigVal &RtConfig::get(string name) {
+RtConfigVal &RtConfig::get(const char *name) {
+  if(name == NULL) {
+    return unset;
+  }
+
   map<string,RtConfigVal>::iterator p = parms.find(name);
 
   if(p == parms.end()) {
@@ -149,8 +184,31 @@ RtConfigVal &RtConfig::get(string name) {
 
 // set a parm value
 template<class T>
-void RtConfig::set(string name, T tval) {
+void RtConfig::set(const string name, T tval) {
+  set(name.c_str(), tval);
+}
+
+// set a parm value
+template<class T>
+void RtConfig::set(const char *name, T tval) {
   parms[name] = tval;
+}
+
+// print a parm value
+void RtConfig::print(const char *name) {
+  if(name == NULL) {
+    cout << "name is null";
+    return;
+  }
+
+  map<string,RtConfigVal>::iterator p = parms.find(name);
+
+  if(p == parms.end()) {
+    cout << "unset";
+    return;
+  }
+
+  cout << p->second;
 }
 
 // set the conductor

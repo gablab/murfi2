@@ -11,6 +11,8 @@
 
 #include"RtInput.h"
 #include"RtConfig.h"
+#include"RtSocketServiceServer.h"
+#include"RtSocketScannerImage.h"
 
 // class declaration
 class RtInputScannerImages : public RtInput {
@@ -26,23 +28,34 @@ public:
   virtual ~RtInputScannerImages();
 
   // open and start accepting input
-  bool open(const RtConfig &config);
+  virtual bool open(RtConfig &config);
 
   // close and clean up
   bool close();
-  
+
+  //*** socket functions ***//
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
+protected:
+
+  // validate the passed host and port
+  bool validateHostAndPort(RtConfig &config);
+
 private:
 
   //*** private data members  ***//
+  InetHostAddress *host;
+  int    port;
 
-  string tcpPort;
   bool   saveImagesToFile;
   string saveDirectory;
   string saveFilestem;
+
+  
+  RtSocketServiceServer *socketService;
 
 };
 
@@ -56,5 +69,4 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
 

@@ -27,23 +27,26 @@ RtConductor::RtConductor(int argc, char **argv) {
   config.setConductor(this);
 
   // send the arguments to the configuration, check that it was okay
-  if(!config.parseArgs(argc,argv)) {
+  if(!config.parseArgs(argc,argv) || !config.validateConfig()) {
     cerr << "config failed... exit" << endl;
+    exit(1);
   }
 
-
   // open io 
-  if(!scannerImageInput.open(config)) {
+  if(config.get("receiveScannerImages")==true 
+     && !scannerImageInput.open(config)) {
     cerr << "ERROR: could not establish scanner image listener" << endl;
     exit(1);
   }
 
-  if(!scannerTriggerInput.open(config)) {
+  if(config.get("receiveScannerTriggers")==true 
+     && !scannerTriggerInput.open(config)) {
     cerr << "ERROR: could not establish scanner trigger listener" << endl;
     exit(1);
   }
   
-  if(!logOutput.open(config)) {
+  if(config.get("logOutput")==true 
+     && !logOutput.open(config)) {
     cerr << "ERROR: could not open logfile \"" 
 	 << config.get("filename") << "\"" << endl;
     exit(1);

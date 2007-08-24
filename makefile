@@ -34,6 +34,7 @@ export PKGCONFIG = /usr/bin/pkg-config
 ################################ LIBS ################################
 
 export SIGC_HOME=/usr/include/sigc++-2.0
+export CCPP_LIBS=-lccgnu2 -lccext2 -ldl -lpthread
 
 ################################ FLAG ################################
 
@@ -66,7 +67,7 @@ SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)
 
 export C_INCS = -I$(SIGC_HOME) -I$(SRC_DIR) $(SUB_DIRS)
 
-export C_FLAGS = -Werror -Wall \
+export C_FLAGS = -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
 	$(C_INCS) `$(PKGCONFIG_CMD)`
 
@@ -75,8 +76,9 @@ MATH_LIB = -lm
 DATETIME_LIB = -lboost_date_time
 THREAD_LIB = -lboost_thread
 SIGNALS_LIB = -lboost_signals -lsigc-2.0 
+SOCKETS_LIB = $(CCPP_LIBS)
 
-export C_LIBS = $(MATH_LIB) $(DATETIME_LIB) $(THREAD_LIB) $(SIGNALS_LIB)
+export C_LIBS = $(MATH_LIB) $(DATETIME_LIB) $(THREAD_LIB) $(SIGNALS_LIB) $(SOCKETS_LIB)
 
 export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
 export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)

@@ -54,12 +54,18 @@ public:
   //*** config get/set parms ***/
 
   // get a parm value
-  RtConfigVal &get(string name);
+  RtConfigVal &get(const char *name);
 
   // set parm
   template<class T>
-  void set(string name, T tval);
+  void set(const char *name, T tval);
 
+  // set parm
+  template<class T>
+  void set(const string, T tval);
+
+  // print a parm value
+  void print(const char *name);
 
   //*** general ***//
 
@@ -78,6 +84,10 @@ public:
 
   // print the name/value pairs to the screen
   void dumpConfig(ostream &os);
+
+  // validate the configuration
+  // checks for valid setup of different parts of the program
+  bool validateConfig();
 
 private:
 
@@ -178,8 +188,9 @@ public:
 
   const bool operator==(const bool b) {
     bool bval;
-    return convert<bool>(bval,val) 
+    bool ret = convert(bval,val) 
       & bval == b;
+    return ret;
   }
 
   // outstream operator
@@ -197,9 +208,25 @@ private:
   static const double dTol = 0.00000000001;
 
   // for conversion of string types to other types
-  template <class T> inline bool convert(T& t, const string& s) {
+  template <class T> inline bool convert(T &t, const string& s) {
     istringstream iss(s);
     return !(iss >> dec >> t).fail();
+  }
+
+  // for conversion of string types to bool
+  inline bool convert(bool &b, const string& s) {    
+    if(
+       s == "0"
+       || s == "false"
+       || s == ""
+       ) {
+      b = false;
+    }
+    else {
+      b = true;
+    }
+
+    return true;
   }
 };
 

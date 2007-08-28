@@ -14,26 +14,32 @@ RtDataImage::RtDataImage() {
 }
 
 // constructor with data
-RtDataImage::RtDataImage(unsigned short *_data, vector<int> &_dims) {
-  int numPix = 0;
-  dims = _dims;
-  for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++) {
-    numPix *= *i;
-  }
-
-  memcpy(data,_data,numPix*sizeof(unsigned short));
-}
+//RtDataImage::RtDataImage(unsigned short *_data, vector<int> &_dims) {
+//  int numPix = 0;
+//  dims = _dims;
+//  for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++) {
+//    numPix *= *i;
+//  }
+//
+//  memcpy(data,_data,numPix*sizeof(unsigned short));
+//}
 
 // construct from an image info struct and some byte data
-RtDataImage::RtDataImage(ExternalImageInfo &info, char *bytes) {
-  memcpy(data,bytes,info.lImageDataLength);
-  dims[0] = info.nLin;
-  dims[1] = info.nCol;
+RtDataImage::RtDataImage(RtExternalImageInfo &_info, char *bytes) {
+  info = _info;
+  memcpy(data,bytes,info.imgDataLen);
 }
 
 // destructor
 RtDataImage::~RtDataImage() {
   delete [] data;
+}
+
+// set info struct
+//  in
+//   _info: struct to copy
+void RtDataImage::setInfo(const RtExternalImageInfo &_info) {
+  info = _info;
 }
 
 

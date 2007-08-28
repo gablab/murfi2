@@ -28,6 +28,15 @@ bool RtOutput::open(const RtConfig &config) {
   return true;
 }
 
+// prints the current time 
+void RtOutput::printNow(ostream &os) {
+  now.update();
+
+  os << now.year() << "/" << now.month() << "/" << now.day() << " "
+     << now.hour() << ":" << now.minute() << ":" << now.second()
+     << "." << now.microsec();
+}
+  
 // gets the version
 //  out:
 //   cvs version string for this class

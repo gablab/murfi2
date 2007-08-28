@@ -65,20 +65,34 @@ endif
 
 SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/analysis -I$(SRC_DIR)/display
 
-export C_INCS = -I$(SIGC_HOME) -I$(SRC_DIR) $(SUB_DIRS)
+# library flags
+
+# math
+
+MATH_LIB = -lm 
+
+GSL_INCS=-I/usr/include/gsl
+GSL_LIB=-lgsl -lgslcblas
+
+#DATETIME_LIB = -lboost_date_time
+#THREAD_LIB = -lboost_thread
+#SIGNALS_LIB = -lboost_signals -lsigc-2.0 
+#SOCKETS_LIB = $(CCPP_LIBS)
+
+#ACE_HOME=/usr/local/ACE_wrappers
+#ACE_INCS=-I$(ACE_HOME)/ace
+#ACE_LIB=-L$(ACE_HOME)/lib -lACE
+ACE_LIB=-lACE
+
+# build compiler flags
+
+export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) 
 
 export C_FLAGS = -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
 	$(C_INCS) `$(PKGCONFIG_CMD)`
 
-# required library flags
-MATH_LIB = -lm
-DATETIME_LIB = -lboost_date_time
-THREAD_LIB = -lboost_thread
-SIGNALS_LIB = -lboost_signals -lsigc-2.0 
-SOCKETS_LIB = $(CCPP_LIBS)
-
-export C_LIBS = $(MATH_LIB) $(DATETIME_LIB) $(THREAD_LIB) $(SIGNALS_LIB) $(SOCKETS_LIB)
+export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB)
 
 export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
 export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)

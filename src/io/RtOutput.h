@@ -10,6 +10,8 @@
 
 #include"RtIO.h"
 #include"RtConfig.h"
+#include"ace/Date_Time.h"
+#include<ostream>
 
 // class declaration
 class RtOutput : public RtIO {
@@ -28,6 +30,10 @@ public:
   // open and start accepting input
   virtual bool open(const RtConfig &config);
 
+  // prints the current time 
+  void printNow(ostream &os);
+  
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -36,7 +42,7 @@ private:
 
   //*** private data members  ***//
 
-
+  ACE_Date_Time now;
 };
 
 #endif

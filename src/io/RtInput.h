@@ -41,7 +41,7 @@ private:
   //*** private data members  ***//
 
   // callback to receive the input
-  sigc::signal<void, RtData&> callback;
+  //sigc::signal<void, RtData&> callback;
   
 
 };

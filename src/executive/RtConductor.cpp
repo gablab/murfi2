@@ -123,7 +123,7 @@ bool RtConductor::run() {
   logOutput << "\n";
 
   
-  
+  scannerImageInput.run();
 
 
   // print end time to log file

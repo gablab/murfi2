@@ -8,8 +8,6 @@ static char *VERSION = "$Id$";
 
 
 #include"RtOutputFile.h"
-#include "boost/date_time/posix_time/posix_time.hpp"
-using namespace boost::posix_time;
 
 // default constructor
 RtOutputFile::RtOutputFile() : RtOutput() {
@@ -51,9 +49,9 @@ bool RtOutputFile::open(RtConfig &config) {
      << "# " << getVersionString() << endl
      << "# " << config.getVersionString() << endl
      << "# " << config.getConductorVersionString() << endl
-     << "created " 
-     << to_simple_string(second_clock::local_time()) 
-     << endl << endl;
+     << "created ";
+  RtOutput::printNow(fp);
+  fp  << endl << endl;
 
   fp.flush();
 
@@ -63,12 +61,18 @@ bool RtOutputFile::open(RtConfig &config) {
 // close and clean up
 bool RtOutputFile::close() {
 
-  fp << "closed " << to_simple_string(second_clock::local_time())
-     << endl;
+  fp << "closed ";
+  RtOutput::printNow(fp);
+  fp  << endl;
 
   fp.close();
 
   return true;
+}
+
+// prints the current time to the file
+void RtOutputFile::printNow() {
+  RtOutput::printNow(fp);
 }
 
 // prints the configuration to the file
@@ -79,11 +83,6 @@ void RtOutputFile::writeConfig(RtConfig &config) {
     config.dumpConfig(fp);
     fp << "--------------" << endl << endl;
   }
-}
-
-// prints the current time 
-void RtOutputFile::printNow() {
-  fp << to_simple_string(second_clock::local_time());
 }
 
 // gets the version

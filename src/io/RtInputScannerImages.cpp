@@ -34,20 +34,9 @@ RtInputScannerImages::~RtInputScannerImages() {
 bool RtInputScannerImages::open(RtConfig &config) {
   RtInput::open(config);
 
-  // validate
-//  if(!validateHostAndPort(config)) {
-//    cerr << "ERROR: host " << config.get("scannerHost")
-//	 << ":" << config.get("scannerPort") << " is invalid." << endl;
-//    isOpen = false;
-//    return false;
-//  }
-
-  // get the host and port from the config
-  // try to open the socket
+  // get port from the config and try to open the socket
   port = config.get("scannerPort")==true 
     ? config.get("scannerPort") : DEFAULT_PORT;
-
-  //host = (char*) config.get("scannerHost");
 
   // build the address
   address.set(port,INADDR_ANY);
@@ -115,10 +104,13 @@ int RtInputScannerImages::svc() {
   while(isOpen && acceptor.accept(stream) != -1) {
 
     // read forever while we are open
-    for(; isOpen; imageNum++) {
+    for(; acceptor.isOpen && isOpen; imageNum++) {
 
       // get the info
       ei = receiveImageInfo(stream);
+//      if(!receiveImageInfo(stream,ei)) {
+//	continue;
+//      }
 
       // get the image
       img = receiveImage(stream, *ei);
@@ -162,13 +154,29 @@ int RtInputScannerImages::svc() {
 //  out
 //   image info struct on successful read (NULL otherwise)
 RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &stream) {
+  unsigned int rec;
 
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
-  for(unsigned int rec = 0; rec < sizeof(RtExternalImageInfo);
-    rec += stream.recv_n (buffer+rec, sizeof(RtExternalImageInfo)-rec));
+//  for(rec = 0; rec < sizeof(RtExternalImageInfo);
+//    rec += stream.recv_n (buffer+rec, sizeof(RtExternalImageInfo)-rec));
+  rec = stream.recv(buffer, MAXBUFSIZ);
 
-  struct RtExternalImageInfo* info = new RtExternalImageInfo(buffer);
+  // arbitrary limit
+  if(rec < 100) {
+    return false;
+  }
+
+  cout << "received img header of size " << rec << endl;
+
+  bool dumpHeader = true;
+  if(dumpHeader) {
+    FILE* hdr = fopen("/tmp/dat.hdr","wb");
+    fwrite(buffer, 1, rec, hdr);
+    fclose(hdr);
+  }
+
+  RtExternalImageInfo *info = new RtExternalImageInfo(buffer);
 
   return info;
 }

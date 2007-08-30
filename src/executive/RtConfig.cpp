@@ -148,13 +148,6 @@ bool RtConfig::validateConfig() {
 
   // check scanner IP and port
   set("receiveScannerImages",true);
-  if(get("scannerHost")==false) {
-    cerr << "WARNING: no hostname specified for receiving scanner images" 
-	 << endl;
-    set("receiveScannerImages",false);
-  } 
-
-  set("logOutput",true);
   if((int) get("scannerPort") < 1 || (int) get("scannerPort") > 65535) {
     cerr << "WARNING: invalid port number for receiving scanner images" 
 	 << endl;

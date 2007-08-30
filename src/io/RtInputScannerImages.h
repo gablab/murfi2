@@ -22,6 +22,24 @@
 //#include"RtSocketScannerImage.h"
 
 
+class RtImageAcceptor : public ACE_SOCK_Acceptor {
+public:
+
+  RtImageAcceptor() : isOpen(false) {}
+
+  int close() {
+    isOpen = false;
+    return ACE_SOCK_Acceptor::close();
+  }
+
+  int accept(ACE_SOCK_Stream &new_stream, ACE_Addr *remote_addr=0, ACE_Time_Value *timeout=0, int restart=1, int reset_new_handle=0) {
+    isOpen = true;
+    return ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout, restart, reset_new_handle=0);
+  }
+
+  bool isOpen;
+
+};
 
 // class declaration
 class RtInputScannerImages : public RtInput, public ACE_Task_Base {
@@ -93,7 +111,7 @@ private:
   unsigned short port;
 
   ACE_INET_Addr address;
-  ACE_SOCK_Acceptor acceptor;   
+  RtImageAcceptor acceptor;   
   ACE_SOCK_Stream stream;   
 
   bool   saveImagesToFile;

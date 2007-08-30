@@ -8,7 +8,7 @@
 #ifndef RTINPUT_H
 #define RTINPUT_H
 
-#include <sigc++/sigc++.h>
+//#include <sigc++/sigc++.h>
 
 #include"RtIO.h"
 #include"RtData.h"

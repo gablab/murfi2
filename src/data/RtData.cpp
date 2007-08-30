@@ -10,7 +10,7 @@
   
 // default constructor
 RtData::RtData() {
-  creationTime = microsec_clock::local_time();
+
 }
 
 // destructor

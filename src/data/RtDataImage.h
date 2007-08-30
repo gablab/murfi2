@@ -9,6 +9,8 @@
 #define RTDATAIMAGE_H
 
 #include<vector>
+#include<iostream>
+#include<iomanip>
 #include"ace/Date_Time.h"
 #include"gsl_matrix.h"
 
@@ -20,7 +22,7 @@ using namespace std;
 class RtDataImage;
 
 // info class
-class RtDataImageInfo {
+class RtDataImageInfo : public RtData {
 
 public:
   
@@ -34,9 +36,7 @@ public:
   
   // copy constructor accepting a siemens ExternalImageInfo struct
   RtDataImageInfo(const RtExternalImageInfo &info) :
-    bytesPerPix(sizeof(unsigned short)),
-    vxl2ras(gsl_matrix_calloc(4,4)),
-    ras2ref(gsl_matrix_calloc(4,4)) {
+    bytesPerPix(sizeof(unsigned short))  {
 
     // determine the dimensions
 //    if(info.nCol != rint(info.dFOVread*info.dVoxSizRead)) {// probably mosaiced
@@ -51,12 +51,16 @@ public:
 
     // calculate image size
     imgDataLen = bytesPerPix;
+    numPix = 1;
     for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++) {
       imgDataLen *= (*i);
+      numPix *= (*i);
     }
 
     // build voxel 2 RAS transformation matrix
+    vxl2ras = gsl_matrix_calloc(4,4);
     gsl_matrix_set_identity(vxl2ras);
+
     gsl_matrix_set(vxl2ras,0,0,info.dRowSag);
     gsl_matrix_set(vxl2ras,0,1,info.dRowCor);
     gsl_matrix_set(vxl2ras,0,2,info.dRowTra);
@@ -73,13 +77,10 @@ public:
     gsl_matrix_set(vxl2ras,1,3,info.dPosCor);
     gsl_matrix_set(vxl2ras,2,3,info.dPosTra);
 
-    gsl_matrix_set(vxl2ras,3,0,0);
-    gsl_matrix_set(vxl2ras,3,1,0);
-    gsl_matrix_set(vxl2ras,3,2,0);
-    gsl_matrix_set(vxl2ras,3,2,1);
-
     // build RAS 2 REF transformation matrix
+    ras2ref = gsl_matrix_calloc(4,4);
     gsl_matrix_set_identity(ras2ref);
+
 
     // image info
     slice = info.lSliceIndex;
@@ -109,6 +110,7 @@ public:
 
     // received data parms
     fromScanner = info.iDataSource == 0;
+
   }
 
   // destruct
@@ -117,6 +119,76 @@ public:
     // free matrices
     gsl_matrix_free(vxl2ras);
     gsl_matrix_free(ras2ref);
+  }
+
+  // print info members to cout 
+  void print() {
+    print(cout);
+  }
+
+  // print some of the info members
+  void print(ostream &os) {
+    int wid = 30;
+
+    os << setiosflags(ios::left);
+
+    os << "---------------------------" << endl
+       << "dumping RtDataImageInfo" << endl
+       << "---------------------------" << endl
+       << setw(wid) << "created at: " 
+       << ACE_Date_Time2SiemensTime(creationTime) << endl
+       << setw(wid) << "ndims: / dim1 / dim2... /" << numDims << ": / ";
+
+    for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++) {
+      os << *i << " / ";
+    }
+
+    os << endl
+       << setw(wid) << "imgDataLen in bytes " << imgDataLen << endl
+       << setw(wid) << "numPix" << numPix << endl
+       << setw(wid) << "bytesPerPix" << bytesPerPix << endl;
+    
+    os << setw(wid) << "vxl2ras transform";
+    for(int i = 0; i < 4; i++) {
+      if(i > 0) {
+	os << setw(wid) << "";
+      }
+      for(int j = 0; j < 4; j++) {
+	os << gsl_matrix_get(vxl2ras,i,j) << " ";
+      }
+      os << endl;
+    }
+
+    os << setw(wid) << "ras2ref transform";
+    for(int i = 0; i < 4; i++) {
+      if(i > 0) {
+	os << setw(wid) << "";
+      }
+      for(int j = 0; j < 4; j++) {
+	os << gsl_matrix_get(ras2ref,i,j) << " ";
+      }
+      os << endl;
+    }
+
+    os << setw(wid) << "slice" << slice << endl 
+       << setw(wid) << "readFOV phaseFOV" 
+       << readFOV << " " << phaseFOV << endl
+       << setw(wid) << "sliceThick" << sliceThick << endl
+       << setw(wid) << "pace" << pace << endl
+       << setw(wid) << "swapReadPhase" << swapReadPhase << endl
+       << setw(wid) << "acqNum" << acqNum << endl
+       << setw(wid) << "timeAfterStart" << timeAfterStart << endl
+       << setw(wid) << "te / tr / ti" << te << " / " 
+       << tr << " / " << ti << endl
+       << setw(wid) << "triggerTime" << triggerTime << endl
+       << setw(wid) << "time" << ACE_Date_Time2SiemensTime(time) << endl
+       << setw(wid) << "refFrameTime" 
+       << ACE_Date_Time2SiemensTime(refFrameTime) << endl
+       << setw(wid) << "reconDelay" << reconDelay << endl
+       << setw(wid) << "distCorrect2D" << distCorrect2D << endl
+       << setw(wid) << "moco" << moco << endl
+       << setw(wid) << "fromScanner" << fromScanner << endl
+       << "---------------------------" << endl;
   }
 
   // convert a siemens hhmmss.xxxxxx time string to an ACE_Date_Time type
@@ -128,6 +200,16 @@ public:
     t.second(atol(timeStr.substr(4,2).c_str()));
     t.microsec(atol(timeStr.substr(7,6).c_str()));
     return t;
+  }
+
+  // convert an ACE_Date_Time type to  siemens hhmmss.xxxxxx time string
+  static string ACE_Date_Time2SiemensTime(const ACE_Date_Time &t) {
+    char str[] = "hhmmss.xxxxxx";
+    sprintf(str,"%02ld%02ld%02ld.%06ld", 
+	    t.hour(), t.minute(), t.second(), t.microsec());
+
+    string s(str);
+    return s;
   }
 
 protected:
@@ -186,19 +268,64 @@ public:
   // default constructor
   RtDataImage(); 
 
+  // construct from raw bytes -- BE CAREFUL WITH THIS
+  RtDataImage(char *bytes, unsigned int len);
+
   // construct from  byte data and dim sizes
   //  RtDataImage(unsigned short *bytes, vector<int> &_dims); 
 
-  // construct from an image info struct and some byte data
-  RtDataImage(RtExternalImageInfo &info, char *bytes); 
+  // construct from an image info struct and some image data
+  RtDataImage(RtExternalImageInfo &info, unsigned short *data); 
+
+  // write an image to a file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  bool write(const string &filename);
 
   // set info struct
   //  in
   //   _info: struct to copy
   void setInfo(const RtExternalImageInfo &_info);
 
+  // print info about this image
+  void printInfo(ostream &os);
+
   // destructor
   virtual ~RtDataImage();
+
+  //********  methods for getting data from the image *******//
+
+  // get the acquisition number
+  string getCreationTime() const {
+    return RtDataImageInfo::ACE_Date_Time2SiemensTime(creationTime);
+  }
+
+  // get the acquisition number
+  unsigned int getAcquisitionNum() const {
+    return info.acqNum;
+  }
+
+  // get dimensions
+  int getDim(int i) {
+    return info.numDims > i && i >= 0 ? info.dims[i] : -1;
+  }
+
+  // get data size
+  unsigned int getImgDataLen() {
+    return info.imgDataLen;
+  }
+
+  // get the image info
+  RtDataImageInfo &getInfo() {
+    return info;
+  }
+
+  // get a pointer to the image data
+  unsigned short *getData() {
+    return data;
+  }
 
 private:
 

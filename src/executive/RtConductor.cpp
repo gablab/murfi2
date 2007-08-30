@@ -9,7 +9,6 @@
 static char *VERSION = "$Id$";
 
 #include"RtConductor.h"
-
 #include<iostream>
 
 //*** constructors/destructors  ***//
@@ -39,6 +38,12 @@ RtConductor::RtConductor(int argc, char **argv) {
     exit(1);
   }
 
+  if(config.get("imageDisplay")==true 
+     && !displayImage.init(config)) {
+    cerr << "ERROR: could not initialize image display" << endl;
+    exit(1);
+  }
+
   if(config.get("receiveScannerTriggers")==true 
      && !scannerTriggerInput.open(config)) {
     cerr << "ERROR: could not establish scanner trigger listener" << endl;
@@ -50,6 +55,13 @@ RtConductor::RtConductor(int argc, char **argv) {
     cerr << "ERROR: could not open logfile \"" 
 	 << config.get("filename") << "\"" << endl;
     exit(1);
+  }
+
+
+  // connect components that need connecting
+  if(config.get("imageDisplay")==true 
+     && config.get("receiveScannerImages")==true) {
+    scannerImageInput.setHandler(displayImage);
   }
 
 }
@@ -123,8 +135,23 @@ bool RtConductor::run() {
   logOutput << "\n";
 
   
-  scannerImageInput.run();
 
+  // start up the threads
+
+  if(config.get("receiveScannerImages")==true) {
+    scannerImageInput.activate();
+  }
+
+  // start the display
+  if(config.get("imageDisplay")==true) {
+    displayImage.svc();
+  }
+
+  // wait for threads to complete
+
+  if(config.get("receiveScannerImages")==true) {
+    scannerImageInput.wait();
+  }
 
   // print end time to log file
   logOutput << "done running at ";
@@ -144,7 +171,7 @@ char *RtConductor::getVersionString() {
 
 // main function for the realtime system
 // very simple
-int main(int argc, char **args) {
+int ACE_TMAIN(int argc, char **args) {
 
   RtConductor conductor(argc,args);
   

@@ -8,8 +8,7 @@
 #ifndef RTDATA_H
 #define RTDATA_H
 
-#include "boost/date_time/posix_time/posix_time.hpp"
-using namespace boost::posix_time;
+#include "ace/Date_Time.h"
 
 // class declaration
 class RtData {
@@ -28,7 +27,7 @@ protected:
 
   //*** data members  ***//
   
-  ptime creationTime;
+  ACE_Date_Time creationTime;
 
 };
 

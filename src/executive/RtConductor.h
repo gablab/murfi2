@@ -12,6 +12,7 @@
 #include<vector>
 
 #include"RtConfig.h"
+#include"RtDisplayImage.h"
 #include"RtInput.h"
 #include"RtInputScannerImages.h"
 #include"RtInputUSBKb.h"
@@ -88,6 +89,9 @@ private:
 
   // output object to log 
   RtOutputFile logOutput;
+
+  // object to display scanner images
+  RtDisplayImage displayImage;
 
   // configuration object
   RtConfig config;

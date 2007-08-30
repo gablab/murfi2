@@ -11,11 +11,13 @@ default:
 	cd ./executive && $(MAKE)
 	cd ./io &&        $(MAKE)
 	cd ./data &&      $(MAKE)
+	cd ./display &&      $(MAKE)
 
 clean: 
 	cd ./executive && $(MAKE) clean
 	cd ./io &&        $(MAKE) clean
 	cd ./data &&      $(MAKE) clean
+	cd ./display &&      $(MAKE) clean
 
 
 

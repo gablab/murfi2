@@ -12,8 +12,11 @@
 #include"RtInput.h"
 #include"RtConfig.h"
 #include"RtExternalSenderImageInfo.h"
+#include"RtDataImage.h"
+#include"ace/Task.h"
 #include"ace/SOCK_Stream.h"
-#include"ace/SOCK_Connector.h"
+#include"ace/SOCK_Acceptor.h"
+#include"ace/Asynch_IO.h"
 
 //#include"RtSocketServiceServer.h"
 //#include"RtSocketScannerImage.h"
@@ -21,7 +24,7 @@
 
 
 // class declaration
-class RtInputScannerImages : public RtInput {
+class RtInputScannerImages : public RtInput, public ACE_Task_Base {
 
 public:
 
@@ -36,11 +39,14 @@ public:
   // open and start accepting input
   virtual bool open(RtConfig &config);
 
+  // set the handler that should receive new data
+  bool setHandler(ACE_Handler &handler);
+
   // close and clean up
   bool close();
 
   // run the scanner input
-  bool run(); 
+  virtual int svc(); 
 
   // get the version
   //  out: char array that represents the cvs version
@@ -66,18 +72,15 @@ protected:
   unsigned short *receiveImage(ACE_SOCK_Stream &stream, 
 			       const RtExternalImageInfo &info);
 
-  // print info about a received image
+  // saves an image
   //  in
-  //   info:   the last read image info struct
-  void displayImageInfo(const RtExternalImageInfo &info);
+  //   img: image to save
+  bool saveImage(RtDataImage &img);
 
-  // write a received image to a file
+  // sends an image to a event handler
   //  in
-  //   img:  pixel data
-  //   info: info struct for the image
-  //  out
-  //   success or failure
-  bool writeImage(unsigned short *img, const RtExternalImageInfo &info);
+  //   img: image to send
+  bool sendImageToReader(RtDataImage &img);
 
   // validate the passed host and port
   bool validateHostAndPort(RtConfig &config);
@@ -90,14 +93,16 @@ private:
   unsigned short port;
 
   ACE_INET_Addr address;
-  ACE_SOCK_Connector connector;   
+  ACE_SOCK_Acceptor acceptor;   
   ACE_SOCK_Stream stream;   
 
   bool   saveImagesToFile;
-  string saveDirectory;
+  string saveDir;
   string saveFilestem;
+  string saveFileext;
 
-  
+  ACE_Asynch_Read_Stream reader;
+  bool readerOpen;
 };
 
 #endif

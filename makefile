@@ -84,15 +84,18 @@ GSL_LIB=-lgsl -lgslcblas
 #ACE_LIB=-L$(ACE_HOME)/lib -lACE
 ACE_LIB=-lACE
 
+GLUT_LIB=-lglut
+
 # build compiler flags
 
 export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) 
 
 export C_FLAGS = -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
-	$(C_INCS) `$(PKGCONFIG_CMD)`
+	$(C_INCS) 
+#`$(PKGCONFIG_CMD)`
 
-export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB)
+export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB)
 
 export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
 export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)

@@ -108,9 +108,9 @@ int RtInputScannerImages::svc() {
 
       // get the info
       ei = receiveImageInfo(stream);
-//      if(!receiveImageInfo(stream,ei)) {
-//	continue;
-//      }
+      if(ei == NULL) {
+	continue;
+      }
 
       // get the image
       img = receiveImage(stream, *ei);
@@ -176,7 +176,7 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
     fclose(hdr);
   }
 
-  RtExternalImageInfo *info = new RtExternalImageInfo(buffer);
+  RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
 
   return info;
 }

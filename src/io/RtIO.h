@@ -8,10 +8,11 @@
 #ifndef RTIO_H
 #define RTIO_H
 
+#include"RtSignalThrower.h"
 #include"RtConfig.h"
 
 // class declaration
-class RtIO {
+class RtIO : public RtSignalThrower {
 
 public:
 

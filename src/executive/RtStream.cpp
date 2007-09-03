@@ -17,7 +17,7 @@ RtStream::RtStream() {
 
 // destructor
 RtStream::~RtStream() {
-
+  close();
 }
 
 

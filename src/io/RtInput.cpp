@@ -27,6 +27,18 @@ bool RtInput::open(const RtConfig &config) {
 }
 
 
+// closes both the io object and task base
+//  out:
+//   true (for success) or false
+bool RtInput::close() {
+
+  // close super classes
+  ACE_Task_Base::close();
+
+  return RtIO::close();
+}
+
+
 // gets the version
 //  out:
 //   cvs version string for this class
@@ -34,9 +46,6 @@ char *RtInput::getVersionString() {
   return VERSION;
 }
 
-// callback to receive the input
-// sigc::signal<void, RtData&> callback;
-  
 
 /*****************************************************************************
  * $Source$

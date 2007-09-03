@@ -9,6 +9,7 @@
 #define RTDISPLAYIMAGE_H
 
 #include"RtDataImage.h"
+#include"RtOutput.h"
 #include"RtConfig.h"
 #include"glutmaster/glutWindow.h"
 #include"glutmaster/glutMaster.h"
@@ -17,7 +18,7 @@
 #include"ace/Asynch_IO.h"
 
 // class declaration
-class RtDisplayImage : 
+class RtDisplayImage : public RtOutput, 
   public GlutWindow, public ACE_Task_Base, public ACE_Service_Handler {
 
 public:

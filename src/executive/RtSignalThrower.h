@@ -1,55 +1,58 @@
 /******************************************************************************
- * RtInput.h declares a class that implements input operations 
+ * RtSignalThrower.h is the header for an abstract class that 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTINPUT_H
-#define RTINPUT_H
+#ifndef RTSIGNALTHROWER_H
+#define RTSIGNALTHROWER_H
 
-//#include <sigc++/sigc++.h>
+#include"RtStreamComponent.h"
 
-#include"ace/Task.h"
-
-#include"RtIO.h"
-#include"RtData.h"
-#include"RtConfig.h"
-
-// class declaration
-class RtInput : public RtIO, public ACE_Task_Base {
+class RtSignalThrower {
 
 public:
 
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtInput(); 
+  RtSignalThrower() {
+    sigNum = SIGUNUSED;
+  }
+  
+  // constructor w/ signum
+  RtSignalThrower(int _sigNum) : sigNum(_sigNum) {
+
+  }
 
   // destructor
-  virtual ~RtInput();
+  virtual ~RtSignalThrower() {
 
-  // opens an io object and initialize it
-  //  out:
-  //   true (for success) or false
-  virtual bool open(const RtConfig &config);
+  }
 
-  // closes both the io object and task base
-  //  out:
-  //   true (for success) or false
-  virtual bool close();
+  // set the signal number to throw
+  void setSigNum(int _sigNum) {
+    sigNum = _sigNum;
+  }
+
+  // get the signal number
+  int getSigNum() {
+    return sigNum;
+  }
 
   // get the version
   //  out: char array that represents the cvs version
-  virtual char *getVersionString();
+  virtual char *getVersionString() {
+    return "$Id$";
+  }
 
-private:
+protected:
 
   //*** private data members  ***//
 
-  // callback to receive the input
-  //sigc::signal<void, RtData&> callback;
-  
+  // signal number to be thrown
+  int sigNum;
 
 };
 

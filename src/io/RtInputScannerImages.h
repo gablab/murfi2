@@ -13,36 +13,39 @@
 #include"RtConfig.h"
 #include"RtExternalSenderImageInfo.h"
 #include"RtDataImage.h"
-#include"ace/Task.h"
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Acceptor.h"
 #include"ace/Asynch_IO.h"
 
-//#include"RtSocketServiceServer.h"
-//#include"RtSocketScannerImage.h"
-
-
+// acceptor to allow connections from the scanner 
 class RtImageAcceptor : public ACE_SOCK_Acceptor {
 public:
-
+  
   RtImageAcceptor() : isOpen(false) {}
 
+  // called when connection is closed
   int close() {
     isOpen = false;
     return ACE_SOCK_Acceptor::close();
   }
 
-  int accept(ACE_SOCK_Stream &new_stream, ACE_Addr *remote_addr=0, ACE_Time_Value *timeout=0, int restart=1, int reset_new_handle=0) {
+  // accept a new connection
+  // just pass all the arguments along and set isOpen true
+  int accept(ACE_SOCK_Stream &new_stream, ACE_Addr *remote_addr=0, 
+	     ACE_Time_Value *timeout=0, int restart=1, 
+	     int reset_new_handle=0) {
     isOpen = true;
-    return ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout, restart, reset_new_handle=0);
+    return ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout, 
+				     restart, reset_new_handle=0);
   }
 
+  // keep track if we are currently open
   bool isOpen;
 
 };
 
-// class declaration
-class RtInputScannerImages : public RtInput, public ACE_Task_Base {
+// controls input operations to receive scanner images
+class RtInputScannerImages : public RtInput {
 
 public:
 
@@ -58,7 +61,7 @@ public:
   virtual bool open(RtConfig &config);
 
   // set the handler that should receive new data
-  bool setHandler(ACE_Handler &handler);
+  //  bool setHandler(ACE_Handler &handler);
 
   // close and clean up
   bool close();
@@ -100,17 +103,12 @@ protected:
   //   img: image to send
   bool sendImageToReader(RtDataImage &img);
 
-  // validate the passed host and port
-  bool validateHostAndPort(RtConfig &config);
-
 private:
 
   //*** private data members  ***//
 
-  string         host;
+  // port to listen on
   unsigned short port;
-
-  ACE_INET_Addr address;
   RtImageAcceptor acceptor;   
   ACE_SOCK_Stream stream;   
 
@@ -120,6 +118,7 @@ private:
   string saveFileext;
 
   ACE_Asynch_Read_Stream reader;
+
   bool readerOpen;
 };
 

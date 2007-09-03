@@ -10,6 +10,10 @@
 #define RTCONDUCTOR_H
 
 #include<vector>
+#include<queue>
+
+#include"ace/Reactor.h"
+#include"ace/Event_Handler.h"
 
 #include"RtConfig.h"
 #include"RtDisplayImage.h"
@@ -19,11 +23,12 @@
 #include"RtOutput.h"
 #include"RtOutputFile.h"
 #include"RtStream.h"
+#include"RtSignalThrower.h"
 
 using namespace std;
 
 // class declaration
-class RtConductor {
+class RtConductor : public ACE_Event_Handler {
 
 public:
 
@@ -73,6 +78,22 @@ public:
   //   true (for success) or false
   bool run();
 
+  // handle signals appropriately
+  // this method handles errors as well as signals related to normal operation
+  int handle_signal(int sigNum, siginfo_t *sInfo=0, ucontext_t *uContext=0);
+
+  // handle completetion events
+  int handle_input(ACE_HANDLE handle = ACE_INVALID_HANDLE);
+
+  // handle exceptions appropriately
+  // note that handles errors as well as signals related to normal operation
+  // we are notify()ed of exceptions when streams are done or when new data is
+  // available
+  int handle_exception(ACE_HANDLE handle = ACE_INVALID_HANDLE);
+
+  // handle exit of the process
+  int handle_exit(ACE_Process *proc);
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -82,29 +103,39 @@ private:
   //*** private data members  ***//
 
   // input object that handles reception of scanner images
-  RtInputScannerImages scannerImageInput;
-
-  // input object that handles reception of scanner triggers for external sync
-  RtInputUSBKb scannerTriggerInput;
+//  RtInputScannerImages inputScannerImages;
+//
+//  // input object that handles reception of scanner triggers for external sync
+//  RtInputUSBKb inputScannerTriggers;
 
   // output object to log 
-  RtOutputFile logOutput;
+  RtOutputFile* outputLog;
 
   // object to display scanner images
-  RtDisplayImage displayImage;
+  //  RtDisplayImage outputImageDisplay;
 
   // configuration object
   RtConfig config;
 
+  // these vectors store the objects that handle data
+  // note that their indexing is related to the signal number they throw when 
+  // processing is complete. the index is related by the START_CODE_?????
+  // static class members
+  
   // vector of input objects
-  vector<RtInput> inputs;
+  vector<RtInput*> inputs;
+  static const unsigned int START_CODE_INPUTS = 0;
 
   // vector of stream objects
-  vector<RtStream> streams;
+  vector<RtStream*> streams;
+  static const unsigned int START_CODE_STREAMS = 8192;
 
   // vector of output objects
-  vector<RtOutput> outputs;
+  vector<RtOutput*> outputs;
+  static const unsigned int START_CODE_OUTPUTS = 32768;
 
+  // queue for caught signals 
+  queue<int> sigQueue;
 };
 
 #endif

@@ -12,18 +12,22 @@ static char *VERSION = "$Id$";
 
 // defaults
 static const int    DEFAULT_PORT = 15000;
-//static const char*  DEFAULT_HOST = "localhost";
 static const char*  DEFAULT_SAVEDIR  = "/tmp";
 static const char*  DEFAULT_SAVESTEM = "img";
 static const char*  DEFAULT_SAVEEXT  = "dat";
 
-#define MAXBUFSIZ 256*256*256*2
+// increase this size for highres acquisitions
+#define MAXBUFSIZ 256*256*256*2 
 static char buffer[MAXBUFSIZ];
 
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
-                 :  port(DEFAULT_PORT), readerOpen(false) {
-
+  :  port(DEFAULT_PORT), 
+     saveDir(DEFAULT_SAVEDIR),
+     saveFilestem(DEFAULT_SAVESTEM),
+     saveFileext(DEFAULT_SAVEEXT),
+     readerOpen(false) {
+  // nothing to do
 }
 
 // destructor
@@ -38,9 +42,9 @@ bool RtInputScannerImages::open(RtConfig &config) {
   port = config.get("scannerPort")==true 
     ? config.get("scannerPort") : DEFAULT_PORT;
 
-  // build the address
-  address.set(port,INADDR_ANY);
-  if(acceptor.open(address) == -1) {
+  // build the address  
+  ACE_INET_Addr address(port,INADDR_ANY);
+  if(acceptor.open(address,1) == -1) {
     cout << "failed to open" << endl;
     isOpen = false;
     return false;
@@ -52,12 +56,17 @@ bool RtInputScannerImages::open(RtConfig &config) {
   if(config.get("saveImages")==true) {
     saveImagesToFile = true;
     
-    saveDir = config.get("imageDir")==true 
-      ? (char*) config.get("imageDir") :  DEFAULT_SAVEDIR;
-    saveFilestem = config.get("imageStem")==true 
-      ? (char*) config.get("imageStem") : DEFAULT_SAVESTEM;
-    saveFileext = config.get("imageExt")==true 
-      ? (char*) config.get("imageExt") : DEFAULT_SAVEEXT;
+    if(config.get("imageDir")==true) {
+      saveDir = (char*) config.get("imageDir");
+    }
+
+    if(config.get("imageStem")==true) {
+      saveFilestem = (char*) config.get("imageStem");
+    }
+
+    if(config.get("imageExt")==true) {
+      saveFileext = (char*) config.get("imageExt");
+    }
   }
 
   return true;
@@ -67,19 +76,21 @@ bool RtInputScannerImages::open(RtConfig &config) {
 // set the handler that should receive new data
 //  in
 //   handler: handler to send the image to after we receive it
-bool RtInputScannerImages::setHandler(ACE_Handler &handler) {
-
-  if(reader.open(handler) == -1) {
-    cerr << "ERROR: could not register handler to accept scanner images" 
-	 << endl;
-    return readerOpen = false;
-  }
-
-  return readerOpen = true;
-}
+//bool RtInputScannerImages::setHandler(ACE_Handler &handler) {
+//
+//  if(reader.open(handler) == -1) {
+//    cerr << "ERROR: could not register a handler for scanner images" 
+//	 << endl;
+//    return readerOpen = false;
+//  }
+//
+//  return readerOpen = true;
+//}
 
 
 // close and clean up
+//  out
+//   success flag
 bool RtInputScannerImages::close() {
 
   if(isOpen) {
@@ -92,7 +103,6 @@ bool RtInputScannerImages::close() {
 }
 
 // run the scanner input
-// PLACEHOLDER FOR A BETTER THING TO BE IMPLEMENTED
 int RtInputScannerImages::svc() {
   RtExternalImageInfo *ei;
   unsigned short *img;
@@ -101,45 +111,53 @@ int RtInputScannerImages::svc() {
   int imageNum = 0;
 
   // continuously try to accept connections
-  while(isOpen && acceptor.accept(stream) != -1) {
+  for(; isOpen && acceptor.accept(stream) != -1; imageNum++) {
 
-    // read forever while we are open
-    for(; acceptor.isOpen && isOpen; imageNum++) {
-
-      // get the info
-      ei = receiveImageInfo(stream);
-      if(ei == NULL) {
-	continue;
-      }
-
-      // get the image
-      img = receiveImage(stream, *ei);
-
-      // build data class
-      rti = new RtDataImage(*ei,img);
-
-      // print and save
-      rti->printInfo(cout);
-
-      if(saveImagesToFile) {
-	saveImage(*rti);
-      }
-
-      // signal
-      if(readerOpen) {
-	sendImageToReader(*rti);
-      }
-
-      // clean up
-      delete ei;
-      delete [] img;
-      delete rti;
+    // get the info
+    ei = receiveImageInfo(stream);
+    if(ei == NULL) {
+      continue;
     }
+      
+    // DEBUGGING
+    ei->iAcquisitionNumber = imageNum++;
 
+    // get the image
+    img = receiveImage(stream, *ei);
+
+    // build data class
+    rti = new RtDataImage(*ei,img);
+
+    // signal that we got an image
+    cerr << "raising signal number " << sigNum << endl;
+    raise(sigNum);
+
+//    // print and save
+//    rti->printInfo(cout);
+//
+//    if(saveImagesToFile) {
+//      saveImage(*rti);
+//    }
+//
+//    // signal
+//    if(readerOpen) {
+//      sendImageToReader(*rti);
+//    }
+
+    // clean up
+    delete ei;
+    delete [] img;
+
+      
+    delete rti;
+
+    // close the stream (scanner connects anew for each image)
+    stream.close();
   }
   cerr << "ERROR: could not open connection to accept "
        << "images from the scanner on port " 
-       << address.get_port_number() << endl;
+       << port << endl;
+    //<< "errno: " << ACE_OS::last_error();
   isOpen = false;
 
 
@@ -158,9 +176,9 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
-//  for(rec = 0; rec < sizeof(RtExternalImageInfo);
-//    rec += stream.recv_n (buffer+rec, sizeof(RtExternalImageInfo)-rec));
-  rec = stream.recv(buffer, MAXBUFSIZ);
+  for(rec = 0; rec < EXTERNALSENDERSIZEOF;
+    rec += stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF-rec));
+//  rec = stream.recv(buffer, MAXBUFSIZ);
 
   // arbitrary limit
   if(rec < 100) {
@@ -217,6 +235,7 @@ bool RtInputScannerImages::saveImage(RtDataImage &img) {
 //  in
 //   img: image to send
 bool RtInputScannerImages::sendImageToReader(RtDataImage &img) {
+
   // make a message block
   ACE_Message_Block mb(sizeof(RtDataImageInfo)+img.getImgDataLen());
   memcpy(mb.wr_ptr(),&img.getInfo(),sizeof(RtDataImageInfo));
@@ -226,22 +245,6 @@ bool RtInputScannerImages::sendImageToReader(RtDataImage &img) {
 	 << endl;
     return readerOpen = false;
   }
-}
-
-
-
-// validate the passed host and port
-bool RtInputScannerImages::validateHostAndPort(RtConfig &config) {
-
-  // host
-  if(inet_addr((char*) config.get("scannerHost")) < 1) {
-    return false;
-  }
-
-  // port
-//  if(port < 0 || port > 65535) {
-//    return false;
-//  }
 
   return true;
 }

@@ -11,12 +11,15 @@
 
 #include<vector>
 
+#include"ace/Stream.h"
+
+#include"RtSignalThrower.h"
 #include"RtStreamComponent.h"
 
 using namespace std;
 
 // class declaration
-class RtStream {
+class RtStream : public ACE_Stream<ACE_MT_SYNCH>, public RtSignalThrower {
 
 public:
 

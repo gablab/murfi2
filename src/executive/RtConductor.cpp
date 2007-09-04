@@ -21,7 +21,7 @@ RtConductor::RtConductor() {
 
 // constructor with command line args
 RtConductor::RtConductor(int argc, char **argv) {
-  int curSigNum;
+  int curCodeNum;
 
   // set us as the conductor for the config
   config.setConductor(this);
@@ -63,22 +63,24 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   // attach signal numbers to inputs
-  curSigNum = START_CODE_INPUTS;
+  curCodeNum = START_CODE_INPUTS;
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end();
-	curSigNum++, i++) {
-    (*i)->setSigNum(curSigNum);
-    ACE_Reactor::instance()->register_handler(curSigNum, this);
+	curCodeNum++, i++) {
+    (*i)->setConductor(this);
+    (*i)->setCodeNum(curCodeNum);
+    //ACE_Reactor::instance()->register_handler(curCodeNum, this);
   }
 
 
   // prepare streams
 
   // attach signal numbers to streams
-  curSigNum = START_CODE_STREAMS;
+  curCodeNum = START_CODE_STREAMS;
   for(vector<RtStream*>::iterator i = streams.begin(); i != streams.end();
-	curSigNum++, i++) {
-    (*i)->setSigNum(curSigNum);
-    ACE_Reactor::instance()->register_handler(curSigNum, this);
+	curCodeNum++, i++) {
+    (*i)->setConductor(this);
+    (*i)->setCodeNum(curCodeNum);
+    //ACE_Reactor::instance()->register_handler(curCodeNum, this);
   }
 
 
@@ -111,11 +113,12 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   // attach signal numbers to outputs
-  curSigNum = START_CODE_OUTPUTS;
+  curCodeNum = START_CODE_OUTPUTS;
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end();
-	curSigNum++, i++) {
-    (*i)->setSigNum(curSigNum);
-    ACE_Reactor::instance()->register_handler(curSigNum, this);
+	curCodeNum++, i++) {
+    (*i)->setConductor(this);
+    (*i)->setCodeNum(curCodeNum);
+    //ACE_Reactor::instance()->register_handler(curCodeNum, this);
   }
 
 
@@ -220,76 +223,35 @@ bool RtConductor::run() {
 
   // wait for threads to complete
 
+  // start up the threads that listen for input
+  for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
+    (*i)->wait();
+  }
+
 //  if(config.get("receiveScannerImages")==true) {
 //    scannerImageInput.wait();
 //  }
 
   // run the event loop
-  ACE_Reactor::instance()->run_reactor_event_loop();
+  //ACE_Reactor::instance()->run_reactor_event_loop();
 
   return true;
 }
 
+// receive a code signaling completetion of data input or processing
+void RtConductor::receiveCode(unsigned int code) {
 
-// handle signals appropriately
-// this method handles errors as well as signals related to normal operation
-int RtConductor::handle_signal(int sigNum, siginfo_t *sInfo,
-			       ucontext_t *uContext) {
-  // look for signals that are errors
-  switch(sigNum) {
-  case SIGHUP:
-  case SIGINT:
-  case SIGQUIT:
-  case SIGILL:
-  case SIGABRT:
-  case SIGBUS:
-  case SIGFPE:
-  case SIGKILL:
-  case SIGSEGV:
-  case SIGALRM:
-  case SIGTERM:
-  case SIGSTKFLT:
-  case SIGPWR:
-  case SIGSYS:
-
-    // stop the loop and call for cleanup
-    ACE_Reactor::instance()->end_reactor_event_loop();
-
-    return 1;
-  }
-
-  // we threw the signal under normal operation, store it in our queue and
-  // notify the exception handler
-  sigQueue.push(sigNum);
-  ACE_Reactor::instance()->notify(this);
-
-  return 0;
-}
-
-// handle completetion events
-int RtConductor::handle_input(ACE_HANDLE handle) {
-  
-  return 0;
-}
-
-// handle exceptions appropriately
-// note that handles errors as well as signals related to normal operation
-// we are notify()ed of exceptions when streams are done or when new data is
-// available
-int RtConductor::handle_exception(ACE_HANDLE handle) {
-  // pop off the queue
-  unsigned int sigNum = sigQueue.front();
-  sigQueue.pop();
+  // NEED TO MUTEX THIS!
 
   // handle based on the thrower
-  if(sigNum < START_CODE_INPUTS) { // shouldn't get here
-    cerr << "WARNING: caught unknown signal " << sigNum << endl;
-    return 1;
+  if(code < START_CODE_INPUTS) { // shouldn't get here
+    cerr << "WARNING: caught unknown signal " << code << endl;
+    return;
   }
-  else if(sigNum < START_CODE_STREAMS) { // this is an input
+  else if(code < START_CODE_STREAMS) { // this is an input
     cerr << "caught a ready signal from an input" << endl;
   }
-  else if(sigNum < START_CODE_OUTPUTS) { // this is a stream
+  else if(code < START_CODE_OUTPUTS) { // this is a stream
     cerr << "caught a ready signal from a stream" << endl;
 
   }
@@ -297,18 +259,87 @@ int RtConductor::handle_exception(ACE_HANDLE handle) {
     cerr << "caught a ready signal from an output" << endl;
   }
 
-  return 0;
 }
 
-// handle exit of the process
-int RtConductor::handle_exit(ACE_Process *proc) {
-  // print end time to log file
-  (*outputLog) << "done running at ";
-  (*outputLog).printNow();
-  (*outputLog) << "\n";
-
-  return 0;
-}
+//// handle signals appropriately
+//// this method handles errors as well as signals related to normal operation
+//int RtConductor::handle_signal(int sigNum, siginfo_t *sInfo,
+//			       ucontext_t *uContext) {
+//  // look for signals that are errors
+//  switch(sigNum) {
+//  case SIGHUP:
+//  case SIGINT:
+//  case SIGQUIT:
+//  case SIGILL:
+//  case SIGABRT:
+//  case SIGBUS:
+//  case SIGFPE:
+//  case SIGKILL:
+//  case SIGSEGV:
+//  case SIGALRM:
+//  case SIGTERM:
+//  case SIGSTKFLT:
+//  case SIGPWR:
+//  case SIGSYS:
+//
+//    // stop the loop and call for cleanup
+//    ACE_Reactor::instance()->end_reactor_event_loop();
+//
+//    return 1;
+//  }
+//
+//  // we threw the signal under normal operation, store it in our queue and
+//  // notify the exception handler
+//  sigQueue.push(sigNum);
+//  ACE_Reactor::instance()->notify(this);
+//
+//  return 0;
+//}
+//
+//// handle completetion events
+//int RtConductor::handle_input(ACE_HANDLE handle) {
+//  
+//  return 0;
+//}
+//
+//// handle exceptions appropriately
+//// note that handles errors as well as signals related to normal operation
+//// we are notify()ed of exceptions when streams are done or when new data is
+//// available
+//int RtConductor::handle_exception(ACE_HANDLE handle) {
+//  // pop off the queue
+//  unsigned int sigNum = sigQueue.front();
+//  sigQueue.pop();
+//
+//  // handle based on the thrower
+//  if(sigNum < START_CODE_INPUTS) { // shouldn't get here
+//    cerr << "WARNING: caught unknown signal " << sigNum << endl;
+//    return 1;
+//  }
+//  else if(sigNum < START_CODE_STREAMS) { // this is an input
+//    cerr << "caught a ready signal from an input" << endl;
+//  }
+//  else if(sigNum < START_CODE_OUTPUTS) { // this is a stream
+//    cerr << "caught a ready signal from a stream" << endl;
+//
+//  }
+//  else { // this is an output
+//    cerr << "caught a ready signal from an output" << endl;
+//  }
+//
+//  return 0;
+//}
+//
+//// handle exit of the process
+//int RtConductor::handle_exit(ACE_Process *proc) {
+//  // print end time to log file
+//  (*outputLog) << "done running at ";
+//  (*outputLog).printNow();
+//  (*outputLog) << "\n";
+//
+//  return 0;
+//}
+//
 
 // gets the version
 //  out:

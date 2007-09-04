@@ -26,12 +26,18 @@ RtInputScannerImages::RtInputScannerImages()
      saveDir(DEFAULT_SAVEDIR),
      saveFilestem(DEFAULT_SAVESTEM),
      saveFileext(DEFAULT_SAVEEXT),
-     readerOpen(false) {
+     toBeDeleted(received.begin()) {
   // nothing to do
 }
 
 // destructor
 RtInputScannerImages::~RtInputScannerImages() {
+
+  // delete all remaining received images
+  for(; toBeDeleted != received.end(); toBeDeleted++) {
+    delete *toBeDeleted;
+  }
+
 }
 
 // configure and open
@@ -128,9 +134,15 @@ int RtInputScannerImages::svc() {
     // build data class
     rti = new RtDataImage(*ei,img);
 
+    // append this to a vector of gathered images
+    receivedImages.push_back(rti);
+
     // signal that we got an image
-    cerr << "raising signal number " << sigNum << endl;
-    raise(sigNum);
+    cerr << "sending event with code number " << codeNum << endl;
+
+    sendCode();
+
+    //    raise(sigNum);
 
 //    // print and save
 //    rti->printInfo(cout);
@@ -149,7 +161,7 @@ int RtInputScannerImages::svc() {
     delete [] img;
 
       
-    delete rti;
+    //delete rti;
 
     // close the stream (scanner connects anew for each image)
     stream.close();
@@ -162,6 +174,18 @@ int RtInputScannerImages::svc() {
 
 
   return 0;
+}
+
+
+// deleted some received images from the heap
+//  in
+//   deleteNum: maximum number of images to delete
+void RtInputScannerImages::deleteReceivedImages(int deleteNum) {
+  
+  for(int i = 0; i < deleteNum && toBeDeleted != received.end(); 
+      i++, toBeDeleted++) {
+    delete *toBeDeleted;
+  }
 }
 
 
@@ -178,11 +202,10 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   // ADD ERROR HANDLING HERE!!!
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;
     rec += stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF-rec));
-//  rec = stream.recv(buffer, MAXBUFSIZ);
 
   // arbitrary limit
   if(rec < 100) {
-    return false;
+    return NULL;
   }
 
   cout << "received img header of size " << rec << endl;
@@ -231,23 +254,23 @@ bool RtInputScannerImages::saveImage(RtDataImage &img) {
   return img.write(fname);
 }
 
-// sends an image to a event handler
-//  in
-//   img: image to send
-bool RtInputScannerImages::sendImageToReader(RtDataImage &img) {
-
-  // make a message block
-  ACE_Message_Block mb(sizeof(RtDataImageInfo)+img.getImgDataLen());
-  memcpy(mb.wr_ptr(),&img.getInfo(),sizeof(RtDataImageInfo));
-  memcpy(mb.wr_ptr()+sizeof(RtDataImageInfo),img.getData(),img.getImgDataLen());
-  if(reader.read(mb, mb.space()) != 0) {
-    cerr << "ERROR: handler failed to read scanner images" 
-	 << endl;
-    return readerOpen = false;
-  }
-
-  return true;
-}
+//// sends an image to a event handler
+////  in
+////   img: image to send
+//bool RtInputScannerImages::sendImageToReader(RtDataImage &img) {
+//
+//  // make a message block
+//  ACE_Message_Block mb(sizeof(RtDataImageInfo)+img.getImgDataLen());
+//  memcpy(mb.wr_ptr(),&img.getInfo(),sizeof(RtDataImageInfo));
+//  memcpy(mb.wr_ptr()+sizeof(RtDataImageInfo),img.getData(),img.getImgDataLen());
+//  if(reader.read(mb, mb.space()) != 0) {
+//    cerr << "ERROR: handler failed to read scanner images" 
+//	 << endl;
+//    return readerOpen = false;
+//  }
+//
+//  return true;
+//}
 
 
 // gets the version

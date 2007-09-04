@@ -1,45 +1,38 @@
 /******************************************************************************
- * RtSignalThrower.h is the header for an abstract class that 
+ * RtCode.h is the header for an abstract class that 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTSIGNALTHROWER_H
-#define RTSIGNALTHROWER_H
+#ifndef RTCODE_H
+#define RTCODE_H
 
-#include"RtStreamComponent.h"
+class RtConductor;
 
-class RtSignalThrower {
+class RtCode {
 
 public:
 
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtSignalThrower() {
-    sigNum = SIGUNUSED;
-  }
+  RtCode();
   
-  // constructor w/ signum
-  RtSignalThrower(int _sigNum) : sigNum(_sigNum) {
-
-  }
+  // constructor w/ codenum
+  RtCode(RtConductor *_conductor, int _codeNum);
 
   // destructor
-  virtual ~RtSignalThrower() {
+  virtual ~RtCode();
 
-  }
+  // set conductor
+  void setConductor(RtConductor *_conductor);
 
-  // set the signal number to throw
-  void setSigNum(int _sigNum) {
-    sigNum = _sigNum;
-  }
+  // set the code number
+  void setCodeNum(int _codeNum);
 
-  // get the signal number
-  int getSigNum() {
-    return sigNum;
-  }
+  // get the code number
+  int getCodeNum();
 
   // get the version
   //  out: char array that represents the cvs version
@@ -49,10 +42,14 @@ public:
 
 protected:
 
-  //*** private data members  ***//
+  // send the code to the handler
+  void sendCode();
 
-  // signal number to be thrown
-  int sigNum;
+  // conductor instance to send codes to
+  RtConductor *conductor;
+
+  // code number
+  int codeNum;
 
 };
 

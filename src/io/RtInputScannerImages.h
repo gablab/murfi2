@@ -21,7 +21,8 @@
 class RtImageAcceptor : public ACE_SOCK_Acceptor {
 public:
   
-  RtImageAcceptor() : isOpen(false) {}
+  RtImageAcceptor() : isOpen(false) {
+  }
 
   // called when connection is closed
   int close() {
@@ -101,7 +102,12 @@ protected:
   // sends an image to a event handler
   //  in
   //   img: image to send
-  bool sendImageToReader(RtDataImage &img);
+  //bool sendImageToReader(RtDataImage &img);
+
+  // deleted some received images
+  //  in
+  //   deleteNum: maximum number of images to delete
+  void deleteReceivedImages(int deleteNum);
 
 private:
 
@@ -119,7 +125,12 @@ private:
 
   ACE_Asynch_Read_Stream reader;
 
-  bool readerOpen;
+  // vector to store received images 
+  vector<RtDataImage*> received;
+
+  // iterator that points to the first undeleted image
+  vector<RtDataImage*>::iterator toBeDeleted;
+
 };
 
 #endif

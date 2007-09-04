@@ -13,13 +13,13 @@
 
 #include"ace/Stream.h"
 
-#include"RtSignalThrower.h"
+#include"RtCode.h"
 #include"RtStreamComponent.h"
 
 using namespace std;
 
 // class declaration
-class RtStream : public ACE_Stream<ACE_MT_SYNCH>, public RtSignalThrower {
+class RtStream : public ACE_Stream<ACE_MT_SYNCH>, public RtCode {
 
 public:
 

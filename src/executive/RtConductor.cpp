@@ -38,13 +38,8 @@ RtConductor::RtConductor(int argc, char **argv) {
     RtInputScannerImages *scanimg;
     ACE_NEW_NORETURN(scanimg, RtInputScannerImages);
 
-    // open and configure
-    if(!scanimg->open(config)) {
-      cerr << "ERROR: could not establish scanner image listener" << endl;
-      exit(1);
-    }
-    else {
-      inputs.push_back(scanimg);
+    if(!addInput(scanimg)) {
+      cerr << "ERROR: could not add scanner input" << endl;
     }
   }
 
@@ -52,36 +47,23 @@ RtConductor::RtConductor(int argc, char **argv) {
     RtInputUSBKb *scantrig;
     ACE_NEW_NORETURN(scantrig, RtInputUSBKb);
 
-    // open and configure
-    if(!scantrig->open(config)) {
-      cerr << "ERROR: could not establish scanner trigger listener" << endl;
-      exit(1);
-    }
-    else {
-      inputs.push_back(scantrig);
+    if(!addInput(scantrig)) {
+      cerr << "ERROR: could not add scanner trigger listener" << endl;
+      //exit(1);
     }
   }
 
-  // attach signal numbers to inputs
+  // attach code numbers to inputs
   curCodeNum = START_CODE_INPUTS;
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end();
 	curCodeNum++, i++) {
     (*i)->setConductor(this);
     (*i)->setCodeNum(curCodeNum);
-    //ACE_Reactor::instance()->register_handler(curCodeNum, this);
   }
 
 
-  // prepare streams
-
-  // attach signal numbers to streams
-  curCodeNum = START_CODE_STREAMS;
-  for(vector<RtStream*>::iterator i = streams.begin(); i != streams.end();
-	curCodeNum++, i++) {
-    (*i)->setConductor(this);
-    (*i)->setCodeNum(curCodeNum);
-    //ACE_Reactor::instance()->register_handler(curCodeNum, this);
-  }
+  // build the stream and its components
+  buildStream(config);
 
 
   // prepare outputs
@@ -89,13 +71,9 @@ RtConductor::RtConductor(int argc, char **argv) {
   if(config.get("logOutput")==true) {
     ACE_NEW_NORETURN(outputLog, RtOutputFile);
 
-    if(!outputLog->open(config)) {
+    if(!addOutput(outputLog)) {
       cerr << "ERROR: could not open logfile \""
 	   << config.get("filename") << "\"" << endl;
-      exit(1);
-    }
-    else {
-      outputs.push_back(outputLog);
     }
   }
 
@@ -103,45 +81,30 @@ RtConductor::RtConductor(int argc, char **argv) {
     RtDisplayImage *dispimg;
     ACE_NEW_NORETURN(dispimg, RtDisplayImage);    
 
-    if(!dispimg->init(config)) {
+    if(!addOutput(dispimg)) {
       cerr << "ERROR: could not initialize image display" << endl;
-      exit(1);
-    }
-    else {
-      outputs.push_back(dispimg);
     }
   }
 
-  // attach signal numbers to outputs
+  // attach code numbers to outputs
   curCodeNum = START_CODE_OUTPUTS;
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end();
 	curCodeNum++, i++) {
     (*i)->setConductor(this);
     (*i)->setCodeNum(curCodeNum);
-    //ACE_Reactor::instance()->register_handler(curCodeNum, this);
   }
-
-
-  // connect components that need connecting
-//  if(config.get("imageDisplay")==true
-//     && config.get("receiveScannerImages")==true) {
-//    scannerImageInput.setHandler(displayImage);
-//  }
 
 }
 
 // destructor
 RtConductor::~RtConductor() {
 
+  stream.close();
+
   // tell everyone that we're done and delete them
   for(vector<RtInput*>::iterator i=inputs.begin(); i != inputs.end(); i++) {
     (*i)->close();
     delete (*i);
-  }
-
-  for(vector<RtStream*>::iterator j=streams.begin(); j != streams.end(); j++){
-    (*j)->close();
-    delete (*j);
   }
 
   for(vector<RtOutput*>::iterator k=outputs.begin(); k != outputs.end(); k++){
@@ -153,22 +116,38 @@ RtConductor::~RtConductor() {
 
 //*** initialization routines  ***//
 
-// adds a processing stream to the pipeline
+// builds the processing stream 
 //  in:
-//   stream: stream object
+//   config: configuration
 //  out:
 //   true (for success) or false
-bool RtConductor::addStream(RtStream &stream) {
+bool RtConductor::buildStream(RtConfig config) {
+
+  // build preprocessing steps
+
+
+  // build analysis steps
+
+
+  // build post processing steps
 
   return true;
 }
+
 
 // adds input mode
 //  in:
 //   in: input object
 //  out:
 //   true (for success) or false
-bool RtConductor::addInput(RtInput &in) {
+bool RtConductor::addInput(RtInput *in) {
+  // open and configure
+  if(!in->open(config)) {
+    return false;
+  }
+  else {
+    inputs.push_back(in);
+  }
 
   return true;
 }
@@ -178,7 +157,14 @@ bool RtConductor::addInput(RtInput &in) {
 //   out: output object
 //  out:
 //   true (for success) or false
-bool RtConductor::addOutput(RtOutput &out) {
+bool RtConductor::addOutput(RtOutput *out) {
+  // open and configure
+  if(!out->open(config)) {
+    return false;
+  }
+  else {
+    outputs.push_back(out);
+  }
 
   return true;
 }
@@ -216,11 +202,6 @@ bool RtConductor::run() {
     (*i)->activate();
   }
 
-  // start the display
-//  if(config.get("imageDisplay")==true) {
-//    displayImage.activate();
-//  }
-
   // wait for threads to complete
 
   // start up the threads that listen for input
@@ -228,35 +209,40 @@ bool RtConductor::run() {
     (*i)->wait();
   }
 
-//  if(config.get("receiveScannerImages")==true) {
-//    scannerImageInput.wait();
-//  }
 
-  // run the event loop
-  //ACE_Reactor::instance()->run_reactor_event_loop();
+  // print end time to log file
+  (*outputLog) << "done running at ";
+  (*outputLog).printNow();
+  (*outputLog) << "\n";
 
   return true;
 }
 
 // receive a code signaling completetion of data input or processing
-void RtConductor::receiveCode(unsigned int code) {
-
-  // NEED TO MUTEX THIS!
+void RtConductor::receiveCode(unsigned int code, RtData *data) {
 
   // handle based on the thrower
-  if(code < START_CODE_INPUTS) { // shouldn't get here
-    cerr << "WARNING: caught unknown signal " << code << endl;
+  if(code == START_CODE_STREAM) { // stream component has data
+    cerr << "caught data available signal from a stream component" << endl;
+
+    // make data available to all output processes
+    for(vector<RtOutput*>::iterator i = outputs.begin(); 
+	i != outputs.end(); i++) {
+      (*i)->setData(data);
+    }
+
     return;
   }
-  else if(code < START_CODE_STREAMS) { // this is an input
+  else if(code < START_CODE_OUTPUTS) { // this is an input
     cerr << "caught a ready signal from an input" << endl;
-  }
-  else if(code < START_CODE_OUTPUTS) { // this is a stream
-    cerr << "caught a ready signal from a stream" << endl;
 
+    // let the stream decide if it should spawn a new processing instance 
+    stream.setInput(code,data);
   }
   else { // this is an output
     cerr << "caught a ready signal from an output" << endl;
+
+    // dont need to do much here
   }
 
 }

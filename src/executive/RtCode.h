@@ -8,6 +8,8 @@
 #ifndef RTCODE_H
 #define RTCODE_H
 
+#include"RtData.h"
+
 class RtConductor;
 
 class RtCode {
@@ -43,7 +45,7 @@ public:
 protected:
 
   // send the code to the handler
-  void sendCode();
+  void sendCode(RtData *data);
 
   // conductor instance to send codes to
   RtConductor *conductor;

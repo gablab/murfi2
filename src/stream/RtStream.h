@@ -14,6 +14,7 @@
 #include"ace/Stream.h"
 
 #include"RtCode.h"
+#include"RtData.h"
 #include"RtStreamComponent.h"
 
 using namespace std;
@@ -43,22 +44,25 @@ public:
   // initialize stream and prepare to run
   //  out:
   //   true (for success) or false
-  virtual bool init();
+  virtual bool open(RtConfig &config);
 
   //*** operation routines  ***//
-  
-  // begins stream processing
-  //  out:
-  //   true (for success) or false
-  virtual bool run(RtData &data);
+
+  // accept new data received from an input
+  //  in
+  //   data: data 
+  virtual void setInput(unsigned int code, RtData *data);
 
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-private:
-
-  //*** private data members  ***//
+protected:
+  
+  // begins stream processing
+  //  out:
+  //   true (for success) or false
+  virtual bool run(RtData &data);
 
   // vector of components objects
   vector<RtStreamComponent> components;

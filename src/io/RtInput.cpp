@@ -20,7 +20,7 @@ RtInput::~RtInput() {
 }
 
 // init
-bool RtInput::open(const RtConfig &config) {
+bool RtInput::open(RtConfig &config) {
   // set up the callback
   
   return true;

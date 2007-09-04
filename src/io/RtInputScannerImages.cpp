@@ -135,14 +135,12 @@ int RtInputScannerImages::svc() {
     rti = new RtDataImage(*ei,img);
 
     // append this to a vector of gathered images
-    receivedImages.push_back(rti);
+    received.push_back(rti);
 
     // signal that we got an image
     cerr << "sending event with code number " << codeNum << endl;
 
-    sendCode();
-
-    //    raise(sigNum);
+    sendCode(rti);
 
 //    // print and save
 //    rti->printInfo(cout);

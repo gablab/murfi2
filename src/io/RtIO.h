@@ -29,7 +29,7 @@ public:
   // opens an io object and initialize it
   //  out:
   //   true (for success) or false
-  virtual bool open(const RtConfig &config);
+  virtual bool open(RtConfig &config);
 
   // closes an io object
   //  out:

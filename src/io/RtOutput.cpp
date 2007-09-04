@@ -20,12 +20,17 @@ RtOutput::~RtOutput() {
 }
 
 // init
-bool RtOutput::open(const RtConfig &config) {
+bool RtOutput::open(RtConfig &config) {
   if(!RtIO::open(config)) {
     return false;
   }
 
   return true;
+}
+
+// hand off some data to be output
+void RtOutput::setData(RtData *data) {
+  // 
 }
 
 // prints the current time 

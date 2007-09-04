@@ -10,6 +10,7 @@
 
 #include"RtIO.h"
 #include"RtConfig.h"
+#include"RtData.h"
 #include"ace/Date_Time.h"
 #include<ostream>
 
@@ -28,11 +29,13 @@ public:
 
 
   // open and start accepting input
-  virtual bool open(const RtConfig &config);
+  virtual bool open(RtConfig &config);
+
+  // hand of some data to be output
+  virtual void setData(RtData *data);
 
   // prints the current time 
   void printNow(ostream &os);
-  
 
   // get the version
   //  out: char array that represents the cvs version

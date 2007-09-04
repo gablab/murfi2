@@ -40,8 +40,8 @@ int RtCode::getCodeNum() {
 }
 
 // send the code to the handler
-void RtCode::sendCode() {
-  conductor->receiveCode(codeNum);
+void RtCode::sendCode(RtData *data) {
+  conductor->receiveCode(codeNum,data);
 }
 
 /*****************************************************************************

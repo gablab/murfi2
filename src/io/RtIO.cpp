@@ -20,7 +20,7 @@ RtIO::~RtIO() {
 }
 
 // open and start accepting input
-bool RtIO::open(const RtConfig &config) {
+bool RtIO::open(RtConfig &config) {
   isOpen = true;
 
   return true;

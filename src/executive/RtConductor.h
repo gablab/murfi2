@@ -44,28 +44,7 @@ public:
   virtual ~RtConductor();
 
   //*** initialization routines  ***//
-  
-  // adds a processing stream to the pipeline
-  //  in:
-  //   stream: stream object
-  //  out:
-  //   true (for success) or false
-  bool addStream(RtStream &stream);
-
-  // adds input mode
-  //  in:
-  //   in: input object
-  //  out:
-  //   true (for success) or false
-  bool addInput(RtInput &in);
-
-  // adds output mode
-  //  in:
-  //   out: output object
-  //  out:
-  //   true (for success) or false
-  bool addOutput(RtOutput &out);
-
+ 
   // initialize config and prepare to run
   //  out:
   //   true (for success) or false
@@ -79,7 +58,7 @@ public:
   bool run();
 
   // receive a code signaling completetion of data input or processing
-  void receiveCode(unsigned int code);
+  void receiveCode(unsigned int code, RtData *data);
 
 //  // handle signals appropriately
 //  // this method handles errors as well as signals related to normal operation
@@ -101,44 +80,56 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-private:
+protected:
 
-  //*** private data members  ***//
+  //*** methods ***//
 
-  // input object that handles reception of scanner images
-//  RtInputScannerImages inputScannerImages;
-//
-//  // input object that handles reception of scanner triggers for external sync
-//  RtInputUSBKb inputScannerTriggers;
+  // builds the processing stream 
+  //  in:
+  //   config: configuration
+  //  out:
+  //   true (for success) or false
+  bool buildStream(RtConfig config);
 
-  // output object to log 
-  RtOutputFile* outputLog;
+  // adds input mode
+  //  in:
+  //   in: input object
+  //  out:
+  //   true (for success) or false
+  bool addInput(RtInput *in);
 
-  // object to display scanner images
-  //  RtDisplayImage outputImageDisplay;
+  // adds output mode
+  //  in:
+  //   out: output object
+  //  out:
+  //   true (for success) or false
+  bool addOutput(RtOutput *out);
+
+  //*** members ***//
 
   // configuration object
   RtConfig config;
 
-  // these vectors store the objects that handle data
-  // note that their indexing is related to the signal number they throw when 
+  // the data processing stream
+  RtStream stream;
+  static const unsigned int START_CODE_STREAM = 0;
+
+  // output object to log 
+  RtOutputFile* outputLog;
+
+  // these vectors store the objects that handle io
+  // note that their indexing is related to the code number they throw when 
   // processing is complete. the index is related by the START_CODE_?????
   // static class members
   
   // vector of input objects
   vector<RtInput*> inputs;
-  static const unsigned int START_CODE_INPUTS = 0;
-
-  // vector of stream objects
-  vector<RtStream*> streams;
-  static const unsigned int START_CODE_STREAMS = 8192;
+  static const unsigned int START_CODE_INPUTS = 1;
 
   // vector of output objects
   vector<RtOutput*> outputs;
   static const unsigned int START_CODE_OUTPUTS = 32768;
 
-  // queue for caught signals 
-  queue<int> sigQueue;
 };
 
 #endif

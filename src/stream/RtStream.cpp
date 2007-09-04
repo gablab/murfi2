@@ -37,9 +37,16 @@ bool RtStream::addComponent(RtStreamComponent &component) {
 // initialize stream and prepare to run
 //  out:
 //   true (for success) or false
-bool RtStream::init() {
+bool RtStream::open(RtConfig &config) {
 
   return true;
+}
+
+// accept new data received from an input
+//  in
+//   data: data 
+void RtStream::setInput(unsigned int code, RtData *data) {
+
 }
 
 

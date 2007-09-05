@@ -7,11 +7,11 @@
 
 static char *VERSION = "$Id$";
 
-#include"RtPostProcessor.h"
+#include"RtPostprocessor.h"
 
 // default constructor
-RtPostprocessor::RtPostprocessor() : RtStream(), RtStreamComponent() {
-
+RtPostprocessor::RtPostprocessor() 
+  : RtStreamComponent(), RtStream() {
 }
 
 // destructor
@@ -21,16 +21,28 @@ RtPostprocessor::~RtPostprocessor() {
 
 //*** initialization routines  ***//
 
-// initialize components
-//  out:
-//    success failure
-bool RtPostprocessor::open(RtConfig &config) {
+// add modules
+//  in
+//   config
+//  out
+//   success failure
+int RtPostprocessor::addModules(RtConfig &config) {
   // build the list of stream components specified in the config 
+
+  return 0;
+}
+
+
+// process a single acquisition
+int RtPostprocessor::process(RtStreamMessage *msg) {
+  cerr << "postprocessing" << endl;
+
+  return 0;
 }
 
 // get the version
 //  out: char array that repostsents the cvs version
-virtual char *RtPostprocessor::getVersionString() {
+char *RtPostprocessor::getVersionString() {
   return VERSION;
 }
 

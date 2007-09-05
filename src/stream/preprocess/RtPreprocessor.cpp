@@ -1,5 +1,5 @@
 /******************************************************************************
- * RtPostprocessor.cpp is the definition of a class for a postprocessing stream
+ * RtPreprocessor.cpp is the definition of a class for a preprocessing stream
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
@@ -7,30 +7,41 @@
 
 static char *VERSION = "$Id$";
 
-#include"RtPostProcessor.h"
+#include"RtPreprocessor.h"
 
 // default constructor
-RtPostprocessor::RtPostprocessor() : RtStream(), RtStreamComponent() {
-
+RtPreprocessor::RtPreprocessor() 
+  : RtStreamComponent(), RtStream() {
 }
 
 // destructor
-RtPostprocessor::~RtPostprocessor() {
+RtPreprocessor::~RtPreprocessor() {
 
 }
 
 //*** initialization routines  ***//
 
-// initialize components
-//  out:
-//    success failure
-bool RtPostprocessor::open(RtConfig &config) {
+// add modules
+//  in
+//   config
+//  out
+//   success failure
+int RtPreprocessor::addModules(RtConfig &config) {
   // build the list of stream components specified in the config 
+
+  return 0;
+}
+
+// process a single acquisition
+int RtPreprocessor::process(RtStreamMessage *msg) {
+  cerr << "preprocessing" << endl;
+
+  return 0;
 }
 
 // get the version
-//  out: char array that repostsents the cvs version
-virtual char *RtPostprocessor::getVersionString() {
+//  out: char array that represents the cvs version
+char *RtPreprocessor::getVersionString() {
   return VERSION;
 }
 

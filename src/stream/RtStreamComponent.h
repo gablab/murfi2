@@ -17,7 +17,7 @@
 #include"RtData.h"
 
 // class declaration
-class RtStreamComponent :  public ACE_Task<ACE_MT_SYNCH> {
+class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH> {
 
 public:
 
@@ -34,7 +34,7 @@ public:
   // initialize and run thread
   //  out:
   //   0 (for success) or -1 (failure)
-  virtual int open();
+  virtual int open(void * = 0);
 
   // send data when we're done
   //  in 
@@ -66,6 +66,19 @@ protected:
   virtual int process(RtStreamMessage *msg) = 0;
 
 };
+
+
+class RtEndTask : public RtStreamComponent {
+protected:
+  virtual int process(RtStreamMessage*) {
+    return 0;
+  }
+
+  virtual int nextStep(ACE_Message_Block *) {
+    return 0;
+  }
+};
+
 
 #endif
 

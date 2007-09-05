@@ -13,6 +13,7 @@
 
 #include"ace/Stream.h"
 
+#include"RtConductor.h"
 #include"RtCode.h"
 #include"RtData.h"
 #include"RtStreamComponent.h"
@@ -28,7 +29,7 @@ public:
   //*** constructors/destructors  ***//
   
   // constructor
-  RtStream(RtConductor *_conductor); 
+  RtStream(); 
 
   // destructor
   virtual ~RtStream();
@@ -40,17 +41,15 @@ public:
   //   conductor pointer
   void setConductor(RtConductor *_conductor);
 
-  // adds a component to the processing pipeline
-  //  in:
-  //   component: component object
-  //  out:
-  //   true (for success) or false
-  //bool addComponent(RtStreamComponent &component);
-
   // initialize stream and prepare to run
   //  out:
   //   true (for success) or false
-  virtual bool open(RtConfig &config);
+  int configure(RtConfig &config);
+
+  // adds all modules to the stream
+  //  in
+  //   config: configuration info
+  virtual int addModules(RtConfig &config);
 
   //*** operation routines  ***//
 
@@ -86,6 +85,7 @@ protected:
   // maybe a graph?
 
 };
+
 
 #endif
 

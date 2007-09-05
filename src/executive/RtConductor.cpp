@@ -63,6 +63,7 @@ RtConductor::RtConductor(int argc, char **argv) {
 
 
   // build the stream and its components
+  ACE_NEW_NORETURN(stream, RtStream);
   buildStream(config);
 
 
@@ -99,7 +100,8 @@ RtConductor::RtConductor(int argc, char **argv) {
 // destructor
 RtConductor::~RtConductor() {
 
-  stream.close();
+  stream->close();
+  delete stream;
 
   // tell everyone that we're done and delete them
   for(vector<RtInput*>::iterator i=inputs.begin(); i != inputs.end(); i++) {
@@ -122,17 +124,12 @@ RtConductor::~RtConductor() {
 //  out:
 //   true (for success) or false
 bool RtConductor::buildStream(RtConfig config) {
-  
+
   // set the conductor to us
-  stream.setConductor(this);
+  stream->setConductor(this);
 
-  // build preprocessing steps
-
-
-  // build analysis steps
-
-
-  // build post processing steps
+  // open the stream
+  stream->configure(config);
 
   return true;
 }
@@ -193,12 +190,12 @@ bool RtConductor::init() {
 //   true (for success) or false
 bool RtConductor::run() {
 
-  // print start time to log file
+  // print startg time to log file
   (*outputLog) << "began running at ";
   (*outputLog).printNow();
   (*outputLog) << "\n";
 
-
+  // 
 
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
@@ -240,7 +237,7 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     cerr << "caught a ready signal from an input" << endl;
 
     // let the stream decide if it should spawn a new processing instance 
-    stream.setInput(code,data);
+    stream->setInput(code,data);
   }
   else { // this is an output
     cerr << "caught a ready signal from an output" << endl;

@@ -6,6 +6,8 @@
  * 
  *****************************************************************************/
 
+static char *VERSION = "$Id$";
+
 #include"RtStreamComponent.h"
   
 // default constructor
@@ -23,7 +25,8 @@ RtStreamComponent::~RtStreamComponent() {
 // initialize and run thread
 //  out:
 //   0 (for success) or -1 for failure
-int RtStreamComponent::open() {
+int RtStreamComponent::open(void *p) {
+  ACE_DEBUG((LM_DEBUG, ACE_TEXT("activating stream component\n")));
   return this->activate(THR_NEW_LWP | THR_JOINABLE, 1);
 }
 
@@ -62,6 +65,8 @@ int RtStreamComponent::svc() {
   // wait for stuff to do
   while(1) {
 
+    ACE_DEBUG((LM_DEBUG, ACE_TEXT("in stream component svc()\n")));
+
     if(this->getq(msg) == -1) {
       ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("getq returned -1\n")),-1);
     }
@@ -74,6 +79,8 @@ int RtStreamComponent::svc() {
       }
       break;
     }
+
+    ACE_DEBUG((LM_DEBUG, ACE_TEXT("entered stream component svc() with data\n")));
 
     // process normally
     RtStreamMessage *strMsg = (RtStreamMessage*) msg->rd_ptr();
@@ -102,7 +109,7 @@ int RtStreamComponent::nextStep(ACE_Message_Block *mb) {
 // get the version
 //  out: char array that represents the cvs version
 char *RtStreamComponent::getVersionString() {
-
+  return VERSION;
 }
 
 

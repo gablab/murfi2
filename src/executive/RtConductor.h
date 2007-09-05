@@ -24,6 +24,8 @@
 
 using namespace std;
 
+class RtStream;
+
 // class declaration
 class RtConductor {
 
@@ -108,7 +110,7 @@ protected:
   RtConfig config;
 
   // the data processing stream
-  RtStream stream;
+  RtStream *stream;
 
   // output object to log 
   RtOutputFile* outputLog;

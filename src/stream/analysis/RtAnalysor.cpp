@@ -1,5 +1,5 @@
 /******************************************************************************
- * RtPreprocessor.cpp is the definition of a class for a preprocessing stream
+ * RtAnalysor.cpp is the definition of a class for a preprocessing stream
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
@@ -7,30 +7,42 @@
 
 static char *VERSION = "$Id$";
 
-#include"RtPreProcessor.h"
+#include"RtAnalysor.h"
 
 // default constructor
-RtPreprocessor::RtPreprocessor() : RtStream(), RtStreamComponent() {
-
+RtAnalysor::RtAnalysor() 
+  : RtStreamComponent(), RtStream() {
 }
 
 // destructor
-RtPreprocessor::~RtPreprocessor() {
+RtAnalysor::~RtAnalysor() {
 
 }
 
 //*** initialization routines  ***//
 
-// initialize components
-//  out:
-//    success failure
-bool RtPreprocessor::open(RtConfig &config) {
+
+// add modules
+//  in
+//   config
+//  out
+//   success failure
+int RtAnalysor::addModules(RtConfig &config) {
   // build the list of stream components specified in the config 
+
+  return 0;
+}
+
+// process a single acquisition
+int RtAnalysor::process(RtStreamMessage *msg) {
+  cerr << "analyzing" << endl;
+
+  return 0;
 }
 
 // get the version
 //  out: char array that represents the cvs version
-virtual char *RtPreprocessor::getVersionString() {
+char *RtAnalysor::getVersionString() {
   return VERSION;
 }
 

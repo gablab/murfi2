@@ -12,9 +12,6 @@
 #include<vector>
 #include<queue>
 
-//#include"ace/Reactor.h"
-//#include"ace/Event_Handler.h"
-
 #include"RtConfig.h"
 #include"RtDisplayImage.h"
 #include"RtInput.h"
@@ -112,7 +109,6 @@ protected:
 
   // the data processing stream
   RtStream stream;
-  static const unsigned int START_CODE_STREAM = 0;
 
   // output object to log 
   RtOutputFile* outputLog;
@@ -124,11 +120,9 @@ protected:
   
   // vector of input objects
   vector<RtInput*> inputs;
-  static const unsigned int START_CODE_INPUTS = 1;
 
   // vector of output objects
   vector<RtOutput*> outputs;
-  static const unsigned int START_CODE_OUTPUTS = 32768;
 
 };
 

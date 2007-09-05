@@ -122,6 +122,9 @@ RtConductor::~RtConductor() {
 //  out:
 //   true (for success) or false
 bool RtConductor::buildStream(RtConfig config) {
+  
+  // set the conductor to us
+  stream.setConductor(this);
 
   // build preprocessing steps
 

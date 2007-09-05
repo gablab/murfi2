@@ -101,7 +101,7 @@ private:
   void printUsage();
 };
 
-
+// a single configuration value
 class RtConfigVal {
   
 public:

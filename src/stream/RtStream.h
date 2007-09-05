@@ -16,6 +16,7 @@
 #include"RtCode.h"
 #include"RtData.h"
 #include"RtStreamComponent.h"
+#include"RtStreamMessage.h"
 
 using namespace std;
 
@@ -26,20 +27,25 @@ public:
 
   //*** constructors/destructors  ***//
   
-  // default constructor
-  RtStream(); 
+  // constructor
+  RtStream(RtConductor *_conductor); 
 
   // destructor
   virtual ~RtStream();
 
   //*** initialization routines  ***//
   
+  // set the conductor for this stream
+  //  in
+  //   conductor pointer
+  void setConductor(RtConductor *_conductor);
+
   // adds a component to the processing pipeline
   //  in:
   //   component: component object
   //  out:
   //   true (for success) or false
-  bool addComponent(RtStreamComponent &component);
+  //bool addComponent(RtStreamComponent &component);
 
   // initialize stream and prepare to run
   //  out:
@@ -59,13 +65,22 @@ public:
 
 protected:
   
+  // superclass
+  typedef ACE_Stream<ACE_MT_SYNCH> super;
+
+  // processing module
+  typedef ACE_Module<ACE_MT_SYNCH> Module;
+
+  // pointer to conductor 
+  RtConductor *conductor;
+
   // begins stream processing
   //  out:
   //   true (for success) or false
-  virtual bool run(RtData &data);
+  //virtual bool run(RtData &data);
 
   // vector of components objects
-  vector<RtStreamComponent> components;
+  //vector<RtStreamComponent> components;
 
   // here we need a way to represent serial dependencies in processing
   // maybe a graph?

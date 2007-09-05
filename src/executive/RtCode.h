@@ -10,6 +10,14 @@
 
 #include"RtData.h"
 
+// explicitly defined codes (not the only ones
+
+#define START_CODE_STREAM 0
+#define START_CODE_INPUTS 1
+#define SCANNER_IMAGE_RECEIVED START_CODE_INPUTS
+#define START_CODE_OUTPUTS 32768
+
+
 class RtConductor;
 
 class RtCode {

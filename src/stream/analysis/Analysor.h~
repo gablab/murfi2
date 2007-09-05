@@ -1,33 +1,32 @@
 /******************************************************************************
- * RtStreamComponent.h is the header for an abstract class for a
+ * RtAnalysor.h is the header for a class for a
  * processing stream component for a real-time fMRI.
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
  *****************************************************************************/
 
-#ifndef RTSTREAMCOMPONENT_H
-#define RTSTREAMCOMPONENT_H
+#ifndef RTANALYSOR_H
+#define RTANALYSOR_H
 
 #include"ace/Task.h"
 
 #include"RtStream.h"
-#include"RtStreamMessage.h"
 #include"RtConfig.h"
 #include"RtData.h"
 
 // class declaration
-class RtStreamComponent :  public ACE_Task<ACE_MT_SYNCH> {
+class RtAnalysor : public RtStream, public ACE_Task<ACE_MT_SYNCH> {
 
 public:
 
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtStreamComponent();
+  RtAnalysor();
 
   // destructor
-  virtual ~RtStreamComponent();
+  virtual ~RtAnalysor();
 
   //*** initialization routines  ***//
 

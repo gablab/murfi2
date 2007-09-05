@@ -26,9 +26,6 @@ TMP_FILES = $(patsubst ./%,$(OBJ_DIR)/%,$(SRC_FILES))
 OBJ_FILES = $(TMP_FILES:.cpp=.o) 
 
 default: $(OBJ_FILES)
-	cd analysis && $(MAKE)
-	cd preprocess && $(MAKE)
-	cd postprocess && $(MAKE)
 
 ############################### CLEAN ################################
 

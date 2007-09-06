@@ -63,14 +63,14 @@ protected:
   virtual int nextStep(ACE_Message_Block *mb);
 
   // pure virtual for implementation of real processing
-  virtual int process(RtStreamMessage *msg) = 0;
+  virtual int process(ACE_Message_Block *mb) = 0;
 
 };
 
 
 class RtEndTask : public RtStreamComponent {
 protected:
-  virtual int process(RtStreamMessage*) {
+  virtual int process(ACE_Message_Block*) {
     return 0;
   }
 

@@ -59,27 +59,11 @@ RtDisplayImage::~RtDisplayImage() {
   glutDestroyWindow(windowID);
 }
 
-// initialize the display
-//  in
-//   _x: initial x position of the window
-//   _y: initial y position of the window
-//   _w: initial width of the window
-//   _h: initial height of the window
-//   _title: title string of the window
-bool RtDisplayImage::init(int _x, int _y, int _w, int _h, char *_title) {
-  x = _x;
-  y = _y;
-  width = _w;
-  height = _h;
-  strcpy(title,_title);
-
-  return init();
-}
 
 // initialize the display
 //  in
 //   config: config class to get configuration variables from
-bool RtDisplayImage::init(RtConfig &config) {
+bool RtDisplayImage::open(RtConfig &config) {
   
   x = config.get("imageDisplayWinX")==true
     ? config.get("imageDisplayWinX") : DEFAULT_X;
@@ -101,7 +85,25 @@ bool RtDisplayImage::init(RtConfig &config) {
 }
 
 // initialize the display
+//  in
+//   _x: initial x position of the window
+//   _y: initial y position of the window
+//   _w: initial width of the window
+//   _h: initial height of the window
+//   _title: title string of the window
+bool RtDisplayImage::init(int _x, int _y, int _w, int _h, char *_title) {
+  x = _x;
+  y = _y;
+  width = _w;
+  height = _h;
+  strcpy(title,_title);
+
+  return init();
+}
+
+// initialize the display
 bool RtDisplayImage::init() {
+
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
   glutInitWindowSize(width, height);
   glutInitWindowPosition(x, y);
@@ -116,23 +118,31 @@ bool RtDisplayImage::init() {
   glLoadIdentity();
   glOrtho(0.0, (double) width, 0.0, (double) height, 1.0, -1.0);
 
+  // activate the display thread
+  //this->activate();
+
   return true;
 }
 
 // thread entry
 int RtDisplayImage::svc() {
   glutMaster.CallGlutMainLoop();
+
   return 0;
 }
 
 // sets the image to be displayed
-void RtDisplayImage::setImage(RtDataImage &img) {
-  bottomStr = img.getCreationTime();
-  topStr = img.getAcquisitionNum();
+void RtDisplayImage::setData(RtData *data) {
+  RtDataImage *img = (RtDataImage*) data;
 
-  imgw = img.getDim(0);
-  imgh = img.getDim(1);
-  makeTexture(img.getData());
+  bottomStr = img->getCreationTime();
+  topStr = img->getAcquisitionNum();
+
+  cerr << "RtDisplayImage: got new data" << endl;
+
+  imgw = img->getDim(0);
+  imgh = img->getDim(1);
+  makeTexture(img->getData());
 }
 
 // makes a texture from the image data and prepares it for display
@@ -143,8 +153,12 @@ void RtDisplayImage::makeTexture(unsigned short *data) {
     glDeleteTextures(1, &texture);
   }
 
+  GLuint text[10];
+
   /* get the id for the texture */
-  glGenTextures(1, &texture);
+  glGenTextures(1, text);
+
+  cout << "text is " << text[0] << endl;
   
   /* create the image texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, texture);
@@ -170,6 +184,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
    
   // if there is no image yet, draw a message and return
   if(texture == 0) {
+    cerr << "UNDRAWING" << endl;
+
     drawString(10,10,"no image loaded",1,0,0);
     glutSwapBuffers();
     return;
@@ -199,6 +215,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   drawString(10,10,bottomStr.c_str(),1,0,0);
   drawString(10,height-10,topStr.c_str(),0,1,0);
 
+  cerr << "DRAWING" << endl;
+
   glutSwapBuffers();
   
 }
@@ -209,31 +227,17 @@ void RtDisplayImage::CallBackReshapeFunc(int w, int h){
    height= h;
 
    glViewport(0, 0, width, height); 
+
    CallBackDisplayFunc();
 }
 
 void RtDisplayImage::CallBackIdleFunc(void){
-
-  //CallBackDisplayFunc();
+  
+//  if(needsRepaint) {
+//    needsRepaint = false;
+//    CallBackDisplayFunc();
+//  }
 }
-
-// callback for scanner image input
-void RtDisplayImage::handle_read_stream(const ACE_Asynch_Read_Stream::Result &result) {
-  ACE_Message_Block &mb = result.message_block();
-
-
-  // check if we're okay
-  if(!result.success()) {
-    mb.release();
-  }
-
-  // accept the data
-  RtDataImage im(mb.base(), mb.length());
-  setImage(im);  
-
-  mb.release();
-}
-
 
 // draws a black box that will enclose a string of text
 void RtDisplayImage::drawBlackBoxForString(const char *str, GLint x, GLint y) {

@@ -41,6 +41,11 @@ public:
 
   // initialize the display
   //  in
+  //   config: configuration class
+  bool open(RtConfig &config);
+
+  // initialize the display
+  //  in
   //   _x: initial x position of the window
   //   _y: initial y position of the window
   //   _w: initial width of the window
@@ -49,18 +54,13 @@ public:
   bool init(int _x, int _y, int _w, int _h, char *_title);
 
   // initialize the display
-  //  in
-  //   config: configuration class
-  bool init(RtConfig &config);
-
-  // initialize the display
   bool init();
 
   // sets the window running
   virtual int svc();
 
   // sets the image to be displayed
-  void setImage(RtDataImage &img);
+  void setData(RtData *img);
 
   // makes a texture from the image data and prepares it for display
   void makeTexture(unsigned short *data);
@@ -70,9 +70,6 @@ public:
   void CallBackReshapeFunc(int w, int h);   
   void CallBackIdleFunc(void);
 
-  // callback for scanner image input
-  virtual void handle_read_stream(const ACE_Asynch_Read_Stream::Result &result);
-
 protected:
 
   GlutMaster glutMaster;
@@ -80,6 +77,8 @@ protected:
   int x, y, width, height;
   int imgw, imgh;
   GLuint texture;
+
+  bool needsRepaint;
 
   char title[100];
   string bottomStr;

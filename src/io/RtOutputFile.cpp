@@ -8,10 +8,10 @@ static char *VERSION = "$Id$";
 
 
 #include"RtOutputFile.h"
+#include<iostream>
 
 // default constructor
 RtOutputFile::RtOutputFile() : RtOutput() {
-  
 }
 
 // destructor
@@ -20,6 +20,7 @@ RtOutputFile::~RtOutputFile() {
 
 // open and start accepting input
 bool RtOutputFile::open(RtConfig &config) {
+
   if(!RtOutput::open(config)) {
     return false;
   }
@@ -36,24 +37,29 @@ bool RtOutputFile::open(RtConfig &config) {
   if(fn.empty()) {
     return false;
   }
+  else if(fn.substr(0,1) != "/") {
+    fn = (char*) config.get("subjDir") + fn;
+  }
 
-  fp.open(fn.c_str(),fstream::out);
+  cout << "attempting to open logfile " << fn << endl;
+  outfp.open(fn.c_str(),fstream::out);
 
   // check 
-  if(fp.fail()) {
+  if(outfp.fail()) {
+    cerr << "ERROR: could not open log file " << fn << " for output" << endl;
     return false;
   }
 
   // write a header
-  fp << "# realtime system log file" << endl
-     << "# " << getVersionString() << endl
-     << "# " << config.getVersionString() << endl
-     << "# " << config.getConductorVersionString() << endl
-     << "created ";
-  RtOutput::printNow(fp);
-  fp  << endl << endl;
+  outfp << "# realtime system log file" << endl
+	<< "# " << getVersionString() << endl
+	<< "# " << config.getVersionString() << endl
+	<< "# " << config.getConductorVersionString() << endl
+	<< "created ";
+  printNow();
+  outfp  << endl << endl;
 
-  fp.flush();
+  outfp.flush();
 
   return true;
 }
@@ -61,27 +67,27 @@ bool RtOutputFile::open(RtConfig &config) {
 // close and clean up
 bool RtOutputFile::close() {
 
-  fp << "closed ";
-  RtOutput::printNow(fp);
-  fp  << endl;
+  outfp << "closed ";
+  RtOutput::printNow(outfp);
+  outfp  << endl;
 
-  fp.close();
+  outfp.close();
 
   return true;
 }
 
 // prints the current time to the file
 void RtOutputFile::printNow() {
-  RtOutput::printNow(fp);
+  RtOutput::printNow(outfp);
 }
 
 // prints the configuration to the file
 void RtOutputFile::writeConfig(RtConfig &config) {
   if(isOpen) {
-    fp << "configuration:" << endl 
-       << "--------------" << endl;
-    config.dumpConfig(fp);
-    fp << "--------------" << endl << endl;
+    outfp << "configuration:" << endl 
+	  << "--------------" << endl;
+    config.dumpConfig(outfp);
+    outfp << "--------------" << endl << endl;
   }
 }
 

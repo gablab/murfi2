@@ -11,7 +11,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtPostprocessor::RtPostprocessor() 
-  : RtStreamComponent(), RtStream() {
+  : RtStreamComponent() {
 }
 
 // destructor
@@ -34,7 +34,7 @@ int RtPostprocessor::addModules(RtConfig &config) {
 
 
 // process a single acquisition
-int RtPostprocessor::process(RtStreamMessage *msg) {
+int RtPostprocessor::process(ACE_Message_Block *mb) {
   cerr << "postprocessing" << endl;
 
   return 0;

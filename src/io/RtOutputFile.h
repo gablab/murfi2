@@ -36,7 +36,7 @@ public:
   template<class T>
   RtOutputFile &operator<<(const T &t) {
     if(isOpen) {
-      fp << t;
+      outfp << t;
     }
     return *this;
   }
@@ -52,10 +52,10 @@ public:
   virtual char *getVersionString();
 
 
-private:
+protected:
 
   //*** private data members  ***//
-  ofstream fp;
+  ofstream outfp;
 
 };
 

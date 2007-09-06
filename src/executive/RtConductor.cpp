@@ -62,12 +62,18 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
 
-  // build the stream and its components
-  ACE_NEW_NORETURN(stream, RtStream);
-  buildStream(config);
-
 
   // prepare outputs
+
+  // display always first, if here
+  if(config.get("imageDisplay")==true) {
+    RtDisplayImage *dispimg;
+    ACE_NEW_NORETURN(dispimg, RtDisplayImage);    
+
+    if(!addOutput(dispimg)) {
+      cerr << "ERROR: could not initialize image display" << endl;
+    }
+  }
 
   if(config.get("logOutput")==true) {
     ACE_NEW_NORETURN(outputLog, RtOutputFile);
@@ -78,15 +84,6 @@ RtConductor::RtConductor(int argc, char **argv) {
     }
   }
 
-  if(config.get("imageDisplay")==true) {
-    RtDisplayImage *dispimg;
-    ACE_NEW_NORETURN(dispimg, RtDisplayImage);    
-
-    if(!addOutput(dispimg)) {
-      cerr << "ERROR: could not initialize image display" << endl;
-    }
-  }
-
   // attach code numbers to outputs
   curCodeNum = START_CODE_OUTPUTS;
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end();
@@ -94,6 +91,12 @@ RtConductor::RtConductor(int argc, char **argv) {
     (*i)->setConductor(this);
     (*i)->setCodeNum(curCodeNum);
   }
+
+  // build the stream and its components
+  ACE_NEW_NORETURN(stream, RtStream);
+  buildStream(config);
+
+
 
 }
 
@@ -176,6 +179,13 @@ bool RtConductor::init() {
 
   (*outputLog).writeConfig(config);
 
+  // initialize output methods
+//  for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++) {
+//    (*i)->open(config);
+//  }
+
+
+
   (*outputLog) << "initialization completed at ";
   (*outputLog).printNow();
   (*outputLog) << "\n";
@@ -200,6 +210,11 @@ bool RtConductor::run() {
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     (*i)->activate();
+  }
+
+  // start the display
+  if(config.get("imageDisplay")==true) {  
+    getDisplay()->activate();
   }
 
   // wait for threads to complete
@@ -326,6 +341,20 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
 //  return 0;
 //}
 //
+
+
+// get the display output
+//  out 
+//   pointer to the display output object
+RtDisplayImage *RtConductor::getDisplay() {
+  if(config.get("imageDisplay")==true) {
+     return (RtDisplayImage*) (*outputs.begin());
+  }
+  else {
+    return NULL;
+  }
+}
+
 
 // gets the version
 //  out:

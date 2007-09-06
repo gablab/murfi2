@@ -11,7 +11,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtPreprocessor::RtPreprocessor() 
-  : RtStreamComponent(), RtStream() {
+  : RtStreamComponent() {
 }
 
 // destructor
@@ -33,7 +33,7 @@ int RtPreprocessor::addModules(RtConfig &config) {
 }
 
 // process a single acquisition
-int RtPreprocessor::process(RtStreamMessage *msg) {
+int RtPreprocessor::process(ACE_Message_Block *mb) {
   cerr << "preprocessing" << endl;
 
   return 0;

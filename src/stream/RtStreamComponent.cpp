@@ -83,8 +83,8 @@ int RtStreamComponent::svc() {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("entered stream component svc() with data\n")));
 
     // process normally
-    RtStreamMessage *strMsg = (RtStreamMessage*) msg->rd_ptr();
-    if(this->process(strMsg) == -1) {
+    //RtStreamMessage *strMsg = (RtStreamMessage*) msg->rd_ptr();
+    if(this->process(msg) == -1) {
       msg->release();
       ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("process returned -1")), -1);
     }

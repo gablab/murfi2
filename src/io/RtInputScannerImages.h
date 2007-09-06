@@ -15,7 +15,6 @@
 #include"RtDataImage.h"
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Acceptor.h"
-#include"ace/Asynch_IO.h"
 
 // acceptor to allow connections from the scanner 
 class RtImageAcceptor : public ACE_SOCK_Acceptor {
@@ -99,6 +98,10 @@ protected:
   //   img: image to save
   bool saveImage(RtDataImage &img);
 
+  // gets the next series number to be saved in the current image directory
+  // inspects the series currently in the directory and makes a new one
+  unsigned int getNextSeriesNum();
+
   // sends an image to a event handler
   //  in
   //   img: image to send
@@ -109,7 +112,7 @@ protected:
   //   deleteNum: maximum number of images to delete
   void deleteReceivedImages(int deleteNum);
 
-private:
+protected:
 
   //*** private data members  ***//
 
@@ -118,12 +121,15 @@ private:
   RtImageAcceptor acceptor;   
   ACE_SOCK_Stream stream;   
 
+  // parms for image saving to disk
   bool   saveImagesToFile;
+  string savePath;
   string saveDir;
   string saveFilestem;
   string saveFileext;
 
-  ACE_Asynch_Read_Stream reader;
+  // current series number
+  unsigned int seriesNum;
 
   // vector to store received images 
   vector<RtDataImage*> received;

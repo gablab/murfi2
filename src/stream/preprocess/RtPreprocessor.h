@@ -40,7 +40,7 @@ public:
 protected:
 
   // process a single acquisition
-  int process(RtStreamMessage *msg);
+  int process(ACE_Message_Block *mb);
 
 };
 

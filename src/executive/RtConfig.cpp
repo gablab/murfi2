@@ -20,6 +20,10 @@ static char *VERSION = "$Id$";
 
 #define MAX_LINE_CHARS 1000
 
+// defaults
+#define DEFAULT_SUBJECTSDIR "/home/mri/subjects"
+
+
 //*** constructors/destructors  ***//
 
 RtConfigVal unset;
@@ -139,6 +143,35 @@ bool RtConfig::validateConfig() {
   
   bool valid = true;
 
+  // check subject
+  if(get("subject")==false) {
+    cerr << "ERROR: no subject name specified" << endl;
+    valid = false;
+  }
+
+  // check subjects directory
+  if(get("subjectsDir")==true) {
+    set("subjectsDir",DEFAULT_SUBJECTSDIR);
+
+    // check for existance of subjdir
+    string subjdir((char*) get("subjectsDir"));
+    subjdir += "/";
+    subjdir += (char*) get("subject");
+    subjdir += "/";
+
+    string testfile = subjdir + "/testfile";
+
+    ofstream fs(testfile.c_str());
+    if(fs.fail()) {
+      cerr << "ERROR: subject directory " << subjdir << " is bad" << endl;
+      valid = false;
+    }
+    else {
+      set("subjDir",subjdir);
+    }
+    fs.close();
+  }
+
   // check logfile name
   set("logOutput",true);
   if(get("logFilename")==false) {
@@ -146,7 +179,7 @@ bool RtConfig::validateConfig() {
     set("logOutput",false);
   }
 
-  // check scanner IP and port
+  // check port
   set("receiveScannerImages",true);
   if((int) get("scannerPort") < 1 || (int) get("scannerPort") > 65535) {
     cerr << "WARNING: invalid port number for receiving scanner images" 
@@ -208,6 +241,12 @@ void RtConfig::print(const char *name) {
 //  in: _conductor is a pointer to a conductor
 void RtConfig::setConductor(RtConductor *_conductor) {
   conductor = _conductor;
+}
+
+// get the conductor
+//  out: pointer to the conductor
+RtConductor *RtConfig::getConductor() {
+  return conductor;
 }
 
 

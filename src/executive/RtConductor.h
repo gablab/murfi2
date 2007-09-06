@@ -59,21 +59,13 @@ public:
   // receive a code signaling completetion of data input or processing
   void receiveCode(unsigned int code, RtData *data);
 
-//  // handle signals appropriately
-//  // this method handles errors as well as signals related to normal operation
-//  int handle_signal(int sigNum, siginfo_t *sInfo=0, ucontext_t *uContext=0);
-//
-//  // handle completetion events
-//  int handle_input(ACE_HANDLE handle = ACE_INVALID_HANDLE);
-//
-//  // handle exceptions appropriately
-//  // note that handles errors as well as signals related to normal operation
-//  // we are notify()ed of exceptions when streams are done or when new data is
-//  // available
-//  int handle_exception(ACE_HANDLE handle = ACE_INVALID_HANDLE);
-//
-//  // handle exit of the process
-//  int handle_exit(ACE_Process *proc);
+
+  //** gets **//
+
+  // get the display output
+  //  out 
+  //   pointer to the display output object
+  RtDisplayImage *getDisplay();
 
   // get the version
   //  out: char array that represents the cvs version

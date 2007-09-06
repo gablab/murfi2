@@ -73,6 +73,10 @@ public:
   //  in: _conductor is a pointer to a conductor
   void setConductor(RtConductor *_conductor);
 
+  // get the conductor
+  //  out: pointer to the conductor
+  RtConductor *getConductor();
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();

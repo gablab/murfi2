@@ -10,23 +10,30 @@ static char *VERSION = "$Id$";
 #include"RtInputScannerImages.h"
 #include"RtDataImage.h"
 
+#include<fstream>
+using namespace std;
+
 // defaults
 static const int    DEFAULT_PORT = 15000;
-static const char*  DEFAULT_SAVEDIR  = "/tmp";
+static const char*  DEFAULT_SAVEDIR  = "img";
 static const char*  DEFAULT_SAVESTEM = "img";
 static const char*  DEFAULT_SAVEEXT  = "dat";
 
 // increase this size for highres acquisitions
-#define MAXBUFSIZ 256*256*256*2 
-static char buffer[MAXBUFSIZ];
+#define MAX_BUFSIZ 256*256*256*2 
+#define MAX_SERIESNUM 99999
+static char buffer[MAX_BUFSIZ];
 
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
   :  port(DEFAULT_PORT), 
+     savePath(""),
      saveDir(DEFAULT_SAVEDIR),
      saveFilestem(DEFAULT_SAVESTEM),
      saveFileext(DEFAULT_SAVEEXT),
-     toBeDeleted(received.begin()) {
+     seriesNum(0),
+     toBeDeleted(received.begin())
+{
   // nothing to do
 }
 
@@ -62,6 +69,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
   if(config.get("saveImages")==true) {
     saveImagesToFile = true;
     
+    // set up the directory to save to
     if(config.get("imageDir")==true) {
       saveDir = (char*) config.get("imageDir");
     }
@@ -73,6 +81,10 @@ bool RtInputScannerImages::open(RtConfig &config) {
     if(config.get("imageExt")==true) {
       saveFileext = (char*) config.get("imageExt");
     }
+
+    // set the save path
+    savePath = (char*) config.get("subjDir");
+    savePath += saveDir + "/" + saveFilestem;
   }
 
   return true;
@@ -145,14 +157,9 @@ int RtInputScannerImages::svc() {
 //    // print and save
 //    rti->printInfo(cout);
 //
-//    if(saveImagesToFile) {
-//      saveImage(*rti);
-//    }
-//
-//    // signal
-//    if(readerOpen) {
-//      sendImageToReader(*rti);
-//    }
+    if(saveImagesToFile) {
+      saveImage(*rti);
+    }
 
     // clean up
     delete ei;
@@ -244,32 +251,42 @@ unsigned short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 //  in
 //   img: image to save
 bool RtInputScannerImages::saveImage(RtDataImage &img) {
-  char imgNum[6] = "";
-  sprintf(imgNum, "%06d", img.getAcquisitionNum());
+  // if this is the first acquisition, get the series number
+  if(img.getAcquisitionNum() == 1) {
+    seriesNum = getNextSeriesNum();
+  }
+
+  // assumes less than 10000 acquisitions in a series
+  char imgNum[5] = "";
+  sprintf(imgNum, "%05d", img.getAcquisitionNum());
 
   string fname = saveDir + "/" + saveFilestem + "_" + imgNum + "." + saveFileext;
 
   return img.write(fname);
 }
 
-//// sends an image to a event handler
-////  in
-////   img: image to send
-//bool RtInputScannerImages::sendImageToReader(RtDataImage &img) {
-//
-//  // make a message block
-//  ACE_Message_Block mb(sizeof(RtDataImageInfo)+img.getImgDataLen());
-//  memcpy(mb.wr_ptr(),&img.getInfo(),sizeof(RtDataImageInfo));
-//  memcpy(mb.wr_ptr()+sizeof(RtDataImageInfo),img.getData(),img.getImgDataLen());
-//  if(reader.read(mb, mb.space()) != 0) {
-//    cerr << "ERROR: handler failed to read scanner images" 
-//	 << endl;
-//    return readerOpen = false;
-//  }
-//
-//  return true;
-//}
+// gets the next series number to be saved in the current image directory
+// inspects the series currently in the directory and makes a new one
+unsigned int RtInputScannerImages::getNextSeriesNum() {
+  fstream fin;
+  char series[5];
+  string fname;
 
+  for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
+    sprintf(series, "%05d", sn);
+    fname = savePath + series + "-00001" + saveFileext;
+
+    fin.open(fname.c_str());
+    
+    if(fin.is_open() ) {
+      fin.close();
+      return sn;
+    }
+    fin.close();
+  }
+
+  return MAX_SERIESNUM;
+}
 
 // gets the version
 //  out:

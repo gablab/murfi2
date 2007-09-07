@@ -98,6 +98,14 @@ protected:
   //   img: image to save
   bool saveImage(RtDataImage &img);
 
+  // build a filename for a given acquisition number for the current series
+  // number
+  //  in
+  //   acquisition number
+  //  out
+  //   absolute file string
+  string getImageFilename(int seriesNum, int acquisitionNum);
+
   // gets the next series number to be saved in the current image directory
   // inspects the series currently in the directory and makes a new one
   unsigned int getNextSeriesNum();

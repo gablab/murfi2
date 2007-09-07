@@ -13,11 +13,14 @@
 
 #include"ace/Stream.h"
 
-#include"RtConductor.h"
+//#include"RtConductor.h"
 #include"RtCode.h"
-#include"RtData.h"
-#include"RtStreamComponent.h"
-#include"RtStreamMessage.h"
+//#include"RtData.h"
+//#include"RtStreamComponent.h"
+//#include"RtStreamMessage.h"
+#include"RtConfig.h"
+
+class RtConductor;
 
 using namespace std;
 

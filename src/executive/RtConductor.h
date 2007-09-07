@@ -24,8 +24,6 @@
 
 using namespace std;
 
-class RtStream;
-
 // class declaration
 class RtConductor {
 
@@ -102,10 +100,10 @@ protected:
   RtConfig config;
 
   // the data processing stream
-  RtStream *stream;
+  RtStream stream;
 
   // output object to log 
-  RtOutputFile* outputLog;
+  RtOutputFile outputLog;
 
   // these vectors store the objects that handle io
   // note that their indexing is related to the code number they throw when 

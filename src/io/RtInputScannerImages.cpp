@@ -31,7 +31,7 @@ RtInputScannerImages::RtInputScannerImages()
      saveDir(DEFAULT_SAVEDIR),
      saveFilestem(DEFAULT_SAVESTEM),
      saveFileext(DEFAULT_SAVEEXT),
-     seriesNum(0),
+     seriesNum(1),
      toBeDeleted(received.begin())
 {
   // nothing to do
@@ -83,28 +83,15 @@ bool RtInputScannerImages::open(RtConfig &config) {
     }
 
     // set the save path
-    savePath = (char*) config.get("subjDir");
-    savePath += saveDir + "/" + saveFilestem;
+    //string sp((char*) config.get("studyDir"));
+    stringstream sp;
+    //    sp << "/home/mri/subjects/foobar/" << saveDir << "/" << saveFilestem;
+    sp << config.get("studyDir") << saveDir << "/" << saveFilestem;
+    savePath = sp.str();
   }
 
   return true;
 }
-
-
-// set the handler that should receive new data
-//  in
-//   handler: handler to send the image to after we receive it
-//bool RtInputScannerImages::setHandler(ACE_Handler &handler) {
-//
-//  if(reader.open(handler) == -1) {
-//    cerr << "ERROR: could not register a handler for scanner images" 
-//	 << endl;
-//    return readerOpen = false;
-//  }
-//
-//  return readerOpen = true;
-//}
-
 
 // close and clean up
 //  out
@@ -138,7 +125,7 @@ int RtInputScannerImages::svc() {
     }
       
     // DEBUGGING
-    ei->iAcquisitionNumber = imageNum++;
+    //ei->iAcquisitionNumber = imageNum++;
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -215,14 +202,16 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 
   cout << "received img header of size " << rec << endl;
 
-  bool dumpHeader = true;
-  if(dumpHeader) {
-    FILE* hdr = fopen("/tmp/dat.hdr","wb");
-    fwrite(buffer, 1, rec, hdr);
-    fclose(hdr);
-  }
+//  bool dumpHeader = true;
+//  if(dumpHeader) {
+//    FILE* hdr = fopen("/tmp/dat.hdr","wb");
+//    fwrite(buffer, 1, rec, hdr);
+//    fclose(hdr);
+//  }
 
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
+
+  cerr << "received " << seriesNum << ":" << info->iAcquisitionNumber << endl;
 
   return info;
 }
@@ -256,29 +245,43 @@ bool RtInputScannerImages::saveImage(RtDataImage &img) {
     seriesNum = getNextSeriesNum();
   }
 
-  // assumes less than 10000 acquisitions in a series
-  char imgNum[5] = "";
-  sprintf(imgNum, "%05d", img.getAcquisitionNum());
+  cerr << "writing image number " << seriesNum << ":" << img.getAcquisitionNum() << endl;
 
-  string fname = saveDir + "/" + saveFilestem + "_" + imgNum + "." + saveFileext;
+  return img.write(getImageFilename(seriesNum, img.getAcquisitionNum()));
+}
 
-  return img.write(fname);
+// build a filename for a given acquisition number for the current series
+// number
+//  in
+//   acquisition number
+//  out
+//   absolute file string
+string RtInputScannerImages::getImageFilename(int _seriesNum, 
+					      int _acquisitionNum) {
+  // five digit filename assumption here!
+  char srnum[6];  
+  char acnum[6];
+  sprintf(srnum,"%05d",_seriesNum);
+  sprintf(acnum,"%05d",_acquisitionNum);
+
+  stringstream s;
+  s << savePath << "-" << srnum << "-" << acnum << "." << saveFileext;
+  string ret = s.str();
+
+  return s.str();
 }
 
 // gets the next series number to be saved in the current image directory
 // inspects the series currently in the directory and makes a new one
 unsigned int RtInputScannerImages::getNextSeriesNum() {
   fstream fin;
-  char series[5];
   string fname;
 
   for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
-    sprintf(series, "%05d", sn);
-    fname = savePath + series + "-00001" + saveFileext;
-
+    fname = getImageFilename(sn, 1);
     fin.open(fname.c_str());
     
-    if(fin.is_open() ) {
+    if(fin.fail() ) {
       fin.close();
       return sn;
     }

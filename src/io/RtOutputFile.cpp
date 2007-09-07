@@ -31,14 +31,15 @@ bool RtOutputFile::open(RtConfig &config) {
   }
   
   // open the file for output
-  string fn = config.get("logFilename");
+  string fn, logname = config.get("logFilename");
 
   // check the filename
   if(fn.empty()) {
     return false;
   }
   else if(fn.substr(0,1) != "/") {
-    fn = (char*) config.get("subjDir") + fn;
+    fn = (char*) config.get("studyDir");
+    fn += logname;
   }
 
   cout << "attempting to open logfile " << fn << endl;

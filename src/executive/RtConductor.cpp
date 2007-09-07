@@ -16,7 +16,7 @@ static char *VERSION = "$Id$";
 // default constructor
 RtConductor::RtConductor() {
   // all default config
-  outputLog = NULL;
+  //outputLog = NULL;
 }
 
 // constructor with command line args
@@ -61,8 +61,6 @@ RtConductor::RtConductor(int argc, char **argv) {
     (*i)->setCodeNum(curCodeNum);
   }
 
-
-
   // prepare outputs
 
   // display always first, if here
@@ -76,9 +74,9 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   if(config.get("logOutput")==true) {
-    ACE_NEW_NORETURN(outputLog, RtOutputFile);
+    //ACE_NEW_NORETURN(outputLog, RtOutputFile);
 
-    if(!addOutput(outputLog)) {
+    if(!addOutput(&outputLog)) {
       cerr << "ERROR: could not open logfile \""
 	   << config.get("filename") << "\"" << endl;
     }
@@ -93,7 +91,7 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   // build the stream and its components
-  ACE_NEW_NORETURN(stream, RtStream);
+  //ACE_NEW_NORETURN(stream, RtStream);
   buildStream(config);
 
 
@@ -103,8 +101,8 @@ RtConductor::RtConductor(int argc, char **argv) {
 // destructor
 RtConductor::~RtConductor() {
 
-  stream->close();
-  delete stream;
+  stream.close();
+  //delete stream;
 
   // tell everyone that we're done and delete them
   for(vector<RtInput*>::iterator i=inputs.begin(); i != inputs.end(); i++) {
@@ -129,10 +127,10 @@ RtConductor::~RtConductor() {
 bool RtConductor::buildStream(RtConfig config) {
 
   // set the conductor to us
-  stream->setConductor(this);
+  stream.setConductor(this);
 
   // open the stream
-  stream->configure(config);
+  stream.configure(config);
 
   return true;
 }
@@ -177,7 +175,7 @@ bool RtConductor::addOutput(RtOutput *out) {
 //   true (for success) or false
 bool RtConductor::init() {
 
-  (*outputLog).writeConfig(config);
+  outputLog.writeConfig(config);
 
   // initialize output methods
 //  for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++) {
@@ -186,9 +184,9 @@ bool RtConductor::init() {
 
 
 
-  (*outputLog) << "initialization completed at ";
-  (*outputLog).printNow();
-  (*outputLog) << "\n";
+  outputLog << "initialization completed at ";
+  outputLog.printNow();
+  outputLog << "\n";
 
   return true;
 }
@@ -201,9 +199,9 @@ bool RtConductor::init() {
 bool RtConductor::run() {
 
   // print startg time to log file
-  (*outputLog) << "began running at ";
-  (*outputLog).printNow();
-  (*outputLog) << "\n";
+  outputLog << "began running at ";
+  outputLog.printNow();
+  outputLog << "\n";
 
   // 
 
@@ -226,9 +224,9 @@ bool RtConductor::run() {
 
 
   // print end time to log file
-  (*outputLog) << "done running at ";
-  (*outputLog).printNow();
-  (*outputLog) << "\n";
+  outputLog << "done running at ";
+  outputLog.printNow();
+  outputLog << "\n";
 
   return true;
 }
@@ -252,7 +250,7 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     cerr << "caught a ready signal from an input" << endl;
 
     // let the stream decide if it should spawn a new processing instance 
-    stream->setInput(code,data);
+    stream.setInput(code,data);
   }
   else { // this is an output
     cerr << "caught a ready signal from an output" << endl;
@@ -261,86 +259,6 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
   }
 
 }
-
-//// handle signals appropriately
-//// this method handles errors as well as signals related to normal operation
-//int RtConductor::handle_signal(int sigNum, siginfo_t *sInfo,
-//			       ucontext_t *uContext) {
-//  // look for signals that are errors
-//  switch(sigNum) {
-//  case SIGHUP:
-//  case SIGINT:
-//  case SIGQUIT:
-//  case SIGILL:
-//  case SIGABRT:
-//  case SIGBUS:
-//  case SIGFPE:
-//  case SIGKILL:
-//  case SIGSEGV:
-//  case SIGALRM:
-//  case SIGTERM:
-//  case SIGSTKFLT:
-//  case SIGPWR:
-//  case SIGSYS:
-//
-//    // stop the loop and call for cleanup
-//    ACE_Reactor::instance()->end_reactor_event_loop();
-//
-//    return 1;
-//  }
-//
-//  // we threw the signal under normal operation, store it in our queue and
-//  // notify the exception handler
-//  sigQueue.push(sigNum);
-//  ACE_Reactor::instance()->notify(this);
-//
-//  return 0;
-//}
-//
-//// handle completetion events
-//int RtConductor::handle_input(ACE_HANDLE handle) {
-//  
-//  return 0;
-//}
-//
-//// handle exceptions appropriately
-//// note that handles errors as well as signals related to normal operation
-//// we are notify()ed of exceptions when streams are done or when new data is
-//// available
-//int RtConductor::handle_exception(ACE_HANDLE handle) {
-//  // pop off the queue
-//  unsigned int sigNum = sigQueue.front();
-//  sigQueue.pop();
-//
-//  // handle based on the thrower
-//  if(sigNum < START_CODE_INPUTS) { // shouldn't get here
-//    cerr << "WARNING: caught unknown signal " << sigNum << endl;
-//    return 1;
-//  }
-//  else if(sigNum < START_CODE_STREAMS) { // this is an input
-//    cerr << "caught a ready signal from an input" << endl;
-//  }
-//  else if(sigNum < START_CODE_OUTPUTS) { // this is a stream
-//    cerr << "caught a ready signal from a stream" << endl;
-//
-//  }
-//  else { // this is an output
-//    cerr << "caught a ready signal from an output" << endl;
-//  }
-//
-//  return 0;
-//}
-//
-//// handle exit of the process
-//int RtConductor::handle_exit(ACE_Process *proc) {
-//  // print end time to log file
-//  (*outputLog) << "done running at ";
-//  (*outputLog).printNow();
-//  (*outputLog) << "\n";
-//
-//  return 0;
-//}
-//
 
 
 // get the display output

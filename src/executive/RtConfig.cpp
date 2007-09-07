@@ -16,6 +16,7 @@ static char *VERSION = "$Id$";
 #include<iostream>
 #include<iomanip>
 #include<fstream>
+#include<sstream>
 #include<cstdlib>
 
 #define MAX_LINE_CHARS 1000
@@ -150,27 +151,28 @@ bool RtConfig::validateConfig() {
   }
 
   // check subjects directory
-  if(get("subjectsDir")==true) {
+  if(get("subjectsDir")==false) {
     set("subjectsDir",DEFAULT_SUBJECTSDIR);
-
-    // check for existance of subjdir
-    string subjdir((char*) get("subjectsDir"));
-    subjdir += "/";
-    subjdir += (char*) get("subject");
-    subjdir += "/";
-
-    string testfile = subjdir + "/testfile";
-
-    ofstream fs(testfile.c_str());
-    if(fs.fail()) {
-      cerr << "ERROR: subject directory " << subjdir << " is bad" << endl;
-      valid = false;
-    }
-    else {
-      set("subjDir",subjdir);
-    }
-    fs.close();
   }
+
+  // check for existance of studyDir
+  stringstream studyDir;
+  studyDir << (char*) get("subjectsDir") << "/";
+  studyDir <<  (char*) get("subject") << "/";
+  string s1 = studyDir.str();
+
+  string testfile = s1 +  "/testfile";
+
+  ofstream fs(testfile.c_str());
+  if(fs.fail()) {
+    cerr << "ERROR: subject directory " << studyDir.str() << " is bad" << endl;
+    valid = false;
+  }
+  else {
+    set("studyDir",studyDir.str());
+  }
+  fs.close();
+
 
   // check logfile name
   set("logOutput",true);
@@ -207,17 +209,33 @@ RtConfigVal &RtConfig::get(const char *name) {
 
   return p->second;
 }
+//
+//// get a parm value
+//string RtConfig::get(const char *name) {
+//  if(name == NULL) {
+//    return unset;
+//  }
+//
+//  map<string,RtConfigVal>::iterator p = parms.find(name);
+//
+//  if(p == parms.end()) {
+//    return unset;
+//  }
+//
+//  return ((RtConfigVal) p->second).getVal();
+//}
 
 // set a parm value
 template<class T>
 void RtConfig::set(const string name, T tval) {
-  set(name.c_str(), tval);
+  parms[name] = tval;
 }
 
 // set a parm value
 template<class T>
 void RtConfig::set(const char *name, T tval) {
-  parms[name] = tval;
+  string s(name);
+  set(s,tval);
 }
 
 // print a parm value

@@ -56,6 +56,9 @@ public:
   // get a parm value
   RtConfigVal &get(const char *name);
 
+  // get a parm value
+  //string get(const char *name);
+
   // set parm
   template<class T>
   void set(const char *name, T tval);
@@ -123,6 +126,10 @@ public:
     //transform(val.begin(),val.end(),val.begin(),(int(*)(int))tolower); 
   }
 
+  string getVal() {
+    return val;
+  }
+
   //*** operators ***//
 
   // logical not
@@ -158,6 +165,13 @@ public:
   operator string()  {
     string s;
     convert<string>(s,val);
+    return s;
+  }
+
+  // string assignment lvalue
+  string operator=(RtConfigVal &config)  {
+    string s;
+    convert<string>(s,config.val);
     return s;
   }
 

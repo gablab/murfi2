@@ -36,8 +36,11 @@ protected:
   int process(ACE_Message_Block *mb) {
     RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
+    ACE_DEBUG((LM_DEBUG, "passing image %d\n", ((RtDataImage*)msg->getLastData())->getAcquisitionNum()));
+
+
     for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++) {
-      (*i)->setData(msg->data);
+      (*i)->setData(msg->getLastData());
     }
 
     return 0;

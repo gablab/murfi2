@@ -94,6 +94,42 @@ void RtDataImage::setInfo(const RtExternalImageInfo &_info) {
   info = _info;
 }
 
+// sets the min and max pixel value for this data image
+void RtDataImage::setMinMax() {
+  info.maxVal = 0;
+  info.minVal = USHRT_MAX;
+  for(unsigned int i = 0; i < info.numPix; i++) {
+    if(data[i] > info.maxVal) {
+      info.maxVal = data[i];
+    }
+    if(data[i] < info.minVal) {
+      info.minVal = data[i];
+    }
+  }
+  
+  info.minMaxSet = true;
+}
+
+// get a smart contrast level
+float RtDataImage::getAutoContrast() {
+  
+  if(!info.minMaxSet) {
+    setMinMax();
+  }
+
+  return USHRT_MAX/(float) info.maxVal;
+}
+
+
+// get a smart brightness level
+float RtDataImage::getAutoBrightness() {
+  if(!info.minMaxSet) {
+    setMinMax();
+  }
+
+  return (float) info.minVal;
+
+}
 
 /*****************************************************************************
  * $Source$

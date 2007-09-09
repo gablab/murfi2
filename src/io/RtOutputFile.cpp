@@ -9,6 +9,9 @@ static char *VERSION = "$Id$";
 
 #include"RtOutputFile.h"
 #include<iostream>
+#include<sstream>
+
+#include"ace/Mutex.h"
 
 // default constructor
 RtOutputFile::RtOutputFile() : RtOutput() {
@@ -31,48 +34,92 @@ bool RtOutputFile::open(RtConfig &config) {
   }
   
   // open the file for output
-  string fn, logname = config.get("logFilename");
+  string logname = config.get("logFilename");
 
   // check the filename
-  if(fn.empty()) {
+  if(logname.empty()) {
     return false;
   }
-  else if(fn.substr(0,1) != "/") {
-    fn = (char*) config.get("studyDir");
-    fn += logname;
+  else if(logname.substr(0,1) != "/") {
+    stringstream fs;
+    fs << config.get("studyDir") << "/"  << logname;
+  
+    logname = fs.str();
   }
 
-  cout << "attempting to open logfile " << fn << endl;
-  outfp.open(fn.c_str(),fstream::out);
+  cout << "attempting to open logfile " << logname << endl;
+  outfp.open(logname.c_str(), fstream::out | fstream::app);
 
   // check 
   if(outfp.fail()) {
-    cerr << "ERROR: could not open log file " << fn << " for output" << endl;
+    cerr << "ERROR: could not open log file " << logname << " for output" << endl;
     return false;
   }
 
   // write a header
-  outfp << "# realtime system log file" << endl
+  ACE_Mutex mutx;
+  mutx.acquire();
+  
+  outfp << "################################################################"
+	<< endl << endl
+	<< "# realtime system log file" << endl
 	<< "# " << getVersionString() << endl
 	<< "# " << config.getVersionString() << endl
-	<< "# " << config.getConductorVersionString() << endl
+	<< "# " << config.getConductorVersionString() << endl << endl
 	<< "created ";
   printNow();
   outfp  << endl << endl;
 
   outfp.flush();
+  mutx.release();
 
   return true;
+}
+
+// write the string from a stringstream to the output file
+void RtOutputFile::write(stringstream &ss) {
+  write(ss.str());
+}
+
+// write a string to the output file
+void RtOutputFile::write(const string &s) {
+  if(!isOpen) {
+    return;
+  }
+
+  ACE_Mutex mutx;
+
+  // make sure noone else writes while we are
+  mutx.acquire();
+
+  outfp << s;
+
+  outfp.flush();
+
+  mutx.release();
 }
 
 // close and clean up
 bool RtOutputFile::close() {
 
+  ACE_Mutex mutx;
+
+  // make sure noone else writes while we are
+  mutx.acquire();
+
   outfp << "closed ";
   RtOutput::printNow(outfp);
-  outfp  << endl;
+  outfp << endl;
+  outfp << endl;
+
+  outfp << "################################################################"
+	<< endl << endl;
 
   outfp.close();
+
+  isOpen = false;
+
+  mutx.release();
 
   return true;
 }
@@ -84,12 +131,18 @@ void RtOutputFile::printNow() {
 
 // prints the configuration to the file
 void RtOutputFile::writeConfig(RtConfig &config) {
-  if(isOpen) {
-    outfp << "configuration:" << endl 
-	  << "--------------" << endl;
-    config.dumpConfig(outfp);
-    outfp << "--------------" << endl << endl;
-  }
+
+  ACE_Mutex mutx;
+
+  // make sure noone else writes while we are
+  mutx.acquire();
+
+  outfp << "configuration:" << endl 
+	<< "--------------" << endl;
+  config.dumpConfig(outfp);
+  outfp << "--------------" << endl << endl;
+
+  mutx.release();
 }
 
 // gets the version

@@ -12,6 +12,9 @@
 
 #include "glutMaster.h"
 #include "glutWindow.h"
+
+#include<iostream>
+using namespace std;
                                                        
 GlutWindow * viewPorts[MAX_NUMBER_OF_WINDOWS]; 
 
@@ -93,7 +96,6 @@ void GlutMaster::CallBackVisibilityFunc(int visible){
 }
 
 void GlutMaster::CallGlutCreateWindow(char * setTitle, GlutWindow * glutWindow){
-
    // Open new window, record its windowID , 
 
    int windowID = glutCreateWindow(setTitle);

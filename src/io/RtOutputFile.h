@@ -29,6 +29,12 @@ public:
   // open and start accepting input
   bool open(RtConfig &config);
 
+  // write the string from a stringstream to the output file
+  void write(stringstream &ss);
+
+  // write a string to the output file
+  void write(const string &s);
+
   // close and clean up
   bool close();
 

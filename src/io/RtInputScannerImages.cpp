@@ -71,22 +71,22 @@ bool RtInputScannerImages::open(RtConfig &config) {
     
     // set up the directory to save to
     if(config.get("imageDir")==true) {
-      saveDir = (char*) config.get("imageDir");
+      saveDir = config.get("imageDir").str();
     }
 
     if(config.get("imageStem")==true) {
-      saveFilestem = (char*) config.get("imageStem");
+      saveFilestem = config.get("imageStem").str();
     }
 
     if(config.get("imageExt")==true) {
-      saveFileext = (char*) config.get("imageExt");
+      saveFileext = config.get("imageExt").str();
     }
 
     // set the save path
-    //string sp((char*) config.get("studyDir"));
+    //string sp(config.get("studyDir").str());
     stringstream sp;
-    //    sp << "/home/mri/subjects/foobar/" << saveDir << "/" << saveFilestem;
-    sp << config.get("studyDir") << saveDir << "/" << saveFilestem;
+    //sp << "/home/mri/subjects/foobar/" << saveDir << "/" << saveFilestem;
+    sp << config.get("studyDir").str() << saveDir << "/" << saveFilestem;
     savePath = sp.str();
   }
 
@@ -112,6 +112,7 @@ int RtInputScannerImages::svc() {
   RtExternalImageInfo *ei;
   unsigned short *img;
   RtDataImage *rti;
+  stringstream infos;
 
   int imageNum = 0;
 
@@ -141,12 +142,17 @@ int RtInputScannerImages::svc() {
 
     sendCode(rti);
 
-//    // print and save
 //    rti->printInfo(cout);
-//
+
     if(saveImagesToFile) {
       saveImage(*rti);
     }
+
+    // log that we received the image
+    infos.str("");
+    infos << "received image from scanner: series " << seriesNum 
+	  << " acquisition " << ei->iAcquisitionNumber << endl;
+    log(infos);
 
     // clean up
     delete ei;

@@ -33,6 +33,7 @@ default: $(OBJ_FILES)
 clean:
 	@$(ECHO) 'make: removing object and autosave files'
 	-$(RM) -f *.o *~
+	cd glutmaster && $(MAKE) clean
 
 ######################################################################
 ### $Source$

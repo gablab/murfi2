@@ -65,7 +65,7 @@ int RtStreamComponent::svc() {
   // wait for stuff to do
   while(1) {
 
-    ACE_DEBUG((LM_DEBUG, ACE_TEXT("in stream component svc()\n")));
+    ACE_TRACE((LM_TRACE, ACE_TEXT("in stream component svc()\n")));
 
     if(this->getq(msg) == -1) {
       ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("getq returned -1\n")),-1);
@@ -80,7 +80,7 @@ int RtStreamComponent::svc() {
       break;
     }
 
-    ACE_DEBUG((LM_DEBUG, ACE_TEXT("entered stream component svc() with data\n")));
+    ACE_TRACE((LM_TRACE, ACE_TEXT("entered stream component svc() with data\n")));
 
     // process normally
     //RtStreamMessage *strMsg = (RtStreamMessage*) msg->rd_ptr();

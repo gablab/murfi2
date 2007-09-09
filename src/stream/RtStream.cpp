@@ -116,11 +116,11 @@ void RtStream::setInput(unsigned int code, RtData *data) {
 
     RtStreamMessage *msg = (RtStreamMessage*) mb->wr_ptr();
     mb->wr_ptr(sizeof(RtStreamMessage));
+    
+    msg->init(conductor);
+    msg->addData(data);
 
-    msg->conductor = conductor;
-    msg->data = data;
-
-    ACE_DEBUG((LM_DEBUG, ACE_TEXT("starting stream for new data\n")));
+    ACE_TRACE((LM_TRACE, ACE_TEXT("starting stream for new data\n")));
 
     this->put(mb);
 

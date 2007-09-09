@@ -14,10 +14,8 @@ static char *VERSION = "$Id$";
 //*** constructors/destructors  ***//
 
 // default constructor
-RtConductor::RtConductor() {
-  // all default config
-  //outputLog = NULL;
-}
+//RtConductor::RtConductor() {
+//}
 
 // constructor with command line args
 RtConductor::RtConductor(int argc, char **argv) {
@@ -31,6 +29,7 @@ RtConductor::RtConductor(int argc, char **argv) {
     cerr << "config failed... exit" << endl;
     exit(1);
   }
+
 
   // prepare inputs
 
@@ -65,6 +64,7 @@ RtConductor::RtConductor(int argc, char **argv) {
 
   // display always first, if here
   if(config.get("imageDisplay")==true) {
+
     RtDisplayImage *dispimg;
     ACE_NEW_NORETURN(dispimg, RtDisplayImage);    
 
@@ -74,11 +74,10 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   if(config.get("logOutput")==true) {
-    //ACE_NEW_NORETURN(outputLog, RtOutputFile);
 
-    if(!addOutput(&outputLog)) {
+    if(!outputLog.open(config)) {
       cerr << "ERROR: could not open logfile \""
-	   << config.get("filename") << "\"" << endl;
+	   << config.get("logFilename") << "\"" << endl;
     }
   }
 
@@ -91,7 +90,6 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   // build the stream and its components
-  //ACE_NEW_NORETURN(stream, RtStream);
   buildStream(config);
 
 
@@ -177,12 +175,6 @@ bool RtConductor::init() {
 
   outputLog.writeConfig(config);
 
-  // initialize output methods
-//  for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++) {
-//    (*i)->open(config);
-//  }
-
-
 
   outputLog << "initialization completed at ";
   outputLog.printNow();
@@ -203,16 +195,14 @@ bool RtConductor::run() {
   outputLog.printNow();
   outputLog << "\n";
 
-  // 
+  // start the display
+  if(config.get("imageDisplay")==true) {  
+    getDisplay()->activate();
+  }
 
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     (*i)->activate();
-  }
-
-  // start the display
-  if(config.get("imageDisplay")==true) {  
-    getDisplay()->activate();
   }
 
   // wait for threads to complete
@@ -258,6 +248,16 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     // dont need to do much here
   }
 
+}
+
+// write to the log file
+void RtConductor::log(const string &s) {
+  outputLog.write(s);
+}
+
+// write to the log file
+void RtConductor::log(stringstream &s) {
+  outputLog.write(s);
 }
 
 

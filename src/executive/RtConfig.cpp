@@ -23,6 +23,7 @@ static char *VERSION = "$Id$";
 
 // defaults
 #define DEFAULT_SUBJECTSDIR "/home/mri/subjects"
+#define DEFAULT_CONFILENAME "conf/example.conf"
 
 
 //*** constructors/destructors  ***//
@@ -105,7 +106,7 @@ bool RtConfig::parseConfigFile() {
   char next;
 
   if(fn.empty()) {
-    return false;
+    fn =  DEFAULT_CONFILENAME;
   }
 
   // try to open the config file for reading
@@ -135,6 +136,7 @@ bool RtConfig::parseConfigFile() {
 
   cf.close();
 
+
   return true;
 }
 
@@ -157,8 +159,8 @@ bool RtConfig::validateConfig() {
 
   // check for existance of studyDir
   stringstream studyDir;
-  studyDir << (char*) get("subjectsDir") << "/";
-  studyDir <<  (char*) get("subject") << "/";
+  studyDir << get("subjectsDir").str() << "/";
+  studyDir << get("subject").str() << "/";
   string s1 = studyDir.str();
 
   string testfile = s1 +  "/testfile";
@@ -169,24 +171,29 @@ bool RtConfig::validateConfig() {
     valid = false;
   }
   else {
+
     set("studyDir",studyDir.str());
   }
   fs.close();
 
 
   // check logfile name
-  set("logOutput",true);
-  if(get("logFilename")==false) {
-    cerr << "WARNING: no logfile name specified" << endl;
-    set("logOutput",false);
+  if(get("disableLogOutput")==false) {
+    set("logOutput",true);
+    if(get("logFilename")==false) {
+      cerr << "WARNING: no logfile name specified" << endl;
+      set("logOutput",false);
+    }
   }
 
-  // check port
-  set("receiveScannerImages",true);
-  if((int) get("scannerPort") < 1 || (int) get("scannerPort") > 65535) {
-    cerr << "WARNING: invalid port number for receiving scanner images" 
-	 << endl;
-    set("receiveScannerImages",false);
+  // check image receiver
+  if(get("disableReceiveScannerImages")==false) {
+    set("receiveScannerImages",true);
+    if((int) get("scannerPort") < 1 || (int) get("scannerPort") > 65535) {
+      cerr << "WARNING: invalid port number for receiving scanner images" 
+	   << endl;
+      set("receiveScannerImages",false);
+    }
   }
 
   return valid;

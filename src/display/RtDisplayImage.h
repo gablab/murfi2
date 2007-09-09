@@ -60,10 +60,10 @@ public:
   virtual int svc();
 
   // sets the image to be displayed
-  void setData(RtData *img);
+  void setData(RtData *_img);
 
   // makes a texture from the image data and prepares it for display
-  void makeTexture(unsigned short *data);
+  void makeTexture();
 
   // callbacks for opengl
   void CallBackDisplayFunc(void);
@@ -75,10 +75,10 @@ protected:
   GlutMaster glutMaster;
 
   int x, y, width, height;
-  int imgw, imgh;
+  RtDataImage *img;
   GLuint texture;
 
-  bool needsRepaint;
+  bool needsRepaint, newTex;
 
   char title[100];
   string bottomStr;

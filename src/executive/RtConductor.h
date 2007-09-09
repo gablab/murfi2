@@ -10,7 +10,7 @@
 #define RTCONDUCTOR_H
 
 #include<vector>
-#include<queue>
+#include<sstream>
 
 #include"RtConfig.h"
 #include"RtDisplayImage.h"
@@ -32,7 +32,7 @@ public:
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtConductor(); 
+  //RtConductor(); 
 
   // constructor with command line args
   RtConductor(int argc, char **argv); 
@@ -54,9 +54,16 @@ public:
   //   true (for success) or false
   bool run();
 
+  //*** callback entries for threads ***//
+
   // receive a code signaling completetion of data input or processing
   void receiveCode(unsigned int code, RtData *data);
 
+  // write to the log file
+  void log(const string &s);
+
+  // write to the log file
+  void log(stringstream &s);
 
   //** gets **//
 

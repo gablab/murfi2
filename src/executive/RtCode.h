@@ -9,6 +9,10 @@
 #define RTCODE_H
 
 #include"RtData.h"
+#include<sstream>
+#include<string>
+
+using namespace std;
 
 // explicitly defined codes (not the only ones
 
@@ -54,6 +58,12 @@ protected:
 
   // send the code to the handler
   void sendCode(RtData *data);
+
+  // log a message to the global logfile
+  void log(const string &s);
+
+  // log a message to the global logfile
+  void log(stringstream &s);
 
   // conductor instance to send codes to
   RtConductor *conductor;

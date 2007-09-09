@@ -35,7 +35,7 @@
 // default constructor
 RtDisplayImage::RtDisplayImage() 
   : x(DEFAULT_X), y(DEFAULT_Y), width(DEFAULT_W), height(DEFAULT_H), 
-    imgw(0), imgh(0), texture(0) {
+    img(NULL), texture(0), needsRepaint(true), newTex(false) {
 }
 
 // constructor with stuff
@@ -49,7 +49,7 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
 			       int _w, int _h, 
 			       char *_title) 
   : x(_x), y(_y), width(_w), height(_h),
-    imgw(0), imgh(0), texture(0) {
+    img(NULL), texture(0), needsRepaint(true), newTex(false) {
 
   strcpy(title,_title);
 }
@@ -71,14 +71,14 @@ bool RtDisplayImage::open(RtConfig &config) {
   y = config.get("imageDisplayWinY")==true
     ? config.get("imageDisplayWinY") : DEFAULT_Y;
 
-  width = config.get("imageDisplayWinX")==true
-    ? config.get("imageDisplayWinX") : DEFAULT_W;
+  width = config.get("imageDisplayWinW")==true
+    ? config.get("imageDisplayWinW") : DEFAULT_W;
 
-  height = config.get("imageDisplayWinX")==true
-    ? config.get("imageDisplayWinX") : DEFAULT_H;
+  height = config.get("imageDisplayWinH")==true
+    ? config.get("imageDisplayWinH") : DEFAULT_H;
 
   strcpy(title, config.get("imageDisplayWinTitle")==true
-	 ? (char*) config.get("imageDisplayWinTitle") : DEFAULT_TITLE);
+	 ? config.get("imageDisplayWinTitle").str().c_str() : DEFAULT_TITLE);
 
 
   return init();
@@ -110,6 +110,8 @@ bool RtDisplayImage::init() {
   glViewport(0, 0, width, height);
 
   glutMaster.CallGlutCreateWindow(title, this);
+  glutMaster.EnableIdleFunction();
+  glutMaster.SetIdleToCurrentWindow();
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -117,9 +119,6 @@ bool RtDisplayImage::init() {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0.0, (double) width, 0.0, (double) height, 1.0, -1.0);
-
-  // activate the display thread
-  //this->activate();
 
   return true;
 }
@@ -133,41 +132,59 @@ int RtDisplayImage::svc() {
 
 // sets the image to be displayed
 void RtDisplayImage::setData(RtData *data) {
-  RtDataImage *img = (RtDataImage*) data;
+  img = (RtDataImage*) data;
 
+  ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getAcquisitionNum()));
+
+
+  // set the info strings
   bottomStr = img->getCreationTime();
-  topStr = img->getAcquisitionNum();
 
-  cerr << "RtDisplayImage: got new data" << endl;
+  stringstream s;
+  s << img->getAcquisitionNum();
+  topStr = s.str();
 
-  imgw = img->getDim(0);
-  imgh = img->getDim(1);
-  makeTexture(img->getData());
+  newTex = true;
 }
 
 // makes a texture from the image data and prepares it for display
-void RtDisplayImage::makeTexture(unsigned short *data) {
+void RtDisplayImage::makeTexture() {
 
   /* delete the old texture if there is one */
-  if(texture != 0) {
+  if(glIsTexture(texture)) {
     glDeleteTextures(1, &texture);
   }
 
-  GLuint text[10];
-
   /* get the id for the texture */
-  glGenTextures(1, text);
+  glGenTextures(1, &texture);
 
-  cout << "text is " << text[0] << endl;
+  /* contrast */
   
+  float contrast = img->getAutoContrast(); 
+  glPixelTransferf(GL_RED_SCALE,   contrast);
+  glPixelTransferf(GL_GREEN_SCALE, contrast);
+  glPixelTransferf(GL_BLUE_SCALE,  contrast);
+  
+  
+  /* brightness */
+  float brightness = img->getAutoBrightness();
+  glPixelTransferf(GL_RED_BIAS,   brightness);
+  glPixelTransferf(GL_GREEN_BIAS, brightness);
+  glPixelTransferf(GL_BLUE_BIAS,  brightness);
+
   /* create the image texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, texture);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, imgh, imgw, 0, GL_LUMINANCE, 
-	       GL_UNSIGNED_SHORT, data);  
+  glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, img->getDim(0), 
+	       img->getDim(1), 0, GL_LUMINANCE, 
+	       GL_UNSIGNED_SHORT, img->getData());  
+
+  if(!glIsTexture(texture)) {
+    cerr << "ERROR: could not generate a new texture" << endl;
+  }  
 
 
   CallBackDisplayFunc();
@@ -183,13 +200,16 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
    
   // if there is no image yet, draw a message and return
-  if(texture == 0) {
-    cerr << "UNDRAWING" << endl;
-
+  if(texture == 0 || img == NULL) {
     drawString(10,10,"no image loaded",1,0,0);
     glutSwapBuffers();
     return;
   }
+
+  ACE_DEBUG((LM_DEBUG, "showing image %d\n", img->getAcquisitionNum()));
+
+  int imgw = img->getDim(1);
+  int imgh = img->getDim(0);
 
   /* turn on texture mapping */
   glEnable(GL_TEXTURE_RECTANGLE_EXT);
@@ -200,22 +220,20 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   /* make a quadrilateral and provide texture coords */
   glBegin(GL_QUADS); {
     glTexCoord2d(0.0,0.0);
-    glVertex3f(0.0, height, 0.0);
+    glVertex3f(0.0, width, 0.0);
     glTexCoord2d(imgw,0.0);
-    glVertex3f(width, height, 0.0);
-    glTexCoord2d(imgw, imgh);
-    glVertex3f(width, 0, 0.0);
-    glTexCoord2d(0.0,imgh);
     glVertex3f(0.0, 0.0, 0.0);
+    glTexCoord2d(imgw, imgh);
+    glVertex3f(height, 0.0, 0.0);
+    glTexCoord2d(0.0,imgh);
+    glVertex3f(height, width, 0.0);
   } glEnd();
    
   glDisable(GL_TEXTURE_RECTANGLE_EXT);
 
   // draw the strings
   drawString(10,10,bottomStr.c_str(),1,0,0);
-  drawString(10,height-10,topStr.c_str(),0,1,0);
-
-  cerr << "DRAWING" << endl;
+  drawString(10,height-20,topStr.c_str(),0,1,0);
 
   glutSwapBuffers();
   
@@ -232,11 +250,18 @@ void RtDisplayImage::CallBackReshapeFunc(int w, int h){
 }
 
 void RtDisplayImage::CallBackIdleFunc(void){
-  
-//  if(needsRepaint) {
-//    needsRepaint = false;
-//    CallBackDisplayFunc();
-//  }
+
+  if(newTex) {
+    newTex = false;
+    makeTexture();
+  }
+
+  if(needsRepaint) {
+    needsRepaint = false;
+    CallBackDisplayFunc();
+  }
+
+  //sleep(1); // to prevent cpu hogging (need to have a beeter way to do this)
 }
 
 // draws a black box that will enclose a string of text

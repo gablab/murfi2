@@ -126,6 +126,10 @@ public:
     //transform(val.begin(),val.end(),val.begin(),(int(*)(int))tolower); 
   }
 
+  string str() {
+    return val;
+  }
+
   string getVal() {
     return val;
   }
@@ -163,16 +167,12 @@ public:
 
   // string assignment rvalue
   operator string()  {
-    string s;
-    convert<string>(s,val);
-    return s;
+    return val;
   }
 
   // string assignment lvalue
   string operator=(RtConfigVal &config)  {
-    string s;
-    convert<string>(s,config.val);
-    return s;
+    return config.val;
   }
 
   // comparison 

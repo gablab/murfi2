@@ -44,6 +44,17 @@ void RtCode::sendCode(RtData *data) {
   conductor->receiveCode(codeNum,data);
 }
 
+// log a message to the global logfile
+void RtCode::log(const string &s) {
+  conductor->log(s);
+}
+
+// log a message to the global logfile
+void RtCode::log(stringstream &s) {
+  conductor->log(s);
+}
+
+
 /*****************************************************************************
  * $Source$
  * Local Variables:

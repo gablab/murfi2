@@ -8,6 +8,15 @@
 #include"RtDataImageInfo.h"
 
 
+// deep copy constructor
+RtDataImageInfo::RtDataImageInfo(const RtDataImageInfo &info) {
+  (*this) = info;
+
+  // deep copy matrices
+  gsl_matrix_memcpy(vxl2ras, info.vxl2ras);
+  gsl_matrix_memcpy(ras2ref, info.ras2ref);
+}
+
 // copy constructor accepting a siemens ExternalImageInfo struct
 RtDataImageInfo::RtDataImageInfo(const RtExternalImageInfo &info) :
   bytesPerPix(sizeof(unsigned short)), minMaxSet(false), minVal(0), maxVal(0) {

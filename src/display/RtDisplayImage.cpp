@@ -23,7 +23,7 @@
 #endif
 
 // defaults
-#define DEFAULT_X 0
+#define DEFAULT_X 400
 #define DEFAULT_Y 0
 #define DEFAULT_W 600
 #define DEFAULT_H 600
@@ -110,8 +110,8 @@ bool RtDisplayImage::init() {
   glViewport(0, 0, width, height);
 
   glutMaster.CallGlutCreateWindow(title, this);
-  glutMaster.EnableIdleFunction();
-  glutMaster.SetIdleToCurrentWindow();
+  glutMaster.EnableTimerFunction();
+  glutMaster.SetTimerToCurrentWindow();
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -138,7 +138,7 @@ void RtDisplayImage::setData(RtData *data) {
 
 
   // set the info strings
-  bottomStr = img->getCreationTime();
+  bottomStr = img->getID();
 
   stringstream s;
   s << img->getAcquisitionNum();
@@ -206,7 +206,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     return;
   }
 
-  ACE_DEBUG((LM_DEBUG, "showing image %d\n", img->getAcquisitionNum()));
+  //  ACE_DEBUG((LM_DEBUG, "showing image %d\n", img->getAcquisitionNum()));
 
   int imgw = img->getDim(1);
   int imgh = img->getDim(0);
@@ -249,7 +249,8 @@ void RtDisplayImage::CallBackReshapeFunc(int w, int h){
    CallBackDisplayFunc();
 }
 
-void RtDisplayImage::CallBackIdleFunc(void){
+
+void RtDisplayImage::CallBackTimerFunc(int time, int val) {
 
   if(newTex) {
     newTex = false;
@@ -261,7 +262,6 @@ void RtDisplayImage::CallBackIdleFunc(void){
     CallBackDisplayFunc();
   }
 
-  //sleep(1); // to prevent cpu hogging (need to have a beeter way to do this)
 }
 
 // draws a black box that will enclose a string of text

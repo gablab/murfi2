@@ -11,7 +11,7 @@ static char *VERSION = "$Id$";
 #include"RtStreamComponent.h"
   
 // default constructor
-RtStreamComponent::RtStreamComponent() : super() {
+RtStreamComponent::RtStreamComponent() : super(), persistent(false) {
   
 }
 
@@ -112,6 +112,15 @@ char *RtStreamComponent::getVersionString() {
   return VERSION;
 }
 
+// sets whether this data should be kept around after the stream is done
+void RtStreamComponent::setPersistent(bool p) {
+  persistent = p;
+}
+
+// gets whether this data should be kept around after the stream is done
+bool RtStreamComponent::getPersistent() {
+  return persistent;
+}
 
 /*****************************************************************************
  * $Source$

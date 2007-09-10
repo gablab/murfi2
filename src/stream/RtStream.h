@@ -10,6 +10,7 @@
 #define RTSTREAM_H
 
 #include<vector>
+#include<stack>
 
 #include"ace/Stream.h"
 
@@ -61,6 +62,12 @@ public:
   //   data: data 
   virtual void setInput(unsigned int code, RtData *data);
 
+  // adds all the modules on the stack to the processing stream
+  // the module stack is emtpty after this executes
+  //  out
+  //   -1 for error, 0 on success
+  int pushAllModules();
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -76,17 +83,8 @@ protected:
   // pointer to conductor 
   RtConductor *conductor;
 
-  // begins stream processing
-  //  out:
-  //   true (for success) or false
-  //virtual bool run(RtData &data);
-
-  // vector of components objects
-  //vector<RtStreamComponent> components;
-
-  // here we need a way to represent serial dependencies in processing
-  // maybe a graph?
-
+  // stack of moules to be added
+  stack<Module*> addMod;
 };
 
 

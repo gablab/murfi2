@@ -21,11 +21,30 @@ class RtDataImageInfo : public RtData {
 public:
   
   RtDataImageInfo()  :
+       imgDataLen(0),
+       numPix(0),
        bytesPerPix(sizeof(unsigned short)),
+       minMaxSet(false),
+       minVal(USHRT_MAX),
+       maxVal(0),
        vxl2ras(gsl_matrix_calloc(4,4)),
-       ras2ref(gsl_matrix_calloc(4,4))
+       ras2ref(gsl_matrix_calloc(4,4)),
+       slice(0),
+       readFOV(0),
+       phaseFOV(0),
+       sliceThick(0),
+       pace(false),
+       swapReadPhase(false),
+       acqNum(0),
+       timeAfterStart(0),
+       te(0), tr(0), ti(0),
+       triggerTime(0),
+       reconDelay(0),
+       distCorrect2D(false),
+       moco(false),
+       fromScanner(false)
   {
-
+    
   }
 
   // destruct
@@ -35,6 +54,9 @@ public:
     gsl_matrix_free(vxl2ras);
     gsl_matrix_free(ras2ref);
   }
+
+  // deep copy constructor
+  RtDataImageInfo(const RtDataImageInfo &info);
 
   // copy constructor accepting a siemens ExternalImageInfo struct
   RtDataImageInfo(const RtExternalImageInfo &info);

@@ -20,6 +20,7 @@ public:
 
   RtStreamMessage()  {
     numData = 0;
+    curDataIndex = 0;
   }
 
 
@@ -45,6 +46,24 @@ public:
   //   sucess or failure
   bool setData(RtData *_data, unsigned int index);
 
+  // sets the current data to the specified index
+  //  in
+  //   index of data to set as current
+  //  out
+  //   sucess or failure
+  bool setCurrentData(unsigned int index);
+
+  // sets the last data to be current
+  //  out
+  //   sucess or failure
+  bool setLastDataAsCurrent();
+
+  // get the current data (original data plus any desired processing up to
+  // this point) 
+  //  out 
+  //   pointer to the current data or NULL, if none
+  RtData *getCurrentData();
+
   // get the last added data
   //  out
   //   pointer to the last data or NULL, if none
@@ -66,6 +85,10 @@ protected:
 
   // how many data objs we have
   unsigned int numData;
+
+  // index of the current data: data that represents the end result of
+  // processing up this point
+  unsigned int curDataIndex;
 
   // pointer to conductor
   RtConductor *conductor;

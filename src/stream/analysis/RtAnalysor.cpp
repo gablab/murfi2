@@ -32,24 +32,21 @@ RtAnalysor::~RtAnalysor() {
 int RtAnalysor::addModules(RtConfig &config) {
   // build the list of stream components specified in the config 
 
-  // add a passer module for the original data
-  Module *passerMod;
-  RtPasser *passer = new RtPasser();
-  ACE_NEW_RETURN(passerMod, Module(ACE_TEXT("original data passer module"),
-				   passer),-1);
-  RtOutput* display = config.getConductor()->getDisplay();
-  if(display != NULL) {
-    passer->addOutput(display);
-  }
+  // add a passer module for the preprocessed data
+//  Module *passerMod;
+//  RtPasser *passer = new RtPasser();
+//  ACE_NEW_RETURN(passerMod, Module(ACE_TEXT("preprocessed data passer module"),
+//				   passer),-1);
+//  RtOutput* display = config.getConductor()->getDisplay();
+//  if(display != NULL) {
+//    passer->addOutput(display);
+//  }
   
-
-
-
   
-  if(this->push(passerMod) == -1) {
-    ACE_ERROR_RETURN((LM_ERROR, 
-		     ACE_TEXT("failed to add preprocessor\n")),-1);
-  }
+//  if(this->push(passerMod) == -1) {
+//    ACE_ERROR_RETURN((LM_ERROR, 
+//		     ACE_TEXT("failed to add passer\n")),-1);
+//  }
 
 
   return 0;

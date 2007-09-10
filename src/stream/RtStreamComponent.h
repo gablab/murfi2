@@ -54,6 +54,11 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
+  // sets whether this data should be kept around after the stream is done
+  void setPersistent(bool p);
+
+  // gets whether this data should be kept around after the stream is done
+  bool getPersistent();
 
 protected:
 
@@ -64,6 +69,9 @@ protected:
 
   // pure virtual for implementation of real processing
   virtual int process(ACE_Message_Block *mb) = 0;
+
+  // whether data created by this component should be persistent
+  bool persistent;
 
 };
 

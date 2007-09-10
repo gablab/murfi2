@@ -35,8 +35,14 @@ public:
   // construct from  byte data and dim sizes
   //  RtDataImage(unsigned short *bytes, vector<int> &_dims); 
 
-  // construct from an image info struct and some image data
+  // construct from an external image info struct (siemens) and some image data
   RtDataImage(RtExternalImageInfo &info, unsigned short *data); 
+
+  // construct from an image info struct and (possibly blank) data
+  RtDataImage(RtDataImageInfo &info, unsigned short *data = NULL); 
+
+  // construct from another image
+  RtDataImage(RtDataImage &img);
 
   // write an image to a file
   //  in
@@ -59,37 +65,28 @@ public:
   //********  methods for getting data from the image *******//
 
   // get the acquisition number
-  string getCreationTime() const {
-    return RtDataImageInfo::ACE_Date_Time2SiemensTime(creationTime);
-  }
+  string getCreationTime() const;
 
   // get the acquisition number
-  unsigned int getAcquisitionNum() const {
-    return info.acqNum;
-  }
+  unsigned int getAcquisitionNum() const;
 
   // get dimensions
-  int getDim(int i) {
-    return info.numDims > i && i >= 0 ? info.dims[i] : -1;
-  }
+  int getDim(int i);
+
+  // get number of pix
+  int getNumPix();
+
+  // get pixel value
+  unsigned short getPixel(unsigned int i);
 
   // get data size
-  unsigned int getImgDataLen() {
-    return info.imgDataLen;
-  }
+  unsigned int getImgDataLen();
 
   // get the image info
-  RtDataImageInfo &getInfo() {
-    return info;
-  }
+  RtDataImageInfo &getInfo();
 
   // get a pointer to the image data
-  unsigned short *getData() {
-    return data;
-  }
-
-  // sets the min and max pixel value for this data image
-  void setMinMax();
+  unsigned short *getData();
 
 
   // get a smart contrast level
@@ -98,6 +95,16 @@ public:
   // get a smart brightness level
   float getAutoBrightness();
 
+  //*** sets  ***//
+
+  // sets the min and max pixel value for this data image
+  void setMinMax();
+
+  // set pixel value
+  void setPixel(unsigned int i, unsigned short v);
+
+  // set pixel value when locked
+  void setPixelLocked(RtLocker *locker, unsigned int i, unsigned short v); 
 private:
 
   //*** private data members  ***//

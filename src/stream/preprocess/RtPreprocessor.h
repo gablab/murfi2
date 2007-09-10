@@ -11,6 +11,7 @@
 
 #include"RtStreamComponent.h"
 #include"RtData.h"
+#include"RtPasser.h"
 
 // class declaration
 class RtPreprocessor : public RtStreamComponent, public RtStream {

@@ -25,6 +25,14 @@ bool RtStreamMessage::addData(RtData *_data) {
   return true;
 }
 
+// get the current data (original data plus any desired processing up to
+// this point) 
+//  out 
+//   pointer to the current data or NULL, if none
+RtData *RtStreamMessage::getCurrentData() {
+  return getData(curDataIndex);
+}
+
 // get the last added data
 //  out
 //   pointer to the last data or NULL, if none
@@ -68,6 +76,31 @@ bool RtStreamMessage::setData(RtData *_data, unsigned int index) {
 
   return true;
 }
+
+
+// sets the current data to the specified index
+//  in
+//   index of data to set as current
+//  out
+//   sucess or failure
+bool RtStreamMessage::setCurrentData(unsigned int index) {
+  if(index > numData) {
+    return false;
+  }
+
+  curDataIndex = index;
+
+  return true;  
+}
+
+// sets the last data to be current
+//  out
+//   sucess or failure
+bool RtStreamMessage::setLastDataAsCurrent() {
+  curDataIndex = numData-1;
+  return true;
+}
+
 
 // get the number of data objects we currently have
 unsigned int RtStreamMessage::getNumData() {

@@ -34,16 +34,6 @@ void RtStream::setConductor(RtConductor *_conductor) {
   conductor = _conductor;
 }
   
-// adds a component to the processing pipeline
-//  in:
-//   component: component object
-//  out:
-//   true (for success) or false
-//bool RtStream::addComponent(RtStreamComponent &component) {
-//
-//  return true;
-//}
-
 
 // initialize stream and prepare to run
 //  out:
@@ -129,15 +119,24 @@ void RtStream::setInput(unsigned int code, RtData *data) {
 }
 
 
-//*** operation routines  ***//
+// adds all the modules on the stack to the processing stream
+// the module stack is emtpty after this executes
+//  out
+//   -1 for error, 0 on success
+int RtStream::pushAllModules() {
+
+  // add all the modules from the stack
+  while(!addMod.empty()) {
+    if(this->push(addMod.top()) == -1) {
+      ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT("failed to add a module\n")),-1);
+    }
+    
+    addMod.pop();
+  }
   
-// begins stream processing
-//  out:
-//   true (for success) or false
-//bool RtStream::run(RtData &data) {
-//
-//  return true;
-//}
+  return 0;
+}
+
 
 
 // gets the version

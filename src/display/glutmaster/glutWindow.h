@@ -26,6 +26,7 @@ public:
 
    virtual void CallBackDisplayFunc();
    virtual void CallBackIdleFunc(void);
+   virtual void CallBackTimerFunc(int elapsedTime, int value);
    virtual void CallBackKeyboardFunc(unsigned char key, int x, int y);
    virtual void CallBackMotionFunc(int x, int y);
    virtual void CallBackMouseFunc(int button, int state, int x, int y);

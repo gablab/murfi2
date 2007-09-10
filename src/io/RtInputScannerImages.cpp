@@ -134,6 +134,9 @@ int RtInputScannerImages::svc() {
     // build data class
     rti = new RtDataImage(*ei,img);
 
+    // set the image id for handling
+    rti->addToID("scanner");
+
     // append this to a vector of gathered images
     received.push_back(rti);
 
@@ -206,18 +209,16 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
     return NULL;
   }
 
-  cout << "received img header of size " << rec << endl;
-
-//  bool dumpHeader = true;
-//  if(dumpHeader) {
-//    FILE* hdr = fopen("/tmp/dat.hdr","wb");
-//    fwrite(buffer, 1, rec, hdr);
-//    fclose(hdr);
-//  }
+  ACE_TRACE((LM_TRACE, "received header of size %d\n", rec));
 
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
 
-  cerr << "received " << seriesNum << ":" << info->iAcquisitionNumber << endl;
+  // if this is the first acquisition, get the series number
+  if(info->iAcquisitionNumber == 1) {
+    seriesNum = getNextSeriesNum();
+  }
+
+  ACE_DEBUG((LM_DEBUG, "received info for %d:%d\n", seriesNum, info->iAcquisitionNumber));
 
   return info;
 }
@@ -232,9 +233,12 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 unsigned short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 						   const RtExternalImageInfo &info) {
 
+  ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
+
   int numPix = info.nLin * info.nCol;
   for(unsigned int rec = 0; rec < numPix*sizeof(unsigned short);
-    rec += stream.recv_n (buffer+rec, numPix*sizeof(unsigned short)-rec));
+      rec += stream.recv_n (buffer+rec, numPix*sizeof(unsigned short)-rec)) {
+  }
 
   unsigned short *img = new unsigned short[numPix];
   memcpy(img,buffer,numPix*sizeof(unsigned short));
@@ -246,10 +250,6 @@ unsigned short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 //  in
 //   img: image to save
 bool RtInputScannerImages::saveImage(RtDataImage &img) {
-  // if this is the first acquisition, get the series number
-  if(img.getAcquisitionNum() == 1) {
-    seriesNum = getNextSeriesNum();
-  }
 
   cerr << "writing image number " << seriesNum << ":" << img.getAcquisitionNum() << endl;
 

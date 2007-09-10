@@ -30,6 +30,11 @@ void GlutWindow::CallBackIdleFunc(void){
                              //dummy function
 }
 
+void GlutWindow::CallBackTimerFunc(int, int){
+
+                             //dummy function
+}
+
 void GlutWindow::CallBackKeyboardFunc(unsigned char key, int x, int y){
 
   //key; x; y;                //dummy function

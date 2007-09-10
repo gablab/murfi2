@@ -13,13 +13,23 @@
 #include "glutMaster.h"
 #include "glutWindow.h"
 
+
 #include<iostream>
 using namespace std;
                                                        
 GlutWindow * viewPorts[MAX_NUMBER_OF_WINDOWS]; 
 
+#ifndef DISABLE_IDLE
 int GlutMaster::currentIdleWindow   = 0;
 int GlutMaster::idleFunctionEnabled = 0;
+#endif
+
+int GlutMaster::currentTimerWindow   = 0;
+int GlutMaster::timerFunctionEnabled = 0;
+
+
+int GlutMaster::timerVal    = 0;
+int GlutMaster::timerPeriod = 50; // msecs
 
 
 GlutMaster::GlutMaster(){
@@ -45,12 +55,25 @@ void GlutMaster::CallBackDisplayFunc(void){
    viewPorts[windowID]->CallBackDisplayFunc();
 }
 
+#ifndef DISABLE_IDLE
 void GlutMaster::CallBackIdleFunc(void){
 
    if(idleFunctionEnabled && currentIdleWindow){
       glutSetWindow(currentIdleWindow);
       viewPorts[currentIdleWindow]->CallBackIdleFunc();
    }
+}
+#endif
+
+void GlutMaster::CallBackTimerFunc(int val) {
+
+   if(timerFunctionEnabled && currentTimerWindow){
+      glutSetWindow(currentTimerWindow);
+      viewPorts[currentTimerWindow]->CallBackTimerFunc(glutGet(GLUT_ELAPSED_TIME),val);
+   }
+
+   glutTimerFunc(timerPeriod, CallBackTimerFunc, timerVal); 
+
 }
  
 void GlutMaster::CallBackKeyboardFunc(unsigned char key, int x, int y){
@@ -111,7 +134,12 @@ void GlutMaster::CallGlutCreateWindow(char * setTitle, GlutWindow * glutWindow){
    // This must be for each new window, even though the address are constant.
 
    glutDisplayFunc(CallBackDisplayFunc);
+
+#ifndef DISABLE_IDLE
    glutIdleFunc(CallBackIdleFunc); 
+#endif
+
+   glutTimerFunc(timerPeriod,CallBackTimerFunc,timerVal); 
    glutKeyboardFunc(CallBackKeyboardFunc);
    glutSpecialFunc(CallBackSpecialFunc);
    glutMouseFunc(CallBackMouseFunc);
@@ -126,6 +154,8 @@ void GlutMaster::CallGlutMainLoop(void){
    glutMainLoop();
 }
                               
+#ifndef DISABLE_IDLE
+
 void GlutMaster::DisableIdleFunction(void){
 
    idleFunctionEnabled = 0;
@@ -154,6 +184,70 @@ void GlutMaster::SetIdleToCurrentWindow(void){
 
    currentIdleWindow = glutGetWindow();
 }
+#endif
+                              
+void GlutMaster::DisableTimerFunction(void){
+
+   timerFunctionEnabled = 0;
+}
+
+void GlutMaster::EnableTimerFunction(void){
+
+   timerFunctionEnabled = 1;
+}
+
+int GlutMaster::TimerFunctionEnabled(void){
+
+   // Is timer function enabled?
+
+   return(timerFunctionEnabled);
+}
+
+int GlutMaster::TimerSetToCurrentWindow(void){
+
+   // Is current timer window same as current window?
+
+   return( currentTimerWindow == glutGetWindow() );
+}
+
+void GlutMaster::SetTimerToCurrentWindow(void){
+
+   currentTimerWindow = glutGetWindow();
+}
+
+int GlutMaster::TimerValue(void){
+
+   return( timerVal );
+}
+
+void GlutMaster::SetTimerVal(int val){
+
+  timerVal = val;
+}
+
+
+int GlutMaster::TimerPeriod(void){
+
+   return( timerPeriod );
+}
+
+void GlutMaster::SetTimerPeriod(int period){
+
+  timerPeriod = period;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

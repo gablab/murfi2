@@ -68,7 +68,7 @@ public:
   // callbacks for opengl
   void CallBackDisplayFunc(void);
   void CallBackReshapeFunc(int w, int h);   
-  void CallBackIdleFunc(void);
+  void CallBackTimerFunc(int, int);
 
 protected:
 

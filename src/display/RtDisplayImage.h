@@ -69,6 +69,7 @@ public:
   void CallBackDisplayFunc(void);
   void CallBackReshapeFunc(int w, int h);   
   void CallBackTimerFunc(int, int);
+  void CallBackKeyboardFunc(unsigned char key, int x, int y);
 
 protected:
 
@@ -83,6 +84,8 @@ protected:
   char title[100];
   string bottomStr;
   string topStr;
+
+  string imageDisplayType;
 
   // draws a black box that will enclose a string of text
   void drawBlackBoxForString(const char *str, GLint x, GLint y);

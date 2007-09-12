@@ -27,6 +27,8 @@ RtPostprocessor::~RtPostprocessor() {
 //  out
 //   success failure
 int RtPostprocessor::addModules(RtConfig &config) {
+  ACE_TRACE(("RtPostprocessor::addModules"));
+
   // build the list of stream components specified in the config 
 
   return 0;
@@ -35,7 +37,7 @@ int RtPostprocessor::addModules(RtConfig &config) {
 
 // process a single acquisition
 int RtPostprocessor::process(ACE_Message_Block *mb) {
-  cerr << "postprocessing" << endl;
+  ACE_TRACE(("RtPostprocessor::process"));
 
   return 0;
 }

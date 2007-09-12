@@ -53,6 +53,8 @@ int RtStream::configure(RtConfig &config) {
 //  in
 //   config: configuration info
 int RtStream::addModules(RtConfig &config) {
+  ACE_TRACE(("RtStream::addModules"));
+
   // add the preprocessing module
   Module *preprocMod;
   RtPreprocessor *preproc = new RtPreprocessor();
@@ -61,29 +63,29 @@ int RtStream::addModules(RtConfig &config) {
   preproc->configure(config);
 
   // add the analysis module
-  Module *analysMod;
-  RtAnalysor *analys = new RtAnalysor();
-  ACE_NEW_RETURN(analysMod, Module("analysis module", analys), -1);
-  analys->configure(config);
-  
-  // add the postprocessing module
-  Module *postprocMod;
-  RtPostprocessor *postproc = new RtPostprocessor();
-  ACE_NEW_RETURN(postprocMod, Module("postprocessing module", postproc), -1);
-  postproc->configure(config);
-  
-  
-  // push the modules into the processing queue
-  if(this->push(postprocMod) == -1) {
-    ACE_ERROR_RETURN((LM_ERROR, 
-		     ACE_TEXT("failed to add postprocessor to stream\n")),-1);
-  }
-
-  if(this->push(analysMod) == -1) {
-    ACE_ERROR_RETURN((LM_ERROR, 
-		     ACE_TEXT("failed to add analysis to stream\n")),-1);
-  }
-
+//  Module *analysMod;
+//  RtAnalysor *analys = new RtAnalysor();
+//  ACE_NEW_RETURN(analysMod, Module("analysis module", analys), -1);
+//  analys->configure(config);
+//  
+//  // add the postprocessing module
+//  Module *postprocMod;
+//  RtPostprocessor *postproc = new RtPostprocessor();
+//  ACE_NEW_RETURN(postprocMod, Module("postprocessing module", postproc), -1);
+//  postproc->configure(config);
+//  
+//  
+//  // push the modules into the processing queue
+//  if(this->push(postprocMod) == -1) {
+//    ACE_ERROR_RETURN((LM_ERROR, 
+//		     ACE_TEXT("failed to add postprocessor to stream\n")),-1);
+//  }
+//
+//  if(this->push(analysMod) == -1) {
+//    ACE_ERROR_RETURN((LM_ERROR, 
+//		     ACE_TEXT("failed to add analysis to stream\n")),-1);
+//  }
+//
   if(this->push(preprocMod) == -1) {
     ACE_ERROR_RETURN((LM_ERROR, 
 		     ACE_TEXT("failed to add preprocessor\n")),-1);
@@ -96,10 +98,12 @@ int RtStream::addModules(RtConfig &config) {
 //  in
 //   data: data 
 void RtStream::setInput(unsigned int code, RtData *data) {
+  ACE_TRACE(("RtStream::setInput"));
   
   // take action based on the kind of new input
   switch(code) {
   case SCANNER_IMAGE_RECEIVED:
+
     // if this code is from a new scanner image, start the processing
     ACE_Message_Block *mb;
     ACE_NEW_NORETURN(mb, ACE_Message_Block(sizeof(RtStreamMessage)));
@@ -110,10 +114,12 @@ void RtStream::setInput(unsigned int code, RtData *data) {
     msg->init(conductor);
     msg->addData(data);
 
-    ACE_TRACE((LM_TRACE, ACE_TEXT("starting stream for new data\n")));
-
     this->put(mb);
 
+//    for(int i = 0; i < 5; i++) {
+//      cerr << "sending ready signal" << endl;
+//    }
+//    
     break;
   }
 }
@@ -124,6 +130,7 @@ void RtStream::setInput(unsigned int code, RtData *data) {
 //  out
 //   -1 for error, 0 on success
 int RtStream::pushAllModules() {
+  ACE_TRACE(("RtStream::pushAllModules"));
 
   // add all the modules from the stack
   while(!addMod.empty()) {

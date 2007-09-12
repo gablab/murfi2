@@ -15,6 +15,8 @@
 //  out
 //   success or failure
 bool RtStreamMessage::addData(RtData *_data) {
+  ACE_TRACE(("RtStreamMessage::addData"));
+
   if(numData >= MAX_MSGDATAS) {
     return false;
   }

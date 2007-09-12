@@ -9,7 +9,7 @@
 
   
 // default constructor
-RtData::RtData() : id("data"), persistent(false) {
+RtData::RtData() : id("data"), persistent(false), lock(NULL) {
 
 }
 
@@ -61,6 +61,8 @@ void RtData::setPersistent(bool p) {
 //  out
 //   if lock was obtained
 bool RtData::lockData(RtLocker *locker) {
+  ACE_TRACE(("RtData::lockData"));
+
   if(lock == NULL) {
     lock = locker;
     return true;
@@ -73,6 +75,8 @@ bool RtData::lockData(RtLocker *locker) {
 //  out
 //   if lock was released or if data was not locked
 bool RtData::unlockData(RtLocker *locker) {
+  ACE_TRACE(("RtData::unlockData"));
+
   if(lock == locker || lock == NULL) {
     locker = NULL;
     return true;

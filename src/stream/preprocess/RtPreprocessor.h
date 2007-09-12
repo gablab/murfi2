@@ -37,6 +37,7 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
+  
 
 protected:
 

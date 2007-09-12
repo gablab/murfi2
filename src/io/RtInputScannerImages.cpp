@@ -118,6 +118,7 @@ int RtInputScannerImages::svc() {
 
   // continuously try to accept connections
   for(; isOpen && acceptor.accept(stream) != -1; imageNum++) {
+    cout << "connection accepted" << endl;
 
     // get the info
     ei = receiveImageInfo(stream);
@@ -166,6 +167,8 @@ int RtInputScannerImages::svc() {
 
     // close the stream (scanner connects anew for each image)
     stream.close();
+
+    cout << "waiting for another image" << endl;
   }
   cerr << "ERROR: could not open connection to accept "
        << "images from the scanner on port " 
@@ -199,6 +202,8 @@ void RtInputScannerImages::deleteReceivedImages(int deleteNum) {
 RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &stream) {
   unsigned int rec;
 
+  static int acnum = 1;
+
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;
@@ -209,9 +214,11 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
     return NULL;
   }
 
-  ACE_TRACE((LM_TRACE, "received header of size %d\n", rec));
+  ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
 
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
+
+  info->iAcquisitionNumber = acnum++;
 
   // if this is the first acquisition, get the series number
   if(info->iAcquisitionNumber == 1) {

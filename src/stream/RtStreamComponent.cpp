@@ -12,7 +12,7 @@ static char *VERSION = "$Id$";
   
 // default constructor
 RtStreamComponent::RtStreamComponent() : super(), persistent(false) {
-  
+  id = "RtStreamComponent";
 }
 
 // destructor
@@ -36,6 +36,8 @@ int RtStreamComponent::open(void *p) {
 //   msg: message to send
 //   to:  timeout
 int RtStreamComponent::put(ACE_Message_Block *msg, ACE_Time_Value *to) {
+  ACE_TRACE(("RtStreamComponent::put"));
+
   return this->putq(msg,to);
 }
   
@@ -43,6 +45,7 @@ int RtStreamComponent::put(ACE_Message_Block *msg, ACE_Time_Value *to) {
 //  in
 //   flags: flags to tell us who called
 int RtStreamComponent::close(u_long flags) {
+  ACE_TRACE(("RtStreamComponent::close"));
 
   if(flags == 1) { // stream close
     ACE_Message_Block *hangup = new ACE_Message_Block();
@@ -52,7 +55,7 @@ int RtStreamComponent::close(u_long flags) {
       ACE_ERROR_RETURN ((LM_ERROR, ACE_TEXT ("Task::close() putq")), -1);
     }
     
-    return this->wait ();
+    return this->wait();
   }
   
   return 0;
@@ -60,12 +63,12 @@ int RtStreamComponent::close(u_long flags) {
 
 // run the processing
 int RtStreamComponent::svc() {
+  ACE_TRACE(("RtStreamComponent::svc"));
+
   ACE_Message_Block *msg = 0;
 
   // wait for stuff to do
   while(1) {
-
-    ACE_TRACE((LM_TRACE, ACE_TEXT("in stream component svc()\n")));
 
     if(this->getq(msg) == -1) {
       ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("getq returned -1\n")),-1);
@@ -79,8 +82,6 @@ int RtStreamComponent::svc() {
       }
       break;
     }
-
-    ACE_TRACE((LM_TRACE, ACE_TEXT("entered stream component svc() with data\n")));
 
     // process normally
     //RtStreamMessage *strMsg = (RtStreamMessage*) msg->rd_ptr();
@@ -102,6 +103,7 @@ int RtStreamComponent::svc() {
 
 // tells the next step to begin processing 
 int RtStreamComponent::nextStep(ACE_Message_Block *mb) {
+  ACE_TRACE(("RtStreamComponent::next_step"));
   return this->put_next(mb);
 }
 

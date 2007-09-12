@@ -8,17 +8,19 @@
 static char *VERSION = "$Id$";
 
 #include"RtPreprocessor.h"
+#include"RtDataIDs.h"
 #include"RtDiff.h"
 #include"RtVar.h"
 
 // default constructor
 RtPreprocessor::RtPreprocessor() 
   : RtStreamComponent() {
+  id = "RtPreprocessor";
 }
 
 // destructor
 RtPreprocessor::~RtPreprocessor() {
-
+  
 }
 
 //*** initialization routines  ***//
@@ -29,6 +31,8 @@ RtPreprocessor::~RtPreprocessor() {
 //  out
 //   success failure
 int RtPreprocessor::addModules(RtConfig &config) {
+  ACE_TRACE(("RtPreprocessor::addModules"));
+
   // build the list of stream components specified in the config 
 
 
@@ -39,17 +43,17 @@ int RtPreprocessor::addModules(RtConfig &config) {
 
   RtOutput* display = config.getConductor()->getDisplay();
 
-//  // add a passer module for the original data
-//  Module *passerMod;
-//  RtPasser *passer = new RtPasser();
-//  ACE_NEW_RETURN(passerMod, Module(ACE_TEXT("original data passer module"),
-//				   passer),-1);
-//  addMod.push(passerMod);
-//  
-//  if(display != NULL) {
-//    passer->addOutput(display);
-//  }
+  // add a passer module for the original data
+  Module *passerMod;
+  RtPasser *passer = new RtPasser(ID_SCANNERIMG);
+  ACE_NEW_RETURN(passerMod, Module(ACE_TEXT("original data passer module"),
+				   passer),-1);
+  addMod.push(passerMod);
   
+  if(display != NULL) {
+    passer->addOutput(display);
+  }
+
 
   // add a module to compute the difference between the last two acquisitions
   Module *diffMod;
@@ -62,7 +66,7 @@ int RtPreprocessor::addModules(RtConfig &config) {
 
   // add a passer module for the differenced data
   Module *diffPasserMod;
-  RtPasser *diffPasser = new RtPasser();
+  RtPasser *diffPasser = new RtPasser(ID_DIFFIMG);
   ACE_NEW_RETURN(diffPasserMod, Module(ACE_TEXT("diff data passer module"),
 				   diffPasser),-1);
   addMod.push(diffPasserMod);
@@ -81,16 +85,16 @@ int RtPreprocessor::addModules(RtConfig &config) {
 
 
   // add a passer module for the variance
-//  Module *varPasserMod;
-//  RtPasser *varPasser = new RtPasser();
-//  ACE_NEW_RETURN(varPasserMod, Module(ACE_TEXT("var data passer module"),
-//				   varPasser),-1);
-//  addMod.push(varPasserMod);
-//  
-//  if(display != NULL) {
-//    varPasser->addOutput(display);
-//  }
-//
+  Module *varPasserMod;
+  RtPasser *varPasser = new RtPasser(ID_VARIMG);
+  ACE_NEW_RETURN(varPasserMod, Module(ACE_TEXT("var data passer module"),
+				   varPasser),-1);
+  addMod.push(varPasserMod);
+  
+  if(display != NULL) {
+    varPasser->addOutput(display);
+  }
+
 
   // all modules are now added to the stream
   pushAllModules();
@@ -101,7 +105,7 @@ int RtPreprocessor::addModules(RtConfig &config) {
 
 // process a single acquisition
 int RtPreprocessor::process(ACE_Message_Block *mb) {
-  ACE_TRACE((LM_TRACE, "RtPreprocessor::process"));
+  ACE_TRACE(("RtPreprocessor::process"));
 
 
   // pass the message block down to our stream

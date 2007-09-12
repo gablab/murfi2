@@ -73,10 +73,18 @@ protected:
   // whether data created by this component should be persistent
   bool persistent;
 
+  // id string (for debugging)
+  string id;
 };
 
 
 class RtEndTask : public RtStreamComponent {
+
+public:
+  RtEndTask() : RtStreamComponent() {
+    id = "RtEndTask";
+  }
+
 protected:
   virtual int process(ACE_Message_Block*) {
     return 0;

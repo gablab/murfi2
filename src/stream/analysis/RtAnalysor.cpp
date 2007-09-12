@@ -30,6 +30,8 @@ RtAnalysor::~RtAnalysor() {
 //  out
 //   success failure
 int RtAnalysor::addModules(RtConfig &config) {
+  ACE_TRACE(("RtAnalysor::addModules"));
+
   // build the list of stream components specified in the config 
 
   // add a passer module for the preprocessed data
@@ -54,8 +56,7 @@ int RtAnalysor::addModules(RtConfig &config) {
 
 // process a single acquisition
 int RtAnalysor::process(ACE_Message_Block *mb) {
-  cerr << "analyzing" << endl;
-
+  ACE_TRACE(("RtAnalysor::process"));
 
   // pass the message block down to our stream
   RtStream::put(mb);

@@ -21,6 +21,8 @@ RtDataImageInfo::RtDataImageInfo(const RtDataImageInfo &info) {
 RtDataImageInfo::RtDataImageInfo(const RtExternalImageInfo &info) :
   bytesPerPix(sizeof(unsigned short)), minMaxSet(false), minVal(0), maxVal(0) {
 
+  ACE_TRACE(("RtDataImageInfo::RtDataImageInfo"));
+
   // determine the dimensions
   //    if(info.nCol != rint(info.dFOVread*info.dVoxSizRead)) {// probably mosaiced
   //      
@@ -104,6 +106,8 @@ void RtDataImageInfo::print() {
 
 // print some of the info members
 void RtDataImageInfo::print(ostream &os) {
+  ACE_TRACE(("RtDataImageInfo::print"));
+
   int wid = 30;
 
   os << setiosflags(ios::left);

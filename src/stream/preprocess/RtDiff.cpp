@@ -12,6 +12,7 @@
 
 // default constructor
 RtDiff::RtDiff() : RtStreamComponent() {
+  id = "RtDiff";
   last = NULL;
 }
 
@@ -20,6 +21,8 @@ RtDiff::~RtDiff() {}
 
 // process a single acquisition
 int RtDiff::process(ACE_Message_Block *mb) {
+  ACE_TRACE(("RtDiff::process"));
+
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   RtDataImage *img = (RtDataImage*)msg->getLastData();
@@ -50,11 +53,31 @@ int RtDiff::process(ACE_Message_Block *mb) {
 
   // compute the absolute difference
   for(int i = 0; i < img->getNumPix(); i++) {
-    diff->setPixel(i, absdiff(img->getPixel(i),last->getPixel(i)));
+    unsigned short d = absdiff(img->getPixel(i),last->getPixel(i));
+
+    diff->setPixel(i, d);    
   }  
 
   // set the image id for handling
   diff->addToID("voxel_difference");
+
+//  string fn;
+//
+//  fn = "/tmp/voxdiff";
+//  //  fn += img->getAcquisitionNum();
+//  fn += ".dat";
+//  diff->write(fn);
+//  
+//  fn = "/tmp/last";
+//  //  fn += last->getAcquisitionNum();
+//  fn += ".dat";
+//  last->write(fn);
+//  
+//  fn = "/tmp/img";
+//  //  fn += img->getAcquisitionNum();
+//  fn += ".dat";
+//  img->write(fn);
+  
 
   // store this as last image
   last = img;

@@ -12,6 +12,7 @@
 
 // default constructor
 RtVar::RtVar() : RtStreamComponent() {
+  id = "RtVar";
   numTimePoints = 0;
 }
 
@@ -20,6 +21,8 @@ RtVar::~RtVar() {}
 
 // process a single acquisition
 int RtVar::process(ACE_Message_Block *mb) {
+  ACE_TRACE(("RtVar::process"));
+
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   // get the current image to operate on
@@ -62,7 +65,7 @@ int RtVar::process(ACE_Message_Block *mb) {
       * mean.getPixel(i) + img->getPixel(i)/(double)numTimePoints));
     
     // consider using an incremental approach
-    unsigned int v = 0;
+    unsigned short v = 0;
     for(vector<RtDataImage*>::iterator j = hist.begin(); j != hist.end(); j++){
       v += absdiff((*j)->getPixel(i), mean.getPixel(i))
 	* absdiff((*j)->getPixel(i), mean.getPixel(i));
@@ -75,6 +78,11 @@ int RtVar::process(ACE_Message_Block *mb) {
 
   // set the image id for handling
   var->addToID("voxel_variance");
+
+//  string fn("/tmp/voxvar");
+//  fn += img->getAcquisitionNum();
+//  fn += ".dat";
+//  var->write(fn);
 
   // add the variance to the message
   msg->addData(var);

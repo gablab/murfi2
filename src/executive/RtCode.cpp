@@ -41,6 +41,8 @@ int RtCode::getCodeNum() {
 
 // send the code to the handler
 void RtCode::sendCode(RtData *data) {
+  ACE_TRACE(("RtCode::sendCode"));
+
   conductor->receiveCode(codeNum,data);
 }
 

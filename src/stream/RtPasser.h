@@ -20,35 +20,37 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
-  RtPasser() : RtStreamComponent() {}
+  RtPasser();
+
+  // string with id constructor
+  //  in
+  //   dataID is a string that constrains what type of data we send, if its
+  //   empty we send all the data
+  RtPasser(string _dataID);
+
+  // char* with id constructor
+  //  in
+  //   dataID is a string that constrains what type of data we send, if its
+  //   empty we send all the data
+  RtPasser(char *_dataID);
 
   // destructor
-  ~RtPasser() {}
+  ~RtPasser();
 
   //*** initialization routines  ***//
-  void addOutput(RtOutput *out) {
-    outputs.push_back(out);
-  }
+  void addOutput(RtOutput *out);
 
 protected:
 
   // process a single acquisition
-  int process(ACE_Message_Block *mb) {
-    RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
-
-    ACE_DEBUG((LM_DEBUG, "passing image %d\n", ((RtDataImage*)msg->getLastData())->getAcquisitionNum()));
-
-
-    for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++) {
-      (*i)->setData(msg->getLastData());
-    }
-
-    return 0;
-  }
+  int process(ACE_Message_Block *mb);
 
   // vector of outputs to pass the data to
   vector<RtOutput*> outputs;
 
+  // only pass data of this id
+  string dataID;
+  
 };
 
 #endif

@@ -18,6 +18,8 @@ RtDataImage::RtDataImage() : RtData() {
 // construct from raw bytes sent by RtInputScannerImages
 // BE CAREFUL WITH THIS
 RtDataImage::RtDataImage(char *bytes, unsigned int len) : RtData() {
+  ACE_TRACE(("RtDataImage::RtDataImage"));
+
   addToID("image");
 
   // try to do some checks
@@ -63,7 +65,7 @@ RtDataImage::RtDataImage(RtDataImageInfo &_info, unsigned short *_data)
 }
 
 // construct from another image (deep copy)
-RtDataImage::RtDataImage(RtDataImage &img) {
+RtDataImage::RtDataImage(RtDataImage &img) : RtData() {
   persistent = img.persistent;
   id = img.id;
 
@@ -81,6 +83,8 @@ void RtDataImage::printInfo(ostream &os) {
 
 // destructor
 RtDataImage::~RtDataImage() {
+  ACE_TRACE(("RtDataImage::~RtDataImage"));
+
   // notify our locker that we are being deleted
   if(lock != NULL) {
     lock->beingDeleted();
@@ -95,6 +99,7 @@ RtDataImage::~RtDataImage() {
 //  out
 //   success or failure
 bool RtDataImage::write(const string &filename) {
+  ACE_TRACE(("RtDataImage::write"));
 
   unsigned int one = 1;
   unsigned int rows = info.dims[0];
@@ -163,22 +168,32 @@ void RtDataImage::setInfo(const RtExternalImageInfo &_info) {
 
 // sets the min and max pixel value for this data image
 void RtDataImage::setMinMax() {
+  ACE_TRACE(("RtDataImage::setMinMax"));
+
+  int mini = -1, maxi = -1;
+
   info.maxVal = 0;
   info.minVal = USHRT_MAX;
   for(unsigned int i = 0; i < info.numPix; i++) {
     if(data[i] > info.maxVal) {
       info.maxVal = data[i];
+      maxi = i;
     }
     if(data[i] < info.minVal) {
       info.minVal = data[i];
+      mini = i;
     }
   }
+  cout << "min " << info.minVal << " at " << mini 
+       << " max " << info.maxVal << " at " << maxi << endl;
+
   
   info.minMaxSet = true;
 }
 
 // get a smart contrast level
 float RtDataImage::getAutoContrast() {
+  ACE_TRACE(("RtDataImage::getAutoContrast"));
   
   if(!info.minMaxSet) {
     setMinMax();
@@ -190,6 +205,8 @@ float RtDataImage::getAutoContrast() {
 
 // get a smart brightness level
 float RtDataImage::getAutoBrightness() {
+  ACE_TRACE(("RtDataImage::getAutoBrightness"));
+
   if(!info.minMaxSet) {
     setMinMax();
   }
@@ -208,7 +225,7 @@ void RtDataImage::setPixel(unsigned int i, unsigned short v) {
 // set pixel value when locked
 void RtDataImage::setPixelLocked(RtLocker *locker, 
 				 unsigned int i, unsigned short v) {
-  if(lock == NULL || lock == locker && i < info.numPix) {
+  if((lock == NULL || lock == locker) && i < info.numPix) {
     data[i] = v;
   }
 }

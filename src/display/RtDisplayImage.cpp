@@ -6,6 +6,9 @@
  *****************************************************************************/
 
 #include"RtDisplayImage.h"
+#include"RtDataIDs.h"
+
+#include"ace/Mutex.h"
 
 #ifdef GL_TEXTURE_RECTANGLE_EXT
 #ifndef GL_TEXTURE_RECTANGLE_NV
@@ -35,7 +38,8 @@
 // default constructor
 RtDisplayImage::RtDisplayImage() 
   : x(DEFAULT_X), y(DEFAULT_Y), width(DEFAULT_W), height(DEFAULT_H), 
-    img(NULL), texture(0), needsRepaint(true), newTex(false) {
+    img(NULL), texture(0), needsRepaint(true), newTex(false),
+    imageDisplayType(ID_SCANNERIMG) {
 }
 
 // constructor with stuff
@@ -49,7 +53,8 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
 			       int _w, int _h, 
 			       char *_title) 
   : x(_x), y(_y), width(_w), height(_h),
-    img(NULL), texture(0), needsRepaint(true), newTex(false) {
+    img(NULL), texture(0), needsRepaint(true), newTex(false), 
+    imageDisplayType(ID_SCANNERIMG) {
 
   strcpy(title,_title);
 }
@@ -64,6 +69,7 @@ RtDisplayImage::~RtDisplayImage() {
 //  in
 //   config: config class to get configuration variables from
 bool RtDisplayImage::open(RtConfig &config) {
+  ACE_TRACE(("RtDisplayImage::open"));
   
   x = config.get("imageDisplayWinX")==true
     ? config.get("imageDisplayWinX") : DEFAULT_X;
@@ -92,6 +98,8 @@ bool RtDisplayImage::open(RtConfig &config) {
 //   _h: initial height of the window
 //   _title: title string of the window
 bool RtDisplayImage::init(int _x, int _y, int _w, int _h, char *_title) {
+  ACE_TRACE(("RtDisplayImage::init(..)"));
+  
   x = _x;
   y = _y;
   width = _w;
@@ -103,7 +111,8 @@ bool RtDisplayImage::init(int _x, int _y, int _w, int _h, char *_title) {
 
 // initialize the display
 bool RtDisplayImage::init() {
-
+  ACE_TRACE(("RtDisplayImage::init()"));
+  
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
   glutInitWindowSize(width, height);
   glutInitWindowPosition(x, y);
@@ -125,6 +134,8 @@ bool RtDisplayImage::init() {
 
 // thread entry
 int RtDisplayImage::svc() {
+  ACE_TRACE(("RtDisplayImage::svc"));
+  
   glutMaster.CallGlutMainLoop();
 
   return 0;
@@ -132,6 +143,13 @@ int RtDisplayImage::svc() {
 
 // sets the image to be displayed
 void RtDisplayImage::setData(RtData *data) {
+  ACE_TRACE(("RtDisplayImage::setData"));
+  
+  if(data->getID() != imageDisplayType) {
+    ACE_DEBUG((LM_DEBUG, "ignoring image of type %s\n", data->getID()));
+    return;
+  }
+
   img = (RtDataImage*) data;
 
   ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getAcquisitionNum()));
@@ -149,6 +167,8 @@ void RtDisplayImage::setData(RtData *data) {
 
 // makes a texture from the image data and prepares it for display
 void RtDisplayImage::makeTexture() {
+  ACE_TRACE(("RtDisplayImage::makeTexture"));
+  
 
   /* delete the old texture if there is one */
   if(glIsTexture(texture)) {
@@ -191,6 +211,7 @@ void RtDisplayImage::makeTexture() {
 }
 
 void RtDisplayImage::CallBackDisplayFunc(void) {
+  ACE_TRACE(("RtDisplayImage::CallBackDisplayFunc"));
 
   glClear(GL_COLOR_BUFFER_BIT);
    
@@ -220,13 +241,13 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   /* make a quadrilateral and provide texture coords */
   glBegin(GL_QUADS); {
     glTexCoord2d(0.0,0.0);
-    glVertex3f(0.0, width, 0.0);
+    glVertex3f(0.0, height, 0.0);
     glTexCoord2d(imgw,0.0);
-    glVertex3f(0.0, 0.0, 0.0);
+    glVertex3f(width, height, 0.0);
     glTexCoord2d(imgw, imgh);
-    glVertex3f(height, 0.0, 0.0);
+    glVertex3f(width, 0.0, 0.0);
     glTexCoord2d(0.0,imgh);
-    glVertex3f(height, width, 0.0);
+    glVertex3f(0.0, 0.0, 0.0);
   } glEnd();
    
   glDisable(GL_TEXTURE_RECTANGLE_EXT);
@@ -263,6 +284,21 @@ void RtDisplayImage::CallBackTimerFunc(int time, int val) {
   }
 
 }
+
+void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
+  switch(key) {
+  case 's':
+    imageDisplayType = ID_SCANNERIMG;
+    break;
+  case 'd':
+    imageDisplayType = ID_DIFFIMG;
+    break;
+  case 'v':
+    imageDisplayType = ID_VARIMG;
+    break;
+  }
+}
+
 
 // draws a black box that will enclose a string of text
 void RtDisplayImage::drawBlackBoxForString(const char *str, GLint x, GLint y) {

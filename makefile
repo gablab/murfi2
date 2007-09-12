@@ -20,6 +20,11 @@ export STRIP = 1
 
 export MTRACE = 0
 
+# ace log levels
+export ACE_NTRACE   = 1
+export ACE_NDEBUG   = 0
+export ACE_NLOGGING = 0
+
 export SRC_DIR = $(PWD)/src
 export BIN_DIR = $(PWD)/bin
 export OBJ_DIR = $(PWD)/obj
@@ -63,6 +68,25 @@ ifeq ($(MTRACE),1)
 	MTRACE_FLAG = -DMTRACE
 endif
 
+# ace log flags
+ifeq ($(ACE_NTRACE),1)
+	ACE_NTRACE_FLAG = -DACE_NTRACE=1
+else
+	ACE_NTRACE_FLAG = -DACE_NTRACE=0
+endif
+
+ifeq ($(ACE_NDEBUG),1)
+	ACE_NDEBUG_FLAG = -DACE_NDEBUG=1
+else
+	ACE_NDEBUG_FLAG = -DACE_NDEBUG=0
+endif
+
+ifeq ($(ACE_NLOGGING),1)
+	ACE_NLOGGING_FLAG = -DACE_NLOGGING=1
+else
+	ACE_NLOGGING_FLAG = -DACE_NLOGGING=0
+endif
+
 SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/stream -I$(SRC_DIR)/stream/analysis -I$(SRC_DIR)/stream/preprocess -I$(SRC_DIR)/stream/postprocess -I$(SRC_DIR)/display
 
 # library flags
@@ -82,15 +106,17 @@ GSL_LIB=-lgsl -lgslcblas
 #ACE_HOME=/usr/local/ACE_wrappers
 #ACE_INCS=-I$(ACE_HOME)/ace
 #ACE_LIB=-L$(ACE_HOME)/lib -lACE
+ACE_FLAGS=$(ACE_NLOGGING_FLAG) $(ACE_NDEBUG_FLAG) $(ACE_NTRACE_FLAG)
 ACE_LIB=-lACE
+
 
 GLUT_LIB=-lglut
 
 # build compiler flags
 
-export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) 
+export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS)
 
-export C_FLAGS = -Wall \
+export C_FLAGS = -Werror -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
 	$(C_INCS) 
 #`$(PKGCONFIG_CMD)`

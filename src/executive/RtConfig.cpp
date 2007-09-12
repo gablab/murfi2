@@ -49,6 +49,8 @@ RtConfig::~RtConfig() {
 
 // parse command line args
 bool RtConfig::parseArgs(int argc, char **args) {
+  ACE_TRACE(("RtConfig::parseArgs"));
+
   int i;
   string::size_type eqind;
   string pair, name, val;
@@ -99,6 +101,7 @@ bool RtConfig::parseArgs(int argc, char **args) {
 // parse config file
 //  out: true (success) or false
 bool RtConfig::parseConfigFile() {
+  ACE_TRACE(("RtConfig::parseConfigFile"));
 
   string name, val;
   string fn = get("confFilename");
@@ -143,6 +146,7 @@ bool RtConfig::parseConfigFile() {
 // validate the configuration
 // checks for valid setup of different parts of the program
 bool RtConfig::validateConfig() {
+  ACE_TRACE(("RtConfig::validateConfig"));
   
   bool valid = true;
 
@@ -203,6 +207,8 @@ bool RtConfig::validateConfig() {
 
 // get a parm value
 RtConfigVal &RtConfig::get(const char *name) {
+  ACE_TRACE(("RtConfig::get"));
+
   if(name == NULL) {
     return unset;
   }

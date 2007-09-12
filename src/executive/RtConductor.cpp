@@ -19,6 +19,8 @@ static char *VERSION = "$Id$";
 
 // constructor with command line args
 RtConductor::RtConductor(int argc, char **argv) {
+  ACE_TRACE(("RtConductor::RtConductor"));
+
   int curCodeNum;
 
   // set us as the conductor for the config
@@ -98,6 +100,7 @@ RtConductor::RtConductor(int argc, char **argv) {
 
 // destructor
 RtConductor::~RtConductor() {
+  ACE_TRACE(("RtConductor::~RtConductor"));
 
   stream.close();
   //delete stream;
@@ -123,6 +126,7 @@ RtConductor::~RtConductor() {
 //  out:
 //   true (for success) or false
 bool RtConductor::buildStream(RtConfig config) {
+  ACE_TRACE(("RtConductor::buildStream"));
 
   // set the conductor to us
   stream.setConductor(this);
@@ -140,6 +144,8 @@ bool RtConductor::buildStream(RtConfig config) {
 //  out:
 //   true (for success) or false
 bool RtConductor::addInput(RtInput *in) {
+  ACE_TRACE(("RtConductor::addInput"));
+
   // open and configure
   if(!in->open(config)) {
     return false;
@@ -157,6 +163,8 @@ bool RtConductor::addInput(RtInput *in) {
 //  out:
 //   true (for success) or false
 bool RtConductor::addOutput(RtOutput *out) {
+  ACE_TRACE(("RtConductor::addOutput"));
+
   // open and configure
   if(!out->open(config)) {
     return false;
@@ -172,6 +180,7 @@ bool RtConductor::addOutput(RtOutput *out) {
 //  out:
 //   true (for success) or false
 bool RtConductor::init() {
+  ACE_TRACE(("RtConductor::init"));
 
   outputLog.writeConfig(config);
 
@@ -189,6 +198,7 @@ bool RtConductor::init() {
 //  out:
 //   true (for success) or false
 bool RtConductor::run() {
+  ACE_TRACE(("RtConductor::run"));
 
   // print startg time to log file
   outputLog << "began running at ";
@@ -223,6 +233,7 @@ bool RtConductor::run() {
 
 // receive a code signaling completetion of data input or processing
 void RtConductor::receiveCode(unsigned int code, RtData *data) {
+  ACE_TRACE(("RtConductor::receiveCode"));
 
   // handle based on the thrower
   if(code == START_CODE_STREAM) { // stream component has data
@@ -241,6 +252,8 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
 
     // let the stream decide if it should spawn a new processing instance 
     stream.setInput(code,data);
+
+    cerr << "sent ready signal" << endl;
   }
   else { // this is an output
     cerr << "caught a ready signal from an output" << endl;
@@ -284,6 +297,8 @@ char *RtConductor::getVersionString() {
 // main function for the realtime system
 // very simple
 int ACE_TMAIN(int argc, char **args) {
+  ACE_TRACE(("ACE_TMAIN"));
+
 
   RtConductor conductor(argc,args);
 

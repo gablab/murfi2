@@ -29,12 +29,12 @@ bool RtOutputFile::open(RtConfig &config) {
   }
 
   // if logging is off, return
-  if(config.get("noLogging")==true) {
+  if(config.get("info:log:disabled")==true) {
     return true;
   }
   
   // open the file for output
-  string logname = config.get("logFilename");
+  string logname = config.get("info:log:filename");
 
   // check the filename
   if(logname.empty()) {
@@ -42,7 +42,7 @@ bool RtOutputFile::open(RtConfig &config) {
   }
   else if(logname.substr(0,1) != "/") {
     stringstream fs;
-    fs << config.get("studyDir") << "/"  << logname;
+    fs << config.get("study:dir") << "/"  << logname;
   
     logname = fs.str();
   }

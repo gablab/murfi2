@@ -55,7 +55,7 @@ endif
 
 # optimize flag
 ifeq ($(OPTIM),1)
-	OPTIM_FLAG = -O3
+	OPTIM_FLAG = -O2
 endif
 
 # optimize flag
@@ -87,7 +87,7 @@ else
 	ACE_NLOGGING_FLAG = -DACE_NLOGGING=0
 endif
 
-SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/stream -I$(SRC_DIR)/stream/analysis -I$(SRC_DIR)/stream/preprocess -I$(SRC_DIR)/stream/postprocess -I$(SRC_DIR)/display
+SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/stream -I$(SRC_DIR)/stream/analysis -I$(SRC_DIR)/stream/preprocess -I$(SRC_DIR)/stream/postprocess -I$(SRC_DIR)/display 
 
 # library flags
 
@@ -109,12 +109,13 @@ GSL_LIB=-lgsl -lgslcblas
 ACE_FLAGS=$(ACE_NLOGGING_FLAG) $(ACE_NDEBUG_FLAG) $(ACE_NTRACE_FLAG)
 ACE_LIB=-lACE
 
+TINYXML_FLAGS=-DTIXML_USE_STL
 
 GLUT_LIB=-lglut
 
 # build compiler flags
 
-export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS)
+export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(TINYXML_FLAGS)
 
 export C_FLAGS = -Werror -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \

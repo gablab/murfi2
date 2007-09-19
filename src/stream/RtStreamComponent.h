@@ -60,6 +60,9 @@ public:
   // gets whether this data should be kept around after the stream is done
   bool getPersistent();
 
+  // module name for config
+  static string moduleString;
+
 protected:
 
   typedef ACE_Task<ACE_MT_SYNCH> super;
@@ -83,6 +86,7 @@ class RtEndTask : public RtStreamComponent {
 public:
   RtEndTask() : RtStreamComponent() {
     id = "RtEndTask";
+    moduleString = "end-task";
   }
 
 protected:

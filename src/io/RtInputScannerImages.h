@@ -122,6 +122,14 @@ protected:
 
 protected:
 
+  // determines if the received image is the first image in a series or not
+  // examines the acquisition number for 1
+  //  in
+  //   info struct for the image to test
+  //  out
+  //   true if this image is the first in a series
+  bool isFirstInSeries(const RtExternalImageInfo &info);
+
   //*** private data members  ***//
 
   // port to listen on

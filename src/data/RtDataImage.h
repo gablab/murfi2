@@ -24,10 +24,16 @@ class RtDataImage : public RtData {
 
 public:
 
+  // magic number for image files
+  const static long MAGIC_NUMBER = 0x5081;
+
   //*** constructors/destructors  ***//
   
   // default constructor
   RtDataImage(); 
+
+  // constructor with a filename to read the image from
+  RtDataImage(const string &filename); 
 
   // construct from raw bytes -- BE CAREFUL WITH THIS
   RtDataImage(char *bytes, unsigned int len);
@@ -50,6 +56,13 @@ public:
   //  out
   //   success or failure
   bool write(const string &filename);
+
+  // read an image from a file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  bool read(const string &filename);
 
   // set info struct
   //  in

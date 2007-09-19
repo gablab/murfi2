@@ -20,13 +20,13 @@ static const char*  DEFAULT_SAVESTEM = "img";
 static const char*  DEFAULT_SAVEEXT  = "dat";
 
 // increase this size for highres acquisitions
-#define MAX_BUFSIZ 256*256*256*2 
+#define MAX_BUFSIZ 256*256*256*2
 #define MAX_SERIESNUM 99999
 static char buffer[MAX_BUFSIZ];
 
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
-  :  port(DEFAULT_PORT), 
+  :  port(DEFAULT_PORT),
      savePath(""),
      saveDir(DEFAULT_SAVEDIR),
      saveFilestem(DEFAULT_SAVESTEM),
@@ -52,13 +52,13 @@ bool RtInputScannerImages::open(RtConfig &config) {
   RtInput::open(config);
 
   // get port from the config and try to open the socket
-  port = config.get("scannerPort")==true 
-    ? config.get("scannerPort") : DEFAULT_PORT;
+  port = config.isSet("scanner:port")
+    ? config.get("scanner:port") : DEFAULT_PORT;
 
-  // build the address  
+  // build the address
   ACE_INET_Addr address(port,INADDR_ANY);
   if(acceptor.open(address,1) == -1) {
-    cout << "failed to open" << endl;
+    ACE_DEBUG((LM_INFO, ACE_TEXT("failed to open acceptor for scanner images\n")));
     isOpen = false;
     return false;
   }
@@ -66,27 +66,27 @@ bool RtInputScannerImages::open(RtConfig &config) {
   isOpen = true;
 
   // see if we should save images to a file
-  if(config.get("saveImages")==true) {
+  if(config.get("scanner:saveImages")==true) {
     saveImagesToFile = true;
-    
+
     // set up the directory to save to
-    if(config.get("imageDir")==true) {
-      saveDir = config.get("imageDir").str();
+    if(config.isSet("scanner:imageDir")) {
+      saveDir = config.get("scanner:imageDir").str();
     }
 
-    if(config.get("imageStem")==true) {
-      saveFilestem = config.get("imageStem").str();
+    if(config.isSet("scanner:imageStem")) {
+      saveFilestem = config.get("scanner:imageStem").str();
     }
 
-    if(config.get("imageExt")==true) {
-      saveFileext = config.get("imageExt").str();
+    if(config.isSet("scanner:imageExt")) {
+      saveFileext = config.get("scanner:imageExt").str();
     }
 
     // set the save path
     //string sp(config.get("studyDir").str());
     stringstream sp;
     //sp << "/home/mri/subjects/foobar/" << saveDir << "/" << saveFilestem;
-    sp << config.get("studyDir").str() << saveDir << "/" << saveFilestem;
+    sp << config.get("study:dir").str() << saveDir << "/" << saveFilestem;
     savePath = sp.str();
   }
 
@@ -125,7 +125,7 @@ int RtInputScannerImages::svc() {
     if(ei == NULL) {
       continue;
     }
-      
+
     // DEBUGGING
     //ei->iAcquisitionNumber = imageNum++;
 
@@ -154,7 +154,7 @@ int RtInputScannerImages::svc() {
 
     // log that we received the image
     infos.str("");
-    infos << "received image from scanner: series " << seriesNum 
+    infos << "received image from scanner: series " << seriesNum
 	  << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
 
@@ -162,7 +162,7 @@ int RtInputScannerImages::svc() {
     delete ei;
     delete [] img;
 
-      
+
     //delete rti;
 
     // close the stream (scanner connects anew for each image)
@@ -171,7 +171,7 @@ int RtInputScannerImages::svc() {
     cout << "waiting for another image" << endl;
   }
   cerr << "ERROR: could not open connection to accept "
-       << "images from the scanner on port " 
+       << "images from the scanner on port "
        << port << endl;
     //<< "errno: " << ACE_OS::last_error();
   isOpen = false;
@@ -185,8 +185,8 @@ int RtInputScannerImages::svc() {
 //  in
 //   deleteNum: maximum number of images to delete
 void RtInputScannerImages::deleteReceivedImages(int deleteNum) {
-  
-  for(int i = 0; i < deleteNum && toBeDeleted != received.end(); 
+
+  for(int i = 0; i < deleteNum && toBeDeleted != received.end();
       i++, toBeDeleted++) {
     delete *toBeDeleted;
   }
@@ -203,6 +203,7 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   unsigned int rec;
 
   static int acnum = 1;
+  acnum++;
 
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
@@ -218,10 +219,10 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
 
-  info->iAcquisitionNumber = acnum++;
+  //info->iAcquisitionNumber = acnum++;
 
   // if this is the first acquisition, get the series number
-  if(info->iAcquisitionNumber == 1) {
+  if(isFirstInSeries(*info)) {
     seriesNum = getNextSeriesNum();
   }
 
@@ -269,10 +270,10 @@ bool RtInputScannerImages::saveImage(RtDataImage &img) {
 //   acquisition number
 //  out
 //   absolute file string
-string RtInputScannerImages::getImageFilename(int _seriesNum, 
+string RtInputScannerImages::getImageFilename(int _seriesNum,
 					      int _acquisitionNum) {
   // five digit filename assumption here!
-  char srnum[6];  
+  char srnum[6];
   char acnum[6];
   sprintf(srnum,"%05d",_seriesNum);
   sprintf(acnum,"%05d",_acquisitionNum);
@@ -284,6 +285,16 @@ string RtInputScannerImages::getImageFilename(int _seriesNum,
   return s.str();
 }
 
+// determines if the received image is the first image in a series or not
+// examines the acquisition number for 1
+//  in
+//   info struct for the image to test
+//  out
+//   true if this image is the first in a series
+bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
+  return info.iAcquisitionNumber == 1;
+}
+
 // gets the next series number to be saved in the current image directory
 // inspects the series currently in the directory and makes a new one
 unsigned int RtInputScannerImages::getNextSeriesNum() {
@@ -293,7 +304,7 @@ unsigned int RtInputScannerImages::getNextSeriesNum() {
   for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
     fname = getImageFilename(sn, 1);
     fin.open(fname.c_str());
-    
+
     if(fin.fail() ) {
       fin.close();
       return sn;

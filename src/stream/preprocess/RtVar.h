@@ -17,6 +17,8 @@ class RtVar : public RtStreamComponent {
 
 public:
 
+  static string moduleString;
+
   //*** constructors/destructors  ***//
 
   // default constructor

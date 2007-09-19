@@ -13,16 +13,13 @@
 #include<cctype>
 #include<cmath>
 #include<string>
-#include<algorithm>
-#include<string>
 #include<cstring>
-#include<sstream>
-#include<map>
+#include"tinyxml/tinyxml.h"
+#include"RtConfigVal.h"
 
 using namespace std;
 
 // class to wrap string for a single parm value
-class RtConfigVal;
 class RtConductor;
 
 // class declaration
@@ -50,22 +47,61 @@ public:
   // parse config file
   bool parseConfigFile();
 
-
   //*** config get/set parms ***/
 
-  // get a parm value
-  RtConfigVal &get(const char *name);
+
+  // get a parm value.
+  //  in
+  //   name is a ':' delimited string spcifying a path into the XML config
+  //        for example preprocessor:module:name
+  //  out
+  //   string representing the value
+  RtConfigVal get(const string &name);
+
+  // get a parm value.
+  //  in
+  //   name is a ':' delimited string spcifying a path into the XML config
+  //        for example preprocessor:module:name
+  //  out
+  //   string representing the value
+  RtConfigVal get(const char *name);
+
+  // get a parm value. start searching from a specified node
+  //  in
+  //   name is a ':' delimited str spcifying a path into the XML configuration
+  //        for example preprocessor:module:name
+  //   node is a xml node to start looking at
+  //  out
+  //   string representing the value
+  RtConfigVal get(const string &name, TiXmlNode *node);
+
+  // determine if there is a value set for a particular config variable
+  //  in
+  //   the variable name to check
+  //  out
+  //   true if the var has been set
+  bool isSet(const string &name);
 
   // get a parm value
   //string get(const char *name);
 
   // set parm
   template<class T>
-  void set(const char *name, T tval);
+  bool set(const char *name, T tval);
 
-  // set parm
+  // set a parm value
   template<class T>
-  void set(const string, T tval);
+  bool set(const string name, T tval);
+
+
+  // sets a parm value starting from a specified xml node
+  // children are created appropritately
+  //  in
+  //   name:  ':' delimited string representing the xml node attribute to set
+  //   value: the value to set the attribute to
+  //   node:  the xml node to start from
+  //  out: success or failure
+  bool set(const string name, const string value, TiXmlNode *node);
 
   // print a parm value
   void print(const char *name);
@@ -90,7 +126,7 @@ public:
 
 
   // print the name/value pairs to the screen
-  void dumpConfig(ostream &os);
+  void dumpConfig(ostream &os = cout);
 
   // validate the configuration
   // checks for valid setup of different parts of the program
@@ -98,155 +134,35 @@ public:
 
 private:
 
-  // map of config params
-  map<string,RtConfigVal> parms;
+  const RtConfigVal unset;
+
+  // xml doc with all the config stuff
+  TiXmlDocument parms;
+
+  // name of the xml config file to read
+  string confFilename;
 
   // pointer to the conductor
   RtConductor *conductor;
 
+  // for conversion of string types to other types
+  template <class T> inline bool convert(T &t, const string& s);
+
   // prints the usage info for the realtime system
   void printUsage();
+
+  //**************************************************//
+  // stuff to support printing to a stream
+  // taken from the tinyXml examples
+  // 
+  const static unsigned int  NUM_INDENTS_PER_SPACE=2;
+  const char *getIndent(unsigned int numIndents);
+  // same as getIndent but no "+" at the end
+  const char * getIndentAlt(unsigned int numIndents);
+  void dumpNode(TiXmlNode* pParent, ostream &os, unsigned int indent = 0);
+  int dumpNodeAttribs(TiXmlElement* pElement,ostream &os,unsigned int indent);
 };
 
-// a single configuration value
-class RtConfigVal {
-  
-public:
-
-  //*** constructor ***/
-
-  // leave blank
-  RtConfigVal() { 
-    val = "";
-  }
-
-  // assign it straight off
-  inline RtConfigVal(string s) {
-    val=s;
-    //transform(val.begin(),val.end(),val.begin(),(int(*)(int))tolower); 
-  }
-
-  string str() {
-    return val;
-  }
-
-  string getVal() {
-    return val;
-  }
-
-  //*** operators ***//
-
-  // logical not
-  const bool operator!() {
-    if(
-       val == "0"
-       || val == "false"
-       || val == ""
-       ) {
-      return true;
-    }
-    return false;
-  }
-
-  // assignment lvalue
-  template<class T>
-  RtConfigVal &operator=(const T t) {
-    stringstream ss;
-    ss << t;
-    ss >> val;
-    return *this;
-  }
-
-  // assignment rvalue
-  template<class T>
-  operator T()  {
-    T t;
-    convert<T>(t,val);
-    return t;
-  }
-
-  // string assignment rvalue
-  operator string()  {
-    return val;
-  }
-
-  // string assignment lvalue
-  string operator=(RtConfigVal &config)  {
-    return config.val;
-  }
-
-  // comparison 
-  const bool operator==(const string s) {
-    return val == s;
-  }
-
-  const bool operator==(const double d) {
-    double dval;
-    return convert<double>(dval,val) 
-      & fabs(d - dval) < dTol;
-  }
-
-  const bool operator==(const float f) {
-    float fval;
-    return convert<float>(fval,val) 
-      & fabsf(f - fval) < fTol;
-  }
-
-  const bool operator==(const long l) {
-    long lval;
-    return convert<long>(lval,val) 
-      & l == lval;
-  }
-
-  const bool operator==(const int i) {
-    int ival;
-    return convert<int>(ival,val) 
-      & i == ival;
-  }
-
-  const bool operator==(const bool b) {
-    bool bval;
-    bool ret = convert(bval,val) 
-      & bval == b;
-    return ret;
-  }
-
-  // outstream operator
- friend ostream &operator<<(ostream &os, const RtConfigVal &v) {
-    os << v.val;
-    return os;
-  }
-
-private:
-
-  string val;
-
-  // tolerances for double and float comparison
-  static const float fTol = 0.00000000001f;
-  static const double dTol = 0.00000000001;
-
-  // for conversion of string types to other types
-  template <class T> inline bool convert(T &t, const string& s) {
-    istringstream iss(s);
-    return !(iss >> dec >> t).fail();
-  }
-
-  // for conversion of string types to bool
-  inline bool convert(bool &b, const string& s) {    
-    if(
-       s == "0"
-       || s == "false"
-       || s == ""
-       ) {
-      b = false;
-    }
-    else {
-      b = true;
-    }
-
-    return true;
-  }
-};
 
 #endif
 

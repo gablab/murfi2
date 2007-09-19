@@ -26,12 +26,14 @@ TMP_FILES = $(patsubst ./%,$(OBJ_DIR)/%,$(SRC_FILES))
 OBJ_FILES = $(TMP_FILES:.cpp=.o) 
 
 default: $(OBJ_FILES)
+	cd tinyxml && $(MAKE)
 
 ############################### CLEAN ################################
 
 clean:
 	@$(ECHO) 'make: removing object and autosave files'
 	-$(RM) -f *.o *~
+	cd tinyxml && $(MAKE) clean
 
 ######################################################################
 ### $Source$

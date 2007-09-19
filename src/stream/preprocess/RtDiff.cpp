@@ -10,6 +10,8 @@
 
 #define absdiff(a,b) (a > b ? a-b : b-a)
 
+string RtDiff::moduleString("voxel-difference");
+
 // default constructor
 RtDiff::RtDiff() : RtStreamComponent() {
   id = "RtDiff";

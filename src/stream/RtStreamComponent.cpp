@@ -9,6 +9,8 @@
 static char *VERSION = "$Id$";
 
 #include"RtStreamComponent.h"
+
+string RtStreamComponent::moduleString("generic-stream-component");
   
 // default constructor
 RtStreamComponent::RtStreamComponent() : super(), persistent(false) {
@@ -113,6 +115,11 @@ int RtStreamComponent::nextStep(ACE_Message_Block *mb) {
 char *RtStreamComponent::getVersionString() {
   return VERSION;
 }
+
+// gets the string to match module names to during config
+//string &RtStreamComponent::getModuleString() {
+//  return moduleString;
+//}
 
 // sets whether this data should be kept around after the stream is done
 void RtStreamComponent::setPersistent(bool p) {

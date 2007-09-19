@@ -71,20 +71,20 @@ RtDisplayImage::~RtDisplayImage() {
 bool RtDisplayImage::open(RtConfig &config) {
   ACE_TRACE(("RtDisplayImage::open"));
   
-  x = config.get("imageDisplayWinX")==true
-    ? config.get("imageDisplayWinX") : DEFAULT_X;
+  x = config.get("display:imageWinX")==true
+    ? config.get("display:imageWinX") : DEFAULT_X;
 
-  y = config.get("imageDisplayWinY")==true
-    ? config.get("imageDisplayWinY") : DEFAULT_Y;
+  y = config.get("display:imageWinY")==true
+    ? config.get("display:imageWinY") : DEFAULT_Y;
 
-  width = config.get("imageDisplayWinW")==true
-    ? config.get("imageDisplayWinW") : DEFAULT_W;
+  width = config.get("display:imageWinW")==true
+    ? config.get("display:imageWinW") : DEFAULT_W;
 
-  height = config.get("imageDisplayWinH")==true
-    ? config.get("imageDisplayWinH") : DEFAULT_H;
+  height = config.get("display:imageWinH")==true
+    ? config.get("display:imageWinH") : DEFAULT_H;
 
-  strcpy(title, config.get("imageDisplayWinTitle")==true
-	 ? config.get("imageDisplayWinTitle").str().c_str() : DEFAULT_TITLE);
+  strcpy(title, config.get("display:imageWinTitle")==true
+	 ? config.get("display:imageWinTitle").str().c_str() : DEFAULT_TITLE);
 
 
   return init();

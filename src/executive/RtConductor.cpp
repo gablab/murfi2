@@ -35,7 +35,7 @@ RtConductor::RtConductor(int argc, char **argv) {
 
   // prepare inputs
 
-  if(config.get("receiveScannerImages")==true) {
+  if(config.get("scanner:receiveImages")==true) {
     RtInputScannerImages *scanimg;
     ACE_NEW_NORETURN(scanimg, RtInputScannerImages);
 
@@ -44,7 +44,7 @@ RtConductor::RtConductor(int argc, char **argv) {
     }
   }
 
-  if(config.get("receiveScannerTriggers")==true) {
+  if(config.get("receiveTriggers")==true) {
     RtInputUSBKb *scantrig;
     ACE_NEW_NORETURN(scantrig, RtInputUSBKb);
 
@@ -65,7 +65,7 @@ RtConductor::RtConductor(int argc, char **argv) {
   // prepare outputs
 
   // display always first, if here
-  if(config.get("imageDisplay")==true) {
+  if(config.get("display:image")==true) {
 
     RtDisplayImage *dispimg;
     ACE_NEW_NORETURN(dispimg, RtDisplayImage);    
@@ -75,11 +75,11 @@ RtConductor::RtConductor(int argc, char **argv) {
     }
   }
 
-  if(config.get("logOutput")==true) {
+  if(config.get("info:log:disabled")==false) {
 
     if(!outputLog.open(config)) {
       cerr << "ERROR: could not open logfile \""
-	   << config.get("logFilename") << "\"" << endl;
+	   << config.get("info:log:logFilename") << "\"" << endl;
     }
   }
 
@@ -206,7 +206,7 @@ bool RtConductor::run() {
   outputLog << "\n";
 
   // start the display
-  if(config.get("imageDisplay")==true) {  
+  if(config.get("display:image")==true) {  
     getDisplay()->activate();
   }
 
@@ -278,7 +278,7 @@ void RtConductor::log(stringstream &s) {
 //  out 
 //   pointer to the display output object
 RtDisplayImage *RtConductor::getDisplay() {
-  if(config.get("imageDisplay")==true) {
+  if(config.get("display:image")==true) {
      return (RtDisplayImage*) (*outputs.begin());
   }
   else {

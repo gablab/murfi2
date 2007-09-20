@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  example configuration file for the realtime fMRI system       -->
+<!--  NOTE... ':' characters are not allowed in any names or values -->
+<!--  Oliver Hinds <ohinds@mit.edu> 2007-09-12                      -->
+
+<study 
+    subject="foobar"
+    subjectsDir="/home/mri/subjects"
+    > </study>
+
+<info>
+  <terminal
+      verbose="true"
+      debug="false"
+      > </terminal>
+  
+  <log
+      filename="log/log.rtl"
+      disabled="false"
+      > </log>
+
+  <errlog
+      filename="log/log.rtl"
+      disabled="false"
+      > </errlog>
+</info>
+
+<scanner
+    disabled="false"
+
+    receiveImages="true"
+    port="15000"
+    saveImages="true"
+
+    receiveTriggers="false"
+    triggerSync="false"
+    triggerCode="83"
+
+    tr="2.0"
+    numMeas="-1"
+> </scanner>
+
+<display
+    image="1"
+    imageWinX="0"
+    imageWinY="0"
+    imageWinW="600"
+    imageWinH="600"
+    imageWinTitle="real time scanner image display"
+    > 
+</display>
+
+<!-- preprocessing steps -->
+<preprocessor>
+  <output>display</output>
+
+  <module name="voxel-difference">
+    <output>display</output>
+    <output>log</output>
+  </module>
+
+  <module name="voxel-variance">
+    <output>display</output>
+  </module>
+
+</preprocessor>
+

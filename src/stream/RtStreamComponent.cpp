@@ -10,6 +10,8 @@ static char *VERSION = "$Id$";
 
 #include"RtStreamComponent.h"
 
+#include"RtPasser.h"
+
 string RtStreamComponent::moduleString("generic-stream-component");
   
 // default constructor
@@ -23,6 +25,19 @@ RtStreamComponent::~RtStreamComponent() {
 }
 
 //*** initialization routines  ***//
+
+// adds an output to receive the data of this stream component
+//  in
+//   output to add
+void RtStreamComponent::addOutput(RtOutput *out, const string &dataId) {
+  if(out == NULL) return;
+
+  if(passer == NULL) {
+    ACE_NEW_NORETURN(passer, RtPasser(dataId));
+  }
+
+  passer->addOutput(out);
+}
 
 // initialize and run thread
 //  out:
@@ -42,6 +57,15 @@ int RtStreamComponent::put(ACE_Message_Block *msg, ACE_Time_Value *to) {
 
   return this->putq(msg,to);
 }
+
+// pass any results to outputs
+//  in: pointer to data to pass
+void RtStreamComponent::passData(RtData* data) {
+  if(passer != NULL) {
+    passer->sendToOutputs(data);
+  }
+}
+
   
 // close a stream component
 //  in
@@ -108,7 +132,6 @@ int RtStreamComponent::nextStep(ACE_Message_Block *mb) {
   ACE_TRACE(("RtStreamComponent::next_step"));
   return this->put_next(mb);
 }
-
 
 // get the version
 //  out: char array that represents the cvs version

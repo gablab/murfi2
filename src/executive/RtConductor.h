@@ -72,6 +72,20 @@ public:
   //   pointer to the display output object
   RtDisplayImage *getDisplay();
 
+  // get an input by its name
+  //  in
+  //   name: name of input to get
+  //  out 
+  //   pointer to the input object
+  RtInput *getInputByName(const string &name);
+
+  // get an output by its name
+  //  in
+  //   name: name of output to get
+  //  out 
+  //   pointer to the output object
+  RtOutput *getOutputByName(const string &name);
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();

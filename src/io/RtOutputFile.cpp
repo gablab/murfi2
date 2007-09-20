@@ -15,6 +15,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtOutputFile::RtOutputFile() : RtOutput() {
+  id += ":file";
 }
 
 // destructor
@@ -47,7 +48,7 @@ bool RtOutputFile::open(RtConfig &config) {
     logname = fs.str();
   }
 
-  cout << "attempting to open logfile " << logname << endl;
+  cout << "opening logfile " << logname << endl;
   outfp.open(logname.c_str(), fstream::out | fstream::app);
 
   // check 

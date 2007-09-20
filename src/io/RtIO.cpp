@@ -33,6 +33,16 @@ bool RtIO::close() {
   return true;
 }
 
+// set the id string
+void RtIO::setID(const string &s) {
+  id = s;
+}
+
+// get the id string
+string RtIO::getID() {
+  return id;
+}
+
 
 // gets the version
 //  out:

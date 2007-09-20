@@ -1,6 +1,6 @@
 /******************************************************************************
  * RtPasser.h is the header for a class that passes data from an
- * analysis stream to output
+ * stream to output
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-05
  *
@@ -9,11 +9,12 @@
 #ifndef RTPASSER_H
 #define RTPASSER_H
 
-#include"RtStreamComponent.h"
+#include"RtOutput.h"
 #include"RtData.h"
+#include"RtStreamComponent.h"
 
 // class declaration
-class RtPasser : public RtStreamComponent {
+class RtPasser: public RtStreamComponent  {
 
 public:
 
@@ -40,10 +41,13 @@ public:
   //*** initialization routines  ***//
   void addOutput(RtOutput *out);
 
+  // process a single acquisition
+  void sendToOutputs(RtData *d);
+
 protected:
 
-  // process a single acquisition
-  int process(ACE_Message_Block *mb);
+  // processes as a stream component
+  int process(ACE_Message_Block*);
 
   // vector of outputs to pass the data to
   vector<RtOutput*> outputs;

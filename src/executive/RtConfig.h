@@ -49,15 +49,6 @@ public:
 
   //*** config get/set parms ***/
 
-
-  // get a parm value.
-  //  in
-  //   name is a ':' delimited string spcifying a path into the XML config
-  //        for example preprocessor:module:name
-  //  out
-  //   string representing the value
-  RtConfigVal get(const string &name);
-
   // get a parm value.
   //  in
   //   name is a ':' delimited string spcifying a path into the XML config
@@ -73,7 +64,16 @@ public:
   //   node is a xml node to start looking at
   //  out
   //   string representing the value
-  RtConfigVal get(const string &name, TiXmlNode *node);
+  RtConfigVal get(const string &name, TiXmlNode *node = NULL);
+
+  // get an xml node in the config. start searching from a specified node
+  //  in
+  //   name is a ':' delimited str spcifying a path into the XML configuration
+  //        for example preprocessor:module:name
+  //   node is a xml node to start looking at
+  //  out
+  //   string representing the value
+  TiXmlNode *getNode(const string &name, TiXmlNode *node = NULL);
 
   // determine if there is a value set for a particular config variable
   //  in
@@ -155,6 +155,8 @@ private:
   // stuff to support printing to a stream
   // taken from the tinyXml examples
   // 
+
+  TiXmlAttribute *getElementAttribute(TiXmlElement *elmt, const string &name);
   const static unsigned int  NUM_INDENTS_PER_SPACE=2;
   const char *getIndent(unsigned int numIndents);
   // same as getIndent but no "+" at the end

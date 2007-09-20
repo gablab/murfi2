@@ -40,6 +40,8 @@ RtDisplayImage::RtDisplayImage()
   : x(DEFAULT_X), y(DEFAULT_Y), width(DEFAULT_W), height(DEFAULT_H), 
     img(NULL), texture(0), needsRepaint(true), newTex(false),
     imageDisplayType(ID_SCANNERIMG) {
+
+  id += ":display";
 }
 
 // constructor with stuff
@@ -57,6 +59,7 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
     imageDisplayType(ID_SCANNERIMG) {
 
   strcpy(title,_title);
+  id += ":display";
 }
 
 // destructor

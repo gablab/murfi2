@@ -29,15 +29,6 @@ public:
   //*** initialization routines  ***//
 
 
-  // add a single module to the module stack
-  //  in
-  //   type: name of the module type to add
-  //   out: optional output to pass the result of this module to
-  //   text: optional text to be associated with the module
-  void addSingleModule(const string &type, 
-		       const RtOutput *out = NULL, 
-		       const string &text = "");
-
   // adds all modules to the stream
   //  in
   //   config: configuration info

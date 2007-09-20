@@ -34,6 +34,7 @@ RtInputScannerImages::RtInputScannerImages()
      seriesNum(1),
      toBeDeleted(received.begin())
 {
+  id += ":scanner:images";
   // nothing to do
 }
 

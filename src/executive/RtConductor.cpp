@@ -286,6 +286,35 @@ RtDisplayImage *RtConductor::getDisplay() {
   }
 }
 
+// get an input by its name
+//  in
+//   name: name of input to get
+//  out 
+//   pointer to the input object
+RtInput *RtConductor::getInputByName(const string &name) {
+  for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
+    if((*i)->getID() == name) {
+      return *i;
+    }
+  }
+  
+  return NULL;
+}
+
+// get an output by its name
+//  in
+//   name: name of output to get
+//  out 
+//   pointer to the output object
+RtOutput *RtConductor::getOutputByName(const string &name) {
+  for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++){
+    if((*i)->getID() == name) {
+      return *i;
+    }
+  }
+
+  return NULL;
+}
 
 // gets the version
 //  out:

@@ -14,6 +14,12 @@ static char *VERSION = "$Id$";
 #include"RtAnalysor.h"
 #include"RtPostprocessor.h"
 
+#include"RtDataIDs.h"
+// individual processing modules
+#include"RtDiff.h"
+#include"RtVar.h"
+#include"RtPasser.h"
+
 // default constructor
 RtStream::RtStream() : super() {
   
@@ -49,6 +55,36 @@ int RtStream::configure(RtConfig &config) {
   return addModules(config);
 }
 
+
+// add a single module to the module stack
+//  in
+//   type: name of the module type to add
+//   out: optional output to pass the result of this module to
+//   text: optional text to be associated with the module
+RtStreamComponent *RtStream::addSingleModule(const string &type, 
+					     const string &text) {
+  Module *mod;
+  RtStreamComponent *sc = NULL;
+
+  // switch amongst module types
+  // ALL NEW MODULES MUST BE REGISTERED HERE
+  if(type == RtPasser::moduleString) { // for original data passer only
+    // empty
+  }
+  else if(type == RtDiff::moduleString) { // voxel time difference
+    ACE_NEW_NORETURN(sc, RtDiff());
+  }
+  else if(type == RtVar::moduleString) { // voxel time variance
+    ACE_NEW_NORETURN(sc, RtVar());
+  }
+
+  // create and add the module
+  ACE_NEW_NORETURN(mod, Module(ACE_TEXT(text.c_str()),sc));
+  addMod.push(mod);
+
+  return sc;
+}
+
 // adds modules to the stream
 //  in
 //   config: configuration info
@@ -60,6 +96,8 @@ int RtStream::addModules(RtConfig &config) {
   RtPreprocessor *preproc = new RtPreprocessor();
   ACE_NEW_RETURN(preprocMod, Module(ACE_TEXT("preprocessing module"),
 				    preproc),-1);
+
+  preproc->setConductor(conductor);
   preproc->configure(config);
 
   // add the analysis module
@@ -94,6 +132,66 @@ int RtStream::addModules(RtConfig &config) {
   return 0;
 }
 
+// adds all 'module' nodes that are children of the passed node as modules
+// for the stream
+//  in
+//   elmt: xml element
+void RtStream::addModulesFromNode(TiXmlElement *elmt) {
+  string name;
+  RtStreamComponent *sc;
+  TiXmlElement *childElmt;
+
+  TiXmlNode *child = 0;
+  while((child = elmt->IterateChildren("module", child))) {
+    if(child->Type() != TiXmlNode::ELEMENT) continue;
+
+    childElmt = (TiXmlElement*) child;
+
+    // send
+    if(TIXML_SUCCESS == childElmt->QueryValueAttribute("name", &name)) {
+      // add the component
+      sc = addSingleModule(name);
+
+      // build the outputs
+      vector<string> outNames;
+      buildOutputNames(childElmt,outNames);
+      addOutputsToComponent(sc,outNames);
+    }
+  }
+
+}
+
+
+// adds outputs to a stream component (needs to be here so that we have
+// access to the conductor to get pointers to the outputs)
+//  in 
+//   sc: stream component to add the outputs to
+void RtStream::addOutputsToComponent(RtStreamComponent *sc, 
+				    vector<string> &outNames) {
+  for(vector<string>::iterator i = outNames.begin(); i != outNames.end(); i++) {
+    sc->addOutput(conductor->getOutputByName(*i));
+  }
+}
+
+
+// build a vector of ids of outputs from an xml node's children
+//  in
+//   module element
+//  out 
+//   vector of string output ids
+void RtStream::buildOutputNames(TiXmlElement *module, vector<string> &names) {
+  TiXmlNode *child = 0;
+  while((child = module->IterateChildren("output", child))) {
+    if(child->Type() != TiXmlNode::ELEMENT) continue;
+
+    // extract the text from this element
+    // CONSIDER USING CHILD ITERATORS HERE
+    string outid = "output:";
+    outid += ((TiXmlElement*)child)->GetText();
+    names.push_back(outid);
+  }  
+}
+
 // accept new data received from an input
 //  in
 //   data: data 
@@ -116,10 +214,6 @@ void RtStream::setInput(unsigned int code, RtData *data) {
 
     this->put(mb);
 
-//    for(int i = 0; i < 5; i++) {
-//      cerr << "sending ready signal" << endl;
-//    }
-//    
     break;
   }
 }

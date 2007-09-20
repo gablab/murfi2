@@ -11,7 +11,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtOutput::RtOutput() {
-
+  id = "output";
 } 
 
 // destructor

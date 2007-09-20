@@ -7,6 +7,7 @@
  *****************************************************************************/
 
 #include"RtPasser.h"
+#include"RtData.h"
 
 // default constructor
 RtPasser::RtPasser() : RtStreamComponent(), dataID("") {
@@ -38,28 +39,29 @@ void RtPasser::addOutput(RtOutput *out) {
 }
 
 // process a single acquisition
-int RtPasser::process(ACE_Message_Block *mb) {
-  ACE_TRACE(("RtPasser::process"));
+void RtPasser::sendToOutputs(RtData *d) {
+  ACE_TRACE(("RtPasser::sendToOutputs"));
 
-  RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
-
-  // look for our kind of data
-  for(unsigned int i = 0; i < msg->getNumData(); i++) {
-
-    RtData *d = msg->getData(i);
-
-    // check if its our type
-    if(!dataID.empty() && d->getID() != dataID) {	
-      continue;
-    }
-
-    //      ACE_DEBUG((LM_DEBUG, "passing image %d\n", ((RtDataImage*)msg->getLastData())->getAcquisitionNum()));
-
-
-    for(vector<RtOutput*>::iterator j = outputs.begin(); j != outputs.end(); j++) {
-      (*j)->setData(d);
-    }
+  // check if this data is our type
+  if(!dataID.empty() && d->getID() != dataID) {	
+    return;
   }
+
+  //      ACE_DEBUG((LM_DEBUG, "passing image %d\n", ((RtDataImage*)msg->getLastData())->getAcquisitionNum()));
+
+
+  // set to all outputs
+  for(vector<RtOutput*>::iterator j = outputs.begin(); j != outputs.end(); j++) {
+    (*j)->setData(d);
+  }
+
+  return;
+}
+
+// processes as a stream component
+int RtPasser::process(ACE_Message_Block* mb) {
+  RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
+  sendToOutputs(msg->getCurrentData());
   return 0;
 }
 

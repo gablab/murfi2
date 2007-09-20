@@ -31,13 +31,13 @@ static char *VERSION = "$Id$";
 //*** constructors/destructors  ***//
 
 // default constructor
-RtConfig::RtConfig() 
+RtConfig::RtConfig()
     : confFilename(DEFAULT_CONFFILENAME), conductor(NULL) {
   // nothing to do here
 }
 
 // default constructor
-RtConfig::RtConfig(RtConductor &_conductor) 
+RtConfig::RtConfig(RtConductor &_conductor)
     : confFilename(DEFAULT_CONFFILENAME), conductor(&_conductor)  {
   // nothing to do here
 }
@@ -55,7 +55,7 @@ bool RtConfig::parseArgs(int argc, char **args) {
 
   // set up short options
   static const ACE_TCHAR options[] = ACE_TEXT (":f:h");
-  ACE_Get_Opt cmdOpts(argc, args, options, 1, 0, 
+  ACE_Get_Opt cmdOpts(argc, args, options, 1, 0,
 		      ACE_Get_Opt::PERMUTE_ARGS, 1);
 
   // set up long options
@@ -73,7 +73,7 @@ bool RtConfig::parseArgs(int argc, char **args) {
     case 'h':
       printUsage();
       exit(1);
-     
+
     case ':':
       ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("-%c requires an argument\n"),
           cmdOpts.opt_opt()), -1);
@@ -85,13 +85,10 @@ bool RtConfig::parseArgs(int argc, char **args) {
 
   // parse the logfile
   if(!parseConfigFile()) {
-    ACE_DEBUG((LM_ERROR, ACE_TEXT("failed to parse config file %s\n"), 
+    ACE_DEBUG((LM_ERROR, ACE_TEXT("failed to parse config file %s\n"),
 	       confFilename));
     return false;
   }
-
-  dumpConfig(cout);
-  cout.flush();
 
   // get the executable name and add it to the config
   set("execName",args[0]);
@@ -116,7 +113,7 @@ bool RtConfig::parseConfigFile() {
 // checks for valid setup of different parts of the program
 bool RtConfig::validateConfig() {
   ACE_TRACE(("RtConfig::validateConfig"));
-  
+
   bool valid = true;
 
   // check subject
@@ -165,7 +162,7 @@ bool RtConfig::validateConfig() {
     }
 
     if((int) get("scanner:port") < 1 || (int) get("scanner:port") > MAX_PORT) {
-      cerr << "WARNING: invalid port number for receiving scanner images" 
+      cerr << "WARNING: invalid port number for receiving scanner images"
 	   << endl;
       set("scanner:receiveImages",false);
     }
@@ -186,16 +183,6 @@ RtConfigVal RtConfig::get(const char *name) {
   return get(string(name));
 }
 
-// get a parm value.
-//  in
-//   name is a ':' delimited string spcifying a path into the XML configuration
-//        for example preprocessor:module:name
-//  out
-//   string representing the value
-RtConfigVal RtConfig::get(const string &name) {
-  return RtConfigVal(get(name,&parms));
-}
-
 // get a parm value. start searching from a specified node
 //  in
 //   name is a ':' delimited string spcifying a path into the XML configuration
@@ -206,10 +193,8 @@ RtConfigVal RtConfig::get(const string &name) {
 RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
   ACE_TRACE((ACE_TEXT("RtConfig::get(string, node)")));
 
-  ACE_DEBUG((LM_DEBUG, ACE_TEXT("string=%s\n"), name));
-
   if(node == NULL) {
-    return unset;
+    node = &parms;
   }
 
   // make sure we are an element if we are not text
@@ -228,11 +213,11 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     string val;
 
     // if no children found, check attributes if there are no more ':'s
-    if(node != &parms 
+    if(node != &parms
        && TIXML_SUCCESS == elmt->QueryValueAttribute(childName,&val)) {
       return RtConfigVal(val);
     }
-    
+
     // search children for text elements to return
     TiXmlNode *text = 0;
     while((text = elmt->IterateChildren(childName, text))) {
@@ -240,10 +225,11 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
 	return RtConfigVal(text->ValueStr());
       }
     }
-    
+
   }
-  else if(delind == name.length()-1) { // check if we have taken all of name  
-    // iterate over children looking for text
+  else if(delind == name.length()-1) {
+    // we havent taken all delimiters, but there is no more remaining name,
+    // so look for text children
     TiXmlNode *me;
     while((me = node->IterateChildren(node->FirstChild()))) {
       if(me->Type() == TiXmlNode::TEXT) {
@@ -251,12 +237,12 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
       }
     }
     return unset;
-  } 
+  }
   else {
     rest = name.substr(delind+1);
   }
 
-  // look for child with name 
+  // look for child with name
   TiXmlNode *child = 0;
   while((child = elmt->IterateChildren(childName, child))) {
     string val = get(rest,child);
@@ -270,6 +256,74 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
   return unset;
 }
 
+// get an xml node in the config. start searching from a specified node
+//  in
+//   name is a ':' delimited str spcifying a path into the XML configuration
+//        for example preprocessor:module:name
+//   node is a xml node to start looking at
+//  out
+//   node representing the value, or NULL if none does
+TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
+  ACE_TRACE((ACE_TEXT("RtConfig::get(string, node)")));
+
+  if(node == NULL) {
+    node = &parms;
+  }
+
+  // make sure we are an element if we are not text
+  if(node->Type() != TiXmlNode::ELEMENT && node != &parms) {
+    return NULL;
+  }
+
+  // if the name string is empty we return the current node
+  if(name.empty()) {
+    return node;
+  }
+
+  TiXmlElement *elmt = (TiXmlElement*) node;
+
+  // find the next ':'
+  size_t delind = name.find(':');
+
+  string childName(name.substr(0,delind));
+  string rest;
+  if(delind == string::npos) {
+    // found no more delim cases, try to return a text child
+
+    TiXmlNode *text = 0;
+    while((text = elmt->IterateChildren(childName, text))) {
+      if(text->Type() == TiXmlNode::TEXT) {
+	return text;
+      }
+    }
+
+  }
+  else if(delind == name.length()-1) {
+    // we havent taken all delimiters, but there is no more remaining name,
+    // so look for text children of any name
+    TiXmlNode *me;
+    while((me = node->IterateChildren(node->FirstChild()))) {
+      if(me->Type() == TiXmlNode::TEXT) {
+	return me;
+      }
+    }
+    return NULL;
+  }
+  else {
+    rest = name.substr(delind+1);
+  }
+
+  // look though each child with name, return the first non NULL
+  TiXmlNode *child = 0;
+  while((child = elmt->IterateChildren(childName, child))) {
+    TiXmlNode *ret = getNode(rest,child);
+    if(ret != NULL) {
+      return ret;
+    }
+  }
+
+  return NULL;
+}
 
 // determine if there is a value set for a particular config variable
 //  in
@@ -288,7 +342,7 @@ bool RtConfig::isSet(const string &name) {
 //   value: the value to set the attribute to
 //   node:  the xml node to start from
 //  out: success or failure
-bool RtConfig::set(const string name, const string value, 
+bool RtConfig::set(const string name, const string value,
 		      TiXmlNode *node) {
   if(node == NULL) {
     return "";
@@ -300,7 +354,7 @@ bool RtConfig::set(const string name, const string value,
 
   // check if we have consumed all of the ':' things in the name
   if(nextdelim == string::npos) {
-    if(node == &parms) { // if top level add an element with text 
+    if(node == &parms) { // if top level add an element with text
       TiXmlElement newel(name);
       TiXmlText txt(value);
       newel.InsertEndChild(txt);
@@ -319,7 +373,7 @@ bool RtConfig::set(const string name, const string value,
 
   // get the child with the appropriate name, or create it
   TiXmlNode *child = ele->FirstChild(nextNode);
-  
+
   if(child == NULL) {
     child = new TiXmlElement(nextNode);
   }
@@ -415,9 +469,25 @@ void RtConfig::dumpConfig(ostream &os) {
 }
 
 //**************************************************//
-// stuff to support printing to a stream
-// taken from the tinyXml examples
-// 
+// tinyxml support stuff
+// some taken from the tinyXml examples
+//
+
+TiXmlAttribute *RtConfig::getElementAttribute(TiXmlElement *elmt,
+					      const string &name) {
+  if(elmt == NULL) {
+    return NULL;
+  }
+
+  TiXmlAttribute* attr = elmt->FirstAttribute();
+  while(attr) {
+    if(name == attr->Name()) {
+      return attr;
+    }
+  }
+
+  return NULL;
+}
 
 const char *RtConfig::getIndent(unsigned int numIndents) {
   static const char *pINDENT="                                      + ";
@@ -438,20 +508,20 @@ const char * RtConfig::getIndentAlt(unsigned int numIndents) {
   return &pINDENT[LENGTH-n];
 }
 
-int RtConfig::dumpNodeAttribs(TiXmlElement* pElement, ostream &os, 
+int RtConfig::dumpNodeAttribs(TiXmlElement* pElement, ostream &os,
 				 unsigned int indent) {
   if(!pElement) return 0;
 
   TiXmlAttribute* pAttrib=pElement->FirstAttribute();
   int i=0;
   const char* pIndent=getIndent(indent);
-  os << endl;
   while(pAttrib) {
     os << pIndent << pAttrib->Name() << '=' << pAttrib->ValueStr() << endl;
     i++;
     pAttrib=pAttrib->Next();
   }
-  return i;	
+  //if(i) os << endl;
+  return i;
 }
 
 void RtConfig::dumpNode(TiXmlNode* pParent, ostream &os,
@@ -461,6 +531,14 @@ void RtConfig::dumpNode(TiXmlNode* pParent, ostream &os,
   TiXmlNode* pChild;
   TiXmlText* pText;
   int t = pParent->Type();
+
+  // ignore certain types
+  if(t == TiXmlNode::COMMENT
+     || t == TiXmlNode::UNKNOWN
+     || t == TiXmlNode::DECLARATION) {
+    return;
+  }
+
   os << getIndent(indent);
 
   switch(t) {
@@ -469,32 +547,20 @@ void RtConfig::dumpNode(TiXmlNode* pParent, ostream &os,
     break;
 
   case TiXmlNode::ELEMENT:
-    os << pParent->Value();
+    os << pParent->Value() << endl;
     dumpNodeAttribs(pParent->ToElement(), os, indent+1);
-    break;
-  case TiXmlNode::COMMENT:
-    //
-    break;
-
-  case TiXmlNode::UNKNOWN:
-    //
     break;
 
   case TiXmlNode::TEXT:
     pText = pParent->ToText();
-    os << pText->Value();
+    os << pText->Value() << endl;;
     break;
 
-  case TiXmlNode::DECLARATION:
-    //
-    break;
   default:
     break;
   }
 
-  os << endl;
-
-  for(pChild = pParent->FirstChild(); pChild != 0; 
+  for(pChild = pParent->FirstChild(); pChild != 0;
       pChild = pChild->NextSibling()) {
     dumpNode(pChild, os, indent+1);
   }

@@ -20,8 +20,10 @@
 //#include"RtStreamComponent.h"
 //#include"RtStreamMessage.h"
 #include"RtConfig.h"
+#include"RtOutput.h"
 
 class RtConductor;
+class RtStreamComponent;
 
 using namespace std;
 
@@ -55,12 +57,40 @@ public:
   //   config: configuration info
   virtual int addModules(RtConfig &config);
 
+  // adds outputs to a stream component (needs to be here so that we have
+  // access to the conductor to get pointers to the outputs)
+  //  in 
+  //   config: configuration info
+  virtual void addOutputsToComponent(RtStreamComponent *sc, 
+				     vector<string> &outNames);
+
+  // build a vector of ids of outputs from an xml node's children
+  //  in
+  //   module element
+  //  out 
+  //   vector of string output ids
+  void buildOutputNames(TiXmlElement *module, vector<string> &names);
+
   //*** operation routines  ***//
 
   // accept new data received from an input
   //  in
   //   data: data 
   virtual void setInput(unsigned int code, RtData *data);
+
+  // adds all 'module' nodes that are children of the passed node as modules
+  // for the stream
+  //  in
+  //   elmt: xml element
+  void addModulesFromNode(TiXmlElement *elmt);
+
+  // add a single module to the module stack
+  //  in
+  //   type: name of the module type to add
+  //   out: optional output to pass the result of this module to
+  //   text: optional text to be associated with the module
+  RtStreamComponent *addSingleModule(const string &type,
+				     const string &text = "");
 
   // adds all the modules on the stack to the processing stream
   // the module stack is emtpty after this executes

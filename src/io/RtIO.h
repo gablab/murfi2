@@ -36,6 +36,12 @@ public:
   //   true (for success) or false
   virtual bool close();
   
+  // set the id string
+  void setID(const string &s);
+
+  // get the id string
+  string getID();
+
   // gets the version
   //  out:
   //   cvs version string for this class
@@ -44,9 +50,9 @@ public:
 protected:
 
 
-  //*** private data members  ***//
-
   bool isOpen;
+
+  string id;
 
 };
 

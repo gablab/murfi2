@@ -15,6 +15,9 @@
 #include"RtStreamMessage.h"
 #include"RtConfig.h"
 #include"RtData.h"
+//#include"RtPasser.h"
+
+class RtPasser;
 
 // class declaration
 class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH> {
@@ -30,6 +33,11 @@ public:
   virtual ~RtStreamComponent();
 
   //*** initialization routines  ***//
+
+  // adds an output to receive the data of this stream component
+  //  in
+  //   output to add
+  virtual void addOutput(RtOutput *out, const string &dataId = "");
 
   // initialize and run thread
   //  out:
@@ -72,6 +80,12 @@ protected:
 
   // pure virtual for implementation of real processing
   virtual int process(ACE_Message_Block *mb) = 0;
+
+  // pass any results to outputs
+  virtual void passData(RtData* data);
+
+  // passer to send the results of our computation to outputs
+  RtPasser *passer;
 
   // whether data created by this component should be persistent
   bool persistent;

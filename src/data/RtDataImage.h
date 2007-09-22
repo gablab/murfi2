@@ -50,6 +50,13 @@ public:
   // construct from another image
   RtDataImage(RtDataImage &img);
 
+  // set this image based on a passed image info and data
+  //  in
+  //   info: struct
+  //   data: array (optional, image data will be  allocated and set
+  //         to all zeros if null) 
+  void setImage(RtDataImageInfo &_info, unsigned short *_data = NULL);
+
   // write an image to a file
   //  in
   //   filename: string filename
@@ -82,6 +89,9 @@ public:
 
   // get the acquisition number
   unsigned int getAcquisitionNum() const;
+
+  // get the series number
+  unsigned int getSeriesNum() const;
 
   // get dimensions
   int getDim(int i);
@@ -118,6 +128,11 @@ public:
 
   // set pixel value when locked
   void setPixelLocked(RtLocker *locker, unsigned int i, unsigned short v); 
+
+  // set the series number
+  void setSeriesNum(unsigned int);
+
+
 private:
 
   //*** private data members  ***//

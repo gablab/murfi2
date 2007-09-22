@@ -1,6 +1,7 @@
 /******************************************************************************
  * RtVar.h is the header for a class that computes the variance over a
- * set of images
+ * set of images. this is an implementation of the west (1979) algorithm for
+ * incremental variance computation. 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-05
  *
@@ -36,8 +37,11 @@ protected:
 
   // saves the mean image up to t-1
   RtDataImage mean;
-  vector<RtDataImage*> hist;
 
+  // saves the variance numerator image up to t-1
+  RtDataImage varnum;
+
+  vector<RtDataImage*> hist;
 };
 
 #endif

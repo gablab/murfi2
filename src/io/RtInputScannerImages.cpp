@@ -135,6 +135,7 @@ int RtInputScannerImages::svc() {
 
     // build data class
     rti = new RtDataImage(*ei,img);
+    rti->setSeriesNum(seriesNum);
 
     // set the image id for handling
     rti->addToID("scanner");

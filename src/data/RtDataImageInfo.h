@@ -35,7 +35,8 @@ public:
        sliceThick(0),
        pace(false),
        swapReadPhase(false),
-       acqNum(0),
+       seriesNum(1),
+       acqNum(1),
        timeAfterStart(0),
        te(0), tr(0), ti(0),
        triggerTime(0),
@@ -100,6 +101,7 @@ protected:
   // imaging parms
   bool   pace;                // pace-enabled sequence
   bool   swapReadPhase;       
+  int    seriesNum;           // series number
   int    acqNum;              // acquisition number
   double timeAfterStart;      // time after start
   double te;                  // echo time (ms)

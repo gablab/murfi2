@@ -71,12 +71,7 @@ RtDataImage::RtDataImage(RtDataImageInfo &_info, unsigned short *_data)
   ACE_TRACE(("RtDataImage::RtDataImage(RtDataImageInfo,unsigned short*)"));
   addToID("image");
 
-  info = _info;
-  data = new unsigned short[info.numPix];
-
-  if(_data != NULL) {
-    memcpy(data, _data, info.imgDataLen);
-  }
+  setImage(_info, _data);
 }
 
 // construct from another image (deep copy)
@@ -90,6 +85,24 @@ RtDataImage::RtDataImage(RtDataImage &img) : RtData() {
   memcpy(data, img.data, info.imgDataLen);
 }
 
+// set this image based on a passed image info and data
+//  in
+//   info: struct
+//   data: array (optional, image data will be  allocated and set
+//         to all zeros if null) 
+void RtDataImage::setImage(RtDataImageInfo &_info, unsigned short *_data) {
+  info = _info;
+  data = new unsigned short[info.numPix];
+
+  if(_data != NULL) {
+    memcpy(data, _data, info.imgDataLen);
+  }
+  else {
+    for(unsigned int i = 0; i < info.numPix; i++) {
+      data[i] = 0;
+    }
+  }
+}
 
 // print info about this image
 void RtDataImage::printInfo(ostream &os) {
@@ -235,6 +248,11 @@ unsigned int RtDataImage::getAcquisitionNum() const {
   return info.acqNum;
 }
 
+// get the series number
+unsigned int RtDataImage::getSeriesNum() const {
+  return info.seriesNum;
+}
+
 // get dimensions
 int RtDataImage::getDim(int i) {
   return info.numDims > i && i >= 0 ? info.dims[i] : -1;
@@ -320,6 +338,12 @@ float RtDataImage::getAutoBrightness() {
 
   return (float) info.minVal;
 
+}
+
+
+// set the series number
+void RtDataImage::setSeriesNum(unsigned int sn) {
+  info.seriesNum = sn;
 }
 
 // set pixel value

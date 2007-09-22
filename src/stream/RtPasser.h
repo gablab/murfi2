@@ -18,6 +18,8 @@ class RtPasser: public RtStreamComponent  {
 
 public:
 
+  static string moduleString;
+
   //*** constructors/destructors  ***//
 
   // default constructor
@@ -39,7 +41,7 @@ public:
   ~RtPasser();
 
   //*** initialization routines  ***//
-  void addOutput(RtOutput *out);
+  void addOutput(RtOutput *out, const string &dataId = "");
 
   // process a single acquisition
   void sendToOutputs(RtData *d);

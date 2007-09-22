@@ -210,11 +210,10 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
   string childName(name.substr(0,delind));
   string rest;
   if(delind == string::npos) { // found no more delim cases, try to return val
-    string val;
+    const char *val;
 
     // if no children found, check attributes if there are no more ':'s
-    if(node != &parms
-       && TIXML_SUCCESS == elmt->QueryValueAttribute(childName,&val)) {
+    if(node != &parms && NULL != (val = elmt->Attribute(childName.c_str()))) {
       return RtConfigVal(val);
     }
 

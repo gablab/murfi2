@@ -46,6 +46,13 @@ void RtData::addToID(char *s) {
   id.append(s);
 }
 
+// set the id string for this data
+//  in
+//   string to set the id to
+void RtData::setID(const string &s) {
+  id = s;
+}
+
 
 // get if we should delete this data after stream processing (not persistent)
 bool RtData::getPersistent() {

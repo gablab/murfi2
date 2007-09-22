@@ -23,7 +23,6 @@ public:
     curDataIndex = 0;
   }
 
-
   // add a peice of data to the message
   //  in 
   //   pointer to the data

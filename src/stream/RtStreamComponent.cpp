@@ -9,14 +9,14 @@
 static char *VERSION = "$Id$";
 
 #include"RtStreamComponent.h"
-
 #include"RtPasser.h"
+#include"ace/Mutex.h"
 
 string RtStreamComponent::moduleString("generic-stream-component");
   
 // default constructor
 RtStreamComponent::RtStreamComponent() : super(), persistent(false) {
-  id = "RtStreamComponent";
+  id = moduleString;
 }
 
 // destructor
@@ -66,6 +66,16 @@ void RtStreamComponent::passData(RtData* data) {
   }
 }
 
+// sets the latest result of processing
+//  in
+//   data result
+void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
+  ACE_Mutex mut;
+  mut.acquire();
+  msg->addData(data);
+  passData(data);
+  mut.release();
+}
   
 // close a stream component
 //  in
@@ -152,6 +162,12 @@ void RtStreamComponent::setPersistent(bool p) {
 // gets whether this data should be kept around after the stream is done
 bool RtStreamComponent::getPersistent() {
   return persistent;
+}
+
+
+// gets the id for this stream component
+string RtStreamComponent::getID() {
+  return id;
 }
 
 /*****************************************************************************

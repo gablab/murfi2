@@ -43,11 +43,10 @@
 
 <display
     image="1"
-    imageWinX="0"
+    imageWinX="300"
     imageWinY="0"
     imageWinW="600"
     imageWinH="600"
-    imageWinTitle="real time scanner image display"
     > 
 </display>
 
@@ -61,7 +60,7 @@
   </module>
 
   <module name="voxel-variance">
-    <output>display</output>
+     <output>display</output>
   </module>
 
 </preprocessor>

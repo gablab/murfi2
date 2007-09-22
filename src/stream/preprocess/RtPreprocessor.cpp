@@ -63,10 +63,8 @@ int RtPreprocessor::addModules(RtConfig &config) {
 int RtPreprocessor::process(ACE_Message_Block *mb) {
   ACE_TRACE(("RtPreprocessor::process"));
 
-
   // pass the message block down to our stream
-  RtStream::put(mb);
-  
+  RtStream::put(mb);  
 
   return 0;
 }

@@ -17,6 +17,14 @@
 #include"RtData.h"
 //#include"RtPasser.h"
 
+// NOTES FOR SUBCLASSING:
+// when this class is subclassed it should get its own 
+//   static string moduleString;
+// then this string should be defined at the top of the source file and id
+// should be assigned to moduleString in all constructors. this rather
+// cumbersome process is required to maintain the ability to retreive
+// component specific id strings both statically and dynamically. sorry.
+
 class RtPasser;
 
 // class declaration
@@ -68,6 +76,9 @@ public:
   // gets whether this data should be kept around after the stream is done
   bool getPersistent();
 
+  // gets the id for this stream component
+  string getID();
+
   // module name for config
   static string moduleString;
 
@@ -84,13 +95,18 @@ protected:
   // pass any results to outputs
   virtual void passData(RtData* data);
 
+  // sets the latest result of processing
+  //  in
+  //   data result
+  void setResult(RtStreamMessage *msg, RtData *data);
+
   // passer to send the results of our computation to outputs
   RtPasser *passer;
 
   // whether data created by this component should be persistent
   bool persistent;
 
-  // id string (for debugging)
+  // id string
   string id;
 };
 
@@ -99,8 +115,7 @@ class RtEndTask : public RtStreamComponent {
 
 public:
   RtEndTask() : RtStreamComponent() {
-    id = "RtEndTask";
-    moduleString = "end-task";
+    id = "end-task";
   }
 
 protected:

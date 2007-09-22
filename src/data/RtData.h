@@ -45,6 +45,9 @@ public:
   //   string to append to the id
   void addToID(char *s);
 
+  // set the id string
+  void setID(const string &s);
+
   // get if we should delete this data after stream processing (not persistent)
   bool getPersistent();
 

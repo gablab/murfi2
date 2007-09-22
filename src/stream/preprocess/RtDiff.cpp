@@ -14,7 +14,7 @@ string RtDiff::moduleString("voxel-difference");
 
 // default constructor
 RtDiff::RtDiff() : RtStreamComponent() {
-  id = "RtDiff";
+  id = moduleString;
   last = NULL;
 }
 
@@ -29,12 +29,16 @@ int RtDiff::process(ACE_Message_Block *mb) {
 
   RtDataImage *img = (RtDataImage*)msg->getLastData();
 
+  cout << "voxel-difference got msg " << msg 
+       << " with curdata " << img
+       << endl;
+
   if(img == NULL) {
     ACE_DEBUG((LM_INFO, "RtDiff:process: image passed is NULL\n"));
-    return -1;
+    return 0;
   }
 
-  if(last == NULL) {
+  if(last == NULL || last->getSeriesNum() != img->getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "differencing found first image\n"));
 
     last = img;
@@ -84,8 +88,7 @@ int RtDiff::process(ACE_Message_Block *mb) {
   // store this as last image
   last = img;
 
-  // add out new data to the message
-  msg->addData(diff);
+  setResult(msg, diff);
 
   return 0;
 }

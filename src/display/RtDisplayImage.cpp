@@ -30,7 +30,7 @@
 #define DEFAULT_Y 0
 #define DEFAULT_W 600
 #define DEFAULT_H 600
-#define DEFAULT_TITLE "real-time system image display"
+#define DEFAULT_TITLE "real: experimentor"
 
 
 //*** constructors/destructors  ***//
@@ -74,21 +74,20 @@ RtDisplayImage::~RtDisplayImage() {
 bool RtDisplayImage::open(RtConfig &config) {
   ACE_TRACE(("RtDisplayImage::open"));
   
-  x = config.get("display:imageWinX")==true
+  x = config.isSet("display:imageWinX")
     ? config.get("display:imageWinX") : DEFAULT_X;
 
-  y = config.get("display:imageWinY")==true
+  y = config.isSet("display:imageWinY")
     ? config.get("display:imageWinY") : DEFAULT_Y;
 
-  width = config.get("display:imageWinW")==true
+  width = config.isSet("display:imageWinW")
     ? config.get("display:imageWinW") : DEFAULT_W;
 
-  height = config.get("display:imageWinH")==true
+  height = config.isSet("display:imageWinH")
     ? config.get("display:imageWinH") : DEFAULT_H;
 
-  strcpy(title, config.get("display:imageWinTitle")==true
+  strcpy(title, config.isSet("display:imageWinTitle")
 	 ? config.get("display:imageWinTitle").str().c_str() : DEFAULT_TITLE);
-
 
   return init();
 }
@@ -157,7 +156,6 @@ void RtDisplayImage::setData(RtData *data) {
 
   ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getAcquisitionNum()));
 
-
   // set the info strings
   bottomStr = img->getID();
 
@@ -194,6 +192,8 @@ void RtDisplayImage::makeTexture() {
   glPixelTransferf(GL_RED_BIAS,   brightness);
   glPixelTransferf(GL_GREEN_BIAS, brightness);
   glPixelTransferf(GL_BLUE_BIAS,  brightness);
+
+  cout << "image " << img->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
 
   /* create the image texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, texture);

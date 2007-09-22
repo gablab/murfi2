@@ -69,7 +69,7 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   // switch amongst module types
   // ALL NEW MODULES MUST BE REGISTERED HERE
   if(type == RtPasser::moduleString) { // for original data passer only
-    // empty
+    ACE_NEW_NORETURN(sc, RtPasser());
   }
   else if(type == RtDiff::moduleString) { // voxel time difference
     ACE_NEW_NORETURN(sc, RtDiff());
@@ -141,6 +141,15 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt) {
   RtStreamComponent *sc;
   TiXmlElement *childElmt;
 
+  // build the outputs at the top level
+  vector<string> topLevelOutNames;
+  buildOutputNames(elmt,topLevelOutNames);
+  if(!topLevelOutNames.empty()) {
+    sc = addSingleModule(RtPasser::moduleString);
+    addOutputsToComponent(sc,topLevelOutNames);
+  }
+
+
   TiXmlNode *child = 0;
   while((child = elmt->IterateChildren("module", child))) {
     if(child->Type() != TiXmlNode::ELEMENT) continue;
@@ -151,6 +160,8 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt) {
     if(TIXML_SUCCESS == childElmt->QueryValueAttribute("name", &name)) {
       // add the component
       sc = addSingleModule(name);
+
+      cout << "added module " << sc->getID()  << " == " << name << endl;
 
       // build the outputs
       vector<string> outNames;
@@ -170,6 +181,8 @@ void RtStream::addOutputsToComponent(RtStreamComponent *sc,
 				    vector<string> &outNames) {
   for(vector<string>::iterator i = outNames.begin(); i != outNames.end(); i++) {
     sc->addOutput(conductor->getOutputByName(*i));
+    cout<< "adding output " << *i << " to " << sc->getID() << endl;
+
   }
 }
 
@@ -206,11 +219,20 @@ void RtStream::setInput(unsigned int code, RtData *data) {
     ACE_Message_Block *mb;
     ACE_NEW_NORETURN(mb, ACE_Message_Block(sizeof(RtStreamMessage)));
 
-    RtStreamMessage *msg = (RtStreamMessage*) mb->wr_ptr();
-    mb->wr_ptr(sizeof(RtStreamMessage));
-    
+
+    RtStreamMessage *msg;
+    ACE_NEW_NORETURN(msg, RtStreamMessage());
+
     msg->init(conductor);
     msg->addData(data);
+
+    memcpy(mb->wr_ptr(), msg, sizeof(RtStreamMessage));
+    mb->wr_ptr(sizeof(RtStreamMessage));
+    
+    //cerr << "got data " << data << " and put it in a msg " << msg << endl;
+
+    // RtStreamMessage *m = (RtStreamMessage*) mb->rd_ptr();
+    //cerr << "retrieve data from msg gives " << m->getCurrentData() << endl;
 
     this->put(mb);
 

@@ -56,7 +56,7 @@ void RtPasser::sendToOutputs(RtData *d) {
 
   // set to all outputs
   for(vector<RtOutput*>::iterator j = outputs.begin(); j != outputs.end(); j++) {
-    cout<< "passing " << d->getID() << " to " << (*j)->getID() << endl;
+    //cout<< "passing " << d->getID() << " to " << (*j)->getID() << endl;
 
     (*j)->setData(d);
   }
@@ -68,9 +68,9 @@ void RtPasser::sendToOutputs(RtData *d) {
 int RtPasser::process(ACE_Message_Block* mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
   RtData *img = msg->getCurrentData();
-  cout << "passer got msg " << msg 
-       << " with curdata " << img
-       << endl;
+//  cout << "passer got msg " << msg 
+//       << " with curdata " << img
+//       << endl;
 
   sendToOutputs(img);
   return 0;

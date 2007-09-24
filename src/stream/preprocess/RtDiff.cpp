@@ -29,10 +29,6 @@ int RtDiff::process(ACE_Message_Block *mb) {
 
   RtDataImage *img = (RtDataImage*)msg->getLastData();
 
-  cout << "voxel-difference got msg " << msg 
-       << " with curdata " << img
-       << endl;
-
   if(img == NULL) {
     ACE_DEBUG((LM_INFO, "RtDiff:process: image passed is NULL\n"));
     return 0;

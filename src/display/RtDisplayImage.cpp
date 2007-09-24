@@ -38,7 +38,8 @@
 // default constructor
 RtDisplayImage::RtDisplayImage() 
   : x(DEFAULT_X), y(DEFAULT_Y), width(DEFAULT_W), height(DEFAULT_H), 
-    img(NULL), texture(0), needsRepaint(true), newTex(false),
+    img(NULL), texture(0), needsRepaint(true), newTex(false), 
+    newImageType(true),
     imageDisplayType(ID_SCANNERIMG) {
 
   id += ":display";
@@ -56,6 +57,7 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
 			       char *_title) 
   : x(_x), y(_y), width(_w), height(_h),
     img(NULL), texture(0), needsRepaint(true), newTex(false), 
+    newImageType(true),
     imageDisplayType(ID_SCANNERIMG) {
 
   strcpy(title,_title);
@@ -179,21 +181,26 @@ void RtDisplayImage::makeTexture() {
   /* get the id for the texture */
   glGenTextures(1, &texture);
 
-  /* contrast */
-  
-  float contrast = img->getAutoContrast(); 
-  glPixelTransferf(GL_RED_SCALE,   contrast);
-  glPixelTransferf(GL_GREEN_SCALE, contrast);
-  glPixelTransferf(GL_BLUE_SCALE,  contrast);
-  
-  
-  /* brightness */
-  float brightness = img->getAutoBrightness();
-  glPixelTransferf(GL_RED_BIAS,   brightness);
-  glPixelTransferf(GL_GREEN_BIAS, brightness);
-  glPixelTransferf(GL_BLUE_BIAS,  brightness);
+  if(newImageType) {
 
-  cout << "image " << img->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
+    /* contrast */
+  
+    float contrast = img->getAutoContrast(); 
+    glPixelTransferf(GL_RED_SCALE,   contrast);
+    glPixelTransferf(GL_GREEN_SCALE, contrast);
+    glPixelTransferf(GL_BLUE_SCALE,  contrast);
+  
+  
+    /* brightness */
+    float brightness = img->getAutoBrightness();
+    glPixelTransferf(GL_RED_BIAS,   brightness);
+    glPixelTransferf(GL_GREEN_BIAS, brightness);
+    glPixelTransferf(GL_BLUE_BIAS,  brightness);
+
+    cout << "image " << img->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
+
+    newImageType = false;
+  }
 
   /* create the image texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, texture);
@@ -289,6 +296,8 @@ void RtDisplayImage::CallBackTimerFunc(int time, int val) {
 }
 
 void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
+  string oldImageDisplayType = imageDisplayType;
+
   switch(key) {
   case 's':
     imageDisplayType = ID_SCANNERIMG;
@@ -299,6 +308,11 @@ void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
   case 'v':
     imageDisplayType = ID_VARIMG;
     break;
+  }
+
+  // signal if we are displaying a new type of image
+  if(imageDisplayType != oldImageDisplayType) {
+    newImageType = true;
   }
 }
 

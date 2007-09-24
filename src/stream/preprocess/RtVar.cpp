@@ -17,11 +17,16 @@ RtVar::RtVar() : RtStreamComponent() {
   numTimePoints = 0;
   mean.addToID("voxel_variance");
   id = moduleString;
+  varnum = NULL;
 }
 
 // destructor
 RtVar::~RtVar() {
   cout << "destroyed" << endl;
+
+  if(varnum != NULL) {
+    delete [] varnum;
+  }
 }
 
 // process a single acquisition
@@ -32,10 +37,6 @@ int RtVar::process(ACE_Message_Block *mb) {
 
   // get the current image to operate on
   RtDataImage *img = (RtDataImage*)msg->getCurrentData();
-
-  cout << "voxel-variance got msg " << msg 
-       << " with curdata " << img
-       << endl;
 
   if(img == NULL) {
     cout << "RtVar:process: image passed is NULL" << endl;
@@ -48,7 +49,11 @@ int RtVar::process(ACE_Message_Block *mb) {
     ACE_DEBUG((LM_DEBUG, "var found first image\n"));
 
     mean = (*img);
-    varnum.setImage(img->getInfo());
+
+    varnum = new double[mean.getNumPix()];
+    for(int i = 0; i < mean.getNumPix(); i++) {
+      varnum[i] = 0;
+    }
 
     numTimePoints++;
 
@@ -65,7 +70,6 @@ int RtVar::process(ACE_Message_Block *mb) {
   }
   
   // save the data
-  hist.push_back(img);
   numTimePoints++;
 
 
@@ -82,39 +86,17 @@ int RtVar::process(ACE_Message_Block *mb) {
       + (int) rint( (thispix-pixmean) / (double)numTimePoints);
     mean.setPixel(i, (unsigned short) newmean);
   
-    int pixvarnum = (int) varnum.getPixel(i);
-    int newvarnum = pixvarnum 
+    double pixvarnum = varnum[i];
+    double newvarnum = pixvarnum 
       + (numTimePoints-1) * (thispix - pixmean) 
-      * (int) rint((thispix - pixmean)/(double)numTimePoints);
-    varnum.setPixel(i, (unsigned short) newvarnum);
+      * (thispix - pixmean) / (double) numTimePoints;
+    varnum[i] = newvarnum;
 
-    // consider using an incremental approach
-    unsigned short v = 0;
-    for(vector<RtDataImage*>::iterator j = hist.begin(); j != hist.end(); j++){
-      v += absdiff((*j)->getPixel(i), mean.getPixel(i))
-	* absdiff((*j)->getPixel(i), mean.getPixel(i));
-    }
-
-    v = (unsigned short) rint(v/(double) numTimePoints);
-
-    cout << newvarnum/(numTimePoints) << " ";
-    if(!i%20) {
-      cout << endl;
-    }
-
-    var->setPixel(i, (unsigned short) newvarnum/(numTimePoints));
-    //var->setPixel(i, mean.getPixel(i));
-    //var->setPixel(i, varnum.getPixel(i));
+    var->setPixel(i, (unsigned short) (newvarnum / (double)(numTimePoints-1)));
   }  
 
   // set the image id for handling
   var->addToID("voxel_variance");
-//
-//  string fn("/tmp/voxvar");
-//  fn += img->getAcquisitionNum();
-//  fn += ".dat";
-//  var->write(fn);
-//
   setResult(msg,var);
 
   return 0;

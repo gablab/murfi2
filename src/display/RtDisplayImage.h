@@ -79,7 +79,7 @@ protected:
   RtDataImage *img;
   GLuint texture;
 
-  bool needsRepaint, newTex;
+  bool needsRepaint, newTex, newImageType;
 
   char title[100];
   string bottomStr;

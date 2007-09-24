@@ -39,9 +39,9 @@ protected:
   RtDataImage mean;
 
   // saves the variance numerator image up to t-1
-  RtDataImage varnum;
+  double *varnum;
 
-  vector<RtDataImage*> hist;
+  //vector<RtDataImage*> hist;
 };
 
 #endif

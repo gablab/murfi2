@@ -1,0 +1,41 @@
+# Oliver Hinds <ohinds@mit.edu>
+# 2007-09-28
+
+* config:
+ - allow spec of input data ids in module names
+
+* logging:
+ - adapt ace logger framework to allow writing to files and screen
+   simultaneously. 
+ - provide nice interface for logging
+ - add auto logging code to processing 
+
+* streams:
+ - work on serial/parallel processing dependencies
+ - allow easier accessing of data produced earlier in a stream
+ - consider eliminating distinction between preprocessing, analysis,
+   and postprocessing
+
+* data
+ - enforce data persistence accounting
+ - make sure all non-persistent data cleaned up after stream
+   completion
+ - develop flexible, efficient method for retreiving persistent data
+   (hashing?). mak available to gui as well
+ - think about id stuff (make id strings consistent '-','_', etc.)
+
+* data structures
+ - roi 
+ - mask 
+
+* algorithms
+ - gembris (2000) correlation
+ - kalman filter (rouche 2004)
+ - roi activation
+ - hooks for external apps
+  + motion correction
+  + intensity normalization
+  + spatial normalization?
+
+* simple gui
+ - overlay (z-scores on epi)

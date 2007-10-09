@@ -10,7 +10,9 @@
 
 #define ID_SCANNERIMG "data.image.scanner"
 #define ID_DIFFIMG    "data.image.voxel_difference"
+#define ID_MEANIMG    "data.image.voxel_mean"
 #define ID_VARIMG     "data.image.voxel_variance"
+#define ID_ZSCOREIMG  "data.image.voxel_zscore"
 
 #endif
 

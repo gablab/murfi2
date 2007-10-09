@@ -27,7 +27,7 @@ int RtDiff::process(ACE_Message_Block *mb) {
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
-  RtDataImage *img = (RtDataImage*)msg->getLastData();
+  RtMRIImage *img = (RtMRIImage*)msg->getCurrentData();
 
   if(img == NULL) {
     ACE_DEBUG((LM_INFO, "RtDiff:process: image passed is NULL\n"));
@@ -51,7 +51,7 @@ int RtDiff::process(ACE_Message_Block *mb) {
   }
 
   // allocate a new data image for the difference
-  RtDataImage *diff = new RtDataImage(img->getInfo());
+  RtMRIImage *diff = new RtMRIImage(img->getInfo());
 
   // compute the absolute difference
   for(int i = 0; i < img->getNumPix(); i++) {
@@ -61,7 +61,7 @@ int RtDiff::process(ACE_Message_Block *mb) {
   }  
 
   // set the image id for handling
-  diff->addToID("voxel_difference");
+  diff->addToID("voxel-difference");
 
 //  string fn;
 //

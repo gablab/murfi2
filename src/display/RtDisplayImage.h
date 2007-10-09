@@ -9,6 +9,8 @@
 #define RTDISPLAYIMAGE_H
 
 #include"RtDataImage.h"
+#include"RtMRIImage.h"
+#include"RtActivation.h"
 #include"RtOutput.h"
 #include"RtConfig.h"
 #include"glutmaster/glutWindow.h"
@@ -65,6 +67,9 @@ public:
   // makes a texture from the image data and prepares it for display
   void makeTexture();
 
+  // makes a texture from the overlay data and prepares it for display
+  void makeOverlayTexture();
+
   // callbacks for opengl
   void CallBackDisplayFunc(void);
   void CallBackReshapeFunc(int w, int h);   
@@ -76,10 +81,12 @@ protected:
   GlutMaster glutMaster;
 
   int x, y, width, height;
-  RtDataImage *img;
-  GLuint texture;
+  RtMRIImage *img;
+  RtActivation *overlay;
+  GLuint imageTex;
+  GLuint overlayTex;
 
-  bool needsRepaint, newTex, newImageType;
+  bool needsRepaint, newTex, newOverlay, newImageType, overlayOn;
 
   char title[100];
   string bottomStr;

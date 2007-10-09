@@ -1,5 +1,5 @@
 /******************************************************************************
- * RtDataImageInfo.h declares a class for MR image info
+ * RtDataImageInfo.h declares a class for generic image info
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-08
  * 
@@ -13,43 +13,28 @@
 #include<iomanip>
 #include"gsl_matrix.h"
 #include"RtData.h"
-#include"RtExternalSenderImageInfo.h"
 
 // info class
-class RtDataImageInfo : public RtData {
+class RtDataImageInfo {
 
 public:
-  
+
+  static const unsigned int MAGIC_NUMBER = 0;
+
   RtDataImageInfo()  :
+       magicNumber(MAGIC_NUMBER),
+       filename(""),
        imgDataLen(0),
        numPix(0),
        bytesPerPix(sizeof(unsigned short)),
-       minMaxSet(false),
-       minVal(USHRT_MAX),
-       maxVal(0),
        vxl2ras(gsl_matrix_calloc(4,4)),
-       ras2ref(gsl_matrix_calloc(4,4)),
-       slice(0),
-       readFOV(0),
-       phaseFOV(0),
-       sliceThick(0),
-       pace(false),
-       swapReadPhase(false),
-       seriesNum(1),
-       acqNum(1),
-       timeAfterStart(0),
-       te(0), tr(0), ti(0),
-       triggerTime(0),
-       reconDelay(0),
-       distCorrect2D(false),
-       moco(false),
-       fromScanner(false)
+       ras2ref(gsl_matrix_calloc(4,4))
   {
     
   }
 
   // destruct
-  ~RtDataImageInfo() {
+  virtual ~RtDataImageInfo() {
 
     // free matrices
     gsl_matrix_free(vxl2ras);
@@ -59,8 +44,14 @@ public:
   // deep copy constructor
   RtDataImageInfo(const RtDataImageInfo &info);
 
-  // copy constructor accepting a siemens ExternalImageInfo struct
-  RtDataImageInfo(const RtExternalImageInfo &info);
+  // check whether a magic number is supported by this class
+  virtual bool validateMagicNumber(unsigned int mn);
+
+  // set the bytes per pixel and guess the magic number
+  void setBytesPerPix(unsigned short _bpp);
+
+  // set the magic number
+  void setMagicNumber(const unsigned int mn);
 
   // print info members to cout 
   void print();
@@ -74,7 +65,10 @@ public:
   // convert an ACE_Date_Time type to  siemens hhmmss.xxxxxx time string
   static string ACE_Date_Time2SiemensTime(const ACE_Date_Time &t);
 
-protected:
+ public: // should be protected, find a way to make the template a friend
+
+  unsigned int magicNumber;
+  string filename;
 
   int numDims;
   vector<int> dims;
@@ -84,47 +78,9 @@ protected:
   unsigned long  numPix;
   unsigned short bytesPerPix;
 
-  bool minMaxSet;
-  unsigned short minVal, maxVal;
-
-
   gsl_matrix *vxl2ras;         // transformation matrix: voxels to RAS space
   gsl_matrix *ras2ref;         // transformation matrix: RAS to reference space
   
-  long slice;                 // slice index (zero based)
-
-  double readFOV;             // mm
-  double phaseFOV;            // mm
-  double sliceThick;          // mm
-
-
-  // imaging parms
-  bool   pace;                // pace-enabled sequence
-  bool   swapReadPhase;       
-  int    seriesNum;           // series number
-  int    acqNum;              // acquisition number
-  double timeAfterStart;      // time after start
-  double te;                  // echo time (ms)
-  double tr;                  // repetition time (ms)
-  double ti;                  // inversion time (ms)
-  double triggerTime;         // trigger time (ms)
-
-  // actual acquision info parms
-  ACE_Date_Time time;                // acquisition time
-  ACE_Date_Time refFrameTime;        // acquisition time of frame of reference
-  double        reconDelay;          // time delay of the reconstruction (ms)
-
-
-  // scanner online post-processing parms
-  bool distCorrect2D;         // 2d distortion correction
-  bool moco;                  // motion correction
-
-  // received data parms
-  bool fromScanner;
-
-  // let images access our members
-  friend class RtDataImage;
-
 };
 
 #endif

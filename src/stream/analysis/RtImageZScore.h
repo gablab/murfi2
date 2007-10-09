@@ -1,19 +1,19 @@
 /******************************************************************************
- * RtDiff.h is the header for a class that computes the difference
- * between two images
+ * RtImageZScore.h is the header for a class that estimates the
+ * instantaneous activation at each voxel in an image using simple z-scores
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-09-05
+ * Oliver Hinds <ohinds@mit.edu> 2007-09-25
  *
  *****************************************************************************/
 
-#ifndef RTDIFF_H
-#define RTDIFF_H
+#ifndef RTIMAGEACTIVATION_H
+#define RTIMAGEACTIVATION_H
 
 #include"RtStreamComponent.h"
-#include"RtMRIImage.h"
+#include"RtDataImage.h"
 
 // class declaration
-class RtDiff : public RtStreamComponent {
+class RtImageZScore : public RtStreamComponent {
 
 public:
 
@@ -22,19 +22,18 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
-  RtDiff();
+  RtImageZScore();
 
   // destructor
-  ~RtDiff();
+  ~RtImageZScore();
 
 protected:
 
   // process a single acquisition
   int process(ACE_Message_Block *mb);
-
-  // pointer to the last data we got 
-  RtMRIImage *last;
-
+  
+  // threshold for z-scores
+  double threshold;
 };
 
 #endif

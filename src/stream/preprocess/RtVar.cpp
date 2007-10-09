@@ -15,18 +15,12 @@ string RtVar::moduleString("voxel-variance");
 // default constructor
 RtVar::RtVar() : RtStreamComponent() {
   numTimePoints = 0;
-  mean.addToID("voxel_variance");
   id = moduleString;
-  varnum = NULL;
 }
 
 // destructor
 RtVar::~RtVar() {
   cout << "destroyed" << endl;
-
-  if(varnum != NULL) {
-    delete [] varnum;
-  }
 }
 
 // process a single acquisition
@@ -36,7 +30,7 @@ int RtVar::process(ACE_Message_Block *mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   // get the current image to operate on
-  RtDataImage *img = (RtDataImage*)msg->getCurrentData();
+  RtMRIImage *img = (RtMRIImage*)msg->getCurrentData();
 
   if(img == NULL) {
     cout << "RtVar:process: image passed is NULL" << endl;
@@ -45,14 +39,24 @@ int RtVar::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  if(numTimePoints == 0 || mean.getSeriesNum() != img->getSeriesNum()) {
+  // get the mean
+  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID("data.image.voxel-mean");
+
+  if(mean == NULL) {
+    cout << "RtVar::process: mean image not found" << endl;
+
+    ACE_DEBUG((LM_INFO, "RtVar::process: mean image not found\n"));
+    return 0;
+  }
+
+
+  if(numTimePoints == 0 || mean->getSeriesNum() != img->getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "var found first image\n"));
 
-    mean = (*img);
+    varnum.setInfo(img->getInfo());
 
-    varnum = new double[mean.getNumPix()];
-    for(int i = 0; i < mean.getNumPix(); i++) {
-      varnum[i] = 0;
+    for(int i = 0; i < varnum.getNumPix(); i++) {
+      varnum.setPixel(i,0.0);
     }
 
     numTimePoints++;
@@ -64,7 +68,7 @@ int RtVar::process(ACE_Message_Block *mb) {
 	     img->getAcquisitionNum()));
   
   // validate sizes
-  if(img->getNumPix() != mean.getNumPix()) {
+  if(img->getNumPix() != mean->getNumPix()) {
     ACE_DEBUG((LM_INFO, "RtVar:process: last image is different size than this one\n"));
     return -1;    
   }
@@ -74,29 +78,29 @@ int RtVar::process(ACE_Message_Block *mb) {
 
 
   // allocate a new data image for the variance
-  RtDataImage *var = new RtDataImage(img->getInfo());
+  RtMRIImage *var = new RtMRIImage(img->getInfo());
   
   // update the mean and variance numerator due to west (1979) for each voxel 
   for(int i = 0; i < img->getNumPix(); i++) {
     // trickery to allow temp negative values
-    int pixmean = (int) mean.getPixel(i);
+    int pixmean = (int) mean->getPixel(i);
     int thispix = (int) img->getPixel(i);
 
     int newmean = pixmean
       + (int) rint( (thispix-pixmean) / (double)numTimePoints);
-    mean.setPixel(i, (unsigned short) newmean);
+    mean->setPixel(i, (unsigned short) newmean);
   
-    double pixvarnum = varnum[i];
+    double pixvarnum = varnum.getPixel(i);
     double newvarnum = pixvarnum 
       + (numTimePoints-1) * (thispix - pixmean) 
       * (thispix - pixmean) / (double) numTimePoints;
-    varnum[i] = newvarnum;
+    varnum.setPixel(i,newvarnum);
 
     var->setPixel(i, (unsigned short) (newvarnum / (double)(numTimePoints-1)));
   }  
 
   // set the image id for handling
-  var->addToID("voxel_variance");
+  var->addToID("voxel-variance");
   setResult(msg,var);
 
   return 0;

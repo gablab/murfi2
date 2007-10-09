@@ -59,7 +59,17 @@
     <output>log</output>
   </module>
 
+  <module name="voxel-mean">
+    <option name="makeavail">true</option>
+    <output>display</output>
+  </module>
+
   <module name="voxel-variance">
+    <option name="makeavail">true</option>
+    <output>display</output>
+  </module>
+
+  <module name="voxel-zscore" threshold="1.0">
      <output>display</output>
   </module>
 

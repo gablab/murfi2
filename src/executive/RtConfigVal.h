@@ -128,6 +128,12 @@ public:
   // for conversion of string types to other types
   template <class T> inline static bool convert(T &t, const string& s) {
     istringstream iss(s);
+
+    // hack for bool
+    if(s == "true") {
+      iss.str("1");
+    }
+
     return !(iss >> dec >> t).fail();
   }
 

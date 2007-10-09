@@ -43,7 +43,6 @@ int RtPreprocessor::addModules(RtConfig &config) {
   // get the node for preprocessing 
   TiXmlNode *preprocNode = config.getNode("preprocessor");
 
-
   // if no preprocessing was specified, just pass the data
   if(preprocNode == NULL || preprocNode->Type() != TiXmlNode::ELEMENT) {
     addSingleModule(RtPasser::moduleString, "original data passer")

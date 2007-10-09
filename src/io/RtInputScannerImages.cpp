@@ -8,7 +8,6 @@
 static char *VERSION = "$Id$";
 
 #include"RtInputScannerImages.h"
-#include"RtDataImage.h"
 
 #include<fstream>
 using namespace std;
@@ -112,7 +111,7 @@ bool RtInputScannerImages::close() {
 int RtInputScannerImages::svc() {
   RtExternalImageInfo *ei;
   unsigned short *img;
-  RtDataImage *rti;
+  RtMRIImage *rti;
   stringstream infos;
 
   int imageNum = 0;
@@ -134,7 +133,7 @@ int RtInputScannerImages::svc() {
     img = receiveImage(stream, *ei);
 
     // build data class
-    rti = new RtDataImage(*ei,img);
+    rti = new RtMRIImage(*ei,img);
     rti->setSeriesNum(seriesNum);
 
     // set the image id for handling
@@ -259,7 +258,7 @@ unsigned short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 // saves an image
 //  in
 //   img: image to save
-bool RtInputScannerImages::saveImage(RtDataImage &img) {
+bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 
   cerr << "writing image number " << seriesNum << ":" << img.getAcquisitionNum() << endl;
 

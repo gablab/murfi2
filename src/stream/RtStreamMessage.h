@@ -30,13 +30,6 @@ public:
   //   success or failure
   bool addData(RtData *_data);
 
-  // get a data portion by index
-  //  in
-  //   index of data to get
-  //  out
-  //   pointer to the data or NULL, if index invalid
-  RtData *getData(unsigned int index);
-
   // sets a data portion by index
   //  in
   //   data pointer
@@ -56,6 +49,20 @@ public:
   //  out
   //   sucess or failure
   bool setLastDataAsCurrent();
+
+  // get a data portion by index
+  //  in
+  //   index of data to get
+  //  out
+  //   pointer to the data or NULL, if index invalid
+  RtData *getData(unsigned int index);
+
+  // get a data portion by data id (returns the first found instance)
+  //  in
+  //   id of data to get
+  //  out
+  //   pointer to the data or NULL, if id doesnt exist
+  RtData *getDataByID(const string &id);
 
   // get the current data (original data plus any desired processing up to
   // this point) 

@@ -42,6 +42,10 @@ public:
 
   //*** initialization routines  ***//
 
+  // configure this stream component
+  //  in
+  //   configuration
+  virtual void init(TiXmlElement *module);
   // adds an output to receive the data of this stream component
   //  in
   //   output to add
@@ -89,6 +93,12 @@ protected:
   // call the next processing step
   virtual int nextStep(ACE_Message_Block *mb);
 
+  // process an option
+  //  in 
+  //   name of the option to process
+  //   val  text of the option node
+  virtual bool processOption(const string &name, const string &text);
+
   // pure virtual for implementation of real processing
   virtual int process(ACE_Message_Block *mb) = 0;
 
@@ -105,6 +115,9 @@ protected:
 
   // whether data created by this component should be persistent
   bool persistent;
+
+  // whether the result should be placed on the message data
+  bool putResultOnMessage;
 
   // id string
   string id;

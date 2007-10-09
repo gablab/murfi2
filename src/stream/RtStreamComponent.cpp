@@ -15,7 +15,8 @@ static char *VERSION = "$Id$";
 string RtStreamComponent::moduleString("generic-stream-component");
   
 // default constructor
-RtStreamComponent::RtStreamComponent() : super(), persistent(false) {
+RtStreamComponent::RtStreamComponent() : super(), 
+    persistent(false), putResultOnMessage(false) {
   id = moduleString;
 }
 
@@ -25,6 +26,47 @@ RtStreamComponent::~RtStreamComponent() {
 }
 
 //*** initialization routines  ***//
+
+// configure this stream component
+//  in
+//   xml module node from which to read <option>s
+void RtStreamComponent::init(TiXmlElement *module) {
+  ACE_TRACE(("RtStreamComponent::init"));
+
+  string name;
+  TiXmlElement *optionElmt;
+
+  // iterate over options
+  for(TiXmlNode *option = 0;
+      (option = module->IterateChildren("option", option)); ) {
+    if(option->Type() != TiXmlNode::ELEMENT) continue;
+
+    optionElmt = (TiXmlElement*) option;
+
+    if(TIXML_SUCCESS != optionElmt->QueryValueAttribute("name", &name)) {
+      continue;
+    }
+
+    // figure out which option we have and process it
+    processOption(name, optionElmt->GetText());
+  }
+  
+}
+
+// process an option
+//  in 
+//   name of the option to process
+//   val  text of the option node
+bool RtStreamComponent::processOption(const string &name, const string &text) {
+
+  // look for known options
+  if(name == "makeavail") {
+    bool ret =  RtConfigVal::convert<bool>(putResultOnMessage, text);
+    return ret;
+  }
+
+  return false;
+}  
 
 // adds an output to receive the data of this stream component
 //  in
@@ -72,7 +114,13 @@ void RtStreamComponent::passData(RtData* data) {
 void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
   ACE_Mutex mut;
   mut.acquire();
-  msg->addData(data);
+
+  cout << "setting data to " << msg << endl;
+  if(putResultOnMessage) {
+    cout << "adding data to " << msg << endl;
+    msg->addData(data);
+  }
+
   passData(data);
   mut.release();
 }

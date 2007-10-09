@@ -248,7 +248,7 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     return;
   }
   else if(code < START_CODE_OUTPUTS) { // this is an input
-    cerr << "caught a ready signal from an input with data " << data << endl;
+    cerr << "caught a ready signal from an input " << endl;
 
     // let the stream decide if it should spawn a new processing instance 
     stream.setInput(code,data);

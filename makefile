@@ -87,7 +87,7 @@ else
 	ACE_NLOGGING_FLAG = -DACE_NLOGGING=0
 endif
 
-SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/stream -I$(SRC_DIR)/stream/analysis -I$(SRC_DIR)/stream/preprocess -I$(SRC_DIR)/stream/postprocess -I$(SRC_DIR)/display 
+SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/stream -I$(SRC_DIR)/stream/analysis -I$(SRC_DIR)/stream/preprocess -I$(SRC_DIR)/stream/postprocess -I$(SRC_DIR)/display -I$(SRC_DIR)/util
 
 # library flags
 

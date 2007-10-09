@@ -15,10 +15,6 @@ static char *VERSION = "$Id$";
 #include"RtPostprocessor.h"
 
 #include"RtDataIDs.h"
-// individual processing modules
-#include"RtDiff.h"
-#include"RtVar.h"
-#include"RtPasser.h"
 
 // default constructor
 RtStream::RtStream() : super() {
@@ -55,6 +51,12 @@ int RtStream::configure(RtConfig &config) {
   return addModules(config);
 }
 
+// exhaustive list of individual processing modules
+#include"RtDiff.h"
+#include"RtMean.h"
+#include"RtVar.h"
+#include"RtPasser.h"
+#include"RtImageZScore.h"
 
 // add a single module to the module stack
 //  in
@@ -67,15 +69,21 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   RtStreamComponent *sc = NULL;
 
   // switch amongst module types
-  // ALL NEW MODULES MUST BE REGISTERED HERE
+  // ALL MODULES MUST BE REGISTERED HERE
   if(type == RtPasser::moduleString) { // for original data passer only
     ACE_NEW_NORETURN(sc, RtPasser());
   }
   else if(type == RtDiff::moduleString) { // voxel time difference
     ACE_NEW_NORETURN(sc, RtDiff());
   }
+  else if(type == RtMean::moduleString) { // voxel time mean
+    ACE_NEW_NORETURN(sc, RtMean());
+  }
   else if(type == RtVar::moduleString) { // voxel time variance
     ACE_NEW_NORETURN(sc, RtVar());
+  }
+  else if(type == RtImageZScore::moduleString) { // voxel time variance
+    ACE_NEW_NORETURN(sc, RtImageZScore());
   }
 
   // create and add the module
@@ -160,8 +168,15 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt) {
     if(TIXML_SUCCESS == childElmt->QueryValueAttribute("name", &name)) {
       // add the component
       sc = addSingleModule(name);
+      if(sc == NULL) {
+	cout << "failed to add module " << name << endl;
+	continue;
+      }
 
       cout << "added module " << sc->getID()  << " == " << name << endl;
+
+      // allow the stream component to configure itself
+      sc->init(childElmt);
 
       // build the outputs
       vector<string> outNames;

@@ -11,7 +11,7 @@
 #define RTVAR_H
 
 #include"RtStreamComponent.h"
-#include"RtDataImage.h"
+#include"RtActivation.h"
 
 // class declaration
 class RtVar : public RtStreamComponent {
@@ -30,18 +30,22 @@ public:
 
 protected:
 
+  // process an option
+  //  in 
+  //   name of the option to process
+  //   val  text of the option node
+  //virtual bool processOption(const string &name, const string &text);
+
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
   unsigned int numTimePoints;
 
   // saves the mean image up to t-1
-  RtDataImage mean;
+  //RtMRIImage mean;
 
   // saves the variance numerator image up to t-1
-  double *varnum;
-
-  //vector<RtDataImage*> hist;
+  RtActivation varnum;
 };
 
 #endif

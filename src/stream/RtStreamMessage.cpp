@@ -27,42 +27,6 @@ bool RtStreamMessage::addData(RtData *_data) {
   return true;
 }
 
-// get the current data (original data plus any desired processing up to
-// this point) 
-//  out 
-//   pointer to the current data or NULL, if none
-RtData *RtStreamMessage::getCurrentData() {
-  return getData(curDataIndex);
-}
-
-// get the last added data
-//  out
-//   pointer to the last data or NULL, if none
-RtData *RtStreamMessage::getLastData() {
-  if(numData == 0) {
-    return NULL;
-  }
-
-  ACE_DEBUG((LM_DEBUG, "retreiving last data: %d: %x\n", numData, this));
-
-  return data[numData-1];
-}
-
-// get a data portion by index
-//  in
-//   index of data to get
-//  out
-//   pointer to the data or NULL, if index invalid
-RtData *RtStreamMessage::getData(unsigned int index) {
-  if(index > numData) {
-    return NULL;
-  }
-
-  ACE_DEBUG((LM_DEBUG, "getting data: %d\n", index));
-
-  return data[index];
-}
-
 // sets a data portion by index
 //  in
 //   data pointer
@@ -103,6 +67,57 @@ bool RtStreamMessage::setLastDataAsCurrent() {
   return true;
 }
 
+// get the current data (original data plus any desired processing up to
+// this point) 
+//  out 
+//   pointer to the current data or NULL, if none
+RtData *RtStreamMessage::getCurrentData() {
+  return getData(curDataIndex);
+}
+
+// get the last added data
+//  out
+//   pointer to the last data or NULL, if none
+RtData *RtStreamMessage::getLastData() {
+  if(numData == 0) {
+    return NULL;
+  }
+
+  ACE_DEBUG((LM_DEBUG, "retreiving last data: %d: %x\n", numData, this));
+
+  return data[numData-1];
+}
+
+// get a data portion by index
+//  in
+//   index of data to get
+//  out
+//   pointer to the data or NULL, if index invalid
+RtData *RtStreamMessage::getData(unsigned int index) {
+  if(index > numData) {
+    return NULL;
+  }
+
+  ACE_DEBUG((LM_DEBUG, "getting data: %d\n", index));
+
+  return data[index];
+}
+
+
+// get a data portion by data id (returns the first found instance)
+//  in
+//   id of data to get
+//  out
+//   pointer to the data or NULL, if id doesnt exist
+RtData *RtStreamMessage::getDataByID(const string &id) {
+  for(unsigned int i = 0; i < numData; i++) {
+    if(data[i]->getID() == id) {
+      return data[i];
+    }
+  }
+
+  return NULL;
+}
 
 // get the number of data objects we currently have
 unsigned int RtStreamMessage::getNumData() {

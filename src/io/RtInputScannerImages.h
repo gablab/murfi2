@@ -12,7 +12,7 @@
 #include"RtInput.h"
 #include"RtConfig.h"
 #include"RtExternalSenderImageInfo.h"
-#include"RtDataImage.h"
+#include"RtMRIImage.h"
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Acceptor.h"
 
@@ -96,7 +96,7 @@ protected:
   // saves an image
   //  in
   //   img: image to save
-  bool saveImage(RtDataImage &img);
+  bool saveImage(RtMRIImage &img);
 
   // build a filename for a given acquisition number for the current series
   // number
@@ -148,10 +148,10 @@ protected:
   unsigned int seriesNum;
 
   // vector to store received images 
-  vector<RtDataImage*> received;
+  vector<RtMRIImage*> received;
 
   // iterator that points to the first undeleted image
-  vector<RtDataImage*>::iterator toBeDeleted;
+  vector<RtMRIImage*>::iterator toBeDeleted;
 
 };
 

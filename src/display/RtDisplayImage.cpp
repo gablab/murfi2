@@ -233,7 +233,6 @@ void RtDisplayImage::makeTexture() {
 void RtDisplayImage::makeOverlayTexture() {
   ACE_TRACE(("RtDisplayImage::makeOverlayTexture"));
   
-
   /* delete the old texture if there is one */
   if(glIsTexture(overlayTex)) {
     glDeleteTextures(1, &overlayTex);

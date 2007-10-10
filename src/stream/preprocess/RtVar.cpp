@@ -40,7 +40,7 @@ int RtVar::process(ACE_Message_Block *mb) {
   }
 
   // get the mean
-  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID("data.image.voxel-mean");
+  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID("data.image.mri.voxel-mean");
 
   if(mean == NULL) {
     cout << "RtVar::process: mean image not found" << endl;
@@ -53,9 +53,9 @@ int RtVar::process(ACE_Message_Block *mb) {
   if(numTimePoints == 0 || mean->getSeriesNum() != img->getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "var found first image\n"));
 
-    varnum.setInfo(img->getInfo());
+    varnum.setInfo(*img);
 
-    for(int i = 0; i < varnum.getNumPix(); i++) {
+    for(unsigned int i = 0; i < varnum.getNumPix(); i++) {
       varnum.setPixel(i,0.0);
     }
 
@@ -78,10 +78,10 @@ int RtVar::process(ACE_Message_Block *mb) {
 
 
   // allocate a new data image for the variance
-  RtMRIImage *var = new RtMRIImage(img->getInfo());
+  RtMRIImage *var = new RtMRIImage(*img);
   
   // update the mean and variance numerator due to west (1979) for each voxel 
-  for(int i = 0; i < img->getNumPix(); i++) {
+  for(unsigned int i = 0; i < img->getNumPix(); i++) {
     // trickery to allow temp negative values
     int pixmean = (int) mean->getPixel(i);
     int thispix = (int) img->getPixel(i);

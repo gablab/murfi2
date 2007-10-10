@@ -8,11 +8,11 @@
 #ifndef RTDATAIDS_H
 #define RTDATAIDS_H
 
-#define ID_SCANNERIMG "data.image.scanner"
-#define ID_DIFFIMG    "data.image.voxel_difference"
-#define ID_MEANIMG    "data.image.voxel_mean"
-#define ID_VARIMG     "data.image.voxel_variance"
-#define ID_ZSCOREIMG  "data.image.voxel_zscore"
+#define ID_SCANNERIMG "data.image.mri"
+#define ID_DIFFIMG    "data.image.mri.voxel-difference"
+#define ID_MEANIMG    "data.image.mri.voxel-mean"
+#define ID_VARIMG     "data.image.mri.voxel-variance"
+#define ID_ZSCOREIMG  "data.image.mri.voxel-zscore"
 
 #endif
 

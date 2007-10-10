@@ -10,8 +10,11 @@
 
 #include<iostream>
 #include"ace/Date_Time.h"
+#include<iostream>
+#include<vector>
+#include<iomanip>
+#include"gsl_matrix.h"
 
-#include"RtDataImageInfo.h"
 #include"RtData.h"
 
 using namespace std;
@@ -23,6 +26,8 @@ class RtDataImage : public RtData {
 
 public:
 
+  const static unsigned int MAGIC_NUMBER = 0;
+
   //*** constructors/destructors  ***//
   
   // default constructor
@@ -32,67 +37,106 @@ public:
   RtDataImage(const string &filename); 
 
   // construct from raw bytes -- BE CAREFUL WITH THIS
-  RtDataImage(char *bytes, unsigned int len);
+  //RtDataImage(char *bytes, unsigned int len);
 
   // construct from an image info struct and (possibly blank) data
-  RtDataImage(RtDataImageInfo &info, T *data = NULL); 
+  //RtDataImage(RtDataImageInfo &info, T *data = NULL); 
 
   // construct from another image
   RtDataImage(RtDataImage &img);
+
+  // destructor
+  virtual ~RtDataImage();
 
   // set this image based on a passed image info and data
   //  in
   //   info: struct
   //   data: array (optional, image data will be  allocated and set
   //         to all zeros if null) 
-  void setImage(RtDataImageInfo &_info, T*_data = NULL);
+  //void setImage(RtDataImageInfo &_info, T*_data = NULL);
 
   // save the image to a file (already set filename)
   //  out
   //   success or failure
-  bool save();
+  virtual bool save();
 
   // write an image to a file
   //  in
   //   filename: string filename
   //  out
   //   success or failure
-  bool write(const string &filename);
+  virtual bool write(const string &filename);
+
+  // write the info (all but data) to a stream
+  //  in
+  //   stream to write to
+  //  out
+  //   success or failure
+  virtual bool writeInfo(ostream &os);
+
+  // write the data to a stream
+  //  in
+  //   stream to write to
+  //  out
+  //   success or failure
+  virtual bool writeData(ostream &os);
 
   // load the image to a file (already set filename)
   //  out
   //   success or failure
-  bool load();
+  virtual bool load();
 
   // read an image from a file
   //  in
   //   filename: string filename
   //  out
   //   success or failure
-  bool read(const string &filename);
+  virtual bool read(const string &filename);
+
+  // read info from a stream
+  //  in
+  //   input stream to read from
+  //  out
+  //   success or failure
+  virtual bool readInfo(istream &is);
+
+  // read data from a stream
+  //  in
+  //   input stream to read from
+  //  out
+  //   success or failure
+  virtual bool readData(istream &is);
 
   // print info about this image
-  void printInfo(ostream &os);
-
-  // destructor
-  virtual ~RtDataImage();
+  //  in
+  //   output stream to write to
+  virtual void printInfo(ostream &os);
 
   //********  methods for getting data from the image *******//
 
   // get dimensions
+  vector<int> &getDims();
+
+  // get dimensions
   int getDim(int i);
 
+  // get vxl2ras
+  gsl_matrix *getVxl2Ras();
+
+  // get ras2ref
+  gsl_matrix *getRas2Ref();
+
   // get number of pix
-  int getNumPix();
+  unsigned int getNumPix();
+
+  // get number of bytes per pixel
+  unsigned short getBytesPerPix();
 
   // get pixel value
   T getPixel(unsigned int i);
 
   // get data size
   unsigned int getImgDataLen();
-
-  // get the image info
-  RtDataImageInfo &getInfo();
 
   // get a pointer to the image data
   T *getData();
@@ -105,15 +149,45 @@ public:
   // set pixel value when locked
   void setPixelLocked(RtLocker *locker, unsigned int i, T v); 
 
+  // sets the min and max pixel value for this data image
+  void setMinMax();
+
+  void setFilename(string _filename);
+
+  //************** statis conversion functions ******************//
+
+  // convert a siemens hhmmss.xxxxxx time string to an ACE_Date_Time type
+  static ACE_Date_Time siemensTime2ACE_Date_Time(const char *tc);
+
+  // convert an ACE_Date_Time type to  siemens hhmmss.xxxxxx time string
+  static string ACE_Date_Time2SiemensTime(const ACE_Date_Time &t);
+
 protected:
 
-  //*** private data members  ***//
-  
-  ACE_Date_Time creationTime;
-
+  // image data
   T *data;
 
-  RtDataImageInfo info;
+  // magic number for this image type
+  unsigned int magicNumber;
+
+  // filename to save/load the image to/from
+  string filename;
+
+  // dimensions of the image data
+  vector<int> dims;
+
+  // info about the pixels
+  unsigned long  imgDataLen;
+  unsigned long  numPix;
+  unsigned short bytesPerPix;
+
+  gsl_matrix *vxl2ras;         // transformation matrix: voxels to RAS space
+  gsl_matrix *ras2ref;         // transformation matrix: RAS to reference space
+  
+
+  // fields for storing min and max values
+  bool minMaxSet;
+  T minVal, maxVal;
   
 };
 
@@ -128,110 +202,110 @@ using namespace std;
   
 // default constructor
 template<class T>
-RtDataImage<T>::RtDataImage() : RtData() {
+RtDataImage<T>::RtDataImage() : RtData(),
+       magicNumber(MAGIC_NUMBER),
+       filename(""),
+       imgDataLen(0),
+       numPix(0),
+       vxl2ras(gsl_matrix_calloc(4,4)),
+       ras2ref(gsl_matrix_calloc(4,4)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage()")); 
 
   addToID("image");
-
   data = NULL;
-
-  info.setBytesPerPix(sizeof(T));
+  bytesPerPix = sizeof(T);
 }
 
 // constructor that accepts a filename to read an image from
 template<class T>
-RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL) {
+RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
+       magicNumber(MAGIC_NUMBER),
+       filename(""),
+       imgDataLen(0),
+       numPix(0),
+       bytesPerPix(sizeof(unsigned short)),
+       vxl2ras(gsl_matrix_calloc(4,4)),
+       ras2ref(gsl_matrix_calloc(4,4)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
   
   addToID("image");
-
-  info.setBytesPerPix(sizeof(T));
-
+  bytesPerPix = sizeof(T);
   read(filename);
 }
 
 // construct from raw bytes sent by RtInputScannerImages
 // BE CAREFUL WITH THIS
-template<class T>
-RtDataImage<T>::RtDataImage(char *bytes, unsigned int len) : RtData() {
-  ACE_TRACE(("RtDataImage<T>::RtDataImage(char*,unsigned int)"));
-
-  addToID("image");
-
-  // try to do some checks
-  if(len < sizeof(RtDataImageInfo)) {
-    return;
-  }
-
-  // extract the info
-  memcpy(&info,bytes,sizeof(RtDataImageInfo));
-
-  // check if we have enough for the image data
-  if(len-sizeof(RtDataImageInfo) != info.imgDataLen) {
-    return;
-  }
-
-  data = new T[info.numPix];
-  memcpy(data,bytes+sizeof(RtDataImageInfo),info.imgDataLen);
-}
+//template<class T>
+//RtDataImage<T>::RtDataImage(char *bytes, unsigned int len) : RtData(),
+//       magicNumber(MAGIC_NUMBER),
+//       filename(""),
+//       imgDataLen(0),
+//       numPix(0),
+//       bytesPerPix(sizeof(unsigned short)),
+//       vxl2ras(gsl_matrix_calloc(4,4)),
+//       ras2ref(gsl_matrix_calloc(4,4)) {
+//  ACE_TRACE(("RtDataImage<T>::RtDataImage(char*,unsigned int)"));
+//
+//  addToID("image");
+//
+//  // try to do some checks
+//  if(len < sizeof(RtDataImageInfo)) {
+//    return;
+//  }
+//
+//  // extract the info
+//  memcpy(&info,bytes,sizeof(RtDataImageInfo));
+//
+//  // check if we have enough for the image data
+//  if(len-sizeof(RtDataImageInfo) != info.imgDataLen) {
+//    return;
+//  }
+//
+//  data = new T[info.numPix];
+//  memcpy(data,bytes+sizeof(RtDataImageInfo),info.imgDataLen);
+//}
 
 
 // construct from an image info struct and (possibly blank) data
-template<class T>
-RtDataImage<T>::RtDataImage(RtDataImageInfo &_info, T *_data) 
-    : RtData() {
-  ACE_TRACE(("RtDataImage<T>::RtDataImage(RtDataImageInfo,T*)"));
-
-  addToID("image");
-
-  setImage(_info, _data);
-}
+//template<class T>
+//RtDataImage<T>::RtDataImage(RtDataImageInfo &_info, T *_data) 
+//    : RtData(),
+//       magicNumber(MAGIC_NUMBER),
+//       filename(""),
+//       imgDataLen(0),
+//       numPix(0),
+//       bytesPerPix(sizeof(unsigned short)),
+//       vxl2ras(gsl_matrix_calloc(4,4)),
+//       ras2ref(gsl_matrix_calloc(4,4))  {
+//  ACE_TRACE(("RtDataImage<T>::RtDataImage(RtDataImageInfo,T*)"));
+//
+//  addToID("image");
+//
+//  setImage(_info, _data);
+//}
 
 // construct from another image (deep copy)
 // only use this with like datatypes
 template<class T>
 RtDataImage<T>::RtDataImage(RtDataImage &img) : RtData() {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(RtDataImage)"));
-  persistent = img.persistent;
-  id = img.id;
 
-  info = img.info;
-  info.setBytesPerPix(sizeof(T));
+  // copy all fields
+  (*this) = *img;
 
-  data = new T[info.numPix];
+  // allocate and copy the matrices
+  vxl2ras = gsl_matrix_alloc(4,4);
+  gsl_matrix_memcpy(vxl2ras, img.vxl2ras);
+
+  ras2ref = gsl_matrix_alloc(4,4);
+  gsl_matrix_memcpy(ras2ref, img.ras2ref);
   
-  // copy the data 
-  if(img.info.bytesPerPix == info.bytesPerPix) {
-    memcpy(data, img.data, info.imgDataLen);
+  // allocate and copy the data 
+  data = new T[numPix];
+  if(img.bytesPerPix == bytesPerPix) {
+    memcpy(data, img.data, imgDataLen);
   }
 }
-
-// set this image based on a passed image info and data
-//  in
-//   info: struct
-//   data: array (optional, image data will be  allocated and set
-//         to all zeros if null) 
-template<class T>
-void RtDataImage<T>::setImage(RtDataImageInfo &_info, T *_data) {
-  info = _info;
-  data = new T[info.numPix];
-
-  if(_data != NULL) {
-    memcpy(data, _data, info.imgDataLen);
-  }
-  else {
-    for(unsigned int i = 0; i < info.numPix; i++) {
-      data[i] = 0;
-    }
-  }
-}
-
-// print info about this image
-template<class T>
-void RtDataImage<T>::printInfo(ostream &os) {
-  info.print(os);
-}
-
 
 // destructor
 template<class T>
@@ -242,8 +316,84 @@ RtDataImage<T>::~RtDataImage() {
   if(lock != NULL) {
     lock->beingDeleted();
   }
+  
+  // free matrices
+  gsl_matrix_free(vxl2ras);
+  gsl_matrix_free(ras2ref);
 
+  // free data
   delete [] data;
+}
+
+
+// set this image based on a passed image info and data
+//  in
+//   info: struct
+//   data: array (optional, image data will be  allocated and set
+//         to all zeros if null) 
+//template<class T>
+//void RtDataImage<T>::setImage(RtDataImageInfo &_info, T *_data) {
+//  info = _info;
+//  data = new T[info.numPix];
+//
+//  if(_data != NULL) {
+//    memcpy(data, _data, info.imgDataLen);
+//  }
+//  else {
+//    for(unsigned int i = 0; i < info.numPix; i++) {
+//      data[i] = 0;
+//    }
+//  }
+//}
+
+// print info about this image
+template<class T>
+void RtDataImage<T>::printInfo(ostream &os) {
+  ACE_TRACE(("RtDataImageInfo::print"));
+
+  int wid = 30;
+
+  os << setiosflags(ios::left);
+
+  os << "---------------------------" << endl
+     << id                            << endl
+     << "---------------------------" << endl
+     << "magic number: " << magicNumber << endl
+     << setw(wid) << "ndims: / dim1 / dim2... /" << dims.size() << ": / ";
+
+  for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++) {
+    os << *i << " / ";
+  }
+
+  os << endl
+     << setw(wid) << "imgDataLen in bytes " << imgDataLen << endl
+     << setw(wid) << "numPix" << numPix << endl
+     << setw(wid) << "bytesPerPix" << bytesPerPix << endl;
+    
+  os << setw(wid) << "vxl2ras transform";
+  for(int i = 0; i < 4; i++) {
+    if(i > 0) {
+      os << setw(wid) << "";
+    }
+    for(int j = 0; j < 4; j++) {
+      os << gsl_matrix_get(vxl2ras,i,j) << " ";
+    }
+    os << endl;
+  }
+
+  os << setw(wid) << "ras2ref transform";
+  for(int i = 0; i < 4; i++) {
+    if(i > 0) {
+      os << setw(wid) << "";
+    }
+    for(int j = 0; j < 4; j++) {
+      os << gsl_matrix_get(ras2ref,i,j) << " ";
+    }
+    os << endl;
+  }
+
+  os << "---------------------------" << endl;
+
 }
 
 
@@ -254,11 +404,11 @@ template<class T>
 bool RtDataImage<T>::save() {
   ACE_TRACE(("RtDataImage<T>::save"));
   
-  if(info.filename == "") {
+  if(filename == "") {
     return false;
   }
 
-  return write(info.filename);
+  return write(filename);
 }
 
 // write the image to a file
@@ -267,53 +417,105 @@ bool RtDataImage<T>::save() {
 //  out
 //   success or failure
 template<class T>
-bool RtDataImage<T>::write(const string &filename) {
+bool RtDataImage<T>::write(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::write"));
 
-  ofstream imgFile(filename.c_str(), ios::out | ios::binary);
+  ofstream imgFile(_filename.c_str(), ios::out | ios::binary);
   
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for writing an image\n"),
-				  filename));
+				  _filename));
     imgFile.close();
     return false;
   }
 
-  imgFile << info.magicNumber;
-
-  if(imgFile.fail()) {
-    ACE_DEBUG((LM_DEBUG, 
-	       ACE_TEXT("couldnt write magic number %ld to %s\n"),
-	       info.magicNumber, filename));
+  // write info 
+  if(!writeInfo(imgFile)) {
+    ACE_DEBUG((LM_DEBUG, ACE_TEXT("couldnt write info to %s\n"),_filename));
     imgFile.close();
     return false;
   }
 
-
-  imgFile.write((char*) &info, sizeof(RtDataImageInfo));
-
-  if(imgFile.fail()) {
-    ACE_DEBUG((LM_DEBUG, 
-	       ACE_TEXT("couldnt write image info to %s\n"),
-	       filename));
-    imgFile.close();
-    return false;
-  }
-
-
-  imgFile.write((char*) data, info.imgDataLen);
-
-  if(imgFile.fail()) {
-    ACE_DEBUG((LM_DEBUG, 
-	       ACE_TEXT("couldnt write image data to %s\n"),
-	       filename));
+  // write data 
+  if(!writeData(imgFile)) {
+    ACE_DEBUG((LM_DEBUG,ACE_TEXT("couldnt write img data to %s\n"),_filename));
     imgFile.close();
     return false;
   }
 
   imgFile.close();
 
+
+  // store filename if its not set
+  if(filename.empty()) {
+    filename = _filename;
+  }
+
   return true;
+}
+
+// constants for field lengths
+#define FILESTR_LEN 256
+#define MAX_NDIMS   10
+
+// write the info (all but data) to a stream
+//  in
+//   stream to write to
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::writeInfo(ostream &os) {
+  if(os.fail()) return false;
+
+  // write all the fields
+  os.write((char*) &magicNumber, sizeof(unsigned int));
+
+  // filename
+  char filecstr[FILESTR_LEN];
+  strcpy(filecstr,filename.c_str());
+  os.write(filecstr, FILESTR_LEN*sizeof(char));
+  
+  // dims
+  unsigned int ndims = dims.size();
+  os.write((char*) &ndims, sizeof(unsigned int));
+  
+  unsigned int dimarr[MAX_NDIMS];
+  int ind = 0;
+  for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++, ind++) {
+    dimarr[ind] = *i;
+  }
+  os.write((char*) dimarr, MAX_NDIMS*sizeof(unsigned int));
+
+  // img data info
+  os.write((char*) &imgDataLen, sizeof(unsigned long));
+  os.write((char*) &numPix, sizeof(unsigned long));
+  os.write((char*) &bytesPerPix, sizeof(unsigned short));
+
+  // matrices
+  os.write((char*) gsl_matrix_ptr(vxl2ras,0,0), 4*4*sizeof(double));
+  os.write((char*) gsl_matrix_ptr(ras2ref,0,0), 4*4*sizeof(double));
+
+  // min/max info
+  char mmset = (char) minMaxSet;
+  os.write((char*) &mmset, sizeof(char));
+  os.write((char*) &minVal, sizeof(T));
+  os.write((char*) &maxVal, sizeof(T));
+
+  return os.good();
+}
+
+// write the data to a stream
+//  in
+//   stream to write to
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::writeData(ostream &os) {
+  if(os.fail()) return false;
+
+  os.write((char*) data, imgDataLen);
+
+  return os.good();
 }
 
 // load the image to a file (already set filename)
@@ -323,11 +525,11 @@ template<class T>
 bool RtDataImage<T>::load() {
   ACE_TRACE(("RtDataImage<T>::save"));
   
-  if(info.filename == "") {
+  if(filename == "") {
     return false;
   }
 
-  return read(info.filename);
+  return read(filename);
 }
 
 
@@ -337,7 +539,7 @@ bool RtDataImage<T>::load() {
 //  out
 //   success or failure
 template<class T>
-bool RtDataImage<T>::read(const string &filename) {
+bool RtDataImage<T>::read(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::read"));
 
   // delete our current image data, if we have it
@@ -345,80 +547,150 @@ bool RtDataImage<T>::read(const string &filename) {
     delete [] data;
   }
 
-  ifstream imgFile(filename.c_str(), ios::in | ios::binary);
+  ifstream imgFile(_filename.c_str(), ios::in | ios::binary);
   
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for reading an image\n"),
-				  filename));
-    imgFile.close();
-    return false;
-  }
-
-  long magNum;
-  imgFile >> magNum;
-
-  if(!info.validateMagicNumber(magNum)) {
-    ACE_DEBUG((LM_DEBUG, 
-	       ACE_TEXT("magic number %ld is invalid\n"), magNum));
+				  _filename));
     imgFile.close();
     return false;
   }
 
   // read the image info
-  imgFile.read((char*) &info, sizeof(RtDataImageInfo));
-
-  if(imgFile.fail()) {
+  if(!readInfo(imgFile)) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image info from %s\n"),
-				  filename));
+				  _filename));
     imgFile.close();
     return false;
   }
   
-
-  // alloc data based on info and read it
-  data = new T[info.numPix];
-  imgFile.read((char*) data, info.imgDataLen);
-
-  if(imgFile.fail()) {
+  // read the image data
+  if(!readData(imgFile)) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image data from %s\n"),
-				  filename));
+				  _filename));
     imgFile.close();
     return false;
   }
 
   imgFile.close();
 
+  // store filename if its not set
+  if(filename.empty()) {
+    filename = _filename;
+  }
+
   return true;
+}
+
+// read info from a stream
+//  in
+//   input stream to read from
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::readInfo(istream &is) {
+  if(!is.good()) return false;
+
+  // read all the fields
+  is.read((char*) &magicNumber, sizeof(unsigned int));
+
+  // filename
+  char filecstr[FILESTR_LEN];
+  is.read(filecstr, FILESTR_LEN*sizeof(char));
+  filename = filecstr;
+  
+  // dims
+  unsigned int ndims;
+  is.read((char*) &ndims, sizeof(unsigned int));
+
+  unsigned int dimarr[MAX_NDIMS];
+  is.read((char*) dimarr, MAX_NDIMS*sizeof(unsigned int));
+  
+  dims.clear();
+  for(unsigned int ind = 0; ind < ndims && ind < MAX_NDIMS; ind++) {
+    dims.push_back(dimarr[ind]);
+  }
+
+  // img data info
+  is.read((char*) &imgDataLen, sizeof(unsigned long));
+  is.read((char*) &numPix, sizeof(unsigned long));
+  is.read((char*) &bytesPerPix, sizeof(unsigned short));
+
+  // matrices
+  is.read((char*) gsl_matrix_ptr(vxl2ras,0,0), 4*4*sizeof(double));
+  is.read((char*) gsl_matrix_ptr(ras2ref,0,0), 4*4*sizeof(double));
+
+  // min/max info
+  char mmset;
+  is.read((char*) &mmset, sizeof(char));
+  minMaxSet = (bool) mmset;
+
+  is.read((char*) &minVal, sizeof(T));
+  is.read((char*) &maxVal, sizeof(T));
+
+  return is.good();
+}
+
+// read data from a stream
+//  in
+//   input stream to read from
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::readData(istream &is) {
+  if(is.fail()) return false;
+
+  is.read((char*) data, imgDataLen);
+
+  return is.good();
+}
+
+// get dimensions
+template<class T>
+vector<int> &RtDataImage<T>::getDims() {
+  return dims;
+}
+
+// get vxl2ras
+template<class T>
+gsl_matrix *RtDataImage<T>::getVxl2Ras() {
+  return vxl2ras;
+}
+
+// get ras2ref
+template<class T>
+gsl_matrix *RtDataImage<T>::getRas2Ref() {
+  return ras2ref;
 }
 
 // get dimensions
 template<class T>
 int RtDataImage<T>::getDim(int i) {
-  return info.numDims > i && i >= 0 ? info.dims[i] : -1;
+  return (int)dims.size() > i && i >= 0 ? dims[i] : -1;
 }
 
 // get number of pix
 template<class T>
-int RtDataImage<T>::getNumPix() {
-  return info.numPix;
+unsigned int RtDataImage<T>::getNumPix() {
+  return numPix;
+}
+
+// get number of bytes per pix
+template<class T>
+unsigned short RtDataImage<T>::getBytesPerPix() {
+  return bytesPerPix;
 }
 
 // get pixel value
 template<class T>
 T RtDataImage<T>::getPixel(unsigned int i) {
-  return i < info.numPix ? data[i] : 0;
+  return i < numPix ? data[i] : 0;
 }
 
 // get data size
 template<class T>
 unsigned int RtDataImage<T>::getImgDataLen() {
-  return info.imgDataLen;
-}
-
-// get the image info
-template<class T>
-RtDataImageInfo &RtDataImage<T>::getInfo() {
-  return info;
+  return imgDataLen;
 }
 
 // get a pointer to the image data
@@ -427,10 +699,18 @@ T *RtDataImage<T>::getData() {
   return data;
 }
 
+//************ sets *****************//
+
+// set filename
+template<class T>
+void RtDataImage<T>::setFilename(string _filename) {
+  filename = _filename;
+}
+
 // set pixel value
 template<class T>
 void RtDataImage<T>::setPixel(unsigned int i, T v) {
-  if(lock == NULL && i < info.numPix) {
+  if(lock == NULL && i < numPix) {
     data[i] = v;
   }
 }
@@ -439,11 +719,60 @@ void RtDataImage<T>::setPixel(unsigned int i, T v) {
 template<class T>
 void RtDataImage<T>::setPixelLocked(RtLocker *locker, 
 				 unsigned int i, T v) {
-  if((lock == NULL || lock == locker) && i < info.numPix) {
+  if((lock == NULL || lock == locker) && i < numPix) {
     data[i] = v;
   }
 }
 
+
+// sets the min and max pixel value for this data image
+template<class T>
+void RtDataImage<T>::setMinMax() {
+  ACE_TRACE(("RtDataImage::setMinMax"));
+
+  int mini = -1, maxi = -1;
+
+  if(numPix < 1) return;
+
+  maxVal = data[0];
+  minVal = data[0];
+  for(unsigned int i = 0; i < numPix; i++) {
+    if(data[i] > maxVal) {
+      maxVal = data[i];
+      maxi = i;
+    }
+    if(data[i] < minVal) {
+      minVal = data[i];
+      mini = i;
+    }
+  }
+
+  minMaxSet = true;
+}
+
+// convert a siemens hhmmss.xxxxxx time string to an ACE_Date_Time type
+template<class T>
+ACE_Date_Time RtDataImage<T>::siemensTime2ACE_Date_Time(const char *tc) {
+  string timeStr = tc;
+  ACE_Date_Time t;
+  t.hour(atol(timeStr.substr(0,2).c_str()));
+  t.minute(atol(timeStr.substr(2,2).c_str()));
+  t.second(atol(timeStr.substr(4,2).c_str()));
+  t.microsec(atol(timeStr.substr(7,6).c_str()));
+  return t;
+}
+
+#define SIEMENS_TIMESTR_LEN 13
+// convert an ACE_Date_Time type to  siemens hhmmss.xxxxxx time string
+template<class T>
+string RtDataImage<T>::ACE_Date_Time2SiemensTime(const ACE_Date_Time &t) {
+  char str[] = "hhmmss.xxxxxx";
+  sprintf(str,"%02ld%02ld%02ld.%06ld", 
+	  t.hour(), t.minute(), t.second(), t.microsec());
+
+  string s(str);
+  return s;
+}
 
 #endif
 

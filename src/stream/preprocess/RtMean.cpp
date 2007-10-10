@@ -63,10 +63,10 @@ int RtMean::process(ACE_Message_Block *mb) {
 
 
   // allocate a new data image for the variance
-  RtMRIImage *mean = new RtMRIImage(storemean.getInfo());
+  RtMRIImage *mean = new RtMRIImage(storemean);
   
   // update the mean and variance numerator due to west (1979) for each voxel 
-  for(int i = 0; i < img->getNumPix(); i++) {
+  for(unsigned int i = 0; i < img->getNumPix(); i++) {
     // trickery to allow temp negative values
     int pixmean = (int) storemean.getPixel(i);
     int thispix = (int) img->getPixel(i);

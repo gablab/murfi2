@@ -137,7 +137,7 @@ int RtInputScannerImages::svc() {
     rti->setSeriesNum(seriesNum);
 
     // set the image id for handling
-    rti->addToID("scanner");
+    //rti->addToID("scanner");
 
     // append this to a vector of gathered images
     received.push_back(rti);
@@ -147,7 +147,7 @@ int RtInputScannerImages::svc() {
 
     sendCode(rti);
 
-//    rti->printInfo(cout);
+    rti->printInfo(cout);
 
     if(saveImagesToFile) {
       saveImage(*rti);

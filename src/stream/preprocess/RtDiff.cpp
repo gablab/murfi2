@@ -51,10 +51,10 @@ int RtDiff::process(ACE_Message_Block *mb) {
   }
 
   // allocate a new data image for the difference
-  RtMRIImage *diff = new RtMRIImage(img->getInfo());
+  RtMRIImage *diff = new RtMRIImage(*img);
 
   // compute the absolute difference
-  for(int i = 0; i < img->getNumPix(); i++) {
+  for(unsigned int i = 0; i < img->getNumPix(); i++) {
     unsigned short d = absdiff(img->getPixel(i),last->getPixel(i));
 
     diff->setPixel(i, d);    

@@ -11,8 +11,7 @@
 #include<iostream>
 
 #include"RtDataImage.h"
-#include"RtActivationInfo.h"
-#include"RtMRIImageInfo.h"
+#include"RtMRIImage.h"
 
 using namespace std;
 
@@ -21,30 +20,19 @@ class RtActivation : public RtDataImage<double> {
 
 public:
 
+  // magic numbers for image types
+  const static unsigned int MAGIC_NUMBER = 0x5083;
+
   //*** constructors/destructors  ***//
 
   // default constructor
   RtActivation();
 
   // construct with info from an MRI image
-  RtActivation(const RtMRIImageInfo &_info);
+  RtActivation(RtMRIImage &img);
 
   // destructor
   virtual ~RtActivation();
-
-  // write an activation image to a file
-  //  in
-  //   filename: string filename
-  //  out
-  //   success or failure
-  bool write(const string &filename);
-
-  // read an activation image from a file
-  //  in
-  //   filename: string filename
-  //  out
-  //   success or failure
-  bool read(const string &filename);
 
   // print info about this image
   void printInfo(ostream &os);
@@ -53,9 +41,6 @@ public:
 
   // get the threshold
   double getThreshold() const;
-
-  // get the image info
-  RtActivationInfo &getInfo();
 
   // get a smart contrast level
   float getAutoContrast();
@@ -68,17 +53,12 @@ public:
   // sets the threshold
   void setThreshold(double thresh);
 
-  // sets the threshold
-  void setMinMax();
+  // set the info based on a generic data image info
+  void setInfo(RtMRIImage &_info);
 
-  // set info from an MRI image
-  void setInfo(const RtMRIImageInfo &_info);
-
-private:
+protected:
 
   double threshold;
-
-  RtActivationInfo info;
 
 };
 

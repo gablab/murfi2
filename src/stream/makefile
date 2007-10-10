@@ -35,6 +35,9 @@ default: $(OBJ_FILES)
 clean:
 	@$(ECHO) 'make: removing object and autosave files'
 	-$(RM) -f *.o *~
+	cd analysis && $(MAKE) clean
+	cd preprocess && $(MAKE) clean 
+	cd postprocess && $(MAKE) clean
 
 ######################################################################
 ### $Source$

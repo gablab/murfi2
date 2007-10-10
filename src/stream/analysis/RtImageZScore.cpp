@@ -27,17 +27,17 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   // get the current image to operate on
-  RtDataImage<unsigned short> *img = (RtDataImage<unsigned short>*)msg->getCurrentData();
+  RtMRIImage *img = (RtMRIImage*)msg->getCurrentData();
 
   if(img == NULL) {
-    cout << "RtImageZScore:process: image passed is NULL" << endl;
+    cout << "RtImageZScore::process: image passed is NULL" << endl;
 
     ACE_DEBUG((LM_INFO, "RtImageZScore:process: image passed is NULL\n"));
     return 0;
   }
 
   // get the mean
-  RtDataImage<unsigned short> *mean = (RtDataImage<unsigned short>*)msg->getDataByID("data.image.voxel_mean");
+  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID("data.image.mri.voxel-mean");
 
   if(mean == NULL) {
     cout << "RtImageZScore:process: mean image not found" << endl;
@@ -47,7 +47,7 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   }
   
   // get the variance
-  RtDataImage<unsigned short> *var = (RtDataImage<unsigned short>*)msg->getDataByID("data.image.voxel_variance");
+  RtMRIImage *var = (RtMRIImage*)msg->getDataByID("data.image.mri.voxel-variance");
 
   if(var == NULL) {
     cout << "RtImageZScore:process: variance image not found" << endl;
@@ -62,15 +62,15 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   // validate sizes
   if(img->getNumPix() != mean->getNumPix() 
      || img->getNumPix() != var->getNumPix()) {
-    ACE_DEBUG((LM_INFO, "RtImageZScore:process: image is different size than mean or variance image\n"));
+    ACE_DEBUG((LM_INFO, "RtImageZScore::process: image is different size than mean or variance image\n"));
     return -1;    
   }
   
   // allocate a new data image for the zscore
-  RtDataImage<double> *zscore = new RtDataImage<double>(img->getInfo());
+  RtActivation *zscore = new RtActivation(*img);
   
   // compute zscore for each voxel
-  for(int i = 0; i < img->getNumPix(); i++) {
+  for(unsigned int i = 0; i < img->getNumPix(); i++) {
     double z = ((double) img->getPixel(i) - mean->getPixel(i)) 
       / sqrt(var->getPixel(i));
 
@@ -78,7 +78,7 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   }  
 
   // set the image id for handling
-  zscore->addToID("voxel_zscore");
+  zscore->addToID("voxel-zscore");
   setResult(msg,zscore);
 
   return 0;

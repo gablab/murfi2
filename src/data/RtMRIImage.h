@@ -12,7 +12,6 @@
 #include<iostream>
 #include"ace/Date_Time.h"
 
-#include"RtMRIImageInfo.h"
 #include"RtDataImage.h"
 #include"RtExternalSenderImageInfo.h"
 
@@ -24,40 +23,42 @@ class RtMRIImage : public RtDataImage<unsigned short> {
 
 public:
 
+  const static unsigned int MAGIC_NUMBER = 0x5081;
+
   //*** constructors/destructors  ***//
   
   // default constructor
   RtMRIImage(); 
 
-  // constructor with a filename to read the image from
-  RtMRIImage(const string &filename); 
+  // destructor
+  virtual ~RtMRIImage();
 
-  // construct from raw bytes -- BE CAREFUL WITH THIS
-  RtMRIImage(char *bytes, unsigned int len);
-
-  // construct from an image info struct and (possibly blank) data
-  RtMRIImage(RtMRIImageInfo &_info, unsigned short  *_data = NULL);
+//  // constructor with a filename to read the image from
+//  RtMRIImage(const string &filename); 
+//
+//  // construct from raw bytes -- BE CAREFUL WITH THIS
+//  RtMRIImage(char *bytes, unsigned int len);
+//
+//  // construct from an image info struct and (possibly blank) data
+//  RtMRIImage(RtMRIImageInfo &_info, unsigned short  *_data = NULL);
 
   // construct from an external image info struct (siemens) and some image data
-  RtMRIImage(RtExternalImageInfo &info, unsigned short *data); 
+  RtMRIImage(RtExternalImageInfo &info, unsigned short *data = NULL); 
 
   // construct from another image
   RtMRIImage(RtMRIImage &img);
 
-  // write the image to a file
-  // TODO: templatize this or something so dont have to copy (info is the issue)
   //  in
   //   filename: string filename
   //  out
   //   success or failure
-  bool write(const string &filename);
+  bool writeInfo(ostream &os);
 
-  // read the image from a file
   //  in
   //   filename: string filename
   //  out
   //   success or failure
-  bool read(const string &filename);  
+  bool readInfo(istream &is);
 
   // set info struct
   //  in
@@ -69,13 +70,10 @@ public:
   //   info: struct
   //   data: array (optional, image data will be  allocated and set
   //         to all zeros if null) 
-  void setImage(RtMRIImageInfo &_info, unsigned short *_data);
+  //void setImage(RtMRIImageInfo &_info, unsigned short *_data);
 
   // print info about this image
   void printInfo(ostream &os);
-
-  // destructor
-  virtual ~RtMRIImage();
 
   //********  methods for getting data from the image *******//
 
@@ -88,10 +86,6 @@ public:
   // get the series number
   unsigned int getSeriesNum() const;
 
-  // get the image info
-  RtMRIImageInfo &getInfo();
-
-
   // get a smart contrast level
   float getAutoContrast();
 
@@ -100,16 +94,41 @@ public:
 
   //*** sets  ***//
 
-  // sets the min and max pixel value for this data image
-  void setMinMax();
-
   // set the series number
   void setSeriesNum(unsigned int);
 
+protected:
 
-private:
+  unsigned long slice;                 // slice index (zero based)
 
-  RtMRIImageInfo info;
+  double readFOV;             // mm
+  double phaseFOV;            // mm
+  double sliceThick;          // mm
+
+
+  // imaging parms
+  bool         pace;                // pace-enabled sequence
+  bool         swapReadPhase;       
+  unsigned int  seriesNum;           // series number
+  unsigned int  acqNum;              // acquisition number
+  double timeAfterStart;      // time after start
+  double te;                  // echo time (ms)
+  double tr;                  // repetition time (ms)
+  double ti;                  // inversion time (ms)
+  double triggerTime;         // trigger time (ms)
+
+  // actual acquision info parms
+  ACE_Date_Time time;                // acquisition time
+  ACE_Date_Time refFrameTime;        // acquisition time of frame of reference
+  double        reconDelay;          // time delay of the reconstruction (ms)
+
+
+  // scanner online post-processing parms
+  bool distCorrect2D;         // 2d distortion correction
+  bool moco;                  // motion correction
+
+  // received data parms
+  bool fromScanner;
   
 };
 

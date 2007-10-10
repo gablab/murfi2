@@ -8,65 +8,58 @@
 #include"RtActivation.h"
 #include<cmath>
 
-
 //*** constructors/destructors  ***//
 
 // default constructor
 RtActivation::RtActivation() : RtDataImage<double>() {
+  ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
+  addToID("activation");
+  magicNumber = MAGIC_NUMBER;
 
+}
+
+// constructor with MRIInfo
+RtActivation::RtActivation(RtMRIImage &img) 
+  : RtDataImage<double>() {
+  ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
+  addToID("activation");
+  magicNumber = MAGIC_NUMBER;
+
+  setInfo(img);
 }
 
 // destructor
 RtActivation::~RtActivation() {
 }
 
-// write an activation image to a file
-//  in
-//   filename: string filename
-//  out
-//   success or failure
-bool RtActivation::write(const string &filename) {
-  
-  return true;
-}
-
-// read an activation image from a file
-//  in
-//   filename: string filename
-//  out
-//   success or failure
-bool RtActivation::read(const string &filename) {
-  
-  return true;
-}
-
 // print info about this image
 void RtActivation::printInfo(ostream &os) {
-  info.print(os);
+  ACE_TRACE(("RtActivation::printInfo"));
+  
+  int wid = 30;
+  
+  RtDataImage<double>::printInfo(os);
+  
+  os << setw(wid) << "threshold: " << threshold << endl;
 }
 
 //********  methods for getting data from the image *******//
 
 // get the threshold
 double RtActivation::getThreshold() const {
-  return info.threshold;
-}
-
-// get the image info
-RtActivationInfo &RtActivation::getInfo() {
-  return info;
+  return threshold;
 }
 
 // get a smart contrast level
 float RtActivation::getAutoContrast() {
   ACE_TRACE(("RtDataImage<T>::getAutoContrast"));
   
-  if(!info.minMaxSet) {
+  if(!minMaxSet) {
     setMinMax();
   }
 
-  float c = (float) (( fabs(info.minVal) > fabs(info.maxVal) 
-		       ? info.minVal : info.maxVal) - threshold);
+  float c = (float) (( fabs(minVal) > fabs(maxVal) 
+		       ? minVal : maxVal) - threshold);
   return c > 0 ? c : 0;
 }
 
@@ -74,7 +67,7 @@ float RtActivation::getAutoContrast() {
 float RtActivation::getAutoBrightness() {
   ACE_TRACE(("RtDataImage<T>::getAutoContrast"));
   
-  if(!info.minMaxSet) {
+  if(!minMaxSet) {
     setMinMax();
   }
 
@@ -85,7 +78,27 @@ float RtActivation::getAutoBrightness() {
 
 // sets the threshold
 void RtActivation::setThreshold(double thresh) {
-  info.threshold = thresh;
+  threshold = thresh;
+}
+
+// set the info based on a generic data image info
+void RtActivation::setInfo(RtMRIImage &img) {
+  ACE_TRACE(("RtDataImage<T>::getAutoContrast"));
+
+  dims = img.getDims();
+
+  imgDataLen = img.getImgDataLen();
+  numPix = img.getNumPix();
+  bytesPerPix = img.getBytesPerPix();
+
+  gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
+  gsl_matrix_memcpy(ras2ref, img.getRas2Ref());
+
+  if(data != NULL) {
+    delete [] data;
+  }
+
+  data = new double[numPix];
 }
 
 /*****************************************************************************

@@ -15,7 +15,8 @@ RtActivation::RtActivation() : RtDataImage<double>() {
   ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
   addToID("activation");
   magicNumber = MAGIC_NUMBER;
-
+  threshold = 10.0;
+  ceiling = 16.0;
 }
 
 // constructor with MRIInfo
@@ -26,6 +27,9 @@ RtActivation::RtActivation(RtMRIImage &img)
   magicNumber = MAGIC_NUMBER;
 
   setInfo(img);
+
+  threshold = 10.0;
+  ceiling = 16.0;
 }
 
 // destructor
@@ -41,6 +45,7 @@ void RtActivation::printInfo(ostream &os) {
   RtDataImage<double>::printInfo(os);
   
   os << setw(wid) << "threshold: " << threshold << endl;
+  os << setw(wid) << "ceiling: "   << ceiling << endl;
 }
 
 //********  methods for getting data from the image *******//
@@ -48,6 +53,11 @@ void RtActivation::printInfo(ostream &os) {
 // get the threshold
 double RtActivation::getThreshold() const {
   return threshold;
+}
+
+// get the ceiling
+double RtActivation::getCeiling() const {
+  return ceiling;
 }
 
 // get a smart contrast level
@@ -58,9 +68,10 @@ float RtActivation::getAutoContrast() {
     setMinMax();
   }
 
-  float c = (float) (( fabs(minVal) > fabs(maxVal) 
-		       ? minVal : maxVal) - threshold);
-  return c > 0 ? c : 0;
+  double c = fabs(minVal) > fabs(maxVal) ? minVal : maxVal;
+  ceiling = c > 0.0 ? c : 0.0;
+
+  return (float) ceiling;
 }
 
 // get a smart brightness level
@@ -79,6 +90,11 @@ float RtActivation::getAutoBrightness() {
 // sets the threshold
 void RtActivation::setThreshold(double thresh) {
   threshold = thresh;
+}
+
+// sets the ceiling
+void RtActivation::setCeiling(double _ceiling) {
+  ceiling = _ceiling;
 }
 
 // set the info based on a generic data image info

@@ -2,7 +2,7 @@
  * RtDisplayImage.cpp defines a class for displaying single images
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-29
- * 
+ *
  *****************************************************************************/
 
 #include"RtDisplayImage.h"
@@ -12,17 +12,17 @@
 
 #ifdef GL_TEXTURE_RECTANGLE_EXT
 #ifndef GL_TEXTURE_RECTANGLE_NV
-#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_RECTANGLE_EXT 
+#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_RECTANGLE_EXT
 #endif
 #else
 #ifdef GL_TEXTURE_RECTANGLE_NV
 #ifndef GL_TEXTURE_RECTANGLE_EXT
 #define GL_TEXTURE_RECTANGLE_EXT GL_TEXTURE_RECTANGLE_NV
-#endif 
+#endif
 //#else
 //#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
 //#define GL_TEXTURE_RECTANGLE_EXT GL_TEXTURE_2D
-#endif 
+#endif
 #endif
 
 // defaults
@@ -34,11 +34,11 @@
 
 
 //*** constructors/destructors  ***//
-  
+
 // default constructor
-RtDisplayImage::RtDisplayImage() 
-  : x(DEFAULT_X), y(DEFAULT_Y), width(DEFAULT_W), height(DEFAULT_H), 
-    img(NULL), imageTex(0), overlayTex(0), needsRepaint(true), newTex(false), 
+RtDisplayImage::RtDisplayImage()
+  : x(DEFAULT_X), y(DEFAULT_Y), width(DEFAULT_W), height(DEFAULT_H),
+    img(NULL), imageTex(0), overlayTex(0), needsRepaint(true), newTex(false),
     newOverlay(false), newImageType(true), overlayOn(false),
     imageDisplayType(ID_SCANNERIMG) {
 
@@ -52,11 +52,11 @@ RtDisplayImage::RtDisplayImage()
 //   _w: initial width of the window
 //   _h: initial height of the window
 //   _title: title string of the window
-RtDisplayImage::RtDisplayImage(int _x, int _y, 
-			       int _w, int _h, 
-			       char *_title) 
+RtDisplayImage::RtDisplayImage(int _x, int _y,
+			       int _w, int _h,
+			       char *_title)
   : x(_x), y(_y), width(_w), height(_h),
-    img(NULL), imageTex(0), overlayTex(0), needsRepaint(true), newTex(false), 
+    img(NULL), imageTex(0), overlayTex(0), needsRepaint(true), newTex(false),
     newOverlay(false), newImageType(true), overlayOn(false),
     imageDisplayType(ID_SCANNERIMG) {
 
@@ -75,7 +75,7 @@ RtDisplayImage::~RtDisplayImage() {
 //   config: config class to get configuration variables from
 bool RtDisplayImage::open(RtConfig &config) {
   ACE_TRACE(("RtDisplayImage::open"));
-  
+
   x = config.isSet("display:imageWinX")
     ? config.get("display:imageWinX") : DEFAULT_X;
 
@@ -103,7 +103,7 @@ bool RtDisplayImage::open(RtConfig &config) {
 //   _title: title string of the window
 bool RtDisplayImage::init(int _x, int _y, int _w, int _h, char *_title) {
   ACE_TRACE(("RtDisplayImage::init(..)"));
-  
+
   x = _x;
   y = _y;
   width = _w;
@@ -116,8 +116,8 @@ bool RtDisplayImage::init(int _x, int _y, int _w, int _h, char *_title) {
 // initialize the display
 bool RtDisplayImage::init() {
   ACE_TRACE(("RtDisplayImage::init()"));
-  
-  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+
+  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
   glutInitWindowSize(width, height);
   glutInitWindowPosition(x, y);
   glViewport(0, 0, width, height);
@@ -128,7 +128,7 @@ bool RtDisplayImage::init() {
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);
-   
+
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0.0, (double) width, 0.0, (double) height, 1.0, -1.0);
@@ -139,7 +139,7 @@ bool RtDisplayImage::init() {
 // thread entry
 int RtDisplayImage::svc() {
   ACE_TRACE(("RtDisplayImage::svc"));
-  
+
   glutMaster.CallGlutMainLoop();
 
   return 0;
@@ -148,7 +148,7 @@ int RtDisplayImage::svc() {
 // sets the image to be displayed
 void RtDisplayImage::setData(RtData *data) {
   ACE_TRACE(("RtDisplayImage::setData"));
-  
+
   // handle overlay
   if(data->getID() == ID_ZSCOREIMG) {
     overlay = (RtActivation*) data;
@@ -180,7 +180,7 @@ void RtDisplayImage::setData(RtData *data) {
 // makes a texture from the image data and prepares it for display
 void RtDisplayImage::makeTexture() {
   ACE_TRACE(("RtDisplayImage::makeTexture"));
-  
+
 
   /* delete the old texture if there is one */
   if(glIsTexture(imageTex)) {
@@ -193,13 +193,13 @@ void RtDisplayImage::makeTexture() {
   if(newImageType) {
 
     /* contrast */
-  
-    float contrast = img->getAutoContrast(); 
+
+    float contrast = img->getAutoContrast();
     glPixelTransferf(GL_RED_SCALE,   contrast);
     glPixelTransferf(GL_GREEN_SCALE, contrast);
     glPixelTransferf(GL_BLUE_SCALE,  contrast);
-  
-  
+
+
     /* brightness */
     float brightness = img->getAutoBrightness();
     glPixelTransferf(GL_RED_BIAS,   brightness);
@@ -217,22 +217,22 @@ void RtDisplayImage::makeTexture() {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, img->getDim(0), 
-	       img->getDim(1), 0, GL_LUMINANCE, 
-	       GL_UNSIGNED_SHORT, img->getData());  
+  glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, img->getDim(0),
+	       img->getDim(1), 0, GL_LUMINANCE,
+	       GL_UNSIGNED_SHORT, img->getData());
 
   if(!glIsTexture(imageTex)) {
     cerr << "ERROR: could not generate a new texture" << endl;
-  }  
+  }
 
-
-  CallBackDisplayFunc();
+  needsRepaint = true;
+  //CallBackDisplayFunc();
 }
 
 // makes a texture from the overlay data and prepares it for display
 void RtDisplayImage::makeOverlayTexture() {
   ACE_TRACE(("RtDisplayImage::makeOverlayTexture"));
-  
+
   /* delete the old texture if there is one */
   if(glIsTexture(overlayTex)) {
     glDeleteTextures(1, &overlayTex);
@@ -241,21 +241,49 @@ void RtDisplayImage::makeOverlayTexture() {
   /* get the id for the texture */
   glGenTextures(1, &overlayTex);
 
-  double contrast = overlay->getAutoContrast(); 
-  glPixelTransferf(GL_RED_SCALE,   contrast);
-  glPixelTransferf(GL_GREEN_SCALE, contrast);
-  glPixelTransferf(GL_BLUE_SCALE,  contrast);
-  
-  
-    /* brightness */
-    float brightness = img->getAutoBrightness();
-    glPixelTransferf(GL_RED_BIAS,   brightness);
-    glPixelTransferf(GL_GREEN_BIAS, brightness);
-    glPixelTransferf(GL_BLUE_BIAS,  brightness);
+//  double contrast = overlay->getAutoContrast();
+//  glPixelTransferf(GL_RED_SCALE,   contrast);
+//  glPixelTransferf(GL_GREEN_SCALE, contrast);
+//  glPixelTransferf(GL_BLUE_SCALE,  contrast);
+//
+//
+//  /* brightness */
+//  float brightness = img->getAutoBrightness();
+//  glPixelTransferf(GL_RED_BIAS,   brightness);
+//  glPixelTransferf(GL_GREEN_BIAS, brightness);
+//  glPixelTransferf(GL_BLUE_BIAS,  brightness);
+//
+//  cout << "overlay " << overlay->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
 
-    cout << "overlay " << overlay->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
+  // convert overlay data into a displayable image
+  unsigned short *overlayImg = new unsigned short[4*overlay->getNumPix()];
+  for(unsigned int i = 0; i < overlay->getNumPix(); i++) {
+    // use a cheap heat colormap
+    if(overlay->getPixel(i) > overlay->getThreshold()) {
+      overlayImg[4*i+0] = USHRT_MAX; // r
+      overlayImg[4*i+1] = (unsigned short) ((overlay->getPixel(i)
+			  -overlay->getThreshold())/overlay->getCeiling())
+							 *USHRT_MAX; // g
+      overlayImg[4*i+2] = 0; // b
+      overlayImg[4*i+3] = USHRT_MAX; // a
+    }
+    else if(overlay->getPixel(i) < -overlay->getThreshold()) {
+      overlayImg[4*i+0] = 0; // r
+      overlayImg[4*i+1] = (unsigned short) ((overlay->getPixel(i)
+			  -overlay->getThreshold())/overlay->getCeiling())
+							 *USHRT_MAX; // g
+      overlayImg[4*i+2] = USHRT_MAX; // b
+      overlayImg[4*i+3] = USHRT_MAX; // a
 
-  
+    }
+    else {
+      overlayImg[4*i+0] = 0; // r
+      overlayImg[4*i+1] = 0; // g
+      overlayImg[4*i+2] = 0; // b
+      overlayImg[4*i+3] = 0; // a
+    }
+  }
+
 
   /* create the image texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, overlayTex);
@@ -263,30 +291,51 @@ void RtDisplayImage::makeOverlayTexture() {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, overlay->getDim(0), 
-	       overlay->getDim(1), 0, GL_LUMINANCE, 
-	       GL_UNSIGNED_SHORT, overlay->getData());  
+  glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 4, overlay->getDim(0),
+	       overlay->getDim(1), 0, GL_RGBA,
+	       GL_UNSIGNED_SHORT, overlayImg);
+
+  delete overlayImg;
 
   if(!glIsTexture(overlayTex)) {
     cerr << "ERROR: could not generate a new overlay texture" << endl;
-  }  
+  }
 
-
-  CallBackDisplayFunc();
+  needsRepaint = true;
+  //CallBackDisplayFunc();
 }
 
 void RtDisplayImage::CallBackDisplayFunc(void) {
   ACE_TRACE(("RtDisplayImage::CallBackDisplayFunc"));
 
-  glClear(GL_COLOR_BUFFER_BIT);
-   
-  /* gl init stuff */
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
+  glClearDepth(1.0);
+  glDepthFunc(GL_LEQUAL);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+  //glAlphaFunc(GL_GREATER,0.1);
+  //glEnable(GL_ALPHA_TEST);
+  //glEnable(GL_CULL_FACE);
+
+  //glClear(GL_COLOR_BUFFER_BIT);
+
+  /* gl init stuff */
   glPushMatrix();
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-   
+
+  // debug
+  glColor3d(0.0,1.0,0);
+  glRectd(0.0, 0.0, 10, 10);
+  glRectd(0.0, height, 10, height-10);
+  glRectd(width, height, width-10, height-10);
+  glRectd(width, 0.0, width-10, 10);
+
+
+
   // if there is no image yet, draw a message and return
-  if(imageTex == 0 || img == NULL) {
+  if(!glIsTexture(imageTex) || img == NULL) {
     drawString(10,10,"no image loaded",1,0,0);
     glutSwapBuffers();
     return;
@@ -299,10 +348,10 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* turn on texture mapping */
   glEnable(GL_TEXTURE_RECTANGLE_EXT);
-   
+
   /* draw the main texture */
-  glBindTexture(GL_TEXTURE_2D, imageTex);
-   
+  glBindTexture(GL_TEXTURE_RECTANGLE_EXT, imageTex);
+
   /* make a quadrilateral and provide texture coords */
   glBegin(GL_QUADS); {
     glTexCoord2d(0.0,0.0);
@@ -314,25 +363,50 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     glTexCoord2d(0.0,imgh);
     glVertex3f(0.0, 0.0, 0.0);
   } glEnd();
-   
+
+  /* draw the overlay texture */
+  if(overlayOn && glIsTexture(overlayTex)) {
+    glBindTexture(GL_TEXTURE_RECTANGLE_EXT, overlayTex);
+
+    /* make a quadrilateral and provide texture coords */
+    glBegin(GL_QUADS); {
+      glTexCoord2d(0.0,0.0);
+      glVertex3f(0.0, height, 0.0);
+      glTexCoord2d(imgw,0.0);
+      glVertex3f(width, height, 0.0);
+      glTexCoord2d(imgw, imgh);
+      glVertex3f(width, 0.0, 0.0);
+      glTexCoord2d(0.0,imgh);
+      glVertex3f(0.0, 0.0, 0.0);
+    } glEnd();
+
+  }
+
   glDisable(GL_TEXTURE_RECTANGLE_EXT);
 
   // draw the strings
   drawString(10,10,bottomStr.c_str(),1,0,0);
   drawString(10,height-20,topStr.c_str(),0,1,0);
 
+
   glutSwapBuffers();
-  
+
 }
 
 void RtDisplayImage::CallBackReshapeFunc(int w, int h){
 
-   width = w;
-   height= h;
-
-   glViewport(0, 0, width, height); 
-
-   CallBackDisplayFunc();
+  if(width != w | height != h) {
+    glutReshapeWindow(width,height);
+  }
+//
+//   width = w;
+//   height= h;
+//
+//   cout << w << " " << h << endl;
+//
+//   glViewport(0, 0, width, height);
+//
+//   CallBackDisplayFunc();
 }
 
 
@@ -341,6 +415,11 @@ void RtDisplayImage::CallBackTimerFunc(int time, int val) {
   if(newTex) {
     newTex = false;
     makeTexture();
+  }
+
+  if(newOverlay) {
+    newOverlay = false;
+    makeOverlayTexture();
   }
 
   if(needsRepaint) {
@@ -367,7 +446,7 @@ void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
     imageDisplayType = ID_VARIMG;
     break;
   case 'z':
-    imageDisplayType = ID_ZSCOREIMG;
+    overlayOn = !overlayOn;
     break;
   }
 

@@ -12,7 +12,7 @@
 #define ID_DIFFIMG    "data.image.mri.voxel-difference"
 #define ID_MEANIMG    "data.image.mri.voxel-mean"
 #define ID_VARIMG     "data.image.mri.voxel-variance"
-#define ID_ZSCOREIMG  "data.image.mri.voxel-zscore"
+#define ID_ZSCOREIMG  "data.image.activation.voxel-zscore"
 
 #endif
 

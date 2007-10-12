@@ -147,7 +147,7 @@ int RtInputScannerImages::svc() {
 
     sendCode(rti);
 
-    rti->printInfo(cout);
+    //rti->printInfo(cout);
 
     if(saveImagesToFile) {
       saveImage(*rti);

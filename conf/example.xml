@@ -6,7 +6,7 @@
 
 <study 
     subject="foobar"
-    subjectsDir="/home/mri/subjects"
+    subjectsDir="/data/subjects"
     > </study>
 
 <info>
@@ -45,9 +45,9 @@
     image="1"
     imageWinX="300"
     imageWinY="0"
-    imageWinW="600"
-    imageWinH="600"
-    > 
+    imageWinW="1000"
+    imageWinH="1000"
+    >
 </display>
 
 <!-- preprocessing steps -->
@@ -69,7 +69,7 @@
     <output>display</output>
   </module>
 
-  <module name="voxel-zscore" threshold="1.0">
+  <module name="voxel-zscore" threshold="3.0">
      <output>display</output>
   </module>
 

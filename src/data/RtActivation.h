@@ -42,6 +42,9 @@ public:
   // get the threshold
   double getThreshold() const;
 
+  // get the ceiling
+  double getCeiling() const;
+
   // get a smart contrast level
   float getAutoContrast();
 
@@ -53,12 +56,16 @@ public:
   // sets the threshold
   void setThreshold(double thresh);
 
+  // sets the ceiling
+  void setCeiling(double thresh);
+
   // set the info based on a generic data image info
   void setInfo(RtMRIImage &_info);
 
 protected:
 
   double threshold;
+  double ceiling;
 
 };
 

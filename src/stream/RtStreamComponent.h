@@ -46,6 +46,7 @@ public:
   //  in
   //   configuration
   virtual void init(TiXmlElement *module);
+
   // adds an output to receive the data of this stream component
   //  in
   //   output to add
@@ -73,7 +74,6 @@ public:
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
-
   // sets whether this data should be kept around after the stream is done
   void setPersistent(bool p);
 

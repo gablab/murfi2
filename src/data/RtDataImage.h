@@ -13,6 +13,7 @@
 #include<iostream>
 #include<vector>
 #include<iomanip>
+#include<cmath>
 #include"gsl_matrix.h"
 
 #include"RtData.h"
@@ -114,6 +115,9 @@ public:
 
   //********  methods for getting data from the image *******//
 
+  // initialize to all zeros
+  void initToZeros();
+
   // get dimensions
   vector<int> &getDims();
 
@@ -154,7 +158,45 @@ public:
 
   void setFilename(string _filename);
 
-  //************** statis conversion functions ******************//
+
+  //************** transforms ******************//
+
+  // transform 1D index into RAS world coords 
+  void getRASfrom1D(unsigned int i, double &r, double &a, double &s);
+
+  // transform 2D index into RAS world coords 
+  void getRASfrom2D(unsigned int i, unsigned int j, 
+		    double &r, double &a, double &s);
+
+  // transform 3D index into RAS world coords 
+  void getRASfrom3D(unsigned int i, unsigned int j, unsigned int k,
+		    double &r, double &a, double &s);
+
+  // transform 2D index into 1D index
+  unsigned int get1Dfrom2D(unsigned int i, unsigned int j);
+
+  // transform 3D index into 1D index
+  unsigned int get1Dfrom3D(unsigned int i, unsigned int j, unsigned int k);
+
+  // transform RAS world coords into 1D index
+  unsigned int get1DfromRAS(double r, double a, double s);
+
+  // transform 1D index into 2D index
+  void get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned int &j2D);
+
+  // transform 3D index into 2D index
+  void get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D, 
+		   unsigned int &i2D, unsigned int &j2D);
+
+  // transform 1D index into 3D index
+  void get3Dfrom1D(unsigned int i1D, 
+		   unsigned int &i3D, unsigned int &j3D, unsigned int &k3D);
+
+  // transform 2D index into 3D index
+  void get2Dfrom2D(unsigned int i1D, unsigned int j1D, 
+		   unsigned int &i3D, unsigned int &j3D, unsigned int &k3D);
+
+  //************** time conversion functions ******************//
 
   // convert a siemens hhmmss.xxxxxx time string to an ACE_Date_Time type
   static ACE_Date_Time siemensTime2ACE_Date_Time(const char *tc);
@@ -645,6 +687,18 @@ bool RtDataImage<T>::readData(istream &is) {
   return is.good();
 }
 
+// initialize to all zeros
+template<class T>
+void RtDataImage<T>::initToZeros() {
+  if(data == NULL) {
+    return;
+  }
+
+  for(unsigned int i = 0; i < numPix; i++) {
+    data[i] = 0;
+  }  
+}
+
 // get dimensions
 template<class T>
 vector<int> &RtDataImage<T>::getDims() {
@@ -748,6 +802,131 @@ void RtDataImage<T>::setMinMax() {
   }
 
   minMaxSet = true;
+}
+
+//************** transforms ******************//
+
+// transform 1D index into RAS world coords 
+template<class T>
+void RtDataImage<T>::getRASfrom1D(unsigned int i, double &r, double &a, double &s) {
+  
+}
+
+// transform 2D index into RAS world coords 
+template<class T>
+void RtDataImage<T>::getRASfrom2D(unsigned int i, unsigned int j, 
+		  double &r, double &a, double &s) {
+
+}
+
+// transform 3D index into RAS world coords 
+template<class T>
+void RtDataImage<T>::getRASfrom3D(unsigned int i, unsigned int j, unsigned int k,
+		  double &r, double &a, double &s) {
+
+}
+
+// transform 2D index into 1D index
+template<class T>
+unsigned int RtDataImage<T>::get1Dfrom2D(unsigned int i, unsigned int j) {
+  // different answers based on how many dimensions the image is
+  switch(dims.size()) {
+  case 0:
+    return 0;
+  case 1:
+    return i;
+  case 2:
+    return i*dims[1]+j;
+  case 3:
+    return i*dims[1]*ceil(sqrt(dims[2]))+j;
+  default:
+    return i;
+  }
+}
+
+// transform 3D index into 1D index
+template<class T>
+unsigned int RtDataImage<T>::get1Dfrom3D(unsigned int i, unsigned int j, unsigned int k) {
+  // different answers based on how many dimensions the image is
+  switch(dims.size()) {
+  case 0:
+    return 0;
+  case 1:
+    return i;
+  case 2:
+    return i*dims[1]+j;
+  case 3:
+    return i*dims[1]*dims[2]+j*dims[2];
+  default:
+    return i;
+  }
+}
+
+// transform RAS world coords into 1D index
+template<class T>
+unsigned int RtDataImage<T>::get1DfromRAS(double r, double a, double s) {
+  // make vectors for transform
+  gsl_vector *ras = gsl_vector_alloc(4);
+  gsl_vector_set(ras,0,r);
+  gsl_vector_set(ras,1,a);
+  gsl_vector_set(ras,2,s);
+  gsl_vector_set(ras,3,1.0);
+
+  gsl_vector *vox = gsl_vector_alloc(4);
+  gsl_vector_set(vox,0,r);
+  gsl_vector_set(vox,1,a);
+  gsl_vector_set(vox,2,s);
+  gsl_vector_set(vox,3,1.0);
+
+
+}
+
+// transform 1D index into 2D index
+template<class T>
+void RtDataImage<T>::get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned int &j2D) {
+  // different answers based on how many dimensions the image is
+  switch(dims.size()) {
+  case 0:
+    i2D = 0;
+    j2D = 0;
+    break;
+  case 1:
+    i2D = i;
+    j2D = 0;
+    break;
+  case 2:
+    i2D = i1D/dims[1];
+    j2D = i1D%dims[1];
+    break;
+  case 3:
+    i2D = i1D/(dims[1]*ceil(sqrt(dims[2])));
+    j2D = i1D%(dims[1]*ceil(sqrt(dims[2])));
+  default:
+    i2D = 0;
+    j2D = 0;    
+    break;
+  }  
+}
+
+// transform 3D index into 2D index
+template<class T>
+void RtDataImage<T>::get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D, 
+		 unsigned int &i2D, unsigned int &j2D) {
+
+}
+
+// transform 1D index into 3D index
+template<class T>
+void RtDataImage<T>::get3Dfrom1D(unsigned int i1D, 
+		 unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
+
+}
+
+// transform 2D index into 3D index
+template<class T>
+void RtDataImage<T>::get2Dfrom2D(unsigned int i1D, unsigned int j1D, 
+		 unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
+
 }
 
 // convert a siemens hhmmss.xxxxxx time string to an ACE_Date_Time type

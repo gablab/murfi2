@@ -73,5 +73,13 @@
      <output>display</output>
   </module>
 
+  <module name="voxel-slidewincor">
+     <output>display</output>
+     <option name="regressor">
+        1 1 1 -1 -1 -1
+     </option>
+     <option name="windowLen">6</option>
+  </module>
+
 </preprocessor>
 

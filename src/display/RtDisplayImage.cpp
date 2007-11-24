@@ -150,7 +150,8 @@ void RtDisplayImage::setData(RtData *data) {
   ACE_TRACE(("RtDisplayImage::setData"));
 
   // handle overlay
-  if(data->getID() == ID_ZSCOREIMG) {
+  //  if(data->getID() == ID_ZSCOREIMG) {
+  if(data->getID() == ID_SLIDEWINCOR) {
     overlay = (RtActivation*) data;
     newOverlay = true;
     return;
@@ -259,7 +260,8 @@ void RtDisplayImage::makeOverlayTexture() {
   unsigned short *overlayImg = new unsigned short[4*overlay->getNumPix()];
   for(unsigned int i = 0; i < overlay->getNumPix(); i++) {
     // use a cheap heat colormap
-    if(overlay->getPixel(i) > overlay->getThreshold()) {
+    if(!overlay->getScaleIsInverted() 
+       && overlay->getPixel(i) > overlay->getThreshold()) {
       overlayImg[4*i+0] = USHRT_MAX; // r
       overlayImg[4*i+1] = (unsigned short) ((overlay->getPixel(i)
 			  -overlay->getThreshold())/overlay->getCeiling())
@@ -267,7 +269,8 @@ void RtDisplayImage::makeOverlayTexture() {
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = USHRT_MAX; // a
     }
-    else if(overlay->getPixel(i) < -overlay->getThreshold()) {
+    else if(!overlay->getScaleIsInverted() 
+	    && overlay->getPixel(i) < -overlay->getThreshold()) {
       overlayImg[4*i+0] = 0; // r
       overlayImg[4*i+1] = (unsigned short) ((overlay->getPixel(i)
 			  -overlay->getThreshold())/overlay->getCeiling())
@@ -275,6 +278,15 @@ void RtDisplayImage::makeOverlayTexture() {
       overlayImg[4*i+2] = USHRT_MAX; // b
       overlayImg[4*i+3] = USHRT_MAX; // a
 
+    }
+    else if(overlay->getScaleIsInverted() 
+	    && fabs(overlay->getPixel(i)) < overlay->getThreshold()) {
+      overlayImg[4*i+0] = USHRT_MAX; // r
+      overlayImg[4*i+1] = (unsigned short) 
+	(1 - (fabs(overlay->getPixel(i))/overlay->getThreshold()))
+	*USHRT_MAX; // g
+      overlayImg[4*i+2] = 0; // b
+      overlayImg[4*i+3] = USHRT_MAX; // a
     }
     else {
       overlayImg[4*i+0] = 0; // r

@@ -55,6 +55,11 @@ double RtActivation::getThreshold() const {
   return threshold;
 }
 
+// get the scale inverted flag
+bool RtActivation::getScaleIsInverted() const {
+  return scaleIsInverted;
+}
+
 // get the ceiling
 double RtActivation::getCeiling() const {
   return ceiling;
@@ -95,6 +100,11 @@ void RtActivation::setThreshold(double thresh) {
 // sets the ceiling
 void RtActivation::setCeiling(double _ceiling) {
   ceiling = _ceiling;
+}
+
+// set the scale inverted flag
+void RtActivation::setScaleIsInverted(bool sii) {
+  scaleIsInverted = sii;
 }
 
 // set the info based on a generic data image info

@@ -57,6 +57,7 @@ int RtStream::configure(RtConfig &config) {
 #include"RtVar.h"
 #include"RtPasser.h"
 #include"RtImageZScore.h"
+#include"RtImageSlideWinCor.h"
 
 // add a single module to the module stack
 //  in
@@ -84,6 +85,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   }
   else if(type == RtImageZScore::moduleString) { // voxel time variance
     ACE_NEW_NORETURN(sc, RtImageZScore());
+  }
+  else if(type == RtImageSlideWinCor::moduleString) { // voxel time variance
+    ACE_NEW_NORETURN(sc, RtImageSlideWinCor());
   }
 
   // create and add the module

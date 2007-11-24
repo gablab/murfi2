@@ -45,6 +45,9 @@ public:
   // get the ceiling
   double getCeiling() const;
 
+  // get the scale inverted flag
+  bool getScaleIsInverted() const;
+
   // get a smart contrast level
   float getAutoContrast();
 
@@ -59,13 +62,19 @@ public:
   // sets the ceiling
   void setCeiling(double thresh);
 
+  // set the scale inverted flag
+  void setScaleIsInverted(bool sii);
+
   // set the info based on a generic data image info
   void setInfo(RtMRIImage &_info);
 
 protected:
-
+  
+  // for display
   double threshold;
   double ceiling;
+
+  bool scaleIsInverted; // true for data where near zero is active (two-tailed)
 
 };
 

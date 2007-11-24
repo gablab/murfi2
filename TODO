@@ -17,6 +17,7 @@
    and postprocessing
 
 * data
+ - convert to vxl image representation (numerics too)
  - enforce data persistence accounting
  - make sure all non-persistent data cleaned up after stream
    completion
@@ -38,5 +39,6 @@
   + intensity normalization
   + spatial normalization?
 
+
 * simple gui
- - overlay (z-scores on epi)
+ - overlay (z-scores on epi) DONE

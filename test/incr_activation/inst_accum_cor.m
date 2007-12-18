@@ -1,10 +1,11 @@
 % Oliver Hinds <ohinds@mit.edu>
 % 2007-11-28
 
-function [ps as Ts] = accum_cor(vol, onoff)
+function [ps as Ts tcs] = inst_accum_cor(vol, onoff)
   
   hrf = spm_hrf(2);
   ntp = size(vol,4);
+%  ntp = 64;
   imsiz = [size(vol,1) size(vol,2) size(vol,3)];
   
   % build regressors
@@ -24,6 +25,18 @@ function [ps as Ts] = accum_cor(vol, onoff)
 %  reg = stim;
   reg = reg(1:length(stim));
 
+%  keyboard
+  
+  vox = [
+      15 27 14 % good response
+      14 27 14 % good resp, linear trend
+      13 27 14 % good response, quadratic trend
+      14 27 12 % noisy but good response
+      11 20 21 % good motor
+      24 20 21 % noisy motor
+      ];
+  voi = 1;
+  
   % build detrend regs
   L = 2;
   s = zeros(ntp, L);  
@@ -47,15 +60,30 @@ function [ps as Ts] = accum_cor(vol, onoff)
   f = zeros(L+1,1);
   g = zeros(L+1,1);
   h = zeros(L+1,1);
+  h = zeros(L+1,1);
   
   % initialize C,c,p,a
+%  C = [10^-7*eye(L+1) zeros(L+1,1)]; % choleski rows that dont change per vox
   C = [10^-7*eye(L+1) zeros(L+1,1)]; % choleski rows that dont change per vox
   c = zeros([imsiz L+2]);
   c(:,:,:,end) = 10^-7; % row that does change
   p = zeros(imsiz);
   a = zeros(imsiz);
   T = zeros(imsiz);
+  lastoff = zeros(imsiz);
+  lastwason = 0;
 
+%  tcs = {};
+%  for(i=1:9)
+%    tcs{i} = zeros(ntp,1);
+%  end
+%  
+%  tcs{1} = squeeze(vol(vox(voi,1),vox(voi,2),vox(voi,3),:));
+%  m = [];
+%  
+%  hndl = figure; hold on;
+
+  offind = 0;
   for(t=1:ntp)
     % voxel independent init
     z = [s(t,:) reg(t)];
@@ -76,9 +104,31 @@ function [ps as Ts] = accum_cor(vol, onoff)
     end
     
     %keyboard
+
+    % this timepoint
+    im = vol(:,:,:,t);
+    
+    % start the running mean
+    if(reg(t) < eps)
+      if(offind == 0)
+	lastoff = im;
+      else
+	lastoff = lastoff + (im - lastoff)./(offind+1);
+%	fprintf();
+      end
+      offind = offind+1;
+    else
+%      if(offind > 0)
+%	keyboard
+%	lastoff = mean(m,4);
+%      end
+      offind = 0;
+%      m = [];
+    end
+    
     
     % update p,a in each voxel
-    im = vol(:,:,:,t);    
+    tsum = 0;
     for(vi=1:size(im,1))
       for(vj=1:size(im,2))
 	for(vk=1:size(im,3))
@@ -87,7 +137,15 @@ function [ps as Ts] = accum_cor(vol, onoff)
 	    continue;
 	  end
 	  
-	  z_hat = im(vi,vj,vk);
+	  if(reg(t) < eps)
+	    z_hat = im(vi,vj,vk);	  
+	  else
+	    z_hat = lastoff(vi,vj,vk);
+	  end
+
+%	  if([vi vj vk] == vox(voi,:))
+%	    tcs{2}(t) = z_hat;
+%	  end
 	  
 	  for(j=1:L+1)
 	    z_hat = z_hat - h(j)*c(vi,vj,vk,j);
@@ -95,35 +153,77 @@ function [ps as Ts] = accum_cor(vol, onoff)
 	  end
 	  
 	  c(vi,vj,vk,L+2) = sqrt(c(vi,vj,vk,L+2)^2+(z_hat/b_old)^2);
+	  
+	  
+	  % theirs
 	  p(vi,vj,vk) = c(vi,vj,vk,L+1)/sqrt(c(vi,vj,vk,L+2)^2+c(vi,vj,vk,L+1)^2);
 	  a(vi,vj,vk) = c(vi,vj,vk,L+1)/C(L+1,L+1);
+
+%	  tcs{1}(vi,vj,vk,t) = c(vi,vj,vk,1)*h(1);
+%	  tcs{2}(vi,vj,vk,t) = c(vi,vj,vk,2)*h(2);
+%	  tcs{3}(vi,vj,vk,t) = C(L+1,L+1)/c(vi,vj,vk,L+2);
 	  
-	  if(t > L+1)
-	    T(vi,vj,vk) = sqrt(t-L-1) * c(vi,vj,vk,L+1)/c(vi,vj,vk,L+2);
+	    
+	  % ours
+%	  T(vi,vj,vk) =
+%	  (im(vi,vj,vk)-c(vi,vj,vk,1)*h(1))*C(L+1,L+1)/c(vi,vj,vk,L+2)*sqrt(t-L-1);
+          if(t > L+1)
+	    T(vi,vj,vk) = (im(vi,vj,vk)-c(vi,vj,vk,1)*h(1)-c(vi,vj,vk,2)* ...
+			   h(2))*C(L+1,L+1)/c(vi,vj,vk,L+2);
+%	    tsum = tsum + T(vi,vj,vk);
 	  end
+	  %          tcs{2}(t) = T(vi,vj,vk);
+
+%	  if([vi vj vk] == vox(voi,:))
+%	  if([vi vj vk] == vox(voi,:) & t > 5)
+%	    figure(hndl);
+%	    plot(t,im(vi,vj,vk),'b.');
+%	    plot(t,c(vi,vj,vk,1)*h(1)+c(vi,vj,vk,2)*h(2),'r.');
+%	    plot(t,c(vi,vj,vk,1)*h(1),'k.');
+%	    plot(t,T(vi,vj,vk),'c.');
+
+%	    tcs{3}(t) = lastoff(vi,vj,vk);
+%	    tcs{4}(t) = T(vi,vj,vk);
+%	    tcs{5}(t) = reg(t);
+	    
+%
+%            tcs{3}(t) = c(vi,vj,vk,1);
+%            tcs{4}(t) = c(vi,vj,vk,1)*h(1);
+%
+%            tcs{5}(t) = c(vi,vj,vk,2);
+%            tcs{6}(t) = c(vi,vj,vk,2)*h(2);
+%	    
+%	    tcs{7}(t) = C(L+1,L+1)/c(vi,vj,vk,L+2);
+%	    tcs{8}(t) = sqrt(t-L-1);
+%
+%	    tcs{9}(t) = T(vi,vj,vk);
+%	  end
+	    
+	    
 	end
       end
     end
 
+%    T = T-tsum/sum(mask(:));
+    
     visualize = 1;
     if(visualize)
-      
-      % find corrected threshold
       thresh = abs(tinv(0.05/numvox,t-L-1));
-      
-      vis_vol(T,thresh,im);
+
+      vis_vol(T,2,im);
 
       if(reg(t) > 0.5)
 	title([num2str(t) ': on']);
       else
 	title([num2str(t) ': off']);
       end
-      pause(.1);
+      pause(.5);
     end
  
     ps(:,:,:,t) = p;
     as(:,:,:,t) = a;
     Ts(:,:,:,t) = T;
+    fprintf('t=%d, mean T=%f\n',t,mean(T(:)));
   end
   
  %keyboard

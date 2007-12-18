@@ -82,7 +82,7 @@ public:
   // for the stream
   //  in
   //   elmt: xml element
-  void addModulesFromNode(TiXmlElement *elmt);
+  void addModulesFromNode(TiXmlElement *elmt, RtConfig *config);
 
   // add a single module to the module stack
   //  in

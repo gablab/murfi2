@@ -22,7 +22,7 @@ static char *VERSION = "$Id$";
 
 
 // defaults
-#define DEFAULT_SUBJECTSDIR  "/home/mri/subjects"
+#define DEFAULT_SUBJECTSDIR  "/data/subjects"
 #define DEFAULT_CONFFILENAME "conf/example.xml"
 
 // limits

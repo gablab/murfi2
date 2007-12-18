@@ -38,7 +38,7 @@
     triggerCode="83"
 
     tr="2.0"
-    numMeas="-1"
+    measurements="240"
 > </scanner>
 
 <display
@@ -69,16 +69,26 @@
     <output>display</output>
   </module>
 
-  <module name="voxel-zscore" threshold="3.0">
-     <output>display</output>
-  </module>
+<!--   <module name="voxel-zscore" threshold="3.0"> -->
+<!--      <output>display</output> -->
+<!--   </module> -->
 
-  <module name="voxel-slidewincor">
+<!--   <module name="voxel-slidewincor"> -->
+<!--      <output>display</output> -->
+<!--      <option name="regressor"> -->
+<!--         1 1 1 -1 -1 -1 -->
+<!--      </option> -->
+<!--      <option name="windowLen">6</option> -->
+<!--   </module> -->
+
+  <module name="accumcor">
      <output>display</output>
-     <option name="regressor">
-        1 1 1 -1 -1 -1
+
+     <option name="condition">
+        0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
      </option>
-     <option name="windowLen">6</option>
+
+     <option name="trends">2</option>
   </module>
 
 </preprocessor>

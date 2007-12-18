@@ -9,7 +9,9 @@
 #ifndef RTACTIVATIONESTIMATOR_H
 #define RTACTIVATIONESTIMATOR_H
 
-#include<vnl_vector.h>
+#include<vnl/vnl_vector.h>
+#include<vnl/vnl_matrix.h>
+
 #include"RtStreamComponent.h"
 #include"RtDataImage.h"
 
@@ -23,25 +25,31 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
-  RtImageAccumCor();
+  RtActivationEstimator();
 
   // destructor
-  ~RtImageAccumCor();
+  ~RtActivationEstimator();
 
-  // initialize and prepare for run
-  // builds regressors
-  virtual bool init();
 
 protected:
 
   // process a single acquisition
   virtual int process(ACE_Message_Block *mb) = 0;
 
+  // process the configuration: only use this for cross module or global config
+  // that is not available in the xml node for this stream component
+  //  in 
+  //   config class
+  virtual bool processConfig(RtConfig &config);
+
   // process an option
   //  in 
   //   name of the option to process
   //   val  text of the option node
   virtual bool processOption(const string &name, const string &text);
+
+  // finish initialization tasks for run
+  virtual bool finishInit();
 
   // build the trend regressors
   virtual void buildTrends();

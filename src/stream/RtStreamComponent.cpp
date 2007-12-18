@@ -30,8 +30,11 @@ RtStreamComponent::~RtStreamComponent() {
 // configure this stream component
 //  in
 //   xml module node from which to read <option>s
-void RtStreamComponent::init(TiXmlElement *module) {
+void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
   ACE_TRACE(("RtStreamComponent::init"));
+
+  // process config info for cross module and global config info
+  processConfig(*config);
 
   string name;
   TiXmlElement *optionElmt;
@@ -50,7 +53,19 @@ void RtStreamComponent::init(TiXmlElement *module) {
     // figure out which option we have and process it
     processOption(name, optionElmt->GetText());
   }
-  
+
+  if(!finishInit()) {
+    cerr << "initialization failed" << endl;
+    
+  }
+}
+
+// process the configuration: only use this for cross module or global config
+// that is not available in the xml node for this stream component
+//  in 
+//   config class
+bool RtStreamComponent::processConfig(RtConfig &config) {
+  return true;
 }
 
 // process an option
@@ -79,6 +94,11 @@ void RtStreamComponent::addOutput(RtOutput *out, const string &dataId) {
   }
 
   passer->addOutput(out);
+}
+
+// finish initialization for prepare to run
+bool RtStreamComponent::finishInit() {
+  return true;
 }
 
 // initialize and run thread

@@ -8,12 +8,15 @@
 #ifndef RTDATAIDS_H
 #define RTDATAIDS_H
 
+// remember to modify RtStream.cpp to add the new module type
+
 #define ID_SCANNERIMG   "data.image.mri"
 #define ID_DIFFIMG      "data.image.mri.voxel-difference"
 #define ID_MEANIMG      "data.image.mri.voxel-mean"
 #define ID_VARIMG       "data.image.mri.voxel-variance"
 #define ID_ZSCOREIMG    "data.image.activation.voxel-zscore"
 #define ID_SLIDEWINCOR  "data.image.activation.voxel-slidewincor"
+#define ID_ACCUMCOR     "data.image.activation.voxel-accumcor"
 
 #endif
 

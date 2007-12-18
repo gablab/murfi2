@@ -49,7 +49,7 @@ int RtPreprocessor::addModules(RtConfig &config) {
       ->addOutput(config.getConductor()->getDisplay());
   }
   else { // find modules in the node and add each
-    addModulesFromNode((TiXmlElement*) preprocNode);
+    addModulesFromNode((TiXmlElement*) preprocNode, &config);
   }
     // all modules are now added to the stream
   pushAllModules();

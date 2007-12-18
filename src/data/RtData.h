@@ -54,6 +54,9 @@ public:
   // get if we should delete this data after stream processing (not persistent)
   void setPersistent(bool p);
 
+  // get the number of elements in this datatype
+  unsigned int getNumEl();
+
   // try to obtain a lock for this data
   //  out
   //   if lock was obtained
@@ -81,6 +84,9 @@ protected:
   // NOTE: locks only prevent write and delete operations. 
   // reads are still possible
   RtLocker *lock; 
+
+  // number of distinct elements of data 
+  unsigned int numEl;
 
 };
 

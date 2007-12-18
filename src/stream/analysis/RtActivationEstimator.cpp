@@ -12,18 +12,9 @@ string RtActivationEstimator::moduleString("voxel-accumcor");
 
 // default constructor
 RtActivationEstimator::RtActivationEstimator() : RtStreamComponent(), 
-                                                 numConditions(0), 
-                                                 numTrends(0), numMeas(0) {
-  id = moduleString;
-}
-
-// constructor
-RtActivationEstimator::RtActivationEstimator(unsigned int _numMeas) 
-                                               : RtStreamComponent(), 
-                                                 numConditions(0), 
+					         numMeas(0), numConditions(0), 
                                                  numTrends(0) {
   id = moduleString;
-  numMeas = _numMeas;
 }
 
 // destructor
@@ -41,7 +32,8 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     conditions.set_size(numMeas,numConditions++);
 
     double el;
-    for(unsigned int i = 0; unsigned int i1 = 0, i2 = text.find(" "); 1; 
+    unsigned int i = 0;
+    for(unsigned int i1 = 0, i2 = text.find(" "); 1; 
 	i++, i1 = i2+1, i2 = text.find(" ", i1)) {
 
       if(!RtConfigVal::convert<double>(el, 
@@ -57,7 +49,7 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
 
     // fill the rest of the measurements as periodic stim
     for(unsigned int startind = i; i < numMeas; i++) {
-      conditions.put(i,numConditions,conditions.get(i%startind,j));
+      conditions.put(i,numConditions,conditions.get(i%startind,0));
     }
 
     return true;
@@ -65,17 +57,29 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "trends") {
     return RtConfigVal::convert<unsigned int>(numTrends,text);
   }
-  else if(name == "measurements") {
-    return RtConfigVal::convert<unsigned int>(numMeas,text);
-  }
 
   return RtStreamComponent::processOption(name, text);
 }  
 
 
-// initialize
-void RtActivationEstimator::init() {
+// process gloabl config info or config from other modules
+bool RtActivationEstimator::processConfig(RtConfig &config) {
+  
+  if(config.isSet("scanner:measurements")) {
+    numMeas = config.get("scanner:measurements");
+  } 
+  else {
+    cerr << "error: number of measurements has not been set" << endl;
+    return false;
+  }
+
+  return true;
+}
+
+// finish initialization and prepare to run
+bool RtActivationEstimator::finishInit() {
   buildTrends();
+  return true;
 }
 
 
@@ -83,8 +87,8 @@ void RtActivationEstimator::init() {
 void RtActivationEstimator::buildTrends() {
   
   trends.set_size(numMeas, numTrends);
-  for(i = 0; i < numTrends; i++) {
-    for(j = 0; j < numMeas; j++) {
+  for(unsigned int i = 0; i < numTrends; i++) {
+    for(unsigned int j = 0; j < numMeas; j++) {
       switch(i) {
       case 0: // mean
 	trends.put(i,j,1.0);

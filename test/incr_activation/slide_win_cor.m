@@ -1,8 +1,33 @@
 % Oliver Hinds <ohinds@mit.edu>
 % 2007-11-21
 
-function cor = slide_win_cor(vol,regressor,windowLen)
+function cor = slide_win_cor(vol,onoff,windowLen)
+
+  base = mean(vol,4);
+  
+  hrf = spm_hrf(2);
   ntp = size(vol,4);
+  imsiz = [size(vol,1) size(vol,2) size(vol,3)];
+  
+  % build regressors
+  
+  if(size(onoff,1) < size(onoff,2))
+    onoff = onoff';
+  end
+  
+  if(size(onoff,1) < ntp)
+    stim = repmat(onoff,1,ceil(ntp/size(onoff,1)));
+    stim = stim(1:ntp);
+  else
+    stim = onoff;
+  end
+  
+  reg = conv(stim,hrf);
+%  reg = stim;
+  reg = reg(1:length(stim));
+
+  plot(reg);pause
+  
   cor = zeros(size(vol));
   
   warning('off','all');
@@ -15,18 +40,18 @@ function cor = slide_win_cor(vol,regressor,windowLen)
   
   for(t=1:ntp)
     lcor = zeros(size(vol(:,:,:,1)));
-    regNewIndex = mod(t-1,length(regressor))+1;
-    regOldIndex = mod(t-windowLen-1,length(regressor))+1;
-    dataIndex   = mod(t-1,windowLen);
+    regNewIndex = t;
+    regOldIndex = t-windowLen;
+    dataIndex   = mod(t-1,windowLen)+1;
 
     regold = 0;
-    regnew = regressor(regNewIndex);
+    regnew = reg(regNewIndex);
 
     if(t <= windowLen) 
       b = regnew;
       d = regnew*regnew;    
     else
-      regold = regressor(regOldIndex);
+      regold = reg(regOldIndex);
       b = b - regold + regnew;
       d = d - regold*regold + regnew*regnew;
     end
@@ -62,6 +87,7 @@ function cor = slide_win_cor(vol,regressor,windowLen)
     end    
     lcor = lcor./max(lcor(:));
     cor(:,:,:,t) = lcor;
+    vis_vol(lcor,0.2,base); title(num2str(t)); pause(0.1);
   end
   
 return

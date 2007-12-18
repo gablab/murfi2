@@ -64,6 +64,13 @@ void RtData::setPersistent(bool p) {
   persistent = p;
 }
 
+
+// get the number of elements in this datatype
+unsigned int RtData::getNumEl() {
+  return numEl;
+}
+
+
 // try to obtain a lock for this data
 //  out
 //   if lock was obtained

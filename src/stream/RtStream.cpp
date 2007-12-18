@@ -58,6 +58,7 @@ int RtStream::configure(RtConfig &config) {
 #include"RtPasser.h"
 #include"RtImageZScore.h"
 #include"RtImageSlideWinCor.h"
+#include"RtAccumCor.h"
 
 // add a single module to the module stack
 //  in
@@ -71,6 +72,7 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
 
   // switch amongst module types
   // ALL MODULES MUST BE REGISTERED HERE
+  // remember to modify RtDataIDs.h to add the new data id
   if(type == RtPasser::moduleString) { // for original data passer only
     ACE_NEW_NORETURN(sc, RtPasser());
   }
@@ -83,11 +85,14 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   else if(type == RtVar::moduleString) { // voxel time variance
     ACE_NEW_NORETURN(sc, RtVar());
   }
-  else if(type == RtImageZScore::moduleString) { // voxel time variance
+  else if(type == RtImageZScore::moduleString) { // voxel z score
     ACE_NEW_NORETURN(sc, RtImageZScore());
   }
-  else if(type == RtImageSlideWinCor::moduleString) { // voxel time variance
+  else if(type == RtImageSlideWinCor::moduleString) { // voxel sliding window correlation
     ACE_NEW_NORETURN(sc, RtImageSlideWinCor());
+  }
+  else if(type == RtAccumCor::moduleString) { // voxel accumulative correlation
+    ACE_NEW_NORETURN(sc, RtAccumCor());
   }
 
   // create and add the module
@@ -148,7 +153,7 @@ int RtStream::addModules(RtConfig &config) {
 // for the stream
 //  in
 //   elmt: xml element
-void RtStream::addModulesFromNode(TiXmlElement *elmt) {
+void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
   string name;
   RtStreamComponent *sc;
   TiXmlElement *childElmt;
@@ -180,7 +185,7 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt) {
       cout << "added module " << sc->getID()  << " == " << name << endl;
 
       // allow the stream component to configure itself
-      sc->init(childElmt);
+      sc->init(childElmt, config);
 
       // build the outputs
       vector<string> outNames;

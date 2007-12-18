@@ -45,7 +45,7 @@ public:
   // configure this stream component
   //  in
   //   configuration
-  virtual void init(TiXmlElement *module);
+  virtual void init(TiXmlElement *module, RtConfig *config);
 
   // adds an output to receive the data of this stream component
   //  in
@@ -93,11 +93,20 @@ protected:
   // call the next processing step
   virtual int nextStep(ACE_Message_Block *mb);
 
+  // process the configuration: only use this for cross module or global config
+  // that is not available in the xml node for this stream component
+  //  in 
+  //   config class
+  virtual bool processConfig(RtConfig &config);
+
   // process an option
   //  in 
   //   name of the option to process
   //   val  text of the option node
   virtual bool processOption(const string &name, const string &text);
+
+  // finish initialization tasks for run
+  virtual bool finishInit();
 
   // pure virtual for implementation of real processing
   virtual int process(ACE_Message_Block *mb) = 0;

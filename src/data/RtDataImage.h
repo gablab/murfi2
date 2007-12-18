@@ -133,11 +133,17 @@ public:
   // get number of pix
   unsigned int getNumPix();
 
+  // get number of elements
+  unsigned int getNumEl();
+
   // get number of bytes per pixel
   unsigned short getBytesPerPix();
 
   // get pixel value
   T getPixel(unsigned int i);
+
+  // get element value
+  T getElement(unsigned int i);
 
   // get data size
   unsigned int getImgDataLen();
@@ -235,7 +241,7 @@ protected:
 
 
 // definition of template class here
-// (because you can't separate the declaration and definition (STUPUD!!)
+// (because you can't separate the declaration and definition (STUPID!!)
 
 #include"ace/Log_Msg.h"
 #include<fstream>
@@ -729,6 +735,12 @@ unsigned int RtDataImage<T>::getNumPix() {
   return numPix;
 }
 
+// get number of elements (same as num pix)
+template<class T>
+unsigned int RtDataImage<T>::getNumEl() {
+  return getNumPix();
+}
+
 // get number of bytes per pix
 template<class T>
 unsigned short RtDataImage<T>::getBytesPerPix() {
@@ -739,6 +751,12 @@ unsigned short RtDataImage<T>::getBytesPerPix() {
 template<class T>
 T RtDataImage<T>::getPixel(unsigned int i) {
   return i < numPix ? data[i] : 0;
+}
+
+// get element value (same as pixel)
+template<class T>
+T RtDataImage<T>::getElement(unsigned int i) {
+  return getPixel(i);
 }
 
 // get data size
@@ -878,7 +896,7 @@ unsigned int RtDataImage<T>::get1DfromRAS(double r, double a, double s) {
   gsl_vector_set(vox,2,s);
   gsl_vector_set(vox,3,1.0);
 
-
+  return 0;
 }
 
 // transform 1D index into 2D index
@@ -891,7 +909,7 @@ void RtDataImage<T>::get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned i
     j2D = 0;
     break;
   case 1:
-    i2D = i;
+    i2D = i1D;
     j2D = 0;
     break;
   case 2:
@@ -900,7 +918,7 @@ void RtDataImage<T>::get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned i
     break;
   case 3:
     i2D = i1D/(dims[1]*ceil(sqrt(dims[2])));
-    j2D = i1D%(dims[1]*ceil(sqrt(dims[2])));
+    j2D = floor(fmod(i1D,(dims[1]*ceil(sqrt(dims[2])))));
   default:
     i2D = 0;
     j2D = 0;    

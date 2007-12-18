@@ -10,8 +10,8 @@
 #ifndef RTIMAGEACCUMCOR_H
 #define RTIMAGEACCUMCOR_H
 
-#include<vnl_vector.h>
-#include"RtStreamComponent.h"
+#include<vnl/vnl_vector.h>
+#include"RtActivationEstimator.h"
 #include"RtDataImage.h"
 
 // class declaration
@@ -27,12 +27,12 @@ public:
   RtImageAccumCor();
 
   // destructor
-  ~RtImageAccumCor();
+  virtual ~RtImageAccumCor();
 
 protected:
 
   // process a single acquisition
-  int process(ACE_Message_Block *mb);
+  virtual int process(ACE_Message_Block *mb);
 
   // process an option
   //  in 
@@ -42,34 +42,9 @@ protected:
 
   bool needsInit;
 
-  // length of window
-  unsigned int windowLen;
-
-  // vector of pointers to last <windowLen> images
-  vector<RtMRIImage*> windowData;
-
-  // number of timepoints
-  unsigned int numMeas;        // total expected
-  unsigned int numTimepoints;  // so far
-
-  // regressor vector
-  vnl_vector<double> regressor;
-
-  // trend vectors
-  unsigned int numTrends; 
-  vnl_matrix<double> trends;
-
   // mask
   RtMRIImage mask;
   
-  // subsidiary variables
-  vnl_vector<double> f;
-  vnl_vector<double> g;
-  vnl_vector<double> h;
-  vnl_vector<double> z;
-
-  vnl_matrix<double> C;
-  vnl_vector<double> c;
    
 };
 

@@ -34,7 +34,7 @@ bool RtAccumCor::processOption(const string &name, const string &text) {
     return true;
   }
 
-  return RtStreamComponent::processOption(name, text);
+  return RtActivationEstimator::processOption(name, text);
 }  
 
 // process a single acquisition
@@ -65,25 +65,25 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
     //buildTrends();
 
     // initialize all subsidiary variables
-    C.set_size(numTrends+1,numTrends+2);
-    C.fill_diagonal(10e-7);
+    C = new vnl_matrix<double>(numTrends+1,numTrends+2);
+    C->fill_diagonal(10e-7);
 
-    c.set_size(numData,numTrends+2);
+    c = new vnl_matrix<double>(numData,numTrends+2);
     for(unsigned int i = 0; i < numData; i++) {
-      c.put(i,numTrends+1,10e-7);
+      c->put(i,numTrends+1,10e-7);
     }
 
-    f.set_size(numTrends+2);
-    f.fill(0.0);
+    f = new vnl_vector<double>(numTrends+2);
+    f->fill(0.0);
 
-    g.set_size(numTrends+2);
-    g.fill(0.0);
+    g = new vnl_vector<double>(numTrends+2);
+    g->fill(0.0);
 
-    h.set_size(numTrends+2);
-    h.fill(0.0);
+    h = new vnl_vector<double>(numTrends+2);
+    h->fill(0.0);
 
-    z.set_size(numTrends+2);
-    z.fill(0.0);
+    z = new vnl_vector<double>(numTrends+2);
+    z->fill(0.0);
 
     needsInit = false;
     return 0;
@@ -98,55 +98,56 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   // allocate a new data image for the correlation
   RtActivation *cor = new RtActivation(*dat);
   //cor->setScaleIsInverted(true);
-  cor->setThreshold(2.3);
+  cor->setThreshold(3.0);
 
   //// element independent setup
 
   // build z
   for(unsigned int i = 0; i < numTrends; i++) {
-    z.put(i,trends.get(numTimepoints,i));
+    z->put(i,trends->get(numTimepoints,i));
   }
-  z.put(numTrends,conditions.get(1,numTimepoints));
+  z->put(numTrends,conditions->get(1,numTimepoints));
   
   double b_new, b_old = 1;
 
   // update the element independent entries of C
   for(unsigned int j = 0; j < numTrends+1; j++) {
-    h.put(j, z.get(j)/C.get(j,j));
-    b_new = sqrt(b_old*b_old+h[j]*h[j]);
-    f.put(j, b_new/b_old);
-    g.put(j, h[j]/(b_new*b_old));
+    h->put(j, z->get(j)/C->get(j,j));
+    b_new = sqrt(pow(b_old,2)+pow(h->get(j),2));
+    f->put(j, b_new/b_old);
+    g->put(j, h->get(j)/(b_new*b_old));
     b_old = b_new;
     
     for(unsigned int k = 0; k < numTrends+1; k++) {
-      z.put(k, z[k] - h[j]*C.get(k,j));
-      C.put(k,j, f[j]*C.get(k,j) + g[j]*z[k]);
+      z->put(k, z->get(k) - h->get(j)*C->get(k,j));
+      C->put(k,j, f->get(j)*C->get(k,j) + g->get(j)*z->get(k));
     }
 
   }
 
-
-  // compute for each element
+  //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     double z_hat = dat->getElement(i);
 	  
     for(unsigned int j = 0; j < numTrends+1; j++) {
-      z_hat = z_hat - h[j]*c.get(i,j);
-      c.put(i,j, f[j]*c.get(i,j) + g[j]*z_hat);
+      z_hat = z_hat - h->get(j)*c->get(i,j);
+      c->put(i,j, f->get(j)*c->get(i,j) + g->get(j)*z_hat);
     }	  
-    c.put(i,numTrends+2, sqrt(pow(c.get(i,numTrends+2),2)+pow(z_hat/b_old,2)));
+    c->put(i,numTrends+1, sqrt(pow(c->get(i,numTrends+1),2)+pow(z_hat/b_old,2)));
 //    p(vi,vj,vk) = c(vi,vj,vk,L+1)/sqrt(c(vi,vj,vk,L+2)^2+c(vi,vj,vk,L+1)^2);
 //    a(vi,vj,vk) = c(vi,vj,vk,L+1)/C(L+1,L+1);
-	  
+
     if(numTimepoints > numTrends+1) {
       cor->setPixel(i, sqrt(numTimepoints-numTrends-1) 
-		    * c.get(i,numTrends+1)/c.get(i,numTrends+2));
+		    * c->get(i,numTrends)/c->get(i,numTrends+1));
+//      cout << sqrt(numTimepoints-numTrends-1) 
+//	* c->get(i,numTrends)/c->get(i,numTrends+1) << " ";
     }
   }  
   cout << endl;
 
   // set the image id for handling
-  cor->addToID("accumcor");
+  cor->addToID("voxel-accumcor");
   setResult(msg,cor);
 
   return 0;

@@ -11,9 +11,12 @@
 
 #include<vnl/vnl_vector.h>
 #include<vnl/vnl_matrix.h>
+#include<vnl/algo/vnl_convolve.h>
 
 #include"RtStreamComponent.h"
 #include"RtDataImage.h"
+
+#define MAX_CONDITIONS 1
 
 // class declaration
 class RtActivationEstimator : public RtStreamComponent {
@@ -60,14 +63,14 @@ protected:
 
   // condition regressors
   unsigned int numConditions; 
-  vnl_matrix<double> conditions;
+  vnl_matrix<double> *conditions;
 
   // trend regressors
   unsigned int numTrends; 
-  vnl_matrix<double> trends;
+  vnl_matrix<double> *trends;
 
   // mask
-  RtMRIImage mask;
+  //RtMRIImage mask;
    
 };
 

@@ -114,7 +114,7 @@ TINYXML_FLAGS=-DTIXML_USE_STL
 GLUT_LIB=-lglut
 
 VXL_INCS=-I/usr/local/include/vxl/core -I/usr/local/include/vxl/vcl
-VXL_LIBS=-lvnl -lvcl 
+VXL_LIBS=-lvnl -lvcl -lvnl_algo
 
 # build compiler flags
 

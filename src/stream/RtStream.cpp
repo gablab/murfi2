@@ -204,9 +204,8 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
 void RtStream::addOutputsToComponent(RtStreamComponent *sc, 
 				    vector<string> &outNames) {
   for(vector<string>::iterator i = outNames.begin(); i != outNames.end(); i++) {
-    sc->addOutput(conductor->getOutputByName(*i));
     cout<< "adding output " << *i << " to " << sc->getID() << endl;
-
+    sc->addOutput(conductor->getOutputByName(*i));
   }
 }
 

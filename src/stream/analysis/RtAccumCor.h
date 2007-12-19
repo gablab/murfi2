@@ -51,13 +51,13 @@ protected:
   unsigned int numData;
 
   // subsidiary variables
-  vnl_vector<double> f;
-  vnl_vector<double> g;
-  vnl_vector<double> h;
-  vnl_vector<double> z;
+  vnl_vector<double> *f;
+  vnl_vector<double> *g;
+  vnl_vector<double> *h;
+  vnl_vector<double> *z;
 
-  vnl_matrix<double> C;
-  vnl_matrix<double> c;
+  vnl_matrix<double> *C;
+  vnl_matrix<double> *c;
    
 };
 

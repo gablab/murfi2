@@ -446,6 +446,9 @@ void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
   string oldImageDisplayType = imageDisplayType;
 
   switch(key) {
+  case 'q':
+    exit(0);
+    break;
   case 's':
     imageDisplayType = ID_SCANNERIMG;
     break;

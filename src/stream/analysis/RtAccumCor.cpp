@@ -16,10 +16,33 @@ RtAccumCor::RtAccumCor() : RtActivationEstimator() {
   id = moduleString;
 
   needsInit = true;
+
+  z = f = g = h = NULL; 
+  mask = NULL;
 }
 
 // destructor
 RtAccumCor::~RtAccumCor() {
+  if(z != NULL) {
+    delete z;
+  }
+
+  if(f != NULL) {
+    delete f;
+  }
+
+  if(g != NULL) {
+    delete g;
+  }
+
+  if(h != NULL) {
+    delete h;
+  }
+
+  if(mask != NULL) {
+    delete mask;
+  }
+
   cout << "destroyed" << endl;
 }
 
@@ -36,6 +59,12 @@ bool RtAccumCor::processOption(const string &name, const string &text) {
 
   return RtActivationEstimator::processOption(name, text);
 }  
+
+void printVnlVector(vnl_vector<double> v) {
+  for(unsigned int i = 0; i < v.size(); i++) {
+    cout << v[i] << " ";
+  }
+}
 
 // process a single acquisition
 int RtAccumCor::process(ACE_Message_Block *mb) {
@@ -61,10 +90,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
     // get the number of datapoints we must process
     numData = dat->getNumEl();
 
-    // initialize the trend vectors
-    //buildTrends();
-
-    // initialize all subsidiary variables
+    //// initialize all subsidiary variables
     C = new vnl_matrix<double>(numTrends+1,numTrends+2);
     C->fill_diagonal(10e-7);
 
@@ -85,8 +111,30 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
     z = new vnl_vector<double>(numTrends+2);
     z->fill(0.0);
 
+    //// build the mask image
+    mask = new RtMRIImage(*dat);
+    
+    // first compute the mean voxel intensity
+    double mean = 0;
+    for(unsigned int i = 0; i < dat->getNumEl(); i++) {
+      mean += dat->getElement(i);
+    }
+    mean /= dat->getNumEl();
+
+    // find voxels above threshold
+    double maskThresh = 0.3*mean;
+    cout << "using mask threshold of " << maskThresh << endl;
+    
+    for(unsigned int i = 0; i < dat->getNumEl(); i++) {
+      if(dat->getElement(i) > maskThresh) {
+	mask->setPixel(i,1);
+      }
+      else {
+	mask->setPixel(i,0);
+      }
+    }    
+
     needsInit = false;
-    return 0;
   }
 
   // validate sizes
@@ -98,15 +146,15 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   // allocate a new data image for the correlation
   RtActivation *cor = new RtActivation(*dat);
   //cor->setScaleIsInverted(true);
-  cor->setThreshold(3.0);
+  cor->setThreshold(3.5);
 
   //// element independent setup
 
   // build z
   for(unsigned int i = 0; i < numTrends; i++) {
-    z->put(i,trends->get(numTimepoints,i));
+    z->put(i,trends->get(numTimepoints-1,i));
   }
-  z->put(numTrends,conditions->get(1,numTimepoints));
+  z->put(numTrends,conditions->get(1,numTimepoints-1));
   
   double b_new, b_old = 1;
 
@@ -127,6 +175,11 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
+//    if(!mask->getPixel(i)) {
+//      cor->setPixel(i,0.0);
+//      continue;
+//    }
+
     double z_hat = dat->getElement(i);
 	  
     for(unsigned int j = 0; j < numTrends+1; j++) {
@@ -143,11 +196,31 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 //      cout << sqrt(numTimepoints-numTrends-1) 
 //	* c->get(i,numTrends)/c->get(i,numTrends+1) << " ";
     }
+
+    if(i == 1 && numTimepoints == 2) {
+      fprintf(stdout,"%d %d %f %f\n", i, dat->getElement(i), z_hat, cor->getPixel(i));
+
+      cout << "z: "; printVnlVector(*z); cout << endl;
+      cout << "f: "; printVnlVector(*f); cout << endl;
+      cout << "g: "; printVnlVector(*g); cout << endl;
+      cout << "h: "; printVnlVector(*h); cout << endl;
+      cout << "C: " << endl;
+      C->print(cout);
+      cout << "c: "; printVnlVector(c->get_row(i)); cout << endl;
+
+      //if(i > 40) {
+	int trash;
+	cin >> trash;
+      //}
+    }
   }  
   cout << endl;
 
   // set the image id for handling
   cor->addToID("voxel-accumcor");
+
+  
+
   setResult(msg,cor);
 
   return 0;

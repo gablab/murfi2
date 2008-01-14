@@ -15,7 +15,7 @@ function show_timecourse(vols,thresh,bg)
   while(1)
     vis_vol(vols(:,:,:,i),thresh,bg);
     title(i);
-    pause(1);
+    pause(0.1);
     i = i+1;
     if(i > size(vols,4))
       i = 1;

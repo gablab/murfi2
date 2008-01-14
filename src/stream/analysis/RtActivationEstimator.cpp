@@ -127,7 +127,7 @@ bool RtActivationEstimator::finishInit() {
   for(unsigned int i = 0; i < numConditions; i++) {
     vnl_vector<double> col = conditions->get_column(i);
     vnl_vector<double> convhrfcol = vnl_convolve(col,hrf);
-    col.update(convhrfcol);
+    col.update(convhrfcol.extract(col.size()));
     conditions->set_column(i,col);
   }
 
@@ -140,9 +140,6 @@ void RtActivationEstimator::buildTrends() {
   trends = new vnl_matrix<double>(numMeas, numTrends);
 
   for(unsigned int i = 0; i < numTrends; i++) {
-    cout << i << endl;    
-    cout.flush();
-
     for(unsigned int j = 0; j < numMeas; j++) {
       switch(i) {
       case 0: // mean

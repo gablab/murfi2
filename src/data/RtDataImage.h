@@ -370,7 +370,9 @@ RtDataImage<T>::~RtDataImage() {
   gsl_matrix_free(ras2ref);
 
   // free data
-  delete [] data;
+  if(data != NULL) {
+    delete [] data;
+  }
 }
 
 

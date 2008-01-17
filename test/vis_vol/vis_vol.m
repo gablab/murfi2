@@ -63,6 +63,7 @@ function vis_vol(vol, thresh, base)
   end
 
   imshow(im,[0 bbits+cmprec],'InitialMagnification',400);
+%  imshow(im,[0 bbits+cmprec]);
   colormap(cm);
   
 return

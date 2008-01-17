@@ -25,7 +25,7 @@ function [ps as Ts] = accum_cor(vol, onoff)
 
   reg = conv(stim,hrf);
 %  reg = stim;
-  reg = reg(1:length(stim));
+  reg = reg(2:length(stim)+1);
 
   % build detrend regs
   L = 2;
@@ -37,8 +37,8 @@ function [ps as Ts] = accum_cor(vol, onoff)
   firstvol = squeeze(vol(:,:,:,1));
   mask = zeros(imsiz);
 
-%  maskThresh = 0.3*mean(firstvol(:));
-  maskThresh = 1681.38;
+  maskThresh = 0.3*mean(firstvol(:));
+%  maskThresh = 1681.38;
   mask(find(firstvol > maskThresh)) = 1;
   numvox = sum(mask(:));
 
@@ -67,7 +67,7 @@ function [ps as Ts] = accum_cor(vol, onoff)
     z = [s(t,:) reg(t)];
     b_old = 1;
 
-
+%keyboard
     for(j=1:L+1)
       h(j) = z(j)/C(j,j);
       b_new = sqrt(b_old^2+h(j)^2);
@@ -81,19 +81,19 @@ function [ps as Ts] = accum_cor(vol, onoff)
       end
     end
 
-%    keyboard
+    %keyboard
 
     % update p,a in each voxel
     im = vol(:,:,:,t);
-    count = -1;
+    %count = -1;
     for(vj=1:size(im,2))
       for(vk=1:size(im,3))
 	for(vi=1:size(im,1))
-	  count = count+1;
+	  %count = count+1;
 
-%	  if(mask(vi,vj,vk) == 0)
-%	    continue;
-%	  end
+	  if(mask(vi,vj,vk) == 0)
+	    continue;
+	  end
 
 %	  keyboard
 	  
@@ -112,15 +112,15 @@ function [ps as Ts] = accum_cor(vol, onoff)
 	    T(vi,vj,vk) = sqrt(t-L-1) * c(vi,vj,vk,L+1)/c(vi,vj,vk,L+2);
 	  end
 	  
-	  if(t == 2)
-	    fprintf('%d %d %f %f\n', count, im(vi,vj,vk), z_hat, T(vi,vj,vk));
-	    z
-	    f
-	    g
-	    h
-	    C
-	    squeeze(c(vi,vj,vk,:))
-	    keyboard
+	  if(vi == 15 && vj == 27 && vk == 13)
+	    fprintf('%d %d %f %f\n', t, im(vi,vj,vk), z_hat, T(vi,vj,vk));
+	    %z
+	    %f
+	    %g
+	    %h
+	    %C
+	    %squeeze(c(vi,vj,vk,:))
+	    %keyboard
 	  end
 	end
       end
@@ -132,7 +132,8 @@ function [ps as Ts] = accum_cor(vol, onoff)
 
       % find corrected threshold
       thresh = abs(tinv(0.05/numvox,t-L-1));
-
+      fprintf('threshold = %f\n',thresh);
+      
       vis_vol(T,thresh,im);
 
       if(reg(t) > 0.5)

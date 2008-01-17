@@ -256,7 +256,11 @@ RtMRIImage::~RtMRIImage() {
     lock->beingDeleted();
   }
 
-  delete [] data;
+  // don't need this cause our parent will delete the data
+//  if(data != NULL) {
+//    delete [] data;
+//    data = NULL;
+//  }
 }
 
 

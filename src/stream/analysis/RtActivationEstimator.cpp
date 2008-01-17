@@ -8,6 +8,8 @@
 
 #include"RtActivationEstimator.h"
 
+#include<gnuplot_i_vxl.h>
+
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
 // default constructor
@@ -37,7 +39,7 @@ RtActivationEstimator::~RtActivationEstimator() {
 bool RtActivationEstimator::processOption(const string &name, const string &text) {
 
   // look for known options
-  if(name == "condition") {
+  if(name == "condition") { // load the condition vector
     numConditions++;
 
     if(numConditions == 1) { // allocate condition matrix
@@ -54,18 +56,19 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
 	i++, i1 = i2+1, i2 = text.find(" ", i1)) {
 
       if(!RtConfigVal::convert<double>(el, 
-		text.substr(i1,i2 == string::npos ? text.size()-i1 : i2-i1))) {
+		text.substr(i1, 
+			    i2 == string::npos ? text.size()-i1 : i2-i1))) {
 	continue;
       }
       conditions->put(i,numConditions-1,el);
 
-      if(i2 == string::npos) {
+      if(i2 == string::npos) { // test if we are on the last one
 	break;
       }
     }
 
     // fill the rest of the measurements as periodic stim
-    for(unsigned int startind = i; i < numMeas; i++) {
+    for(unsigned int startind = i+1; i < numMeas; i++) {
       conditions->put(i,numConditions-1,conditions->get(i%startind,0));
     }
 
@@ -123,6 +126,10 @@ bool RtActivationEstimator::finishInit() {
   vnl_vector<double> hrf(17);
   hrf.copy_in(hrf_da);
 
+  //Gnuplot g1, g2;
+  //g1 = Gnuplot("lines");
+  //g1.plot_x(hrf,"hrf");
+
   // convolve each condition with the hrf
   for(unsigned int i = 0; i < numConditions; i++) {
     vnl_vector<double> col = conditions->get_column(i);
@@ -146,7 +153,7 @@ void RtActivationEstimator::buildTrends() {
 	trends->put(j,i,1.0);
 	break;
       case 1: // linear
-	trends->put(j,i,j);
+	trends->put(j,i,j+1);
 	break;
       default:
 	trends->put(j,i,0.0);

@@ -8,6 +8,7 @@
 
 #include"RtAccumCor.h"
 #include"RtMRIImage.h"
+#include"gsl/gsl_cdf.h"
 
 string RtAccumCor::moduleString("accumcor");
 
@@ -60,14 +61,15 @@ bool RtAccumCor::processOption(const string &name, const string &text) {
   return RtActivationEstimator::processOption(name, text);
 }  
 
-void printVnlVector(vnl_vector<double> v) {
-  for(unsigned int i = 0; i < v.size(); i++) {
-    cout << v[i] << " ";
-  }
-}
+//#include "gnuplot_i_vxl.h"
 
 // process a single acquisition
 int RtAccumCor::process(ACE_Message_Block *mb) {
+  static int numComparisons = 0;
+  static vnl_vector<double> tc(248);
+//  static Gnuplot gp = Gnuplot("lines");
+//  gp.set_yrange(38000,41000);
+
   ACE_TRACE(("RtAccumCor::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
@@ -82,6 +84,10 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
     return 0;
   }
 
+//  tc.put(numTimepoints,(double) dat->getElement(16*32*32 + 28*32 + 14));
+//  gp.reset_plot();
+//  gp.plot_x(tc,"timeseries");
+  
   numTimepoints++;
 
   // initialize the computation if necessary
@@ -92,23 +98,25 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
     //// initialize all subsidiary variables
     C = new vnl_matrix<double>(numTrends+1,numTrends+2);
-    C->fill_diagonal(10e-7);
+    C->fill(0.0);
+    C->fill_diagonal(1e-7);
 
     c = new vnl_matrix<double>(numData,numTrends+2);
+    c->fill(0.0);
     for(unsigned int i = 0; i < numData; i++) {
-      c->put(i,numTrends+1,10e-7);
+      c->put(i,numTrends+1,1e-7);
     }
 
-    f = new vnl_vector<double>(numTrends+2);
+    f = new vnl_vector<double>(numTrends+1);
     f->fill(0.0);
 
-    g = new vnl_vector<double>(numTrends+2);
+    g = new vnl_vector<double>(numTrends+1);
     g->fill(0.0);
 
-    h = new vnl_vector<double>(numTrends+2);
+    h = new vnl_vector<double>(numTrends+1);
     h->fill(0.0);
 
-    z = new vnl_vector<double>(numTrends+2);
+    z = new vnl_vector<double>(numTrends+1);
     z->fill(0.0);
 
     //// build the mask image
@@ -124,10 +132,12 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
     // find voxels above threshold
     double maskThresh = 0.3*mean;
     cout << "using mask threshold of " << maskThresh << endl;
+
     
     for(unsigned int i = 0; i < dat->getNumEl(); i++) {
       if(dat->getElement(i) > maskThresh) {
 	mask->setPixel(i,1);
+	numComparisons++;
       }
       else {
 	mask->setPixel(i,0);
@@ -145,8 +155,13 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   // allocate a new data image for the correlation
   RtActivation *cor = new RtActivation(*dat);
-  //cor->setScaleIsInverted(true);
-  cor->setThreshold(3.5);
+  cor->initToZeros();
+
+  if(numTimepoints > numTrends+1) {
+    cor->setThreshold(fabs(gsl_cdf_tdist_Pinv(0.05/numComparisons, 
+					      numTimepoints-numTrends-1)));
+    cout << cor->getThreshold() << endl;
+  }
 
   //// element independent setup
 
@@ -154,7 +169,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   for(unsigned int i = 0; i < numTrends; i++) {
     z->put(i,trends->get(numTimepoints-1,i));
   }
-  z->put(numTrends,conditions->get(1,numTimepoints-1));
+  z->put(numTrends,conditions->get(numTimepoints-1,0));
   
   double b_new, b_old = 1;
 
@@ -173,12 +188,13 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   }
 
+
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-//    if(!mask->getPixel(i)) {
-//      cor->setPixel(i,0.0);
-//      continue;
-//    }
+    if(!mask->getPixel(i)) {
+      cor->setPixel(i,0.0);
+      continue;
+    }
 
     double z_hat = dat->getElement(i);
 	  
@@ -197,24 +213,26 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 //	* c->get(i,numTrends)/c->get(i,numTrends+1) << " ";
     }
 
-    if(i == 1 && numTimepoints == 2) {
-      fprintf(stdout,"%d %d %f %f\n", i, dat->getElement(i), z_hat, cor->getPixel(i));
-
-      cout << "z: "; printVnlVector(*z); cout << endl;
-      cout << "f: "; printVnlVector(*f); cout << endl;
-      cout << "g: "; printVnlVector(*g); cout << endl;
-      cout << "h: "; printVnlVector(*h); cout << endl;
-      cout << "C: " << endl;
-      C->print(cout);
-      cout << "c: "; printVnlVector(c->get_row(i)); cout << endl;
-
-      //if(i > 40) {
-	int trash;
-	cin >> trash;
-      //}
-    }
+//    if(i == 1 && numTimepoints == 2) {
+//    if(i == 16*32*32 + 28*32 + 14) {
+//      fprintf(stderr,"%d %d %f %f %f\n", numTimepoints, dat->getElement(i), 
+//	      conditions->get(numTimepoints-1,0), z_hat, cor->getPixel(i));
+//
+//      cout << "z: "; printVnlVector(*z); cout << endl;
+//      cout << "f: "; printVnlVector(*f); cout << endl;
+//      cout << "g: "; printVnlVector(*g); cout << endl;
+//      cout << "h: "; printVnlVector(*h); cout << endl;
+//      cout << "C: " << endl;
+//      C->print(cout);
+//      cout << "c: "; printVnlVector(c->get_row(i)); cout << endl;
+//
+//      //if(i > 40) {
+//	int trash;
+//	cin >> trash;
+//      //}
+//    }
   }  
-  cout << endl;
+//  cout << endl;
 
   // set the image id for handling
   cor->addToID("voxel-accumcor");

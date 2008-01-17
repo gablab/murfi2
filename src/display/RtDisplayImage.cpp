@@ -264,18 +264,19 @@ void RtDisplayImage::makeOverlayTexture() {
     if(!overlay->getScaleIsInverted() 
        && overlay->getPixel(i) > overlay->getThreshold()) {
       overlayImg[4*i+0] = USHRT_MAX; // r
-      overlayImg[4*i+1] = (unsigned short) ((overlay->getPixel(i)
-			  -overlay->getThreshold())/overlay->getCeiling())
-							 *USHRT_MAX; // g
+      overlayImg[4*i+1] = (unsigned short) rint(((overlay->getPixel(i)
+						     -overlay->getThreshold())/*/overlay->getCeiling()*/)
+						*USHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = USHRT_MAX; // a
+
     }
     else if(!overlay->getScaleIsInverted() 
 	    && overlay->getPixel(i) < -overlay->getThreshold()) {
       overlayImg[4*i+0] = 0; // r
-      overlayImg[4*i+1] = (unsigned short) ((overlay->getPixel(i)
-			  -overlay->getThreshold())/overlay->getCeiling())
-							 *USHRT_MAX; // g
+      overlayImg[4*i+1] = (unsigned short) rint(((overlay->getPixel(i)
+						  -overlay->getThreshold())/*/overlay->getCeiling()*/)
+						*USHRT_MAX); // g
       overlayImg[4*i+2] = USHRT_MAX; // b
       overlayImg[4*i+3] = USHRT_MAX; // a
 
@@ -302,8 +303,8 @@ void RtDisplayImage::makeOverlayTexture() {
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, overlayTex);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 4, overlay->getDim(0),
 	       overlay->getDim(1), 0, GL_RGBA,
 	       GL_UNSIGNED_SHORT, overlayImg);

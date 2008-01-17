@@ -116,6 +116,8 @@ GLUT_LIB=-lglut
 VXL_INCS=-I/usr/local/include/vxl/core -I/usr/local/include/vxl/vcl
 VXL_LIBS=-lvnl -lvcl -lvnl_algo
 
+GNUPLOT_LIBS=-lgnuplot_i_vxl -L/usr/local/lib
+
 # build compiler flags
 
 export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(TINYXML_FLAGS) $(VXL_INCS)
@@ -125,7 +127,7 @@ export C_FLAGS = -Werror -Wall \
 	$(C_INCS) 
 #`$(PKGCONFIG_CMD)`
 
-export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS)
+export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS) $(GNUPLOT_LIBS)
 
 export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
 export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)

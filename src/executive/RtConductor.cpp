@@ -237,7 +237,7 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
 
   // handle based on the thrower
   if(code == START_CODE_STREAM) { // stream component has data
-    cerr << "caught data " << data << " available signal from a stream component" << endl;
+    cout << "caught data " << data << " available signal from a stream component" << endl;
 
     // make data available to all output processes
     for(vector<RtOutput*>::iterator i = outputs.begin(); 
@@ -248,15 +248,15 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     return;
   }
   else if(code < START_CODE_OUTPUTS) { // this is an input
-    cerr << "caught a ready signal from an input " << endl;
+    cout << "caught a ready signal from an input " << endl;
 
     // let the stream decide if it should spawn a new processing instance 
     stream.setInput(code,data);
 
-    cerr << "sent ready signal" << endl;
+    cout << "sent ready signal" << endl;
   }
   else { // this is an output
-    cerr << "caught a ready signal from an output" << endl;
+    cout << "caught a ready signal from an output" << endl;
 
     // dont need to do much here
   }

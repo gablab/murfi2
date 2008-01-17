@@ -143,7 +143,7 @@ int RtInputScannerImages::svc() {
     received.push_back(rti);
 
     // signal that we got an image
-    cerr << "sending event with code number " << codeNum << endl;
+    cout << "sending event with code number " << codeNum << endl;
 
     sendCode(rti);
 
@@ -260,7 +260,7 @@ unsigned short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 //   img: image to save
 bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 
-  cerr << "writing image number " << seriesNum << ":" << img.getAcquisitionNum() << endl;
+  cout << "writing image number " << seriesNum << ":" << img.getAcquisitionNum() << endl;
 
   return img.write(getImageFilename(seriesNum, img.getAcquisitionNum()));
 }

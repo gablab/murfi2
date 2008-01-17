@@ -60,7 +60,7 @@ function [ps as Ts tcs] = inst_accum_cor(vol, onoff)
   f = zeros(L+1,1);
   g = zeros(L+1,1);
   h = zeros(L+1,1);
-  h = zeros(L+1,1);
+  z = zeros(L+1,1);
   
   % initialize C,c,p,a
 %  C = [10^-7*eye(L+1) zeros(L+1,1)]; % choleski rows that dont change per vox

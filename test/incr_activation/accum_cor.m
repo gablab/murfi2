@@ -112,8 +112,8 @@ function [ps as Ts] = accum_cor(vol, onoff)
 	    T(vi,vj,vk) = sqrt(t-L-1) * c(vi,vj,vk,L+1)/c(vi,vj,vk,L+2);
 	  end
 	  
-	  if(vi == 15 && vj == 27 && vk == 13)
-	    fprintf('%d %d %f %f\n', t, im(vi,vj,vk), z_hat, T(vi,vj,vk));
+%	  if(vi == 15 && vj == 27 && vk == 13)
+%	    fprintf('%d %d %f %f\n', t, im(vi,vj,vk), z_hat, T(vi,vj,vk));
 	    %z
 	    %f
 	    %g
@@ -121,18 +121,18 @@ function [ps as Ts] = accum_cor(vol, onoff)
 	    %C
 	    %squeeze(c(vi,vj,vk,:))
 	    %keyboard
-	  end
+%	  end
 	end
       end
     end
 %    keyboard
 
-    visualize = 0;
+    visualize = 1;
     if(visualize)
 
       % find corrected threshold
       thresh = abs(tinv(0.05/numvox,t-L-1));
-      fprintf('threshold = %f\n',thresh);
+      %fprintf('threshold = %f\n',thresh);
       
       vis_vol(T,thresh,im);
 

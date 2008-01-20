@@ -17,6 +17,7 @@
 #define ID_ZSCOREIMG    "data.image.activation.voxel-zscore"
 #define ID_SLIDEWINCOR  "data.image.activation.voxel-slidewincor"
 #define ID_ACCUMCOR     "data.image.activation.voxel-accumcor"
+#define ID_SINGLEIMCOR  "data.image.activation.voxel-singleimcor"
 
 #endif
 

@@ -59,6 +59,7 @@ int RtStream::configure(RtConfig &config) {
 #include"RtImageZScore.h"
 #include"RtImageSlideWinCor.h"
 #include"RtAccumCor.h"
+#include"RtSingleImageCor.h"
 
 // add a single module to the module stack
 //  in
@@ -93,6 +94,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   }
   else if(type == RtAccumCor::moduleString) { // voxel accumulative correlation
     ACE_NEW_NORETURN(sc, RtAccumCor());
+  }
+  else if(type == RtSingleImageCor::moduleString) { // voxel single image correlation
+    ACE_NEW_NORETURN(sc, RtSingleImageCor());
   }
 
   // create and add the module

@@ -81,7 +81,17 @@
 <!--      <option name="windowLen">6</option> -->
 <!--   </module> -->
 
-  <module name="accumcor">
+<!--   <module name="accumcor"> -->
+<!--      <output>display</output> -->
+
+<!--      <option name="condition"> -->
+<!--         0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 -->
+<!--      </option> -->
+
+<!--      <option name="trends">2</option> -->
+<!--   </module> -->
+
+  <module name="singleimcor">
      <output>display</output>
 
      <option name="condition">
@@ -89,6 +99,8 @@
      </option>
 
      <option name="trends">2</option>
+
+     <option name="baselineThreshold">0.0</option>
   </module>
 
 </preprocessor>

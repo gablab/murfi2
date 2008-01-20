@@ -9,7 +9,6 @@
 #include"RtSingleImageCor.h"
 #include"RtMRIImage.h"
 #include"RtActivation.h"
-#include"gsl/gsl_cdf.h"
 
 string RtSingleImageCor::moduleString("singleimcor");
 
@@ -79,7 +78,6 @@ void RtSingleImageCor::initBaselineMeans(RtMRIImage *img) {
   deleteBaselineMeans();
 
   // allocate vectors and initialize them
-  baselineMeans.resize(numConditions);
   for(unsigned int i = 0; i < numConditions; i++) {
     baselineMeans.push_back(new RtActivation(*img));
   }
@@ -101,7 +99,7 @@ void RtSingleImageCor::deleteBaselineMeans() {
 
 // process a single acquisition
 int RtSingleImageCor::process(ACE_Message_Block *mb) {
-  static int numComparisons = 0;
+//  static int numComparisons = 0;
 //  static vnl_vector<double> tc(248);
 //  static Gnuplot gp = Gnuplot("lines");
 //  gp.set_yrange(38000,41000);
@@ -128,7 +126,6 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   // initialize the computation if necessary
   if(needsInit) {
-
     // create images to store baseline estimates
     initBaselineMeans(dat);
 
@@ -172,7 +169,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     double maskThresh = 0.3*mean;
     cout << "using mask threshold of " << maskThresh << endl;
 
-
+    // assign ones to mask positive voxels and count the number of comparisons
     for(unsigned int i = 0; i < dat->getNumEl(); i++) {
       if(dat->getElement(i) > maskThresh) {
 	mask->setPixel(i,1);
@@ -196,10 +193,11 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   RtActivation *cor = new RtActivation(*dat);
   cor->initToZeros();
 
+  // set threshold
   if(numTimepoints > numTrends+1) {
-    cor->setThreshold(fabs(gsl_cdf_tdist_Pinv(0.05/numComparisons,
-					      numTimepoints-numTrends-1)));
-    cout << cor->getThreshold() << endl;
+    cor->setThreshold(getTStatThreshold(1));
+    cout << "single image est: using t threshold of" 
+	 << cor->getThreshold() << endl;
   }
 
   //// element independent setup

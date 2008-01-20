@@ -99,8 +99,10 @@
      </option>
 
      <option name="trends">2</option>
-
      <option name="baselineThreshold">0.0</option>
+     <option name="probThreshold">0.05</option>
+     <option name="correctForMultiComp">true</option>
+
   </module>
 
 </preprocessor>

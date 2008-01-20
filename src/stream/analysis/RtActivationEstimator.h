@@ -33,8 +33,39 @@ public:
   // destructor
   ~RtActivationEstimator();
 
+  // set the desired probability threshold
+  void setProbThreshold(double p);
+
+  // get the desired probability threshold
+  double  getProbThreshold();
+
+  // set whether stat thresholds should reflect multiple comparisons corrections
+  void setCorrectMultipleComparisons(bool correct);
+
+  // get whether stat thresholds should reflect multiple comparisons corrections
+  bool getCorrectMultipleComparisons();
+
+  // get the desired t statistic threshold
+  // in
+  //  dof: number of degrees of freedom
+  // out
+  //  t statistic threshold for the current probability threshold and 
+  //  mulitple comparisons correction state
+  double getTStatThreshold(unsigned int dof);
 
 protected:
+
+  // builds an hrf vector 
+  //
+  // NOTE: ALL INPUT ARGS ARE IGNORED CURRENTLY
+  // TODO: GENERATE THE HRF FROM GAMMA FUNCTIONS
+  //
+  // in
+  //  sampleRate: temporal precision in milliseconds
+  //  length:     length of the HRF in milliseconds
+  // out
+  //  vnl_vector HRF
+  vnl_vector<double> buildHRF(unsigned int sampleRate, unsigned int length);
 
   // process a single acquisition
   virtual int process(ACE_Message_Block *mb) = 0;
@@ -68,6 +99,16 @@ protected:
   // trend regressors
   unsigned int numTrends; 
   vnl_matrix<double> *trends;
+
+  // probability of false positive at which to threshold activations
+  double probThreshold;
+
+  // whether the probability threshold should be corrected for mulitple
+  // comparisons
+  bool correctForMultiComps; 
+  
+  // number of statistical comparisons
+  unsigned int numComparisons;
 
   // mask
   //RtMRIImage mask;

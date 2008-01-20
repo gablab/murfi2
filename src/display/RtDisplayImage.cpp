@@ -152,7 +152,8 @@ void RtDisplayImage::setData(RtData *data) {
   // handle overlay
   //  if(data->getID() == ID_ZSCOREIMG) {
   //  if(data->getID() == ID_SLIDEWINCOR) {
-  if(data->getID() == ID_ACCUMCOR) {
+  //  if(data->getID() == ID_ACCUMCOR) {
+  if(data->getID() == ID_SINGLEIMCOR) {
     overlay = (RtActivation*) data;
     newOverlay = true;
     return;

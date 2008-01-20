@@ -9,16 +9,22 @@
 #include"RtActivationEstimator.h"
 
 #include<gnuplot_i_vxl.h>
+#include"gsl/gsl_cdf.h"
 
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
 // default constructor
-RtActivationEstimator::RtActivationEstimator() : RtStreamComponent(), 
-					         numMeas(0), numConditions(0), 
-                                                 numTrends(0) {
-  id = moduleString;
+RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
 
+  // standard init
+  id = moduleString;
   trends = conditions = NULL;
+  numTrends = numConditions = numMeas = 0;
+
+  // default values for probability thresholding
+  probThreshold = 0.05;
+  numComparisons = 0;
+  correctForMultiComps = true;
 }
 
 // destructor
@@ -30,6 +36,34 @@ RtActivationEstimator::~RtActivationEstimator() {
   if(conditions != NULL) {
     delete conditions;
   }
+}
+
+
+// set the desired probability threshold
+void RtActivationEstimator::setProbThreshold(double p) {
+  probThreshold = p;
+}
+
+// get the desired probability threshold
+double RtActivationEstimator::getProbThreshold() {
+  return probThreshold;
+}
+
+// set whether stat thresholds should reflect multiple comparisons corrections
+void RtActivationEstimator:: setCorrectMultipleComparisons(bool correct) {
+  correctForMultiComps = correct;
+}
+
+// get whether stat thresholds should reflect multiple comparisons corrections
+bool RtActivationEstimator::getCorrectMultipleComparisons() {
+  return correctForMultiComps;
+}
+
+// get the desired t statistic threshold
+double RtActivationEstimator::getTStatThreshold(unsigned int dof) {
+  return fabs(gsl_cdf_tdist_Pinv(probThreshold 
+				 / correctForMultiComps ? numComparisons : 1.0,
+				 dof));
 }
 
 // process a configuration option
@@ -77,6 +111,13 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "trends") {
     return RtConfigVal::convert<unsigned int>(numTrends,text);
   }
+  if(name == "probThreshold") {
+    return RtConfigVal::convert<double>(probThreshold,text);
+  }  
+  if(name == "correctForMultiComps") {
+    return RtConfigVal::convert<bool>(correctForMultiComps,text);
+  }
+  
 
   return RtStreamComponent::processOption(name, text);
 }  
@@ -96,13 +137,22 @@ bool RtActivationEstimator::processConfig(RtConfig &config) {
   return true;
 }
 
-// finish initialization and prepare to run
-bool RtActivationEstimator::finishInit() {
-  buildTrends();
+// builds an hrf vector 
+//
+// NOTE: ALL INPUT ARGS ARE IGNORED CURRENTLY
+// TODO: GENERATE THE HRF FROM GAMMA FUNCTIONS
+//
+// in
+//  sampleRate: temporal precision in milliseconds
+//  length:     length of the HRF in milliseconds
+// out
+//  vnl_vector HRF
+vnl_vector<double> RtActivationEstimator::buildHRF(unsigned int sampleRate, 
+						   unsigned int length) {
 
-  // convolve the conditions with hrf (cannonical from SPM)
-
-  // FOR NOW ASSUME A TR OF 2 SECONDS 
+  // FOR NOW ASSUME 
+  // sampleRate = 2000 milliseconds
+  // length = 32000 milliseconds
   double hrf_da[] = {
     0,
     0.08656608099364,
@@ -125,6 +175,16 @@ bool RtActivationEstimator::finishInit() {
 
   vnl_vector<double> hrf(17);
   hrf.copy_in(hrf_da);
+
+  return hrf;
+}
+
+// finish initialization and prepare to run
+bool RtActivationEstimator::finishInit() {
+  buildTrends();
+
+  // convolve the conditions with hrf (cannonical from SPM)
+  vnl_vector<double> hrf = buildHRF(2000,32000);
 
   //Gnuplot g1, g2;
   //g1 = Gnuplot("lines");

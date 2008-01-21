@@ -99,9 +99,9 @@
      </option>
 
      <option name="trends">2</option>
-     <option name="baselineThreshold">0.0</option>
-     <option name="probThreshold">0.05</option>
-     <option name="correctForMultiComp">true</option>
+     <option name="baselineThreshold">0.00001</option>
+     <option name="probThreshold">0.10</option>
+     <option name="correctForMultiComps">0</option>
 
   </module>
 

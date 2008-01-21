@@ -44,6 +44,11 @@ protected:
   //   val  text of the option node
   virtual bool processOption(const string &name, const string &text);
 
+  // initialize the estimation algorithm for a particular image size
+  // in
+  //  first acquired image to use as a template for parameter inits
+  void initEstimation(RtMRIImage &image);
+
   // initialize the baseline mean estimation parameters to match an image
   void initBaselineMeans(RtMRIImage *img);
 

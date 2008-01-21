@@ -7,6 +7,7 @@ function [ps as Ts tcs] = inst_accum_cor(vol, onoff)
   ntp = size(vol,4);
 %  ntp = 64;
   imsiz = [size(vol,1) size(vol,2) size(vol,3)];
+  vol = vol.*49;
   
   % build regressors
   
@@ -147,6 +148,10 @@ function [ps as Ts tcs] = inst_accum_cor(vol, onoff)
 %	    tcs{2}(t) = z_hat;
 %	  end
 	  
+	  if(vi == 15 && vj == 27 && vk == 13)
+fprintf('%f ', z_hat);
+	  end
+
 	  for(j=1:L+1)
 	    z_hat = z_hat - h(j)*c(vi,vj,vk,j);
 	    c(vi,vj,vk,j) = f(j)*c(vi,vj,vk,j) + g(j)*z_hat;
@@ -174,6 +179,10 @@ function [ps as Ts tcs] = inst_accum_cor(vol, onoff)
 	  end
 	  %          tcs{2}(t) = T(vi,vj,vk);
 
+	  if(vi == 15 && vj == 27 && vk == 13)
+	    fprintf('%d %d %f %f %f\n', t, im(vi,vj,vk), reg(t), z_hat, T(vi,vj,vk));
+	  end	  
+	  
 %	  if([vi vj vk] == vox(voi,:))
 %	  if([vi vj vk] == vox(voi,:) & t > 5)
 %	    figure(hndl);
@@ -223,7 +232,7 @@ function [ps as Ts tcs] = inst_accum_cor(vol, onoff)
     ps(:,:,:,t) = p;
     as(:,:,:,t) = a;
     Ts(:,:,:,t) = T;
-    fprintf('t=%d, mean T=%f\n',t,mean(T(:)));
+    %fprintf('t=%d, mean T=%f\n',t,mean(T(:)));
   end
   
  %keyboard

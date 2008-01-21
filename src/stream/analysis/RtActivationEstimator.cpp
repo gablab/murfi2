@@ -13,6 +13,16 @@
 
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
+
+void printVnlVector(vnl_vector<double> v) {
+  for(unsigned int i = 0; i < v.size(); i++) {
+    cout << v[i] << " ";
+  }
+}
+
+
+
+
 // default constructor
 RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
 
@@ -62,7 +72,7 @@ bool RtActivationEstimator::getCorrectMultipleComparisons() {
 // get the desired t statistic threshold
 double RtActivationEstimator::getTStatThreshold(unsigned int dof) {
   return fabs(gsl_cdf_tdist_Pinv(probThreshold 
-				 / correctForMultiComps ? numComparisons : 1.0,
+			      / (correctForMultiComps ? numComparisons : 1.0),
 				 dof));
 }
 
@@ -116,8 +126,7 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   }  
   if(name == "correctForMultiComps") {
     return RtConfigVal::convert<bool>(correctForMultiComps,text);
-  }
-  
+  }  
 
   return RtStreamComponent::processOption(name, text);
 }  
@@ -147,8 +156,9 @@ bool RtActivationEstimator::processConfig(RtConfig &config) {
 //  length:     length of the HRF in milliseconds
 // out
 //  vnl_vector HRF
-vnl_vector<double> RtActivationEstimator::buildHRF(unsigned int sampleRate, 
-						   unsigned int length) {
+void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
+				     unsigned int sampleRate, 
+				     unsigned int length) {
 
   // FOR NOW ASSUME 
   // sampleRate = 2000 milliseconds
@@ -173,10 +183,8 @@ vnl_vector<double> RtActivationEstimator::buildHRF(unsigned int sampleRate,
     -0.00014625750688
   };
 
-  vnl_vector<double> hrf(17);
+  hrf.set_size(17);
   hrf.copy_in(hrf_da);
-
-  return hrf;
 }
 
 // finish initialization and prepare to run
@@ -184,11 +192,16 @@ bool RtActivationEstimator::finishInit() {
   buildTrends();
 
   // convolve the conditions with hrf (cannonical from SPM)
-  vnl_vector<double> hrf = buildHRF(2000,32000);
+  vnl_vector<double> hrf;
+  buildHRF(hrf, 2000, 32000);
 
-  //Gnuplot g1, g2;
-  //g1 = Gnuplot("lines");
-  //g1.plot_x(hrf,"hrf");
+  printVnlVector(hrf);
+  
+
+//  Gnuplot g1;
+//  g1 = Gnuplot("lines");
+//  g1.plot_x(hrf,"hrf");
+//  sleep(10);
 
   // convolve each condition with the hrf
   for(unsigned int i = 0; i < numConditions; i++) {

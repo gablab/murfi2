@@ -12,6 +12,7 @@
 
 string RtSingleImageCor::moduleString("singleimcor");
 
+
 // default constructor
 RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   id = moduleString;
@@ -70,6 +71,67 @@ bool RtSingleImageCor::processOption(const string &name, const string &text) {
 }
 
 
+// initialize the estimation algorithm for a particular image size
+// in
+//  first acquired image to use as a template for parameter inits
+void RtSingleImageCor::initEstimation(RtMRIImage &image) {
+  // create images to store baseline estimates
+  initBaselineMeans(&image);
+
+  // get the number of datapoints we must process
+  numData = image.getNumEl();
+
+  //// initialize all subsidiary variables
+  C = new vnl_matrix<double>(numTrends+1,numTrends+2);
+  C->fill(0.0);
+  C->fill_diagonal(1e-7);
+
+  c = new vnl_matrix<double>(numData,numTrends+2);
+  c->fill(0.0);
+  for(unsigned int i = 0; i < numData; i++) {
+    c->put(i,numTrends+1,1e-7);
+  }
+
+  f = new vnl_vector<double>(numTrends+1);
+  f->fill(0.0);
+
+  g = new vnl_vector<double>(numTrends+1);
+  g->fill(0.0);
+
+  h = new vnl_vector<double>(numTrends+1);
+  h->fill(0.0);
+
+  z = new vnl_vector<double>(numTrends+1);
+  z->fill(0.0);
+
+  //// build the mask image
+  mask = new RtMRIImage(image);
+
+  // first compute the mean voxel intensity
+  double mean = 0;
+  for(unsigned int i = 0; i < image.getNumEl(); i++) {
+    mean += image.getElement(i);
+  }
+  mean /= image.getNumEl();
+
+  // find voxels above threshold
+  double maskThresh = 0.3*mean;
+  cout << "using mask threshold of " << maskThresh << endl;
+
+  // assign ones to mask positive voxels and count the number of comparisons
+  for(unsigned int i = 0; i < image.getNumEl(); i++) {
+    if(image.getElement(i) > maskThresh) {
+      mask->setPixel(i,1);
+      numComparisons++;
+    }
+    else {
+      mask->setPixel(i,0);
+    }
+  }
+
+  needsInit = false;
+}
+
 // initialize the baseline mean estimation parameters to match an image
 // in 
 //  mri image to be used as a template to allocate space for running means
@@ -126,61 +188,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   // initialize the computation if necessary
   if(needsInit) {
-    // create images to store baseline estimates
-    initBaselineMeans(dat);
-
-    // get the number of datapoints we must process
-    numData = dat->getNumEl();
-
-    //// initialize all subsidiary variables
-    C = new vnl_matrix<double>(numTrends+1,numTrends+2);
-    C->fill(0.0);
-    C->fill_diagonal(1e-7);
-
-    c = new vnl_matrix<double>(numData,numTrends+2);
-    c->fill(0.0);
-    for(unsigned int i = 0; i < numData; i++) {
-      c->put(i,numTrends+1,1e-7);
-    }
-
-    f = new vnl_vector<double>(numTrends+1);
-    f->fill(0.0);
-
-    g = new vnl_vector<double>(numTrends+1);
-    g->fill(0.0);
-
-    h = new vnl_vector<double>(numTrends+1);
-    h->fill(0.0);
-
-    z = new vnl_vector<double>(numTrends+1);
-    z->fill(0.0);
-
-    //// build the mask image
-    mask = new RtMRIImage(*dat);
-
-    // first compute the mean voxel intensity
-    double mean = 0;
-    for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-      mean += dat->getElement(i);
-    }
-    mean /= dat->getNumEl();
-
-    // find voxels above threshold
-    double maskThresh = 0.3*mean;
-    cout << "using mask threshold of " << maskThresh << endl;
-
-    // assign ones to mask positive voxels and count the number of comparisons
-    for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-      if(dat->getElement(i) > maskThresh) {
-	mask->setPixel(i,1);
-	numComparisons++;
-      }
-      else {
-	mask->setPixel(i,0);
-      }
-    }
-
-    needsInit = false;
+    initEstimation(*dat);
   }
 
   // validate sizes
@@ -196,11 +204,25 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // set threshold
   if(numTimepoints > numTrends+1) {
     cor->setThreshold(getTStatThreshold(1));
-    cout << "single image est: using t threshold of" 
-	 << cor->getThreshold() << endl;
+//    cout << "single image est: using t threshold of " 
+//	 << cor->getThreshold() << endl;
   }
 
   //// element independent setup
+
+  // decide if we are in an "on" or "off" stimulus condition for each condition
+  static vnl_vector<unsigned int> isBaseline(numConditions);
+  isBaseline.fill(0);
+
+  // decide whether we are in an on or off condition
+  for(unsigned int j = 0; j < numConditions; j++) {
+    // when in baseline condition, set the flag and increment the 
+    // number of timepoints this baseline condition has
+    if(conditions->get(numTimepoints-1,j) < baselineThreshold.get(j)) { 
+      isBaseline.put(j,1);
+      numBaselineTimepoints.put(j,numBaselineTimepoints.get(j)+1);
+    }
+  }
 
   // build z
   for(unsigned int i = 0; i < numTrends; i++) {
@@ -225,7 +247,6 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   }
 
-
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     if(!mask->getPixel(i)) {
@@ -238,22 +259,33 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     // decide whether we are in an on or off condition
     // NOTE: by testing after the mask we are assuming a constant mask over time
     for(unsigned int j = 0; j < numConditions; j++) {
-      if(conditions->get(numTimepoints-1,j) < baselineThreshold.get(j)) { // off
-	// if this is the first baseline timpoint, set the mean to zero
-	if(numBaselineTimepoints.get(j) == 0) {
-	  baselineMeans[j]->setPixel(i,0);
+      if(isBaseline.get(j)) { // off
+	// check whether this is the first image of the baseline
+	if(numBaselineTimepoints.get(j) == 1) {	  
+	  // replace the mean with the voxel intensity for first timepoint
+	  baselineMeans[j]->setPixel(i, z_hat);
+	}
+	else {
+	  // sum the voxel intensity within this baseline condition
+	  baselineMeans[j]->setPixel(i, baselineMeans[j]->getPixel(i) + z_hat);
 	}
 
-	// increment number of timepoints this baseline condition has
-	numBaselineTimepoints.put(j,numBaselineTimepoints.get(j)+1);
-
-	// update the mean voxel intensity within this baseline condition
-	double curMean = baselineMeans[j]->getPixel(i);
-	baselineMeans[j]->setPixel(i, 
-		  curMean + (z_hat - curMean)/numBaselineTimepoints.get(j));	
+    if(i == 16*32*32 + 28*32 + 14) {
+      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i)/(numBaselineTimepoints.get(j) > 0 ? numBaselineTimepoints.get(j) : 1));
+    }    
       }
       else {
-	numBaselineTimepoints.put(j,0);
+	// update the mean
+	if(numBaselineTimepoints.get(j) > 0) {
+	  baselineMeans[j]->setPixel(i, 
+	      baselineMeans[j]->getPixel(i)/(numBaselineTimepoints.get(j)));
+	}
+
+    if(i == 16*32*32 + 28*32 + 14) {
+      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i));
+    }
+
+
 
 	// change z_hat to be the mean of the last baseline in the on condition
 	// TODO: model trends within the on block (maybe this already happens)	
@@ -266,9 +298,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
       c->put(i,j, f->get(j)*c->get(i,j) + g->get(j)*z_hat);
     }
     c->put(i,numTrends+1, sqrt(pow(c->get(i,numTrends+1),2)+pow(z_hat/b_old,2)));
-//    p(vi,vj,vk) = c(vi,vj,vk,L+1)/sqrt(c(vi,vj,vk,L+2)^2+c(vi,vj,vk,L+1)^2);
-//    a(vi,vj,vk) = c(vi,vj,vk,L+1)/C(L+1,L+1);
-
+    // compute the correlation after we have enough timepoints to
     if(numTimepoints > numTrends+1) {
       cor->setPixel(i, (dat->getPixel(i) 
 			- c->get(i,0)*h->get(0) 
@@ -282,9 +312,9 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     }
 
 //    if(i == 1 && numTimepoints == 2) {
-//    if(i == 16*32*32 + 28*32 + 14) {
-//      fprintf(stderr,"%d %d %f %f %f\n", numTimepoints, dat->getElement(i),
-//	      conditions->get(numTimepoints-1,0), z_hat, cor->getPixel(i));
+    if(i == 16*32*32 + 28*32 + 14) {
+      fprintf(stderr,"%d %d %f %f %f\n", numTimepoints, dat->getElement(i),
+	      conditions->get(numTimepoints-1,0), z_hat, cor->getPixel(i));
 //
 //      cout << "z: "; printVnlVector(*z); cout << endl;
 //      cout << "f: "; printVnlVector(*f); cout << endl;
@@ -298,14 +328,19 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 //	int trash;
 //	cin >> trash;
 //      //}
-//    }
+    }
   }
 //  cout << endl;
 
   // set the image id for handling
-  cor->addToID("voxel-accumcor");
+  cor->addToID("voxel-singleimcor");
 
-
+  // in the first non-baseline condition reset the number of baseline timepoints
+  for(unsigned int j = 0; j < numTrends+1; j++) {
+    if(numBaselineTimepoints.get(j) > 0 && !isBaseline.get(j)) {
+      numBaselineTimepoints.put(j,0);
+    }
+  }
 
   setResult(msg,cor);
 

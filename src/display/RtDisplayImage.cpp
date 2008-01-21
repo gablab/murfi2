@@ -156,6 +156,7 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() == ID_SINGLEIMCOR) {
     overlay = (RtActivation*) data;
     newOverlay = true;
+  cout << "display got an overlay " << img->getID() << endl;
     return;
   }
 

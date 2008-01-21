@@ -65,7 +65,8 @@ protected:
   //  length:     length of the HRF in milliseconds
   // out
   //  vnl_vector HRF
-  vnl_vector<double> buildHRF(unsigned int sampleRate, unsigned int length);
+  void buildHRF(vnl_vector<double> &hrf, 
+		unsigned int sampleRate, unsigned int length);
 
   // process a single acquisition
   virtual int process(ACE_Message_Block *mb) = 0;

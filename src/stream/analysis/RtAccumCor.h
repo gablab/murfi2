@@ -61,6 +61,12 @@ protected:
 
   // mask image
   RtMRIImage *mask;
+
+  // whether to save the result as a mask
+  bool saveResultAsMask;
+
+  // filename to save mask to
+  string maskFilename;
    
 };
 

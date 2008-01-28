@@ -47,8 +47,15 @@
     imageWinY="0"
     imageWinW="1000"
     imageWinH="1000"
-    >
+    overlayID="data.image.activation.voxel-accumcor"
+>
 </display>
+
+<socket
+    host="192.168.1.5"
+    port="15001"
+>
+</socket>
 
 <!-- preprocessing steps -->
 <preprocessor>
@@ -81,17 +88,7 @@
 <!--      <option name="windowLen">6</option> -->
 <!--   </module> -->
 
-<!--   <module name="accumcor"> -->
-<!--      <output>display</output> -->
-
-<!--      <option name="condition"> -->
-<!--         0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 -->
-<!--      </option> -->
-
-<!--      <option name="trends">2</option> -->
-<!--   </module> -->
-
-  <module name="singleimcor">
+  <module name="accumcor">
      <output>display</output>
 
      <option name="condition">
@@ -99,11 +96,24 @@
      </option>
 
      <option name="trends">2</option>
-     <option name="baselineThreshold">0.00001</option>
-     <option name="probThreshold">0.10</option>
-     <option name="correctForMultiComps">0</option>
 
+     <option name="saveasmask">1</option>
+     <option name="maskfilename">accumcor_mask.dat</option>
   </module>
+
+<!--   <module name="singleimcor"> -->
+<!--      <output>display</output> -->
+
+<!--      <option name="condition"> -->
+<!--         0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 -->
+<!--      </option> -->
+
+<!--      <option name="trends">2</option> -->
+<!--      <option name="baselineThreshold">0.00001</option> -->
+<!--      <option name="probThreshold">0.10</option> -->
+<!--      <option name="correctForMultiComps">0</option> -->
+
+<!--   </module> -->
 
 </preprocessor>
 

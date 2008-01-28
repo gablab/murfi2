@@ -12,6 +12,10 @@
 
 #include"RtDataImage.h"
 #include"RtMRIImage.h"
+#include"RtMaskImage.h"
+#include"RtTypes.h"
+
+class RtMaskImage;
 
 using namespace std;
 
@@ -36,6 +40,13 @@ public:
 
   // print info about this image
   void printInfo(ostream &os);
+
+  // create a mask by thresholding the activation
+  // in:
+  //  sign of activation to take (POS,NEG,POSNEG)
+  // out:
+  //  binary mask image 
+  RtMaskImage *toMask(Sign direction);
 
   //********  methods for getting data from the image *******//
 

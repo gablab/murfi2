@@ -14,15 +14,6 @@
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
 
-void printVnlVector(vnl_vector<double> v) {
-  for(unsigned int i = 0; i < v.size(); i++) {
-    cout << v[i] << " ";
-  }
-}
-
-
-
-
 // default constructor
 RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
 
@@ -35,6 +26,10 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   probThreshold = 0.05;
   numComparisons = 0;
   correctForMultiComps = true;
+
+  // default values for mask
+  maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
+  maskIntensityThreshold = 0.5;
 }
 
 // destructor
@@ -127,6 +122,25 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "correctForMultiComps") {
     return RtConfigVal::convert<bool>(correctForMultiComps,text);
   }  
+  if(name == "maskSource") {
+    // match type string
+    if(text == "thresholdFirstImageIntensity") {
+      maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
+    }
+    else if(text == "loadFromFile") {
+      maskSource = LOAD_FROM_FILE;
+    }
+    else if(text == "passedFromInside") {
+      maskSource = PASSED_FROM_INSIDE;
+    }
+  }
+  if(name == "maskFilename") {
+    mask.setFilename(text);
+    return true;
+  }  
+  if(name == "maskIntensityThreshold") {
+    return RtConfigVal::convert<double>(maskIntensityThreshold,text);
+  }  
 
   return RtStreamComponent::processOption(name, text);
 }  
@@ -191,12 +205,14 @@ void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
 bool RtActivationEstimator::finishInit() {
   buildTrends();
 
+  // mask from file
+  if(maskSource == LOAD_FROM_FILE) {
+    mask.load();
+  }
+
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
   buildHRF(hrf, 2000, 32000);
-
-  printVnlVector(hrf);
-  
 
 //  Gnuplot g1;
 //  g1 = Gnuplot("lines");
@@ -213,7 +229,6 @@ bool RtActivationEstimator::finishInit() {
 
   return true;
 }
-
 
 // build the trend regressors
 void RtActivationEstimator::buildTrends() {
@@ -235,6 +250,16 @@ void RtActivationEstimator::buildTrends() {
     }
   }
 
+}
+
+// initialize the estimation algorithm for a particular image size
+// in
+//  first acquired image to use as a template for parameter inits
+void RtActivationEstimator::initEstimation(RtMRIImage &image) {
+  // mask from intensity threshold
+  if(maskSource == THRESHOLD_FIRST_IMAGE_INTENSITY) {
+    mask.initByMeanIntensityThreshold(image, maskIntensityThreshold);
+  }
 }
 
 /*****************************************************************************

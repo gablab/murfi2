@@ -36,6 +36,35 @@ RtActivation::RtActivation(RtMRIImage &img)
 RtActivation::~RtActivation() {
 }
 
+// create a mask by thresholding the activation
+// in:
+//  sign of activation to take (POS,NEG,POSNEG)
+// out:
+//  binary mask image 
+RtMaskImage *RtActivation::toMask(Sign direction) {
+  // create a boolean image the same size as this image
+  RtMaskImage *activationMask = new RtMaskImage(*this);
+  
+  // assign the mask based on activation and direction
+  for(unsigned int i = 0; i < getNumEl(); i++) {
+    double voxel = getPixel(i);
+    
+    switch(direction) {
+    case POS:
+      activationMask->setPixel(i,voxel >= threshold ? true : false);
+      break;
+    case NEG:
+      activationMask->setPixel(i,voxel <= threshold ? true : false);
+      break;
+    case POSNEG:
+      activationMask->setPixel(i,fabs(voxel) >= threshold ? true : false);
+      break;
+    }
+  }
+
+  return activationMask;
+}
+
 // print info about this image
 void RtActivation::printInfo(ostream &os) {
   ACE_TRACE(("RtActivation::printInfo"));

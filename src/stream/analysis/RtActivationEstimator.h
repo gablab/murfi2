@@ -15,6 +15,7 @@
 
 #include"RtStreamComponent.h"
 #include"RtDataImage.h"
+#include"RtMaskImage.h"
 
 #define MAX_CONDITIONS 1
 
@@ -89,6 +90,11 @@ protected:
   // build the trend regressors
   virtual void buildTrends();
 
+  // initialize the estimation algorithm for a particular image size
+  // in
+  //  first acquired image to use as a template for parameter inits
+  virtual void initEstimation(RtMRIImage &image);
+
   // number of timepoints
   unsigned int numMeas;        // total expected
   unsigned int numTimepoints;  // so far
@@ -111,8 +117,17 @@ protected:
   // number of statistical comparisons
   unsigned int numComparisons;
 
-  // mask
-  //RtMRIImage mask;
+  /// mask ///
+  RtMaskImage mask;
+  enum MaskSource {
+    THRESHOLD_FIRST_IMAGE_INTENSITY, 
+    LOAD_FROM_FILE,
+    PASSED_FROM_INSIDE
+  } maskSource;
+
+  // parameters for different mask sources
+  double maskIntensityThreshold;
+  string maskFilename;
    
 };
 

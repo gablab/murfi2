@@ -86,8 +86,6 @@ protected:
   vnl_matrix<double> *C;
   vnl_matrix<double> *c;
 
-  // mask image
-  RtMRIImage *mask;
 };
 
 #endif

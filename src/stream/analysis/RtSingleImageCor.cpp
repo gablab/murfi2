@@ -20,7 +20,6 @@ RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   needsInit = true;
 
   z = f = g = h = NULL;
-  mask = NULL;
 
   baselineThreshold.set_size(1);
   baselineThreshold.put(0,0.0);
@@ -44,10 +43,6 @@ RtSingleImageCor::~RtSingleImageCor() {
 
   if(h != NULL) {
     delete h;
-  }
-
-  if(mask != NULL) {
-    delete mask;
   }
 
   cout << "destroyed" << endl;
@@ -75,6 +70,8 @@ bool RtSingleImageCor::processOption(const string &name, const string &text) {
 // in
 //  first acquired image to use as a template for parameter inits
 void RtSingleImageCor::initEstimation(RtMRIImage &image) {
+  RtActivationEstimator::initEstimation(image);
+
   // create images to store baseline estimates
   initBaselineMeans(&image);
 
@@ -104,30 +101,6 @@ void RtSingleImageCor::initEstimation(RtMRIImage &image) {
   z = new vnl_vector<double>(numTrends+1);
   z->fill(0.0);
 
-  //// build the mask image
-  mask = new RtMRIImage(image);
-
-  // first compute the mean voxel intensity
-  double mean = 0;
-  for(unsigned int i = 0; i < image.getNumEl(); i++) {
-    mean += image.getElement(i);
-  }
-  mean /= image.getNumEl();
-
-  // find voxels above threshold
-  double maskThresh = 0.3*mean;
-  cout << "using mask threshold of " << maskThresh << endl;
-
-  // assign ones to mask positive voxels and count the number of comparisons
-  for(unsigned int i = 0; i < image.getNumEl(); i++) {
-    if(image.getElement(i) > maskThresh) {
-      mask->setPixel(i,1);
-      numComparisons++;
-    }
-    else {
-      mask->setPixel(i,0);
-    }
-  }
 
   needsInit = false;
 }
@@ -249,7 +222,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-    if(!mask->getPixel(i)) {
+    if(!mask.getPixel(i)) {
       cor->setPixel(i,0.0);
       continue;
     }
@@ -269,10 +242,10 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 	  // sum the voxel intensity within this baseline condition
 	  baselineMeans[j]->setPixel(i, baselineMeans[j]->getPixel(i) + z_hat);
 	}
-
-    if(i == 16*32*32 + 28*32 + 14) {
-      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i)/(numBaselineTimepoints.get(j) > 0 ? numBaselineTimepoints.get(j) : 1));
-    }    
+//
+//    if(i == 16*32*32 + 28*32 + 14) {
+//      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i)/(numBaselineTimepoints.get(j) > 0 ? numBaselineTimepoints.get(j) : 1));
+//    }    
       }
       else {
 	// update the mean
@@ -281,9 +254,9 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 	      baselineMeans[j]->getPixel(i)/(numBaselineTimepoints.get(j)));
 	}
 
-    if(i == 16*32*32 + 28*32 + 14) {
-      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i));
-    }
+//    if(i == 16*32*32 + 28*32 + 14) {
+//      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i));
+//    }
 
 
 
@@ -312,9 +285,9 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     }
 
 //    if(i == 1 && numTimepoints == 2) {
-    if(i == 16*32*32 + 28*32 + 14) {
-      fprintf(stderr,"%d %d %f %f %f\n", numTimepoints, dat->getElement(i),
-	      conditions->get(numTimepoints-1,0), z_hat, cor->getPixel(i));
+//    if(i == 16*32*32 + 28*32 + 14) {
+//      fprintf(stderr,"%d %d %f %f %f\n", numTimepoints, dat->getElement(i),
+//	      conditions->get(numTimepoints-1,0), z_hat, cor->getPixel(i));
 //
 //      cout << "z: "; printVnlVector(*z); cout << endl;
 //      cout << "f: "; printVnlVector(*f); cout << endl;
@@ -328,7 +301,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 //	int trash;
 //	cin >> trash;
 //      //}
-    }
+//    }
   }
 //  cout << endl;
 

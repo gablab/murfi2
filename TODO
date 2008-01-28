@@ -17,6 +17,8 @@
    and postprocessing
 
 * data
+ - clean up setInfo parts of RtActivation and RtMaskImage (for
+   creation based on geometry of other images)
  - convert to vxl image representation (numerics too)
  - enforce data persistence accounting
  - make sure all non-persistent data cleaned up after stream
@@ -27,12 +29,17 @@
  - add nifti reading/writing
 
 * data structures
+ - fill out functionality in RtDataImage.h and turn it into a .txx
  - roi 
- - mask 
+ - RtMaskImage has duplicated functionality to handle RtMRIImage 
+   and RtActivation
+
 
 * algorithms
- - gembris (2000) correlation
+ - cox (1995) accumulative correlation (DONE)
+ - gembris (2000) sliding window correlation
  - kalman filter (rouche 2004)
+ - hinds (2008) single image correlation (DONE)
  - roi activation
  - hooks for external apps
   + motion correction

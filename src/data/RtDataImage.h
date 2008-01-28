@@ -613,6 +613,9 @@ bool RtDataImage<T>::read(const string &_filename) {
     imgFile.close();
     return false;
   }
+
+  // allocate new data
+  data = new T[numPix];
   
   // read the image data
   if(!readData(imgFile)) {

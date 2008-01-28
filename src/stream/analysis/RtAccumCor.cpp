@@ -20,6 +20,9 @@ RtAccumCor::RtAccumCor() : RtActivationEstimator() {
 
   z = f = g = h = NULL; 
   mask = NULL;
+
+  saveResultAsMask = false;
+  maskFilename = "accumcor_mask.dat";
 }
 
 // destructor
@@ -53,8 +56,11 @@ RtAccumCor::~RtAccumCor() {
 //   val  text of the option node
 bool RtAccumCor::processOption(const string &name, const string &text) {
   // look for known options
-  if(name == "something") {
-
+  if(name == "saveasmask") {
+    return RtConfigVal::convert<bool>(saveResultAsMask,text);
+  }
+  else if(name == "maskfilename") {
+    maskFilename = text;
     return true;
   }
 
@@ -240,6 +246,13 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   
 
   setResult(msg,cor);
+
+  // test if this is the last measurement for mask conversion and saving
+  if(numTimepoints == numMeas && saveResultAsMask) {
+    RtMaskImage *activationMask = cor->toMask(POS);
+    activationMask->setFilename(maskFilename);
+    activationMask->save();
+  }
 
   return 0;
 }

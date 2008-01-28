@@ -31,6 +31,7 @@
 #define DEFAULT_W 600
 #define DEFAULT_H 600
 #define DEFAULT_TITLE "real: experimentor"
+#define DEFAULT_OVERLAYID "data.image.activation.voxel-singleimcor"
 
 
 //*** constructors/destructors  ***//
@@ -60,6 +61,7 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
     newOverlay(false), newImageType(true), overlayOn(false),
     imageDisplayType(ID_SCANNERIMG) {
 
+  overlayID = DEFAULT_OVERLAYID;
   strcpy(title,_title);
   id += ":display";
 }
@@ -90,6 +92,9 @@ bool RtDisplayImage::open(RtConfig &config) {
 
   strcpy(title, config.isSet("display:imageWinTitle")
 	 ? config.get("display:imageWinTitle").str().c_str() : DEFAULT_TITLE);
+
+  overlayID = config.isSet("display:overlayID")
+	 ? config.get("display:overlayID").str() : DEFAULT_OVERLAYID;
 
   return init();
 }
@@ -150,10 +155,7 @@ void RtDisplayImage::setData(RtData *data) {
   ACE_TRACE(("RtDisplayImage::setData"));
 
   // handle overlay
-  //  if(data->getID() == ID_ZSCOREIMG) {
-  //  if(data->getID() == ID_SLIDEWINCOR) {
-  //  if(data->getID() == ID_ACCUMCOR) {
-  if(data->getID() == ID_SINGLEIMCOR) {
+  if(data->getID() == overlayID) {
     overlay = (RtActivation*) data;
     newOverlay = true;
   cout << "display got an overlay " << img->getID() << endl;

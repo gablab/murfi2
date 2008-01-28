@@ -94,6 +94,9 @@ protected:
 
   string imageDisplayType;
 
+  // data id of the image type that will be used as an overlay
+  string overlayID;
+
   // draws a black box that will enclose a string of text
   void drawBlackBoxForString(const char *str, GLint x, GLint y);
 

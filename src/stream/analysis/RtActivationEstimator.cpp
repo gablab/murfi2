@@ -141,6 +141,13 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "maskIntensityThreshold") {
     return RtConfigVal::convert<double>(maskIntensityThreshold,text);
   }  
+  if(name == "saveAsMask") {
+    return RtConfigVal::convert<bool>(saveResultAsMask,text);
+  }
+  if(name == "saveAsMaskfilename") {
+    saveAsMaskFilename = text;
+    return true;
+  }
 
   return RtStreamComponent::processOption(name, text);
 }  

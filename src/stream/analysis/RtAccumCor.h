@@ -59,15 +59,6 @@ protected:
   vnl_matrix<double> *C;
   vnl_matrix<double> *c;
 
-  // mask image
-  RtMRIImage *mask;
-
-  // whether to save the result as a mask
-  bool saveResultAsMask;
-
-  // filename to save mask to
-  string maskFilename;
-   
 };
 
 #endif

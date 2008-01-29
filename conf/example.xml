@@ -38,7 +38,7 @@
     triggerCode="83"
 
     tr="2.0"
-    measurements="248"
+    measurements="64"
 > </scanner>
 
 <display
@@ -97,8 +97,8 @@
 
      <option name="trends">2</option>
 
-     <option name="saveasmask">1</option>
-     <option name="maskfilename">accumcor_mask.dat</option>
+     <option name="saveAsMask">1</option>
+     <option name="saveAsMaskFilename">accumcor_mask.dat</option>
   </module>
 
 <!--   <module name="singleimcor"> -->

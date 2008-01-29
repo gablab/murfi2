@@ -22,7 +22,7 @@ RtAccumCor::RtAccumCor() : RtActivationEstimator() {
   mask = NULL;
 
   saveResultAsMask = false;
-  maskFilename = "accumcor_mask.dat";
+  saveAsMaskFilename = "accumcor_mask.dat";
 }
 
 // destructor
@@ -56,13 +56,6 @@ RtAccumCor::~RtAccumCor() {
 //   val  text of the option node
 bool RtAccumCor::processOption(const string &name, const string &text) {
   // look for known options
-  if(name == "saveasmask") {
-    return RtConfigVal::convert<bool>(saveResultAsMask,text);
-  }
-  else if(name == "maskfilename") {
-    maskFilename = text;
-    return true;
-  }
 
   return RtActivationEstimator::processOption(name, text);
 }  

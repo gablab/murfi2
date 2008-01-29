@@ -128,6 +128,14 @@ protected:
   // parameters for different mask sources
   double maskIntensityThreshold;
   string maskFilename;
+
+
+  // whether to save the result as a mask
+  bool saveResultAsMask;
+
+  // filename to save mask to
+  string saveAsMaskFilename;
+   
    
 };
 

@@ -40,7 +40,7 @@
 RtDisplayImage::RtDisplayImage()
   : x(DEFAULT_X), y(DEFAULT_Y), width(DEFAULT_W), height(DEFAULT_H),
     img(NULL), imageTex(0), overlayTex(0), needsRepaint(true), newTex(false),
-    newOverlay(false), newImageType(true), overlayOn(false),
+    newOverlay(false), newImageType(true), overlayOn(true),
     imageDisplayType(ID_SCANNERIMG) {
 
   id += ":display";

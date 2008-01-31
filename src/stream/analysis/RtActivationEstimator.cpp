@@ -142,9 +142,10 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     return RtConfigVal::convert<double>(maskIntensityThreshold,text);
   }  
   if(name == "saveAsMask") {
+    RtConfigVal::convert<bool>(saveResultAsMask,text);
     return RtConfigVal::convert<bool>(saveResultAsMask,text);
   }
-  if(name == "saveAsMaskfilename") {
+  if(name == "saveAsMaskFilename") {
     saveAsMaskFilename = text;
     return true;
   }
@@ -265,7 +266,8 @@ void RtActivationEstimator::buildTrends() {
 void RtActivationEstimator::initEstimation(RtMRIImage &image) {
   // mask from intensity threshold
   if(maskSource == THRESHOLD_FIRST_IMAGE_INTENSITY) {
-    mask.initByMeanIntensityThreshold(image, maskIntensityThreshold);
+    numComparisons 
+      = mask.initByMeanIntensityThreshold(image, maskIntensityThreshold);
   }
 }
 

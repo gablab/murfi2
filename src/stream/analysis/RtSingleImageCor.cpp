@@ -130,13 +130,13 @@ void RtSingleImageCor::deleteBaselineMeans() {
   }
 }
 
-//#include "gnuplot_i_vxl.h"
+#include "gnuplot_i_vxl.h"
 
 // process a single acquisition
 int RtSingleImageCor::process(ACE_Message_Block *mb) {
 //  static int numComparisons = 0;
-//  static vnl_vector<double> tc(248);
-//  static Gnuplot gp = Gnuplot("lines");
+  static vnl_vector<double> tc(248);
+  static Gnuplot gp = Gnuplot("lines");
 //  gp.set_yrange(38000,41000);
 
   ACE_TRACE(("RtSingleImageCor::process"));
@@ -152,10 +152,6 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     ACE_DEBUG((LM_INFO, "RtSingleImageCor:process: data passed is NULL\n"));
     return 0;
   }
-
-//  tc.put(numTimepoints,(double) dat->getElement(16*32*32 + 28*32 + 14));
-//  gp.reset_plot();
-//  gp.plot_x(tc,"timeseries");
 
   numTimepoints++;
 
@@ -220,6 +216,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   }
 
+  double sum = 0;
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     if(!mask.getPixel(i)) {
@@ -278,6 +275,8 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 			- c->get(i,1)*h->get(1))
 		    * C->get(numTrends, numTrends)/c->get(i,numTrends+1));
 
+      sum += cor->getPixel(i);
+
 //      cor->setPixel(i, sqrt(numTimepoints-numTrends-1)
 //		    * c->get(i,numTrends)/c->get(i,numTrends+1));
 //      cout << sqrt(numTimepoints-numTrends-1)
@@ -316,6 +315,13 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   }
 
   setResult(msg,cor);
+
+    // plot the sum
+    tc.put(numTimepoints,sum);
+    gp.reset_plot();
+    gp.plot_x(tc,"timeseries");
+    gp.plot_x(conditions->get_column(0)*400,"condition");
+
 
   return 0;
 }

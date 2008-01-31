@@ -19,7 +19,6 @@ RtAccumCor::RtAccumCor() : RtActivationEstimator() {
   needsInit = true;
 
   z = f = g = h = NULL; 
-  mask = NULL;
 
   saveResultAsMask = false;
   saveAsMaskFilename = "accumcor_mask.dat";
@@ -43,10 +42,6 @@ RtAccumCor::~RtAccumCor() {
     delete h;
   }
 
-  if(mask != NULL) {
-    delete mask;
-  }
-
   cout << "destroyed" << endl;
 }
 
@@ -64,8 +59,8 @@ bool RtAccumCor::processOption(const string &name, const string &text) {
 
 // process a single acquisition
 int RtAccumCor::process(ACE_Message_Block *mb) {
-  static int numComparisons = 0;
-  static vnl_vector<double> tc(248);
+//  static int numComparisons = 0;
+//  static vnl_vector<double> tc(248);
 //  static Gnuplot gp = Gnuplot("lines");
 //  gp.set_yrange(38000,41000);
 
@@ -118,30 +113,8 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
     z = new vnl_vector<double>(numTrends+1);
     z->fill(0.0);
 
-    //// build the mask image
-    mask = new RtMRIImage(*dat);
-    
-    // first compute the mean voxel intensity
-    double mean = 0;
-    for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-      mean += dat->getElement(i);
-    }
-    mean /= dat->getNumEl();
-
-    // find voxels above threshold
-    double maskThresh = 0.3*mean;
-    cout << "using mask threshold of " << maskThresh << endl;
-
-    
-    for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-      if(dat->getElement(i) > maskThresh) {
-	mask->setPixel(i,1);
-	numComparisons++;
-      }
-      else {
-	mask->setPixel(i,0);
-      }
-    }    
+    // build the mask image
+    initEstimation(*dat);
 
     needsInit = false;
   }
@@ -157,8 +130,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   cor->initToZeros();
 
   if(numTimepoints > numTrends+1) {
-    cor->setThreshold(fabs(gsl_cdf_tdist_Pinv(0.05/numComparisons, 
-					      numTimepoints-numTrends-1)));
+    cor->setThreshold(getTStatThreshold(numTimepoints-numTrends-1));
     cout << cor->getThreshold() << endl;
   }
 
@@ -190,7 +162,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-    if(!mask->getPixel(i)) {
+    if(!mask.getPixel(i)) {
       cor->setPixel(i,0.0);
       continue;
     }
@@ -236,14 +208,12 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   // set the image id for handling
   cor->addToID("voxel-accumcor");
 
-  
-
   setResult(msg,cor);
 
   // test if this is the last measurement for mask conversion and saving
   if(numTimepoints == numMeas && saveResultAsMask) {
     RtMaskImage *activationMask = cor->toMask(POS);
-    activationMask->setFilename(maskFilename);
+    activationMask->setFilename(saveAsMaskFilename);
     activationMask->save();
   }
 

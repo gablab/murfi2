@@ -35,6 +35,9 @@ public:
   // construct with info from an MRI image
   RtActivation(RtMRIImage &img);
 
+  // construct with a certain number of elements
+  RtActivation(unsigned int numElements);
+
   // destructor
   virtual ~RtActivation();
 
@@ -78,6 +81,9 @@ public:
 
   // set the info based on a generic data image info
   void setInfo(RtMRIImage &_info);
+
+  // reallocate data array based on current number of pixels
+  void reallocateData();
 
 protected:
   

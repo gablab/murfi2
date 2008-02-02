@@ -316,13 +316,6 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   setResult(msg,cor);
 
-    // plot the sum
-    tc.put(numTimepoints,sum);
-    gp.reset_plot();
-    gp.plot_x(tc,"timeseries");
-    gp.plot_x(conditions->get_column(0)*400,"condition");
-
-
   return 0;
 }
 

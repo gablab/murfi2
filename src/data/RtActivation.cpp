@@ -12,7 +12,7 @@
 
 // default constructor
 RtActivation::RtActivation() : RtDataImage<double>() {
-  ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
+  ACE_TRACE(("RtMRIImage::RtActivation()")); 
   addToID("activation");
   magicNumber = MAGIC_NUMBER;
   threshold = 10.0;
@@ -22,7 +22,7 @@ RtActivation::RtActivation() : RtDataImage<double>() {
 // constructor with MRIInfo
 RtActivation::RtActivation(RtMRIImage &img) 
   : RtDataImage<double>() {
-  ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
+  ACE_TRACE(("RtMRIImage::RtActivation(RtMRIImage)")); 
   addToID("activation");
   magicNumber = MAGIC_NUMBER;
 
@@ -30,6 +30,27 @@ RtActivation::RtActivation(RtMRIImage &img)
 
   threshold = 10.0;
   ceiling = 16.0;
+}
+
+// constructor with number of elements 
+RtActivation::RtActivation(unsigned int numElements) 
+  : RtDataImage<double>() {
+  ACE_TRACE(("RtMRIImage::RtActivation(unsigned int)")); 
+  addToID("activation");
+  magicNumber = MAGIC_NUMBER;
+
+  dims.reserve(1);
+  dims.clear();
+  dims[0] = numElements;
+
+  numPix = numElements;
+  bytesPerPix = sizeof(double);
+  imgDataLen = numPix * bytesPerPix;
+
+  reallocateData();
+
+  threshold = 0.0;
+  ceiling = 0.0;
 }
 
 // destructor
@@ -149,10 +170,14 @@ void RtActivation::setInfo(RtMRIImage &img) {
   gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
   gsl_matrix_memcpy(ras2ref, img.getRas2Ref());
 
+  reallocateData();
+}
+
+// reallocate data array based on current number of pixels
+void RtActivation::reallocateData() {
   if(data != NULL) {
     delete [] data;
   }
-
   data = new double[numPix];
 }
 

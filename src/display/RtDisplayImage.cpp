@@ -32,6 +32,7 @@
 #define DEFAULT_H 600
 #define DEFAULT_TITLE "real: experimentor"
 #define DEFAULT_OVERLAYID "data.image.activation.voxel-singleimcor"
+#define DEFAULT_ACTIVATIONSUMID "data.image.activation.voxel-singleimcor.activation-sum"
 
 
 //*** constructors/destructors  ***//
@@ -62,6 +63,7 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
     imageDisplayType(ID_SCANNERIMG) {
 
   overlayID = DEFAULT_OVERLAYID;
+  activationSumID = DEFAULT_ACTIVATIONSUMID;
   strcpy(title,_title);
   id += ":display";
 }
@@ -95,6 +97,9 @@ bool RtDisplayImage::open(RtConfig &config) {
 
   overlayID = config.isSet("display:overlayID")
 	 ? config.get("display:overlayID").str() : DEFAULT_OVERLAYID;
+
+  activationSumID = config.isSet("display:activationSumID")
+	 ? config.get("display:activationSumID").str() : DEFAULT_ACTIVATIONSUMID;
 
   return init();
 }
@@ -153,6 +158,20 @@ int RtDisplayImage::svc() {
 // sets the image to be displayed
 void RtDisplayImage::setData(RtData *data) {
   ACE_TRACE(("RtDisplayImage::setData"));
+
+  // handle socket activation sum
+  static vnl_vector<double> tc(248);
+  static Gnuplot gp = Gnuplot("lines");
+  static unsigned int numTimepoints = 0;
+
+  // handle overlay
+  if(data->getID() == activationSumID) {
+    // plot the sum
+    tc.put(numTimepoints,data->getEl(0));
+    gp.reset_plot();
+    gp.plot_x(tc,"activation sum");
+    numTimepoints++;
+  }
 
   // handle overlay
   if(data->getID() == overlayID) {

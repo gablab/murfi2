@@ -29,8 +29,17 @@ public:
 
 protected:
 
+  // process an option
+  //  in 
+  //   name of the option to process
+  //   val  text of the option node
+  bool processOption(const string &name, const string &text);
+
   // process a single acquisition
   int process(ACE_Message_Block *mb);
+
+  // dataID for the activ ation we will sum
+  string dataIDForSum;
 
 };
 

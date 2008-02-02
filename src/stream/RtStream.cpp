@@ -60,6 +60,7 @@ int RtStream::configure(RtConfig &config) {
 #include"RtImageSlideWinCor.h"
 #include"RtAccumCor.h"
 #include"RtSingleImageCor.h"
+#include"RtActivationSum.h"
 
 // add a single module to the module stack
 //  in
@@ -97,6 +98,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   }
   else if(type == RtSingleImageCor::moduleString) { // voxel single image correlation
     ACE_NEW_NORETURN(sc, RtSingleImageCor());
+  }
+  else if(type == RtActivationSum::moduleString) { // sum image activation
+    ACE_NEW_NORETURN(sc, RtActivationSum());
   }
 
   // create and add the module

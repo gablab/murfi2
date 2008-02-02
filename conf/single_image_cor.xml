@@ -48,6 +48,7 @@
     imageWinW="1000"
     imageWinH="1000"
     overlayID="data.image.activation.voxel-singleimcor"
+    activationSumID="data.image.activation.activation-sum"
 >
 </display>
 
@@ -77,6 +78,7 @@
   </module>
 
   <module name="singleimcor">
+    <option name="makeavail">true</option>
     <output>display</output>
     
     <option name="condition">
@@ -96,7 +98,7 @@
   <module name="activation-sum">
     <output>display</output>
     <output>socket</output>
-    <option name="dataIDToSum">data.image.activation.voxel-singleimcor</option>
+    <option name="dataIDForSum">data.image.activation.voxel-singleimcor</option>
   </module>
 
 </preprocessor>

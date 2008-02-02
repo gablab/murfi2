@@ -18,6 +18,8 @@ string RtStreamComponent::moduleString("generic-stream-component");
 RtStreamComponent::RtStreamComponent() : super(), 
     persistent(false), putResultOnMessage(false) {
   id = moduleString;
+
+  passer = NULL;
 }
 
 // destructor
@@ -135,9 +137,7 @@ void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
   ACE_Mutex mut;
   mut.acquire();
 
-  cout << "setting data to " << msg << endl;
   if(putResultOnMessage) {
-    cout << "adding data to " << msg << endl;
     msg->addData(data);
   }
 

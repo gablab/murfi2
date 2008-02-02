@@ -8,6 +8,10 @@
 #include"RtDisplayImage.h"
 #include"RtDataIDs.h"
 
+#include<vnl/vnl_vector.h>
+#include "gnuplot_i_vxl.h"
+
+
 #include"ace/Mutex.h"
 
 #ifdef GL_TEXTURE_RECTANGLE_EXT
@@ -166,8 +170,10 @@ void RtDisplayImage::setData(RtData *data) {
 
   // handle overlay
   if(data->getID() == activationSumID) {
+    cout << "got an activation sum: " << ((RtActivation*)data)->getPixel(0) 
+	 << endl;
     // plot the sum
-    tc.put(numTimepoints,data->getEl(0));
+    tc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
     gp.reset_plot();
     gp.plot_x(tc,"activation sum");
     numTimepoints++;

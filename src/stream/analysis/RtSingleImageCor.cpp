@@ -130,13 +130,9 @@ void RtSingleImageCor::deleteBaselineMeans() {
   }
 }
 
-#include "gnuplot_i_vxl.h"
-
 // process a single acquisition
 int RtSingleImageCor::process(ACE_Message_Block *mb) {
 //  static int numComparisons = 0;
-  static vnl_vector<double> tc(248);
-  static Gnuplot gp = Gnuplot("lines");
 //  gp.set_yrange(38000,41000);
 
   ACE_TRACE(("RtSingleImageCor::process"));

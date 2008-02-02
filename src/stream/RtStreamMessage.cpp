@@ -111,7 +111,6 @@ RtData *RtStreamMessage::getData(unsigned int index) {
 //   pointer to the data or NULL, if id doesnt exist
 RtData *RtStreamMessage::getDataByID(const string &id) {
   for(unsigned int i = 0; i < numData; i++) {
-    cout << data[i]->getID() << endl;
     if(data[i]->getID() == id) {
       return data[i];
     }

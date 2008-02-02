@@ -479,8 +479,6 @@ bool RtDataImage<T>::write(const string &_filename) {
     return false;
   }
 
-  cout << "here" << endl;
-
   // write info 
   if(!writeInfo(imgFile)) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("couldnt write info to %s\n"),_filename));
@@ -494,8 +492,6 @@ bool RtDataImage<T>::write(const string &_filename) {
     imgFile.close();
     return false;
   }
-
-  cout << "here" << endl;
 
   imgFile.close();
 

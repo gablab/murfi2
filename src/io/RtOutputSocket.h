@@ -31,29 +31,11 @@ public:
   // open and start accepting input
   bool open(RtConfig &config);
 
-  // write the string from a stringstream to the output socket
-  void write(stringstream &ss);
-
-  // write a string to the output socket
-  void write(const string &s);
+  // output data to the socket
+  void setData(RtData *data);
 
   // close and clean up
   bool close();
-
-  // write to the socket 
-  template<class T>
-  RtOutputSocket &operator<<(const T &t) {
-    if(isOpen) {
-      //      outfp << t;
-    }
-    return *this;
-  }
-
-  // outstream operator
-  void writeConfig(RtConfig &config);
-
-  // prints the current time 
-  void printNow();
 
   // get the version
   //  out: char array that represents the cvs version
@@ -68,7 +50,7 @@ protected:
   // data transfer object
   ACE_SOCK_Stream stream;
 
-  // Initialize the connector.
+  // connector
   ACE_SOCK_Connector connector;
   
 };

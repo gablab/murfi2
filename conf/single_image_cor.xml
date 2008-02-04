@@ -53,8 +53,8 @@
 </display>
 
 <socket
-    host="192.168.2.6"
-    port="15001"
+    host="localhost"
+    port="15004"
 >
 </socket>
 

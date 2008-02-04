@@ -17,6 +17,7 @@
    and postprocessing
 
 * data
+ - make standardized interface to serialize data using XML. 
  - clean up setInfo parts of RtActivation and RtMaskImage (for
    creation based on geometry of other images)
  - convert to vxl image representation (numerics too)

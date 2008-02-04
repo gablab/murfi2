@@ -1,8 +1,8 @@
 /******************************************************************************
  * RtDataImage.h declares a base class for a generic image
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
+ * Oliver Hinds <ohinds@mit.edu> 2007-08-14
+ *
  *****************************************************************************/
 
 #ifndef RTDATAIMAGE_H
@@ -30,18 +30,18 @@ public:
   const static unsigned int MAGIC_NUMBER = 0;
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtDataImage(); 
+  RtDataImage();
 
   // constructor with a filename to read the image from
-  RtDataImage(const string &filename); 
+  RtDataImage(const string &filename);
 
   // construct from raw bytes -- BE CAREFUL WITH THIS
   //RtDataImage(char *bytes, unsigned int len);
 
   // construct from an image info struct and (possibly blank) data
-  //RtDataImage(RtDataImageInfo &info, T *data = NULL); 
+  //RtDataImage(RtDataImageInfo &info, T *data = NULL);
 
   // construct from another image
   RtDataImage(RtDataImage &img);
@@ -53,7 +53,7 @@ public:
   //  in
   //   info: struct
   //   data: array (optional, image data will be  allocated and set
-  //         to all zeros if null) 
+  //         to all zeros if null)
   //void setImage(RtDataImageInfo &_info, T*_data = NULL);
 
   // save the image to a file (already set filename)
@@ -113,6 +113,9 @@ public:
   //   output stream to write to
   virtual void printInfo(ostream &os);
 
+  // serialize the data as xml for transmission or saving to a file
+  virtual TiXmlDocument *serializeAsXML();
+
   //********  methods for getting data from the image *******//
 
   // initialize to all zeros
@@ -157,7 +160,7 @@ public:
   void setPixel(unsigned int i, T v);
 
   // set pixel value when locked
-  void setPixelLocked(RtLocker *locker, unsigned int i, T v); 
+  void setPixelLocked(RtLocker *locker, unsigned int i, T v);
 
   // sets the min and max pixel value for this data image
   void setMinMax();
@@ -167,14 +170,14 @@ public:
 
   //************** transforms ******************//
 
-  // transform 1D index into RAS world coords 
+  // transform 1D index into RAS world coords
   void getRASfrom1D(unsigned int i, double &r, double &a, double &s);
 
-  // transform 2D index into RAS world coords 
-  void getRASfrom2D(unsigned int i, unsigned int j, 
+  // transform 2D index into RAS world coords
+  void getRASfrom2D(unsigned int i, unsigned int j,
 		    double &r, double &a, double &s);
 
-  // transform 3D index into RAS world coords 
+  // transform 3D index into RAS world coords
   void getRASfrom3D(unsigned int i, unsigned int j, unsigned int k,
 		    double &r, double &a, double &s);
 
@@ -191,15 +194,15 @@ public:
   void get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned int &j2D);
 
   // transform 3D index into 2D index
-  void get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D, 
+  void get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D,
 		   unsigned int &i2D, unsigned int &j2D);
 
   // transform 1D index into 3D index
-  void get3Dfrom1D(unsigned int i1D, 
+  void get3Dfrom1D(unsigned int i1D,
 		   unsigned int &i3D, unsigned int &j3D, unsigned int &k3D);
 
   // transform 2D index into 3D index
-  void get2Dfrom2D(unsigned int i1D, unsigned int j1D, 
+  void get2Dfrom2D(unsigned int i1D, unsigned int j1D,
 		   unsigned int &i3D, unsigned int &j3D, unsigned int &k3D);
 
   //************** time conversion functions ******************//
@@ -231,12 +234,12 @@ protected:
 
   gsl_matrix *vxl2ras;         // transformation matrix: voxels to RAS space
   gsl_matrix *ras2ref;         // transformation matrix: RAS to reference space
-  
+
 
   // fields for storing min and max values
   bool minMaxSet;
   T minVal, maxVal;
-  
+
 };
 
 
@@ -247,7 +250,7 @@ protected:
 #include<fstream>
 
 using namespace std;
-  
+
 // default constructor
 template<class T>
 RtDataImage<T>::RtDataImage() : RtData(),
@@ -257,7 +260,7 @@ RtDataImage<T>::RtDataImage() : RtData(),
        numPix(0),
        vxl2ras(gsl_matrix_calloc(4,4)),
        ras2ref(gsl_matrix_calloc(4,4)) {
-  ACE_TRACE(("RtDataImage<T>::RtDataImage()")); 
+  ACE_TRACE(("RtDataImage<T>::RtDataImage()"));
 
   addToID("image");
   data = NULL;
@@ -275,7 +278,7 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
        vxl2ras(gsl_matrix_calloc(4,4)),
        ras2ref(gsl_matrix_calloc(4,4)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
-  
+
   addToID("image");
   bytesPerPix = sizeof(T);
   read(filename);
@@ -316,7 +319,7 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
 
 // construct from an image info struct and (possibly blank) data
 //template<class T>
-//RtDataImage<T>::RtDataImage(RtDataImageInfo &_info, T *_data) 
+//RtDataImage<T>::RtDataImage(RtDataImageInfo &_info, T *_data)
 //    : RtData(),
 //       magicNumber(MAGIC_NUMBER),
 //       filename(""),
@@ -347,8 +350,8 @@ RtDataImage<T>::RtDataImage(RtDataImage &img) : RtData() {
 
   ras2ref = gsl_matrix_alloc(4,4);
   gsl_matrix_memcpy(ras2ref, img.ras2ref);
-  
-  // allocate and copy the data 
+
+  // allocate and copy the data
   data = new T[numPix];
   if(img.bytesPerPix == bytesPerPix) {
     memcpy(data, img.data, imgDataLen);
@@ -364,7 +367,7 @@ RtDataImage<T>::~RtDataImage() {
   if(lock != NULL) {
     lock->beingDeleted();
   }
-  
+
   // free matrices
   gsl_matrix_free(vxl2ras);
   gsl_matrix_free(ras2ref);
@@ -380,7 +383,7 @@ RtDataImage<T>::~RtDataImage() {
 //  in
 //   info: struct
 //   data: array (optional, image data will be  allocated and set
-//         to all zeros if null) 
+//         to all zeros if null)
 //template<class T>
 //void RtDataImage<T>::setImage(RtDataImageInfo &_info, T *_data) {
 //  info = _info;
@@ -419,7 +422,7 @@ void RtDataImage<T>::printInfo(ostream &os) {
      << setw(wid) << "imgDataLen in bytes " << imgDataLen << endl
      << setw(wid) << "numPix" << numPix << endl
      << setw(wid) << "bytesPerPix" << bytesPerPix << endl;
-    
+
   os << setw(wid) << "vxl2ras transform";
   for(int i = 0; i < 4; i++) {
     if(i > 0) {
@@ -446,6 +449,26 @@ void RtDataImage<T>::printInfo(ostream &os) {
 
 }
 
+// serialize the data as xml for transmission or saving to a file
+template<class T>
+TiXmlDocument *RtDataImage<T>::serializeAsXML() {
+  TiXmlDocument *doc = new TiXmlDocument();
+
+  TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "");
+  doc->LinkEndChild(decl);
+
+  TiXmlElement *element = new TiXmlElement( "error" );
+  doc->LinkEndChild(element);
+
+  TiXmlText *text = new TiXmlText("this is a stub, no data serialization is supported for this type");
+  element->LinkEndChild(text);
+
+  delete decl;
+  delete element;
+  delete text;
+
+  return doc;
+}
 
 // save the image to a file (already set filename)
 //  out
@@ -453,7 +476,7 @@ void RtDataImage<T>::printInfo(ostream &os) {
 template<class T>
 bool RtDataImage<T>::save() {
   ACE_TRACE(("RtDataImage<T>::save"));
-  
+
   if(filename == "") {
     return false;
   }
@@ -471,7 +494,7 @@ bool RtDataImage<T>::write(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::write"));
 
   ofstream imgFile(_filename.c_str(), ios::out | ios::binary);
-  
+
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for writing an image\n"),
 				  _filename));
@@ -479,14 +502,14 @@ bool RtDataImage<T>::write(const string &_filename) {
     return false;
   }
 
-  // write info 
+  // write info
   if(!writeInfo(imgFile)) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("couldnt write info to %s\n"),_filename));
     imgFile.close();
     return false;
   }
 
-  // write data 
+  // write data
   if(!writeData(imgFile)) {
     ACE_DEBUG((LM_DEBUG,ACE_TEXT("couldnt write img data to %s\n"),_filename));
     imgFile.close();
@@ -524,11 +547,11 @@ bool RtDataImage<T>::writeInfo(ostream &os) {
   char filecstr[FILESTR_LEN];
   strcpy(filecstr,filename.c_str());
   os.write(filecstr, FILESTR_LEN*sizeof(char));
-  
+
   // dims
   unsigned int ndims = dims.size();
   os.write((char*) &ndims, sizeof(unsigned int));
-  
+
   unsigned int dimarr[MAX_NDIMS];
   int ind = 0;
   for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++, ind++) {
@@ -574,7 +597,7 @@ bool RtDataImage<T>::writeData(ostream &os) {
 template<class T>
 bool RtDataImage<T>::load() {
   ACE_TRACE(("RtDataImage<T>::save"));
-  
+
   if(filename == "") {
     return false;
   }
@@ -598,7 +621,7 @@ bool RtDataImage<T>::read(const string &_filename) {
   }
 
   ifstream imgFile(_filename.c_str(), ios::in | ios::binary);
-  
+
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for reading an image\n"),
 				  _filename));
@@ -616,7 +639,7 @@ bool RtDataImage<T>::read(const string &_filename) {
 
   // allocate new data
   data = new T[numPix];
-  
+
   // read the image data
   if(!readData(imgFile)) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image data from %s\n"),
@@ -651,14 +674,14 @@ bool RtDataImage<T>::readInfo(istream &is) {
   char filecstr[FILESTR_LEN];
   is.read(filecstr, FILESTR_LEN*sizeof(char));
   filename = filecstr;
-  
+
   // dims
   unsigned int ndims;
   is.read((char*) &ndims, sizeof(unsigned int));
 
   unsigned int dimarr[MAX_NDIMS];
   is.read((char*) dimarr, MAX_NDIMS*sizeof(unsigned int));
-  
+
   dims.clear();
   for(unsigned int ind = 0; ind < ndims && ind < MAX_NDIMS; ind++) {
     dims.push_back(dimarr[ind]);
@@ -707,7 +730,7 @@ void RtDataImage<T>::initToZeros() {
 
   for(unsigned int i = 0; i < numPix; i++) {
     data[i] = 0;
-  }  
+  }
 }
 
 // get dimensions
@@ -794,7 +817,7 @@ void RtDataImage<T>::setPixel(unsigned int i, T v) {
 
 // set pixel value when locked
 template<class T>
-void RtDataImage<T>::setPixelLocked(RtLocker *locker, 
+void RtDataImage<T>::setPixelLocked(RtLocker *locker,
 				 unsigned int i, T v) {
   if((lock == NULL || lock == locker) && i < numPix) {
     data[i] = v;
@@ -829,20 +852,20 @@ void RtDataImage<T>::setMinMax() {
 
 //************** transforms ******************//
 
-// transform 1D index into RAS world coords 
+// transform 1D index into RAS world coords
 template<class T>
 void RtDataImage<T>::getRASfrom1D(unsigned int i, double &r, double &a, double &s) {
-  
+
 }
 
-// transform 2D index into RAS world coords 
+// transform 2D index into RAS world coords
 template<class T>
-void RtDataImage<T>::getRASfrom2D(unsigned int i, unsigned int j, 
+void RtDataImage<T>::getRASfrom2D(unsigned int i, unsigned int j,
 		  double &r, double &a, double &s) {
 
 }
 
-// transform 3D index into RAS world coords 
+// transform 3D index into RAS world coords
 template<class T>
 void RtDataImage<T>::getRASfrom3D(unsigned int i, unsigned int j, unsigned int k,
 		  double &r, double &a, double &s) {
@@ -926,28 +949,28 @@ void RtDataImage<T>::get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned i
     j2D = floor(fmod(i1D,(dims[1]*ceil(sqrt(dims[2])))));
   default:
     i2D = 0;
-    j2D = 0;    
+    j2D = 0;
     break;
-  }  
+  }
 }
 
 // transform 3D index into 2D index
 template<class T>
-void RtDataImage<T>::get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D, 
+void RtDataImage<T>::get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D,
 		 unsigned int &i2D, unsigned int &j2D) {
 
 }
 
 // transform 1D index into 3D index
 template<class T>
-void RtDataImage<T>::get3Dfrom1D(unsigned int i1D, 
+void RtDataImage<T>::get3Dfrom1D(unsigned int i1D,
 		 unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
 
 }
 
 // transform 2D index into 3D index
 template<class T>
-void RtDataImage<T>::get2Dfrom2D(unsigned int i1D, unsigned int j1D, 
+void RtDataImage<T>::get2Dfrom2D(unsigned int i1D, unsigned int j1D,
 		 unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
 
 }
@@ -969,7 +992,7 @@ ACE_Date_Time RtDataImage<T>::siemensTime2ACE_Date_Time(const char *tc) {
 template<class T>
 string RtDataImage<T>::ACE_Date_Time2SiemensTime(const ACE_Date_Time &t) {
   char str[] = "hhmmss.xxxxxx";
-  sprintf(str,"%02ld%02ld%02ld.%06ld", 
+  sprintf(str,"%02ld%02ld%02ld.%06ld",
 	  t.hour(), t.minute(), t.second(), t.microsec());
 
   string s(str);

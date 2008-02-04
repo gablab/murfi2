@@ -10,6 +10,7 @@
 
 #include"ace/Date_Time.h"
 #include<string>
+#include"tinyxml/tinyxml.h"
 
 #include"RtLocker.h"
 
@@ -66,6 +67,9 @@ public:
   //  out
   //   if lock was released or if data was not locked
   bool unlockData(RtLocker *locker);
+
+  // serialize the data as xml for transmission or saving to a file
+  virtual TiXmlDocument *serializeAsXML() = 0;
 
   // get the creation time
   ACE_Date_Time getCreationTime();

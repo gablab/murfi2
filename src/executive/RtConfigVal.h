@@ -120,7 +120,7 @@ public:
   }
 
   // outstream operator
- friend ostream &operator<<(ostream &os, const RtConfigVal &v) {
+  friend ostream &operator<<(ostream &os, const RtConfigVal &v) {
     os << v.val;
     return os;
   }

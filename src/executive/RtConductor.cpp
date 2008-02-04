@@ -9,6 +9,7 @@
 static char *VERSION = "$Id$";
 
 #include"RtConductor.h"
+#include"RtOutputSocket.h"
 #include<iostream>
 
 //*** constructors/destructors  ***//
@@ -66,7 +67,6 @@ RtConductor::RtConductor(int argc, char **argv) {
 
   // display always first, if here
   if(config.get("display:image")==true) {
-
     RtDisplayImage *dispimg;
     ACE_NEW_NORETURN(dispimg, RtDisplayImage);    
 
@@ -75,8 +75,17 @@ RtConductor::RtConductor(int argc, char **argv) {
     }
   }
 
-  if(config.get("info:log:disabled")==false) {
+  // open output socket
+  if(config.get("socket:host")==true) {
+    RtOutputSocket *sock;
+    ACE_NEW_NORETURN(sock, RtOutputSocket);    
 
+    if(!addOutput(sock)) {
+      cerr << "ERROR: could not initialize output socket" << endl;
+    }
+  }
+
+  if(config.get("info:log:disabled")==false) {
     if(!outputLog.open(config)) {
       cerr << "ERROR: could not open logfile \""
 	   << config.get("info:log:logFilename") << "\"" << endl;

@@ -9,11 +9,13 @@
 #define RTACTIVATION_H
 
 #include<iostream>
+#include"tinyxml/tinyxml.h"
 
 #include"RtDataImage.h"
 #include"RtMRIImage.h"
 #include"RtMaskImage.h"
 #include"RtTypes.h"
+
 
 class RtMaskImage;
 
@@ -40,6 +42,9 @@ public:
 
   // destructor
   virtual ~RtActivation();
+
+  // serialize the data as xml for transmission or saving to a file
+  virtual TiXmlDocument *serializeAsXML();
 
   // print info about this image
   void printInfo(ostream &os);

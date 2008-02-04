@@ -8,8 +8,12 @@ static char *VERSION = "$Id$";
 
 
 #include"RtOutputSocket.h"
+#include"tinyxml/tinyxml.h"
 
 #include"ace/Mutex.h"
+
+#define DEFAULT_PORT 15001
+#define DEFAULT_HOST "localhost"
 
 // default constructor
 RtOutputSocket::RtOutputSocket() : RtOutput() {
@@ -22,84 +26,75 @@ RtOutputSocket::~RtOutputSocket() {
 
 // open and start accepting input
 bool RtOutputSocket::open(RtConfig &config) {
+  unsigned short port = DEFAULT_PORT;
+  string host = DEFAULT_HOST;
 
   if(!RtOutput::open(config)) {
     return false;
   }
-  
-  // setup the socket address
-  //address.set(portNum, hostId);
 
-  return true;
-}
-
-// write from a stringstream to the output socket
-void RtOutputSocket::write(stringstream &ss) {
-  write(ss.str());
-}
-
-// write a string to the output socket
-void RtOutputSocket::write(const string &s) {
-  if(!isOpen) {
-    return;
+  // see if host info has been provided
+  if(config.isSet("port")) {
+    port = (unsigned short) config.get("port");
   }
 
-  ACE_Mutex mutx;
+  if(config.isSet("host")) {
+    host = config.get("host").str();
+  }
+  
+  cout << "opened output socket: host " << host << ":" << port << endl;
 
-  // make sure noone else writes while we are
-  mutx.acquire();
+  // setup the socket address
+  address.set(port, host.c_str());
 
-  //outfp << s;
-
-  //outfp.flush();
-
-  mutx.release();
+  return true;
 }
 
 // close and clean up
 bool RtOutputSocket::close() {
 
-  ACE_Mutex mutx;
-
-  // make sure noone else writes while we are
-  mutx.acquire();
-
-  //outfp << "closed ";
-  //RtOutput::printNow(outfp);
-  //outfp << endl;
-  //outfp << endl;
-  //
-  //outfp << "################################################################"
-  //	<< endl << endl;
-  //
-  //outfp.close();
+  // close stream and socket
 
   isOpen = false;
-
-  mutx.release();
 
   return true;
 }
 
-// prints the current time to the socket
-void RtOutputSocket::printNow() {
-  //RtOutput::printNow(outfp);
-}
+// output data to the socket
+void RtOutputSocket::setData(RtData *data) {
+  // get a serialized version of this data as xml
+  TiXmlDocument *serializedData = data->serializeAsXML();
+  if(serializedData == NULL) {
+    cerr << "couldn't serialize data, not sending" << endl;    
+    return;
+  }
 
-// prints the configuration to the socket
-void RtOutputSocket::writeConfig(RtConfig &config) {
+  // conect to server (listener)
+  if(!connector.connect(stream, address)) {
+    cerr << "couldn't connect to server, not sending data" << endl;
+    return;
+  }
 
+  // get string version of xml
+  TiXmlPrinter printer;
+  printer.SetStreamPrinting();
+  serializedData->Accept(&printer);
+  char *serializedStr = new char[printer.Size()+1]; 
+  strcpy(serializedStr, printer.CStr());
+
+  // lock the socket
   ACE_Mutex mutx;
+  mutx.acquire();  
 
-  // make sure noone else writes while we are
-  mutx.acquire();
+  cout << "connected to server, sending data " << endl << serializedStr;
 
-  //outfp << "configuration:" << endl 
-  //	<< "--------------" << endl;
-  //config.dumpConfig(outfp);
-  //outfp << "--------------" << endl << endl;
+  // send it
+  stream.send_n(serializedStr,strlen(serializedStr));
 
   mutx.release();
+
+  delete [] serializedStr;
+  delete serializedData;
 }
 
 // gets the version

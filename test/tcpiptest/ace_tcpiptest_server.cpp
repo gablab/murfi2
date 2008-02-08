@@ -17,21 +17,34 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   ACE_SOCK_Acceptor acceptor;
   acceptor.open(my_addr,1);
 
-  // keep receiving new connections 
-  while(acceptor.accept(stream, &my_addr) != -1) {
-
-    cout << "made connection, accepting msg from " 
+  cout 
 	 << my_addr.get_host_name() << ":" << my_addr.get_port_number() << endl;
 
-    char msg[1024];
-    stream.recv_n(msg, 1024);
+  // keep receiving new connections 
+  while(acceptor.accept(stream, &my_addr) != -1) {
+    cout << "accepting msg from " 
+	 << my_addr.get_host_name() << ":" << my_addr.get_port_number() << endl;
+//
+//    char msg[1024];
+//    unsigned int recieved = 0;
+//    for(    char last = 'a'; last != '\0'; recieved++) {
+//      stream.recv_n(&last, 1);      
+//      msg[recieved] = last;
+//    }
+//    msg[recieved] = '\0';
+//
+//    cout << "got " << msg << endl;
+//
 
-    cout << "got " << msg << endl;
+    char *msg = "yer mom has a red mouse tit";
+    stream.send_n(msg, strlen(msg));      
+
+    sleep(1);
 
     stream.close();
   }
-
   acceptor.close();
+
 
   return 0;
 }

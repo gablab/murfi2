@@ -71,20 +71,24 @@ int main(int argc, char *argv[]) {
 
 
    char *msg = "todd sux\n";
+   char term = '\0';
 
    int sent;
+
    while(connect(connector, reinterpret_cast <sockaddr *>(&remoteAddr), sizeof remoteAddr) != -1) {
      sent = send(connector, msg, strlen(msg)*sizeof(char), 0);
+     send(connector, &term, sizeof(char), 0);
      printf("sent %d bytes for msg\n",sent);
-     close(connector);
 
 #if defined _MSC_VER
      Sleep(1000);
 #else
      sleep(1);
 #endif
-     
+
    }
+     
+     close(connector);
 
    return 0;
 }

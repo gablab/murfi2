@@ -16,20 +16,23 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   // Initialize the connector.
   ACE_SOCK_Connector connector;
 
-  // keep making new connections 
-  while(connector.connect (stream, my_addr) != -1) {
+  if(connector.connect (stream, my_addr) == -1) {
+    cout << "connection failed with errno " 
+	 << errno << endl;
+    return 0;
+  }
 
-    cout << "made connection, sending msg" << endl;
+  // send forever
+  while(1) {
+    cout << "sending msg" << endl;
 
     char *msg = "todd rox";
     stream.send_n (msg, strlen(msg)+1);
 
     usleep(1000000);
-
-    stream.close();
   }
 
-  cout << errno << endl;
+  stream.close();
 
   return 0;
 }

@@ -13,36 +13,7 @@
 #include"RtConfig.h"
 #include"RtExternalSenderImageInfo.h"
 #include"RtMRIImage.h"
-#include"ace/SOCK_Stream.h"
-#include"ace/SOCK_Acceptor.h"
-
-// acceptor to allow connections from the scanner 
-class RtImageAcceptor : public ACE_SOCK_Acceptor {
-public:
-  
-  RtImageAcceptor() : isOpen(false) {
-  }
-
-  // called when connection is closed
-  int close() {
-    isOpen = false;
-    return ACE_SOCK_Acceptor::close();
-  }
-
-  // accept a new connection
-  // just pass all the arguments along and set isOpen true
-  int accept(ACE_SOCK_Stream &new_stream, ACE_Addr *remote_addr=0, 
-	     ACE_Time_Value *timeout=0, int restart=1, 
-	     int reset_new_handle=0) {
-    isOpen = true;
-    return ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout, 
-				     restart, reset_new_handle=0);
-  }
-
-  // keep track if we are currently open
-  bool isOpen;
-
-};
+#include"RtServerSocket.h"
 
 // controls input operations to receive scanner images
 class RtInputScannerImages : public RtInput {
@@ -134,7 +105,7 @@ protected:
 
   // port to listen on
   unsigned short port;
-  RtImageAcceptor acceptor;   
+  RtSocketAcceptor acceptor;   
   ACE_SOCK_Stream stream;   
 
   // parms for image saving to disk

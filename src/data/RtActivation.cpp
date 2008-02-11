@@ -86,17 +86,11 @@ RtMaskImage *RtActivation::toMask(Sign direction) {
   return activationMask;
 }
 
-
 // serialize the data as xml for transmission or saving to a file
-TiXmlDocument *RtActivation::serializeAsXML() {
-  // set up a new xml document
-  TiXmlDocument *doc = new TiXmlDocument();
-  TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "");
-  doc->LinkEndChild(decl);
-
+TiXmlElement *RtActivation::serializeAsXML() {
   // add an element for the data
-  TiXmlElement *element = new TiXmlElement( "data" );
-  doc->LinkEndChild(element);
+  TiXmlElement *element = new TiXmlElement("data");
+  element->SetAttribute("name","activation");
 
   // build text string containing all the data separated by spaces
   #define NUM_SIGFIGS 6
@@ -109,11 +103,7 @@ TiXmlDocument *RtActivation::serializeAsXML() {
   TiXmlText *text = new TiXmlText(dataStr.str());
   element->LinkEndChild(text);
 
-  //delete decl;
-  //delete element;
-  //delete text;
-
-  return doc;
+  return element;
 }
 
 // print info about this image

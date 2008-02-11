@@ -10,13 +10,45 @@
 #define RTSERVERSOCKET_H
 
 #include"RtInput.h"
+#include"ace/Task.h"
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Acceptor.h"
 
 using namespace std;
 
+
+// acceptor to allow connections from the scanner 
+class RtSocketAcceptor : public ACE_SOCK_Acceptor {
+public:
+  
+  RtSocketAcceptor() : isOpen(false) {
+  }
+
+  // called when connection is closed
+  int close() {
+    isOpen = false;
+    return ACE_SOCK_Acceptor::close();
+  }
+
+  // accept a new connection
+  // just pass all the arguments along and set isOpen true
+  int accept(ACE_SOCK_Stream &new_stream, ACE_Addr *remote_addr=0, 
+	     ACE_Time_Value *timeout=0, int restart=1, 
+	     int reset_new_handle=0) {
+    int ret = ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout, 
+					restart, reset_new_handle=0);
+    isOpen = ret == 0;
+    return ret;
+  }
+
+  // keep track if we are currently open
+  bool isOpen;
+};
+
+
+
 // class declaration
-class RtServerSocket : public RtInput {
+class RtServerSocket : public ACE_Task_Base {
 
 public:
 
@@ -24,15 +56,15 @@ public:
   
   // default constructor
   RtServerSocket(); 
+  
+  // constructor with port and host
+  RtServerSocket(unsigned short portNum, string hostname = ""); 
 
   // destructor
   virtual ~RtServerSocket();
 
   // open and start accepting
   bool open(RtConfig &config);
-
-  // output data to the socket
-  void setData(RtData *data);
 
   // close and clean up
   bool close();
@@ -41,8 +73,25 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-
 protected:
+
+  // receive a message
+  // in 
+  //    string recieved
+  //    stream recieved on
+  // out  string response
+  virtual string recieveMessage(string &message, ACE_SOCK_Stream &stream);
+
+  // send a message to a client
+  // in
+  //  message to send
+  //  stream to send on
+  // out
+  //  success or failure
+  virtual bool sendMessage(const string &message, ACE_SOCK_Stream &stream);
+
+  // run the scanner input
+  virtual int svc(); 
 
   // client address
   ACE_INET_Addr address;
@@ -51,7 +100,7 @@ protected:
   ACE_SOCK_Stream stream;
 
   // connector
-  ACE_SOCK_Acceptor acceptor;
+  RtSocketAcceptor acceptor;
   
 };
 

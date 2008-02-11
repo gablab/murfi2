@@ -25,7 +25,7 @@
  - make sure all non-persistent data cleaned up after stream
    completion
  - develop flexible, efficient method for retreiving persistent data
-   (hashing?). make available to gui as well
+   (hashing?). make available to gui and info server as well
  - think about id stuff (make id strings consistent '-','_', etc.)
  - add nifti reading/writing
 

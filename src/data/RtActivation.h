@@ -44,7 +44,7 @@ public:
   virtual ~RtActivation();
 
   // serialize the data as xml for transmission or saving to a file
-  virtual TiXmlDocument *serializeAsXML();
+  virtual TiXmlElement *serializeAsXML();
 
   // print info about this image
   void printInfo(ostream &os);

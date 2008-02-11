@@ -63,11 +63,17 @@ bool RtOutputSocket::close() {
 // output data to the socket
 void RtOutputSocket::setData(RtData *data) {
   // get a serialized version of this data as xml
-  TiXmlDocument *serializedData = data->serializeAsXML();
+  TiXmlDocument serializedDataDoc;
+  TiXmlDeclaration decl( "1.0", "", "" );
+  serializedDataDoc.LinkEndChild(&decl);
+  
+  TiXmlElement *serializedData  = data->serializeAsXML();
   if(serializedData == NULL) {
     cerr << "couldn't serialize data, not sending" << endl;    
     return;
   }
+
+  serializedDataDoc.LinkEndChild(serializedData);
 
   // conect to server (listener)
   if(!connector.connect(stream, address)) {
@@ -78,7 +84,7 @@ void RtOutputSocket::setData(RtData *data) {
   // get string version of xml
   TiXmlPrinter printer;
   printer.SetStreamPrinting();
-  serializedData->Accept(&printer);
+  serializedDataDoc.Accept(&printer);
   char *serializedStr = new char[printer.Size()+1]; 
   strcpy(serializedStr, printer.CStr());
 
@@ -94,7 +100,7 @@ void RtOutputSocket::setData(RtData *data) {
   mutx.release();
 
   delete [] serializedStr;
-  delete serializedData;
+  delete serializedData;  // ??
 }
 
 // gets the version

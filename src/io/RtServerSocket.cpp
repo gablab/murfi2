@@ -16,7 +16,7 @@ RtServerSocket::RtServerSocket() {
 }
 
 // constructor with port and host
-RtServerSocket::RtServerSocket(unsigned short portNum, string hostName = "") {
+RtServerSocket::RtServerSocket(unsigned short portNum, string hostName) {
   address.set(portNum, hostName.c_str());
 }
 
@@ -32,25 +32,49 @@ bool RtServerSocket::open(RtConfig &config) {
   // find host and port
   if(config.isSet("socket:host")) {
     string host = config.get("socket:host");
-    address.set_address(host.c_str(). host.length());
+    address.set_address(host.c_str(), host.length());
   }
   if(config.isSet("socket:port")) {
     address.set_port_number((unsigned short) config.get("socket:port"));
   }
 
-  acceptor.open(address,1);
+  if(acceptor.open(address,1) == -1) {
+    cerr << "couldn't open acceptor to listen on " << address.get_host_name() 
+	 << ":" << address.get_port_number() << endl;
+    acceptor.isOpen = false;
+    return false;
+  }
+
+  acceptor.isOpen = true;
+  return true;
 }
 
 // close and clean up
 bool RtServerSocket::close() {
   acceptor.close();
+  return true;
 }
 
 // receive a message
 // in   string recieved
-// out  success or failure
-bool RtServerSocket::recieveMessage(string message, ACE_SOCK_Stream &stream) {
-  cout << "recieved " << message << endl;
+// out  string response
+string RtServerSocket::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
+  return message;
+}
+
+// send a message to a client
+// in
+//  message to send
+//  stream to send on
+// out
+//  success or failure
+bool RtServerSocket::sendMessage(const string &message, ACE_SOCK_Stream &stream) {
+  unsigned int sent = stream.send_n(message.c_str(), message.length());
+  if(sent < message.length()) {
+    cerr << "incomplete send" << endl;
+    return false;
+  }
+
   return true;
 }
 
@@ -67,8 +91,12 @@ int RtServerSocket::svc() {
       message << last;
     }
 
-    // pass the message along
-    recieveMessage(message.str(),stream);
+    // receive the message, store the response
+    string recieved = message.str();
+    string response = recieveMessage(recieved,stream);
+    
+    // send the response
+    sendMessage(response, stream);
 
     // close the stream (scanner connects anew for each image)
     stream.close();

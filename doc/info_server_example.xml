@@ -1,0 +1,56 @@
+<!-- examples of protocol used to request info from real -->
+
+<!-- roi info -->
+
+  <!-- activation -->
+
+    <!-- last tr -->
+
+      <!-- send this -->
+      <info>
+        <roi id="roi_id">
+          <get name="activation" trfirst="last">
+          </get>
+        </roi>
+      </info>
+      
+      <!-- receive this -->
+      <info>
+        <roi id="roi_id">
+          <data name="activation" tr="32">
+	    3.14159
+          </data>
+        </roi>
+      </info>
+      
+  <!-- tr range -->
+
+    <!-- send this -->
+      <info>
+        <roi id="roi_id">
+          <get name="activation" trfirst="32" trlast="35">
+          </get>
+        </roi>
+      </info>
+      
+    <!-- receive this -->
+      <info>
+        <roi id="roi_id">
+          <data name="activation" tr="32">
+	    3.14159
+          </data>
+          <data name="activation" tr="33">
+	    4.14159
+          </data>
+          <data name="activation" tr="34">
+	    5.14159
+          </data>
+          <data name="activation" tr="35">
+	    6.14159
+          </data>
+        </roi>
+      </info>
+      
+
+
+

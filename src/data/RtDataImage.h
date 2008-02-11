@@ -114,7 +114,7 @@ public:
   virtual void printInfo(ostream &os);
 
   // serialize the data as xml for transmission or saving to a file
-  virtual TiXmlDocument *serializeAsXML();
+  virtual TiXmlElement *serializeAsXML();
 
   //********  methods for getting data from the image *******//
 
@@ -451,23 +451,13 @@ void RtDataImage<T>::printInfo(ostream &os) {
 
 // serialize the data as xml for transmission or saving to a file
 template<class T>
-TiXmlDocument *RtDataImage<T>::serializeAsXML() {
-  TiXmlDocument *doc = new TiXmlDocument();
-
-  TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "");
-  doc->LinkEndChild(decl);
-
+TiXmlElement *RtDataImage<T>::serializeAsXML() {
   TiXmlElement *element = new TiXmlElement( "error" );
-  doc->LinkEndChild(element);
 
   TiXmlText *text = new TiXmlText("this is a stub, no data serialization is supported for this type");
   element->LinkEndChild(text);
 
-  delete decl;
-  delete element;
-  delete text;
-
-  return doc;
+  return element;
 }
 
 // save the image to a file (already set filename)

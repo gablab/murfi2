@@ -69,7 +69,7 @@ public:
   bool unlockData(RtLocker *locker);
 
   // serialize the data as xml for transmission or saving to a file
-  virtual TiXmlDocument *serializeAsXML() = 0;
+  virtual TiXmlElement *serializeAsXML() = 0;
 
   // get the creation time
   ACE_Date_Time getCreationTime();

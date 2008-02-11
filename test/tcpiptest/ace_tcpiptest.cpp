@@ -9,8 +9,8 @@ using namespace std;
 
 int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   // Local server address.
-  ACE_INET_Addr my_addr ( argc > 5 ? atoi(argv[5]) : 15000,
-			  argc > 4 ? argv[4] : "localhost");
+  ACE_INET_Addr my_addr ( argc > 1 ? atoi(argv[1]) : 15000,
+			  argc > 2 ? argv[2] : "localhost");
   // Data transfer object.
   ACE_SOCK_Stream stream;
   // Initialize the connector.

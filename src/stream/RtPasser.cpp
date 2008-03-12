@@ -56,6 +56,7 @@ void RtPasser::sendToOutputs(RtData *d) {
 
   // set to all outputs
   for(vector<RtOutput*>::iterator j = outputs.begin(); j != outputs.end(); j++) {
+    //cout << "sending " << d->getID() << " to " << (*j)->getID() << endl;
     (*j)->setData(d);
   }
 

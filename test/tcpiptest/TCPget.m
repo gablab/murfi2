@@ -1,5 +1,9 @@
 function [strOut] =  TCPget(hostname,port,msg)
 
+  if(nargin < 3)
+    msg = '<?xml version="1.0" encoding="UTF-8"?><info><roi id="roi_id"><get name="activation" tr="last"></get></roi></info>';
+  end
+    
 import java.*;
 import java.io.*;
 import java.net.*;
@@ -15,15 +19,15 @@ in =  BufferedReader(InputStreamReader(skt.getInputStream()));
 out =  PrintWriter(skt.getOutputStream(),true);
 
 % send a request
-xmlstr = String('<?xml version="1.0" encoding="UTF-8"?><info><roi id="roi_id"><get name="activation" trStart="120" trEnd="140"></get></roi></info>\n');
+xmlstr = String(msg);
 
 out.println(xmlstr);
 
 strOut = [];
-tmp = 'a';
+tmp = in.read();
 while(~strcmp(tmp,term) && tmp ~= -1)
-  tmp = in.read();
   strOut(end+1) = char(tmp);
+  tmp = in.read();
 end
 disp(['Retrieved from server socket: ' strOut]);
 

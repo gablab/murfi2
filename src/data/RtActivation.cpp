@@ -91,6 +91,7 @@ TiXmlElement *RtActivation::serializeAsXML() {
   // add an element for the data
   TiXmlElement *element = new TiXmlElement("data");
   element->SetAttribute("name","activation");
+  element->SetAttribute("roiID",roiID);
 
   // build text string containing all the data separated by spaces
   #define NUM_SIGFIGS 6
@@ -114,6 +115,7 @@ void RtActivation::printInfo(ostream &os) {
   
   RtDataImage<double>::printInfo(os);
   
+  os << setw(wid) << "roiID: " << roiID << endl;
   os << setw(wid) << "threshold: " << threshold << endl;
   os << setw(wid) << "ceiling: "   << ceiling << endl;
 }

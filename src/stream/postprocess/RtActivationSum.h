@@ -1,6 +1,6 @@
 /******************************************************************************
- * RtActivationSum.h is the header for a class that computes the difference
- * between two images
+ * RtActivationSum.h is the header for a class that computes the sum over
+ * all voxels in an activation map
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-05
  *
@@ -33,13 +33,13 @@ protected:
   //  in 
   //   name of the option to process
   //   val  text of the option node
-  bool processOption(const string &name, const string &text);
+  virtual bool processOption(const string &name, const string &text);
 
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
-  // dataID for the activ ation we will sum
-  string dataIDForSum;
+  // roiID for the activ ation we will sum
+  string roiID;
 
 };
 

@@ -103,7 +103,6 @@ RtData *RtStreamMessage::getData(unsigned int index) {
   return data[index];
 }
 
-
 // get a data portion by data id (returns the first found instance)
 //  in
 //   id of data to get
@@ -112,6 +111,24 @@ RtData *RtStreamMessage::getData(unsigned int index) {
 RtData *RtStreamMessage::getDataByID(const string &id) {
   for(unsigned int i = 0; i < numData; i++) {
     if(data[i]->getID() == id) {
+      return data[i];
+    }
+  }
+
+  return NULL;
+}
+
+// get data by data id and roi id (returns the first found instance)
+//  in
+//   dataid id of data
+//   roiid  id of roi
+//  out
+//   pointer to the data or NULL, if id doesnt exist
+RtData *RtStreamMessage::getDataByIDAndRoiID(const string &dataid, 
+					     const string &roiid) {
+  for(unsigned int i = 0; i < numData; i++) {
+    //cout << data[i]->getID() << " " << data[i]->getRoiID() << endl;
+    if(data[i]->getID() == dataid && data[i]->getRoiID() == roiid) {
       return data[i];
     }
   }

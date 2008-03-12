@@ -8,13 +8,12 @@
 #ifndef RTINFOSERVER_H
 #define RTINFOSERVER_H
 
-#include"RtOutput.h"
 #include"RtServerSocket.h"
 #include<vector>
 using namespace std;
 
 // class declaration
-class RtInfoServer : public RtOutput, public RtServerSocket  {
+class RtInfoServer : public RtServerSocket  {
 
 public:
 
@@ -24,7 +23,7 @@ public:
   RtInfoServer(); 
   
   // constructor with port and host
-  RtInfoServer(unsigned short portNum, string hostname = ""); 
+  RtInfoServer(unsigned short portNum); 
 
   // destructor
   virtual ~RtInfoServer();
@@ -51,6 +50,13 @@ protected:
   // out
   //  string representation
   string buildXMLString(TiXmlDocument &doc);
+
+  // build an error element
+  // in
+  //  name of the error
+  // out
+  //  XML element containing error info
+  TiXmlElement *createErrorElement(string error);
 
   // database
   // NOTE: now this only stores activation sums by tr.

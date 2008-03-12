@@ -163,8 +163,8 @@ int RtDisplayImage::svc() {
 void RtDisplayImage::setData(RtData *data) {
   ACE_TRACE(("RtDisplayImage::setData"));
 
-  // handle socket activation sum
-  static vnl_vector<double> tc(248);
+  // handle socket activation sum // DEBUGGING ONLY
+  static vnl_vector<double> tc(280,0.0);
   static Gnuplot gp = Gnuplot("lines");
   static unsigned int numTimepoints = 0;
 
@@ -288,7 +288,21 @@ void RtDisplayImage::makeOverlayTexture() {
 
   // convert overlay data into a displayable image
   unsigned short *overlayImg = new unsigned short[4*overlay->getNumPix()];
+
+  // debugging
+  double min = 1000000, max = -1000000;
+
+
   for(unsigned int i = 0; i < overlay->getNumPix(); i++) {
+
+    // debugging
+      if(min > overlay->getPixel(i)) {
+	min = overlay->getPixel(i);
+      }
+      if(max < overlay->getPixel(i)) {
+	max = overlay->getPixel(i);
+      }
+
     // use a cheap heat colormap
     if(!overlay->getScaleIsInverted() 
        && overlay->getPixel(i) > overlay->getThreshold()) {
@@ -298,7 +312,6 @@ void RtDisplayImage::makeOverlayTexture() {
 						*USHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = USHRT_MAX; // a
-
     }
     else if(!overlay->getScaleIsInverted() 
 	    && overlay->getPixel(i) < -overlay->getThreshold()) {
@@ -327,6 +340,9 @@ void RtDisplayImage::makeOverlayTexture() {
     }
   }
 
+  // debugging
+  cout << "thresh=" << overlay->getThreshold() << endl 
+       << "min=" << min << endl << "max=" << max << endl;
 
   /* create the image texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, overlayTex);

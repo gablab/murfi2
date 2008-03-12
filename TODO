@@ -1,6 +1,13 @@
 # Oliver Hinds <ohinds@mit.edu>
 # 2007-09-28
 
+NOWNOWNOW
+- fix Nan problem
+- look into image saving
+- integrate registration methods. 
+- add roi viewing/editing to gui
+- add conditions to info server
+
 * config:
  - allow spec of input data ids in module names
 
@@ -26,6 +33,8 @@
    completion
  - develop flexible, efficient method for retreiving persistent data
    (hashing?). make available to gui and info server as well
+ - also develop either method for unique ids for each data instance or
+   iterator method to choose like data
  - think about id stuff (make id strings consistent '-','_', etc.)
  - add nifti reading/writing
 
@@ -40,13 +49,23 @@
  - cox (1995) accumulative correlation (DONE)
  - gembris (2000) sliding window correlation
  - kalman filter (rouche 2004)
- - hinds (2008) single image correlation (DONE)
- - roi activation
+ - hinds (2008) single image correlation 
+   first implementation done. method needs to be extended
+   to allow arbitrary contrasts
+ - add baseline scans at beginning to let stabilize (DONE)
+ - roi activation (DONE)
+ - roi-based spatial subtraction
+ - completely general ROI sum arithmetic
  - hooks for external apps
   + motion correction
   + intensity normalization
-  + spatial normalization?
+  + registration
 
+* communication
+ - fix Nan problem
+ - setting up stim schedule
+ - add conditions to infoserver
 
 * simple gui
  - overlay (z-scores on epi) DONE
+

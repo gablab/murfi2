@@ -85,8 +85,10 @@
 
      <option name="trends">2</option>
 
-     <option name="saveAsMask">1</option>
-     <option name="saveAsMaskFilename">accumcor_mask.dat</option>
+     <option name="savePosAsMask">1</option>
+     <option name="saveNegAsMask">1</option>
+     <option name="savePosAsMaskFilename">active_mask.dat</option>
+     <option name="saveNegAsMaskFilename">background_mask.dat</option>
   </module>
 
 </preprocessor>

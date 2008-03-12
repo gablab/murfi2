@@ -11,6 +11,8 @@
 #include<gnuplot_i_vxl.h>
 #include"gsl/gsl_cdf.h"
 
+
+
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
 
@@ -21,6 +23,8 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   id = moduleString;
   trends = conditions = NULL;
   numTrends = numConditions = numMeas = 0;
+  numTimepoints = 0;
+  conditionShift = 0;
 
   // default values for probability thresholding
   probThreshold = 0.05;
@@ -67,8 +71,7 @@ bool RtActivationEstimator::getCorrectMultipleComparisons() {
 // get the desired t statistic threshold
 double RtActivationEstimator::getTStatThreshold(unsigned int dof) {
   return fabs(gsl_cdf_tdist_Pinv(probThreshold 
-			      / (correctForMultiComps ? numComparisons : 1.0),
-				 dof));
+		    / (correctForMultiComps ? numComparisons : 1.0),dof));
 }
 
 // process a configuration option
@@ -95,8 +98,8 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
 	i++, i1 = i2+1, i2 = text.find(" ", i1)) {
 
       if(!RtConfigVal::convert<double>(el, 
-		text.substr(i1, 
-			    i2 == string::npos ? text.size()-i1 : i2-i1))) {
+				       text.substr(i1, 
+						   i2 == string::npos ? text.size()-i1 : i2-i1))) {
 	continue;
       }
       conditions->put(i,numConditions-1,el);
@@ -112,6 +115,9 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     }
 
     return true;
+  }
+  if(name == "conditionshift") {
+    return RtConfigVal::convert<unsigned int>(conditionShift,text);
   }
   if(name == "trends") {
     return RtConfigVal::convert<unsigned int>(numTrends,text);
@@ -137,16 +143,26 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "maskFilename") {
     mask.setFilename(text);
     return true;
+  }
+  if(name == "roiID") {
+    roiID = text;
+    return true;
   }  
   if(name == "maskIntensityThreshold") {
     return RtConfigVal::convert<double>(maskIntensityThreshold,text);
   }  
-  if(name == "saveAsMask") {
-    RtConfigVal::convert<bool>(saveResultAsMask,text);
-    return RtConfigVal::convert<bool>(saveResultAsMask,text);
+  if(name == "savePosAsMask") {
+    return RtConfigVal::convert<bool>(savePosResultAsMask,text);
   }
-  if(name == "saveAsMaskFilename") {
-    saveAsMaskFilename = text;
+  if(name == "saveNegAsMask") {
+    return RtConfigVal::convert<bool>(saveNegResultAsMask,text);
+  }
+  if(name == "savePosAsMaskFilename") {
+    savePosAsMaskFilename = text;
+    return true;
+  }
+  if(name == "saveNegAsMaskFilename") {
+    saveNegAsMaskFilename = text;
     return true;
   }
 
@@ -222,10 +238,23 @@ bool RtActivationEstimator::finishInit() {
   vnl_vector<double> hrf;
   buildHRF(hrf, 2000, 32000);
 
-//  Gnuplot g1;
-//  g1 = Gnuplot("lines");
-//  g1.plot_x(hrf,"hrf");
-//  sleep(10);
+  // debugging
+//static Gnuplot g1;
+//g1 = Gnuplot("lines");
+//g1.plot_x(hrf,"hrf");
+
+  // incorporate condition shift
+  if(conditionShift > 0 && conditionShift < numMeas) {
+    vnl_vector<double> shiftdelta(numMeas,0.0);
+    shiftdelta.put(conditionShift,1);
+
+    for(unsigned int i = 0; i < numConditions; i++) {
+      vnl_vector<double> col = conditions->get_column(i);
+      vnl_vector<double> shiftcol = vnl_convolve(col,shiftdelta);
+      col.update(shiftcol.extract(col.size()));
+      conditions->set_column(i,col);
+    }  
+  }
 
   // convolve each condition with the hrf
   for(unsigned int i = 0; i < numConditions; i++) {

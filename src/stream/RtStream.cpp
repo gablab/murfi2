@@ -61,6 +61,7 @@ int RtStream::configure(RtConfig &config) {
 #include"RtAccumCor.h"
 #include"RtSingleImageCor.h"
 #include"RtActivationSum.h"
+#include"RtActivationSumDifference.h"
 
 // add a single module to the module stack
 //  in
@@ -101,6 +102,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   }
   else if(type == RtActivationSum::moduleString) { // sum image activation
     ACE_NEW_NORETURN(sc, RtActivationSum());
+  }
+  else if(type == RtActivationSumDifference::moduleString) { // activation sum diff
+    ACE_NEW_NORETURN(sc, RtActivationSumDifference());
   }
 
   // create and add the module
@@ -212,7 +216,7 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
 void RtStream::addOutputsToComponent(RtStreamComponent *sc, 
 				    vector<string> &outNames) {
   for(vector<string>::iterator i = outNames.begin(); i != outNames.end(); i++) {
-    cout<< "adding output " << *i << " to " << sc->getID() << endl;
+    //cout<< "adding output " << *i << " to " << sc->getID() << endl;
     sc->addOutput(conductor->getOutputByName(*i));
   }
 }

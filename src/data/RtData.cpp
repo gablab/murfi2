@@ -9,7 +9,7 @@
 
   
 // default constructor
-RtData::RtData() : id("data"), persistent(false), lock(NULL) {
+RtData::RtData() : id("data"), roiID("unset"), persistent(false), lock(NULL) {
 
 }
 
@@ -28,6 +28,11 @@ RtData::~RtData() {
 //   id string
 const string &RtData::getID() {
   return id;
+}
+
+// get the roiID
+string RtData::getRoiID() {
+  return roiID;
 }
 
 // append to the id string for this data
@@ -53,6 +58,10 @@ void RtData::setID(const string &s) {
   id = s;
 }
 
+// set the roiID
+void RtData::setRoiID(const string &id) {
+  roiID = id;
+}
 
 // get if we should delete this data after stream processing (not persistent)
 bool RtData::getPersistent() {

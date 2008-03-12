@@ -4,7 +4,7 @@
 <!--  NOTE... ':' characters are not allowed in any names or values -->
 <!--  Oliver Hinds <ohinds@mit.edu> 2007-09-12                      -->
 
-<study 
+<study
     subject="foobar"
     subjectsDir="/data/subjects"
     > </study>
@@ -14,7 +14,7 @@
       verbose="true"
       debug="false"
       > </terminal>
-  
+
   <log
       filename="log/log.rtl"
       disabled="false"
@@ -38,7 +38,7 @@
     triggerCode="83"
 
     tr="2.0"
-    measurements="248"
+    measurements="280"
 > </scanner>
 
 <display
@@ -52,11 +52,10 @@
 >
 </display>
 
-<socket
-    host="localhost"
-    port="15004"
+<infoserver
+    port="15001"
 >
-</socket>
+</infoserver>
 
 <!-- preprocessing steps -->
 <preprocessor>
@@ -77,29 +76,67 @@
     <output>display</output>
   </module>
 
+  <!-- activation region -->
   <module name="singleimcor">
     <option name="makeavail">true</option>
     <output>display</output>
-    
+
+    <option name="conditionshift">8</option>
     <option name="condition">
-      0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+      1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 
     </option>
-    
+
     <option name="trends">2</option>
     <option name="baselineThreshold">0.00001</option>
     <option name="probThreshold">0.10</option>
     <option name="correctForMultiComps">0</option>
-    
+
     <option name="maskSource">loadFromFile</option>
-    <option name="maskFilename">accumcor_mask.dat</option>
+    <option name="roiID">active</option>
+    <option name="maskFilename">active_mask.dat</option>
 
   </module>
+
+
+  <!-- background region -->
+<!--   <module name="singleimcor"> -->
+<!--     <option name="makeavail">true</option> -->
+<!--     <output>display</output> -->
+
+<!--     <option name="conditionshift">8</option> -->
+<!--     <option name="condition"> -->
+<!--       1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0  -->
+<!--     </option> -->
+
+<!--     <option name="trends">2</option> -->
+<!--     <option name="baselineThreshold">0.00001</option> -->
+<!--     <option name="probThreshold">0.10</option> -->
+<!--     <option name="correctForMultiComps">0</option> -->
+
+<!--     <option name="maskSource">loadFromFile</option> -->
+<!--     <option name="roiID">background</option> -->
+<!--     <option name="maskFilename">background_mask.dat</option> -->
+
+<!--   </module> -->
 
   <module name="activation-sum">
+    <option name="makeavail">true</option>
+    <output>infoserver</output>
     <output>display</output>
-    <output>socket</output>
-    <option name="dataIDForSum">data.image.activation.voxel-singleimcor</option>
+    <option name="roiID">active</option>
   </module>
+
+<!--   <module name="activation-sum"> -->
+<!--     <option name="makeavail">true</option> -->
+<!--     <option name="roiID">background</option> -->
+<!--   </module> -->
+
+<!--   <module name="activation-sum-difference"> -->
+<!--     <output>infoserver</output> -->
+<!--     <output>display</output> -->
+<!--     <option name="posRoiID">active</option> -->
+<!--     <option name="negRoiID">background</option> -->
+<!--   </module> -->
 
 </preprocessor>
 

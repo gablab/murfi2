@@ -13,14 +13,13 @@
 static char *VERSION = "$Id$";
 
 // default constructor
-RtInfoServer::RtInfoServer() : RtOutput(), RtServerSocket() {
-  
+RtInfoServer::RtInfoServer() : RtServerSocket() {
+  id += ":infoserver";
 } 
   
 // constructor with port and host
-RtInfoServer::RtInfoServer(unsigned short portNum, string hostName) 
-  : RtOutput(), RtServerSocket(portNum, hostName) {
-  
+RtInfoServer::RtInfoServer(unsigned short portNum) : RtServerSocket(portNum) {
+  id += ":infoserver";  
 }
 
 // destructor
@@ -33,7 +32,6 @@ RtInfoServer::~RtInfoServer() {
 // each tr in an xml document 
 void RtInfoServer::setData(RtData *data) {
   if(data->getID() == ID_ACTIVATIONSUM) {
-    cout << "adding an activation sum" << endl;
     database.push_back(data);
   }
   else {
@@ -47,45 +45,51 @@ void RtInfoServer::setData(RtData *data) {
 //  stream recieved on
 // out XML string response
 string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
-  // parse the string
+  // set up the response
+  TiXmlDocument response;
+  TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
+  response.LinkEndChild(decl);
+
+  // parse the request
   TiXmlDocument request;
   request.Parse(message.c_str());
   if(request.Error()) {
-    cerr << "couldn't parse request XML" << endl;
-  }
-
-  // set up the response
-  TiXmlDocument response;
-  TiXmlDeclaration decl( "1.0", "", "" );
-  response.LinkEndChild(&decl);
+    string errString = "could not parse request XML";
+    cerr << errString << endl;
+    // put an unsupported msg in XML 
+    TiXmlElement *infoResponse = new TiXmlElement("info");
+    response.LinkEndChild(infoResponse);
+    TiXmlElement *errEl = createErrorElement(errString);
+    infoResponse->LinkEndChild(errEl);
+    // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
+  }  
 
   // search for info tags
   for(TiXmlNode *info = 0; (info = request.IterateChildren("info", info)); ) {
     // create an info node for this request
-    TiXmlElement infoResponse("info");
-    response.LinkEndChild(&infoResponse);
+    TiXmlElement *infoResponse = new TiXmlElement("info");
+    response.LinkEndChild(infoResponse);
 
     // find roi tags
     for(TiXmlElement *roi = 0; 
 	(roi = (TiXmlElement*) info->IterateChildren("roi", roi)); ) {
       // create an roi node
-      TiXmlElement roiResponse("roi");
-      response.LinkEndChild(&infoResponse);
+      TiXmlElement *roiResponse = new TiXmlElement("roi");
+      infoResponse->LinkEndChild(roiResponse);
       
       // set the id
       if(roi->Attribute("id")) {
-	roiResponse.SetAttribute("id", roi->Attribute("id"));
-      }      
+	roiResponse->SetAttribute("id", roi->Attribute("id"));
+      }
 
       // find get tags
       for(TiXmlElement *get = 0; 
 	  (get = (TiXmlElement*) roi->IterateChildren("get", get)); ) {
 	// check name
-	if(get->Attribute("name") != "activation") {
+	if(strcmp(get->Attribute("name"), "activation")) {
 	  // put an unsupported msg in XML 
-	  TiXmlElement *unsupported = new TiXmlElement("data");
-	  unsupported->SetAttribute("name","unsupported");
-	  roi->LinkEndChild(unsupported);
+	  TiXmlElement *errEl = createErrorElement("unsupported data type");
+	  roiResponse->LinkEndChild(errEl);
 	  // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
 	  continue;
 	}
@@ -96,36 +100,62 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	// check for single tr
 	if(get->Attribute("tr")) {
 	  // check for proper format and get tr
-	  if(!RtConfigVal::convert<unsigned int>(trStart,
+	  if(!strcmp(get->Attribute("tr"),"last")) {
+	    trStart = database.size();
+	  }
+	  else if(!RtConfigVal::convert<unsigned int>(trStart,
 						 get->Attribute("tr"))) {
-	    cerr << "error converting tr attribute to integer" << endl;
+	    string errString = "error converting tr attribute to integer";
+	    cerr << errString << endl;
+	    TiXmlElement *errEl = createErrorElement(errString);
+	    roiResponse->LinkEndChild(errEl);
+	    // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
 	    continue;	   
 	  }
 	  
 	  // just set trEnd to the same as start
 	  trEnd = trStart;
 	}
-	else if(get->Attribute("trstart")) {
+	else if(get->Attribute("trStart")) {
 	  // check for proper format and get trStart
-	  if(!RtConfigVal::convert<unsigned int>(trStart,
+	  if(!strcmp(get->Attribute("trStart"),"first")) {
+	    trStart = 1;
+	  }
+	  else if(!RtConfigVal::convert<unsigned int>(trStart,
 						 get->Attribute("trStart"))) {
-	    cerr << "error converting trStart attribute to integer" << endl;
+	    string errString = "error converting trStart attribute to integer";
+	    cerr << errString << endl;
+	    TiXmlElement *errEl = createErrorElement(errString);
+	    roiResponse->LinkEndChild(errEl);
+	    // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
 	    continue;	   
 	  }
 
 	  // check for proper format and get trEnd
-	  if(!RtConfigVal::convert<unsigned int>(trEnd,
+	  if(!strcmp(get->Attribute("trEnd"),"last")) {
+	    trEnd = database.size();
+	  }
+	  else if(!RtConfigVal::convert<unsigned int>(trEnd,
 						 get->Attribute("trEnd"))) {
-	    cerr << "error converting trEnd attribute to integer" << endl;
+	    string errString = "error converting trEnd attribute to integer";
+	    cerr << errString << endl;
+	    TiXmlElement *errEl = createErrorElement(errString);
+	    roiResponse->LinkEndChild(errEl);
+	    // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
 	    continue;	   
 	  }
 
 	}
 	  
+	cout << trStart << " trend=" << trEnd << " database size=" << database.size() << endl; 
+
 	// check range (fix this when database is better)
 	if(trStart < 1 || trEnd > database.size()) {
-	  cerr << "tr range requested (" << trStart << "-" << trEnd 
-	       << ") is invalid" << endl;
+	  string errString = "tr range requested is invalid";
+	  cerr << errString << endl;
+	  TiXmlElement *errEl = createErrorElement(errString);
+	  roiResponse->LinkEndChild(errEl);
+	  // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
 	  continue;
 	}
 	  
@@ -133,7 +163,7 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	for(unsigned int tr=trStart; tr <= trEnd; tr++) {
 	  TiXmlElement *trel = database[tr-1]->serializeAsXML();
 	  trel->SetAttribute("tr",tr);
-	  roi->LinkEndChild(trel);
+	  roiResponse->LinkEndChild(trel);
 	  // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
 	}
       }      
@@ -154,6 +184,18 @@ string RtInfoServer::buildXMLString(TiXmlDocument &doc) {
   printer.SetStreamPrinting();
   doc.Accept(&printer);
   return printer.Str();
+}
+
+// build an error element
+// in
+//  name of the error
+// out
+//  XML element containing error info
+TiXmlElement *RtInfoServer::createErrorElement(string error) {
+  TiXmlElement *errEl = new TiXmlElement("data");
+  errEl->SetAttribute("name","error");
+  errEl->SetAttribute("type",error);
+  return errEl; 
 }
 
 // get the version

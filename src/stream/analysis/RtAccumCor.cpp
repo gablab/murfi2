@@ -20,8 +20,9 @@ RtAccumCor::RtAccumCor() : RtActivationEstimator() {
 
   z = f = g = h = NULL; 
 
-  saveResultAsMask = false;
-  saveAsMaskFilename = "accumcor_mask.dat";
+  savePosResultAsMask = saveNegResultAsMask = false;
+  savePosAsMaskFilename = "pos_mask.dat";
+  saveNegAsMaskFilename = "neg_mask.dat";
 }
 
 // destructor
@@ -211,9 +212,14 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   setResult(msg,cor);
 
   // test if this is the last measurement for mask conversion and saving
-  if(numTimepoints == numMeas && saveResultAsMask) {
+  if(numTimepoints == numMeas && savePosResultAsMask) {
     RtMaskImage *activationMask = cor->toMask(POS);
-    activationMask->setFilename(saveAsMaskFilename);
+    activationMask->setFilename(savePosAsMaskFilename);
+    activationMask->save();
+  }
+  if(numTimepoints == numMeas && saveNegResultAsMask) {
+    RtMaskImage *activationMask = cor->toMask(POS);
+    activationMask->setFilename(saveNegAsMaskFilename);
     activationMask->save();
   }
 

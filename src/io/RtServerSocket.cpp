@@ -12,12 +12,13 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtServerSocket::RtServerSocket() {
-
+  messageTerminationChar = '\n';
 }
 
 // constructor with port and host
-RtServerSocket::RtServerSocket(unsigned short portNum, string hostName) {
-  address.set(portNum, hostName.c_str());
+RtServerSocket::RtServerSocket(unsigned short portNum) {
+  messageTerminationChar = '\n';
+  address.set(portNum);
 }
 
 // destructor
@@ -29,13 +30,9 @@ RtServerSocket::~RtServerSocket() {
 
 // open and start accepting
 bool RtServerSocket::open(RtConfig &config) {
-  // find host and port
-  if(config.isSet("socket:host")) {
-    string host = config.get("socket:host");
-    address.set_address(host.c_str(), host.length());
-  }
-  if(config.isSet("socket:port")) {
-    address.set_port_number((unsigned short) config.get("socket:port"));
+  // find port
+  if(config.isSet("infoserver:port")) {
+    address.set_port_number((unsigned short) config.get("infoserver:port"));
   }
 
   if(acceptor.open(address,1) == -1) {
@@ -44,6 +41,8 @@ bool RtServerSocket::open(RtConfig &config) {
     acceptor.isOpen = false;
     return false;
   }
+  cerr << "opened acceptor to listen on " << address.get_host_name() 
+       << ":" << address.get_port_number() << endl;
 
   acceptor.isOpen = true;
   return true;
@@ -59,6 +58,7 @@ bool RtServerSocket::close() {
 // in   string recieved
 // out  string response
 string RtServerSocket::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
+  cout << "in wrong version" << endl;
   return message;
 }
 
@@ -74,6 +74,10 @@ bool RtServerSocket::sendMessage(const string &message, ACE_SOCK_Stream &stream)
     cerr << "incomplete send" << endl;
     return false;
   }
+  
+  stream.send_n(&messageTerminationChar,1);
+
+  cout << "sent " << message << endl;
 
   return true;
 }
@@ -86,15 +90,19 @@ int RtServerSocket::svc() {
 
     // get characters until null character
     char last = 'a';
-    while(last != '\0') {
-      stream.recv_n(&last,1);
+    while(last != messageTerminationChar) {
+      if(0 == stream.recv_n(&last,1)) {
+	cout << "received empty message" << endl;
+	break;
+      }
+
       message << last;
     }
 
     // receive the message, store the response
     string recieved = message.str();
     string response = recieveMessage(recieved,stream);
-    
+
     // send the response
     sendMessage(response, stream);
 

@@ -9,7 +9,7 @@
 static char *VERSION = "$Id$";
 
 #include"RtConductor.h"
-#include"RtOutputSocket.h"
+#include"RtInfoServer.h"
 #include<iostream>
 
 //*** constructors/destructors  ***//
@@ -76,13 +76,14 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   // open output socket
-  if(config.get("socket:host")==true) {
-    RtOutputSocket *sock;
-    ACE_NEW_NORETURN(sock, RtOutputSocket);    
+  if(config.get("infoserver:port")==true) {
+    RtInfoServer *infoserver;
+    ACE_NEW_NORETURN(infoserver, RtInfoServer);    
 
-    if(!addOutput(sock)) {
-      cerr << "ERROR: could not initialize output socket" << endl;
+    if(!addOutput(infoserver)) {
+      cerr << "ERROR: could not initialize info server" << endl;
     }
+    cout << "added infoserver as output" << endl;
   }
 
   if(config.get("info:log:disabled")==false) {
@@ -219,6 +220,11 @@ bool RtConductor::run() {
     getDisplay()->activate();
   }
 
+  // start the info server
+  if(config.isSet("infoserver:port")) {  
+    getInfoServer()->activate();
+  }
+
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     (*i)->activate();
@@ -295,6 +301,13 @@ RtDisplayImage *RtConductor::getDisplay() {
   }
 }
 
+// get the info server
+//  out 
+//   pointer to the infoserver object
+RtInfoServer *RtConductor::getInfoServer() {
+  return (RtInfoServer*) getOutputByName("output:infoserver");
+}
+
 // get an input by its name
 //  in
 //   name: name of input to get
@@ -317,6 +330,7 @@ RtInput *RtConductor::getInputByName(const string &name) {
 //   pointer to the output object
 RtOutput *RtConductor::getOutputByName(const string &name) {
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++){
+    //cout << (*i)->getID() << "=" << name << endl;
     if((*i)->getID() == name) {
       return *i;
     }

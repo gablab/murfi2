@@ -1,6 +1,5 @@
 /******************************************************************************
- * RtActivationSum.h is the header for a class that computes the difference
- * between two images
+ * RtActivationSum.cpp computes the sum over all voxels in an roi map
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-05
  *
@@ -13,7 +12,6 @@ string RtActivationSum::moduleString("activation-sum");
 // default constructor
 RtActivationSum::RtActivationSum() : RtStreamComponent() {
   id = moduleString;
-  dataIDForSum = "data.image.activation";
 }
 
 // destructor
@@ -24,27 +22,27 @@ RtActivationSum::~RtActivationSum() {}
 //   name of the option to process
 //   val  text of the option node
 bool RtActivationSum::processOption(const string &name, const string &text) {
-
-  // look for options
-  if(name == "dataIDForSum") {
-    dataIDForSum = text;
+  if(name == "roiID") {
+    roiID = text;
     return true;
   }
 
-  return false;
+  return RtStreamComponent::processOption(name, text);
 }  
 
 // process a single acquisition
 int RtActivationSum::process(ACE_Message_Block *mb) {
   ACE_TRACE(("RtActivationSum::process"));
 
-
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
-  // find the data with the right data ID
-  RtActivation *act = (RtActivation*)msg->getDataByID(dataIDForSum);
+  // find the activation with the right roiID
+  RtActivation *act 
+    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.voxel-singleimcor",roiID);
 
   if(act == NULL) {
+    cout << "couldn't find " << roiID << endl;
+
     ACE_DEBUG((LM_INFO, "RtActivationSum:process: activation passed is NULL\n"));
     return 0;
   }
@@ -54,14 +52,21 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
 	    
   // create a one element activation image
   RtActivation *sum = new RtActivation(1);
+  sum->setThreshold(act->getThreshold());
 
   // compute the absolute difference
   for(unsigned int i = 0; i < act->getNumPix(); i++) {
     sum->setPixel(0, sum->getPixel(0) + act->getPixel(i));
-  }  
+  }
+  
+  if(fabs(sum->getPixel(0)) > 10000 | isnan(sum->getPixel(0))) {
+    cout << "BIG SUM FOUND: " << sum->getPixel(0) << endl;
+  }
+
 
   // set the image id for handling
   sum->addToID("activation-sum");
+  sum->setRoiID(act->getRoiID());
 
   setResult(msg, sum);
 

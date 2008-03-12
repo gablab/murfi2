@@ -36,6 +36,9 @@ public:
   //   id string
   const string &getID();
 
+  // get the roiID
+  string getRoiID();
+
   // append to the id string for this data
   //  in
   //   string to append to the id
@@ -48,6 +51,9 @@ public:
 
   // set the id string
   void setID(const string &s);
+
+  // set the roiID
+  void setRoiID(const string &id);
 
   // get if we should delete this data after stream processing (not persistent)
   bool getPersistent();
@@ -77,9 +83,11 @@ public:
 protected:
 
   //*** data members  ***//
-  
-  string id;
 
+  // ids
+  string id;     // data type id
+  string roiID;  // roi id
+  
   ACE_Date_Time creationTime;
 
   bool persistent;

@@ -14,6 +14,7 @@
 
 #include"RtConfig.h"
 #include"RtDisplayImage.h"
+#include"RtInfoServer.h"
 #include"RtInput.h"
 #include"RtInputScannerImages.h"
 #include"RtInputUSBKb.h"
@@ -71,6 +72,11 @@ public:
   //  out 
   //   pointer to the display output object
   RtDisplayImage *getDisplay();
+
+  // get the info server
+  //  out 
+  //   pointer to the infoserver object
+  RtInfoServer *getInfoServer();
 
   // get an input by its name
   //  in

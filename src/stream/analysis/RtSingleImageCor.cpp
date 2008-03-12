@@ -169,8 +169,8 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // set threshold
   if(numTimepoints > numTrends+1) {
     cor->setThreshold(getTStatThreshold(1));
-//    cout << "single image est: using t threshold of " 
-//	 << cor->getThreshold() << endl;
+    cout << "single image est: using t threshold of " 
+	 << cor->getThreshold() << endl;
   }
 
   //// element independent setup
@@ -302,6 +302,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   // set the image id for handling
   cor->addToID("voxel-singleimcor");
+  cor->setRoiID(roiID);
 
   // in the first non-baseline condition reset the number of baseline timepoints
   for(unsigned int j = 0; j < numTrends+1; j++) {

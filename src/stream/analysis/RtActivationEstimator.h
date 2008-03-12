@@ -102,6 +102,7 @@ protected:
   // condition regressors
   unsigned int numConditions; 
   vnl_matrix<double> *conditions;
+  unsigned int conditionShift;  // shift all condition regressors
 
   // trend regressors
   unsigned int numTrends; 
@@ -117,6 +118,9 @@ protected:
   // number of statistical comparisons
   unsigned int numComparisons;
 
+  // id of roi this represents
+  string roiID;  
+
   /// mask ///
   RtMaskImage mask;
   enum MaskSource {
@@ -131,10 +135,12 @@ protected:
 
 
   // whether to save the result as a mask
-  bool saveResultAsMask;
+  bool savePosResultAsMask;
+  bool saveNegResultAsMask;
 
   // filename to save mask to
-  string saveAsMaskFilename;
+  string savePosAsMaskFilename;
+  string saveNegAsMaskFilename;
    
    
 };

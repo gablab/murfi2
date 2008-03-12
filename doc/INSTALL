@@ -8,7 +8,7 @@ Requirements:
   -cvs
     -sudo apt-get install cvs
   -libraries
-    -ibace-dev
+    -libace-dev
     -freeglut3-dev
     -libgsl0-dev
     -cmake (needed to build vxl)

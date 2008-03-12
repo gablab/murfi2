@@ -10,6 +10,7 @@
 #define RTSTREAMMESSAGE_H
 
 #include"RtData.h"
+#include"RtActivation.h"
 #include"RtConductor.h"
 
 #define MAX_MSGDATAS 10000
@@ -74,6 +75,15 @@ public:
   //  out
   //   pointer to the last data or NULL, if none
   RtData *getLastData();
+
+
+  // get data by data id and roi id (returns the first found instance)
+  //  in
+  //   dataid id of data
+  //   roiid  id of roi
+  //  out
+  //   pointer to the data or NULL, if id doesnt exist
+  RtData *getDataByIDAndRoiID(const string &dataid, const string &roiid);
 
   // get number of data objects currently stored
   unsigned int getNumData();

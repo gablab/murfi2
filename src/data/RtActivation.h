@@ -91,7 +91,7 @@ public:
   void reallocateData();
 
 protected:
-  
+
   // for display
   double threshold;
   double ceiling;

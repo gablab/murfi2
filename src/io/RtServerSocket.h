@@ -9,7 +9,7 @@
 #ifndef RTSERVERSOCKET_H
 #define RTSERVERSOCKET_H
 
-#include"RtInput.h"
+#include"RtOutput.h"
 #include"ace/Task.h"
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Acceptor.h"
@@ -48,7 +48,7 @@ public:
 
 
 // class declaration
-class RtServerSocket : public ACE_Task_Base {
+class RtServerSocket : public ACE_Task_Base, public RtOutput {
 
 public:
 
@@ -58,16 +58,16 @@ public:
   RtServerSocket(); 
   
   // constructor with port and host
-  RtServerSocket(unsigned short portNum, string hostname = ""); 
+  RtServerSocket(unsigned short portNum); 
 
   // destructor
   virtual ~RtServerSocket();
 
   // open and start accepting
-  bool open(RtConfig &config);
+  virtual bool open(RtConfig &config);
 
   // close and clean up
-  bool close();
+  virtual bool close();
 
   // get the version
   //  out: char array that represents the cvs version
@@ -101,7 +101,9 @@ protected:
 
   // connector
   RtSocketAcceptor acceptor;
-  
+
+  // termination character
+  char messageTerminationChar;
 };
 
 #endif

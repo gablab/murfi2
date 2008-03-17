@@ -15,7 +15,7 @@
 class RtActivation;
 
 // class declaration
-class RtMaskImage : public RtDataImage<bool> {
+class RtMaskImage : public RtDataImage<unsigned short> {
 
 public:
 

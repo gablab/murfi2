@@ -11,13 +11,33 @@
 string RtImageZScore::moduleString("voxel-zscore");
 
 // default constructor
-RtImageZScore::RtImageZScore() : RtStreamComponent(), threshold(1.0) {
+RtImageZScore::RtImageZScore() : RtActivationEstimator () {
   id = moduleString;
+
+  meanDataID = "data.image.mri.voxel-mean";
+  varDataID = "data.image.mri.voxel-variance";
 }
 
 // destructor
 RtImageZScore::~RtImageZScore() {
   cout << "destroyed" << endl;
+}
+
+// process a configuration option
+//  in
+//   name of the option to process
+//   val  text of the option node
+bool RtImageZScore::processOption(const string &name, const string &text) {
+  if(name == "meanDataID") {
+    meanDataID = text;
+    return true;
+  }
+  if(name == "varDataID") {
+    varDataID = text;
+    return true;
+  }
+
+  return RtActivationEstimator::processOption(name, text);
 }
 
 // process a single acquisition
@@ -36,8 +56,13 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
     return 0;
   }
 
+  // initialize the computation if necessary
+  if(needsInit) {
+    initEstimation(*img);
+  }
+
   // get the mean
-  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID("data.image.mri.voxel-mean");
+  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID(meanDataID);
 
   if(mean == NULL) {
     cout << "RtImageZScore:process: mean image not found" << endl;
@@ -47,7 +72,7 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   }
   
   // get the variance
-  RtMRIImage *var = (RtMRIImage*)msg->getDataByID("data.image.mri.voxel-variance");
+  RtMRIImage *var = (RtMRIImage*)msg->getDataByID(varDataID);
 
   if(var == NULL) {
     cout << "RtImageZScore:process: variance image not found" << endl;
@@ -71,11 +96,22 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   
   // compute zscore for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
+    if(!mask.getPixel(i) || var->getPixel(i) < 1) {
+      zscore->setPixel(i,fmod(1.0,0.0)); // assign nan
+      continue;
+    }
+
     double z = ((double) img->getPixel(i) - mean->getPixel(i)) 
       / sqrt(var->getPixel(i));
 
     zscore->setPixel(i, z);
   }  
+  
+  // threshold
+  zscore->setThreshold(getTStatThreshold(1));
+
+  // roi id
+  zscore->setRoiID(roiID);
 
   // set the image id for handling
   zscore->addToID("voxel-zscore");

@@ -17,6 +17,7 @@
 #include"gsl_matrix.h"
 
 #include"RtData.h"
+#include"nifti1_io.h"
 
 using namespace std;
 
@@ -36,6 +37,9 @@ public:
 
   // constructor with a filename to read the image from
   RtDataImage(const string &filename);
+
+  // constructor with a number of 
+  RtDataImage(unsigned int);
 
   // construct from raw bytes -- BE CAREFUL WITH THIS
   //RtDataImage(char *bytes, unsigned int len);
@@ -68,6 +72,20 @@ public:
   //   success or failure
   virtual bool write(const string &filename);
 
+  // write an image to a raw file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  virtual bool writeRaw(const string &filename);
+
+  // write an image to a nifti file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  virtual bool writeNifti(const string &filename);
+
   // write the info (all but data) to a stream
   //  in
   //   stream to write to
@@ -94,6 +112,20 @@ public:
   //   success or failure
   virtual bool read(const string &filename);
 
+  // read an image from a raw file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  virtual bool readRaw(const string &filename);
+
+  // read an image from a nifti file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  virtual bool readNifti(const string &filename);
+
   // read info from a stream
   //  in
   //   input stream to read from
@@ -107,6 +139,20 @@ public:
   //  out
   //   success or failure
   virtual bool readData(istream &is);
+
+  // set info from a nifti image header
+  //  in
+  //   nifti image struct
+  //  out
+  //   success or failure
+  bool setInfo(nifti_image *hdr);
+
+  // copy info from our image into a nifti image header
+  //  in
+  //   nifti image struct
+  //  out
+  //   success or failure
+  bool copyInfo(nifti_image *hdr);
 
   // print info about this image
   //  in
@@ -482,6 +528,17 @@ bool RtDataImage<T>::save() {
 template<class T>
 bool RtDataImage<T>::write(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::write"));
+  return writeNifti(_filename);
+}
+
+// write the image to a file
+//  in
+//   filename: string filename
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::writeRaw(const string &_filename) {
+  ACE_TRACE(("RtDataImage<T>::write"));
 
   ofstream imgFile(_filename.c_str(), ios::out | ios::binary);
 
@@ -513,6 +570,36 @@ bool RtDataImage<T>::write(const string &_filename) {
   if(filename.empty()) {
     filename = _filename;
   }
+
+  return true;
+}
+
+// write the image to a nifti file
+//  in
+//   filename: string filename
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::writeNifti(const string &_filename) {
+  ACE_TRACE(("RtDataImage<T>::writeNifti"));
+
+  // store filename if its not set
+  if(filename.empty()) {
+    filename = _filename;
+  }
+
+  // fill the nifti struct with our data
+  nifti_image *img = (nifti_image*) malloc(sizeof(nifti_image));
+  copyInfo(img);
+  
+  // allocate and copy data
+  img->data = (void*) malloc(img->nbyper*img->nvox);
+  memcpy(img->data, data, img->nbyper*img->nvox);
+
+  // write the file
+  nifti_image_write(img);
+
+  nifti_image_free(img);
 
   return true;
 }
@@ -604,6 +691,17 @@ bool RtDataImage<T>::load() {
 template<class T>
 bool RtDataImage<T>::read(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::read"));
+  return readNifti(_filename);
+}
+
+// read the image from a raw file
+//  in
+//   filename: string filename
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::readRaw(const string &_filename) {
+  ACE_TRACE(("RtDataImage<T>::read"));
 
   // delete our current image data, if we have it
   if(data != NULL) {
@@ -639,6 +737,54 @@ bool RtDataImage<T>::read(const string &_filename) {
   }
 
   imgFile.close();
+
+  // store filename if its not set
+  if(filename.empty()) {
+    filename = _filename;
+  }
+
+  return true;
+}
+
+// read the image from a nifti1 file
+//  in
+//   filename: string filename
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::readNifti(const string &_filename) {
+  ACE_TRACE(("RtDataImage<T>::read"));
+
+  nifti_image *img = nifti_image_read(_filename.c_str(), 0);
+  if(img == NULL) {
+    cerr << "could not open " << _filename << " for reading a nifti image" 
+	 << endl;
+    return false;
+  }
+
+  // validfate the datatype
+  if(img->nbyper != sizeof(T)) {
+    cerr << _filename << " has " << img->nbyper 
+	 << " bytes/voxel but i was expecting " << sizeof(T)
+	 << endl;
+    return false;
+  }
+
+  // transform nifti header into our image info struct
+  setInfo(img);
+
+  // delete our current image data, if we have it
+  if(data != NULL) {
+    delete [] data;
+  }
+
+  // read the image data
+  nifti_image_load(img);
+
+  // allocate new data
+  data = new T[img->nvox];
+  memcpy(data, img->data, img->nbyper * img->nvox);
+  
 
   // store filename if its not set
   if(filename.empty()) {
@@ -709,6 +855,222 @@ bool RtDataImage<T>::readData(istream &is) {
   is.read((char*) data, imgDataLen);
 
   return is.good();
+}
+
+// set info from a nifti image header
+//  in
+//   nifti image struct
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::setInfo(nifti_image *hdr) {
+  magicNumber = MAGIC_NUMBER;
+
+  // filename
+  filename = hdr->fname;
+
+  // dims
+  dims.clear();
+  for(int ind = 0; ind < hdr->ndim && ind < MAX_NDIMS; ind++) {
+    dims.push_back(hdr->dim[ind+1]);
+  }
+
+  // img data info
+  numPix = hdr->nvox;
+  bytesPerPix = hdr->nbyper;
+  imgDataLen = numPix*hdr->nbyper;
+
+  // vxl2ras
+  gsl_matrix_set(vxl2ras,0,0,hdr->qto_xyz.m[0][0]);
+  gsl_matrix_set(vxl2ras,0,1,hdr->qto_xyz.m[0][1]);
+  gsl_matrix_set(vxl2ras,0,2,hdr->qto_xyz.m[0][2]);
+  gsl_matrix_set(vxl2ras,0,3,hdr->qto_xyz.m[0][3]);
+  gsl_matrix_set(vxl2ras,1,0,hdr->qto_xyz.m[1][0]);
+  gsl_matrix_set(vxl2ras,1,1,hdr->qto_xyz.m[1][1]);
+  gsl_matrix_set(vxl2ras,1,2,hdr->qto_xyz.m[1][2]);
+  gsl_matrix_set(vxl2ras,1,3,hdr->qto_xyz.m[1][3]);
+  gsl_matrix_set(vxl2ras,2,0,hdr->qto_xyz.m[2][0]);
+  gsl_matrix_set(vxl2ras,2,1,hdr->qto_xyz.m[2][1]);
+  gsl_matrix_set(vxl2ras,2,2,hdr->qto_xyz.m[2][2]);
+  gsl_matrix_set(vxl2ras,2,3,hdr->qto_xyz.m[2][3]);
+  gsl_matrix_set(vxl2ras,3,0,hdr->qto_xyz.m[3][0]);
+  gsl_matrix_set(vxl2ras,3,1,hdr->qto_xyz.m[3][1]);
+  gsl_matrix_set(vxl2ras,3,2,hdr->qto_xyz.m[3][2]);
+  gsl_matrix_set(vxl2ras,3,3,hdr->qto_xyz.m[3][3]);
+
+  minMaxSet = false;
+  minVal = 0;
+  maxVal = 0;
+
+  return true;
+}
+
+// copy info from our image into a nifti image header
+//  in
+//   nifti image struct
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
+
+  // filename
+  hdr->fname = (char*) malloc((filename.length()+1)*sizeof(char));
+  strcpy(hdr->fname,filename.c_str());
+  hdr->iname = (char*) malloc((filename.length()+1)*sizeof(char));
+  strcpy(hdr->iname,filename.c_str());
+
+  // dims
+  hdr->ndim = dims.size();
+  hdr->dim[0] = dims.size();
+  hdr->pixdim[0] = dims.size();
+  for(int ind = 1; ind <= hdr->ndim; ind++) {
+    hdr->dim[ind] = dims[ind-1];
+    hdr->pixdim[ind] = 1.0f;
+  }
+
+  // crappy
+  switch(hdr->ndim) {
+  case 7:
+    hdr->nw = hdr->dim[7];
+    hdr->dw = hdr->pixdim[7];
+  case 6:
+    hdr->nv = hdr->dim[6];
+    hdr->dv = hdr->pixdim[6];
+  case 5:
+    hdr->nu = hdr->dim[5];
+    hdr->du = hdr->pixdim[5];
+  case 4:
+    hdr->nt = hdr->dim[4];
+    hdr->dt = hdr->pixdim[4];
+  case 3:
+    hdr->nz = hdr->dim[3];
+    hdr->dz = hdr->pixdim[3];
+  case 2:
+    hdr->ny = hdr->dim[2];
+    hdr->dy = hdr->pixdim[2];
+  case 1:
+    hdr->nx = hdr->dim[1];
+    hdr->dx = hdr->pixdim[1];
+    break;
+  default:
+    break;
+  }
+
+  // img data info
+  hdr->nvox = numPix;
+  hdr->nbyper = bytesPerPix;
+
+  // data type
+  switch(bytesPerPix) {
+//  case sizeof(bool):
+//    hdr->datatype = DT_BINARY;
+//    break;
+  case sizeof(unsigned short):
+    hdr->datatype = DT_UINT16;
+    break;
+  case sizeof(double):
+    hdr->datatype = DT_DOUBLE;
+    break;
+  default:
+    hdr->datatype = DT_DOUBLE;
+    break;
+  }
+
+  hdr->scl_slope = 1;
+  hdr->scl_inter = 1;
+  hdr->slice_start = 0;
+  hdr->slice_end = 0;
+
+  // nifti type (NIFTI-1 (1 file)
+  hdr->nifti_type = 1;
+
+  hdr->xyz_units = NIFTI_UNITS_MM;
+  hdr->time_units = NIFTI_UNITS_SEC;
+
+  // change this to be read from dicom header!!
+  hdr->qform_code = 1;
+  hdr->quatern_b = 0; 
+  hdr->quatern_c = 0; 
+  hdr->quatern_d = 0; 
+  hdr->qoffset_x = 0; 
+  hdr->qoffset_y = 0; 
+  hdr->qoffset_z = 0; 
+//
+//  // qto_xyz
+//  hdr->qto_xyz.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
+//  hdr->qto_xyz.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
+//  hdr->qto_xyz.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
+//  hdr->qto_xyz.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
+//  hdr->qto_xyz.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
+//  hdr->qto_xyz.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
+//  hdr->qto_xyz.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
+//  hdr->qto_xyz.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
+//  hdr->qto_xyz.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
+//  hdr->qto_xyz.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
+//  hdr->qto_xyz.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
+//  hdr->qto_xyz.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
+//  hdr->qto_xyz.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
+//  hdr->qto_xyz.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
+//  hdr->qto_xyz.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
+//  hdr->qto_xyz.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
+//
+//  // qto_ijk
+//  hdr->qto_ijk.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
+//  hdr->qto_ijk.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
+//  hdr->qto_ijk.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
+//  hdr->qto_ijk.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
+//  hdr->qto_ijk.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
+//  hdr->qto_ijk.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
+//  hdr->qto_ijk.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
+//  hdr->qto_ijk.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
+//  hdr->qto_ijk.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
+//  hdr->qto_ijk.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
+//  hdr->qto_ijk.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
+//  hdr->qto_ijk.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
+//  hdr->qto_ijk.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
+//  hdr->qto_ijk.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
+//  hdr->qto_ijk.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
+//  hdr->qto_ijk.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
+//
+//  // sto_xyz
+//  hdr->sto_xyz.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
+//  hdr->sto_xyz.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
+//  hdr->sto_xyz.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
+//  hdr->sto_xyz.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
+//  hdr->sto_xyz.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
+//  hdr->sto_xyz.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
+//  hdr->sto_xyz.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
+//  hdr->sto_xyz.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
+//  hdr->sto_xyz.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
+//  hdr->sto_xyz.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
+//  hdr->sto_xyz.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
+//  hdr->sto_xyz.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
+//  hdr->sto_xyz.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
+//  hdr->sto_xyz.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
+//  hdr->sto_xyz.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
+//  hdr->sto_xyz.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
+//
+//  // sto_ijk
+//  hdr->sto_ijk.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
+//  hdr->sto_ijk.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
+//  hdr->sto_ijk.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
+//  hdr->sto_ijk.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
+//  hdr->sto_ijk.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
+//  hdr->sto_ijk.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
+//  hdr->sto_ijk.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
+//  hdr->sto_ijk.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
+//  hdr->sto_ijk.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
+//  hdr->sto_ijk.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
+//  hdr->sto_ijk.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
+//  hdr->sto_ijk.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
+//  hdr->sto_ijk.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
+//  hdr->sto_ijk.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
+//  hdr->sto_ijk.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
+//  hdr->sto_ijk.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
+//
+  hdr->num_ext = 0;
+
+  return true;
 }
 
 // initialize to all zeros

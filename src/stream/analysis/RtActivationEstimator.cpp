@@ -12,7 +12,6 @@
 #include"gsl/gsl_cdf.h"
 
 
-
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
 
@@ -34,6 +33,8 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   // default values for mask
   maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
   maskIntensityThreshold = 0.5;
+
+  needsInit = true;
 }
 
 // destructor
@@ -298,6 +299,8 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
     numComparisons 
       = mask.initByMeanIntensityThreshold(image, maskIntensityThreshold);
   }
+
+  needsInit = false;
 }
 
 /*****************************************************************************

@@ -55,11 +55,13 @@ int RtStream::configure(RtConfig &config) {
 #include"RtDiff.h"
 #include"RtMean.h"
 #include"RtVar.h"
+#include"RtIntensityNorm.h"
 #include"RtPasser.h"
 #include"RtImageZScore.h"
 #include"RtImageSlideWinCor.h"
 #include"RtAccumCor.h"
 #include"RtSingleImageCor.h"
+#include"RtFluctuationMonitor.h"
 #include"RtActivationSum.h"
 #include"RtActivationSumDifference.h"
 
@@ -88,6 +90,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   else if(type == RtVar::moduleString) { // voxel time variance
     ACE_NEW_NORETURN(sc, RtVar());
   }
+  else if(type == RtIntensityNorm::moduleString) { // intensity normalization
+    ACE_NEW_NORETURN(sc, RtIntensityNorm());
+  }
   else if(type == RtImageZScore::moduleString) { // voxel z score
     ACE_NEW_NORETURN(sc, RtImageZScore());
   }
@@ -99,6 +104,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   }
   else if(type == RtSingleImageCor::moduleString) { // voxel single image correlation
     ACE_NEW_NORETURN(sc, RtSingleImageCor());
+  }
+  else if(type == RtFluctuationMonitor::moduleString) { // fluctuation monitor
+    ACE_NEW_NORETURN(sc, RtFluctuationMonitor());
   }
   else if(type == RtActivationSum::moduleString) { // sum image activation
     ACE_NEW_NORETURN(sc, RtActivationSum());

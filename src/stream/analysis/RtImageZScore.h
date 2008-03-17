@@ -6,14 +6,14 @@
  *
  *****************************************************************************/
 
-#ifndef RTIMAGEACTIVATION_H
-#define RTIMAGEACTIVATION_H
+#ifndef RTIMAGEZSCORE_H
+#define RTIMAGEZSCORE_H
 
-#include"RtStreamComponent.h"
+#include"RtActivationEstimator.h"
 #include"RtDataImage.h"
 
 // class declaration
-class RtImageZScore : public RtStreamComponent {
+class RtImageZScore : public RtActivationEstimator {
 
 public:
 
@@ -30,10 +30,17 @@ public:
 protected:
 
   // process a single acquisition
-  int process(ACE_Message_Block *mb);
-  
-  // threshold for z-scores
-  double threshold;
+  virtual int process(ACE_Message_Block *mb);
+
+  // process a configuration option
+  //  in
+  //   name of the option to process
+  //   val  text of the option node
+  virtual bool processOption(const string &name, const string &text);
+
+  // data ids to get the mean and variance images from
+  string meanDataID;
+  string varDataID;
 };
 
 #endif

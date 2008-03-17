@@ -38,6 +38,9 @@ protected:
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
+  // data ID for the activation we will sum
+  string activationID;
+
   // roiID for the activ ation we will sum
   string roiID;
 

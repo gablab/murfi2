@@ -18,7 +18,8 @@ string RtStreamComponent::moduleString("generic-stream-component");
 RtStreamComponent::RtStreamComponent() : super(), 
     persistent(false), putResultOnMessage(false) {
   id = moduleString;
-
+  inputDataID = "data.mri.image";
+  makeCurrentData = false;
   passer = NULL;
 }
 
@@ -77,6 +78,14 @@ bool RtStreamComponent::processConfig(RtConfig &config) {
 bool RtStreamComponent::processOption(const string &name, const string &text) {
 
   // look for known options
+  if(name == "input") {
+    inputDataID = text;
+    return true;
+  }
+  if(name == "makecurrent") {
+    bool ret =  RtConfigVal::convert<bool>(makeCurrentData, text);
+    return ret;
+  }
   if(name == "makeavail") {
     bool ret =  RtConfigVal::convert<bool>(putResultOnMessage, text);
     return ret;
@@ -139,6 +148,10 @@ void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
 
   if(putResultOnMessage) {
     msg->addData(data);
+
+    if(makeCurrentData) {
+      msg->setLastDataAsCurrent();
+    }
   }
 
   passData(data);
@@ -236,6 +249,16 @@ bool RtStreamComponent::getPersistent() {
 // gets the id for this stream component
 string RtStreamComponent::getID() {
   return id;
+}
+
+// gets the data id for the input
+string RtStreamComponent::getInputDataID() {
+  return inputDataID;
+}
+
+// sets the data id for the input
+void RtStreamComponent::setInputDataID(string id) {
+  inputDataID = id;;
 }
 
 /*****************************************************************************

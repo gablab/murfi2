@@ -34,6 +34,7 @@
 #define DEFAULT_Y 0
 #define DEFAULT_W 600
 #define DEFAULT_H 600
+#define DEFAULT_NUMMEAS 600
 #define DEFAULT_TITLE "real: experimentor"
 #define DEFAULT_OVERLAYID "data.image.activation.voxel-singleimcor"
 #define DEFAULT_ACTIVATIONSUMID "data.image.activation.voxel-singleimcor.activation-sum"
@@ -95,6 +96,9 @@ bool RtDisplayImage::open(RtConfig &config) {
 
   height = config.isSet("display:imageWinH")
     ? config.get("display:imageWinH") : DEFAULT_H;
+
+  numMeas = config.isSet("scanner:measurements")
+    ? config.get("scanner:measurements") : DEFAULT_NUMMEAS;
 
   strcpy(title, config.isSet("display:imageWinTitle")
 	 ? config.get("display:imageWinTitle").str().c_str() : DEFAULT_TITLE);
@@ -163,8 +167,8 @@ int RtDisplayImage::svc() {
 void RtDisplayImage::setData(RtData *data) {
   ACE_TRACE(("RtDisplayImage::setData"));
 
-  // handle socket activation sum // DEBUGGING ONLY
-  static vnl_vector<double> tc(280,0.0);
+  // plot activation sum over time // DEBUGGING ONLY
+  static vnl_vector<double> tc(numMeas,0.0);
   static Gnuplot gp = Gnuplot("lines");
   static unsigned int numTimepoints = 0;
 
@@ -503,6 +507,9 @@ void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
     break;
   case 'm':
     imageDisplayType = ID_MEANIMG;
+    break;
+  case 'n':
+    imageDisplayType = ID_INTENSITYNORMIMG;
     break;
   case 'v':
     imageDisplayType = ID_VARIMG;

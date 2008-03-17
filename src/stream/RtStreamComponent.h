@@ -83,6 +83,12 @@ public:
   // gets the id for this stream component
   string getID();
 
+  // gets the data id for the input
+  string getInputDataID();
+
+  // sets the data id for the input
+  void setInputDataID(string id);
+
   // module name for config
   static string moduleString;
 
@@ -128,8 +134,14 @@ protected:
   // whether the result should be placed on the message data
   bool putResultOnMessage;
 
+  // whether the result should be made the current data on the message
+  bool makeCurrentData;
+
   // id string
   string id;
+
+  // input data id string
+  string inputDataID;
 };
 
 

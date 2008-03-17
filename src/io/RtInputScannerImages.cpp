@@ -16,7 +16,7 @@ using namespace std;
 static const int    DEFAULT_PORT = 15000;
 static const char*  DEFAULT_SAVEDIR  = "img";
 static const char*  DEFAULT_SAVESTEM = "img";
-static const char*  DEFAULT_SAVEEXT  = "dat";
+static const char*  DEFAULT_SAVEEXT  = "nii";
 
 // increase this size for highres acquisitions
 #define MAX_BUFSIZ 256*256*256*2
@@ -34,7 +34,7 @@ RtInputScannerImages::RtInputScannerImages()
      toBeDeleted(received.begin())
 {
   id += ":scanner:images";
-  // nothing to do
+  saveImagesToFile = false;
 }
 
 // destructor

@@ -2,8 +2,8 @@
 # 2007-09-28
 
 NOWNOWNOW
-- fix Nan problem
-- look into image saving
+- fix Nan problem (can't replicate)
+- look into image saving (DONE)
 - integrate registration methods. 
 - add roi viewing/editing to gui
 - add conditions to info server
@@ -27,6 +27,7 @@ NOWNOWNOW
  - make standardized interface to serialize data using XML. 
  - clean up setInfo parts of RtActivation and RtMaskImage (for
    creation based on geometry of other images)
+ - add interator type interface for mask image
  - convert to vxl image representation (numerics too)
  - enforce data persistence accounting
  - make sure all non-persistent data cleaned up after stream
@@ -67,5 +68,5 @@ NOWNOWNOW
  - add conditions to infoserver
 
 * simple gui
- - overlay (z-scores on epi) DONE
+ - overlay (z-scores on epi) (DONE)
 

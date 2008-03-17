@@ -13,10 +13,11 @@
 using namespace std;
   
 // default constructor
-RtMaskImage::RtMaskImage() : RtDataImage<bool>() {
+RtMaskImage::RtMaskImage() : RtDataImage<unsigned short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage()")); 
   addToID("mask");
   magicNumber = MAGIC_NUMBER;
+  bytesPerPix = sizeof(unsigned short);
 }
 
 // destructor
@@ -34,18 +35,20 @@ RtMaskImage::RtMaskImage(RtMaskImage &img) {
   magicNumber = MAGIC_NUMBER;
 
   // copy the data 
-  data = new bool[numPix];
-  imgDataLen = numPix*sizeof(bool);
+  data = new unsigned short[numPix];
+  imgDataLen = numPix*sizeof(unsigned short);
   memcpy(data, img.data, imgDataLen);
+  bytesPerPix = sizeof(unsigned short);
 }
 
 
 // construct from an mri image
 RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold) 
-    : RtDataImage<bool>() {
+    : RtDataImage<unsigned short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
   addToID("mask");
   magicNumber = MAGIC_NUMBER;
+  bytesPerPix = sizeof(unsigned short);
 
   setInfo(img);
 
@@ -58,10 +61,11 @@ RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold)
 
 // construct from an activation image
 RtMaskImage::RtMaskImage(RtActivation &img, double threshold) 
-    : RtDataImage<bool>() {
+    : RtDataImage<unsigned short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
   addToID("mask");
   magicNumber = MAGIC_NUMBER;
+  bytesPerPix = sizeof(unsigned short);
 
   setInfo(img);
 
@@ -100,11 +104,11 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtMRIImage &image,
   // assign ones to mask positive voxels and count the number of comparisons
   for(unsigned int i = 0; i < image.getNumEl(); i++) {
     if(image.getElement(i) > maskThresh) {
-      setPixel(i,true);
+      setPixel(i,1);
       numOnVoxels++;
     }
     else {
-      setPixel(i,false);
+      setPixel(i,0);
     }
   }
   
@@ -139,11 +143,11 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtActivation &image,
   // assign ones to mask positive voxels and count the number of comparisons
   for(unsigned int i = 0; i < image.getNumEl(); i++) {
     if(image.getElement(i) > maskThresh) {
-      setPixel(i,true);
+      setPixel(i,1);
       numOnVoxels++;
     }
     else {
-      setPixel(i,false);
+      setPixel(i,0);
     }
   }
   
@@ -164,7 +168,7 @@ void RtMaskImage::setInfo(RtMRIImage &img) {
 
   imgDataLen = img.getImgDataLen();
   numPix = img.getNumPix();
-  bytesPerPix = img.getBytesPerPix();
+  bytesPerPix = sizeof(unsigned short);
 
   gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
   gsl_matrix_memcpy(ras2ref, img.getRas2Ref());
@@ -173,7 +177,7 @@ void RtMaskImage::setInfo(RtMRIImage &img) {
     delete [] data;
   }
 
-  data = new bool[numPix];
+  data = new unsigned short[numPix];
 }
 
 // set the info based on a generic data image info
@@ -184,7 +188,7 @@ void RtMaskImage::setInfo(RtActivation &img) {
 
   imgDataLen = img.getImgDataLen();
   numPix = img.getNumPix();
-  bytesPerPix = img.getBytesPerPix();
+  bytesPerPix = sizeof(unsigned short);
 
   gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
   gsl_matrix_memcpy(ras2ref, img.getRas2Ref());
@@ -193,7 +197,7 @@ void RtMaskImage::setInfo(RtActivation &img) {
     delete [] data;
   }
 
-  data = new bool[numPix];
+  data = new unsigned short[numPix];
 }
 
 /*****************************************************************************

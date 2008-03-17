@@ -34,15 +34,15 @@ protected:
   //  in 
   //   name of the option to process
   //   val  text of the option node
-  //virtual bool processOption(const string &name, const string &text);
+  virtual bool processOption(const string &name, const string &text);
 
   // process a single acquisition
-  int process(ACE_Message_Block *mb);
+  virtual int process(ACE_Message_Block *mb);
 
   unsigned int numTimePoints;
 
-  // saves the mean image up to t-1
-  //RtMRIImage mean;
+  // the mean image to use in var calculation
+  string meanDataID;  //RtMRIImage mean;
 
   // saves the variance numerator image up to t-1
   RtActivation varnum;

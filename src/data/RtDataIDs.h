@@ -14,10 +14,12 @@
 #define ID_DIFFIMG                  "data.image.mri.voxel-difference"
 #define ID_MEANIMG                  "data.image.mri.voxel-mean"
 #define ID_VARIMG                   "data.image.mri.voxel-variance"
+#define ID_INTENSITYNORMIMG         "data.image.mri.intensity-norm"
 #define ID_ZSCOREIMG                "data.image.activation.voxel-zscore"
 #define ID_SLIDEWINCOR              "data.image.activation.voxel-slidewincor"
 #define ID_ACCUMCOR                 "data.image.activation.voxel-accumcor"
 #define ID_SINGLEIMCOR              "data.image.activation.voxel-singleimcor"
+#define ID_FLUCTUATIONMONITOR       "data.image.activation.voxel-fluctuationmonitor"
 #define ID_ACTIVATIONSUM            "data.image.activation.activation-sum"
 #define ID_ACTIVATIONSUMDIFFERENCE  "data.image.activation.activation-sum-difference"
 

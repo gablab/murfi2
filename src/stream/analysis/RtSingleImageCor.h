@@ -71,9 +71,6 @@ protected:
   // number of samples we have so far in the current baseline for each condition
   vnl_vector<unsigned int> numBaselineTimepoints; // numConditions in length
  
-  // if we should reinit
-  bool needsInit;
-
   // number of data points to process
   unsigned int numData;
 

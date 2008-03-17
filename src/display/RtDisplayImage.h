@@ -80,7 +80,7 @@ protected:
 
   GlutMaster glutMaster;
 
-  int x, y, width, height;
+  int x, y, width, height, numMeas;
   RtMRIImage *img;
   RtActivation *overlay;
   GLuint imageTex;

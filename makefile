@@ -118,16 +118,19 @@ VXL_LIBS=-lvnl -lvcl -lvnl_algo
 
 GNUPLOT_LIBS=-lgnuplot_i_vxl -L/usr/local/lib
 
+NIFTI_INCS=-I/usr/include/nifti
+NIFTI_LIBS=-lniftiio -lznz
+
 # build compiler flags
 
-export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(TINYXML_FLAGS) $(VXL_INCS)
+export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(TINYXML_FLAGS) $(VXL_INCS) $(NIFTI_INCS)
 
 export C_FLAGS = -Werror -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
 	$(C_INCS) 
 #`$(PKGCONFIG_CMD)`
 
-export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS) $(GNUPLOT_LIBS)
+export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS) $(GNUPLOT_LIBS) $(NIFTI_LIBS)
 
 export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
 export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)

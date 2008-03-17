@@ -41,31 +41,23 @@ int RtMean::process(ACE_Message_Block *mb) {
 
   if(numTimePoints == 0 || storemean.getSeriesNum() != img->getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "mean found first image\n"));
-
     storemean = (*img);
-
-    numTimePoints++;
-
-    return 0;
   }
-  
-  ACE_DEBUG((LM_DEBUG, "including image %d in the mean estimate\n", 
-	     img->getAcquisitionNum()));
-  
+
   // validate sizes
   if(img->getNumPix() != storemean.getNumPix()) {
     ACE_DEBUG((LM_INFO, "RtMean::process: storemean is different size than this one\n"));
-    return -1;    
+    return -1;
   }
-  
+
   // save the data
   numTimePoints++;
 
 
   // allocate a new data image for the variance
-  RtMRIImage *mean = new RtMRIImage(storemean);
-  
-  // update the mean and variance numerator due to west (1979) for each voxel 
+  RtMRIImage *mean = new RtMRIImage(*img);
+
+  // update the mean and variance numerator due to west (1979) for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     // trickery to allow temp negative values
     int pixmean = (int) storemean.getPixel(i);
@@ -75,10 +67,11 @@ int RtMean::process(ACE_Message_Block *mb) {
       + (int) rint( (thispix-pixmean) / (double)numTimePoints);
     storemean.setPixel(i, (unsigned short) newmean);
     mean->setPixel(i, (unsigned short) newmean);
-  }  
+  }
 
   // set the image id for handling
   mean->addToID("voxel-mean");
+  cout << "mean id " << mean->getID() << endl;
   setResult(msg,mean);
 
   return 0;

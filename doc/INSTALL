@@ -96,3 +96,10 @@ make: built [real] successfully!
 17. atighe@atighe:~/realtime/system$ sudo chown -R atighe:atighe data
 18. atighe@atighe:~/realtime/system$ bin/real
 [should run]
+
+
+oliver's notes:
+--------------
+
+2008-03-15 had to modify /usr/include/dirent.h to workaround both
+nifti libs and direct defining DT_UNKNOWN

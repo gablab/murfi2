@@ -12,6 +12,8 @@ string RtActivationSum::moduleString("activation-sum");
 // default constructor
 RtActivationSum::RtActivationSum() : RtStreamComponent() {
   id = moduleString;
+
+  activationID = "data.image.activation.voxel-singleimcor";
 }
 
 // destructor
@@ -26,6 +28,10 @@ bool RtActivationSum::processOption(const string &name, const string &text) {
     roiID = text;
     return true;
   }
+  if(name == "activationID") {
+    activationID = text;
+    return true;
+  }
 
   return RtStreamComponent::processOption(name, text);
 }  
@@ -38,7 +44,7 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
 
   // find the activation with the right roiID
   RtActivation *act 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.voxel-singleimcor",roiID);
+    = (RtActivation*) msg->getDataByIDAndRoiID(activationID,roiID);
 
   if(act == NULL) {
     cout << "couldn't find " << roiID << endl;
@@ -55,9 +61,16 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   sum->setThreshold(act->getThreshold());
 
   // compute the absolute difference
+  unsigned int numPix = 0;
   for(unsigned int i = 0; i < act->getNumPix(); i++) {
-    sum->setPixel(0, sum->getPixel(0) + act->getPixel(i));
+    double pix = act->getPixel(i);
+    if(!isnan(pix)) {
+      sum->setPixel(0, sum->getPixel(0) + pix);
+      numPix++;
+    }
   }
+  sum->setPixel(0, sum->getPixel(0)/numPix);
+  
   
   if(fabs(sum->getPixel(0)) > 10000 | isnan(sum->getPixel(0))) {
     cout << "BIG SUM FOUND: " << sum->getPixel(0) << endl;

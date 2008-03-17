@@ -17,8 +17,6 @@ string RtSingleImageCor::moduleString("singleimcor");
 RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   id = moduleString;
 
-  needsInit = true;
-
   z = f = g = h = NULL;
 
   baselineThreshold.set_size(1);
@@ -216,7 +214,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     if(!mask.getPixel(i)) {
-      cor->setPixel(i,0.0);
+      cor->setPixel(i,fmod(1.0,0.0)); // assign nan
       continue;
     }
 

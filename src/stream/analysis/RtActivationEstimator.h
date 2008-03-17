@@ -95,6 +95,8 @@ protected:
   //  first acquired image to use as a template for parameter inits
   virtual void initEstimation(RtMRIImage &image);
 
+  bool needsInit;
+
   // number of timepoints
   unsigned int numMeas;        // total expected
   unsigned int numTimepoints;  // so far

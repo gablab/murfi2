@@ -16,11 +16,27 @@ string RtVar::moduleString("voxel-variance");
 RtVar::RtVar() : RtStreamComponent() {
   numTimePoints = 0;
   id = moduleString;
+  meanDataID = "data.image.mri.voxel-mean";
 }
 
 // destructor
 RtVar::~RtVar() {
   cout << "destroyed" << endl;
+}
+
+// process a configuration option
+//  in
+//   name of the option to process
+//   val  text of the option node
+bool RtVar::processOption(const string &name, const string &text) {
+
+  // look for known options
+  if(name == "meanDataID") {
+    meanDataID = text;
+    return true;
+  }
+
+  return RtStreamComponent::processOption(name, text);
 }
 
 // process a single acquisition
@@ -40,7 +56,8 @@ int RtVar::process(ACE_Message_Block *mb) {
   }
 
   // get the mean
-  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID("data.image.mri.voxel-mean");
+  cout << "getting mean data with id " << meanDataID << endl;
+  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID(meanDataID);
 
   if(mean == NULL) {
     cout << "RtVar::process: mean image not found" << endl;
@@ -101,6 +118,7 @@ int RtVar::process(ACE_Message_Block *mb) {
 
   // set the image id for handling
   var->addToID("voxel-variance");
+  cout << "var id " << var->getID() << endl;
   setResult(msg,var);
 
   return 0;

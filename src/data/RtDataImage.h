@@ -38,7 +38,7 @@ public:
   // constructor with a filename to read the image from
   RtDataImage(const string &filename);
 
-  // constructor with a number of 
+  // constructor with a number of
   RtDataImage(unsigned int);
 
   // construct from raw bytes -- BE CAREFUL WITH THIS
@@ -161,6 +161,12 @@ public:
 
   // serialize the data as xml for transmission or saving to a file
   virtual TiXmlElement *serializeAsXML();
+
+  // convert to a mosaic representation
+  bool mosaic();
+
+  // convert from a mosaic representation
+  bool unmosaic();
 
   //********  methods for getting data from the image *******//
 
@@ -286,6 +292,9 @@ protected:
   bool minMaxSet;
   T minVal, maxVal;
 
+  unsigned short matrixSize;
+  unsigned short numSlices;
+
 };
 
 
@@ -311,6 +320,8 @@ RtDataImage<T>::RtDataImage() : RtData(),
   addToID("image");
   data = NULL;
   bytesPerPix = sizeof(T);
+  matrixSize = 64;
+  numSlices = 32;
 }
 
 // constructor that accepts a filename to read an image from
@@ -325,6 +336,8 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
        ras2ref(gsl_matrix_calloc(4,4)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
+  matrixSize = 64;
+  numSlices = 32;
   addToID("image");
   bytesPerPix = sizeof(T);
   read(filename);
@@ -591,10 +604,15 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
   // fill the nifti struct with our data
   nifti_image *img = (nifti_image*) malloc(sizeof(nifti_image));
   copyInfo(img);
-  
+
   // allocate and copy data
   img->data = (void*) malloc(img->nbyper*img->nvox);
   memcpy(img->data, data, img->nbyper*img->nvox);
+
+  cout << img->nbyper*img->nvox << "==" << imgDataLen << endl;
+
+  // debugging
+  nifti_image_infodump(img);
 
   // write the file
   nifti_image_write(img);
@@ -757,14 +775,14 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
 
   nifti_image *img = nifti_image_read(_filename.c_str(), 0);
   if(img == NULL) {
-    cerr << "could not open " << _filename << " for reading a nifti image" 
+    cerr << "could not open " << _filename << " for reading a nifti image"
 	 << endl;
     return false;
   }
 
   // validfate the datatype
   if(img->nbyper != sizeof(T)) {
-    cerr << _filename << " has " << img->nbyper 
+    cerr << _filename << " has " << img->nbyper
 	 << " bytes/voxel but i was expecting " << sizeof(T)
 	 << endl;
     return false;
@@ -784,7 +802,7 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
   // allocate new data
   data = new T[img->nvox];
   memcpy(data, img->data, img->nbyper * img->nvox);
-  
+
 
   // store filename if its not set
   if(filename.empty()) {
@@ -989,12 +1007,12 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 
   // change this to be read from dicom header!!
   hdr->qform_code = 1;
-  hdr->quatern_b = 0; 
-  hdr->quatern_c = 0; 
-  hdr->quatern_d = 0; 
-  hdr->qoffset_x = 0; 
-  hdr->qoffset_y = 0; 
-  hdr->qoffset_z = 0; 
+  hdr->quatern_b = 0;
+  hdr->quatern_c = 0;
+  hdr->quatern_d = 0;
+  hdr->qoffset_x = 0;
+  hdr->qoffset_y = 0;
+  hdr->qoffset_z = 0;
 //
 //  // qto_xyz
 //  hdr->qto_xyz.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
@@ -1069,6 +1087,99 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 //  hdr->sto_ijk.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
 //
   hdr->num_ext = 0;
+
+  return true;
+}
+
+// convert to a mosaic representation
+template<class T>
+bool RtDataImage<T>::unmosaic() {
+  // validate
+  if(dims.size() != 2) { // dims
+    cerr << "can't unmosaic an image with " << dims.size() << " dimensions"
+	 << endl;
+    return false;
+  }
+
+  if(matrixSize == 0) { // matrix size set
+    cerr << "can't unmosaic an image if i don't know the matrix size"
+	 << endl;
+    return false;
+  }
+
+//  if(numSlices == 0) { // num slices set
+//    cerr << "can't mosaic an image if i don't know the number of slices"
+//	 << endl;
+//    return false;
+//  }
+
+  // build a new dim array
+  int width = dims[0];
+  int height = dims[1];
+
+  dims.clear();
+  dims.reserve(3);
+  
+  dims.push_back(matrixSize);
+  dims.push_back(matrixSize);
+
+  if(numSlices > 0) {
+    dims.push_back(numSlices);
+  }
+  else {
+    dims.push_back(width/matrixSize * height/matrixSize);    
+  }
+
+  return true;
+}
+
+// convert to a mosaic representation
+template<class T>
+bool RtDataImage<T>::mosaic() {
+  // validate
+  if(dims.size() != 3) { // dims
+    cerr << "can't mosaic an image with " << dims.size() << " dimensions"
+	 << endl;
+    return false;
+  }
+
+  if(dims[0] != dims[1]) { // must be same size 
+    cerr << "can't mosaic an image with different row and column sizes"
+	 << endl;
+    return false;
+  }
+
+//  if(numSlices == 0) { // num slices set
+//    cerr << "can't mosaic an image if i don't know the number of slices"
+//	 << endl;
+//    return false;
+//  }
+
+  // set the matrix size and number of slices
+  matrixSize = dims[0];
+  numSlices = dims[2];
+
+  dims.clear();
+  dims.reserve(2);
+  
+  dims.push_back(matrixSize*(int)ceil(sqrt(matrixSize*matrixSize*numSlices)));
+  dims.push_back(matrixSize*(int)ceil(sqrt(matrixSize*matrixSize*numSlices)));
+  numPix = dims[0]*dims[1];
+
+  // reallocate data if mosaic is bigger
+  if(numPix > (unsigned int) matrixSize*matrixSize*numSlices) {
+    T *tmpdata = data;
+    data = new T[numPix];
+
+    // copy the first bit
+    memcpy(data,tmpdata,sizeof(T)*matrixSize*matrixSize*numSlices);
+    // loop so we can fill with zeros
+    for(unsigned int i = matrixSize*matrixSize*numSlices; i < numPix; i++) {
+      data[i] = 0;
+    }
+    
+    delete tmpdata;
+  }
 
   return true;
 }

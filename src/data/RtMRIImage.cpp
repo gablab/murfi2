@@ -293,6 +293,9 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   dims.resize(2);
   dims[0] = info.nLin;
   dims[1] = info.nCol;
+
+  //matrixSize = rint(info.dFOVread*info.dVoxSizRead);
+
   //    }
 
   // calculate image size

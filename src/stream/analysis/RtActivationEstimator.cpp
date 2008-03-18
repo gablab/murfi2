@@ -26,7 +26,7 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   conditionShift = 0;
 
   // default values for probability thresholding
-  probThreshold = 0.05;
+  probThreshold = 0.2;
   numComparisons = 0;
   correctForMultiComps = true;
 

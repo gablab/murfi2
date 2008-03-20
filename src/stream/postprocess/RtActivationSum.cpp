@@ -72,8 +72,9 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   sum->setPixel(0, sum->getPixel(0)/numPix);
   
   
-  if(fabs(sum->getPixel(0)) > 10000 | isnan(sum->getPixel(0))) {
+  if(fabs(sum->getPixel(0)) > 100 | isnan(sum->getPixel(0))) {
     cout << "BIG SUM FOUND: " << sum->getPixel(0) << endl;
+    sum->setPixel(0, 0);
   }
 
 

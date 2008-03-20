@@ -35,6 +35,8 @@ RtInputScannerImages::RtInputScannerImages()
 {
   id += ":scanner:images";
   saveImagesToFile = false;
+  matrixSize = 64;
+  numSlices = 32;
 }
 
 // destructor
@@ -64,6 +66,15 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
 
   isOpen = true;
+
+
+  if(config.isSet("scanner:matrixSize")) {
+    matrixSize = config.get("scanner:matrixSize");
+  }
+
+  if(config.isSet("scanner:slices")) {
+    numSlices = config.get("scanner:slices");
+  }
 
   // see if we should save images to a file
   if(config.get("scanner:saveImages")==true) {
@@ -135,6 +146,8 @@ int RtInputScannerImages::svc() {
     // build data class
     rti = new RtMRIImage(*ei,img);
     rti->setSeriesNum(seriesNum);
+    rti->setMatrixSize(matrixSize);
+    rti->setNumSlices(numSlices);
 
     // set the image id for handling
     //rti->addToID("scanner");

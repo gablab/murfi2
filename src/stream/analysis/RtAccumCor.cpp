@@ -21,8 +21,8 @@ RtAccumCor::RtAccumCor() : RtActivationEstimator() {
   z = f = g = h = NULL; 
 
   savePosResultAsMask = saveNegResultAsMask = false;
-  savePosAsMaskFilename = "pos_mask.dat";
-  saveNegAsMaskFilename = "neg_mask.dat";
+  savePosAsMaskFilename = "pos_mask.nii";
+  saveNegAsMaskFilename = "neg_mask.nii";
 }
 
 // destructor
@@ -132,7 +132,8 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   if(numTimepoints > numTrends+1) {
     cor->setThreshold(getTStatThreshold(numTimepoints-numTrends-1));
-    cout << cor->getThreshold() << endl;
+    cout << "t thresh: " << cor->getThreshold() << " (p=" 
+	 << getProbThreshold() << ")" << endl;
   }
 
   //// element independent setup

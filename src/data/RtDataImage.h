@@ -219,6 +219,8 @@ public:
 
   void setFilename(string _filename);
 
+  string getFilename();
+
 
   //************** transforms ******************//
 
@@ -609,10 +611,8 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
   img->data = (void*) malloc(img->nbyper*img->nvox);
   memcpy(img->data, data, img->nbyper*img->nvox);
 
-  cout << img->nbyper*img->nvox << "==" << imgDataLen << endl;
-
   // debugging
-  nifti_image_infodump(img);
+  //nifti_image_infodump(img);
 
   // write the file
   nifti_image_write(img);
@@ -938,14 +938,19 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   strcpy(hdr->iname,filename.c_str());
 
   // dims
-  hdr->ndim = dims.size();
-  hdr->dim[0] = dims.size();
-  hdr->pixdim[0] = dims.size();
-  for(int ind = 1; ind <= hdr->ndim; ind++) {
-    hdr->dim[ind] = dims[ind-1];
-    hdr->pixdim[ind] = 1.0f;
+  hdr->ndim = dims.size()+1;
+  hdr->dim[0] = dims.size()+1;
+  for(int ind = 1; ind < 8; ind++) {
+    if(ind < hdr->ndim) {
+      hdr->dim[ind] = dims[ind-1];
+      hdr->pixdim[ind] = 1.0f;
+    }
+    else {
+      hdr->dim[hdr->ndim] = 1;
+      hdr->pixdim[hdr->ndim] = 1.0f;  
+    }
   }
-
+  
   // crappy
   switch(hdr->ndim) {
   case 7:
@@ -994,18 +999,14 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
     break;
   }
 
-  hdr->scl_slope = 1;
-  hdr->scl_inter = 1;
-  hdr->slice_start = 0;
-  hdr->slice_end = 0;
-
   // nifti type (NIFTI-1 (1 file)
   hdr->nifti_type = 1;
 
   hdr->xyz_units = NIFTI_UNITS_MM;
-  hdr->time_units = NIFTI_UNITS_SEC;
+  hdr->time_units = NIFTI_UNITS_MSEC;
 
   // change this to be read from dicom header!!
+  hdr->sform_code = 0;
   hdr->qform_code = 1;
   hdr->quatern_b = 0;
   hdr->quatern_c = 0;
@@ -1013,80 +1014,36 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   hdr->qoffset_x = 0;
   hdr->qoffset_y = 0;
   hdr->qoffset_z = 0;
-//
-//  // qto_xyz
-//  hdr->qto_xyz.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
-//  hdr->qto_xyz.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
-//  hdr->qto_xyz.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
-//  hdr->qto_xyz.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
-//  hdr->qto_xyz.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
-//  hdr->qto_xyz.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
-//  hdr->qto_xyz.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
-//  hdr->qto_xyz.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
-//  hdr->qto_xyz.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
-//  hdr->qto_xyz.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
-//  hdr->qto_xyz.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
-//  hdr->qto_xyz.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
-//  hdr->qto_xyz.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
-//  hdr->qto_xyz.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
-//  hdr->qto_xyz.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
-//  hdr->qto_xyz.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
-//
-//  // qto_ijk
-//  hdr->qto_ijk.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
-//  hdr->qto_ijk.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
-//  hdr->qto_ijk.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
-//  hdr->qto_ijk.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
-//  hdr->qto_ijk.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
-//  hdr->qto_ijk.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
-//  hdr->qto_ijk.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
-//  hdr->qto_ijk.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
-//  hdr->qto_ijk.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
-//  hdr->qto_ijk.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
-//  hdr->qto_ijk.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
-//  hdr->qto_ijk.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
-//  hdr->qto_ijk.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
-//  hdr->qto_ijk.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
-//  hdr->qto_ijk.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
-//  hdr->qto_ijk.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
-//
-//  // sto_xyz
-//  hdr->sto_xyz.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
-//  hdr->sto_xyz.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
-//  hdr->sto_xyz.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
-//  hdr->sto_xyz.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
-//  hdr->sto_xyz.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
-//  hdr->sto_xyz.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
-//  hdr->sto_xyz.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
-//  hdr->sto_xyz.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
-//  hdr->sto_xyz.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
-//  hdr->sto_xyz.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
-//  hdr->sto_xyz.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
-//  hdr->sto_xyz.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
-//  hdr->sto_xyz.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
-//  hdr->sto_xyz.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
-//  hdr->sto_xyz.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
-//  hdr->sto_xyz.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
-//
-//  // sto_ijk
-//  hdr->sto_ijk.m[0][0] = gsl_matrix_get(vxl2ras,0,0);
-//  hdr->sto_ijk.m[0][1] = gsl_matrix_get(vxl2ras,0,1);
-//  hdr->sto_ijk.m[0][2] = gsl_matrix_get(vxl2ras,0,2);
-//  hdr->sto_ijk.m[0][3] = gsl_matrix_get(vxl2ras,0,3);
-//  hdr->sto_ijk.m[1][0] = gsl_matrix_get(vxl2ras,1,0);
-//  hdr->sto_ijk.m[1][1] = gsl_matrix_get(vxl2ras,1,1);
-//  hdr->sto_ijk.m[1][2] = gsl_matrix_get(vxl2ras,1,2);
-//  hdr->sto_ijk.m[1][3] = gsl_matrix_get(vxl2ras,1,3);
-//  hdr->sto_ijk.m[2][0] = gsl_matrix_get(vxl2ras,2,0);
-//  hdr->sto_ijk.m[2][1] = gsl_matrix_get(vxl2ras,2,1);
-//  hdr->sto_ijk.m[2][2] = gsl_matrix_get(vxl2ras,2,2);
-//  hdr->sto_ijk.m[2][3] = gsl_matrix_get(vxl2ras,2,3);
-//  hdr->sto_ijk.m[3][0] = gsl_matrix_get(vxl2ras,3,0);
-//  hdr->sto_ijk.m[3][1] = gsl_matrix_get(vxl2ras,3,1);
-//  hdr->sto_ijk.m[3][2] = gsl_matrix_get(vxl2ras,3,2);
-//  hdr->sto_ijk.m[3][3] = gsl_matrix_get(vxl2ras,3,3);
-//
+
+  hdr->freq_dim = 1;
+  hdr->phase_dim = 2;
+  hdr->slice_dim = 3;
+
+  hdr->cal_min = 0;
+  hdr->cal_max = 0;
+
+  hdr->toffset = 0;
+
+  hdr->slice_code = 0;
+  hdr->scl_slope = 0;
+  hdr->scl_inter = 0;
+  hdr->slice_start = 0;
+  hdr->slice_end = 0;
+  hdr->slice_duration = 0;
+
+  hdr->intent_code = 0;
+  hdr->intent_p1 = 0;
+  hdr->intent_p2 = 0;
+  hdr->intent_p3 = 0;
+  strcpy(hdr->intent_name,"");
+
+  strcpy(hdr->descrip,"");
+  strcpy(hdr->aux_file,"");
+
+  hdr->swapsize = 0;
+
   hdr->num_ext = 0;
+  hdr->ext_list = NULL;
 
   return true;
 }
@@ -1130,6 +1087,33 @@ bool RtDataImage<T>::unmosaic() {
     dims.push_back(width/matrixSize * height/matrixSize);    
   }
 
+  // reshape the data
+  T *newdata = new T[numPix];
+
+  unsigned int slc, row, col, newind;
+  unsigned int sqMatrixSize = matrixSize*matrixSize;
+  for(unsigned int i = 0; i < numPix; i++) {
+    slc = (i%width)/matrixSize + 
+      (i/(matrixSize*width))*(width/matrixSize);
+    row = (i/width)%matrixSize;
+    col = i%matrixSize;
+    newind = slc*sqMatrixSize+row*matrixSize+col;
+
+ //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
+    newdata[newind] = data[i];
+  }
+
+//  ofstream of;
+//  of.open("/tmp/imgarr.txt");
+//  for(unsigned int i=0; i < numPix; i++) {
+//    of << newdata[i] << endl;
+//    //cout << newdata[i] << endl;
+//  }
+//  of.close();
+  
+  delete data;
+  data = newdata;
+
   return true;
 }
 
@@ -1149,12 +1133,6 @@ bool RtDataImage<T>::mosaic() {
     return false;
   }
 
-//  if(numSlices == 0) { // num slices set
-//    cerr << "can't mosaic an image if i don't know the number of slices"
-//	 << endl;
-//    return false;
-//  }
-
   // set the matrix size and number of slices
   matrixSize = dims[0];
   numSlices = dims[2];
@@ -1165,6 +1143,25 @@ bool RtDataImage<T>::mosaic() {
   dims.push_back(matrixSize*(int)ceil(sqrt(matrixSize*matrixSize*numSlices)));
   dims.push_back(matrixSize*(int)ceil(sqrt(matrixSize*matrixSize*numSlices)));
   numPix = dims[0]*dims[1];
+
+//  // reshape the data
+//  T *newdata = new T[numPix];
+//
+//  unsigned int slc, row, col, newind;
+//  unsigned int sqMatrixSize = matrixSize*matrixSize;
+//  for(unsigned int i = 0; i < numPix; i++) {
+//    slc = (i%dims[1])/matrixSize + (i/(matrixSize*dims[1])*dims[1]/matrixSize);
+//    row = (i/dims[1])%matrixSize;
+//    col = i%matrixSize;
+//    newind = slc*sqMatrixSize+row*matrixSize+col;
+//
+////    // DEBUGGING
+////    newind = i;
+//    newdata[newind] = data[i];
+//  }
+//
+//  delete data;
+//  data = newdata;
 
   // reallocate data if mosaic is bigger
   if(numPix > (unsigned int) matrixSize*matrixSize*numSlices) {
@@ -1194,6 +1191,14 @@ void RtDataImage<T>::initToZeros() {
   for(unsigned int i = 0; i < numPix; i++) {
     data[i] = 0;
   }
+}
+
+//************ sets *****************//
+
+// get filename
+template<class T>
+string RtDataImage<T>::getFilename() {
+  return filename;
 }
 
 // get dimensions

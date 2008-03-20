@@ -11,6 +11,8 @@
 #include<gnuplot_i_vxl.h>
 #include"gsl/gsl_cdf.h"
 
+// for gamma functions
+#include<vnl/vnl_gamma.h>
 
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
@@ -26,7 +28,7 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   conditionShift = 0;
 
   // default values for probability thresholding
-  probThreshold = 0.2;
+  probThreshold = 0.05;
   numComparisons = 0;
   correctForMultiComps = true;
 
@@ -177,6 +179,9 @@ bool RtActivationEstimator::processConfig(RtConfig &config) {
   if(config.isSet("scanner:measurements")) {
     numMeas = config.get("scanner:measurements");
   } 
+  if(config.isSet("scanner:tr")) {
+    tr= config.get("scanner:tr");
+  } 
   else {
     cerr << "error: number of measurements has not been set" << endl;
     return false;
@@ -185,45 +190,82 @@ bool RtActivationEstimator::processConfig(RtConfig &config) {
   return true;
 }
 
-// builds an hrf vector 
-//
-// NOTE: ALL INPUT ARGS ARE IGNORED CURRENTLY
-// TODO: GENERATE THE HRF FROM GAMMA FUNCTIONS
+// build a gamma pdf with shape and scale parms
+// see http://www.itl.nist.gov/div898/handbook/apr/section1/apr165.htm
+double gammaPDF(double t, double a, double b) {
+  return pow(b,a)/vnl_gamma(a) * pow(t,a-1) * exp(-b*t);
+}
+
+
+// builds an hrf vector from the difference of two gammas
 //
 // in
-//  sampleRate: temporal precision in milliseconds
-//  length:     length of the HRF in milliseconds
+//  tr:           repetition time in seconds
+//  samplePeriod: temporal precision in seconds
+//  length:       length of the HRF in seconds
 // out
 //  vnl_vector HRF
 void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
-				     unsigned int sampleRate, 
-				     unsigned int length) {
+				     double tr,
+				     double samplePeriod, 
+				     double length) {
 
-  // FOR NOW ASSUME 
-  // sampleRate = 2000 milliseconds
-  // length = 32000 milliseconds
-  double hrf_da[] = {
-    0,
-    0.08656608099364,
-    0.37488823647169,
-    0.38492338174546,
-    0.21611731564656,
-    0.07686956525508,
-    0.00162017719800,
-    -0.03060781173404,
-    -0.03730607813300,
-    -0.03083737159887,
-    -0.02051613335212,
-    -0.01164416374906,
-    -0.00582063147183,
-    -0.00261854249819,
-    -0.00107732374409,
-    -0.00041044352236,
-    -0.00014625750688
-  };
+  double timeToPeakPos = 6;
+  double timeToPeakNeg = 16;
+  double posToNegRatio = 6;
 
-  hrf.set_size(17);
-  hrf.copy_in(hrf_da);
+  double dt = tr*samplePeriod;
+  hrf.set_size((int)ceil(length/tr+1));
+  //double *hrf_da = new double[(int)ceil(length/tr+1)];
+  for(unsigned int i = 0, t = 0; t <= (unsigned int) ceil(length/samplePeriod); 
+      t += (unsigned int) ceil(tr/samplePeriod), i++) {
+//    hrf_da[i] = gammaPDF(t/tr,timeToPeakPos,dt)
+//      - gammaPDF(t/tr,timeToPeakNeg,dt)/posToNegRatio;
+    hrf.put(i, gammaPDF(t/tr,timeToPeakPos,dt)
+  	    - gammaPDF(t/tr,timeToPeakNeg,dt)/posToNegRatio);
+      
+//    cout << i << " " << t << " " << hrf[i] << endl;
+  }
+  //hrf.set_size((int)ceil(length/tr+1));
+  //hrf.copy_in(hrf_da);
+
+  //cout << "jdsgljd" << endl;
+  hrf.normalize();
+
+  // sum
+  for(unsigned int i = 0; i < hrf.size(); i++) {
+    cout << hrf[i] << endl;
+  }
+
+//  // FOR NOW ASSUME 
+//  // sampleRate = 2000 milliseconds
+//  // length = 32000 milliseconds
+//  double hrf_da[] = {
+//    0,
+//    0.08656608099364,
+//    0.37488823647169,
+//    0.38492338174546,
+//    0.21611731564656,
+//    0.07686956525508,
+//    0.00162017719800,
+//    -0.03060781173404,
+//    -0.03730607813300,
+//    -0.03083737159887,
+//    -0.02051613335212,
+//    -0.01164416374906,
+//    -0.00582063147183,
+//    -0.00261854249819,
+//    -0.00107732374409,
+//    -0.00041044352236,
+//    -0.00014625750688
+//  };
+//
+//  hrf.set_size(17);
+//  hrf.copy_in(hrf_da);
+//
+//  for(unsigned int i = 0; i < hrf.size(); i++) {
+//    cout << hrf_da[i] << endl;
+//  }
 }
 
 // finish initialization and prepare to run
@@ -237,7 +279,7 @@ bool RtActivationEstimator::finishInit() {
 
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
-  buildHRF(hrf, 2000, 32000);
+  buildHRF(hrf, tr, 1/16.0, 32);
 
   // debugging
 //static Gnuplot g1;

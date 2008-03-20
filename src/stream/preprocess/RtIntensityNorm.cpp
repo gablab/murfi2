@@ -19,7 +19,8 @@ RtIntensityNorm::RtIntensityNorm() : RtStreamComponent() {
 
   makeBETMask = true;
   computingMask = false;
-  path2BET = "/usr/share/fsl/bin";
+  maskScript = "/home/ohinds/projects/realtime/system/scripts/make_bet_mask.sh";
+  betParms = "-f 0.5 -g 0 -n -m";
 
   maskIntensityThreshold = 0.7;
 
@@ -40,8 +41,12 @@ bool RtIntensityNorm::processOption(const string &name, const string &text) {
   if(name == "betmask") {
     return RtConfigVal::convert<bool>(makeBETMask,text);
   }
-  if(name == "betpath") {
-    path2BET = text;
+  if(name == "maskScript") {
+    maskScript = text;
+    return true;
+  }
+  if(name == "betParms") {
+    betParms = text;
     return true;
   }
 
@@ -85,8 +90,10 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
 	  img->mosaic();	
 	}  mutx.release();
 
-	string cmd = path2BET + "/bet mask/first_img.nii mask/brain -f 0.5 -g 0 -n -m &";
-	system("rm mask/brain_mask.*");
+	string cmd = maskScript + " " 
+	  + img->getFilename() + " "
+	  + "mask/brain" + " " 
+	  + betParms;
 	system(cmd.c_str());
 
 	computingMask = true;
@@ -95,11 +102,12 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
       }
       else {
 	// execute commands to read the mask PLATFORM SPECIFIC!!!!!
-	string cmd = "if [ -f -f mask/brain_mask.nii -o -f mask/brain_mask.nii.gz ]; then exit 0; else exit 1; fi";
+	string cmd = "if [ -f mask/brain_mask.nii -o -f mask/brain_mask.nii.gz ]; then exit 0; else exit 1; fi";
 	if(!system(cmd.c_str())) {
 	  computingMask = false;
 	  mask.read("mask/brain_mask.nii");
 	  mask.mosaic();
+	  mask.write("/tmp/mosaic_mask.nii");
 	}
 	else {
 	  return 0;

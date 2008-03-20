@@ -361,6 +361,26 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   fromScanner = info.iDataSource == 0;
 }
 
+// set the matrix size
+void RtMRIImage::setMatrixSize(unsigned int ms) {
+  matrixSize = ms;
+}
+
+// get the matrix size
+unsigned int RtMRIImage::getMatrixSize() {
+  return matrixSize;
+}
+
+// set the matrix size
+void RtMRIImage::setNumSlices(unsigned int ns) {
+  numSlices = ns;
+}
+
+// get the matrix size
+unsigned int RtMRIImage::getNumSlices() {
+  return numSlices;
+}
+
 // get a smart contrast level
 float RtMRIImage::getAutoContrast() {
   ACE_TRACE(("RtMRIImage::getAutoContrast"));

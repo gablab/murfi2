@@ -39,6 +39,8 @@
 
     tr="2.0"
     measurements="32"
+    matrixSize="64"
+    slices="32"
 > </scanner>
 
 <display
@@ -83,12 +85,14 @@
         0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
      </option>
 
+     <option name="probThreshold">0.05</option>
+
      <option name="trends">2</option>
 
      <option name="savePosAsMask">1</option>
      <option name="saveNegAsMask">1</option>
-     <option name="savePosAsMaskFilename">active_mask.dat</option>
-     <option name="saveNegAsMaskFilename">background_mask.dat</option>
+     <option name="savePosAsMaskFilename">active_mask.nii</option>
+     <option name="saveNegAsMaskFilename">background_mask.nii</option>
   </module>
 
 </preprocessor>

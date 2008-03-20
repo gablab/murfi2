@@ -115,6 +115,10 @@ protected:
   string saveFilestem;
   string saveFileext;
 
+  // scanner parms
+  unsigned int matrixSize;
+  unsigned int numSlices;
+  
   // current series number
   unsigned int seriesNum;
 

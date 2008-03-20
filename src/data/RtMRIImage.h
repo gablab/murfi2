@@ -83,6 +83,18 @@ public:
   // get the acquisition number
   unsigned int getAcquisitionNum() const;
 
+  // set the matrix size
+  void setMatrixSize(unsigned int ms);
+
+  // get the matrix size
+  unsigned int getMatrixSize();
+
+  // set the matrix size
+  void setNumSlices(unsigned int ns);
+
+  // get the matrix size
+  unsigned int getNumSlices();
+
   // get the series number
   unsigned int getSeriesNum() const;
 

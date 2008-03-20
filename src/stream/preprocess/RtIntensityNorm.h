@@ -49,7 +49,8 @@ protected:
   // use bet
   bool makeBETMask;  // default
   bool computingMask;
-  string path2BET;
+  string maskScript;
+  string betParms;
   
   // dont use bet
   double meanIntensity; // intensity to normalize to

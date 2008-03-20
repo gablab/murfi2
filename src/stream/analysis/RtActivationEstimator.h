@@ -58,16 +58,13 @@ protected:
 
   // builds an hrf vector 
   //
-  // NOTE: ALL INPUT ARGS ARE IGNORED CURRENTLY
-  // TODO: GENERATE THE HRF FROM GAMMA FUNCTIONS
-  //
   // in
   //  sampleRate: temporal precision in milliseconds
   //  length:     length of the HRF in milliseconds
   // out
   //  vnl_vector HRF
-  void buildHRF(vnl_vector<double> &hrf, 
-		unsigned int sampleRate, unsigned int length);
+  void buildHRF(vnl_vector<double> &hrf, double tr,
+		double sampleRate, double length);
 
   // process a single acquisition
   virtual int process(ACE_Message_Block *mb) = 0;
@@ -96,6 +93,8 @@ protected:
   virtual void initEstimation(RtMRIImage &image);
 
   bool needsInit;
+
+  double tr;      
 
   // number of timepoints
   unsigned int numMeas;        // total expected

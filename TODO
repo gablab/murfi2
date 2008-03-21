@@ -2,11 +2,11 @@
 # 2007-09-28
 
 NOWNOWNOW
-- fix Nan problem (can't replicate)
-- look into image saving (DONE)
 - integrate registration methods. 
 - add roi viewing/editing to gui
 - add conditions to info server
+- fix incremental GLM
+- look into image saving (DONE)
 
 * config:
  - allow spec of input data ids in module names
@@ -24,11 +24,13 @@ NOWNOWNOW
    and postprocessing
 
 * data
+ - enforce directory structure (make structure as well)
  - make standardized interface to serialize data using XML. 
  - clean up setInfo parts of RtActivation and RtMaskImage (for
    creation based on geometry of other images)
  - add interator type interface for mask image
- - convert to vxl image representation (numerics too)
+ - convert to nii image representation
+ - convert all numerics to vxl
  - enforce data persistence accounting
  - make sure all non-persistent data cleaned up after stream
    completion
@@ -37,7 +39,8 @@ NOWNOWNOW
  - also develop either method for unique ids for each data instance or
    iterator method to choose like data
  - think about id stuff (make id strings consistent '-','_', etc.)
- - add nifti reading/writing
+ - add nifti reading/writing (DONE)
+ - add (un)mosaic 
 
 * data structures
  - fill out functionality in RtDataImage.h and turn it into a .txx
@@ -61,6 +64,7 @@ NOWNOWNOW
   + motion correction
   + intensity normalization
   + registration
+  + brain mask computation (DONE)
 
 * communication
  - fix Nan problem
@@ -68,5 +72,5 @@ NOWNOWNOW
  - add conditions to infoserver
 
 * simple gui
- - overlay (z-scores on epi) (DONE)
+ - overlay (z-scores on epi) (DONE, but need fixed)
 

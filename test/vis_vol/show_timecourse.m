@@ -1,7 +1,7 @@
 % Oliver Hinds <ohinds@mit.edu>
 % 2007-11-09
 
-function show_timecourse(vols,thresh,bg)
+function show_timecourse(vols,thresh,bg,mag)
   
   if(nargin < 2)
     thresh = 0;
@@ -11,9 +11,14 @@ function show_timecourse(vols,thresh,bg)
     bg = zeros(size(vols(:,:,:,1)));
   end
   
+  if(nargin < 4)
+    mag = 400;
+  end
+  
+  
   i = 1;
   while(1)
-    vis_vol(vols(:,:,:,i),thresh,bg);
+    vis_vol(vols(:,:,:,i),thresh,bg,mag);
     title(i);
     pause(0.1);
     i = i+1;

@@ -2,7 +2,7 @@
 % Oliver Hinds <ohinds@mit.edu>
 % 2007-11-09
 
-function vis_vol(vol, thresh, base)
+function vis_vol(vol, thresh, base, mag, pos)
   
   squareside = ceil(log2(size(vol,3)))+1;
 
@@ -10,10 +10,21 @@ function vis_vol(vol, thresh, base)
     thresh = 0;
   end
   
+<<<<<<< vis_vol.m
+  if(nargin < 4)
+    mag = 400;
+  end
+  
+  if(nargin < 5)
+    pos = 0;
+  end
+  
+=======
   if(nargin < 3)
     base = zeros(size(vol));
   end
   
+>>>>>>> 1.2
   
   % build custom colormap
   bbits = 2^(2^ceil(log2(ceil(log2(max(base(:)))))));
@@ -22,9 +33,15 @@ function vis_vol(vol, thresh, base)
   end
   
   cmprec = 64;
-  j = jet(cmprec+20);
-  cm = [gray(bbits); j([cmprec/2:-1:1 cmprec+20:-1:cmprec/2+21],:)];
   
+  if(pos)
+    j = jet(cmprec);
+    cm = [gray(bbits); j];
+  else
+    j = jet(cmprec+20);
+    cm = [gray(bbits); j([cmprec/2:-1:1 cmprec+20:-1:cmprec/2+21],:)];
+  end
+    
   im = zeros(squareside*size(vol,2),squareside*size(vol,1));
   if(nargin < 3)
     base = zeros(squareside*size(vol,2),squareside*size(vol,1));
@@ -45,13 +62,24 @@ function vis_vol(vol, thresh, base)
       act = vol(:,:,curz)';
             
       % find vol below -threshold
+<<<<<<< vis_vol.m
+      if(~pos)
+	inds = find(act <= -thresh);
+	panel(inds) = bbits + cmprec/2+step*(act(inds)+thresh);
+=======
       inds = find(act <= -thresh);
       panel(inds) = bbits + cmprec/2+step*(act(inds)+thresh)+1;
+>>>>>>> 1.2
 
-      % find vol above threshold
-      inds = find(act >= thresh);
-      panel(inds) = bbits + cmprec/2+step*(act(inds)-thresh);
-      
+	% find vol above threshold
+	inds = find(act >= thresh);
+	panel(inds) = bbits + cmprec/2+step*(act(inds)-thresh);
+      else
+	% find vol above threshold
+	inds = find(act >= thresh);
+	panel(inds) = bbits + 2*step*(act(inds)-thresh);	
+      end
+	
       % assign base
       im(...
 	  size(vol,1)*(i-1)+1:size(vol,1)*(i-1)+size(vol,2),...
@@ -61,9 +89,17 @@ function vis_vol(vol, thresh, base)
       curz = curz+1;
     end
   end
+<<<<<<< vis_vol.m
+  
+  imshow(im,[0 bbits+cmprec],'InitialMagnification',mag);
+=======
 
   imshow(im,[0 bbits+cmprec],'InitialMagnification',400);
+<<<<<<< vis_vol.m
+>>>>>>> 1.2
+=======
 %  imshow(im,[0 bbits+cmprec]);
+>>>>>>> 1.3
   colormap(cm);
   
 return

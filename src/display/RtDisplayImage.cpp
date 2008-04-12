@@ -254,7 +254,7 @@ void RtDisplayImage::makeTexture() {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, img->getDim(0),
 	       img->getDim(1), 0, GL_LUMINANCE,
-	       GL_UNSIGNED_SHORT, img->getData());
+	       GL_SHORT, img->getData());
 
   if(!glIsTexture(imageTex)) {
     cerr << "ERROR: could not generate a new texture" << endl;
@@ -291,7 +291,7 @@ void RtDisplayImage::makeOverlayTexture() {
 //  cout << "overlay " << overlay->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
 
   // convert overlay data into a displayable image
-  unsigned short *overlayImg = new unsigned short[4*overlay->getNumPix()];
+  short *overlayImg = new short[4*overlay->getNumPix()];
 
   // debugging
   double min = 1000000, max = -1000000;
@@ -310,31 +310,31 @@ void RtDisplayImage::makeOverlayTexture() {
     // use a cheap heat colormap
     if(!overlay->getScaleIsInverted() 
        && overlay->getPixel(i) > overlay->getThreshold()) {
-      overlayImg[4*i+0] = USHRT_MAX; // r
-      overlayImg[4*i+1] = (unsigned short) rint(((overlay->getPixel(i)
+      overlayImg[4*i+0] = SHRT_MAX; // r
+      overlayImg[4*i+1] = (short) rint(((overlay->getPixel(i)
 						     -overlay->getThreshold())/*/overlay->getCeiling()*/)
-						*USHRT_MAX); // g
+						*SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
-      overlayImg[4*i+3] = USHRT_MAX; // a
+      overlayImg[4*i+3] = SHRT_MAX; // a
     }
     else if(!overlay->getScaleIsInverted() 
 	    && overlay->getPixel(i) < -overlay->getThreshold()) {
       overlayImg[4*i+0] = 0; // r
-      overlayImg[4*i+1] = (unsigned short) rint(((overlay->getPixel(i)
+      overlayImg[4*i+1] = (short) rint(((overlay->getPixel(i)
 						  -overlay->getThreshold())/*/overlay->getCeiling()*/)
-						*USHRT_MAX); // g
-      overlayImg[4*i+2] = USHRT_MAX; // b
-      overlayImg[4*i+3] = USHRT_MAX; // a
+						*SHRT_MAX); // g
+      overlayImg[4*i+2] = SHRT_MAX; // b
+      overlayImg[4*i+3] = SHRT_MAX; // a
 
     }
     else if(overlay->getScaleIsInverted() 
 	    && fabs(overlay->getPixel(i)) < overlay->getThreshold()) {
-      overlayImg[4*i+0] = USHRT_MAX; // r
-      overlayImg[4*i+1] = (unsigned short) 
+      overlayImg[4*i+0] = SHRT_MAX; // r
+      overlayImg[4*i+1] = (short) 
 	(1 - (fabs(overlay->getPixel(i))/overlay->getThreshold()))
 	*USHRT_MAX; // g
       overlayImg[4*i+2] = 0; // b
-      overlayImg[4*i+3] = USHRT_MAX; // a
+      overlayImg[4*i+3] = SHRT_MAX; // a
     }
     else {
       overlayImg[4*i+0] = 0; // r
@@ -356,7 +356,7 @@ void RtDisplayImage::makeOverlayTexture() {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 4, overlay->getDim(0),
 	       overlay->getDim(1), 0, GL_RGBA,
-	       GL_UNSIGNED_SHORT, overlayImg);
+	       GL_SHORT, overlayImg);
 
   delete overlayImg;
 

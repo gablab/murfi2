@@ -19,7 +19,7 @@ using namespace std;
 
 
 // class declaration
-class RtMRIImage : public RtDataImage<unsigned short> {
+class RtMRIImage : public RtDataImage<short> {
 
 public:
 
@@ -43,7 +43,7 @@ public:
 //  RtMRIImage(RtMRIImageInfo &_info, unsigned short  *_data = NULL);
 
   // construct from an external image info struct (siemens) and some image data
-  RtMRIImage(RtExternalImageInfo &info, unsigned short *data = NULL); 
+  RtMRIImage(RtExternalImageInfo &info, short *data = NULL); 
 
   // construct from another image
   RtMRIImage(RtMRIImage &img);
@@ -70,7 +70,7 @@ public:
   //   info: struct
   //   data: array (optional, image data will be  allocated and set
   //         to all zeros if null) 
-  //void setImage(RtMRIImageInfo &_info, unsigned short *_data);
+  //void setImage(RtMRIImageInfo &_info, short *_data);
 
   // print info about this image
   void printInfo(ostream &os);
@@ -119,9 +119,9 @@ protected:
 
 
   // imaging parms
-  bool         pace;                // pace-enabled sequence
   bool         swapReadPhase;       
   unsigned int  seriesNum;           // series number
+  string        seriesInstanceUID;   // series id
   unsigned int  acqNum;              // acquisition number
   double timeAfterStart;      // time after start
   double te;                  // echo time (ms)

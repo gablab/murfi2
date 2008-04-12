@@ -121,7 +121,7 @@ bool RtInputScannerImages::close() {
 // run the scanner input
 int RtInputScannerImages::svc() {
   RtExternalImageInfo *ei;
-  unsigned short *img;
+  short *img;
   RtMRIImage *rti;
   stringstream infos;
 
@@ -222,7 +222,8 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;
-    rec += stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF-rec));
+      rec += stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF-rec));
+  //rec = stream.recv_n (buffer, EXTERNALSENDERSIZEOF);
 
   // arbitrary limit
   if(rec < 100) {
@@ -230,6 +231,7 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
+  cout << "received header of size " << rec << endl;
 
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
 
@@ -241,6 +243,7 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   }
 
   ACE_DEBUG((LM_DEBUG, "received info for %d:%d\n", seriesNum, info->iAcquisitionNumber));
+  cout << "received info for " << seriesNum << ":" << info->iAcquisitionNumber << endl;
 
   return info;
 }
@@ -252,18 +255,19 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 //   info:   the last read image info struct
 //  out
 //   image data on successful read (NULL otherwise)
-unsigned short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
+short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 						   const RtExternalImageInfo &info) {
 
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
+  cout << "receiving image..." << endl;
 
   int numPix = info.nLin * info.nCol;
-  for(unsigned int rec = 0; rec < numPix*sizeof(unsigned short);
-      rec += stream.recv_n (buffer+rec, numPix*sizeof(unsigned short)-rec)) {
+  for(unsigned int rec = 0; rec < numPix*sizeof(short);
+      rec += stream.recv_n (buffer+rec, numPix*sizeof(short)-rec)) {
   }
 
-  unsigned short *img = new unsigned short[numPix];
-  memcpy(img,buffer,numPix*sizeof(unsigned short));
+  short *img = new short[numPix];
+  memcpy(img,buffer,numPix*sizeof(short));
 
   return img;
 };

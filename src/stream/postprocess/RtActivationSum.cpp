@@ -9,6 +9,13 @@
 
 string RtActivationSum::moduleString("activation-sum");
 
+#define DUMPAS 0
+#ifdef DUMPAS
+#include<fstream>
+static ofstream dumpfile("/tmp/activation_sum_dump.txt");
+#endif
+
+
 // default constructor
 RtActivationSum::RtActivationSum() : RtStreamComponent() {
   id = moduleString;
@@ -38,6 +45,8 @@ bool RtActivationSum::processOption(const string &name, const string &text) {
 
 // process a single acquisition
 int RtActivationSum::process(ACE_Message_Block *mb) {
+  static int img = 0;
+  
   ACE_TRACE(("RtActivationSum::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
@@ -56,33 +65,43 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   ACE_DEBUG((LM_DEBUG, "summing activation in image %d\n", 
 	     img->getAcquisitionNum()));
 	    
-  // create a one element activation image
-  RtActivation *sum = new RtActivation(1);
-  sum->setThreshold(act->getThreshold());
-
   // compute the absolute difference
+  double sum = 0;
   unsigned int numPix = 0;
   for(unsigned int i = 0; i < act->getNumPix(); i++) {
     double pix = act->getPixel(i);
     if(!isnan(pix)) {
-      sum->setPixel(0, sum->getPixel(0) + pix);
+      sum += pix;
       numPix++;
+
+#ifdef DUMPAS
+      dumpfile << img << " " << i << numPix << " " << " " << pix
+	       << " " << sum << endl;
+      dumpfile.flush();
+#endif
+      
     }
   }
-  sum->setPixel(0, sum->getPixel(0)/numPix);
+
+  // create a one element activation image
+  RtActivation *mean = new RtActivation(1);
+  mean->setThreshold(act->getThreshold());
+  mean->setPixel(0, sum/numPix);
   
   
-  if(fabs(sum->getPixel(0)) > 100 | isnan(sum->getPixel(0))) {
-    cout << "BIG SUM FOUND: " << sum->getPixel(0) << endl;
-    sum->setPixel(0, 0);
+  if(fabs(mean->getPixel(0)) > 100 | isnan(mean->getPixel(0))) {
+    cout << "BIG SUM FOUND: " << mean->getPixel(0) << endl;
+    mean->setPixel(0, 0);
   }
 
 
   // set the image id for handling
-  sum->addToID("activation-sum");
-  sum->setRoiID(act->getRoiID());
+  mean->addToID("activation-sum");
+  mean->setRoiID(act->getRoiID());
 
-  setResult(msg, sum);
+  setResult(msg, mean);
+
+  img++;
 
   return 0;
 }

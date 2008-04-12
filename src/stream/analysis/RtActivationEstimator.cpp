@@ -36,6 +36,15 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
   maskIntensityThreshold = 0.5;
 
+  // save t volume or not
+  saveTVol = false;
+  saveTVolFilename = "t.nii";
+
+  // mask the resulting t vol and save it as a mask or not
+  savePosResultAsMask = saveNegResultAsMask = false;
+  savePosAsMaskFilename = "pos_mask.nii";
+  saveNegAsMaskFilename = "neg_mask.nii";
+
   needsInit = true;
 }
 
@@ -154,6 +163,13 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "maskIntensityThreshold") {
     return RtConfigVal::convert<double>(maskIntensityThreshold,text);
   }  
+  if(name == "saveTVol") {
+    return RtConfigVal::convert<bool>(saveTVol,text);
+  }
+  if(name == "saveTVolFilename") {
+    saveTVolFilename = text;
+    return true;
+  }
   if(name == "savePosAsMask") {
     return RtConfigVal::convert<bool>(savePosResultAsMask,text);
   }
@@ -216,55 +232,17 @@ void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
 
   double dt = tr*samplePeriod;
   hrf.set_size((int)ceil(length/tr+1));
-  //double *hrf_da = new double[(int)ceil(length/tr+1)];
   for(unsigned int i = 0, t = 0; t <= (unsigned int) ceil(length/samplePeriod); 
       t += (unsigned int) ceil(tr/samplePeriod), i++) {
-//    hrf_da[i] = gammaPDF(t/tr,timeToPeakPos,dt)
-//      - gammaPDF(t/tr,timeToPeakNeg,dt)/posToNegRatio;
     hrf.put(i, gammaPDF(t/tr,timeToPeakPos,dt)
   	    - gammaPDF(t/tr,timeToPeakNeg,dt)/posToNegRatio);
       
-//    cout << i << " " << t << " " << hrf[i] << endl;
   }
-  //hrf.set_size((int)ceil(length/tr+1));
-  //hrf.copy_in(hrf_da);
-
-  //cout << "jdsgljd" << endl;
   hrf.normalize();
 
-  // sum
-  for(unsigned int i = 0; i < hrf.size(); i++) {
-    cout << hrf[i] << endl;
-  }
-
-//  // FOR NOW ASSUME 
-//  // sampleRate = 2000 milliseconds
-//  // length = 32000 milliseconds
-//  double hrf_da[] = {
-//    0,
-//    0.08656608099364,
-//    0.37488823647169,
-//    0.38492338174546,
-//    0.21611731564656,
-//    0.07686956525508,
-//    0.00162017719800,
-//    -0.03060781173404,
-//    -0.03730607813300,
-//    -0.03083737159887,
-//    -0.02051613335212,
-//    -0.01164416374906,
-//    -0.00582063147183,
-//    -0.00261854249819,
-//    -0.00107732374409,
-//    -0.00041044352236,
-//    -0.00014625750688
-//  };
-//
-//  hrf.set_size(17);
-//  hrf.copy_in(hrf_da);
-//
+//  // sum
 //  for(unsigned int i = 0; i < hrf.size(); i++) {
-//    cout << hrf_da[i] << endl;
+//    cout << hrf[i] << endl;
 //  }
 }
 

@@ -61,7 +61,7 @@ protected:
   //   info:   the last read image info struct
   //  out
   //   image data on successful read (NULL otherwise)
-  unsigned short *receiveImage(ACE_SOCK_Stream &stream, 
+  short *receiveImage(ACE_SOCK_Stream &stream, 
 			       const RtExternalImageInfo &info);
 
   // saves an image

@@ -12,7 +12,7 @@
 using namespace std;
   
 // default constructor
-RtMRIImage::RtMRIImage() : RtDataImage<unsigned short>() {
+RtMRIImage::RtMRIImage() : RtDataImage<short>() {
   ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
   addToID("mri");
   magicNumber = MAGIC_NUMBER;
@@ -25,7 +25,7 @@ RtMRIImage::RtMRIImage() : RtDataImage<unsigned short>() {
 //  
 //  data = NULL;
 //
-//  info.setBytesPerPix(sizeof(unsigned short));
+//  info.setBytesPerPix(sizeof(short));
 //
 //  read(filename);
 //}
@@ -33,16 +33,16 @@ RtMRIImage::RtMRIImage() : RtDataImage<unsigned short>() {
 //// construct from raw bytes sent by RtInputScannerImages
 //// BE CAREFUL WITH THIS
 //RtMRIImage::RtMRIImage(char *bytes, unsigned int len) 
-//    : RtDataImage<unsigned short>(bytes,len) {
+//    : RtDataImage<short>(bytes,len) {
 //  ACE_TRACE(("RtMRIImage::RtMRIImage(char*,unsigned int)"));
 //
 //  addToID("mri");
 //}
 
 // construct from an image info struct and some byte data
-RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, unsigned short *bytes) 
-    : RtDataImage<unsigned short>() {
-  ACE_TRACE(("RtMRIImage::RtMRIImage(RtExternalImageInfo,unsigned short*)"));
+RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes) 
+    : RtDataImage<short>() {
+  ACE_TRACE(("RtMRIImage::RtMRIImage(RtExternalImageInfo,short*)"));
 
   addToID("mri");
   magicNumber = MAGIC_NUMBER;
@@ -50,7 +50,7 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, unsigned short *bytes)
   setInfo(extinfo);
 
   // allocate and copy the img data
-  data = new unsigned short[numPix];
+  data = new short[numPix];
 
   if(bytes != NULL) {
     memcpy(data,bytes,imgDataLen);
@@ -59,8 +59,8 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, unsigned short *bytes)
 
 
 //// construct from an image info struct and (possibly blank) data
-//RtMRIImage::RtMRIImage(RtMRIImageInfo &_info, unsigned short  *_data) 
-//    : RtDataImage<unsigned short>() {
+//RtMRIImage::RtMRIImage(RtMRIImageInfo &_info, short  *_data) 
+//    : RtDataImage<short>() {
 //  ACE_TRACE(("RtMRIImage::RtMRIImage(RtMRIImageInfo,T*)"));
 //  addToID("mri");
 //  magicNumber = MAGIC_NUMBER;
@@ -78,7 +78,7 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
   magicNumber = MAGIC_NUMBER;
 
   // copy the data 
-  data = new unsigned short[numPix];
+  data = new short[numPix];
   memcpy(data, img.data, imgDataLen);
 }
 
@@ -87,9 +87,9 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
 //   info: struct
 //   data: array (optional, image data will be  allocated and set
 //         to all zeros if null) 
-//void RtMRIImage::setImage(RtMRIImageInfo &_info, unsigned short *_data) {
+//void RtMRIImage::setImage(RtMRIImageInfo &_info, short *_data) {
 //  info = _info;
-//  data = new unsigned short[info.numPix];
+//  data = new short[info.numPix];
 //
 //  if(_data != NULL) {
 //    memcpy(data, _data, info.imgDataLen);
@@ -109,7 +109,7 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
 bool RtMRIImage::writeInfo(ostream &os) {
   if(os.fail()) return false;
 
-  if(!RtDataImage<unsigned short>::writeInfo(os)) {
+  if(!RtDataImage<short>::writeInfo(os)) {
     return false;
   }
 
@@ -121,9 +121,6 @@ bool RtMRIImage::writeInfo(ostream &os) {
 
   char boolcon;
   
-  boolcon = (char) pace;
-  os.write((char*) &boolcon, sizeof(char));
-
   boolcon = (char) swapReadPhase;
   os.write((char*) &boolcon, sizeof(char));
   
@@ -167,7 +164,7 @@ bool RtMRIImage::writeInfo(ostream &os) {
 bool RtMRIImage::readInfo(istream &is) {
   if(is.fail()) return false;
 
-  if(!RtDataImage<unsigned short>::readInfo(is)) {
+  if(!RtDataImage<short>::readInfo(is)) {
     return false;
   }
 
@@ -179,9 +176,6 @@ bool RtMRIImage::readInfo(istream &is) {
 
   char boolcon;
   
-  is.read((char*) &boolcon, sizeof(char));
-   pace = (bool) boolcon;
-
   is.read((char*) &boolcon, sizeof(char));
   swapReadPhase = (bool) boolcon;
   
@@ -229,7 +223,6 @@ void RtMRIImage::printInfo(ostream &os) {
      << setw(wid) << "readFOV phaseFOV" 
      << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
-     << setw(wid) << "pace" << pace << endl
      << setw(wid) << "swapReadPhase" << swapReadPhase << endl
      << setw(wid) << "acqNum" << acqNum << endl
      << setw(wid) << "timeAfterStart" << timeAfterStart << endl
@@ -285,18 +278,14 @@ unsigned int RtMRIImage::getSeriesNum() const {
 //   _info: struct to copy
 void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
-  // determine the dimensions
-  //    if(info.nCol != rint(info.dFOVread*info.dVoxSizRead)) {// probably mosaiced
-  //      
-  //    }
-  //    else {
+  // determine the dimensions and voxel size
   dims.resize(2);
-  dims[0] = info.nLin;
-  dims[1] = info.nCol;
+  dims[0] = info.nLin*info.iMosaicGridSize;
+  dims[1] = info.nCol*info.iMosaicGridSize;
 
-  //matrixSize = rint(info.dFOVread*info.dVoxSizRead);
-
-  //    }
+  pixdims.resize(3);
+  pixdims[0] = info.dFOVread / info.nLin;
+  pixdims[1] = info.dFOVphase / info.nCol;
 
   // calculate image size
   imgDataLen = bytesPerPix;
@@ -335,10 +324,11 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   slice = info.lSliceIndex;
   readFOV = info.dFOVread;
   phaseFOV = info.dFOVphase;
+  matrixSize = info.nCol;
+  numSlices = info.iNoOfImagesInMosaic;
   sliceThick = info.dThick;
-    
+  seriesInstanceUID = info.cSeriesInstanceUID;
 
-  pace = false;
   swapReadPhase = info.bSwapReadPhase;       
   acqNum = info.iAcquisitionNumber;
   timeAfterStart = info.dTimeAfterStart;
@@ -355,7 +345,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
   // scanner online post-processing parms
   distCorrect2D = false;
-  moco = false;  
+  moco = info.bIsMoCo;  
 
   // received data parms
   fromScanner = info.iDataSource == 0;

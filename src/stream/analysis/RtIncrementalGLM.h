@@ -1,26 +1,19 @@
 /******************************************************************************
- * RtFluctuationMonitor.h is the header for a class that estimates the
- * activation at each voxel in a single image using a GLM-based
- * correlation analysis based on Hids, et al., 2008
+ * RtIncrementalGLM.h is the header for a class that estimates the
+ * activation at each voxel incrementally using Gentleman's method
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-01-16
+ * Oliver Hinds <ohinds@mit.edu> 2008-04-01
  *
  *****************************************************************************/
 
-#ifndef RTFLUCTUATIONMONITOR_H
-#define RTFLUCTUATIONMONITOR_H
-
-#include<vnl/vnl_vector.h>
-#include<vnl/vnl_matrix.h>
+#ifndef RTNCREMENTALGLM_H
+#define RTINCREMENTALGLM_H
 
 #include"RtActivationEstimator.h"
 #include"RtLeastSquaresSolve.h"
 
-#include<vector>
-using namespace std;
-
 // class declaration
-class RtFluctuationMonitor : public RtActivationEstimator {
+class RtIncrementalGLM : public RtActivationEstimator {
 
 public:
 
@@ -29,10 +22,10 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
-  RtFluctuationMonitor();
+  RtIncrementalGLM();
 
   // destructor
-  ~RtFluctuationMonitor();
+  ~RtIncrementalGLM();
 
 protected:
 
@@ -45,7 +38,8 @@ protected:
   //   val  text of the option node
   virtual bool processOption(const string &name, const string &text);
 
-  //// parameters of the activation estimation algorithm
+  // get a datapoint by index
+  //virtual unsigned short getDatapoint(RtData &data, unsigned int index) = 0;
 
   // if we should reinit
   bool needsInit;
@@ -55,7 +49,7 @@ protected:
 
   // one solver for each voxel 
   RtLeastSquaresSolve **solvers;
-  
+
 };
 
 #endif

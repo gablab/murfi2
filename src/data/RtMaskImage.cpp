@@ -18,6 +18,7 @@ RtMaskImage::RtMaskImage() : RtDataImage<unsigned short>() {
   addToID("mask");
   magicNumber = MAGIC_NUMBER;
   bytesPerPix = sizeof(unsigned short);
+  numOnVoxels = 0;
 }
 
 // destructor
@@ -39,6 +40,8 @@ RtMaskImage::RtMaskImage(RtMaskImage &img) {
   imgDataLen = numPix*sizeof(unsigned short);
   memcpy(data, img.data, imgDataLen);
   bytesPerPix = sizeof(unsigned short);
+
+  numOnVoxels = 0;
 }
 
 
@@ -49,6 +52,8 @@ RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold)
   addToID("mask");
   magicNumber = MAGIC_NUMBER;
   bytesPerPix = sizeof(unsigned short);
+
+  numOnVoxels = 0;
 
   setInfo(img);
 
@@ -68,6 +73,8 @@ RtMaskImage::RtMaskImage(RtActivation &img, double threshold)
   bytesPerPix = sizeof(unsigned short);
 
   setInfo(img);
+
+  numOnVoxels = 0;
 
   // build mask if threshold is specified
   if(fabs(threshold) > EPS) {

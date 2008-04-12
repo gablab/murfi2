@@ -18,6 +18,7 @@
 #define ID_ZSCOREIMG                "data.image.activation.voxel-zscore"
 #define ID_SLIDEWINCOR              "data.image.activation.voxel-slidewincor"
 #define ID_ACCUMCOR                 "data.image.activation.voxel-accumcor"
+#define ID_INCREMENTALGLM           "data.image.activation.voxel-incrglm"
 #define ID_SINGLEIMCOR              "data.image.activation.voxel-singleimcor"
 #define ID_FLUCTUATIONMONITOR       "data.image.activation.voxel-fluctuationmonitor"
 #define ID_ACTIVATIONSUM            "data.image.activation.activation-sum"

@@ -60,6 +60,7 @@ int RtStream::configure(RtConfig &config) {
 #include"RtImageZScore.h"
 #include"RtImageSlideWinCor.h"
 #include"RtAccumCor.h"
+#include"RtIncrementalGLM.h"
 #include"RtSingleImageCor.h"
 #include"RtFluctuationMonitor.h"
 #include"RtActivationSum.h"
@@ -101,6 +102,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   }
   else if(type == RtAccumCor::moduleString) { // voxel accumulative correlation
     ACE_NEW_NORETURN(sc, RtAccumCor());
+  }
+  else if(type == RtIncrementalGLM::moduleString) { // voxel incremental GLM
+    ACE_NEW_NORETURN(sc, RtIncrementalGLM());
   }
   else if(type == RtSingleImageCor::moduleString) { // voxel single image correlation
     ACE_NEW_NORETURN(sc, RtSingleImageCor());

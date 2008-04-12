@@ -12,6 +12,11 @@
 
 string RtSingleImageCor::moduleString("singleimcor");
 
+#define DUMP 0
+#ifdef DUMP
+#include<fstream>
+static ofstream dumpfile("/tmp/sungle_image_dump.txt");
+#endif
 
 // default constructor
 RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
@@ -220,6 +225,14 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
     double z_hat = dat->getElement(i);
 
+
+//    #ifdef DUMP
+//    //if(dat->getPixel(i) > 4090) {
+//      dumpfile << c->get(i,numTrends+1) << " " << pow(c->get(i,numTrends+1),2) << " " << pow(z_hat/b_old,2) << " " << sqrt(pow(c->get(i,numTrends+1),2)+pow(z_hat/b_old,2)) << endl;
+//      //}
+//    #endif
+
+
     // decide whether we are in an on or off condition
     // NOTE: by testing after the mask we are assuming a constant mask over time
     for(unsigned int j = 0; j < numConditions; j++) {
@@ -259,8 +272,16 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
     for(unsigned int j = 0; j < numTrends+1; j++) {
       z_hat = z_hat - h->get(j)*c->get(i,j);
+
       c->put(i,j, f->get(j)*c->get(i,j) + g->get(j)*z_hat);
     }
+
+    #ifdef DUMP
+    //if(dat->getPixel(i) > 4090) {
+      dumpfile << c->get(i,numTrends+1) << " " << pow(c->get(i,numTrends+1),2) << " " << pow(z_hat/b_old,2) << " " << sqrt(pow(c->get(i,numTrends+1),2)+pow(z_hat/b_old,2)) << endl;
+      //}
+    #endif
+
     c->put(i,numTrends+1, sqrt(pow(c->get(i,numTrends+1),2)+pow(z_hat/b_old,2)));
     // compute the correlation after we have enough timepoints to
     if(numTimepoints > numTrends+1) {
@@ -279,8 +300,15 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
 //    if(i == 1 && numTimepoints == 2) {
 //    if(i == 16*32*32 + 28*32 + 14) {
-//      fprintf(stderr,"%d %d %f %f %f\n", numTimepoints, dat->getElement(i),
-//	      conditions->get(numTimepoints-1,0), z_hat, cor->getPixel(i));
+#ifdef DUMP
+    dumpfile << numTimepoints << " " << i << " " << dat->getPixel(i)
+	     << " " << c->get(i,0) << " " << h->get(0) 
+	     << " " << c->get(i,1) << " " << h->get(1) 
+             << " " << C->get(numTrends, numTrends) 
+	     << " " << c->get(i,numTrends+1)
+	     << " " <<  cor->getPixel(i) << endl;
+    dumpfile.flush();
+#endif
 //
 //      cout << "z: "; printVnlVector(*z); cout << endl;
 //      cout << "f: "; printVnlVector(*f); cout << endl;

@@ -38,7 +38,7 @@ RtIntensityNorm::~RtIntensityNorm() {
 bool RtIntensityNorm::processOption(const string &name, const string &text) {
 
   // look for known options
-  if(name == "betmask") {
+  if(name == "betMask") {
     return RtConfigVal::convert<bool>(makeBETMask,text);
   }
   if(name == "maskScript") {
@@ -107,6 +107,7 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
 	  computingMask = false;
 	  mask.read("mask/brain_mask.nii");
 	  mask.mosaic();
+	  mask.setFilename("/tmp/mosaic_mask.nii");
 	  mask.write("/tmp/mosaic_mask.nii");
 	}
 	else {

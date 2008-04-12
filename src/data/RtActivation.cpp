@@ -17,6 +17,7 @@ RtActivation::RtActivation() : RtDataImage<double>() {
   magicNumber = MAGIC_NUMBER;
   threshold = 10.0;
   ceiling = 16.0;
+  bytesPerPix = sizeof(double);
 }
 
 // constructor with MRIInfo
@@ -27,7 +28,7 @@ RtActivation::RtActivation(RtMRIImage &img)
   magicNumber = MAGIC_NUMBER;
 
   setInfo(img);
-
+  bytesPerPix = sizeof(double);
   threshold = 10.0;
   ceiling = 16.0;
 }
@@ -185,9 +186,9 @@ void RtActivation::setInfo(RtMRIImage &img) {
 
   dims = img.getDims();
 
-  imgDataLen = img.getImgDataLen();
   numPix = img.getNumPix();
-  bytesPerPix = img.getBytesPerPix();
+  bytesPerPix = sizeof(double);
+  imgDataLen = numPix*bytesPerPix;
 
   gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
   gsl_matrix_memcpy(ras2ref, img.getRas2Ref());

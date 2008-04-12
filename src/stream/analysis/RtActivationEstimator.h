@@ -134,6 +134,9 @@ protected:
   double maskIntensityThreshold;
   string maskFilename;
 
+  // whether to save the resulting t map
+  bool saveTVol;
+  string saveTVolFilename;
 
   // whether to save the result as a mask
   bool savePosResultAsMask;

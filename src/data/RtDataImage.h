@@ -179,6 +179,9 @@ public:
   // get dimensions
   int getDim(int i);
 
+  // get voxel dimensions
+  double getPixDim(int i);
+
   // get vxl2ras
   gsl_matrix *getVxl2Ras();
 
@@ -280,6 +283,7 @@ protected:
 
   // dimensions of the image data
   vector<int> dims;
+  vector<double> pixdims;
 
   // info about the pixels
   unsigned long  imgDataLen;
@@ -294,6 +298,7 @@ protected:
   bool minMaxSet;
   T minVal, maxVal;
 
+  // for transforming between mosaic representation
   unsigned short matrixSize;
   unsigned short numSlices;
 
@@ -479,6 +484,12 @@ void RtDataImage<T>::printInfo(ostream &os) {
     os << *i << " / ";
   }
 
+  os << setw(wid) << "pixdim1 / pixdim2... /: ";
+
+  for(vector<double>::iterator i = pixdims.begin(); i != pixdims.end(); i++) {
+    os << *i << " / ";
+  }
+
   os << endl
      << setw(wid) << "imgDataLen in bytes " << imgDataLen << endl
      << setw(wid) << "numPix" << numPix << endl
@@ -599,9 +610,7 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::writeNifti"));
 
   // store filename if its not set
-  if(filename.empty()) {
-    filename = _filename;
-  }
+  filename = _filename;
 
   // fill the nifti struct with our data
   nifti_image *img = (nifti_image*) malloc(sizeof(nifti_image));
@@ -653,6 +662,15 @@ bool RtDataImage<T>::writeInfo(ostream &os) {
     dimarr[ind] = *i;
   }
   os.write((char*) dimarr, MAX_NDIMS*sizeof(unsigned int));
+
+  // pixdims
+  double pixdimarr[MAX_NDIMS];
+  ind = 0;
+  for(vector<double>::iterator i = pixdims.begin(); i != pixdims.end(); 
+      i++, ind++) {
+    pixdimarr[ind] = *i;
+  }
+  os.write((char*) pixdimarr, MAX_NDIMS*sizeof(double));
 
   // img data info
   os.write((char*) &imgDataLen, sizeof(unsigned long));
@@ -841,6 +859,15 @@ bool RtDataImage<T>::readInfo(istream &is) {
     dims.push_back(dimarr[ind]);
   }
 
+  // pixdims
+  double pixdimarr[MAX_NDIMS];
+  is.read((char*) pixdimarr, MAX_NDIMS*sizeof(double));
+
+  pixdims.clear();
+  for(unsigned int ind = 0; ind < ndims && ind < MAX_NDIMS; ind++) {
+    pixdims.push_back(pixdimarr[ind]);
+  }
+
   // img data info
   is.read((char*) &imgDataLen, sizeof(unsigned long));
   is.read((char*) &numPix, sizeof(unsigned long));
@@ -893,6 +920,12 @@ bool RtDataImage<T>::setInfo(nifti_image *hdr) {
     dims.push_back(hdr->dim[ind+1]);
   }
 
+  // pixdims
+  pixdims.clear();
+  for(int ind = 0; ind < hdr->ndim && ind < MAX_NDIMS; ind++) {
+    pixdims.push_back(hdr->pixdim[ind+1]);
+  }
+
   // img data info
   numPix = hdr->nvox;
   bytesPerPix = hdr->nbyper;
@@ -930,7 +963,11 @@ bool RtDataImage<T>::setInfo(nifti_image *hdr) {
 //   success or failure
 template<class T>
 bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
-
+  // info
+  hdr->iname_offset = 348;
+  hdr->swapsize = 0;
+  hdr->analyze75_orient = a75_transverse_unflipped;
+  
   // filename
   hdr->fname = (char*) malloc((filename.length()+1)*sizeof(char));
   strcpy(hdr->fname,filename.c_str());
@@ -938,17 +975,16 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   strcpy(hdr->iname,filename.c_str());
 
   // dims
-  hdr->ndim = dims.size()+1;
-  hdr->dim[0] = dims.size()+1;
+  hdr->ndim = (dims.size() >= 4) ? dims.size() : 4;
+  hdr->dim[0] = hdr->ndim;
   for(int ind = 1; ind < 8; ind++) {
-    if(ind < hdr->ndim) {
-      hdr->dim[ind] = dims[ind-1];
-      hdr->pixdim[ind] = 1.0f;
-    }
-    else {
-      hdr->dim[hdr->ndim] = 1;
-      hdr->pixdim[hdr->ndim] = 1.0f;  
-    }
+    hdr->dim[ind] = 1;
+    hdr->pixdim[ind] = 1;
+  }
+
+  for(unsigned int ind = 1; ind <= dims.size(); ind++) {
+    hdr->dim[ind] = dims[ind-1];
+    hdr->pixdim[ind] = pixdims[ind-1];
   }
   
   // crappy
@@ -988,8 +1024,8 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 //  case sizeof(bool):
 //    hdr->datatype = DT_BINARY;
 //    break;
-  case sizeof(unsigned short):
-    hdr->datatype = DT_UINT16;
+  case sizeof(short):
+    hdr->datatype = DT_SIGNED_SHORT;
     break;
   case sizeof(double):
     hdr->datatype = DT_DOUBLE;
@@ -1006,6 +1042,12 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   hdr->time_units = NIFTI_UNITS_MSEC;
 
   // change this to be read from dicom header!!
+  for(int i = 0; i < 4; i++) {
+    for(int j = 0; j < 4; j++) {
+      hdr->qto_xyz.m[i][j] = 0;
+    }
+  }
+  
   hdr->sform_code = 0;
   hdr->qform_code = 1;
   hdr->quatern_b = 0;
@@ -1031,7 +1073,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   hdr->slice_end = 0;
   hdr->slice_duration = 0;
 
-  hdr->intent_code = 0;
+  hdr->intent_code = NIFTI_INTENT_NONE;
   hdr->intent_p1 = 0;
   hdr->intent_p2 = 0;
   hdr->intent_p3 = 0;
@@ -1048,7 +1090,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   return true;
 }
 
-// convert to a mosaic representation
+// convert from a mosaic representation
 template<class T>
 bool RtDataImage<T>::unmosaic() {
   // validate
@@ -1140,28 +1182,26 @@ bool RtDataImage<T>::mosaic() {
   dims.clear();
   dims.reserve(2);
   
-  dims.push_back(matrixSize*(int)ceil(sqrt(matrixSize*matrixSize*numSlices)));
-  dims.push_back(matrixSize*(int)ceil(sqrt(matrixSize*matrixSize*numSlices)));
+  //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);  
+  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt(numSlices)),2)));
+  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt(numSlices)),2)));
   numPix = dims[0]*dims[1];
 
-//  // reshape the data
-//  T *newdata = new T[numPix];
-//
-//  unsigned int slc, row, col, newind;
-//  unsigned int sqMatrixSize = matrixSize*matrixSize;
-//  for(unsigned int i = 0; i < numPix; i++) {
-//    slc = (i%dims[1])/matrixSize + (i/(matrixSize*dims[1])*dims[1]/matrixSize);
-//    row = (i/dims[1])%matrixSize;
-//    col = i%matrixSize;
-//    newind = slc*sqMatrixSize+row*matrixSize+col;
-//
-////    // DEBUGGING
-////    newind = i;
-//    newdata[newind] = data[i];
-//  }
-//
-//  delete data;
-//  data = newdata;
+  // reshape the data
+  T *newdata = new T[numPix];
+
+  unsigned int row, col, newind;
+  unsigned int sqMatrixSize = matrixSize*matrixSize;
+  for(unsigned int i = 0; i < numPix; i++) {
+    // these expressions are bracketed carefully to truncate
+    row = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
+    col = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
+    newind = row*dims[1]+col;
+    newdata[newind] = data[i];
+  }
+
+  delete data;
+  data = newdata;
 
   // reallocate data if mosaic is bigger
   if(numPix > (unsigned int) matrixSize*matrixSize*numSlices) {
@@ -1223,6 +1263,12 @@ gsl_matrix *RtDataImage<T>::getRas2Ref() {
 template<class T>
 int RtDataImage<T>::getDim(int i) {
   return (int)dims.size() > i && i >= 0 ? dims[i] : -1;
+}
+
+// get vox dimensions
+template<class T>
+double RtDataImage<T>::getPixDim(int i) {
+  return pixdims.size() > i && i >= 0 ? pixdims[i] : -1;
 }
 
 // get number of pix

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  example configuration file for the realtime fMRI system       -->
+<!--  NOTE... ':' characters are not allowed in any names or values -->
+<!--  Oliver Hinds <ohinds@mit.edu> 2007-09-12                      -->
+
+<study
+    subject="foobar"
+    subjectsDir="/data/subjects"
+    > </study>
+
+<info>
+  <terminal
+      verbose="true"
+      debug="false"
+      > </terminal>
+
+  <log
+      filename="log/log.rtl"
+      disabled="false"
+      > </log>
+
+  <errlog
+      filename="log/log.rtl"
+      disabled="false"
+      > </errlog>
+</info>
+
+<scanner
+    disabled="false"
+
+    receiveImages="true"
+    port="15000"
+    saveImages="true"
+
+    receiveTriggers="false"
+    triggerSync="false"
+    triggerCode="83"
+
+    tr="2.0"
+    measurements="200"
+> </scanner>
+
+<display
+    image="1"
+    imageWinX="300"
+    imageWinY="0"
+    imageWinW="1000"
+    imageWinH="1000"
+    overlayID="data.image.activation.voxel-zscore"
+    activationSumID="data.image.activation.activation-sum"
+>
+</display>
+
+<infoserver
+    port="15001"
+>
+</infoserver>
+
+<!-- preprocessing steps -->
+<preprocessor>
+  <output>display</output>
+
+  <module name="intensity-norm">
+    <option name="makeavail">true</option>
+    <output>display</output>
+  </module>
+
+</preprocessor>
+

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  example configuration file for the realtime fMRI system       -->
+<!--  NOTE... ':' characters are not allowed in any names or values -->
+<!--  Oliver Hinds <ohinds@mit.edu> 2007-09-12                      -->
+
+<study
+    subject="foobar"
+    subjectsDir="/data/subjects"
+    > </study>
+
+<info>
+  <terminal
+      verbose="true"
+      debug="false"
+      > </terminal>
+
+  <log
+      filename="log/log.rtl"
+      disabled="false"
+      > </log>
+
+  <errlog
+      filename="log/log.rtl"
+      disabled="false"
+      > </errlog>
+</info>
+
+<scanner
+    disabled="false"
+
+    receiveImages="true"
+    port="15000"
+    saveImages="true"
+
+    receiveTriggers="false"
+    triggerSync="false"
+    triggerCode="83"
+
+    tr="2.0"
+    measurements="280"
+> </scanner>
+
+<display
+    image="1"
+    imageWinX="300"
+    imageWinY="0"
+    imageWinW="1000"
+    imageWinH="1000"
+    overlayID="data.image.activation.voxel-zscore"
+    activationSumID="data.image.activation.activation-sum"
+>
+</display>
+
+<infoserver
+    port="15001"
+>
+</infoserver>
+
+<!-- preprocessing steps -->
+<preprocessor>
+  <output>display</output>
+
+  <module name="intensity-norm">
+    <option name="makeavail">true</option>
+<!--     <option name="makecurrent">true</option> -->
+    <output>display</output>
+  </module>
+
+  <module name="voxel-difference">
+    <output>display</output>
+    <output>log</output>
+  </module>
+
+  <module name="voxel-mean">
+    <option name="makeavail">true</option>
+    <output>display</output>
+  </module>
+
+  <module name="voxel-variance">
+    <option name="makeavail">true</option>
+<!--     <option name="meanDataID">data.image.mri.intensity-norm.voxel-mean</option> -->
+    <output>display</output>
+  </module>
+
+  <!-- zscore -->
+  <module name="voxel-zscore">
+    <option name="makeavail">true</option>
+    <output>display</output>
+
+<!--     <option name="meanDataID">data.image.mri.intensity-norm.voxel-mean</option> -->
+<!--     <option name="varDataID">data.image.mri.intensity-norm.voxel-variance</option> -->
+
+
+    <option name="probThreshold">0.05</option>
+    <option name="correctForMultiComps">0</option>
+
+    <option name="maskSource">loadFromFile</option>
+    <option name="roiID">active</option>
+    <option name="maskFilename">125000-5_brain_mask.nii.gz</option>
+
+  </module>
+
+
+  <module name="activation-sum">
+    <option name="makeavail">true</option>
+    <output>infoserver</output>
+    <output>display</output>
+    <option name="activationID">data.image.activation.voxel-zscore</option>
+    <option name="roiID">active</option>
+  </module>
+
+</preprocessor>
+

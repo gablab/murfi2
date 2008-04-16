@@ -23,6 +23,7 @@
 #define ID_FLUCTUATIONMONITOR       "data.image.activation.voxel-fluctuationmonitor"
 #define ID_ACTIVATIONSUM            "data.image.activation.activation-sum"
 #define ID_ACTIVATIONSUMDIFFERENCE  "data.image.activation.activation-sum-difference"
+#define ID_EVENTTRIGGER             "data.event.trigger"
 
 #endif
 

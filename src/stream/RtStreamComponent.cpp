@@ -39,6 +39,9 @@ void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
   // process config info for cross module and global config info
   processConfig(*config);
 
+  // store the display
+  //display = config->getConductor()->getDisplay();
+
   string name;
   TiXmlElement *optionElmt;
 
@@ -70,14 +73,11 @@ void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
 bool RtStreamComponent::processConfig(RtConfig &config) {
   return true;
 }
-
 // process an option
 //  in 
 //   name of the option to process
 //   val  text of the option node
 bool RtStreamComponent::processOption(const string &name, const string &text) {
-
-  // look for known options
   if(name == "input") {
     inputDataID = text;
     return true;

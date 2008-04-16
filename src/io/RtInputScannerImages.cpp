@@ -37,6 +37,7 @@ RtInputScannerImages::RtInputScannerImages()
   saveImagesToFile = false;
   matrixSize = 64;
   numSlices = 32;
+  voxDim[0] = voxDim[1] = voxDim[2] = 1.0;
 }
 
 // destructor
@@ -68,12 +69,21 @@ bool RtInputScannerImages::open(RtConfig &config) {
   isOpen = true;
 
 
+  // set image params
   if(config.isSet("scanner:matrixSize")) {
     matrixSize = config.get("scanner:matrixSize");
   }
-
   if(config.isSet("scanner:slices")) {
     numSlices = config.get("scanner:slices");
+  }
+  if(config.isSet("scanner:voxdim1")) {
+    voxDim[0] = config.get("scanner:voxdim1");
+  }
+  if(config.isSet("scanner:voxdim2")) {
+    voxDim[1] = config.get("scanner:voxdim2");
+  }
+  if(config.isSet("scanner:voxdim3")) {
+    voxDim[2] = config.get("scanner:voxdim3");
   }
 
   // see if we should save images to a file
@@ -148,6 +158,9 @@ int RtInputScannerImages::svc() {
     rti->setSeriesNum(seriesNum);
     rti->setMatrixSize(matrixSize);
     rti->setNumSlices(numSlices);
+    rti->setPixDim(0,voxDim[0]);
+    rti->setPixDim(1,voxDim[1]);
+    rti->setPixDim(2,voxDim[2]);
 
     // set the image id for handling
     //rti->addToID("scanner");

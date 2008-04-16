@@ -12,10 +12,11 @@
 
 string RtSingleImageCor::moduleString("singleimcor");
 
+// debugging
 #define DUMP 0
 #ifdef DUMP
 #include<fstream>
-static ofstream dumpfile("/tmp/sungle_image_dump.txt");
+static ofstream dumpfile("/tmp/single_image_dump.txt");
 #endif
 
 // default constructor

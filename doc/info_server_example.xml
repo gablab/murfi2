@@ -1,5 +1,20 @@
 <!-- examples of protocol used to request info from real -->
 
+<!-- trigger info -->
+
+  <!-- send this -->
+  <info>
+    <trigger time="last">
+    </trigger>
+  </info>
+  
+  <!-- receive this -->
+  <info>
+    <trigger time="last" tr="32">
+    </trigger>
+  </info>
+
+
 <!-- roi info -->
 
   <!-- activation -->

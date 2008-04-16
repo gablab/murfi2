@@ -10,7 +10,6 @@ function vis_vol(vol, thresh, base, mag, pos)
     thresh = 0;
   end
   
-<<<<<<< vis_vol.m
   if(nargin < 4)
     mag = 400;
   end
@@ -19,12 +18,9 @@ function vis_vol(vol, thresh, base, mag, pos)
     pos = 0;
   end
   
-=======
   if(nargin < 3)
     base = zeros(size(vol));
   end
-  
->>>>>>> 1.2
   
   % build custom colormap
   bbits = 2^(2^ceil(log2(ceil(log2(max(base(:)))))));
@@ -62,14 +58,9 @@ function vis_vol(vol, thresh, base, mag, pos)
       act = vol(:,:,curz)';
             
       % find vol below -threshold
-<<<<<<< vis_vol.m
       if(~pos)
 	inds = find(act <= -thresh);
 	panel(inds) = bbits + cmprec/2+step*(act(inds)+thresh);
-=======
-      inds = find(act <= -thresh);
-      panel(inds) = bbits + cmprec/2+step*(act(inds)+thresh)+1;
->>>>>>> 1.2
 
 	% find vol above threshold
 	inds = find(act >= thresh);
@@ -89,17 +80,8 @@ function vis_vol(vol, thresh, base, mag, pos)
       curz = curz+1;
     end
   end
-<<<<<<< vis_vol.m
   
   imshow(im,[0 bbits+cmprec],'InitialMagnification',mag);
-=======
-
-  imshow(im,[0 bbits+cmprec],'InitialMagnification',400);
-<<<<<<< vis_vol.m
->>>>>>> 1.2
-=======
-%  imshow(im,[0 bbits+cmprec]);
->>>>>>> 1.3
   colormap(cm);
   
 return

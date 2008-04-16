@@ -34,6 +34,9 @@ public:
   // destructor
   ~RtFluctuationMonitor();
 
+  // receive a message that stimulus has been triggered
+  void receiveStimTriggered();
+
 protected:
 
   // process a single acquisition
@@ -55,7 +58,16 @@ protected:
 
   // one solver for each voxel 
   RtLeastSquaresSolve **solvers;
-  
+
+  // store the per pixel sum of squared error
+  RtActivation *estErrSumSq;
+
+  // for task triggering based on activation sum
+  bool   triggerStim;
+  bool isTriggered;
+  int afterTriggerSkip;
+  int numImagesSinceTrigger;
+
 };
 
 #endif

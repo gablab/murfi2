@@ -14,6 +14,9 @@
 // for gamma functions
 #include<vnl/vnl_gamma.h>
 
+// mutex
+#include"ace/Mutex.h"
+
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
 
@@ -35,6 +38,7 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   // default values for mask
   maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
   maskIntensityThreshold = 0.5;
+  putMaskOnMessage = false;
 
   // save t volume or not
   saveTVol = false;
@@ -156,13 +160,16 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     mask.setFilename(text);
     return true;
   }
+  if(name == "maskToDisplay") {
+    RtConfigVal::convert<bool>(putMaskOnMessage,text);
+  }
   if(name == "roiID") {
     roiID = text;
     return true;
   }  
   if(name == "maskIntensityThreshold") {
     return RtConfigVal::convert<double>(maskIntensityThreshold,text);
-  }  
+  }
   if(name == "saveTVol") {
     return RtConfigVal::convert<bool>(saveTVol,text);
   }
@@ -252,7 +259,18 @@ bool RtActivationEstimator::finishInit() {
 
   // mask from file
   if(maskSource == LOAD_FROM_FILE) {
-    mask.load();
+    if(mask.load()) {
+      cout << "loaded mask from " << mask.getFilename() << endl;
+    }
+    else {
+      cout << "failed to load mask from " << mask.getFilename() << endl;
+    }
+
+    // mosaic if we need to
+    if((int) mask.getNumPix() > mask.getDim(0) * mask.getDim(1)) {
+      cout << "warning: auto mosaic" << endl;
+      mask.mosaic();
+    }
   }
 
   // convolve the conditions with hrf (cannonical from SPM)
@@ -322,6 +340,26 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
 
   needsInit = false;
 }
+
+// sets the latest result of processing
+//  in
+//   data result
+void RtActivationEstimator::setResult(RtStreamMessage *msg, RtData *data) {
+  // send the mask if desired 
+  if(putMaskOnMessage) {
+    mask.setRoiID(roiID);
+    cout << "sending mask: " << mask.getID() << ":" << roiID << endl;
+
+    ACE_Mutex mut;
+    mut.acquire();
+    passData(&mask);
+    mut.release();
+  }
+
+  RtStreamComponent::setResult(msg,data);
+}
+  
+
 
 /*****************************************************************************
  * $Source$

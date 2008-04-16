@@ -118,6 +118,7 @@ protected:
   // scanner parms
   unsigned int matrixSize;
   unsigned int numSlices;
+  double voxDim[3];
   
   // current series number
   unsigned int seriesNum;

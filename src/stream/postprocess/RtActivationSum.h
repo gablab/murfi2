@@ -41,7 +41,7 @@ protected:
   // data ID for the activation we will sum
   string activationID;
 
-  // roiID for the activ ation we will sum
+  // roiID for the activation we will sum
   string roiID;
 
 };

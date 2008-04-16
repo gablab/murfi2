@@ -26,6 +26,7 @@ function [ps as Ts] = accum_cor(vol, onoff)
   reg = conv(stim,hrf);
 %  reg = stim;
   reg = reg(2:length(stim)+1);
+%  reg = reg-mean(reg);
 
   % build detrend regs
   L = 2;
@@ -62,6 +63,7 @@ function [ps as Ts] = accum_cor(vol, onoff)
   a = zeros(imsiz);
   T = zeros(imsiz);
 
+  hndl = figure; hold on;
   for(t=1:ntp)
     % voxel independent init
     z = [s(t,:) reg(t)];
@@ -112,8 +114,28 @@ function [ps as Ts] = accum_cor(vol, onoff)
 	    T(vi,vj,vk) = sqrt(t-L-1) * c(vi,vj,vk,L+1)/c(vi,vj,vk,L+2);
 	  end
 	  
-%	  if(vi == 15 && vj == 27 && vk == 13)
+	  if(vi == 15 && vj == 27 && vk == 13 & t > 4)
 %	    fprintf('%d %d %f %f\n', t, im(vi,vj,vk), z_hat, T(vi,vj,vk));
+	    %% gentleman's for testing
+	    tc = squeeze(vol(vi,vj,vk,1:t));
+	    [beta ss sserr theta_b rbar] = gentleman(tc,reg(1:t));
+	    %se = sqrt(sserr/(t-L))/(ss(3));
+	    gt = beta(3)/sqrt(sserr) * sqrt(ss(3)) * sqrt((t-L)/t);
+	    
+	    figure(hndl); hold on
+	    plot(t,im(vi,vj,vk),'b.');
+	    plot(t,c(vi,vj,vk,1)*h(1)+c(vi,vj,vk,2)*h(2),'r.');
+	    %plot(t,c(vi,vj,vk,1)*h(1),'k.');
+	    plot(t,mean(squeeze(vol(vi,vj,vk,1:t))),'g.');
+	    
+	    plot(t,beta(1)+beta(2)*t,'k.');
+	    
+	    [b bint r rint stats] = regress(squeeze(vol(vi,vj,vk,1:t)), [ones(t,1) [1:t]' reg(1:t)']);
+	    plot(t,b(1)+b(2)*t,'c.');
+	    
+	    
+	    fprintf('%d %f %f %f %f\n', t, b(3), stats(4), beta(3), ss(3)/t);
+	    fprintf('%d %f %f %f\n', t, T(vi,vj,vk), stats(2), sqrt(t-L)*beta(3)/(sqrt(ss(3)/t)));
 	    %z
 	    %f
 	    %g
@@ -121,13 +143,13 @@ function [ps as Ts] = accum_cor(vol, onoff)
 	    %C
 	    %squeeze(c(vi,vj,vk,:))
 	    %keyboard
-%	  end
+	  end
 	end
       end
     end
 %    keyboard
 
-    visualize = 1;
+    visualize = 0;
     if(visualize)
 
       % find corrected threshold

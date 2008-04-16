@@ -15,7 +15,7 @@ term = String(sprintf('\n'));
 host = String(hostname);
 
 skt =  Socket(host,port);
-in =  BufferedReader(InputStreamReader(skt.getInputStream()));
+in =   BufferedReader(InputStreamReader(skt.getInputStream()));
 out =  PrintWriter(skt.getOutputStream(),true);
 
 % send a request
@@ -23,13 +23,13 @@ xmlstr = String(msg);
 
 out.println(xmlstr);
 
-strOut = [];
-tmp = in.read();
-while(~strcmp(tmp,term) && tmp ~= -1)
-  strOut(end+1) = char(tmp);
-  tmp = in.read();
-end
-disp(['Retrieved from server socket: ' strOut]);
+%strOut = [];
+%tmp = in.read();
+%while(~strcmp(tmp,term) && tmp ~= -1)
+%  strOut(end+1) = char(tmp);
+%  tmp = in.read();
+%end
+%disp(['Retrieved from server socket: ' strOut]);
 
 in.close();
 out.close();

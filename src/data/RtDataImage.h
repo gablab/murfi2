@@ -211,6 +211,9 @@ public:
 
   //*** sets  ***//
 
+  // set pixel dimensions
+  void setPixDim(unsigned int i, double dim);
+
   // set pixel value
   void setPixel(unsigned int i, T v);
 
@@ -1319,6 +1322,15 @@ T *RtDataImage<T>::getData() {
 template<class T>
 void RtDataImage<T>::setFilename(string _filename) {
   filename = _filename;
+}
+
+// set pixel dim
+template<class T>
+void RtDataImage<T>::setPixDim(unsigned int i, double dim) {
+  if(i < 0 || i >= pixdims.size()) {
+    return;
+  }
+  pixdims[i] = dim;
 }
 
 // set pixel value

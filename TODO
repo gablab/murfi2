@@ -5,7 +5,7 @@ NOWNOWNOW
 - integrate registration methods. 
 - add roi viewing/editing to gui
 - add conditions to info server
-- fix incremental GLM
+- fix incremental GLM (DONE)
 - look into image saving (DONE)
 
 * config:
@@ -50,7 +50,8 @@ NOWNOWNOW
 
 
 * algorithms
- - cox (1995) accumulative correlation (DONE)
+ - cox (1995) accumulative correlation (DONE, but sux)
+ - indiv voxel least squares solver (DONE, but adapt to voxel unspecific calcs)
  - gembris (2000) sliding window correlation
  - kalman filter (rouche 2004)
  - hinds (2008) single image correlation 

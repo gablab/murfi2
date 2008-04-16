@@ -60,8 +60,19 @@ public:
   //  thresh: mean intensity multiplier to threshold at
   unsigned int initByMeanIntensityThreshold(RtActivation &img, double threshold);
 
+  // compute the number of "on" voxels
+  void computeNumberOfOnVoxels();
+
   // get the number of "on" voxels
   unsigned int getNumberOfOnVoxels();
+
+
+  // read the image from a file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  bool read(const string &_filename);
 
 protected:
 

@@ -1,6 +1,6 @@
 /******************************************************************************
- * RtFluctuationMonitor.cpp is the implementation of a class that computes the
- * activation in a single image based on Hinds, et al., 2008
+ * RtFluctuationMonitor.cpp is the implementation of a class that monitors
+ * spontaneous fluctuations in the BOLD signal
  *
  * Oliver Hinds <ohinds@mit.edu> 2008-01-16
  *
@@ -9,6 +9,7 @@
 #include"RtFluctuationMonitor.h"
 #include"RtMRIImage.h"
 #include"RtActivation.h"
+#include<limits>
 
 string RtFluctuationMonitor::moduleString("fluctuationmonitor");
 
@@ -18,9 +19,14 @@ RtFluctuationMonitor::RtFluctuationMonitor() : RtActivationEstimator() {
   id = moduleString;
 
   needsInit = true;
-
-  solvers = NULL; 
+  solvers = NULL;
   numData = 0;
+  estErrSumSq = NULL;
+
+  triggerStim = false;
+  isTriggered = false;
+  afterTriggerSkip = 8;
+  numImagesSinceTrigger = INT_MAX;
 }
 
 // destructor
@@ -32,7 +38,17 @@ RtFluctuationMonitor::~RtFluctuationMonitor() {
       }
     }
     delete solvers;
-  }  
+  }
+
+  if(estErrSumSq != NULL) {
+    delete estErrSumSq;
+  }
+}
+
+// receive a message that stimulus has been triggered
+void RtFluctuationMonitor::receiveStimTriggered() {
+  numImagesSinceTrigger = 0;
+  isTriggered = true;
 }
 
 // process a configuration option
@@ -41,20 +57,18 @@ RtFluctuationMonitor::~RtFluctuationMonitor() {
 //   val  text of the option node
 bool RtFluctuationMonitor::processOption(const string &name, const string &text) {
   // look for known options
-//  if(name == "baselineThreshold") {
-//    RtConfigVal::convert<double>(tmp,text);    
-//    baselineThreshold.put(0,tmp);
-//    return true;
-//  }
+  if(name == "triggerStim") {
+    return RtConfigVal::convert<bool>(triggerStim,text);
+  }
+  if(name == "afterTriggerSkip") {
+    return RtConfigVal::convert<int>(afterTriggerSkip,text);
+  }
 
   return RtActivationEstimator::processOption(name, text);
 }
 
 // process a single acquisition
 int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
-//  static int numComparisons = 0;
-//  gp.set_yrange(38000,41000);
-
   ACE_TRACE(("RtFluctuationMonitor::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
@@ -67,6 +81,17 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
     ACE_DEBUG((LM_INFO, "RtFluctuationMonitor:process: data passed is NULL\n"));
     return 0;
+  }
+
+  cout << "operating on image: " << dat->getID() << endl;
+
+  // check the time since triggers
+  if(isTriggered && afterTriggerSkip >= numImagesSinceTrigger++) {
+    cout << "waiting for triggered stim... " << numImagesSinceTrigger << " of "  << afterTriggerSkip << endl;
+    return 0;
+  }
+  else if(isTriggered) {
+    isTriggered = false;
   }
 
   numTimepoints++;
@@ -86,13 +111,21 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
       solvers[i] = new RtLeastSquaresSolve(numTrends+numConditions);
     }
 
+    // setup the estimation error sum of squares
+    if(estErrSumSq != NULL) {
+      delete estErrSumSq;
+    }
+    estErrSumSq = new RtActivation(*dat);
+    estErrSumSq->initToZeros();
+
     needsInit = false;
   }
 
   // validate sizes
   if(dat->getNumEl() != numData) {
     ACE_DEBUG((LM_INFO, "RtFluctuationMonitor::process: new data has wrong number of elements\n"));
-    return -1;    
+    cout << "RtFluctuationMonitor::process: new data has wrong number of elements" << endl;
+    return -1;
   }
 
   // allocate a new data image for the estimation
@@ -100,7 +133,14 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
   fluct->initToZeros();
 
   //// element independent setup
-  
+
+  // set threshold
+  if(numTimepoints > numTrends+1) {
+    fluct->setThreshold(getTStatThreshold(1));
+    cout << "fluctuation monitor: using t threshold of "
+	 << fluct->getThreshold() << endl;
+  }
+
   // build a design matrix xrow
   double *Xrow = new double[numConditions+numTrends];
   for(unsigned int i = 0; i < numTrends; i++) {
@@ -108,10 +148,10 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
   }
 
   //// compute t map for each element
-  double sum = 0.;
+  //double sum = 0.;
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     if(!mask.getPixel(i)) {
-      fluct->setPixel(i,0.0);
+      fluct->setPixel(i,fmod(0,0.));
       continue;
     }
 
@@ -120,10 +160,6 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
     if(numTimepoints > numTrends) {
       double *beta = solvers[i]->regress(0);
-      double *columnSEs = solvers[i]->getSquaredError(0);
-//      double se = sqrt((solvers[i]->getTotalSquaredError(0)
-//			/(numTimepoints-numTrends))
-//		       /columnSEs[numTrends]);
       double err = y;
 
       // subtract the reconstruction based on trend fit
@@ -131,27 +167,54 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 	err -= beta[j]*trends->get(numTimepoints-1,j);
       }
 
-      // transform to z score
-      err/=columnSEs[numTrends-1];
+      estErrSumSq->setPixel(i, estErrSumSq->getPixel(i) + err*err);
 
-      sum += err;
+      fluct->setPixel(i,
+	     sqrt((numTimepoints-1)/estErrSumSq->getPixel(i)) * err);
 
-      fluct->setPixel(i, err);
+      //sum += fluct->getPixel(i);
 
       //cout << fluct->getPixel(i) << endl;
       //fluct->setPixel(i, beta[numTrends]/se);
 
-      delete columnSEs;
+      //if(i == 16*32*32 + 28*32 + 14) {
+//      //#ifdef DUMP
+//    if(1) {
+//      cerr  << numTimepoints << " " << dat->getPixel(i)
+//	    << " " << fluct->getPixel(i) << " " << beta[0] << " "
+//	    << beta[1] << " " << beta[0] + beta[1]*numTimepoints
+//	    << " " <<  estErrSumSq->getPixel(i)
+//	    << endl;
+//      //dumpfile.flush();
+//      //#endif
+//    }
+//
+//      cout << "z: "; printVnlVector(*z); cout << endl;
+//      cout << "f: "; printVnlVector(*f); cout << endl;
+//      cout << "g: "; printVnlVector(*g); cout << endl;
+//      cout << "h: "; printVnlVector(*h); cout << endl;
+//      cout << "C: " << endl;
+//      C->print(cout);
+//      cout << "c: "; printVnlVector(c->get_row(i)); cout << endl;
+//
+//      //if(i > 40) {
+//	int trash;
+//	cin >> trash;
+//      //}
+//    }
+
+
       delete beta;
     }
 
-  }  
-  cout << "sum = " << sum << endl;
+  }
+  //  cout << "sum = " << sum << endl;
 
   delete Xrow;
 
   // set the image id for handling
   fluct->addToID("voxel-fluctmon");
+  fluct->setRoiID(roiID);
 
   setResult(msg,fluct);
 

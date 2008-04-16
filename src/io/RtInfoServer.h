@@ -62,6 +62,9 @@ protected:
   // NOTE: now this only stores activation sums by tr.
   // TODO: reconsider how to store old data and manage access to it
   vector<RtData*> database;
+
+  // the last trigger time
+  int lastTriggerTR;
 };
 
 #endif

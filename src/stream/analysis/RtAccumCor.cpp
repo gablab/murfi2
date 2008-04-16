@@ -211,15 +211,22 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
   // test if this is the last measurement for mask conversion and saving
   if(numTimepoints == numMeas && saveTVol) {
     cout << "saving t vol to " << saveTVolFilename << endl;
+    cout.flush();
     cor->write(saveTVolFilename);
   }
   if(numTimepoints == numMeas && savePosResultAsMask) {
+    cout << "saving pos mask to " << savePosAsMaskFilename << endl;
+    cout.flush();
+
     RtMaskImage *activationMask = cor->toMask(POS);
     activationMask->setFilename(savePosAsMaskFilename);
     activationMask->save();
   }
   if(numTimepoints == numMeas && saveNegResultAsMask) {
-    RtMaskImage *activationMask = cor->toMask(POS);
+    cout << "saving neg mask to " << saveNegAsMaskFilename << endl;
+    cout.flush();
+
+    RtMaskImage *activationMask = cor->toMask(NEG);
     activationMask->setFilename(saveNegAsMaskFilename);
     activationMask->save();
   }

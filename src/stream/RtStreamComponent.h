@@ -123,7 +123,7 @@ protected:
   // sets the latest result of processing
   //  in
   //   data result
-  void setResult(RtStreamMessage *msg, RtData *data);
+  virtual void setResult(RtStreamMessage *msg, RtData *data);
 
   // passer to send the results of our computation to outputs
   RtPasser *passer;
@@ -136,6 +136,9 @@ protected:
 
   // whether the result should be made the current data on the message
   bool makeCurrentData;
+
+  // pointer to the display output object
+  //RtDisplayImage *display;
 
   // id string
   string id;

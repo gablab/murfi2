@@ -31,5 +31,6 @@ fi
 source $FSLDIR/etc/fslconf/fsl.sh
 
 # run bet
+echo bet $infile $maskfile $betflags &
 bet $infile $maskfile $betflags &
 

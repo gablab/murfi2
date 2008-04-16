@@ -10,6 +10,7 @@
 
 #include"RtDataImage.h"
 #include"RtMRIImage.h"
+#include"RtMaskImage.h"
 #include"RtActivation.h"
 #include"RtOutput.h"
 #include"RtConfig.h"
@@ -68,7 +69,13 @@ public:
   void makeTexture();
 
   // makes a texture from the overlay data and prepares it for display
-  void makeOverlayTexture();
+  void makeOverlayTexture(bool pos);
+
+  // makes a texture from the mask data and prepares it for display
+  void makePosMaskTexture();
+
+  // makes a texture from the mask data and prepares it for display
+  void makeNegMaskTexture();
 
   // callbacks for opengl
   void CallBackDisplayFunc(void);
@@ -80,25 +87,51 @@ protected:
 
   GlutMaster glutMaster;
 
+  // window stuff
   int x, y, width, height, numMeas;
-  RtMRIImage *img;
-  RtActivation *overlay;
-  GLuint imageTex;
-  GLuint overlayTex;
-
-  bool needsRepaint, newTex, newOverlay, newImageType, overlayOn;
-
   char title[100];
   string bottomStr;
   string topStr;
 
+  // data 
+  RtMRIImage *img;
+  RtMaskImage *posMask;
+  RtMaskImage *negMask;
+  RtActivation *posOverlay;
+  RtActivation *negOverlay;
+  GLuint imageTex;
+  GLuint posOverlayTex;
+  GLuint negOverlayTex;
+  GLuint posMaskTex;
+  GLuint negMaskTex;
+
+  // data ids to watch for in setData
   string imageDisplayType;
+  string posOverlayID;
+  string posOverlayRoiID;
+  string negOverlayID;
+  string negOverlayRoiID;
+  string posActivationSumID;
+  string posActivationSumRoiID;
+  string negActivationSumID;
+  string negActivationSumRoiID;
+  string posMaskID;
+  string posMaskRoiID;
+  string negMaskID;
+  string negMaskRoiID;
 
-  // data id of the image type that will be used as an overlay
-  string overlayID;
-
-  // data id of the image type that will be used as an overlay
-  string activationSumID;
+  // flags
+  bool needsRepaint;
+  bool newTex;
+  bool newPosOverlay;
+  bool newNegOverlay;
+  bool newPosMask;
+  bool newNegMask;
+  bool newImageType;
+  bool posOverlayOn;
+  bool negOverlayOn;
+  bool posMaskOn;
+  bool negMaskOn;
 
   // draws a black box that will enclose a string of text
   void drawBlackBoxForString(const char *str, GLint x, GLint y);

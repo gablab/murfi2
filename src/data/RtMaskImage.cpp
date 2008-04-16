@@ -166,6 +166,27 @@ unsigned int RtMaskImage::getNumberOfOnVoxels() {
   return numOnVoxels;
 }
 
+// set the number of "on" voxels
+void RtMaskImage::computeNumberOfOnVoxels() {
+  numOnVoxels = 0;
+  for(unsigned int i = 0; i < getNumEl(); i++) {
+    if(getElement(i)) {
+      numOnVoxels++;
+    }
+  }  
+}
+
+// read the image from a file
+//  in
+//   filename: string filename
+//  out
+//   success or failure
+bool RtMaskImage::read(const string &_filename) {
+  bool ret = RtDataImage<unsigned short>::read(_filename);
+  computeNumberOfOnVoxels();
+  return ret;
+}
+
 
 // set the info based on a generic data image info
 void RtMaskImage::setInfo(RtMRIImage &img) {

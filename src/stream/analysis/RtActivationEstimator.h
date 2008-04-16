@@ -92,6 +92,11 @@ protected:
   //  first acquired image to use as a template for parameter inits
   virtual void initEstimation(RtMRIImage &image);
 
+  // sets the latest result of processing
+  //  in
+  //   data result
+  virtual void setResult(RtStreamMessage *msg, RtData *data);
+
   bool needsInit;
 
   double tr;      
@@ -133,6 +138,7 @@ protected:
   // parameters for different mask sources
   double maskIntensityThreshold;
   string maskFilename;
+  bool putMaskOnMessage;
 
   // whether to save the resulting t map
   bool saveTVol;

@@ -71,7 +71,7 @@ int RtMean::process(ACE_Message_Block *mb) {
 
   // set the image id for handling
   mean->addToID("voxel-mean");
-  cout << "mean id " << mean->getID() << endl;
+  //cout << "mean id " << mean->getID() << endl;
   setResult(msg,mean);
 
   return 0;

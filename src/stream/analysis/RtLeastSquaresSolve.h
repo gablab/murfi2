@@ -5,6 +5,9 @@
  * 
  *****************************************************************************/
 
+#ifndef RTLEASTSQUARESSOLVE
+#define RTLEASTSQUARESSOLVE
+
 #include<cstdlib>
 
 class RtLeastSquaresSolve {
@@ -63,6 +66,7 @@ protected:
                         // the Cholesky decomp is D^(1/2)*R
   double **thetabar;    // D^(1/2)*thetabar is the orthogonal coefficients
   double *sserr;        // sum of the squared error
-  
+  //double 
 };
 
+#endif

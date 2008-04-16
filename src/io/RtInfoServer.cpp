@@ -6,6 +6,7 @@
  *****************************************************************************/
 
 #include"RtInfoServer.h"
+#include"RtEvent.h"
 
 #include"RtDataIDs.h"
 #include"tinyxml/tinyxml.h"
@@ -15,6 +16,8 @@ static char *VERSION = "$Id$";
 // default constructor
 RtInfoServer::RtInfoServer() : RtServerSocket() {
   id += ":infoserver";
+
+  lastTriggerTR = -1;
 } 
   
 // constructor with port and host
@@ -33,6 +36,9 @@ RtInfoServer::~RtInfoServer() {
 void RtInfoServer::setData(RtData *data) {
   if(data->getID() == ID_ACTIVATIONSUM) {
     database.push_back(data);
+  }
+  else if(data->getID() == ID_EVENTTRIGGER) {
+    lastTriggerTR = ((RtEvent*)data)->getTR();
   }
   else {
     cout << "ignoring a " << data->getID() << endl;
@@ -70,7 +76,28 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
     TiXmlElement *infoResponse = new TiXmlElement("info");
     response.LinkEndChild(infoResponse);
 
-    // find roi tags
+    //// find specific tags
+    // trigger tags
+    for(TiXmlElement *trigger = 0; (trigger = (TiXmlElement*) info->IterateChildren("trigger", trigger)); ) {
+      // create a trigger node
+      TiXmlElement *triggerResponse = new TiXmlElement("trigger");
+      infoResponse->LinkEndChild(triggerResponse);
+      
+      // check name (now must be "last")
+      if(strcmp(trigger->Attribute("time"), "last")) {
+	// put an unsupported msg in XML 
+	TiXmlElement *errEl = createErrorElement("unsupported time (try last)");
+	triggerResponse->LinkEndChild(errEl);
+	// I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
+	continue;
+      }
+
+      // give the last trigger time
+      triggerResponse->SetAttribute("time","last");
+      triggerResponse->SetAttribute("tr",lastTriggerTR);
+    }
+
+    // roi tags
     for(TiXmlElement *roi = 0; 
 	(roi = (TiXmlElement*) info->IterateChildren("roi", roi)); ) {
       // create an roi node

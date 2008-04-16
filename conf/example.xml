@@ -76,9 +76,9 @@
     <output>display</output>
   </module>
 
-<!--   <module name="voxel-zscore" threshold="3.0"> -->
-<!--      <output>display</output> -->
-<!--   </module> -->
+  <module name="voxel-zscore" threshold="3.0">
+     <output>display</output>
+  </module>
 
 <!--   <module name="voxel-slidewincor"> -->
 <!--      <output>display</output> -->
@@ -97,23 +97,46 @@
 
      <option name="trends">2</option>
 
-     <option name="saveAsMask">1</option>
-     <option name="saveAsMaskFilename">accumcor_mask.dat</option>
+     <option name="saveTVol">1</option>
+     <option name="saveTVolName">mask/active_t.nii</option>
+
+     <option name="savePosAsMask">1</option>
+     <option name="saveNegAsMask">1</option>
+     <option name="savePosAsMaskFilename">mask/active_mask.nii</option>
+     <option name="saveNegAsMaskFilename">mask/background_mask.nii</option>
   </module>
 
-<!--   <module name="singleimcor"> -->
-<!--      <output>display</output> -->
+  <module name="singleimcor">
+     <output>display</output>
 
-<!--      <option name="condition"> -->
-<!--         0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 -->
-<!--      </option> -->
+     <option name="condition">
+        0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+     </option>
 
-<!--      <option name="trends">2</option> -->
-<!--      <option name="baselineThreshold">0.00001</option> -->
-<!--      <option name="probThreshold">0.10</option> -->
-<!--      <option name="correctForMultiComps">0</option> -->
+     <option name="trends">2</option>
+     <option name="baselineThreshold">0.00001</option>
+     <option name="probThreshold">0.10</option>
+     <option name="correctForMultiComps">0</option>
+  </module>
 
-<!--   </module> -->
+  <module name="activation-sum">
+    <option name="makeavail">true</option>
+    <output>infoserver</output>
+    <output>display</output>
+    <option name="roiID">active</option>
+  </module>
+
+  <module name="activation-sum">
+    <option name="makeavail">true</option>
+    <option name="roiID">background</option>
+  </module>
+
+  <module name="activation-sum-difference">
+    <output>infoserver</output>
+    <output>display</output>
+    <option name="posRoiID">active</option>
+    <option name="negRoiID">background</option>
+  </module>
 
 </preprocessor>
 

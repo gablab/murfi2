@@ -56,7 +56,7 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
     = (RtActivation*) msg->getDataByIDAndRoiID(activationID,roiID);
 
   if(act == NULL) {
-    cout << "couldn't find " << roiID << endl;
+    cout << "couldn't find " << activationID << ":" << roiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtActivationSum:process: activation passed is NULL\n"));
     return 0;
@@ -88,12 +88,12 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   mean->setThreshold(act->getThreshold());
   mean->setPixel(0, sum/numPix);
   
-  
-  if(fabs(mean->getPixel(0)) > 100 | isnan(mean->getPixel(0))) {
-    cout << "BIG SUM FOUND: " << mean->getPixel(0) << endl;
-    mean->setPixel(0, 0);
-  }
-
+//  
+//  if(fabs(mean->getPixel(0)) > 100 | isnan(mean->getPixel(0))) {
+//    cout << "BIG SUM FOUND: " << mean->getPixel(0) << endl;
+//    mean->setPixel(0, 0);
+//  }
+//
 
   // set the image id for handling
   mean->addToID("activation-sum");

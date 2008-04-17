@@ -35,7 +35,7 @@ protected:
   virtual bool processOption(const string &name, const string &text);
 
   // process a single acquisition
-  int process(ACE_Message_Block *mb);
+  virtual int process(ACE_Message_Block *mb) = 0;
 
   // roiIDs for the activation sums
   string posroiID;
@@ -44,6 +44,9 @@ protected:
   // flags or whether to monitor rois
   bool monitorPos;
   bool monitorNeg;
+
+  // whether we should trigger on good and bad activation directions
+  bool triggerBothDirections;
 
   // thresholds for triggering
   double posThresh;

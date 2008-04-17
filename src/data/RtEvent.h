@@ -37,7 +37,6 @@ public:
 protected:
 
   int tr;
-
 };
 
 #endif

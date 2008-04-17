@@ -193,6 +193,7 @@ void RtMaskImage::setInfo(RtMRIImage &img) {
   ACE_TRACE(("RtDataImage<T>::getAutoContrast"));
 
   dims = img.getDims();
+  pixdims = img.getPixDims();
 
   imgDataLen = img.getImgDataLen();
   numPix = img.getNumPix();
@@ -213,6 +214,7 @@ void RtMaskImage::setInfo(RtActivation &img) {
   ACE_TRACE(("RtDataImage<T>::getAutoContrast"));
 
   dims = img.getDims();
+  pixdims = img.getPixDims();
 
   imgDataLen = img.getImgDataLen();
   numPix = img.getNumPix();

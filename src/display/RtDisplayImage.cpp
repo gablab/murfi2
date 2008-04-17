@@ -289,31 +289,35 @@ void RtDisplayImage::setData(RtData *data) {
   // handle activation sum
   if(data->getID() == posActivationSumID 
      && data->getRoiID() == posActivationSumRoiID) {
-    cout << "got a pos activation sum: " << ((RtActivation*)data)->getPixel(0) 
-	 << endl;
+  //cout << "display got a pos activation sum: " 
+  //     << ((RtActivation*)data)->getPixel(0) 
+  //     << endl;
     // plot the sum
     postc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
     gp.reset_plot();
-    gp.plot_x(postc,"activation sum");
+    gp.plot_x(postc,posActivationSumRoiID.c_str());
     numTimepoints++;
+    return;
   }
 
   if(data->getID() == negActivationSumID 
      && data->getRoiID() == negActivationSumRoiID) {
-    cout << "got a neg activation sum: " << ((RtActivation*)data)->getPixel(0) 
-	 << endl;
+  //cout << "display got a neg activation sum: " 
+  //     << ((RtActivation*)data)->getPixel(0) 
+  //     << endl;
     // plot the sum
     negtc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
     //gp.reset_plot();
-    gp.plot_x(negtc,"activation sum");
+    gp.plot_x(negtc,negActivationSumRoiID.c_str());
     //numTimepoints++;
+    return;
   }
 
   // handle pos overlay
   if(data->getID() == posOverlayID && data->getRoiID() == posOverlayRoiID) {
     posOverlay = (RtActivation*) data;
     newPosOverlay = true;
-  cout << "display got a pos overlay " << img->getID() << endl;
+  //cout << "display got a pos overlay " << img->getID() << endl;
     return;
   }
 
@@ -321,7 +325,7 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() == negOverlayID && data->getRoiID() == negOverlayRoiID) {
     negOverlay = (RtActivation*) data;
     newNegOverlay = true;
-  cout << "display got a neg overlay " << img->getID() << endl;
+  //cout << "display got a neg overlay " << img->getID() << endl;
     return;
   }
 
@@ -330,7 +334,7 @@ void RtDisplayImage::setData(RtData *data) {
     posMask = (RtMaskImage*) data;
     newPosMask = true;
 
-    cout << "display got a positive mask " << img->getID() << endl;
+    //cout << "display got a positive mask " << img->getID() << endl;
     return;
   }
 
@@ -339,7 +343,7 @@ void RtDisplayImage::setData(RtData *data) {
     negMask = (RtMaskImage*) data;
     newNegMask = true;
 
-    cout << "display got a negative mask " << img->getID() << endl;
+    //cout << "display got a negative mask " << img->getID() << endl;
     return;
   }
 
@@ -352,7 +356,7 @@ void RtDisplayImage::setData(RtData *data) {
   img = (RtMRIImage*) data;
 
   ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getAcquisitionNum()));
-  cout << "display got an image " << img->getID() << endl;
+  //cout << "display got an image " << img->getID() << endl;
 
   // set the info strings
   bottomStr = img->getID();
@@ -393,7 +397,7 @@ void RtDisplayImage::makeTexture() {
     glPixelTransferf(GL_GREEN_BIAS, brightness);
     glPixelTransferf(GL_BLUE_BIAS,  brightness);
 
-    cout << "image " << img->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
+    //cout << "image " << img->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
 
     newImageType = false;
   }

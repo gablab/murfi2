@@ -17,12 +17,16 @@ static char *VERSION = "$Id$";
 RtInfoServer::RtInfoServer() : RtServerSocket() {
   id += ":infoserver";
 
-  lastTriggerTR = -1;
+  lastGoodTriggerTR = -1;
+  lastBadTriggerTR = -1;
 } 
   
 // constructor with port and host
 RtInfoServer::RtInfoServer(unsigned short portNum) : RtServerSocket(portNum) {
   id += ":infoserver";  
+
+  lastGoodTriggerTR = -1;
+  lastBadTriggerTR = -1;
 }
 
 // destructor
@@ -34,11 +38,26 @@ RtInfoServer::~RtInfoServer() {
 // NOTE: at the moment this only takes activation sums and stores them for 
 // each tr in an xml document 
 void RtInfoServer::setData(RtData *data) {
+  cout << data->getID() << endl;
   if(data->getID() == ID_ACTIVATIONSUM) {
     database.push_back(data);
   }
-  else if(data->getID() == ID_EVENTTRIGGER) {
-    lastTriggerTR = ((RtEvent*)data)->getTR();
+  else if(data->getID().find(ID_EVENTTRIGGER) != string::npos) {
+    // note about "good" and "bad" triggers: these are just to denote two
+    // types of triggers, one based on activation in the direction you
+    // expect, and the other opposite. neither is an error
+    
+    cout << "in" << endl;
+
+    size_t pos = data->getID().find(ID_EVENTTRIGGER);
+    if(data->getID().substr(pos).find("bad") != string::npos) { // bad trigger
+      cout << "bad" << endl;
+      lastBadTriggerTR = ((RtEvent*)data)->getTR();
+    }
+    else { // otherwise its good
+      cout << "good" << endl;
+      lastGoodTriggerTR = ((RtEvent*)data)->getTR();
+    }
   }
   else {
     cout << "ignoring a " << data->getID() << endl;
@@ -92,9 +111,23 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	continue;
       }
 
-      // give the last trigger time
+      // check type(good or bad, defaults to good)
+      bool goodTrigger = true;
+      if(!strcmp(trigger->Attribute("type"), "bad")) {
+	goodTrigger = false;
+      }
+
       triggerResponse->SetAttribute("time","last");
-      triggerResponse->SetAttribute("tr",lastTriggerTR);
+
+      // give the last trigger time of appropriate type
+      if(goodTrigger) {
+	triggerResponse->SetAttribute("type","good");
+	triggerResponse->SetAttribute("tr",lastGoodTriggerTR);
+      }
+      else {
+	triggerResponse->SetAttribute("type","bad");
+	triggerResponse->SetAttribute("tr",lastBadTriggerTR);
+      }
     }
 
     // roi tags

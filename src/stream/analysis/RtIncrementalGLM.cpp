@@ -161,7 +161,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
     activationMask->save();
   }
   if(numTimepoints == numMeas && saveNegResultAsMask) {
-    RtMaskImage *activationMask = est->toMask(POS);
+    RtMaskImage *activationMask = est->toMask(NEG);
     activationMask->setFilename(saveNegAsMaskFilename);
     activationMask->save();
   }

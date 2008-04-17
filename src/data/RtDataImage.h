@@ -180,6 +180,9 @@ public:
   int getDim(int i);
 
   // get voxel dimensions
+  vector<double> &getPixDims();
+
+  // get voxel dimensions
   double getPixDim(int i);
 
   // get vxl2ras
@@ -332,6 +335,8 @@ RtDataImage<T>::RtDataImage() : RtData(),
   bytesPerPix = sizeof(T);
   matrixSize = 64;
   numSlices = 32;
+  dims.reserve(4);
+  pixdims.reserve(4);
 }
 
 // constructor that accepts a filename to read an image from
@@ -348,6 +353,8 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
 
   matrixSize = 64;
   numSlices = 32;
+  dims.reserve(4);
+  pixdims.reserve(4);
   addToID("image");
   bytesPerPix = sizeof(T);
   read(filename);
@@ -986,6 +993,9 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   }
 
   for(unsigned int ind = 1; ind <= dims.size(); ind++) {
+    cout << ind << endl;
+    cout.flush();
+
     hdr->dim[ind] = dims[ind-1];
     hdr->pixdim[ind] = pixdims[ind-1];
   }
@@ -1266,6 +1276,12 @@ gsl_matrix *RtDataImage<T>::getRas2Ref() {
 template<class T>
 int RtDataImage<T>::getDim(int i) {
   return (int)dims.size() > i && i >= 0 ? dims[i] : -1;
+}
+
+// get voxel dimensions
+template<class T>
+vector<double> &RtDataImage<T>::getPixDims() {
+  return pixdims;
 }
 
 // get vox dimensions

@@ -63,8 +63,11 @@ protected:
   // TODO: reconsider how to store old data and manage access to it
   vector<RtData*> database;
 
-  // the last trigger time
-  int lastTriggerTR;
+  // the last good trigger time
+  int lastGoodTriggerTR;
+
+  // the last bad trigger time
+  int lastBadTriggerTR;
 };
 
 #endif

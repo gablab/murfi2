@@ -63,8 +63,8 @@ protected:
   RtActivation *estErrSumSq;
 
   // for task triggering based on activation sum
-  bool   triggerStim;
-  bool isTriggered;
+  bool triggerStim;
+  bool isTriggered;  
   int afterTriggerSkip;
   int numImagesSinceTrigger;
 

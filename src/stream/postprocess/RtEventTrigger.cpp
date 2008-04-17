@@ -22,6 +22,7 @@ RtEventTrigger::RtEventTrigger() : RtStreamComponent() {
   negThresh = 3.0;
 
   afterTriggerSkipTRs = 0;
+  triggerBothDirections = true;
 }
 
 // destructor
@@ -60,71 +61,89 @@ bool RtEventTrigger::processOption(const string &name, const string &text) {
 }  
 
 // process a single acquisition
-int RtEventTrigger::process(ACE_Message_Block *mb) {  
-  ACE_TRACE(("RtEventTrigger::process"));
-
-  static int trsSinceTrigger = afterTriggerSkipTRs;
-  
-  cout << "event trigger dump: " 
-    << monitorPos << " "
-    << monitorNeg << " "
-    << posThresh << " "
-    << negThresh << " "
-    << posroiID << " "
-    << negroiID << endl;
-
-  if(!monitorPos && !monitorNeg) {
-    return 0;
-  }
-
-  // check if we need to skip triggers
-  if(trsSinceTrigger < afterTriggerSkipTRs) {
-    trsSinceTrigger++;
-    return 0;
-  }
-
-  RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
-
-  // find the positive activation sum with the right roiID
-  RtActivation *posact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
-						  posroiID);
-  if(monitorPos && posact == NULL) {
-    cout << "couldn't find positive roi " << posroiID << endl;
-
-    ACE_DEBUG((LM_INFO, "RtEventTrigger:process: no positive ROI found\n"));
-    return 0;
-  }
-  
-  // find the positive activation sum with the right roiID
-  RtActivation *negact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
-						  negroiID);
-  if(monitorNeg && negact == NULL) {
-    cout << "couldn't find negative roi " << negroiID << endl;
-
-    ACE_DEBUG((LM_INFO, "RtEventTrigger:process: no negative ROI found\n"));
-    return 0;
-  }
-
-  // check for both above threshold
-  cout << "checking for even trigger: " << posact->getPixel(0) << " >= "
-       << posThresh << endl;
-  if((!monitorPos || posact->getPixel(0) >= posThresh) 
-     && (!monitorNeg || negact->getPixel(0) <= negThresh)) {
-    // trigger
-    RtEvent *event = new RtEvent();
-    event->addToID("trigger");
-    setResult(msg,event);
-
-    cout << "EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-    cout << posact->getPixel(0) << " " << posThresh << endl;
-
-    trsSinceTrigger = 0;
-  }
-  
-  return 0;
-}
+//int RtEventTrigger::process(ACE_Message_Block *mb) {  
+//  ACE_TRACE(("RtEventTrigger::process"));
+//
+//  static int trsSinceTrigger = afterTriggerSkipTRs;
+//  
+//  cout << "event trigger dump: " 
+//    << monitorPos << " "
+//    << monitorNeg << " "
+//    << posThresh << " "
+//    << negThresh << " "
+//    << posroiID << " "
+//    << negroiID << endl;
+//
+//  if(!monitorPos && !monitorNeg) {
+//    return 0;
+//  }
+//
+//  // check if we need to skip triggers
+//  if(trsSinceTrigger < afterTriggerSkipTRs) {
+//    trsSinceTrigger++;
+//    return 0;
+//  }
+//
+//  RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
+//
+//  // find the positive activation sum with the right roiID
+//  RtActivation *posact 
+//    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
+//						  posroiID);
+//  if(monitorPos && posact == NULL) {
+//    cout << "couldn't find positive roi " << posroiID << endl;
+//
+//    ACE_DEBUG((LM_INFO, "RtEventTrigger:process: no positive ROI found\n"));
+//    return 0;
+//  }
+//  
+//  // find the positive activation sum with the right roiID
+//  RtActivation *negact 
+//    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
+//						  negroiID);
+//  if(monitorNeg && negact == NULL) {
+//    cout << "couldn't find negative roi " << negroiID << endl;
+//
+//    ACE_DEBUG((LM_INFO, "RtEventTrigger:process: no negative ROI found\n"));
+//    return 0;
+//  }
+//
+//  cout << "checking for even trigger: " 
+//       << posact->getPixel(0) << " >= " << posThresh 
+//       << " and "
+//       << negact->getPixel(0) << " <= " << negThresh 
+//       << endl;
+//
+//  // check for good trigger
+//  if((!monitorPos || posact->getPixel(0) >= posThresh) 
+//     && (!monitorNeg || negact->getPixel(0) <= negThresh)) {
+//    // trigger
+//    RtEvent *event = new RtEvent();
+//    event->addToID("trigger.good");
+//    setResult(msg,event);
+//
+//    cout << "GOOD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+//    cout << posact->getPixel(0) << " " << posThresh << endl;
+//
+//    trsSinceTrigger = 0;
+//  }
+//  
+//  // check for bad trigger
+//  if((!monitorPos || posact->getPixel(0) <= -posThresh) 
+//     && (!monitorNeg || negact->getPixel(0) >= -negThresh)) {
+//    // trigger
+//    RtEvent *event = new RtEvent();
+//    event->addToID("trigger.bad");
+//    setResult(msg,event);
+//
+//    cout << "BAD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+//    cout << posact->getPixel(0) << " " << posThresh << endl;
+//
+//    trsSinceTrigger = 0;
+//  }
+//  
+//  return 0;
+//}
 
 
 /*****************************************************************************

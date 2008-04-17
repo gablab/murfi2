@@ -65,7 +65,8 @@ int RtStream::configure(RtConfig &config) {
 #include"RtFluctuationMonitor.h"
 #include"RtActivationSum.h"
 #include"RtActivationSumDifference.h"
-#include"RtEventTrigger.h"
+#include"RtEventTriggerActivationSums.h"
+#include"RtEventTriggerActivationDiff.h"
 
 // add a single module to the module stack
 //  in
@@ -119,8 +120,11 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   else if(type == RtActivationSumDifference::moduleString) { // activation sum diff
     ACE_NEW_NORETURN(sc, RtActivationSumDifference());
   }
-  else if(type == RtEventTrigger::moduleString) { // trigger events
-    ACE_NEW_NORETURN(sc, RtEventTrigger());
+  else if(type == RtEventTriggerActivationSums::moduleString) { // trigger acts
+    ACE_NEW_NORETURN(sc, RtEventTriggerActivationSums());
+  }
+  else if(type == RtEventTriggerActivationDiff::moduleString) { // trigger diff
+    ACE_NEW_NORETURN(sc, RtEventTriggerActivationDiff());
   }
 
   // create and add the module

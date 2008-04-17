@@ -76,7 +76,7 @@ RtMaskImage *RtActivation::toMask(Sign direction) {
       activationMask->setPixel(i,voxel >= threshold ? true : false);
       break;
     case NEG:
-      activationMask->setPixel(i,voxel <= threshold ? true : false);
+      activationMask->setPixel(i,voxel <= -threshold ? true : false);
       break;
     case POSNEG:
       activationMask->setPixel(i,fabs(voxel) >= threshold ? true : false);

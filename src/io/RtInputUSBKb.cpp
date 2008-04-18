@@ -14,7 +14,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtInputUSBKb::RtInputUSBKb() {
-  id += ":usbkb";
+  addToID(":usbkb");
 }
 
 // destructor

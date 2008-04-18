@@ -39,17 +39,27 @@ public:
   //   true (for success) or false
   virtual bool close();
 
+  // set the id string
+  void setID(const string &s);
+
+  // add a string to the input id
+  void addToID(string add);
+
+  // get the id string
+  string getID();
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-private:
+protected:
 
   //*** private data members  ***//
 
   // callback to receive the input
   //sigc::signal<void, RtData&> callback;
   
+  string inputID;
 
 };
 

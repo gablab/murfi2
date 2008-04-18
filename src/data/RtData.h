@@ -85,7 +85,7 @@ protected:
   //*** data members  ***//
 
   // ids
-  string id;     // data type id
+  string dataID;     // data type id
   string roiID;  // roi id
   
   ACE_Date_Time creationTime;

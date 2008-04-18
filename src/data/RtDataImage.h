@@ -485,7 +485,7 @@ void RtDataImage<T>::printInfo(ostream &os) {
   os << setiosflags(ios::left);
 
   os << "---------------------------" << endl
-     << id                            << endl
+     << dataID                            << endl
      << "---------------------------" << endl
      << "magic number: " << magicNumber << endl
      << setw(wid) << "ndims: / dim1 / dim2... /" << dims.size() << ": / ";

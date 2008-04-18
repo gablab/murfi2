@@ -17,7 +17,7 @@ static char *VERSION = "$Id$";
 // default constructor
 RtPreprocessor::RtPreprocessor() 
   : RtStreamComponent() {
-  id = "RtPreprocessor";
+  setID("RtPreprocessor");
 }
 
 // destructor

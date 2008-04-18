@@ -49,10 +49,7 @@ public:
   
 protected:
 
-
   bool isOpen;
-
-  string id;
 
 };
 

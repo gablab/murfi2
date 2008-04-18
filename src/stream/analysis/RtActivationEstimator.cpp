@@ -24,7 +24,8 @@ string RtActivationEstimator::moduleString("voxel-accumcor");
 RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
 
   // standard init
-  id = moduleString;
+  componentID = moduleString;
+
   trends = conditions = NULL;
   numTrends = numConditions = numMeas = 0;
   numTimepoints = 0;

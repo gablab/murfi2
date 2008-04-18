@@ -17,7 +17,7 @@ string RtStreamComponent::moduleString("generic-stream-component");
 // default constructor
 RtStreamComponent::RtStreamComponent() : super(), 
     persistent(false), putResultOnMessage(false) {
-  id = moduleString;
+  componentID = moduleString;
   inputDataID = "data.mri.image";
   makeCurrentData = false;
   passer = NULL;
@@ -39,8 +39,8 @@ void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
   // process config info for cross module and global config info
   processConfig(*config);
 
-  // store the display
-  //display = config->getConductor()->getDisplay();
+  // store the conductor
+  conductor = config->getConductor();
 
   string name;
   TiXmlElement *optionElmt;
@@ -73,6 +73,7 @@ void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
 bool RtStreamComponent::processConfig(RtConfig &config) {
   return true;
 }
+
 // process an option
 //  in 
 //   name of the option to process
@@ -90,6 +91,9 @@ bool RtStreamComponent::processOption(const string &name, const string &text) {
     bool ret =  RtConfigVal::convert<bool>(putResultOnMessage, text);
     return ret;
   }
+  if(name == "makeoutput") {
+    return conductor->addOutput(this);
+  }
 
   return false;
 }  
@@ -105,6 +109,18 @@ void RtStreamComponent::addOutput(RtOutput *out, const string &dataId) {
   }
 
   passer->addOutput(out);
+}
+
+// adds outputs from a vector
+//  in:
+//   out: vector of output objects
+//  out:
+//   true (for success) or false
+void RtStreamComponent::addVectorOfOutputs(vector<RtOutput*> &outs) {
+  //cout << "adding " << outs.size() << " outputs to " << getID() << endl;
+  for(vector<RtOutput*>::iterator i = outs.begin(); i != outs.end(); i++) {
+    addOutput(*i);
+  }
 }
 
 // finish initialization for prepare to run
@@ -248,7 +264,7 @@ bool RtStreamComponent::getPersistent() {
 
 // gets the id for this stream component
 string RtStreamComponent::getID() {
-  return id;
+  return componentID;
 }
 
 // gets the data id for the input

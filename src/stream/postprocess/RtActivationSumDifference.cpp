@@ -13,7 +13,7 @@ string RtActivationSumDifference::moduleString("activation-sum-difference");
 
 // default constructor
 RtActivationSumDifference::RtActivationSumDifference() : RtStreamComponent() {
-  id = moduleString;
+  componentID = moduleString;
   posActivationSumID = "data.image.activation.pos";
   negActivationSumID = "data.image.activation.neg";
 }

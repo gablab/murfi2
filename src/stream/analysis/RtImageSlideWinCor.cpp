@@ -12,7 +12,7 @@ string RtImageSlideWinCor::moduleString("voxel-slidewincor");
 
 // default constructor
 RtImageSlideWinCor::RtImageSlideWinCor() : RtStreamComponent(), windowLen(12) {
-  id = moduleString;
+  componentID = moduleString;
 
   needsInit = true;
 }

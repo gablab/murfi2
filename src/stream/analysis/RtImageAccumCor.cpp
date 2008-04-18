@@ -12,7 +12,7 @@ string RtImageAccumCor::moduleString("voxel-accumcor");
 
 // default constructor
 RtImageAccumCor::RtImageAccumCor() : RtActivationEstimator() {
-  id = moduleString;
+  componentID = moduleString;
 
   needsInit = true;
 }

@@ -13,7 +13,7 @@ string RtPasser::moduleString("passer");
 
 // default constructor
 RtPasser::RtPasser() : RtStreamComponent(), dataID("") {
-  id = moduleString;
+  componentID = moduleString;
 }
 
 // string with id constructor
@@ -22,7 +22,7 @@ RtPasser::RtPasser() : RtStreamComponent(), dataID("") {
 //   empty we send all the data
 RtPasser::RtPasser(string _dataID) 
   : RtStreamComponent(), dataID(_dataID) {
-  id = moduleString;
+  componentID = moduleString;
 }
 
 // char* with id constructor
@@ -31,7 +31,7 @@ RtPasser::RtPasser(string _dataID)
 //   empty we send all the data
 RtPasser::RtPasser(char *_dataID) 
   : RtStreamComponent(), dataID(_dataID) {
-  id = moduleString;
+  componentID = moduleString;
 }
 
 // destructor

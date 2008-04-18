@@ -14,7 +14,7 @@ string RtEventTrigger::moduleString("event-trigger");
 
 // default constructor
 RtEventTrigger::RtEventTrigger() : RtStreamComponent() {
-  id = moduleString;
+  componentID = moduleString;
 
   posroiID = "active";
   negroiID = "deactive";
@@ -22,6 +22,7 @@ RtEventTrigger::RtEventTrigger() : RtStreamComponent() {
   negThresh = 3.0;
 
   afterTriggerSkipTRs = 0;
+  initialSkipTRs = 0;
   triggerBothDirections = true;
 }
 
@@ -56,7 +57,9 @@ bool RtEventTrigger::processOption(const string &name, const string &text) {
   if(name == "afterTriggerSkipTRs") {
     return RtConfigVal::convert<int>(afterTriggerSkipTRs,text);
   }
-
+  if(name == "initialSkipTRs") {
+    return RtConfigVal::convert<int>(initialSkipTRs,text);
+  }
   return RtStreamComponent::processOption(name, text);
 }  
 

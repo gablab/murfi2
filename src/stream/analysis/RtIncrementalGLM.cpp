@@ -13,7 +13,7 @@ string RtIncrementalGLM::moduleString("incrglm");
 
 // default constructor
 RtIncrementalGLM::RtIncrementalGLM() : RtActivationEstimator() {
-  id = moduleString;
+  componentID = moduleString;
 
   needsInit = true;
 

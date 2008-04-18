@@ -379,7 +379,7 @@ float RtMRIImage::getAutoContrast() {
     setMinMax();
   }
 
-  return USHRT_MAX/(float) maxVal;
+  return SHRT_MAX/(float) maxVal;
 }
 
 

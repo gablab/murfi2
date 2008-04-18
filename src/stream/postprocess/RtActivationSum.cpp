@@ -18,7 +18,7 @@ static ofstream dumpfile("/tmp/activation_sum_dump.txt");
 
 // default constructor
 RtActivationSum::RtActivationSum() : RtStreamComponent() {
-  id = moduleString;
+  componentID = moduleString;
 
   activationID = "data.image.activation.voxel-singleimcor";
 }

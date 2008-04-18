@@ -21,8 +21,8 @@ static ofstream dumpfile("/tmp/single_image_dump.txt");
 
 // default constructor
 RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
-  id = moduleString;
-
+  componentID = moduleString;
+   
   z = f = g = h = NULL;
 
   baselineThreshold.set_size(1);

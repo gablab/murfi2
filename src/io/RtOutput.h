@@ -27,12 +27,20 @@ public:
   // destructor
   virtual ~RtOutput();
 
-
   // open and start accepting input
   virtual bool open(RtConfig &config);
 
   // hand of some data to be output
   virtual void setData(RtData *data);
+
+  // set the id string
+  void setID(const string &s);
+
+  // add a string to the output id
+  void addToID(string add);
+
+  // get the id string
+  string getID();
 
   // prints the current time 
   void printNow(ostream &os);
@@ -41,10 +49,11 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-private:
+protected:
 
   //*** private data members  ***//
 
+  string outputID;
   ACE_Date_Time now;
 };
 

@@ -11,12 +11,12 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtInput::RtInput() {
-  id = "input";
+  inputID = "input";
 }
 
 // destructor
 RtInput::~RtInput() {
-  id = "input";
+  inputID = "input";
 }
 
 // init
@@ -36,6 +36,21 @@ bool RtInput::close() {
   ACE_Task_Base::close();
 
   return RtIO::close();
+}
+
+// set the id string
+void RtInput::setID(const string &s) {
+  inputID = s;
+}
+
+// add a string to the input id
+void RtInput::addToID(string add) {
+  inputID += add;
+}
+
+// get the id string
+string RtInput::getID() {
+  return inputID;
 }
 
 

@@ -10,12 +10,13 @@
 #define RTSTREAMCOMPONENT_H
 
 #include"ace/Task.h"
+#include"RtOutput.h"
 
 #include"RtStream.h"
 #include"RtStreamMessage.h"
 #include"RtConfig.h"
+#include"RtConductor.h"
 #include"RtData.h"
-//#include"RtPasser.h"
 
 // NOTES FOR SUBCLASSING:
 // when this class is subclassed it should get its own 
@@ -28,7 +29,7 @@
 class RtPasser;
 
 // class declaration
-class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH> {
+class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH>, public RtOutput {
 
 public:
 
@@ -51,6 +52,13 @@ public:
   //  in
   //   output to add
   virtual void addOutput(RtOutput *out, const string &dataId = "");
+
+  // adds outputs from a vector
+  //  in:
+  //   out: vector of output objects
+  //  out:
+  //   true (for success) or false
+  virtual void addVectorOfOutputs(vector<RtOutput*> &outs);
 
   // initialize and run thread
   //  out:
@@ -128,6 +136,9 @@ protected:
   // passer to send the results of our computation to outputs
   RtPasser *passer;
 
+  // pointer to the conductor controlling execution
+  RtConductor *conductor;
+
   // whether data created by this component should be persistent
   bool persistent;
 
@@ -141,7 +152,7 @@ protected:
   //RtDisplayImage *display;
 
   // id string
-  string id;
+  string componentID;
 
   // input data id string
   string inputDataID;
@@ -152,7 +163,7 @@ class RtEndTask : public RtStreamComponent {
 
 public:
   RtEndTask() : RtStreamComponent() {
-    id = "end-task";
+    componentID = "end-task";
   }
 
 protected:

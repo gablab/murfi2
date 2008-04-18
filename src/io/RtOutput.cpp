@@ -11,7 +11,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtOutput::RtOutput() {
-  id = "output";
+  outputID = "output";
 } 
 
 // destructor
@@ -31,6 +31,21 @@ bool RtOutput::open(RtConfig &config) {
 // hand off some data to be output
 void RtOutput::setData(RtData *data) {
   // 
+}
+
+// set the id string
+void RtOutput::setID(const string &s) {
+  outputID = s;
+}
+
+// add a string to the output id
+void RtOutput::addToID(string add) {
+  outputID += add;
+}
+
+// get the id string
+string RtOutput::getID() {
+  return outputID;
 }
 
 // prints the current time 

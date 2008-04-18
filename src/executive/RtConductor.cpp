@@ -83,7 +83,6 @@ RtConductor::RtConductor(int argc, char **argv) {
     if(!addOutput(infoserver)) {
       cerr << "ERROR: could not initialize info server" << endl;
     }
-    cout << "added infoserver as output" << endl;
   }
 
   if(config.get("info:log:disabled")==false) {
@@ -96,15 +95,13 @@ RtConductor::RtConductor(int argc, char **argv) {
   // attach code numbers to outputs
   curCodeNum = START_CODE_OUTPUTS;
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end();
-	curCodeNum++, i++) {
+	curCodeNum++, i++) {    
     (*i)->setConductor(this);
     (*i)->setCodeNum(curCodeNum);
   }
 
   // build the stream and its components
   buildStream(config);
-
-
 
 }
 
@@ -139,7 +136,7 @@ bool RtConductor::buildStream(RtConfig config) {
   ACE_TRACE(("RtConductor::buildStream"));
 
   // set the conductor to us
-  stream.setConductor(this);
+  stream.setStreamConductor(this);
 
   // open the stream
   stream.configure(config);
@@ -167,6 +164,21 @@ bool RtConductor::addInput(RtInput *in) {
   return true;
 }
 
+// adds inputs from a vector
+//  in:
+//   in: vector of input objects
+//  out:
+//   true (for success) or false
+bool RtConductor::addVectorOfInputs(vector<RtInput*> &ins) {
+  bool ret = true;
+  for(vector<RtInput*>::iterator i = ins.begin(); i != ins.end(); i++) {
+    if(!addInput(*i)) {
+      ret = false;
+    }
+  }
+  return ret;
+}
+
 // adds output mode
 //  in:
 //   out: output object
@@ -183,7 +195,24 @@ bool RtConductor::addOutput(RtOutput *out) {
     outputs.push_back(out);
   }
 
+  cout << "added " << out->getID() << " as output " << out << endl;
+
   return true;
+}
+
+// adds outputs from a vector
+//  in:
+//   out: vector of output objects
+//  out:
+//   true (for success) or false
+bool RtConductor::addVectorOfOutputs(vector<RtOutput*> &outs) {
+  bool ret = true;
+  for(vector<RtOutput*>::iterator i = outs.begin(); i != outs.end(); i++) {
+    if(!addOutput(*i)) {
+      ret = false;
+    }
+  }
+  return ret;
 }
 
 // initialize config and prepare to run
@@ -327,7 +356,7 @@ RtInput *RtConductor::getInputByName(const string &name) {
 //  in
 //   name: name of output to get
 //  out 
-//   pointer to the output object
+//   pointer to the output object (the first with the specified name)
 RtOutput *RtConductor::getOutputByName(const string &name) {
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++){
     //cout << (*i)->getID() << "=" << name << endl;
@@ -337,6 +366,23 @@ RtOutput *RtConductor::getOutputByName(const string &name) {
   }
 
   return NULL;
+}
+
+// get all the outputs with a name
+//  in
+//   name: name of output to get
+//  out 
+//   vector of pointers to the output objects
+vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
+  vector<RtOutput*> outs;
+  for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++){
+    //cout << (*i)->getID() << "=" << name << endl;
+    if((*i)->getID() == name) {
+      outs.push_back(*i);
+    }
+  }
+
+  return outs;
 }
 
 // gets the version

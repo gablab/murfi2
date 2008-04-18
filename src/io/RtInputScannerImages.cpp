@@ -33,7 +33,7 @@ RtInputScannerImages::RtInputScannerImages()
      seriesNum(1),
      toBeDeleted(received.begin())
 {
-  id += ":scanner:images";
+  addToID(":scanner:images");
   saveImagesToFile = false;
   matrixSize = 64;
   numSlices = 32;

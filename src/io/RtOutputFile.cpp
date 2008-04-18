@@ -15,7 +15,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtOutputFile::RtOutputFile() : RtOutput() {
-  id += ":file";
+  addToID(":file");
 }
 
 // destructor

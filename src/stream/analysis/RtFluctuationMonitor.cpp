@@ -9,6 +9,7 @@
 #include"RtFluctuationMonitor.h"
 #include"RtMRIImage.h"
 #include"RtActivation.h"
+#include"RtDataIDs.h"
 #include<limits>
 
 string RtFluctuationMonitor::moduleString("fluctuationmonitor");
@@ -16,7 +17,8 @@ string RtFluctuationMonitor::moduleString("fluctuationmonitor");
 
 // default constructor
 RtFluctuationMonitor::RtFluctuationMonitor() : RtActivationEstimator() {
-  id = moduleString;
+  componentID = moduleString;
+  outputID += ":" + string(ID_FLUCTUATIONMONITOR);
 
   needsInit = true;
   solvers = NULL;
@@ -45,8 +47,16 @@ RtFluctuationMonitor::~RtFluctuationMonitor() {
   }
 }
 
+// look for events we triggered
+void RtFluctuationMonitor::setData(RtData *data) {
+  if(data->getID().find(ID_EVENTTRIGGER) != string::npos) {
+    receiveStimTriggered();
+  }
+}
+
 // receive a message that stimulus has been triggered
 void RtFluctuationMonitor::receiveStimTriggered() {
+  cout << "!!!! received trigger event" << endl;
   numImagesSinceTrigger = 0;
   isTriggered = true;
 }
@@ -84,15 +94,6 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
   }
 
   cout << "operating on image: " << dat->getID() << endl;
-
-  // check the time since triggers
-  if(isTriggered && afterTriggerSkip >= numImagesSinceTrigger++) {
-    cout << "waiting for triggered stim... " << numImagesSinceTrigger << " of "  << afterTriggerSkip << endl;
-    return 0;
-  }
-  else if(isTriggered) {
-    isTriggered = false;
-  }
 
   numTimepoints++;
 
@@ -134,6 +135,17 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   //// element independent setup
 
+  // check the time since triggers
+  bool dontInclude = false;
+  if(isTriggered && afterTriggerSkip >= numImagesSinceTrigger++) {
+    cout << "waiting for triggered stim... " << numImagesSinceTrigger << " of "  << afterTriggerSkip << endl;
+
+    dontInclude = true;
+  }
+  else if(isTriggered) {
+    isTriggered = false;
+  }
+
   // set threshold
   if(numTimepoints > numTrends+1) {
     fluct->setThreshold(getTStatThreshold(1));
@@ -156,56 +168,36 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     }
 
     double y = dat->getElement(i);
-    solvers[i]->include(&y,Xrow,1.0);
-
-    if(numTimepoints > numTrends) {
+    if(!dontInclude) {
+      solvers[i]->include(&y,Xrow,1.0);
+    }
+    else { // include a dummy timepoint
       double *beta = solvers[i]->regress(0);
-      double err = y;
 
-      // subtract the reconstruction based on trend fit
+      double est = 0.;
+      // build the estimate
       for(unsigned int j = 0; j < numTrends; j++) {
-	err -= beta[j]*trends->get(numTimepoints-1,j);
+	est += beta[j]*trends->get(numTimepoints-1,j);
       }
 
-      estErrSumSq->setPixel(i, estErrSumSq->getPixel(i) + err*err);
-
-      fluct->setPixel(i,
-	     sqrt((numTimepoints-1)/estErrSumSq->getPixel(i)) * err);
-
-      //sum += fluct->getPixel(i);
-
-      //cout << fluct->getPixel(i) << endl;
-      //fluct->setPixel(i, beta[numTrends]/se);
-
-      //if(i == 16*32*32 + 28*32 + 14) {
-//      //#ifdef DUMP
-//    if(1) {
-//      cerr  << numTimepoints << " " << dat->getPixel(i)
-//	    << " " << fluct->getPixel(i) << " " << beta[0] << " "
-//	    << beta[1] << " " << beta[0] + beta[1]*numTimepoints
-//	    << " " <<  estErrSumSq->getPixel(i)
-//	    << endl;
-//      //dumpfile.flush();
-//      //#endif
-//    }
-//
-//      cout << "z: "; printVnlVector(*z); cout << endl;
-//      cout << "f: "; printVnlVector(*f); cout << endl;
-//      cout << "g: "; printVnlVector(*g); cout << endl;
-//      cout << "h: "; printVnlVector(*h); cout << endl;
-//      cout << "C: " << endl;
-//      C->print(cout);
-//      cout << "c: "; printVnlVector(c->get_row(i)); cout << endl;
-//
-//      //if(i > 40) {
-//	int trash;
-//	cin >> trash;
-//      //}
-//    }
-
-
+      solvers[i]->include(&est,Xrow,1.0);
       delete beta;
     }
+
+    double *beta = solvers[i]->regress(0);
+    double err = y;
+
+    // subtract the reconstruction based on trend fit
+    for(unsigned int j = 0; j < numTrends; j++) {
+      err -= beta[j]*trends->get(numTimepoints-1,j);
+    }
+
+    estErrSumSq->setPixel(i, estErrSumSq->getPixel(i) + err*err);
+
+    fluct->setPixel(i,
+		    sqrt((numTimepoints)/estErrSumSq->getPixel(i)) * err);
+
+    delete beta;
 
   }
   //  cout << "sum = " << sum << endl;

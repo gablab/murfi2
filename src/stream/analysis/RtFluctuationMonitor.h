@@ -14,6 +14,8 @@
 #include<vnl/vnl_matrix.h>
 
 #include"RtActivationEstimator.h"
+#include"RtOutput.h"
+
 #include"RtLeastSquaresSolve.h"
 
 #include<vector>
@@ -36,6 +38,9 @@ public:
 
   // receive a message that stimulus has been triggered
   void receiveStimTriggered();
+
+  // look for triggered events so we can stop estimation during task
+  virtual void setData(RtData *data);
 
 protected:
 

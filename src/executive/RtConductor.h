@@ -48,6 +48,34 @@ public:
   //   true (for success) or false
   bool init();
 
+  // adds input mode
+  //  in:
+  //   in: input object
+  //  out:
+  //   true (for success) or false
+  bool addInput(RtInput *in);
+
+  // adds a vector of inputs
+  //  in:
+  //   in: vector of input object
+  //  out:
+  //   true (for success) or false
+  bool addVectorOfInputs(vector<RtInput*> &ins);
+
+  // adds output mode
+  //  in:
+  //   out: output object
+  //  out:
+  //   true (for success) or false
+  bool addOutput(RtOutput *out);
+
+  // adds outputs from a vector
+  //  in:
+  //   out: vector of output objects
+  //  out:
+  //   true (for success) or false
+  bool addVectorOfOutputs(vector<RtOutput*> &outs);
+
   //*** operation routines  ***//
   
   // begins execution of a realtime fMRI session
@@ -92,6 +120,13 @@ public:
   //   pointer to the output object
   RtOutput *getOutputByName(const string &name);
 
+  // get all the outputs with a name
+  //  in
+  //   name: name of output to get
+  //  out 
+  //   vector of pointers to the output objects
+  vector<RtOutput*> getAllOutputsWithName(const string &name);
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -106,20 +141,6 @@ protected:
   //  out:
   //   true (for success) or false
   bool buildStream(RtConfig config);
-
-  // adds input mode
-  //  in:
-  //   in: input object
-  //  out:
-  //   true (for success) or false
-  bool addInput(RtInput *in);
-
-  // adds output mode
-  //  in:
-  //   out: output object
-  //  out:
-  //   true (for success) or false
-  bool addOutput(RtOutput *out);
 
   //*** members ***//
 

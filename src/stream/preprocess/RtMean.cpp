@@ -14,8 +14,8 @@ string RtMean::moduleString("voxel-mean");
 
 // default constructor
 RtMean::RtMean() : RtStreamComponent() {
+  componentID = moduleString;
   numTimePoints = 0;
-  id = moduleString;
 }
 
 // destructor

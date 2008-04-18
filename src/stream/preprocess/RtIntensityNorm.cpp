@@ -14,7 +14,7 @@ string RtIntensityNorm::moduleString("intensity-norm");
 
 // default constructor
 RtIntensityNorm::RtIntensityNorm() : RtStreamComponent() {
-  id = moduleString;
+  componentID = moduleString;
   meanIntensity = fmod(1.0,0.0); // assign nan
 
   makeBETMask = false;

@@ -12,7 +12,7 @@ string RtImageZScore::moduleString("voxel-zscore");
 
 // default constructor
 RtImageZScore::RtImageZScore() : RtActivationEstimator () {
-  id = moduleString;
+  componentID = moduleString;
 
   meanDataID = "data.image.mri.voxel-mean";
   varDataID = "data.image.mri.voxel-variance";

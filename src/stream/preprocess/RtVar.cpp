@@ -15,7 +15,7 @@ string RtVar::moduleString("voxel-variance");
 // default constructor
 RtVar::RtVar() : RtStreamComponent() {
   numTimePoints = 0;
-  id = moduleString;
+  componentID = moduleString;
   meanDataID = "data.image.mri.voxel-mean";
 }
 

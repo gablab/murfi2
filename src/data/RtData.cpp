@@ -9,25 +9,26 @@
 
   
 // default constructor
-RtData::RtData() : id("data"), roiID("unset"), persistent(false), lock(NULL) {
-
+RtData::RtData() {
+  dataID = "data";
+  roiID = "unset";
+  persistent = false;
+  lock = NULL;
 }
 
 // destructor
 RtData::~RtData() {
-
   // notify our locker that we are being deleted
   if(lock != NULL) {
     lock->beingDeleted();
   }
-  
 }
 
 // gets the id string for this data
 //  out
 //   id string
 const string &RtData::getID() {
-  return id;
+  return dataID;
 }
 
 // get the roiID
@@ -37,25 +38,25 @@ string RtData::getRoiID() {
 
 // append to the id string for this data
 //  in
-//   string to append to the id
+//   string to append to the dataID
 void RtData::addToID(string &s) {
-  id += ".";
-  id += s;
+  dataID += ".";
+  dataID += s;
 }
 
 // append to the id string for this data
 //  in
 //   string to append to the id
 void RtData::addToID(char *s) {
-  id.append(".");
-  id.append(s);
+  dataID.append(".");
+  dataID.append(s);
 }
 
 // set the id string for this data
 //  in
 //   string to set the id to
 void RtData::setID(const string &s) {
-  id = s;
+  dataID = s;
 }
 
 // set the roiID

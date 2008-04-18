@@ -14,7 +14,7 @@ string RtAccumCor::moduleString("accumcor");
 
 // default constructor
 RtAccumCor::RtAccumCor() : RtActivationEstimator() {
-  id = moduleString;
+  componentID = moduleString;
 
   needsInit = true;
 

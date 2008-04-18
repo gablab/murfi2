@@ -32,8 +32,8 @@ RtStream::~RtStream() {
 // set the conductor for this stream
 //  in
 //   conductor pointer
-void RtStream::setConductor(RtConductor *_conductor) {
-  conductor = _conductor;
+void RtStream::setStreamConductor(RtConductor *_conductor) {
+  streamConductor = _conductor;
 }
   
 
@@ -140,13 +140,16 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
 int RtStream::addModules(RtConfig &config) {
   ACE_TRACE(("RtStream::addModules"));
 
+  cout << "in addModule " << endl;
+  cout.flush();
+
   // add the preprocessing module
   Module *preprocMod;
   RtPreprocessor *preproc = new RtPreprocessor();
   ACE_NEW_RETURN(preprocMod, Module(ACE_TEXT("preprocessing module"),
 				    preproc),-1);
 
-  preproc->setConductor(conductor);
+  preproc->setStreamConductor(streamConductor);
   preproc->configure(config);
 
   // add the analysis module
@@ -198,7 +201,6 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
     addOutputsToComponent(sc,topLevelOutNames);
   }
 
-
   TiXmlNode *child = 0;
   while((child = elmt->IterateChildren("module", child))) {
     if(child->Type() != TiXmlNode::ELEMENT) continue;
@@ -214,7 +216,7 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
 	continue;
       }
 
-      cout << "added module " << sc->getID()  << " == " << name << endl;
+      cout << "added module " << sc->getID() << endl;
 
       // allow the stream component to configure itself
       sc->init(childElmt, config);
@@ -236,8 +238,9 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
 void RtStream::addOutputsToComponent(RtStreamComponent *sc, 
 				    vector<string> &outNames) {
   for(vector<string>::iterator i = outNames.begin(); i != outNames.end(); i++) {
-    //cout<< "adding output " << *i << " to " << sc->getID() << endl;
-    sc->addOutput(conductor->getOutputByName(*i));
+    vector<RtOutput*> outs = streamConductor->getAllOutputsWithName(*i);
+    //cout<< "adding " << outs.size() << " outputs " << *i << " to " << sc->getID() << endl;
+    sc->addVectorOfOutputs(outs);
   }
 }
 
@@ -269,7 +272,6 @@ void RtStream::setInput(unsigned int code, RtData *data) {
   // take action based on the kind of new input
   switch(code) {
   case SCANNER_IMAGE_RECEIVED:
-
     // if this code is from a new scanner image, start the processing
     ACE_Message_Block *mb;
     ACE_NEW_NORETURN(mb, ACE_Message_Block(sizeof(RtStreamMessage)));
@@ -278,7 +280,7 @@ void RtStream::setInput(unsigned int code, RtData *data) {
     RtStreamMessage *msg;
     ACE_NEW_NORETURN(msg, RtStreamMessage());
 
-    msg->init(conductor);
+    msg->init(streamConductor);
     msg->addData(data);
 
     memcpy(mb->wr_ptr(), msg, sizeof(RtStreamMessage));

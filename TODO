@@ -3,7 +3,7 @@
 
 NOWNOWNOW
 - integrate registration methods. 
-- add roi viewing/editing to gui
+- add roi viewing/editing to gui (viewing done)
 - add conditions to info server
 - fix incremental GLM (DONE)
 - look into image saving (DONE)
@@ -59,11 +59,11 @@ NOWNOWNOW
    to allow arbitrary contrasts
  - add baseline scans at beginning to let stabilize (DONE)
  - roi activation (DONE)
- - roi-based spatial subtraction
+ - roi-based spatial subtraction (DONE)
  - completely general ROI sum arithmetic
  - hooks for external apps
   + motion correction
-  + intensity normalization
+  + intensity normalization 
   + registration
   + brain mask computation (DONE)
 

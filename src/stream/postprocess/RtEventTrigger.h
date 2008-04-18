@@ -53,6 +53,7 @@ protected:
   double negThresh;
 
   int afterTriggerSkipTRs;
+  int initialSkipTRs;
 };
 
 #endif

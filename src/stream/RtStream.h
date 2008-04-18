@@ -15,7 +15,7 @@
 #include"ace/Stream.h"
 
 //#include"RtConductor.h"
-#include"RtCode.h"
+//#include"RtCode.h"
 //#include"RtData.h"
 //#include"RtStreamComponent.h"
 //#include"RtStreamMessage.h"
@@ -28,7 +28,7 @@ class RtStreamComponent;
 using namespace std;
 
 // class declaration
-class RtStream : public ACE_Stream<ACE_MT_SYNCH>, public RtCode {
+class RtStream : public ACE_Stream<ACE_MT_SYNCH> {
 
 public:
 
@@ -45,7 +45,7 @@ public:
   // set the conductor for this stream
   //  in
   //   conductor pointer
-  void setConductor(RtConductor *_conductor);
+  void setStreamConductor(RtConductor *_conductor);
 
   // initialize stream and prepare to run
   //  out:
@@ -111,7 +111,7 @@ protected:
   typedef ACE_Module<ACE_MT_SYNCH> Module;
 
   // pointer to conductor 
-  RtConductor *conductor;
+  RtConductor *streamConductor;
 
   // stack of moules to be added
   stack<Module*> addMod;

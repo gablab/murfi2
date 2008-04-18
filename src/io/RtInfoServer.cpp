@@ -15,7 +15,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtInfoServer::RtInfoServer() : RtServerSocket() {
-  id += ":infoserver";
+  addToID(":infoserver");
 
   lastGoodTriggerTR = -1;
   lastBadTriggerTR = -1;
@@ -23,7 +23,7 @@ RtInfoServer::RtInfoServer() : RtServerSocket() {
   
 // constructor with port and host
 RtInfoServer::RtInfoServer(unsigned short portNum) : RtServerSocket(portNum) {
-  id += ":infoserver";  
+  addToID(":infoserver");  
 
   lastGoodTriggerTR = -1;
   lastBadTriggerTR = -1;
@@ -47,15 +47,11 @@ void RtInfoServer::setData(RtData *data) {
     // types of triggers, one based on activation in the direction you
     // expect, and the other opposite. neither is an error
     
-    cout << "in" << endl;
-
     size_t pos = data->getID().find(ID_EVENTTRIGGER);
     if(data->getID().substr(pos).find("bad") != string::npos) { // bad trigger
-      cout << "bad" << endl;
       lastBadTriggerTR = ((RtEvent*)data)->getTR();
     }
     else { // otherwise its good
-      cout << "good" << endl;
       lastGoodTriggerTR = ((RtEvent*)data)->getTR();
     }
   }

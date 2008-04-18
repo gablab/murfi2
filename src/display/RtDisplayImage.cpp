@@ -80,7 +80,7 @@ RtDisplayImage::RtDisplayImage() {
   posMaskOn = true;
   negMaskOn = true;
 
-  id += ":display";
+  addToID(":display");
 
   posOverlayID = DEFAULT_POSOVERLAYID;
   posOverlayRoiID = DEFAULT_POSOVERLAYROIID;
@@ -146,7 +146,7 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   negActivationSumID = DEFAULT_NEGACTIVATIONSUMROIID;
 
   strcpy(title,_title);
-  id += ":display";
+  addToID(":display");
 }
 
 // destructor

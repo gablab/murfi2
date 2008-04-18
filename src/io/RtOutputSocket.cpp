@@ -17,7 +17,7 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtOutputSocket::RtOutputSocket() : RtOutput() {
-  id += ":socket";
+  addToID(":socket");
 }
 
 // destructor

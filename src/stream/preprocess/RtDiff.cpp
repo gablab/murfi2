@@ -14,7 +14,7 @@ string RtDiff::moduleString("voxel-difference");
 
 // default constructor
 RtDiff::RtDiff() : RtStreamComponent() {
-  id = moduleString;
+  componentID = moduleString;
   last = NULL;
 }
 

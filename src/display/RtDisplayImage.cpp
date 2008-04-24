@@ -77,8 +77,8 @@ RtDisplayImage::RtDisplayImage() {
 
   posOverlayOn = true;
   negOverlayOn = true;
-  posMaskOn = true;
-  negMaskOn = true;
+  posMaskOn = false;
+  negMaskOn = false;
 
   addToID(":display");
 
@@ -127,8 +127,8 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   newImageType = true;
   posOverlayOn = false;
   negOverlayOn = false;
-  posMaskOn = true;
-  negMaskOn = true;
+  posMaskOn = false;
+  negMaskOn = false;
 
   imageDisplayType = ID_SCANNERIMG;
 
@@ -317,7 +317,7 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() == posOverlayID && data->getRoiID() == posOverlayRoiID) {
     posOverlay = (RtActivation*) data;
     newPosOverlay = true;
-  //cout << "display got a pos overlay " << img->getID() << endl;
+  cout << "display got a pos overlay " << img->getID() << endl;
     return;
   }
 
@@ -325,7 +325,7 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() == negOverlayID && data->getRoiID() == negOverlayRoiID) {
     negOverlay = (RtActivation*) data;
     newNegOverlay = true;
-  //cout << "display got a neg overlay " << img->getID() << endl;
+  cout << "display got a neg overlay " << img->getID() << endl;
     return;
   }
 
@@ -334,7 +334,7 @@ void RtDisplayImage::setData(RtData *data) {
     posMask = (RtMaskImage*) data;
     newPosMask = true;
 
-    //cout << "display got a positive mask " << img->getID() << endl;
+  cout << "display got a positive mask " << img->getID() << endl;
     return;
   }
 
@@ -343,7 +343,7 @@ void RtDisplayImage::setData(RtData *data) {
     negMask = (RtMaskImage*) data;
     newNegMask = true;
 
-    //cout << "display got a negative mask " << img->getID() << endl;
+  cout << "display got a negative mask " << img->getID() << endl;
     return;
   }
 
@@ -657,6 +657,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     glTexCoord2d(0.0,imgh);
     glVertex3f(0.0, 0.0, 0.0);
   } glEnd();
+
 
   /* draw the negMask texture */
   if(negMaskOn && glIsTexture(negMaskTex)) {

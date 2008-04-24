@@ -108,6 +108,9 @@ protected:
   RtSocketAcceptor acceptor;   
   ACE_SOCK_Stream stream;   
 
+  // whether to only read moco images
+  bool onlyReadMoCo;
+
   // parms for image saving to disk
   bool   saveImagesToFile;
   string savePath;

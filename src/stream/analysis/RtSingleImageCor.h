@@ -14,6 +14,7 @@
 #include<vnl/vnl_matrix.h>
 
 #include"RtActivationEstimator.h"
+#include"RtLeastSquaresSolve.h"
 
 #include<vector>
 using namespace std;
@@ -74,14 +75,11 @@ protected:
   // number of data points to process
   unsigned int numData;
 
-  // subsidiary variables
-  vnl_vector<double> *f;
-  vnl_vector<double> *g;
-  vnl_vector<double> *h;
-  vnl_vector<double> *z;
+  // one solver for each voxel 
+  RtLeastSquaresSolve **solvers;
 
-  vnl_matrix<double> *C;
-  vnl_matrix<double> *c;
+  // store the per pixel sum of squared error for the single image model fit
+  RtActivation *estErrSumSq;
 };
 
 #endif

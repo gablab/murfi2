@@ -10,7 +10,7 @@
   
   <!-- receive this -->
   <info>
-    <trigger time="last" tr="32">
+    <trigger time="last" type="[good|bad]" tr="32">
     </trigger>
   </info>
 

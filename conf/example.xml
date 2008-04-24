@@ -47,7 +47,19 @@
     imageWinY="0"
     imageWinW="1000"
     imageWinH="1000"
-    overlayID="data.image.activation.voxel-accumcor"
+
+    posOverlayID="data.image.activation.voxel-fluctmon"
+    posOverlayRoiID="active"
+    negOverlayID="data.image.activation.voxel-fluctmon"
+    negOverlayRoiID="deactive"
+    posMaskID="data.image.mask"
+    posMaskRoiID="active"
+    negMaskID="data.image.mask"
+    negMaskRoiID="deactive"
+    posActivationSumID="data.image.activation.activation-sum"
+    posActivationSumRoiID="active"
+    negActivationSumID="data.image.activation.activation-sum"
+    negActivationSumRoiID="deactive"
 >
 </display>
 
@@ -61,33 +73,41 @@
 <preprocessor>
   <output>display</output>
 
+  <!-- intensity normalization-->
+  <module name="intensity-norm">
+    <option name="makeavail">true</option>
+    <option name="makecurrent">true</option>
+
+    <option name="betMask">true</option>
+    <option name="betParms">-f 0.5 -g 0 -n -m</option>
+    <option name="maskScript">/home/ohinds/projects/realtime/system/scripts/make_bet_mask.sh</option>
+    <output>display</output>
+  </module>
+
+  <!-- voxel-wise image intensity difference between adjacent images -->
   <module name="voxel-difference">
     <output>display</output>
     <output>log</output>
   </module>
 
+  <!-- incrementally computed mean voxel-intensity -->
   <module name="voxel-mean">
     <option name="makeavail">true</option>
     <output>display</output>
   </module>
 
+  <!-- incrementally computed voxel-intensity variance -->
   <module name="voxel-variance">
     <option name="makeavail">true</option>
     <output>display</output>
   </module>
 
+  <!-- incrementally computed voxel-intensity zscore -->
   <module name="voxel-zscore" threshold="3.0">
      <output>display</output>
   </module>
 
-<!--   <module name="voxel-slidewincor"> -->
-<!--      <output>display</output> -->
-<!--      <option name="regressor"> -->
-<!--         1 1 1 -1 -1 -1 -->
-<!--      </option> -->
-<!--      <option name="windowLen">6</option> -->
-<!--   </module> -->
-
+  <!-- incremental GLM  -->
   <module name="accumcor">
      <output>display</output>
 
@@ -106,6 +126,7 @@
      <option name="saveNegAsMaskFilename">mask/background_mask.nii</option>
   </module>
 
+  <!-- deviation of voxel intensity from expected value  -->
   <module name="singleimcor">
      <output>display</output>
 
@@ -119,11 +140,31 @@
      <option name="correctForMultiComps">0</option>
   </module>
 
+  <!-- deviation of voxel intensity from expected value with no regressors -->
+  <module name="fluctuationmonitor">
+    <option name="makeavail">true</option>
+    <output>display</output>
+
+    <option name="makeoutput">true</option>
+
+    <option name="trends">2</option>
+    <option name="probThreshold">0.05</option>
+    <option name="correctForMultiComps">0</option>
+
+    <option name="maskSource">loadFromFile</option>
+    <option name="roiID">active</option>
+    <option name="maskFilename">mask/active_mask.nii</option>
+    <option name="maskToDisplay">true</option>
+
+  </module>
+
+  <!-- sums activation within an ROI -->
   <module name="activation-sum">
     <option name="makeavail">true</option>
     <output>infoserver</output>
     <output>display</output>
     <option name="roiID">active</option>
+    <option name="activationID">data.image.activation.voxel-fluctmon</option>
   </module>
 
   <module name="activation-sum">
@@ -131,11 +172,46 @@
     <option name="roiID">background</option>
   </module>
 
+  <!-- computed the difference in activation between two activation sums -->
   <module name="activation-sum-difference">
     <output>infoserver</output>
     <output>display</output>
     <option name="posRoiID">active</option>
     <option name="negRoiID">background</option>
+  </module>
+
+  <!--  triggers events based on absolute values of activation sums -->
+  <module name="event-trigger-activation-sums">
+    <output>infoserver</output>
+    <output>display</output>
+
+    <option name="monitorPos">true</option>
+    <option name="posroiID">active</option>
+    <option name="posThresh">0.5</option>
+
+    <option name="monitorNeg">false</option>
+    <option name="negroiID">deactive</option>
+    <option name="negThresh">-0.1</option>
+
+    <option name="afterTriggerSkipTRs">10</option>
+  </module>
+
+  <!--  triggers events based on the difference between activation sums -->
+  <module name="event-trigger-activation-diff">
+    <output>infoserver</output>
+    <output>display</output>
+    <output>data.image.activation.voxel-fluctuationmonitor</output>
+
+    <option name="monitorPos">true</option>
+    <option name="posroiID">active</option>
+
+    <option name="monitorNeg">false</option>
+    <option name="negroiID">deactive</option>
+
+    <option name="diffThresh">0.5</option>
+
+    <option name="initialSkipTRs">20</option>
+    <option name="afterTriggerSkipTRs">20</option>
   </module>
 
 </preprocessor>

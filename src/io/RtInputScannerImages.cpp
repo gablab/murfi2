@@ -35,6 +35,7 @@ RtInputScannerImages::RtInputScannerImages()
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
+  onlyReadMoCo = false;
   matrixSize = 64;
   numSlices = 32;
   voxDim[0] = voxDim[1] = voxDim[2] = 1.0;
@@ -84,6 +85,11 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
   if(config.isSet("scanner:voxdim3")) {
     voxDim[2] = config.get("scanner:voxdim3");
+  }
+
+  // see if we should only read moco images
+  if(config.isSet("scanner:onlyReadMoCo")) {
+    onlyReadMoCo = config.get("scanner:onlyReadMoCo");
   }
 
   // see if we should save images to a file
@@ -147,11 +153,18 @@ int RtInputScannerImages::svc() {
       continue;
     }
 
+    //ei->displayImageInfo();
+
     // DEBUGGING
     //ei->iAcquisitionNumber = imageNum++;
 
     // get the image
     img = receiveImage(stream, *ei);
+
+    if(onlyReadMoCo && !ei->bIsMoCo) {
+      cout << "ignoring non-MoCo image." << endl;
+      continue;
+    }
 
     // build data class
     rti = new RtMRIImage(*ei,img);
@@ -173,7 +186,7 @@ int RtInputScannerImages::svc() {
 
     sendCode(rti);
 
-    //rti->printInfo(cout);
+    rti->printInfo(cout);
 
     if(saveImagesToFile) {
       saveImage(*rti);
@@ -274,7 +287,7 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
   cout << "receiving image..." << endl;
 
-  int numPix = info.nLin * info.nCol;
+  int numPix = (int) pow((double)info.iMosaicGridSize,2) * info.nLin * info.nCol;
   for(unsigned int rec = 0; rec < numPix*sizeof(short);
       rec += stream.recv_n (buffer+rec, numPix*sizeof(short)-rec)) {
   }

@@ -10,6 +10,7 @@
 
 // default constructor
 RtCode::RtCode() {
+  conductor = NULL;
   codeNum = -1;
 }
 
@@ -43,16 +44,26 @@ int RtCode::getCodeNum() {
 void RtCode::sendCode(RtData *data) {
   ACE_TRACE(("RtCode::sendCode"));
 
+  if(conductor == NULL) {
+    return;
+  }
+
   conductor->receiveCode(codeNum,data);
 }
 
 // log a message to the global logfile
 void RtCode::log(const string &s) {
+  if(conductor == NULL) {
+    return;
+  }
   conductor->log(s);
 }
 
 // log a message to the global logfile
 void RtCode::log(stringstream &s) {
+  if(conductor == NULL) {
+    return;
+  }
   conductor->log(s);
 }
 

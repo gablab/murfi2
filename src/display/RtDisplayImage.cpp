@@ -77,8 +77,8 @@ RtDisplayImage::RtDisplayImage() {
 
   posOverlayOn = true;
   negOverlayOn = true;
-  posMaskOn = false;
-  negMaskOn = false;
+  posMaskOn = true;
+  negMaskOn = true;
 
   addToID(":display");
 
@@ -127,8 +127,8 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   newImageType = true;
   posOverlayOn = false;
   negOverlayOn = false;
-  posMaskOn = false;
-  negMaskOn = false;
+  posMaskOn = true;
+  negMaskOn = true;
 
   imageDisplayType = ID_SCANNERIMG;
 

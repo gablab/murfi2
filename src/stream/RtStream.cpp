@@ -127,6 +127,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
     ACE_NEW_NORETURN(sc, RtEventTriggerActivationDiff());
   }
 
+  // set the conductor
+  sc->setConductor(streamConductor);
+
   // create and add the module
   ACE_NEW_NORETURN(mod, Module(ACE_TEXT(text.c_str()),sc));
   addMod.push(mod);

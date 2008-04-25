@@ -88,8 +88,12 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
 
   // see if we should only read moco images
-  if(config.isSet("scanner:onlyReadMoCo")) {
-    onlyReadMoCo = config.get("scanner:onlyReadMoCo");
+  if(config.isSet("scanner:onlyReadMoCo") 
+     && config.get("scanner:onlyReadMoCo")==true) {
+    onlyReadMoCo = true;
+  }
+  else {
+    onlyReadMoCo = false;
   }
 
   // see if we should save images to a file

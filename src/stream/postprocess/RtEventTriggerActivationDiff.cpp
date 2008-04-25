@@ -89,6 +89,13 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
     event->addToID("trigger.good");
     setResult(msg,event);
 
+    // log the trigger
+    stringstream logs("");
+    logs << "trigger event good: " 
+	 << posact->getPixel(0) - negact->getPixel(0) << " >= " 
+	 << diffThresh << endl;
+    log(logs);
+
     cout << "GOOD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
     cout << posact->getPixel(0) - negact->getPixel(0) << " " 
 	 << diffThresh << endl;
@@ -103,6 +110,13 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
     event->addToID("trigger.bad");
     event->setTR(tr);
     setResult(msg,event);
+
+    // log the trigger
+    stringstream logs("");
+    logs << "trigger event bad: " 
+	 << posact->getPixel(0) - negact->getPixel(0) << " <= " 
+	 << -diffThresh << endl;
+    log(logs);
 
     cout << "BAD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
     cout << posact->getPixel(0) - negact->getPixel(0) 

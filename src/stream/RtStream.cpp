@@ -279,6 +279,8 @@ void RtStream::setInput(unsigned int code, RtData *data) {
     ACE_Message_Block *mb;
     ACE_NEW_NORETURN(mb, ACE_Message_Block(sizeof(RtStreamMessage)));
 
+    // time processsing
+    int startTime = time(NULL);
 
     RtStreamMessage *msg;
     ACE_NEW_NORETURN(msg, RtStreamMessage());

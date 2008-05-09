@@ -51,7 +51,6 @@ RtConductor::RtConductor(int argc, char **argv) {
 
     if(!addInput(scantrig)) {
       cerr << "ERROR: could not add scanner trigger listener" << endl;
-      //exit(1);
     }
   }
 
@@ -244,11 +243,6 @@ bool RtConductor::run() {
   outputLog.printNow();
   outputLog << "\n";
 
-  // start the display
-  if(config.get("display:image")==true) {  
-    getDisplay()->activate();
-  }
-
   // start the info server
   if(config.isSet("infoserver:port")) {  
     getInfoServer()->activate();
@@ -259,12 +253,20 @@ bool RtConductor::run() {
     (*i)->activate();
   }
 
-  // wait for threads to complete
-
-  // start up the threads that listen for input
-  for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
-    (*i)->wait();
+  // start the display
+  // DIRTY HACK TO LET DISPLAY RUN IN MAIN THREAD
+  if(config.get("display:image")==true) {  
+    getDisplay()->svc();
+    //getDisplay()->activate();
   }
+  //else {
+    // wait for threads to complete
+
+    // start up the threads that listen for input
+    for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
+      (*i)->wait();
+    }
+    //}
 
 
   // print end time to log file
@@ -281,7 +283,7 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
 
   // handle based on the thrower
   if(code == START_CODE_STREAM) { // stream component has data
-    cout << "caught data " << data << " available signal from a stream component" << endl;
+    //cout << "caught data " << data << " available signal from a stream component" << endl;
 
     // make data available to all output processes
     for(vector<RtOutput*>::iterator i = outputs.begin(); 
@@ -292,15 +294,15 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     return;
   }
   else if(code < START_CODE_OUTPUTS) { // this is an input
-    cout << "caught a ready signal from an input " << endl;
+    //cout << "caught a ready signal from an input " << endl;
 
     // let the stream decide if it should spawn a new processing instance 
     stream.setInput(code,data);
 
-    cout << "sent ready signal" << endl;
+    //cout << "sent ready signal" << endl;
   }
   else { // this is an output
-    cout << "caught a ready signal from an output" << endl;
+    //cout << "caught a ready signal from an output" << endl;
 
     // dont need to do much here
   }
@@ -401,6 +403,7 @@ int ACE_TMAIN(int argc, char **args) {
   RtConductor conductor(argc,args);
 
   conductor.init();
+
   conductor.run();
 
   return 0;

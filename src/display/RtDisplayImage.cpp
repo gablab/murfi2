@@ -50,6 +50,9 @@
 #define DEFAULT_NEGACTIVATIONSUMROIID "unset"
 
 
+#define max(a,b) ((a >= b) ? a : b)
+#define min(a,b) ((a <= b) ? a : b)
+
 //*** constructors/destructors  ***//
 
 // default constructor
@@ -94,6 +97,12 @@ RtDisplayImage::RtDisplayImage() {
   posActivationSumID = DEFAULT_POSACTIVATIONSUMROIID;
   negActivationSumID = DEFAULT_NEGACTIVATIONSUMID;
   negActivationSumID = DEFAULT_NEGACTIVATIONSUMROIID;
+
+  // movie stuff
+  makeMovie = false;
+  framePrefix = "/tmp/real_frame_";
+  curFrame = 0;
+  screenShotCommand = "xwd -screen -root ";
 }
 
 // constructor with stuff
@@ -125,8 +134,8 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   newPosMask = false; 
   newNegMask = false; 
   newImageType = true;
-  posOverlayOn = false;
-  negOverlayOn = false;
+  posOverlayOn = true;
+  negOverlayOn = true;
   posMaskOn = true;
   negMaskOn = true;
 
@@ -144,6 +153,12 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   posActivationSumID = DEFAULT_POSACTIVATIONSUMROIID;
   negActivationSumID = DEFAULT_NEGACTIVATIONSUMID;
   negActivationSumID = DEFAULT_NEGACTIVATIONSUMROIID;
+
+  // movie stuff
+  makeMovie = false;
+  framePrefix = "/tmp/real_frame_";
+  curFrame = 0;
+  screenShotCommand = "xwd -screen -root ";
 
   strcpy(title,_title);
   addToID(":display");
@@ -220,6 +235,18 @@ bool RtDisplayImage::open(RtConfig &config) {
 	 ? config.get("display:negActivationSumRoiID").str() 
     : DEFAULT_NEGACTIVATIONSUMROIID;
 
+  // movie stuff
+  if(config.isSet("display:makeMovie") 
+     && config.get("display:makeMovie") == true) {
+    makeMovie = true;
+  }
+  if(config.isSet("display:framePrefix")) {
+    framePrefix = config.get("display:framePrefix").str();
+  }
+  if(config.isSet("display:screenShotCommand")) {
+    screenShotCommand = config.get("display:screenshotCommand").str();
+  }
+
   return init();
 }
 
@@ -249,11 +276,12 @@ bool RtDisplayImage::init() {
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
   glutInitWindowSize(width, height);
   glutInitWindowPosition(x, y);
-  glViewport(0, 0, width, height);
 
   glutMaster.CallGlutCreateWindow(title, this);
+  glViewport(0, 0, width, height);
   glutMaster.EnableTimerFunction();
   glutMaster.SetTimerToCurrentWindow();
+  //glutMaster.SetTimerPeriod(1000);
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -289,9 +317,9 @@ void RtDisplayImage::setData(RtData *data) {
   // handle activation sum
   if(data->getID() == posActivationSumID 
      && data->getRoiID() == posActivationSumRoiID) {
-  //cout << "display got a pos activation sum: " 
-  //     << ((RtActivation*)data)->getPixel(0) 
-  //     << endl;
+//  cout << "display got a pos activation sum: " 
+//       << ((RtActivation*)data)->getPixel(0) 
+//       << " " << numTimepoints << endl;
     // plot the sum
     postc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
     gp.reset_plot();
@@ -302,9 +330,9 @@ void RtDisplayImage::setData(RtData *data) {
 
   if(data->getID() == negActivationSumID 
      && data->getRoiID() == negActivationSumRoiID) {
-  //cout << "display got a neg activation sum: " 
-  //     << ((RtActivation*)data)->getPixel(0) 
-  //     << endl;
+//  cout << "display got a neg activation sum: " 
+//       << ((RtActivation*)data)->getPixel(0) 
+//       << endl;
     // plot the sum
     negtc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
     //gp.reset_plot();
@@ -317,7 +345,7 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() == posOverlayID && data->getRoiID() == posOverlayRoiID) {
     posOverlay = (RtActivation*) data;
     newPosOverlay = true;
-  cout << "display got a pos overlay " << img->getID() << endl;
+  //cout << "display got a pos overlay " << img->getID() << endl;
     return;
   }
 
@@ -325,7 +353,7 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() == negOverlayID && data->getRoiID() == negOverlayRoiID) {
     negOverlay = (RtActivation*) data;
     newNegOverlay = true;
-  cout << "display got a neg overlay " << img->getID() << endl;
+  //cout << "display got a neg overlay " << img->getID() << endl;
     return;
   }
 
@@ -334,7 +362,7 @@ void RtDisplayImage::setData(RtData *data) {
     posMask = (RtMaskImage*) data;
     newPosMask = true;
 
-  cout << "display got a positive mask " << img->getID() << endl;
+  //cout << "display got a positive mask " << img->getID() << endl;
     return;
   }
 
@@ -343,7 +371,7 @@ void RtDisplayImage::setData(RtData *data) {
     negMask = (RtMaskImage*) data;
     newNegMask = true;
 
-  cout << "display got a negative mask " << img->getID() << endl;
+  //cout << "display got a negative mask " << img->getID() << endl;
     return;
   }
 
@@ -380,11 +408,13 @@ void RtDisplayImage::makeTexture() {
 
   /* get the id for the texture */
   glGenTextures(1, &imageTex);
+//  if(!glIsTexture(imageTex)) {
+//    cerr << "ERROR: could not generate a new texture" << endl;
+//    //return;
+//  }
 
   if(newImageType) {
-
     /* contrast */
-
     float contrast = img->getAutoContrast();
     glPixelTransferf(GL_RED_SCALE,   contrast);
     glPixelTransferf(GL_GREEN_SCALE, contrast);
@@ -435,26 +465,11 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   /* get the id for the texture */
   glGenTextures(1, overlayTex);
 
-//  double contrast = overlay->getAutoContrast();
-//  glPixelTransferf(GL_RED_SCALE,   contrast);
-//  glPixelTransferf(GL_GREEN_SCALE, contrast);
-//  glPixelTransferf(GL_BLUE_SCALE,  contrast);
-//
-//
-//  /* brightness */
-//  float brightness = img->getAutoBrightness();
-//  glPixelTransferf(GL_RED_BIAS,   brightness);
-//  glPixelTransferf(GL_GREEN_BIAS, brightness);
-//  glPixelTransferf(GL_BLUE_BIAS,  brightness);
-//
-//  cout << "overlay " << overlay->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
-
   // convert overlay data into a displayable image
   short *overlayImg = new short[4*overlay->getNumPix()];
 
   // debugging
   double min = 1000000, max = -1000000;
-
 
   for(unsigned int i = 0; i < overlay->getNumPix(); i++) {
 
@@ -470,18 +485,18 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
     if(!overlay->getScaleIsInverted() 
        && overlay->getPixel(i) > overlay->getThreshold()) {
       overlayImg[4*i+0] = SHRT_MAX; // r
-      overlayImg[4*i+1] = (short) rint(((overlay->getPixel(i)
-						     -overlay->getThreshold())/*/overlay->getCeiling()*/)
-						*SHRT_MAX); // g
+      overlayImg[4*i+1] = (short) rint(min(1,((overlay->getPixel(i)
+			     -overlay->getThreshold())/overlay->getCeiling()))
+				       *SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
     else if(!overlay->getScaleIsInverted() 
 	    && overlay->getPixel(i) < -overlay->getThreshold()) {
       overlayImg[4*i+0] = 0; // r
-      overlayImg[4*i+1] = (short) rint(((overlay->getPixel(i)
-						  -overlay->getThreshold())/*/overlay->getCeiling()*/)
-						*SHRT_MAX); // g
+      overlayImg[4*i+1] = (short) rint(min(1,((overlay->getPixel(i)
+			     -overlay->getThreshold())/overlay->getCeiling()))
+				       *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
 
@@ -560,6 +575,10 @@ void RtDisplayImage::makePosMaskTexture() {
 
   delete posMaskImg;
 
+  if(!glIsTexture(posMaskTex)) {
+    cerr << "ERROR: could not generate a new positive mask texture" << endl;
+  }
+
   needsRepaint = true;
 }
 
@@ -596,12 +615,58 @@ void RtDisplayImage::makeNegMaskTexture() {
 
   delete negMaskImg;
 
+  if(!glIsTexture(negMaskTex)) {
+    cerr << "ERROR: could not generate a new negative mask texture" << endl;
+  }
+
   needsRepaint = true;
 }
 
+// debug
+// GLuint tex;
+// 
+// /**
+//  * makes the textures for display from the current volume 
+//  */
+// void makeTextures(int width, int height) {
+//   GLuint format = GL_LUMINANCE;
+//   GLenum type = GL_SHORT;
+//   int bpp = 8*sizeof(short);
+// 
+//   /* delete the old texture if there is one */
+//   if(tex != 0) {
+//     return;
+//     //glDeleteTextures(1, &tex);
+//   }
+// 
+//   short *img = (short*) malloc(width*height*sizeof(short));
+//   for(int i = 0; i < width*height; i++) {
+//     img[i] = i;
+//   }
+// 
+//   /* perform texture init */
+//   glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+//     
+// 
+//   /* get the id for the textures */
+//   glGenTextures(1, &tex);
+// 
+//   if(!glIsTexture(tex)) {
+//     printf("texture id %d\n",tex);
+//   }
+//   
+//   /* create the image texture */
+//   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, tex);
+//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, width, height, 0, format, type, img); 
+//   free(img);
+// }
+
 void RtDisplayImage::CallBackDisplayFunc(void) {
   ACE_TRACE(("RtDisplayImage::CallBackDisplayFunc"));
-
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
@@ -609,6 +674,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   glDepthFunc(GL_LEQUAL);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
+
   //glAlphaFunc(GL_GREATER,0.1);
   //glEnable(GL_ALPHA_TEST);
   //glEnable(GL_CULL_FACE);
@@ -631,6 +697,35 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   // if there is no image yet, draw a message and return
   if(!glIsTexture(imageTex) || img == NULL) {
     drawString(10,10,"no image loaded",1,0,0);
+
+    // debug
+//    makeTextures(width,height);
+//    
+//  /* turn on texture mapping */
+//  glEnable(GL_TEXTURE_RECTANGLE_EXT);
+//
+//  /* draw the main texture */
+//  glBindTexture(GL_TEXTURE_RECTANGLE_EXT, tex);
+//
+//  int w = width;
+//  int h = height;
+//  double tw = width;
+//  double th = height;
+//
+//  /* make a quadrilateral and provide texture coords */
+//  glBegin(GL_QUADS); {
+//    glTexCoord2d(0.0,0.0);
+//    glVertex3f(0, h, 0.0);
+//    glTexCoord2d(tw,0.0);
+//    glVertex3f(w, h, 0.0);
+//    glTexCoord2d(tw,th);
+//    glVertex3f(w, 0, 0.0);
+//    glTexCoord2d(0,th);
+//    glVertex3f(0, 0, 0.0);
+//  } glEnd();
+//
+//  glDisable(GL_TEXTURE_RECTANGLE_EXT);
+
     glutSwapBuffers();
     return;
   }
@@ -739,6 +834,21 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   glutSwapBuffers();
 
+  // take screenshot for movie frame
+  if(makeMovie) {
+    // build command
+    stringstream cmd;
+    cmd << screenShotCommand
+	<< " -out " << framePrefix;
+    cmd.fill('0');
+    cmd.width(5);
+    cmd << curFrame++;
+
+    //cout << cmd.str();
+    
+    // PLATFORM DEPENDENT
+    system(cmd.str().c_str());
+  }
 }
 
 void RtDisplayImage::CallBackReshapeFunc(int w, int h){

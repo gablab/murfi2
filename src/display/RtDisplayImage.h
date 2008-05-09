@@ -133,6 +133,12 @@ protected:
   bool posMaskOn;
   bool negMaskOn;
 
+  // movie flags
+  bool makeMovie;
+  string framePrefix;
+  short curFrame;
+  string screenShotCommand;
+
   // draws a black box that will enclose a string of text
   void drawBlackBoxForString(const char *str, GLint x, GLint y);
 

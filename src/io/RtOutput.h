@@ -11,7 +11,6 @@
 #include"RtIO.h"
 #include"RtConfig.h"
 #include"RtData.h"
-#include"ace/Date_Time.h"
 #include<ostream>
 
 // class declaration
@@ -42,9 +41,6 @@ public:
   // get the id string
   string getID();
 
-  // prints the current time 
-  void printNow(ostream &os);
-
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -54,7 +50,6 @@ protected:
   //*** private data members  ***//
 
   string outputID;
-  ACE_Date_Time now;
 };
 
 #endif

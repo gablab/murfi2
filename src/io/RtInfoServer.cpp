@@ -38,8 +38,8 @@ RtInfoServer::~RtInfoServer() {
 // NOTE: at the moment this only takes activation sums and stores them for 
 // each tr in an xml document 
 void RtInfoServer::setData(RtData *data) {
-  cout << data->getID() << endl;
-  if(data->getID() == ID_ACTIVATIONSUM) {
+  //cout << data->getID() << endl;
+  if(data->getID() == ID_ACTIVATIONSUMDIFFERENCE) {
     database.push_back(data);
   }
   else if(data->getID().find(ID_EVENTTRIGGER) != string::npos) {
@@ -56,7 +56,7 @@ void RtInfoServer::setData(RtData *data) {
     }
   }
   else {
-    cout << "ignoring a " << data->getID() << endl;
+    cout << "infoserver: ignoring a " << data->getID() << endl;
   }
 }
 

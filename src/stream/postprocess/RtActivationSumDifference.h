@@ -42,6 +42,8 @@ protected:
   // dataID for the positive and negative activation sums
   string posActivationSumID;
   string negActivationSumID;
+  string posRoiID;
+  string negRoiID;
 
 };
 

@@ -14,8 +14,10 @@ string RtActivationSumDifference::moduleString("activation-sum-difference");
 // default constructor
 RtActivationSumDifference::RtActivationSumDifference() : RtStreamComponent() {
   componentID = moduleString;
-  posActivationSumID = "data.image.activation.pos";
-  negActivationSumID = "data.image.activation.neg";
+  posActivationSumID = "data.image.activation.activation-sum";
+  negActivationSumID = "data.image.activation.activation-sum";
+  posRoiID = "active";
+  negRoiID = "deactive";
 }
 
 // destructor
@@ -36,8 +38,16 @@ bool RtActivationSumDifference::processOption(const string &name, const string &
     negActivationSumID = text;
     return true;
   }
+  else if(name == "posRoiID") {
+    posRoiID = text;
+    return true;
+  }
+  else if(name == "negRoiID") {
+    negRoiID = text;
+    return true;
+  }
 
-  return false;
+  return RtStreamComponent::processOption(name,text);
 }  
 
 // process a single acquisition
@@ -46,13 +56,16 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
+  cout << "PROCESSING " << endl;
+
   // find the data with the right data IDs
   RtActivation *posact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",posActivationSumID);
+    = (RtActivation*) msg->getDataByIDAndRoiID(posActivationSumID,posRoiID);
   RtActivation *negact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",negActivationSumID);
+    = (RtActivation*) msg->getDataByIDAndRoiID(negActivationSumID,negRoiID);
 
   if(posact == NULL || negact == NULL) {
+    cout << "activation-sum-difference: couldn't find required rois" << endl;
     ACE_DEBUG((LM_INFO, "RtActivationSumDifference::process: pos or neg activation passed is NULL\n"));
     return 0;
   }
@@ -64,10 +77,10 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
   RtActivation *diff = new RtActivation(1);
 
   // compute the difference
-  diff->setPixel(1, posact->getPixel(1) - negact->getPixel(1));
+  diff->setPixel(0, posact->getPixel(0) - negact->getPixel(0));
 
-  cout << diff->getPixel(1) << " = " << posact->getPixel(1) << " - " 
-       << negact->getPixel(1) << endl;
+  cout << diff->getPixel(0) << " = " << posact->getPixel(0) << " - " 
+       << negact->getPixel(0) << endl;
 
   // set the image id for handling
   diff->addToID("activation-sum-difference");

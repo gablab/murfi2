@@ -161,8 +161,8 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // set threshold
   if(numTimepoints > numTrends+1) {
     cor->setThreshold(getTStatThreshold(1));
-    cout << "single image est: using t threshold of " 
-	 << cor->getThreshold() << endl;
+//    cout << "single image est: using t threshold of " 
+//	 << cor->getThreshold() << endl;
   }
 
   //// element independent setup
@@ -280,15 +280,15 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 //      cout << sqrt(numTimepoints-numTrends-1)
 //	* c->get(i,numTrends)/c->get(i,numTrends+1) << " ";
 //    if(i == 1 && numTimepoints == 2) {
-    if(i == 16*32*32 + 28*32 + 14) {
-      //#ifdef DUMP
-      cout << numTimepoints << " " << i << " " << dat->getPixel(i) << " "
-	 << beta[0] << " " 
-	 << beta[1] << " " 
-	 << beta[2] << " " 
-	 << " " <<  cor->getPixel(i) << endl;
-    cout.flush();
-    }
+//    if(i == 16*32*32 + 28*32 + 14) {
+//      //#ifdef DUMP
+//      cout << numTimepoints << " " << i << " " << dat->getPixel(i) << " "
+//	 << beta[0] << " " 
+//	 << beta[1] << " " 
+//	 << beta[2] << " " 
+//	 << " " <<  cor->getPixel(i) << endl;
+//    cout.flush();
+//    }
     //#endif
 
   }
@@ -296,6 +296,11 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // set the image id for handling
   cor->addToID("voxel-singleimcor");
   cor->setRoiID(roiID);
+
+  cout << "done processing single image correlation at ";
+  printNow(cout);
+  cout << endl;
+
 
   // in the first non-baseline condition reset the number of baseline timepoints
 //  for(unsigned int j = 0; j < numTrends+1; j++) {

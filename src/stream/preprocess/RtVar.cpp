@@ -56,7 +56,7 @@ int RtVar::process(ACE_Message_Block *mb) {
   }
 
   // get the mean
-  cout << "getting mean data with id " << meanDataID << endl;
+  //cout << "getting mean data with id " << meanDataID << endl;
   RtMRIImage *mean = (RtMRIImage*)msg->getDataByID(meanDataID);
 
   if(mean == NULL) {
@@ -118,7 +118,6 @@ int RtVar::process(ACE_Message_Block *mb) {
 
   // set the image id for handling
   var->addToID("voxel-variance");
-  cout << "var id " << var->getID() << endl;
   setResult(msg,var);
 
   return 0;

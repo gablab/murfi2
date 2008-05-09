@@ -9,13 +9,6 @@
 
 string RtActivationSum::moduleString("activation-sum");
 
-#define DUMPAS 0
-#ifdef DUMPAS
-#include<fstream>
-static ofstream dumpfile("/tmp/activation_sum_dump.txt");
-#endif
-
-
 // default constructor
 RtActivationSum::RtActivationSum() : RtStreamComponent() {
   componentID = moduleString;
@@ -73,13 +66,6 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
     if(!isnan(pix)) {
       sum += pix;
       numPix++;
-
-#ifdef DUMPAS
-      dumpfile << img << " " << i << numPix << " " << " " << pix
-	       << " " << sum << endl;
-      dumpfile.flush();
-#endif
-      
     }
   }
 
@@ -88,18 +74,22 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   mean->setThreshold(act->getThreshold());
   mean->setPixel(0, sum/numPix);
   
-//  
-//  if(fabs(mean->getPixel(0)) > 100 | isnan(mean->getPixel(0))) {
-//    cout << "BIG SUM FOUND: " << mean->getPixel(0) << endl;
-//    mean->setPixel(0, 0);
-//  }
-//
-
   // set the image id for handling
   mean->addToID("activation-sum");
   mean->setRoiID(act->getRoiID());
 
   setResult(msg, mean);
+
+  // log the sum
+  stringstream logs("");
+  logs << "activation sum: " << img << " " 
+       << activationID << ":" << roiID  
+       << " " << mean->getPixel(0) << endl;
+  log(logs);
+
+  cout << "done processing activation sum at ";
+  printNow(cout);
+  cout << endl;
 
   img++;
 

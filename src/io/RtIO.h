@@ -10,6 +10,7 @@
 
 #include"RtCode.h"
 #include"RtConfig.h"
+#include"ace/Date_Time.h"
 
 // class declaration
 class RtIO : public RtCode {
@@ -42,6 +43,9 @@ public:
   // get the id string
   string getID();
 
+  // prints the current time 
+  void printNow(ostream &os);
+
   // gets the version
   //  out:
   //   cvs version string for this class
@@ -50,6 +54,7 @@ public:
 protected:
 
   bool isOpen;
+  ACE_Date_Time now;
 
 };
 

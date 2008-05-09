@@ -17,6 +17,12 @@
 // mutex
 #include"ace/Mutex.h"
 
+// debugging
+//#define DUMP 1
+#ifdef DUMP
+#include"dump.c"
+#endif 
+
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
 
@@ -292,6 +298,14 @@ bool RtActivationEstimator::finishInit() {
       vnl_vector<double> col = conditions->get_column(i);
       vnl_vector<double> shiftcol = vnl_convolve(col,shiftdelta);
       col.update(shiftcol.extract(col.size()));
+
+      // debugging 
+      #ifdef DUMP
+      cout << "dumping condition vector:" << endl;
+      printVnlVector(col);
+
+      #endif
+
       conditions->set_column(i,col);
     }  
   }

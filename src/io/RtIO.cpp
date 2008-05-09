@@ -33,6 +33,15 @@ bool RtIO::close() {
   return true;
 }
 
+// prints the current time 
+void RtIO::printNow(ostream &os) {
+  now.update();
+
+  os << now.year() << "/" << now.month() << "/" << now.day() << " "
+     << now.hour() << ":" << now.minute() << ":" << now.second()
+     << "." << now.microsec();
+}
+
 // gets the version
 //  out:
 //   cvs version string for this class

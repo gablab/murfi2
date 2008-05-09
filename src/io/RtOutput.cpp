@@ -47,15 +47,6 @@ void RtOutput::addToID(string add) {
 string RtOutput::getID() {
   return outputID;
 }
-
-// prints the current time 
-void RtOutput::printNow(ostream &os) {
-  now.update();
-
-  os << now.year() << "/" << now.month() << "/" << now.day() << " "
-     << now.hour() << ":" << now.minute() << ":" << now.second()
-     << "." << now.microsec();
-}
   
 // gets the version
 //  out:

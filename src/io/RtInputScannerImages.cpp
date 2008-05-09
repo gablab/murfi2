@@ -149,7 +149,7 @@ int RtInputScannerImages::svc() {
 
   // continuously try to accept connections
   for(; isOpen && acceptor.accept(stream) != -1; imageNum++) {
-    cout << "connection accepted" << endl;
+    //cout << "connection accepted" << endl;
 
     // get the info
     ei = receiveImageInfo(stream);
@@ -166,7 +166,7 @@ int RtInputScannerImages::svc() {
     img = receiveImage(stream, *ei);
 
     if(onlyReadMoCo && !ei->bIsMoCo) {
-      cout << "ignoring non-MoCo image." << endl;
+      //cout << "ignoring non-MoCo image." << endl;
       continue;
     }
 
@@ -186,11 +186,11 @@ int RtInputScannerImages::svc() {
     received.push_back(rti);
 
     // signal that we got an image
-    cout << "sending event with code number " << codeNum << endl;
+    //cout << "sending event with code number " << codeNum << endl;
 
     sendCode(rti);
 
-    rti->printInfo(cout);
+    //rti->printInfo(cout);
 
     if(saveImagesToFile) {
       saveImage(*rti);
@@ -201,6 +201,10 @@ int RtInputScannerImages::svc() {
     infos << "received image from scanner: series " << seriesNum
 	  << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
+    
+    cout << "started processing image at ";
+    printNow(cout);
+    cout << endl;
 
     // clean up
     delete ei;
@@ -212,7 +216,7 @@ int RtInputScannerImages::svc() {
     // close the stream (scanner connects anew for each image)
     stream.close();
 
-    cout << "waiting for another image" << endl;
+    //cout << "waiting for another image" << endl;
   }
   cerr << "ERROR: could not open connection to accept "
        << "images from the scanner on port "
@@ -261,7 +265,7 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
-  cout << "received header of size " << rec << endl;
+  //cout << "received header of size " << rec << endl;
 
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
 
@@ -273,7 +277,6 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   }
 
   ACE_DEBUG((LM_DEBUG, "received info for %d:%d\n", seriesNum, info->iAcquisitionNumber));
-  cout << "received info for " << seriesNum << ":" << info->iAcquisitionNumber << endl;
 
   return info;
 }
@@ -289,7 +292,7 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 						   const RtExternalImageInfo &info) {
 
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
-  cout << "receiving image..." << endl;
+  cout << "receiving image " << info.iAcquisitionNumber << endl;
 
   int numPix = (int) pow((double)info.iMosaicGridSize,2) * info.nLin * info.nCol;
   for(unsigned int rec = 0; rec < numPix*sizeof(short);

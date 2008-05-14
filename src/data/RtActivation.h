@@ -37,7 +37,7 @@ public:
   // construct with info from an MRI image
   RtActivation(RtMRIImage &img);
 
-  // construct with a certain number of elements
+  // construct with a specified number of elements
   RtActivation(unsigned int numElements);
 
   // destructor

@@ -18,7 +18,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
   if(connector.connect (stream, my_addr) == -1) {
     cout << "connection failed with errno " 
-	 << errno << endl;
+	 << errno <<  endl;
     return 0;
   }
 
@@ -26,8 +26,12 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   while(1) {
     cout << "sending msg" << endl;
 
-    char *msg = "todd rox";
+    char msg[1024];
+    strcpy(msg,"todd rox\n");
     stream.send_n (msg, strlen(msg)+1);
+
+    stream.recv_n(msg,1024);
+    cout << "got back " << msg << endl;
 
     usleep(1000000);
   }

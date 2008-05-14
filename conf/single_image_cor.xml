@@ -92,8 +92,8 @@
     <option name="correctForMultiComps">0</option>
 
     <option name="maskSource">loadFromFile</option>
-    <option name="roiID">active</option>
     <option name="maskFilename">active_mask.dat</option>
+    <option name="roiID">active</option>
 
   </module>
 

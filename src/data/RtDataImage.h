@@ -976,7 +976,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   // info
   hdr->iname_offset = 348;
   hdr->swapsize = 0;
-  hdr->analyze75_orient = a75_transverse_unflipped;
+  //hdr->analyze75_orient = a75_transverse_unflipped;
   
   // filename
   hdr->fname = (char*) malloc((filename.length()+1)*sizeof(char));

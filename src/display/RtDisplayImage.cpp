@@ -78,10 +78,10 @@ RtDisplayImage::RtDisplayImage() {
   newNegMask = false; 
   newImageType = true; 
 
-  posOverlayOn = true;
-  negOverlayOn = true;
-  posMaskOn = true;
-  negMaskOn = true;
+  posOverlayOn = false;
+  negOverlayOn = false;
+  posMaskOn = false;
+  negMaskOn = false;
 
   addToID(":display");
 
@@ -134,10 +134,10 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   newPosMask = false; 
   newNegMask = false; 
   newImageType = true;
-  posOverlayOn = true;
-  negOverlayOn = true;
-  posMaskOn = true;
-  negMaskOn = true;
+  posOverlayOn = false;
+  negOverlayOn = false;
+  posMaskOn = false;
+  negMaskOn = false;
 
   imageDisplayType = ID_SCANNERIMG;
 
@@ -194,29 +194,38 @@ bool RtDisplayImage::open(RtConfig &config) {
   strcpy(title, config.isSet("display:imageWinTitle")
 	 ? config.get("display:imageWinTitle").str().c_str() : DEFAULT_TITLE);
 
-  posOverlayID = config.isSet("display:overlayID")
-	 ? config.get("display:overlayID").str() : DEFAULT_POSOVERLAYID;
+  if(config.isSet("display:overlayID")) {
+    posOverlayID = config.get("display:overlayID").str();
+    posOverlayOn = true;
+  }
 
-  posOverlayID = config.isSet("display:posOverlayID")
-	 ? config.get("display:posOverlayID").str() : DEFAULT_POSOVERLAYID;
+  if(config.isSet("display:posOverlayID")) {
+    posOverlayID = config.get("display:posOverlayID").str();
+    posOverlayOn = true;
+  }
 
   posOverlayRoiID = config.isSet("display:posOverlayRoiID")
 	 ? config.get("display:posOverlayRoiID").str() :DEFAULT_POSOVERLAYROIID;
 
-  negOverlayID = config.isSet("display:negOverlayID")
-	 ? config.get("display:negOverlayID").str() : DEFAULT_NEGOVERLAYID;
+  if(config.isSet("display:negOverlayID")) {
+    negOverlayID = config.get("display:negOverlayID").str();
+  }
 
   negOverlayRoiID = config.isSet("display:negOverlayRoiID")
 	 ? config.get("display:negOverlayRoiID").str() :DEFAULT_NEGOVERLAYROIID;
 
-  posMaskID = config.isSet("display:posMaskID")
-	 ? config.get("display:posMaskID").str() : DEFAULT_POSMASKID;
+  if(config.isSet("display:posMaskID")) {
+    posMaskID = config.get("display:posMaskID").str();
+    posMaskOn = true;
+  }
 
   posMaskRoiID = config.isSet("display:posMaskRoiID")
 	 ? config.get("display:posMaskRoiID").str() : DEFAULT_POSMASKROIID;
 
-  negMaskID = config.isSet("display:negMaskID")
-	 ? config.get("display:negMaskID").str() : DEFAULT_NEGMASKID;
+  if(config.isSet("display:negMaskID")) {
+    negMaskID = config.get("display:negMaskID").str();
+    negMaskOn = true;
+  }
 
   negMaskRoiID = config.isSet("display:negMaskRoiID")
 	 ? config.get("display:negMaskRoiID").str() : DEFAULT_NEGMASKROIID;
@@ -408,10 +417,6 @@ void RtDisplayImage::makeTexture() {
 
   /* get the id for the texture */
   glGenTextures(1, &imageTex);
-//  if(!glIsTexture(imageTex)) {
-//    cerr << "ERROR: could not generate a new texture" << endl;
-//    //return;
-//  }
 
   if(newImageType) {
     /* contrast */
@@ -441,6 +446,8 @@ void RtDisplayImage::makeTexture() {
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, img->getDim(0),
 	       img->getDim(1), 0, GL_LUMINANCE,
 	       GL_SHORT, img->getData());
+
+  //cout << "making texture " << imageTex << " from " << img << endl;
 
   if(!glIsTexture(imageTex)) {
     cerr << "ERROR: could not generate a new texture" << endl;
@@ -741,6 +748,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   /* draw the main texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, imageTex);
 
+  //cout << "drawing image tex: " << imageTex << endl;
+
   /* make a quadrilateral and provide texture coords */
   glBegin(GL_QUADS); {
     glTexCoord2d(0.0,0.0);
@@ -756,6 +765,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the negMask texture */
   if(negMaskOn && glIsTexture(negMaskTex)) {
+    //cout << "drawing neg mask tex: " << negMaskTex << endl;
+
     glBindTexture(GL_TEXTURE_RECTANGLE_EXT, negMaskTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -774,6 +785,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the posMask texture */
   if(posMaskOn && glIsTexture(posMaskTex)) {
+    cout << "drawing pos mask tex: " << posMaskTex << endl;
+
     glBindTexture(GL_TEXTURE_RECTANGLE_EXT, posMaskTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -792,6 +805,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the pos overlay texture */
   if(posOverlayOn && glIsTexture(posOverlayTex)) {
+    cout << "drawing pos overlay tex: " << posOverlayTex << endl;
+
     glBindTexture(GL_TEXTURE_RECTANGLE_EXT, posOverlayTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -810,6 +825,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the neg overlay texture */
   if(negOverlayOn && glIsTexture(negOverlayTex)) {
+    cout << "drawing neg overlay tex: " << negOverlayTex << endl;
+
     glBindTexture(GL_TEXTURE_RECTANGLE_EXT, negOverlayTex);
 
     /* make a quadrilateral and provide texture coords */

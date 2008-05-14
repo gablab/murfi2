@@ -129,7 +129,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 //		       /columnSEs[numTrends]);
 
       est->setPixel(i,
-		    beta[numTrends]*sqrt(columnSEs[numTrends]
+		    0.05*beta[numTrends]*sqrt(columnSEs[numTrends]
 			 * (numTimepoints-numTrends)/(double)numTimepoints
 			 / solvers[i]->getTotalSquaredError(0)));
 

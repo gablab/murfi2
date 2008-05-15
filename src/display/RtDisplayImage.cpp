@@ -501,19 +501,21 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
     else if(!overlay->getScaleIsInverted() 
 	    && overlay->getPixel(i) < -overlay->getThreshold()) {
       overlayImg[4*i+0] = 0; // r
-      overlayImg[4*i+1] = (short) rint(min(1,((overlay->getPixel(i)
-			     -overlay->getThreshold())/overlay->getCeiling()))
+      overlayImg[4*i+1] = (short) rint(min(1,-1*((overlay->getPixel(i)
+			     +overlay->getThreshold())/overlay->getCeiling()))
 				       *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
-
+      cout << overlay->getPixel(i) << " " << overlay->getThreshold() 
+	   << " " << overlay->getCeiling() << " " 
+	   << overlayImg[4*i+1] << endl;
     }
     else if(overlay->getScaleIsInverted() 
 	    && fabs(overlay->getPixel(i)) < overlay->getThreshold()) {
       overlayImg[4*i+0] = SHRT_MAX; // r
       overlayImg[4*i+1] = (short) 
 	(1 - (fabs(overlay->getPixel(i))/overlay->getThreshold()))
-	*USHRT_MAX; // g
+	*SHRT_MAX; // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
@@ -805,7 +807,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the pos overlay texture */
   if(posOverlayOn && glIsTexture(posOverlayTex)) {
-    cout << "drawing pos overlay tex: " << posOverlayTex << endl;
+    //cout << "drawing pos overlay tex: " << posOverlayTex << endl;
 
     glBindTexture(GL_TEXTURE_RECTANGLE_EXT, posOverlayTex);
 

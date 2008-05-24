@@ -21,11 +21,12 @@ RtStreamComponent::RtStreamComponent() : super(),
   inputDataID = "data.mri.image";
   makeCurrentData = false;
   passer = NULL;
+  outFilename = "";
 }
 
 // destructor
 RtStreamComponent::~RtStreamComponent() {
-
+  ofile.close();
 }
 
 //*** initialization routines  ***//
@@ -58,6 +59,14 @@ void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
 
     // figure out which option we have and process it
     processOption(name, optionElmt->GetText());
+  }
+
+  // open outfile if name set
+  if(outFilename != "") {
+    ofile.open(outFilename.c_str(),ios_base::app);
+    ofile << "started at ";
+    printNow(ofile);
+    ofile << endl;
   }
 
   if(!finishInit()) {
@@ -93,6 +102,10 @@ bool RtStreamComponent::processOption(const string &name, const string &text) {
   }
   if(name == "makeoutput") {
     return conductor->addOutput(this);
+  }
+  if(name == "outputfile") {
+    outFilename = text;
+    return true;
   }
 
   return false;

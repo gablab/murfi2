@@ -32,10 +32,12 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   // standard init
   componentID = moduleString;
 
-  trends = conditions = NULL;
+  //trends = conditions = NULL;
   numTrends = numConditions = numMeas = 0;
   numTimepoints = 0;
   conditionShift = 0;
+  modelEachBlock = false;
+  blockLen = 0;
 
   // default values for probability thresholding
   probThreshold = 0.05;
@@ -44,29 +46,40 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
 
   // default values for mask
   maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
+  mosaicMask = false;
+  flipLRMask = false;
   maskIntensityThreshold = 0.5;
   putMaskOnMessage = false;
 
   // save t volume or not
   saveTVol = false;
+  unmosaicTVol = false;
   saveTVolFilename = "t.nii";
 
   // mask the resulting t vol and save it as a mask or not
   savePosResultAsMask = saveNegResultAsMask = false;
+  unmosaicPosMask = unmosaicPosMask = false;
   savePosAsMaskFilename = "pos_mask.nii";
   saveNegAsMaskFilename = "neg_mask.nii";
 
   needsInit = true;
+
+  dumpAlgoVars = false;
+  dumpAlgoVarsFilename = "log/activation_estimator_dump.txt";
 }
 
 // destructor
 RtActivationEstimator::~RtActivationEstimator() {
-  if(trends != NULL) {
-    delete trends;
-  }
+//   if(trends != NULL) {
+//     delete trends;
+//   }
 
-  if(conditions != NULL) {
-    delete conditions;
+//   if(conditions != NULL) {
+//     delete conditions;
+//   }
+
+  if(dumpAlgoVars) {
+    dumpFile.close();
   }
 }
 
@@ -108,7 +121,8 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     numConditions++;
 
     if(numConditions == 1) { // allocate condition matrix
-      conditions = new vnl_matrix<double>(numMeas,MAX_CONDITIONS);
+      conditions.clear();
+      conditions.set_size(numMeas,MAX_CONDITIONS);
     }
     else if(numConditions > MAX_CONDITIONS) {
       cerr << "warning: max number of conditions exceeded." << endl;
@@ -121,26 +135,36 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
 	i++, i1 = i2+1, i2 = text.find(" ", i1)) {
 
       if(!RtConfigVal::convert<double>(el, 
-				       text.substr(i1, 
-						   i2 == string::npos ? text.size()-i1 : i2-i1))) {
+	  text.substr(i1,i2 == string::npos ? text.size()-i1 : i2-i1))) {
 	continue;
       }
-      conditions->put(i,numConditions-1,el);
+      conditions.put(i,numConditions-1,el);
 
       if(i2 == string::npos) { // test if we are on the last one
+	// set the blockLen if its not been set
+	if(blockLen == 0) {
+	  blockLen = i+1;
+	  cout << "auto setting blockLen to " << blockLen << endl;
+	}
+
 	break;
       }
     }
 
     // fill the rest of the measurements as periodic stim
-    for(unsigned int startind = i+1; i < numMeas; i++) {
-      conditions->put(i,numConditions-1,conditions->get(i%startind,0));
+    for(; i < numMeas; i++) {
+      conditions.put(i,numConditions-1,conditions.get(i%blockLen,0));
     }
+
+
 
     return true;
   }
   if(name == "conditionshift") {
     return RtConfigVal::convert<unsigned int>(conditionShift,text);
+  }
+  if(name == "modelEachBlock") {
+    return RtConfigVal::convert<bool>(modelEachBlock,text);
   }
   if(name == "trends") {
     return RtConfigVal::convert<unsigned int>(numTrends,text);
@@ -167,6 +191,12 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     mask.setFilename(text);
     return true;
   }
+  if(name == "mosaicMask") {
+    RtConfigVal::convert<bool>(mosaicMask,text);
+  }
+  if(name == "flipLRMask") {
+    RtConfigVal::convert<bool>(flipLRMask,text);
+  }
   if(name == "maskToDisplay") {
     RtConfigVal::convert<bool>(putMaskOnMessage,text);
   }
@@ -180,6 +210,9 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "saveTVol") {
     return RtConfigVal::convert<bool>(saveTVol,text);
   }
+  if(name == "unmosaicTVol") {
+    return RtConfigVal::convert<bool>(unmosaicTVol,text);
+  }
   if(name == "saveTVolFilename") {
     saveTVolFilename = text;
     return true;
@@ -187,8 +220,14 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   if(name == "savePosAsMask") {
     return RtConfigVal::convert<bool>(savePosResultAsMask,text);
   }
+  if(name == "unmosaicPosMask") {
+    return RtConfigVal::convert<bool>(unmosaicPosMask,text);
+  }
   if(name == "saveNegAsMask") {
     return RtConfigVal::convert<bool>(saveNegResultAsMask,text);
+  }
+  if(name == "unmosaicNegMask") {
+    return RtConfigVal::convert<bool>(unmosaicNegMask,text);
   }
   if(name == "savePosAsMaskFilename") {
     savePosAsMaskFilename = text;
@@ -196,6 +235,13 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   }
   if(name == "saveNegAsMaskFilename") {
     saveNegAsMaskFilename = text;
+    return true;
+  }
+  if(name == "dumpAlgoVars") {
+    return RtConfigVal::convert<bool>(dumpAlgoVars,text);
+  }
+  if(name == "dumpAlgoVarsFilename") {
+    dumpAlgoVarsFilename = text;
     return true;
   }
 
@@ -263,6 +309,7 @@ void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
 // finish initialization and prepare to run
 bool RtActivationEstimator::finishInit() {
   buildTrends();
+  buildConditions();
 
   // mask from file
   if(maskSource == LOAD_FROM_FILE) {
@@ -274,12 +321,38 @@ bool RtActivationEstimator::finishInit() {
     }
 
     // mosaic if we need to
-    if((int) mask.getNumPix() > mask.getDim(0) * mask.getDim(1)) {
-      cout << "warning: auto mosaic" << endl;
+    if(mosaicMask 
+       || ((int) mask.getNumPix() > mask.getDim(0) * mask.getDim(1))) {
+      //cout << "warning: auto mosaic" << endl;
       mask.mosaic();
+    }
+
+    // flip if we need to
+    if(flipLRMask) {
+      mask.flipLR();
     }
   }
 
+  // open the dump file
+  if(dumpAlgoVars) {
+    dumpFile.open(dumpAlgoVarsFilename.c_str());
+    if(dumpFile.fail()) {
+      cout << "couldn't open file to dump vars" << endl;
+      dumpAlgoVars = false;
+    }
+    else {
+      cout << "opened file " << dumpAlgoVarsFilename << " to dump vars" << endl;
+      startDumpAlgoVarsFile();
+    }
+  }
+
+  return true;
+}
+
+#include"printVnlMat.cpp"
+
+// build the condition regressors
+void RtActivationEstimator::buildConditions() {
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
   buildHRF(hrf, tr, 1/16.0, 32);
@@ -295,52 +368,68 @@ bool RtActivationEstimator::finishInit() {
     shiftdelta.put(conditionShift,1);
 
     for(unsigned int i = 0; i < numConditions; i++) {
-      vnl_vector<double> col = conditions->get_column(i);
+      vnl_vector<double> col = conditions.get_column(i);
       vnl_vector<double> shiftcol = vnl_convolve(col,shiftdelta);
       col.update(shiftcol.extract(col.size()));
 
-      // debugging 
-      #ifdef DUMP
-      cout << "dumping condition vector:" << endl;
-      printVnlVector(col);
-
-      #endif
-
-      conditions->set_column(i,col);
+      conditions.set_column(i,col);
     }  
+  }
+
+  // build block-wise condition vectors if required
+  if(modelEachBlock) {
+    int numBlocks = (numMeas-conditionShift)/blockLen;
+    
+    // make a new condition matrix
+    vnl_matrix<double> newConds(numMeas, numConditions*numBlocks);
+    newConds.fill(0);
+    for(unsigned int meas=conditionShift; meas < numMeas; meas++) {
+      unsigned int block = (meas-conditionShift)/blockLen;
+      for(unsigned int cond=0; cond < numConditions; cond++) {
+	newConds.put(meas, cond*numBlocks+block, conditions[meas][cond]);
+      }
+    }
+//     cout << "conds" << endl;
+//     printVnlMat(conditions);
+//    cout << endl;
+
+    conditions = newConds;
+    numConditions*=numBlocks;
+
+//     cout << "new conds" << endl;
+//     printVnlMat(conditions);
+//     cout << endl;
   }
 
   // convolve each condition with the hrf
   for(unsigned int i = 0; i < numConditions; i++) {
-    vnl_vector<double> col = conditions->get_column(i);
+    vnl_vector<double> col = conditions.get_column(i);
     vnl_vector<double> convhrfcol = vnl_convolve(col,hrf);
     col.update(convhrfcol.extract(col.size()));
-    conditions->set_column(i,col);
+    conditions.set_column(i,col);
   }
-
-  return true;
 }
 
 // build the trend regressors
 void RtActivationEstimator::buildTrends() {
-  trends = new vnl_matrix<double>(numMeas, numTrends);
+  trends.clear();
+  trends.set_size(numMeas, numTrends);
 
   for(unsigned int i = 0; i < numTrends; i++) {
     for(unsigned int j = 0; j < numMeas; j++) {
       switch(i) {
       case 0: // mean
-	trends->put(j,i,1.0);
+	trends.put(j,i,1.0);
 	break;
       case 1: // linear
-	trends->put(j,i,j+1);
+	trends.put(j,i,j+1);
 	break;
       default:
-	trends->put(j,i,0.0);
+	trends.put(j,i,0.0);
 	break;
       }
     }
   }
-
 }
 
 // initialize the estimation algorithm for a particular image size
@@ -363,7 +452,7 @@ void RtActivationEstimator::setResult(RtStreamMessage *msg, RtData *data) {
   // send the mask if desired 
   if(putMaskOnMessage) {
     mask.setRoiID(roiID);
-    cout << "sending mask: " << mask.getID() << ":" << roiID << endl;
+    //cout << "sending mask: " << mask.getID() << ":" << roiID << endl;
 
     ACE_Mutex mut;
     mut.acquire();
@@ -374,6 +463,14 @@ void RtActivationEstimator::setResult(RtStreamMessage *msg, RtData *data) {
   RtStreamComponent::setResult(msg,data);
 }
   
+// start a logfile 
+void RtActivationEstimator::startDumpAlgoVarsFile() {
+  dumpFile << "started at ";
+  printNow(dumpFile);
+  dumpFile << endl
+	   << "print variable names here separated by spaces "
+	   << "end" << endl;  
+}
 
 
 /*****************************************************************************

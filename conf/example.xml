@@ -33,12 +33,18 @@
     port="15000"
     saveImages="true"
 
+    onlyReadMoco="false"
+    unmosaic="false"
+
     receiveTriggers="false"
     triggerSync="false"
     triggerCode="83"
 
     tr="2.0"
     measurements="64"
+    matrixSize="64"
+    slices="64"
+
 > </scanner>
 
 <display

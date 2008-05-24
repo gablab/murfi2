@@ -8,7 +8,8 @@
 static char *VERSION = "$Id$";
 
 #include"RtInputScannerImages.h"
-
+#include<vnl/vnl_matrix_fixed.h>
+#include<vnl/vnl_vector.h>
 #include<fstream>
 using namespace std;
 
@@ -35,9 +36,11 @@ RtInputScannerImages::RtInputScannerImages()
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
+  unmosaic = false;
   onlyReadMoCo = false;
   matrixSize = 64;
   numSlices = 32;
+  sliceGap = 0.1;
   voxDim[0] = voxDim[1] = voxDim[2] = 1.0;
 }
 
@@ -77,6 +80,9 @@ bool RtInputScannerImages::open(RtConfig &config) {
   if(config.isSet("scanner:slices")) {
     numSlices = config.get("scanner:slices");
   }
+  if(config.isSet("scanner:sliceGap")) {
+    sliceGap = config.get("scanner:sliceGap");
+  }
   if(config.isSet("scanner:voxdim1")) {
     voxDim[0] = config.get("scanner:voxdim1");
   }
@@ -96,6 +102,12 @@ bool RtInputScannerImages::open(RtConfig &config) {
     onlyReadMoCo = false;
   }
 
+ // see if we should unmosaic the images
+  if(config.isSet("scanner:unmosaic") 
+     && config.get("scanner:unmosaic")==true) {
+    unmosaic = true;
+  }
+ 
   // see if we should save images to a file
   if(config.get("scanner:saveImages")==true) {
     saveImagesToFile = true;
@@ -157,9 +169,9 @@ int RtInputScannerImages::svc() {
       continue;
     }
 
-    //ei->displayImageInfo();
 
     // DEBUGGING
+    //ei->displayImageInfo();
     //ei->iAcquisitionNumber = imageNum++;
 
     // get the image
@@ -175,9 +187,15 @@ int RtInputScannerImages::svc() {
     rti->setSeriesNum(seriesNum);
     rti->setMatrixSize(matrixSize);
     rti->setNumSlices(numSlices);
-    rti->setPixDim(0,voxDim[0]);
-    rti->setPixDim(1,voxDim[1]);
-    rti->setPixDim(2,voxDim[2]);
+
+
+//    rti->setPixDim(0,voxDim[0]);
+//    rti->setPixDim(1,voxDim[1]);
+//    rti->setPixDim(2,voxDim[2]);
+
+    if(unmosaic) {
+      rti->unmosaic();
+    }
 
     // set the image id for handling
     //rti->addToID("scanner");
@@ -343,7 +361,7 @@ string RtInputScannerImages::getImageFilename(int _seriesNum,
 //  out
 //   true if this image is the first in a series
 bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
-  return info.iAcquisitionNumber == 1;
+  return info.iAcquisitionNumber == 0;
 }
 
 // gets the next series number to be saved in the current image directory
@@ -353,7 +371,7 @@ unsigned int RtInputScannerImages::getNextSeriesNum() {
   string fname;
 
   for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
-    fname = getImageFilename(sn, 1);
+    fname = getImageFilename(sn, 0);
     fin.open(fname.c_str());
 
     if(fin.fail() ) {

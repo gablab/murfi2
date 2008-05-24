@@ -143,9 +143,6 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
 int RtStream::addModules(RtConfig &config) {
   ACE_TRACE(("RtStream::addModules"));
 
-  cout << "in addModule " << endl;
-  cout.flush();
-
   // add the preprocessing module
   Module *preprocMod;
   RtPreprocessor *preproc = new RtPreprocessor();

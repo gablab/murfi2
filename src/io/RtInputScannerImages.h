@@ -113,6 +113,7 @@ protected:
 
   // parms for image saving to disk
   bool   saveImagesToFile;
+  bool unmosaic;
   string savePath;
   string saveDir;
   string saveFilestem;
@@ -121,6 +122,7 @@ protected:
   // scanner parms
   unsigned int matrixSize;
   unsigned int numSlices;
+  double sliceGap;
   double voxDim[3];
   
   // current series number

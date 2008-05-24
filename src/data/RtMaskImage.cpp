@@ -199,8 +199,8 @@ void RtMaskImage::setInfo(RtMRIImage &img) {
   numPix = img.getNumPix();
   bytesPerPix = sizeof(unsigned short);
 
-  gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
-  gsl_matrix_memcpy(ras2ref, img.getRas2Ref());
+  vxl2ras = img.getVxl2Ras();
+  ras2ref = img.getRas2Ref();
 
   if(data != NULL) {
     delete [] data;
@@ -220,8 +220,8 @@ void RtMaskImage::setInfo(RtActivation &img) {
   numPix = img.getNumPix();
   bytesPerPix = sizeof(unsigned short);
 
-  gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
-  gsl_matrix_memcpy(ras2ref, img.getRas2Ref());
+  vxl2ras = img.getVxl2Ras();
+  ras2ref = img.getRas2Ref();
 
   if(data != NULL) {
     delete [] data;

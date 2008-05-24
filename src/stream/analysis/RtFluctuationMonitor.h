@@ -53,6 +53,9 @@ protected:
   //   val  text of the option node
   virtual bool processOption(const string &name, const string &text);
 
+  // start a logfile 
+  virtual void startDumpAlgoVarsFile();
+
   //// parameters of the activation estimation algorithm
 
   // if we should reinit
@@ -65,7 +68,8 @@ protected:
   RtLeastSquaresSolve **solvers;
 
   // store the per pixel sum of squared error
-  RtActivation *estErrSumSq;
+  RtActivation *absEstErrSum;
+  int numDataInErrSum;
 
   // for task triggering based on activation sum
   bool triggerStim;

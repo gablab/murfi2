@@ -18,6 +18,9 @@
 #include"RtConductor.h"
 #include"RtData.h"
 
+#include<fstream>
+using namespace std;
+
 // NOTES FOR SUBCLASSING:
 // when this class is subclassed it should get its own 
 //   static string moduleString;
@@ -156,6 +159,10 @@ protected:
 
   // input data id string
   string inputDataID;
+
+  // file to log processing results to
+  ofstream ofile;
+  string outFilename;
 };
 
 

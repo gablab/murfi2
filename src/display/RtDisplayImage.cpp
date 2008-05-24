@@ -393,7 +393,7 @@ void RtDisplayImage::setData(RtData *data) {
   img = (RtMRIImage*) data;
 
   ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getAcquisitionNum()));
-  //cout << "display got an image " << img->getID() << endl;
+  cout << "display got an image " << img->getID() << endl;
 
   // set the info strings
   bottomStr = img->getID();
@@ -479,7 +479,6 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   double min = 1000000, max = -1000000;
 
   for(unsigned int i = 0; i < overlay->getNumPix(); i++) {
-
     // debugging
       if(min > overlay->getPixel(i)) {
 	min = overlay->getPixel(i);
@@ -497,6 +496,14 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 				       *SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
+//      cout << overlay->getPixel(i) << " " << overlay->getThreshold() 
+//	   << " " << overlay->getCeiling() << " " 
+//	   << overlayImg[4*i+1] << " "
+//	   << overlayImg[4*i+0] << "," 
+//	   << overlayImg[4*i+1] << "," 
+//	   << overlayImg[4*i+2] << "," 
+//	   << overlayImg[4*i+3] << "," 
+//	   << endl;
     }
     else if(!overlay->getScaleIsInverted() 
 	    && overlay->getPixel(i) < -overlay->getThreshold()) {
@@ -506,9 +513,9 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 				       *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
-      cout << overlay->getPixel(i) << " " << overlay->getThreshold() 
-	   << " " << overlay->getCeiling() << " " 
-	   << overlayImg[4*i+1] << endl;
+//      cout << overlay->getPixel(i) << " " << overlay->getThreshold() 
+//	   << " " << overlay->getCeiling() << " " 
+//	   << overlayImg[4*i+1] << endl;
     }
     else if(overlay->getScaleIsInverted() 
 	    && fabs(overlay->getPixel(i)) < overlay->getThreshold()) {
@@ -787,7 +794,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the posMask texture */
   if(posMaskOn && glIsTexture(posMaskTex)) {
-    cout << "drawing pos mask tex: " << posMaskTex << endl;
+    //cout << "drawing pos mask tex: " << posMaskTex << endl;
 
     glBindTexture(GL_TEXTURE_RECTANGLE_EXT, posMaskTex);
 
@@ -827,7 +834,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the neg overlay texture */
   if(negOverlayOn && glIsTexture(negOverlayTex)) {
-    cout << "drawing neg overlay tex: " << negOverlayTex << endl;
+    //cout << "drawing neg overlay tex: " << negOverlayTex << endl;
 
     glBindTexture(GL_TEXTURE_RECTANGLE_EXT, negOverlayTex);
 

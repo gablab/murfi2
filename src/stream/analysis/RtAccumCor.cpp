@@ -136,9 +136,9 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   // build z
   for(unsigned int i = 0; i < numTrends; i++) {
-    z->put(i,trends->get(numTimepoints-1,i));
+    z->put(i,trends.get(numTimepoints-1,i));
   }
-  z->put(numTrends,conditions->get(numTimepoints-1,0));
+  z->put(numTrends,conditions.get(numTimepoints-1,0));
   
   double b_new, b_old = 1;
 
@@ -185,7 +185,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 //    if(i == 1 && numTimepoints == 2) {
 //    if(i == 16*32*32 + 28*32 + 14) {
 //      fprintf(stderr,"%d %d %f %f %f\n", numTimepoints, dat->getElement(i), 
-//	      conditions->get(numTimepoints-1,0), z_hat, cor->getPixel(i));
+//	      conditions.get(numTimepoints-1,0), z_hat, cor->getPixel(i));
 //
 //      cout << "z: "; printVnlVector(*z); cout << endl;
 //      cout << "f: "; printVnlVector(*f); cout << endl;

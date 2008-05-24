@@ -273,6 +273,11 @@ unsigned int RtMRIImage::getSeriesNum() const {
   return seriesNum;
 }
 
+
+// DEBUGGGING
+#include"printVnl44Mat.cpp"
+
+
 // set info struct
 //  in
 //   _info: struct to copy
@@ -295,30 +300,50 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
     numPix *= (*i);
   }
 
-  // build voxel 2 RAS transformation matrix
-  vxl2ras = gsl_matrix_calloc(4,4);
-  gsl_matrix_set_identity(vxl2ras);
+  // set geometry info
+  setPixDim(0,info.dFOVread/info.nLin);
+  setPixDim(1,info.dFOVphase/info.nCol);
+  setPixDim(2,info.dThick * sliceGap);
 
-  gsl_matrix_set(vxl2ras,0,0,info.dRowSag);
-  gsl_matrix_set(vxl2ras,0,1,info.dRowCor);
-  gsl_matrix_set(vxl2ras,0,2,info.dRowTra);
+  // build xform (no translations included yet, just scales and rotations)
 
-  gsl_matrix_set(vxl2ras,1,0,info.dColSag);
-  gsl_matrix_set(vxl2ras,1,1,info.dColCor);
-  gsl_matrix_set(vxl2ras,1,2,info.dColTra);
+  // scaling matrix
+  vnl_matrix_fixed<double,4,4> scaleMat;
+  scaleMat.set_identity();
+  scaleMat.put(0,0, -info.dFOVread/info.nLin);
+  scaleMat.put(1,1, -info.dFOVphase/info.nCol);
+  scaleMat.put(2,2,  info.dThick * (1+sliceGap));
 
-  gsl_matrix_set(vxl2ras,2,0,info.dNorSag);
-  gsl_matrix_set(vxl2ras,2,1,info.dNorCor);
-  gsl_matrix_set(vxl2ras,2,2,info.dNorTra);
+  // rotation matrix
+  vnl_matrix_fixed<double,4,4> rotMat;
+  rotMat.set_identity();
 
-  gsl_matrix_set(vxl2ras,0,3,info.dPosSag);
-  gsl_matrix_set(vxl2ras,1,3,info.dPosCor);
-  gsl_matrix_set(vxl2ras,2,3,info.dPosTra);
+  rotMat.put(0,0, info.dRowSag);
+  rotMat.put(0,1, info.dRowCor);
+  rotMat.put(0,2, info.dRowTra);
+
+  rotMat.put(1,0, info.dColSag);
+  rotMat.put(1,1, info.dColCor);
+  rotMat.put(1,2, info.dColTra);
+
+  rotMat.put(2,0, info.dNorSag);
+  rotMat.put(2,1, info.dNorCor);
+  rotMat.put(2,2, info.dNorTra);
+
+  vxl2ras = scaleMat*rotMat;
+
+  // debugging
+//  cout << "scale" << endl;
+//  printVnl44Mat(scaleMat);
+//
+//  cout << "rot" << endl;
+//  printVnl44Mat(rotMat);
+//
+//  cout << "xform" << endl;
+//  printVnl44Mat(vxl2ras);
 
   // build RAS 2 REF transformation matrix
-  ras2ref = gsl_matrix_calloc(4,4);
-  gsl_matrix_set_identity(ras2ref);
-
+  ras2ref.set_identity();
 
   // image info
   slice = info.lSliceIndex;

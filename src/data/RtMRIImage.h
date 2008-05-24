@@ -115,7 +115,7 @@ protected:
 
   double readFOV;             // mm
   double phaseFOV;            // mm
-  double sliceThick;          // mm
+  //  double sliceThick;          // mm
 
 
   // imaging parms

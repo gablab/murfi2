@@ -14,8 +14,8 @@
 #include<vector>
 #include<iomanip>
 #include<cmath>
-#include"gsl_matrix.h"
-
+#include<vnl/vnl_matrix_fixed.h>
+#include<gsl_vector.h>
 #include"RtData.h"
 #include"nifti1_io.h"
 
@@ -162,6 +162,9 @@ public:
   // serialize the data as xml for transmission or saving to a file
   virtual TiXmlElement *serializeAsXML();
 
+  // flip each slice LR
+  bool flipLR();
+
   // convert to a mosaic representation
   bool mosaic();
 
@@ -186,10 +189,10 @@ public:
   double getPixDim(int i);
 
   // get vxl2ras
-  gsl_matrix *getVxl2Ras();
+  vnl_matrix_fixed<double,4,4> &getVxl2Ras();
 
   // get ras2ref
-  gsl_matrix *getRas2Ref();
+  vnl_matrix_fixed<double,4,4> &getRas2Ref();
 
   // get number of pix
   unsigned int getNumPix();
@@ -296,9 +299,11 @@ protected:
   unsigned long  numPix;
   unsigned short bytesPerPix;
 
-  gsl_matrix *vxl2ras;         // transformation matrix: voxels to RAS space
-  gsl_matrix *ras2ref;         // transformation matrix: RAS to reference space
+  // transformation matrix: voxels to RAS space
+  vnl_matrix_fixed<double,4,4> vxl2ras;
 
+  // transformation matrix: RAS to reference space
+  vnl_matrix_fixed<double,4,4> ras2ref;
 
   // fields for storing min and max values
   bool minMaxSet;
@@ -307,6 +312,8 @@ protected:
   // for transforming between mosaic representation
   unsigned short matrixSize;
   unsigned short numSlices;
+  double sliceThick;
+  double sliceGap;
 
 };
 
@@ -325,9 +332,7 @@ RtDataImage<T>::RtDataImage() : RtData(),
        magicNumber(MAGIC_NUMBER),
        filename(""),
        imgDataLen(0),
-       numPix(0),
-       vxl2ras(gsl_matrix_calloc(4,4)),
-       ras2ref(gsl_matrix_calloc(4,4)) {
+       numPix(0) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage()"));
 
   addToID("image");
@@ -335,6 +340,8 @@ RtDataImage<T>::RtDataImage() : RtData(),
   bytesPerPix = sizeof(T);
   matrixSize = 64;
   numSlices = 32;
+  sliceThick = 1;
+  sliceGap = 0.1;
   dims.reserve(4);
   pixdims.reserve(4);
 }
@@ -346,18 +353,21 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
        filename(""),
        imgDataLen(0),
        numPix(0),
-       bytesPerPix(sizeof(unsigned short)),
-       vxl2ras(gsl_matrix_calloc(4,4)),
-       ras2ref(gsl_matrix_calloc(4,4)) {
+       bytesPerPix(sizeof(unsigned short)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
   matrixSize = 64;
   numSlices = 32;
+  sliceThick = 1;
+  sliceGap = 0.1;
   dims.reserve(4);
   pixdims.reserve(4);
   addToID("image");
   bytesPerPix = sizeof(T);
   read(filename);
+
+  vxl2ras.set_identity();
+  ras2ref.set_identity();
 }
 
 // construct from raw bytes sent by RtInputScannerImages
@@ -421,11 +431,9 @@ RtDataImage<T>::RtDataImage(RtDataImage &img) : RtData() {
   (*this) = *img;
 
   // allocate and copy the matrices
-  vxl2ras = gsl_matrix_alloc(4,4);
-  gsl_matrix_memcpy(vxl2ras, img.vxl2ras);
+  vxl2ras = img.vxl2ras;
 
-  ras2ref = gsl_matrix_alloc(4,4);
-  gsl_matrix_memcpy(ras2ref, img.ras2ref);
+  ras2ref = img.ras2ref;
 
   // allocate and copy the data
   data = new T[numPix];
@@ -443,10 +451,6 @@ RtDataImage<T>::~RtDataImage() {
   if(lock != NULL) {
     lock->beingDeleted();
   }
-
-  // free matrices
-  gsl_matrix_free(vxl2ras);
-  gsl_matrix_free(ras2ref);
 
   // free data
   if(data != NULL) {
@@ -511,7 +515,7 @@ void RtDataImage<T>::printInfo(ostream &os) {
       os << setw(wid) << "";
     }
     for(int j = 0; j < 4; j++) {
-      os << gsl_matrix_get(vxl2ras,i,j) << " ";
+      os << vxl2ras[i][j] << " ";
     }
     os << endl;
   }
@@ -522,7 +526,7 @@ void RtDataImage<T>::printInfo(ostream &os) {
       os << setw(wid) << "";
     }
     for(int j = 0; j < 4; j++) {
-      os << gsl_matrix_get(ras2ref,i,j) << " ";
+      os << ras2ref[i][j] << " ";
     }
     os << endl;
   }
@@ -676,7 +680,7 @@ bool RtDataImage<T>::writeInfo(ostream &os) {
   // pixdims
   double pixdimarr[MAX_NDIMS];
   ind = 0;
-  for(vector<double>::iterator i = pixdims.begin(); i != pixdims.end(); 
+  for(vector<double>::iterator i = pixdims.begin(); i != pixdims.end();
       i++, ind++) {
     pixdimarr[ind] = *i;
   }
@@ -688,8 +692,8 @@ bool RtDataImage<T>::writeInfo(ostream &os) {
   os.write((char*) &bytesPerPix, sizeof(unsigned short));
 
   // matrices
-  os.write((char*) gsl_matrix_ptr(vxl2ras,0,0), 4*4*sizeof(double));
-  os.write((char*) gsl_matrix_ptr(ras2ref,0,0), 4*4*sizeof(double));
+  //os.write((char*) gsl_matrix_ptr(vxl2ras,0,0), 4*4*sizeof(double));
+  //os.write((char*) gsl_matrix_ptr(ras2ref,0,0), 4*4*sizeof(double));
 
   // min/max info
   char mmset = (char) minMaxSet;
@@ -737,7 +741,8 @@ bool RtDataImage<T>::load() {
 template<class T>
 bool RtDataImage<T>::read(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::read"));
-  return readNifti(_filename);
+  bool suc = readNifti(_filename);
+  return suc;
 }
 
 // read the image from a raw file
@@ -831,7 +836,6 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
   data = new T[img->nvox];
   memcpy(data, img->data, img->nbyper * img->nvox);
 
-
   // store filename if its not set
   if(filename.empty()) {
     filename = _filename;
@@ -884,8 +888,8 @@ bool RtDataImage<T>::readInfo(istream &is) {
   is.read((char*) &bytesPerPix, sizeof(unsigned short));
 
   // matrices
-  is.read((char*) gsl_matrix_ptr(vxl2ras,0,0), 4*4*sizeof(double));
-  is.read((char*) gsl_matrix_ptr(ras2ref,0,0), 4*4*sizeof(double));
+  //is.read((char*) gsl_matrix_ptr(vxl2ras,0,0), 4*4*sizeof(double));
+  //is.read((char*) gsl_matrix_ptr(ras2ref,0,0), 4*4*sizeof(double));
 
   // min/max info
   char mmset;
@@ -942,22 +946,22 @@ bool RtDataImage<T>::setInfo(nifti_image *hdr) {
   imgDataLen = numPix*hdr->nbyper;
 
   // vxl2ras
-  gsl_matrix_set(vxl2ras,0,0,hdr->qto_xyz.m[0][0]);
-  gsl_matrix_set(vxl2ras,0,1,hdr->qto_xyz.m[0][1]);
-  gsl_matrix_set(vxl2ras,0,2,hdr->qto_xyz.m[0][2]);
-  gsl_matrix_set(vxl2ras,0,3,hdr->qto_xyz.m[0][3]);
-  gsl_matrix_set(vxl2ras,1,0,hdr->qto_xyz.m[1][0]);
-  gsl_matrix_set(vxl2ras,1,1,hdr->qto_xyz.m[1][1]);
-  gsl_matrix_set(vxl2ras,1,2,hdr->qto_xyz.m[1][2]);
-  gsl_matrix_set(vxl2ras,1,3,hdr->qto_xyz.m[1][3]);
-  gsl_matrix_set(vxl2ras,2,0,hdr->qto_xyz.m[2][0]);
-  gsl_matrix_set(vxl2ras,2,1,hdr->qto_xyz.m[2][1]);
-  gsl_matrix_set(vxl2ras,2,2,hdr->qto_xyz.m[2][2]);
-  gsl_matrix_set(vxl2ras,2,3,hdr->qto_xyz.m[2][3]);
-  gsl_matrix_set(vxl2ras,3,0,hdr->qto_xyz.m[3][0]);
-  gsl_matrix_set(vxl2ras,3,1,hdr->qto_xyz.m[3][1]);
-  gsl_matrix_set(vxl2ras,3,2,hdr->qto_xyz.m[3][2]);
-  gsl_matrix_set(vxl2ras,3,3,hdr->qto_xyz.m[3][3]);
+  vxl2ras.put(0,0,hdr->qto_xyz.m[0][0]);
+  vxl2ras.put(0,1,hdr->qto_xyz.m[0][1]);
+  vxl2ras.put(0,2,hdr->qto_xyz.m[0][2]);
+  vxl2ras.put(0,3,hdr->qto_xyz.m[0][3]);
+  vxl2ras.put(1,0,hdr->qto_xyz.m[1][0]);
+  vxl2ras.put(1,1,hdr->qto_xyz.m[1][1]);
+  vxl2ras.put(1,2,hdr->qto_xyz.m[1][2]);
+  vxl2ras.put(1,3,hdr->qto_xyz.m[1][3]);
+  vxl2ras.put(2,0,hdr->qto_xyz.m[2][0]);
+  vxl2ras.put(2,1,hdr->qto_xyz.m[2][1]);
+  vxl2ras.put(2,2,hdr->qto_xyz.m[2][2]);
+  vxl2ras.put(2,3,hdr->qto_xyz.m[2][3]);
+  vxl2ras.put(3,0,hdr->qto_xyz.m[3][0]);
+  vxl2ras.put(3,1,hdr->qto_xyz.m[3][1]);
+  vxl2ras.put(3,2,hdr->qto_xyz.m[3][2]);
+  vxl2ras.put(3,3,hdr->qto_xyz.m[3][3]);
 
   minMaxSet = false;
   minVal = 0;
@@ -977,7 +981,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   hdr->iname_offset = 348;
   hdr->swapsize = 0;
   //hdr->analyze75_orient = a75_transverse_unflipped;
-  
+
   // filename
   hdr->fname = (char*) malloc((filename.length()+1)*sizeof(char));
   strcpy(hdr->fname,filename.c_str());
@@ -993,13 +997,10 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   }
 
   for(unsigned int ind = 1; ind <= dims.size(); ind++) {
-    cout << ind << endl;
-    cout.flush();
-
     hdr->dim[ind] = dims[ind-1];
     hdr->pixdim[ind] = pixdims[ind-1];
   }
-  
+
   // crappy
   switch(hdr->ndim) {
   case 7:
@@ -1057,12 +1058,13 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   // change this to be read from dicom header!!
   for(int i = 0; i < 4; i++) {
     for(int j = 0; j < 4; j++) {
-      hdr->qto_xyz.m[i][j] = 0;
+      hdr->qto_xyz.m[i][j] = vxl2ras[i][j];
+      hdr->sto_xyz.m[i][j] = vxl2ras[i][j];
     }
   }
-  
-  hdr->sform_code = 0;
-  hdr->qform_code = 1;
+
+  hdr->sform_code = 1;
+  hdr->qform_code = 0;
   hdr->quatern_b = 0;
   hdr->quatern_c = 0;
   hdr->quatern_d = 0;
@@ -1103,6 +1105,20 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   return true;
 }
 
+// flip each slice LR
+template<class T>
+bool RtDataImage<T>::flipLR() {
+  for(unsigned int row = 0; row < getNumPix()/matrixSize; row++) {
+    for(unsigned int j = 0, begInd = row*matrixSize; j < matrixSize/2; j++) {
+      T tmp = data[begInd+j];
+      data[begInd+j] = data[begInd+matrixSize-1-j];
+      data[begInd+matrixSize-1-j] = tmp;
+    }
+  }
+
+  return true;
+}
+
 // convert from a mosaic representation
 template<class T>
 bool RtDataImage<T>::unmosaic() {
@@ -1130,8 +1146,8 @@ bool RtDataImage<T>::unmosaic() {
   int height = dims[1];
 
   dims.clear();
-  dims.reserve(3);
-  
+  dims.reserve(4);
+
   dims.push_back(matrixSize);
   dims.push_back(matrixSize);
 
@@ -1139,8 +1155,11 @@ bool RtDataImage<T>::unmosaic() {
     dims.push_back(numSlices);
   }
   else {
-    dims.push_back(width/matrixSize * height/matrixSize);    
+    dims.push_back(width/matrixSize * height/matrixSize);
   }
+
+  // build a new pixdim
+  pixdims[2] = sliceThick*(1+sliceGap);
 
   // reshape the data
   T *newdata = new T[numPix];
@@ -1148,7 +1167,7 @@ bool RtDataImage<T>::unmosaic() {
   unsigned int slc, row, col, newind;
   unsigned int sqMatrixSize = matrixSize*matrixSize;
   for(unsigned int i = 0; i < numPix; i++) {
-    slc = (i%width)/matrixSize + 
+    slc = (i%width)/matrixSize +
       (i/(matrixSize*width))*(width/matrixSize);
     row = (i/width)%matrixSize;
     col = i%matrixSize;
@@ -1165,7 +1184,7 @@ bool RtDataImage<T>::unmosaic() {
 //    //cout << newdata[i] << endl;
 //  }
 //  of.close();
-  
+
   delete data;
   data = newdata;
 
@@ -1182,7 +1201,7 @@ bool RtDataImage<T>::mosaic() {
     return false;
   }
 
-  if(dims[0] != dims[1]) { // must be same size 
+  if(dims[0] != dims[1]) { // must be same size
     cerr << "can't mosaic an image with different row and column sizes"
 	 << endl;
     return false;
@@ -1194,8 +1213,8 @@ bool RtDataImage<T>::mosaic() {
 
   dims.clear();
   dims.reserve(2);
-  
-  //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);  
+
+  //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);
   dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt(numSlices)),2)));
   dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt(numSlices)),2)));
   numPix = dims[0]*dims[1];
@@ -1227,7 +1246,7 @@ bool RtDataImage<T>::mosaic() {
     for(unsigned int i = matrixSize*matrixSize*numSlices; i < numPix; i++) {
       data[i] = 0;
     }
-    
+
     delete tmpdata;
   }
 
@@ -1262,13 +1281,13 @@ vector<int> &RtDataImage<T>::getDims() {
 
 // get vxl2ras
 template<class T>
-gsl_matrix *RtDataImage<T>::getVxl2Ras() {
+vnl_matrix_fixed<double,4,4> &RtDataImage<T>::getVxl2Ras() {
   return vxl2ras;
 }
 
 // get ras2ref
 template<class T>
-gsl_matrix *RtDataImage<T>::getRas2Ref() {
+vnl_matrix_fixed<double,4,4> &RtDataImage<T>::getRas2Ref() {
   return ras2ref;
 }
 

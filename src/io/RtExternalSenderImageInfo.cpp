@@ -10,8 +10,8 @@ RtExternalImageInfo::RtExternalImageInfo()
   :
   lVersion(0),
   iSizeOfRtExternalImageInfo(EXTERNALSENDERSIZEOF),
-  dFOVread(300),
-  dFOVphase(100),
+  dFOVread(200),
+  dFOVphase(200),
   dThick(5),
   nCol(256),
   nLin(256),

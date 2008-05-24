@@ -17,6 +17,9 @@
 #include"RtDataImage.h"
 #include"RtMaskImage.h"
 
+#include<fstream>
+using namespace std;
+
 #define MAX_CONDITIONS 1
 
 // class declaration
@@ -50,13 +53,13 @@ public:
   // in
   //  dof: number of degrees of freedom
   // out
-  //  t statistic threshold for the current probability threshold and 
+  //  t statistic threshold for the current probability threshold and
   //  mulitple comparisons correction state
   double getTStatThreshold(unsigned int dof);
 
 protected:
 
-  // builds an hrf vector 
+  // builds an hrf vector
   //
   // in
   //  sampleRate: temporal precision in milliseconds
@@ -71,18 +74,21 @@ protected:
 
   // process the configuration: only use this for cross module or global config
   // that is not available in the xml node for this stream component
-  //  in 
+  //  in
   //   config class
   virtual bool processConfig(RtConfig &config);
 
   // process an option
-  //  in 
+  //  in
   //   name of the option to process
   //   val  text of the option node
   virtual bool processOption(const string &name, const string &text);
 
   // finish initialization tasks for run
   virtual bool finishInit();
+
+  // build the condition regressors
+  virtual void buildConditions();
 
   // build the trend regressors
   virtual void buildTrends();
@@ -92,6 +98,9 @@ protected:
   //  first acquired image to use as a template for parameter inits
   virtual void initEstimation(RtMRIImage &image);
 
+  // start a logfile 
+  virtual void startDumpAlgoVarsFile();  
+
   // sets the latest result of processing
   //  in
   //   data result
@@ -99,38 +108,40 @@ protected:
 
   bool needsInit;
 
-  double tr;      
+  double tr;
 
   // number of timepoints
   unsigned int numMeas;        // total expected
   unsigned int numTimepoints;  // so far
 
   // condition regressors
-  unsigned int numConditions; 
-  vnl_matrix<double> *conditions;
+  unsigned int numConditions;
+  vnl_matrix<double> conditions;
   unsigned int conditionShift;  // shift all condition regressors
+  bool modelEachBlock;
+  unsigned int blockLen;
 
   // trend regressors
-  unsigned int numTrends; 
-  vnl_matrix<double> *trends;
+  unsigned int numTrends;
+  vnl_matrix<double> trends;
 
   // probability of false positive at which to threshold activations
   double probThreshold;
 
   // whether the probability threshold should be corrected for mulitple
   // comparisons
-  bool correctForMultiComps; 
-  
+  bool correctForMultiComps;
+
   // number of statistical comparisons
   unsigned int numComparisons;
 
   // id of roi this represents
-  string roiID;  
+  string roiID;
 
   /// mask ///
   RtMaskImage mask;
   enum MaskSource {
-    THRESHOLD_FIRST_IMAGE_INTENSITY, 
+    THRESHOLD_FIRST_IMAGE_INTENSITY,
     LOAD_FROM_FILE,
     PASSED_FROM_INSIDE
   } maskSource;
@@ -138,21 +149,30 @@ protected:
   // parameters for different mask sources
   double maskIntensityThreshold;
   string maskFilename;
+  bool mosaicMask;
+  bool flipLRMask;
   bool putMaskOnMessage;
 
   // whether to save the resulting t map
   bool saveTVol;
+  bool unmosaicTVol;
   string saveTVolFilename;
 
   // whether to save the result as a mask
   bool savePosResultAsMask;
+  bool unmosaicPosMask;
+
   bool saveNegResultAsMask;
+  bool unmosaicNegMask;
 
   // filename to save mask to
   string savePosAsMaskFilename;
   string saveNegAsMaskFilename;
-   
-   
+
+  // for logging the analysis process
+  bool dumpAlgoVars;
+  string dumpAlgoVarsFilename;
+  ofstream dumpFile;
 };
 
 #endif

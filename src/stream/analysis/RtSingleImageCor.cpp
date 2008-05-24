@@ -9,31 +9,22 @@
 #include"RtSingleImageCor.h"
 #include"RtMRIImage.h"
 #include"RtActivation.h"
+#include<limits>
 
 string RtSingleImageCor::moduleString("singleimcor");
-
-// debugging
-#define DUMP 0
-#ifdef DUMP
-#include<fstream>
-static ofstream dumpfile("/tmp/single_image_dump.txt");
-#endif
 
 // default constructor
 RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   componentID = moduleString;
    
-  baselineThreshold.set_size(1);
-  baselineThreshold.put(0,0.0);
   solvers = NULL; 
   numData = 0;
-  estErrSumSq = NULL;
+  absEstErrSum = NULL;
+  numDataPointsForErrEst = INT_MAX;
 }
 
 // destructor
 RtSingleImageCor::~RtSingleImageCor() {
-  deleteBaselineMeans();
-
   // delete all solvers
   if(solvers != NULL) {
     for(unsigned int i = 0; i < numData; i++) {
@@ -45,9 +36,10 @@ RtSingleImageCor::~RtSingleImageCor() {
   }
 
 
-  if(estErrSumSq != NULL) {
-    delete estErrSumSq;
+  if(absEstErrSum != NULL) {
+    delete absEstErrSum;
   }
+
 }
 
 // process a configuration option
@@ -55,27 +47,20 @@ RtSingleImageCor::~RtSingleImageCor() {
 //   name of the option to process
 //   val  text of the option node
 bool RtSingleImageCor::processOption(const string &name, const string &text) {
-  double tmp;
 
   // look for known options
-  if(name == "baselineThreshold") {
-    RtConfigVal::convert<double>(tmp,text);    
-    baselineThreshold.put(0,tmp);
-    return true;
+  if(name == "numDataPointsForErrEst") {
+    return RtConfigVal::convert<int>(numDataPointsForErrEst,text);    
   }
 
   return RtActivationEstimator::processOption(name, text);
 }
-
 
 // initialize the estimation algorithm for a particular image size
 // in
 //  first acquired image to use as a template for parameter inits
 void RtSingleImageCor::initEstimation(RtMRIImage &image) {
   RtActivationEstimator::initEstimation(image);
-
-  // create images to store baseline estimates
-  initBaselineMeans(&image);
 
   // get the number of datapoints we must process
   numData = image.getNumEl();
@@ -87,39 +72,13 @@ void RtSingleImageCor::initEstimation(RtMRIImage &image) {
   }
 
   // setup the estimation error sum of squares
-  if(estErrSumSq != NULL) {
-    delete estErrSumSq;
+  if(absEstErrSum != NULL) {
+    delete absEstErrSum;
   }
-  estErrSumSq = new RtActivation(image);
-  estErrSumSq->initToZeros();
-
+  absEstErrSum = new RtActivation(image);
+  absEstErrSum->initToZeros();
 
   needsInit = false;
-}
-
-// initialize the baseline mean estimation parameters to match an image
-// in 
-//  mri image to be used as a template to allocate space for running means
-void RtSingleImageCor::initBaselineMeans(RtMRIImage *img) {
-  // clean up existing versions
-  deleteBaselineMeans();
-
-  // allocate vectors and initialize them
-  for(unsigned int i = 0; i < numConditions; i++) {
-    baselineMeans.push_back(new RtActivation(*img));
-  }
-
-  numBaselineTimepoints.set_size(numConditions);
-  numBaselineTimepoints.fill(0);
-}
-
-// deallocate all baseline mean related images
-void RtSingleImageCor::deleteBaselineMeans() {
-  for(unsigned int i = 0; i < baselineMeans.size(); i++) {
-    if(baselineMeans[i] != NULL) {
-      delete baselineMeans[i];
-    }
-  }
 }
 
 // process a single acquisition
@@ -167,27 +126,13 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   //// element independent setup
 
-  // decide if we are in an "on" or "off" stimulus condition for each condition
-  static vnl_vector<unsigned int> isBaseline(numConditions);
-  isBaseline.fill(0);
-
-  // decide whether we are in an on or off condition
-  for(unsigned int j = 0; j < numConditions; j++) {
-    // when in baseline condition, set the flag and increment the 
-    // number of timepoints this baseline condition has
-    if(conditions->get(numTimepoints-1,j) < baselineThreshold.get(j)) { 
-      isBaseline.put(j,1);
-      numBaselineTimepoints.put(j,numBaselineTimepoints.get(j)+1);
-    }
-  }
-
   // build a design matrix xrow
   double *Xrow = new double[numConditions+numTrends];
   for(unsigned int i = 0; i < numTrends; i++) {
-    Xrow[i] = trends->get(numTimepoints-1,i);
+    Xrow[i] = trends.get(numTimepoints-1,i);
   }
   for(unsigned int i = 0; i < numConditions; i++) {
-    Xrow[i+numTrends] = conditions->get(numTimepoints-1,i);
+    Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
   }
 
   //// compute t map for each element
@@ -197,99 +142,54 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
       continue;
     }
 
-    double y = dat->getElement(i);
-
-
-//    #ifdef DUMP
-//    //if(dat->getPixel(i) > 4090) {
-//      dumpfile << c->get(i,numTrends+1) << " " << pow(c->get(i,numTrends+1),2) << " " << pow(z_hat/b_old,2) << " " << sqrt(pow(c->get(i,numTrends+1),2)+pow(z_hat/b_old,2)) << endl;
-//      //}
-//    #endif
-
-
-    // decide whether we are in an on or off condition
-    // NOTE: by testing after the mask we are assuming a constant mask over time
-//    for(unsigned int j = 0; j < numConditions; j++) {
-//      if(isBaseline.get(j)) { // off
-//	// check whether this is the first image of the baseline
-//	if(numBaselineTimepoints.get(j) == 1) {	  
-//	  // replace the mean with the voxel intensity for first timepoint
-//	  baselineMeans[j]->setPixel(i, y);
-//	}
-//	else {
-//	  // sum the voxel intensity within this baseline condition
-//	  baselineMeans[j]->setPixel(i, baselineMeans[j]->getPixel(i) + y);
-//	}
-////
-////    if(i == 16*32*32 + 28*32 + 14) {
-////      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i)/(numBaselineTimepoints.get(j) > 0 ? numBaselineTimepoints.get(j) : 1));
-////    }    
-//      }
-//      else {
-//	// update the mean
-//	if(numBaselineTimepoints.get(j) > 0) {
-//	  baselineMeans[j]->setPixel(i, 
-//	      baselineMeans[j]->getPixel(i)/(numBaselineTimepoints.get(j)));
-//	}
-//
-////    if(i == 16*32*32 + 28*32 + 14) {
-////      fprintf(stderr,"%f ", baselineMeans[j]->getPixel(i));
-////    }
-//
-//
-//
-//	// change y to be the mean of the last baseline in the on condition
-//	// TODO: model trends within the on block (maybe this already happens)	
-//	y = baselineMeans[j]->getPixel(i);
-//      }
-//    }
-
     // include this timepoint in the solver for this voxel
+    double y = dat->getElement(i);
     solvers[i]->include(&y,Xrow,1.0);
 
-    #ifdef DUMP
-    #endif
-
-    // compute the correlation after we have enough timepoints to
-    //if(numTimepoints > numTrends+1) {
+    // get betas
     double *beta = solvers[i]->regress(0);
-    //double *columnSEs = solvers[i]->getSquaredError(0);
-    //      double se = sqrt((solvers[i]->getTotalSquaredError(0)
-    //			/(numTimepoints-numTrends))
-    //		       /columnSEs[numTrends]);
 
+    // get activation signal
     double err = y;
     for(unsigned int j = 0; j < numTrends; j++) {
       err -= beta[j]*Xrow[j];
     }
-    
-    // update the error in the estimate for the voxel
+
+    // get estimation error
     double esterr = err;
     for(unsigned int j = numTrends; j < numTrends+numConditions; j++) {
       esterr -= beta[j]*Xrow[j];
     }
-    estErrSumSq->setPixel(i, estErrSumSq->getPixel(i) + esterr*esterr);
+    
+    // update the error in the estimate for the voxel
+    double stdDev;
+    if(numTimepoints <= numDataPointsForErrEst) {
+      absEstErrSum->setPixel(i, absEstErrSum->getPixel(i) + fabs(esterr));
+      stdDev = absEstErrSum->getPixel(i)/(numTimepoints-1);
+    }
+    else {
+      stdDev = absEstErrSum->getPixel(i)/(numDataPointsForErrEst-1);
+    }
 
-    cor->setPixel(i, err * sqrt((numTimepoints)/estErrSumSq->getPixel(i)));
-    //cout << est->getPixel(i) << endl;
+    // compute the sds away from the mean
+    cor->setPixel(i, err / stdDev);
+
+    if(dumpAlgoVars && numTimepoints > 2) {
+      dumpFile 
+	<< numTimepoints << " " 
+	<< i << " " 
+	<< y << " "
+	<< err << " "
+	<< esterr << " "
+	<< stdDev << " "
+	<< cor->getPixel(i) << " ";
+      for(int b = 0; b < numConditions; b++) {
+	dumpFile << beta[b] << " ";
+      }
+      dumpFile << endl;
+    }
 
     delete beta;
-
-//      cor->setPixel(i, sqrt(numTimepoints-numTrends-1)
-//		    * c->get(i,numTrends)/c->get(i,numTrends+1));
-//      cout << sqrt(numTimepoints-numTrends-1)
-//	* c->get(i,numTrends)/c->get(i,numTrends+1) << " ";
-//    if(i == 1 && numTimepoints == 2) {
-//    if(i == 16*32*32 + 28*32 + 14) {
-//      //#ifdef DUMP
-//      cout << numTimepoints << " " << i << " " << dat->getPixel(i) << " "
-//	 << beta[0] << " " 
-//	 << beta[1] << " " 
-//	 << beta[2] << " " 
-//	 << " " <<  cor->getPixel(i) << endl;
-//    cout.flush();
-//    }
-    //#endif
 
   }
 
@@ -301,19 +201,29 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   printNow(cout);
   cout << endl;
 
-
-  // in the first non-baseline condition reset the number of baseline timepoints
-//  for(unsigned int j = 0; j < numTrends+1; j++) {
-//    if(numBaselineTimepoints.get(j) > 0 && !isBaseline.get(j)) {
-//      numBaselineTimepoints.put(j,0);
-//    }
-//  }
-
   setResult(msg,cor);
 
   return 0;
 }
 
+// start a logfile 
+void RtSingleImageCor::startDumpAlgoVarsFile() {
+  dumpFile << "started at ";
+  printNow(dumpFile);
+  dumpFile << endl
+	   << "time_point "
+	   << "voxel_index "
+	   << "voxel_intensity "
+	   << "activation_signal "
+	   << "residual "
+	   << "std_dev "
+	   << "feedback ";
+  for(int b = 0; b < numConditions; b++) {
+    dumpFile << "beta[" << b << "] ";
+  }
+
+  dumpFile << "end" << endl;  
+}
 
 /*****************************************************************************
  * $Source$

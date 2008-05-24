@@ -6,84 +6,102 @@
 
 using namespace std;
 
-void thresholdDouble(nifti_image *img, double thresh) {
+int thresholdDouble(nifti_image *img, double thresh) {
   double *data = (double*) img->data;
 
   // realloc
   img->nbyper = sizeof(short);
   short *mask = (short*) malloc(img->nvox*img->nbyper);
 
+  int sum = 0;
   for(int i = 0; i < img->nvox; i++) {
-    if(data[i] < thresh) {
+    if((thresh > 0 && data[i] < thresh)
+      ||
+      (thresh < 0 && data[i] > thresh)) {
       mask[i] = 0;
     }
     else {
       mask[i] = 1;
+      sum++;
     }
   }
 
   img->data = (void*) mask;
   free(data);
+  
+  return sum;
 }
 
-void thresholdFloat(nifti_image *img, double thresh) {
+int thresholdFloat(nifti_image *img, double thresh) {
   float *data = (float*) img->data;
 
   // realloc
   img->nbyper = sizeof(short);
   short *mask = (short*) malloc(img->nvox*img->nbyper);
 
+  int sum = 0;
   for(int i = 0; i < img->nvox; i++) {
     if(data[i] < thresh) {
       mask[i] = 0;
     }
     else {
       mask[i] = 1;
+      sum++;
     }
   }
 
   img->data = (void*) mask;
   free(data);
+  
+  return sum;
 }
 
-void thresholdShort(nifti_image *img, double thresh) {
+int thresholdShort(nifti_image *img, double thresh) {
   short *data = (short*) img->data;
 
   // realloc
   img->nbyper = sizeof(short);
   short *mask = (short*) malloc(img->nvox*img->nbyper);
 
+  int sum = 0;
   for(int i = 0; i < img->nvox; i++) {
     if(data[i] < thresh) {
       mask[i] = 0;
     }
     else {
       mask[i] = 1;
+      sum++;
     }
   }
 
   img->data = (void*) mask;
   free(data);
+  
+  return sum;
 }
 
-void thresholdUnsignedShort(nifti_image *img, double thresh) {
+int thresholdUnsignedShort(nifti_image *img, double thresh) {
   unsigned short *data = (unsigned short*) img->data;
 
   // realloc
   img->nbyper = sizeof(short);
   short *mask = (short*) malloc(img->nvox*img->nbyper);
 
+  int sum = 0;
   for(int i = 0; i < img->nvox; i++) {
     if(data[i] < thresh) {
       mask[i] = 0;
     }
     else {
       mask[i] = 1;
+      sum++;
     }
   }
 
   img->data = (void*) mask;
   free(data);
+  
+  return sum;
 }
 
 int main(int argc, char **argv) {
@@ -107,23 +125,26 @@ int main(int argc, char **argv) {
   // read the image data
   nifti_image_load(img);
 
+  int sum;
   // threshold based on type
   switch(img->datatype) {
   case DT_DOUBLE:
-    thresholdDouble(img,thresh);
+    sum = thresholdDouble(img,thresh);
     break;
   case DT_FLOAT:
-    thresholdFloat(img,thresh);
+    sum = thresholdFloat(img,thresh);
     break;
   case DT_SIGNED_SHORT:
-    thresholdShort(img,thresh);
+    sum = thresholdShort(img,thresh);
     break;
   case DT_UINT16:
-    thresholdUnsignedShort(img,thresh);
+    sum = thresholdUnsignedShort(img,thresh);
     break;
   default:
     break;
   }
+
+  cout << "threshold got " << sum << " voxels" << endl;
 
   // modify the header to change the filename
   strcpy(img->fname, outfile.c_str());  
@@ -132,7 +153,7 @@ int main(int argc, char **argv) {
   img->datatype = DT_SIGNED_SHORT;
 
   // debugging
-  nifti_image_infodump(img);
+  //nifti_image_infodump(img);
 
   // write the file
   nifti_image_write(img);

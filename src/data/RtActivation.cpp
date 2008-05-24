@@ -16,7 +16,7 @@ RtActivation::RtActivation() : RtDataImage<double>() {
   addToID("activation");
   magicNumber = MAGIC_NUMBER;
   threshold = 10.0;
-  ceiling = 16.0;
+  ceiling = 50.0;
   bytesPerPix = sizeof(double);
 }
 
@@ -30,7 +30,7 @@ RtActivation::RtActivation(RtMRIImage &img)
   setInfo(img);
   bytesPerPix = sizeof(double);
   threshold = 10.0;
-  ceiling = 16.0;
+  ceiling = 50.0;
 }
 
 // constructor with number of elements 
@@ -51,7 +51,7 @@ RtActivation::RtActivation(unsigned int numElements)
   reallocateData();
 
   threshold = 0.0;
-  ceiling = 0.0;
+  ceiling = 50.0;
 }
 
 // destructor
@@ -190,8 +190,8 @@ void RtActivation::setInfo(RtMRIImage &img) {
   bytesPerPix = sizeof(double);
   imgDataLen = numPix*bytesPerPix;
 
-  gsl_matrix_memcpy(vxl2ras, img.getVxl2Ras());
-  gsl_matrix_memcpy(ras2ref, img.getRas2Ref());
+  vxl2ras = img.getVxl2Ras();
+  ras2ref = img.getRas2Ref();
 
   reallocateData();
 }

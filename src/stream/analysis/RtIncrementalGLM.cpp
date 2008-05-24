@@ -105,10 +105,10 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   // build a design matrix xrow
   double *Xrow = new double[numConditions+numTrends];
   for(unsigned int i = 0; i < numTrends; i++) {
-    Xrow[i] = trends->get(numTimepoints-1,i);
+    Xrow[i] = trends.get(numTimepoints-1,i);
   }
   for(unsigned int i = 0; i < numConditions; i++) {
-    Xrow[i+numTrends] = conditions->get(numTimepoints-1,i);
+    Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
   }
 
   //// compute t map for each element
@@ -153,15 +153,35 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   // test if this is the last measurement for mask conversion and saving
   if(numTimepoints == numMeas && saveTVol) {
     cout << "saving t vol to " << saveTVolFilename << endl;
+
+    if(unmosaicTVol) {
+      est->unmosaic();
+    }
+
     est->write(saveTVolFilename);
+
+    if(unmosaicTVol) {
+      est->mosaic();
+    }
+    
   }
   if(numTimepoints == numMeas && savePosResultAsMask) {
     RtMaskImage *activationMask = est->toMask(POS);
+
+    if(unmosaicPosMask) {
+      activationMask->unmosaic();
+    }
+
     activationMask->setFilename(savePosAsMaskFilename);
     activationMask->save();
   }
   if(numTimepoints == numMeas && saveNegResultAsMask) {
     RtMaskImage *activationMask = est->toMask(NEG);
+
+    if(unmosaicNegMask) {
+      activationMask->unmosaic();
+    }
+
     activationMask->setFilename(saveNegAsMaskFilename);
     activationMask->save();
   }

@@ -38,11 +38,12 @@ bool RtActivationSum::processOption(const string &name, const string &text) {
 
 // process a single acquisition
 int RtActivationSum::process(ACE_Message_Block *mb) {
-  static int img = 0;
-  
   ACE_TRACE(("RtActivationSum::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
+
+  RtMRIImage *img = (RtMRIImage*)msg->getCurrentData();
+  int acqNum = img->getAcquisitionNum();
 
   // find the activation with the right roiID
   RtActivation *act 
@@ -82,16 +83,19 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
 
   // log the sum
   stringstream logs("");
-  logs << "activation sum: " << img << " " 
+  logs << "activation sum: " << acqNum << " " 
        << activationID << ":" << roiID  
        << " " << mean->getPixel(0) << endl;
   log(logs);
 
+  if(ofile.is_open()) {
+    ofile << acqNum << " " << mean->getPixel(0) << endl;
+    ofile.flush();
+  }
+
   cout << "done processing activation sum at ";
   printNow(cout);
   cout << endl;
-
-  img++;
 
   return 0;
 }

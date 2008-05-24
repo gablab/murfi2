@@ -23,7 +23,8 @@ RtFluctuationMonitor::RtFluctuationMonitor() : RtActivationEstimator() {
   needsInit = true;
   solvers = NULL;
   numData = 0;
-  estErrSumSq = NULL;
+  absEstErrSum = NULL;
+  numDataInErrSum = 0;
 
   triggerStim = false;
   isTriggered = false;
@@ -42,8 +43,8 @@ RtFluctuationMonitor::~RtFluctuationMonitor() {
     delete solvers;
   }
 
-  if(estErrSumSq != NULL) {
-    delete estErrSumSq;
+  if(absEstErrSum != NULL) {
+    delete absEstErrSum;
   }
 }
 
@@ -113,11 +114,11 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     }
 
     // setup the estimation error sum of squares
-    if(estErrSumSq != NULL) {
-      delete estErrSumSq;
+    if(absEstErrSum != NULL) {
+      delete absEstErrSum;
     }
-    estErrSumSq = new RtActivation(*dat);
-    estErrSumSq->initToZeros();
+    absEstErrSum = new RtActivation(*dat);
+    absEstErrSum->initToZeros();
 
     needsInit = false;
   }
@@ -144,8 +145,14 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
   }
   else if(isTriggered) {
     isTriggered = false;
+    dontInclude = false;
   }
 
+  // increment the number of included points
+  if(!dontInclude) {
+    numDataInErrSum++;      
+  }  
+  
   // set threshold
   if(numTimepoints > numTrends+1) {
     fluct->setThreshold(getTStatThreshold(1));
@@ -156,7 +163,7 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
   // build a design matrix xrow
   double *Xrow = new double[numConditions+numTrends];
   for(unsigned int i = 0; i < numTrends; i++) {
-    Xrow[i] = trends->get(numTimepoints-1,i);
+    Xrow[i] = trends.get(numTimepoints-1,i);
   }
 
   //// compute t map for each element
@@ -168,37 +175,57 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     }
 
     double y = dat->getElement(i);
-    if(!dontInclude) {
-      solvers[i]->include(&y,Xrow,1.0);
-    }
-    else { // include a dummy timepoint
-      double *beta = solvers[i]->regress(0);
+    solvers[i]->include(&y,Xrow,1.0);
 
-      double est = 0.;
-      // build the estimate
-      for(unsigned int j = 0; j < numTrends; j++) {
-	est += beta[j]*trends->get(numTimepoints-1,j);
-      }
-
-      solvers[i]->include(&est,Xrow,1.0);
-      delete beta;
-    }
+    // old method for discounting time points
+//    if(!dontInclude) {
+//      solvers[i]->include(&y,Xrow,1.0);
+//    }
+//    else { // include a dummy timepoint
+//      double *beta = solvers[i]->regress(0);
+//
+//      double est = 0.;
+//      // build the estimate
+//      for(unsigned int j = 0; j < numTrends; j++) {
+//	est += beta[j]*trends.get(numTimepoints-1,j);
+//      }
+//
+//      solvers[i]->include(&est,Xrow,1.0);
+//      delete beta;
+//    }
 
     double *beta = solvers[i]->regress(0);
     double err = y;
 
     // subtract the reconstruction based on trend fit
     for(unsigned int j = 0; j < numTrends; j++) {
-      err -= beta[j]*trends->get(numTimepoints-1,j);
+      err -= beta[j]*trends.get(numTimepoints-1,j);
     }
 
-    estErrSumSq->setPixel(i, estErrSumSq->getPixel(i) + err*err);
+    double stdDev;
+    if(!dontInclude) {
+      absEstErrSum->setPixel(i, absEstErrSum->getPixel(i) + fabs(err));
+    }
+    stdDev = absEstErrSum->getPixel(i)/(numDataInErrSum-1);
 
-    fluct->setPixel(i,
-		    sqrt((numTimepoints)/estErrSumSq->getPixel(i)) * err);
+    fluct->setPixel(i, err/stdDev);
+
+    if(dumpAlgoVars && numTimepoints > 2) {
+      dumpFile 
+	<< numTimepoints << " " 
+	<< i << " " 
+	<< y << " "
+	<< err << " "
+	<< stdDev << " "
+	<< fluct->getPixel(i) << " "
+	<< dontInclude;
+      for(int b = 0; b < numConditions; b++) {
+	dumpFile << beta[b] << " ";
+      }
+      dumpFile << endl;
+    }
 
     delete beta;
-
   }
   //  cout << "sum = " << sum << endl;
 
@@ -214,6 +241,21 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
   return 0;
 }
 
+
+// start a logfile 
+void RtFluctuationMonitor::startDumpAlgoVarsFile() {
+  dumpFile << "started at ";
+  printNow(dumpFile);
+  dumpFile << endl
+	   << "time_point "
+	   << "voxel_index "
+	   << "voxel_intensity "
+	   << "activation_signal "
+	   << "std_dev "
+	   << "fluctuation "
+	   << "skipping ";
+  dumpFile << "end" << endl;  
+}
 
 /*****************************************************************************
  * $Source$

@@ -50,27 +50,10 @@ protected:
   //  first acquired image to use as a template for parameter inits
   void initEstimation(RtMRIImage &image);
 
-  // initialize the baseline mean estimation parameters to match an image
-  void initBaselineMeans(RtMRIImage *img);
-
-  // deallocate all baseline mean related images
-  void deleteBaselineMeans();
+  // start a logfile 
+  virtual void startDumpAlgoVarsFile();
 
   //// parameters of the activation estimation algorithm
-
-  // threshold on each condition vector below which will be considered the
-  // baseline for that condition. necessary because of convolution with hrf.
-  // TODO: consider having a global baseline in which the baseline is
-  // considered as only when all condition vectors are below some threshold
-  vnl_vector<double> baselineThreshold; // numConditions in length
-  
-  //// auxiliary variables
-
-  // mean activation for each baseline condition
-  vector<RtActivation*> baselineMeans; // numConditions in length
-
-  // number of samples we have so far in the current baseline for each condition
-  vnl_vector<unsigned int> numBaselineTimepoints; // numConditions in length
  
   // number of data points to process
   unsigned int numData;
@@ -78,8 +61,13 @@ protected:
   // one solver for each voxel 
   RtLeastSquaresSolve **solvers;
 
-  // store the per pixel sum of squared error for the single image model fit
-  RtActivation *estErrSumSq;
+  //// error estimation params
+
+  // store the per pixel sum of absolute error for the single image model fit
+  RtActivation *absEstErrSum;
+
+  // the amount of data to use in the estimation of the error
+  int numDataPointsForErrEst;
 };
 
 #endif

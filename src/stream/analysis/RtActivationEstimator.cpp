@@ -318,6 +318,7 @@ bool RtActivationEstimator::finishInit() {
     }
     else {
       cout << "failed to load mask from " << mask.getFilename() << endl;
+      putMaskOnMessage = false;
     }
 
     // mosaic if we need to
@@ -350,12 +351,14 @@ bool RtActivationEstimator::finishInit() {
 }
 
 #include"printVnlMat.cpp"
+#include"printVnlVector.cpp"
 
 // build the condition regressors
 void RtActivationEstimator::buildConditions() {
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
   buildHRF(hrf, tr, 1/16.0, 32);
+  //printVnlVector(hrf);
 
   // debugging
 //static Gnuplot g1;
@@ -408,6 +411,7 @@ void RtActivationEstimator::buildConditions() {
     col.update(convhrfcol.extract(col.size()));
     conditions.set_column(i,col);
   }
+  //printVnlMat(conditions);
 }
 
 // build the trend regressors

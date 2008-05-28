@@ -66,8 +66,14 @@ protected:
   // store the per pixel sum of absolute error for the single image model fit
   RtActivation *absEstErrSum;
 
+  // number of data actually in the error estimate so far
+  int numDataPointsInErrEst;
+
   // the amount of data to use in the estimation of the error
   int numDataPointsForErrEst;
+
+  // whether errors should only be estimated in baseline
+  bool onlyEstErrInBaseline;
 };
 
 #endif

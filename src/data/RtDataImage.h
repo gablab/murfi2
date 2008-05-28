@@ -1119,6 +1119,20 @@ bool RtDataImage<T>::flipLR() {
   return true;
 }
 
+// flip each slice AP
+//template<class T>
+//bool RtDataImage<T>::flipAP() {
+//  for(unsigned int col = 0; col < getNumPix()/matrixSize; col++) {
+//    for(unsigned int j = 0, begInd = col*matrixSize; j < matrixSize/2; j++) {
+//      T tmp = data[begInd+j];
+//      data[begInd+j] = data[begInd+matrixSize-1-j];
+//      data[begInd+matrixSize-1-j] = tmp;
+//    }
+//  }
+//
+//  return true;
+//}
+
 // convert from a mosaic representation
 template<class T>
 bool RtDataImage<T>::unmosaic() {
@@ -1195,7 +1209,7 @@ bool RtDataImage<T>::unmosaic() {
 template<class T>
 bool RtDataImage<T>::mosaic() {
   // validate
-  if(dims.size() != 3) { // dims
+  if(dims.size() != 3 && !(dims.size() == 4 && dims[3] == 1)) { // dims
     cerr << "can't mosaic an image with " << dims.size() << " dimensions"
 	 << endl;
     return false;

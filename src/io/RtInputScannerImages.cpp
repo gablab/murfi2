@@ -361,7 +361,7 @@ string RtInputScannerImages::getImageFilename(int _seriesNum,
 //  out
 //   true if this image is the first in a series
 bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
-  return info.iAcquisitionNumber == 0;
+  return info.iAcquisitionNumber == 1;
 }
 
 // gets the next series number to be saved in the current image directory
@@ -371,7 +371,7 @@ unsigned int RtInputScannerImages::getNextSeriesNum() {
   string fname;
 
   for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
-    fname = getImageFilename(sn, 0);
+    fname = getImageFilename(sn, 1);
     fin.open(fname.c_str());
 
     if(fin.fail() ) {

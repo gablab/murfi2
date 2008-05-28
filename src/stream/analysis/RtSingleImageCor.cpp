@@ -21,6 +21,7 @@ RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   numData = 0;
   absEstErrSum = NULL;
   numDataPointsForErrEst = INT_MAX;
+  onlyEstErrInBaseline = false;
 }
 
 // destructor
@@ -52,6 +53,9 @@ bool RtSingleImageCor::processOption(const string &name, const string &text) {
   if(name == "numDataPointsForErrEst") {
     return RtConfigVal::convert<int>(numDataPointsForErrEst,text);    
   }
+  if(name == "onlyEstErrInBaseline") {
+    return RtConfigVal::convert<bool>(onlyEstErrInBaseline,text);    
+  }
 
   return RtActivationEstimator::processOption(name, text);
 }
@@ -78,6 +82,8 @@ void RtSingleImageCor::initEstimation(RtMRIImage &image) {
   absEstErrSum = new RtActivation(image);
   absEstErrSum->initToZeros();
 
+  numDataPointsInErrEst = 0;
+
   needsInit = false;
 }
 
@@ -91,7 +97,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   // get the current image to operate on
-  RtMRIImage *dat = (RtMRIImage*)msg->getCurrentData();
+  RtMRIImage *dat = (RtMRIImage*) msg->getCurrentData();
 
   if(dat == NULL) {
     cout << "RtSingleImageCor::process: data passed is NULL" << endl;
@@ -131,8 +137,26 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   for(unsigned int i = 0; i < numTrends; i++) {
     Xrow[i] = trends.get(numTimepoints-1,i);
   }
+
+  bool anyOverZero = false;
   for(unsigned int i = 0; i < numConditions; i++) {
     Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
+
+    // check for on condition for any stimulus
+    if(Xrow[i+numTrends] > 0) {
+      anyOverZero = true;
+    }
+  }
+
+  // check if we should include this timepoint in variance computation
+  bool includeInErr;
+  if((numTimepoints > numDataPointsForErrEst)
+     || (onlyEstErrInBaseline && anyOverZero)) {
+    includeInErr = false;
+  }
+  else {
+    includeInErr = true;
+    numDataPointsInErrEst++;
   }
 
   //// compute t map for each element
@@ -163,13 +187,11 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     
     // update the error in the estimate for the voxel
     double stdDev;
-    if(numTimepoints <= numDataPointsForErrEst) {
+    // check if we should include this timepoint in the error estimate
+    if(includeInErr) {
       absEstErrSum->setPixel(i, absEstErrSum->getPixel(i) + fabs(esterr));
-      stdDev = absEstErrSum->getPixel(i)/(numTimepoints-1);
     }
-    else {
-      stdDev = absEstErrSum->getPixel(i)/(numDataPointsForErrEst-1);
-    }
+    stdDev = absEstErrSum->getPixel(i)/(numDataPointsInErrEst-1);
 
     // compute the sds away from the mean
     cor->setPixel(i, err / stdDev);
@@ -180,10 +202,11 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 	<< i << " " 
 	<< y << " "
 	<< err << " "
+	<< conditions.get(numTimepoints-1,0) << " "
 	<< esterr << " "
 	<< stdDev << " "
 	<< cor->getPixel(i) << " ";
-      for(int b = 0; b < numConditions; b++) {
+      for(int b = 0; b < numTrends+numConditions; b++) {
 	dumpFile << beta[b] << " ";
       }
       dumpFile << endl;
@@ -215,10 +238,11 @@ void RtSingleImageCor::startDumpAlgoVarsFile() {
 	   << "voxel_index "
 	   << "voxel_intensity "
 	   << "activation_signal "
+	   << "condition "
 	   << "residual "
 	   << "std_dev "
 	   << "feedback ";
-  for(int b = 0; b < numConditions; b++) {
+  for(int b = 0; b < numTrends+numConditions; b++) {
     dumpFile << "beta[" << b << "] ";
   }
 

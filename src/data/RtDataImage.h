@@ -1236,33 +1236,28 @@ bool RtDataImage<T>::mosaic() {
   // reshape the data
   T *newdata = new T[numPix];
 
-  unsigned int row, col, newind;
+  unsigned int newrow, newcol, oldslc, newind;
   unsigned int sqMatrixSize = matrixSize*matrixSize;
   for(unsigned int i = 0; i < numPix; i++) {
+    oldslc = i/sqMatrixSize;
+
     // these expressions are bracketed carefully to truncate
-    row = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
-    col = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
-    newind = row*dims[1]+col;
-    newdata[newind] = data[i];
+    // DO NOT SIMPLIFY THESE EXPRESSIONS
+    newrow = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
+    newcol = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
+    newind = newrow*dims[1]+newcol;
+
+    // copy if within slices
+    if(oldslc < numSlices) {
+      newdata[newind] = data[i];
+    }
+    else { // fill the blank panels with zeros
+      newdata[newind] = 0;
+    }
   }
 
   delete data;
   data = newdata;
-
-  // reallocate data if mosaic is bigger
-  if(numPix > (unsigned int) matrixSize*matrixSize*numSlices) {
-    T *tmpdata = data;
-    data = new T[numPix];
-
-    // copy the first bit
-    memcpy(data,tmpdata,sizeof(T)*matrixSize*matrixSize*numSlices);
-    // loop so we can fill with zeros
-    for(unsigned int i = matrixSize*matrixSize*numSlices; i < numPix; i++) {
-      data[i] = 0;
-    }
-
-    delete tmpdata;
-  }
 
   return true;
 }

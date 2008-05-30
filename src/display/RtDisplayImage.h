@@ -95,8 +95,17 @@ protected:
 
   // data 
   RtMRIImage *img;
+  bool loadInitialImage;
+  string initialImageFilename;
+
   RtMaskImage *posMask;
+  bool loadInitialPosMask;
+  string initialPosMaskFilename;
+
   RtMaskImage *negMask;
+  bool loadInitialNegMask;
+  string initialNegMaskFilename;
+
   RtActivation *posOverlay;
   RtActivation *negOverlay;
   GLuint imageTex;

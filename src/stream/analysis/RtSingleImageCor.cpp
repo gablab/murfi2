@@ -22,6 +22,8 @@ RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   absEstErrSum = NULL;
   numDataPointsForErrEst = INT_MAX;
   onlyEstErrInBaseline = false;
+
+  conditionOfInterest = 0;
 }
 
 // destructor
@@ -55,6 +57,9 @@ bool RtSingleImageCor::processOption(const string &name, const string &text) {
   }
   if(name == "onlyEstErrInBaseline") {
     return RtConfigVal::convert<bool>(onlyEstErrInBaseline,text);    
+  }
+  if(name == "conditionOfInterest") {
+    return RtConfigVal::convert<unsigned int>(conditionOfInterest,text);    
   }
 
   return RtActivationEstimator::processOption(name, text);
@@ -173,17 +178,33 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     // get betas
     double *beta = solvers[i]->regress(0);
 
-    // get activation signal
+    // get activation signal take out everything except regressor of interest
+    unsigned int regressorOfInterestIndex = conditionOfInterest;
+    if(modelEachBlock) {
+      unsigned int blockNum = (numTimepoints > conditionShift)
+	? (numTimepoints-1-conditionShift)/blockLen : 0;
+      regressorOfInterestIndex 
+	= conditionOfInterest * numMeas/blockLen + blockNum;
+    }
+    if(modelTemporalDerivatives) {
+      regressorOfInterestIndex*=2;
+      //regressorOfInterestIndex++;
+    }
+    regressorOfInterestIndex+=numTrends;
+
     double err = y;
-    for(unsigned int j = 0; j < numTrends; j++) {
+    for(unsigned int j = 0; j < numTrends+numConditions; j++) {
+      if(j == regressorOfInterestIndex) {
+	continue;
+      }
       err -= beta[j]*Xrow[j];
     }
 
     // get estimation error
     double esterr = err;
-    for(unsigned int j = numTrends; j < numTrends+numConditions; j++) {
-      esterr -= beta[j]*Xrow[j];
-    }
+    //for(unsigned int j = numTrends; j < numTrends+numConditions; j++) {
+    esterr -= beta[regressorOfInterestIndex]*Xrow[regressorOfInterestIndex];
+    //}
     
     // update the error in the estimate for the voxel
     double stdDev;

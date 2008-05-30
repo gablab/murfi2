@@ -118,6 +118,9 @@ protected:
   unsigned int numConditions;
   vnl_matrix<double> conditions;
   unsigned int conditionShift;  // shift all condition regressors
+
+  bool modelTemporalDerivatives;
+
   bool modelEachBlock;
   unsigned int blockLen;
 

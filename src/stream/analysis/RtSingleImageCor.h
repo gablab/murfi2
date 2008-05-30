@@ -55,6 +55,9 @@ protected:
 
   //// parameters of the activation estimation algorithm
  
+  // index of the condition of interest
+  unsigned int conditionOfInterest;
+
   // number of data points to process
   unsigned int numData;
 

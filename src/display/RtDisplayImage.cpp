@@ -65,6 +65,10 @@ RtDisplayImage::RtDisplayImage() {
   img = NULL; 
   imageTex = 0; 
   imageDisplayType = ID_SCANNERIMG;
+
+  loadInitialImage = false;
+  initialImageFilename = "";
+
   posOverlayTex = 0; 
   negOverlayTex = 0; 
   posMaskTex = 0; 
@@ -194,6 +198,21 @@ bool RtDisplayImage::open(RtConfig &config) {
   strcpy(title, config.isSet("display:imageWinTitle")
 	 ? config.get("display:imageWinTitle").str().c_str() : DEFAULT_TITLE);
 
+  if(config.isSet("display:initialImage")) {
+    initialImageFilename = config.get("display:initialImage").str();
+    loadInitialImage = true;
+  }
+
+  if(config.isSet("display:initialPosMask")) {
+    initialPosMaskFilename = config.get("display:initialPosMask").str();
+    loadInitialPosMask = true;
+  }
+
+  if(config.isSet("display:initialNegMask")) {
+    initialNegMaskFilename = config.get("display:initialNegMask").str();
+    loadInitialNegMask = true;
+  }
+
   if(config.isSet("display:overlayID")) {
     posOverlayID = config.get("display:overlayID").str();
     posOverlayOn = true;
@@ -299,6 +318,48 @@ bool RtDisplayImage::init() {
   glLoadIdentity();
   glOrtho(0.0, (double) width, 0.0, (double) height, 1.0, -1.0);
 
+  if(loadInitialImage) {
+    img = new RtMRIImage();
+    if(!img->read(initialImageFilename)) {
+      cout << "couldn't read initial image to display" << endl;
+    }
+    else { // success
+      // unmosaic?
+      if(img->getDims().size() > 2) {
+	img->mosaic();
+      }
+      newTex = true;
+    }
+  }
+
+  if(loadInitialPosMask) {
+    posMask = new RtMaskImage();
+    if(!posMask->read(initialPosMaskFilename)) {
+      cout << "couldn't read initial pos mask to display" << endl;
+    }
+    else { // success
+      // unmosaic?
+      if(posMask->getDims().size() > 2) {
+	posMask->mosaic();
+      }
+      newPosMask = true;
+    }
+  }
+
+  if(loadInitialNegMask) {
+    negMask = new RtMaskImage();
+    if(!negMask->read(initialNegMaskFilename)) {
+      cout << "couldn't read initial neg mask to display" << endl;
+    }
+    else { // success
+      // unmosaic?
+      if(negMask->getDims().size() > 2) {
+	negMask->mosaic();
+      }
+      newNegMask = true;
+    }
+  }
+
   return true;
 }
 
@@ -368,6 +429,12 @@ void RtDisplayImage::setData(RtData *data) {
 
   // handle pos mask
   if(data->getID() == posMaskID && data->getRoiID() == posMaskRoiID) {
+    // delete existing if we loaded it from a file
+    if(loadInitialPosMask && posMask) {
+      // memory leak??
+      //delete posMask;
+    }
+
     posMask = (RtMaskImage*) data;
     newPosMask = true;
 
@@ -377,6 +444,12 @@ void RtDisplayImage::setData(RtData *data) {
 
   // handle neg mask
   if(data->getID() == negMaskID && data->getRoiID() == negMaskRoiID) {
+    // delete existing if we loaded it from a file
+    if(loadInitialNegMask && negMask) {
+      // memory leak??
+      //delete negMask;
+    }
+
     negMask = (RtMaskImage*) data;
     newNegMask = true;
 
@@ -388,6 +461,14 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() != imageDisplayType) {
     ACE_DEBUG((LM_DEBUG, "ignoring image of type %s\n", data->getID()));
     return;
+  }
+  
+  // MUST BE AN IMAGE?
+
+  // delete existing if we loaded it from a file
+  if(loadInitialImage && img) {
+    // memory leak??
+    //delete img;
   }
 
   img = (RtMRIImage*) data;
@@ -441,8 +522,8 @@ void RtDisplayImage::makeTexture() {
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, imageTex);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, img->getDim(0),
 	       img->getDim(1), 0, GL_LUMINANCE,
 	       GL_SHORT, img->getData());
@@ -675,8 +756,8 @@ void RtDisplayImage::makeNegMaskTexture() {
 //   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, tex);
 //   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT);
 //   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 //   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, width, height, 0, format, type, img); 
 //   free(img);
 // }

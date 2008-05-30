@@ -36,6 +36,9 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   numTrends = numConditions = numMeas = 0;
   numTimepoints = 0;
   conditionShift = 0;
+
+  modelTemporalDerivatives = false;
+
   modelEachBlock = false;
   blockLen = 0;
 
@@ -162,6 +165,9 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
   }
   if(name == "conditionshift") {
     return RtConfigVal::convert<unsigned int>(conditionShift,text);
+  }
+  if(name == "modelTemporalDerivatives") {
+    return RtConfigVal::convert<bool>(modelTemporalDerivatives,text);
   }
   if(name == "modelEachBlock") {
     return RtConfigVal::convert<bool>(modelEachBlock,text);
@@ -411,7 +417,33 @@ void RtActivationEstimator::buildConditions() {
     col.update(convhrfcol.extract(col.size()));
     conditions.set_column(i,col);
   }
-  //printVnlMat(conditions);
+
+  // add columns for temporal derivatives if required
+  if(modelTemporalDerivatives) {
+    // make a new condition matrix
+    vnl_matrix<double> newConds(numMeas, 2*numConditions);
+    newConds.fill(0);
+
+    for(unsigned int cond=0; cond < numConditions; cond++) {
+      // copy regressor of interest
+      newConds.set_column(2*cond, conditions.get_column(cond));
+
+      // compute derivative for one condition for each measurement
+      for(unsigned int meas=1; meas < numMeas; meas++) {
+	newConds.put(meas, 2*cond+1, 
+		     conditions[meas][cond]-conditions[meas-1][cond]);
+      }
+    }
+//     cout << "conds" << endl;
+//     printVnlMat(conditions);
+//    cout << endl;
+
+    conditions = newConds;
+    numConditions*=2;    
+
+    //printVnlMat(conditions);
+  }
+
 }
 
 // build the trend regressors

@@ -82,7 +82,7 @@
     <output>display</output>
 
     <option name="conditionshift">8</option>
-    <option name="condition">
+    <option name="condition" sign="1" contrastweight="1">
       1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 
     </option>
 

@@ -24,6 +24,7 @@ RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   onlyEstErrInBaseline = false;
 
   conditionOfInterest = 0;
+  feedbackConditionSwitching = false;
 }
 
 // destructor
@@ -60,6 +61,9 @@ bool RtSingleImageCor::processOption(const string &name, const string &text) {
   }
   if(name == "conditionOfInterest") {
     return RtConfigVal::convert<unsigned int>(conditionOfInterest,text);    
+  }
+  if(name == "feedbackConditionSwitching") {
+    return RtConfigVal::convert<bool>(feedbackConditionSwitching,text);    
   }
 
   return RtActivationEstimator::processOption(name, text);
@@ -137,20 +141,36 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
   //// element independent setup
 
-  // build a design matrix xrow
+  /// build a design matrix xrow
+
+  // copy the trends
   double *Xrow = new double[numConditions+numTrends];
   for(unsigned int i = 0; i < numTrends; i++) {
     Xrow[i] = trends.get(numTimepoints-1,i);
   }
 
+  // copy the conditions
+  // also: search for the maximum magnitude condition regressor 
+  // also: check for any regressor over zero
+  unsigned int maxMagnitudeCondInd = 0;
   bool anyOverZero = false;
   for(unsigned int i = 0; i < numConditions; i++) {
     Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
 
+    // check for max amplitude condition
+    if(fabs(Xrow[numTrends+i]) > fabs(Xrow[numTrends+maxMagnitudeCondInd])) {
+      maxMagnitudeCondInd = numTrends-i;
+    }
     // check for on condition for any stimulus
     if(Xrow[i+numTrends] > 0) {
       anyOverZero = true;
     }
+  }
+
+  // switch conditions to max magnitude if condition switching on
+  if(feedbackConditionSwitching) {
+    conditionOfInterest = maxMagnitudeCondInd;
+    cout << "condition of interest is " << conditionOfInterest << endl;
   }
 
   // check if we should include this timepoint in variance computation

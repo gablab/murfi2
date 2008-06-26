@@ -58,6 +58,9 @@ protected:
   // index of the condition of interest
   unsigned int conditionOfInterest;
 
+  // whether to switch feedback conditions dynamically 
+  bool feedbackConditionSwitching;
+
   // number of data points to process
   unsigned int numData;
 

@@ -84,8 +84,17 @@ RtDisplayImage::RtDisplayImage() {
 
   posOverlayOn = false;
   negOverlayOn = false;
+
+
   posMaskOn = false;
+  loadInitialPosMask = false;
+  initialPosMaskFilename = "";
+  flipInitialPosMask = false;
+
   negMaskOn = false;
+  loadInitialNegMask = false;
+  initialNegMaskFilename = "";
+  flipInitialNegMask = false;
 
   addToID(":display");
 
@@ -207,10 +216,20 @@ bool RtDisplayImage::open(RtConfig &config) {
     initialPosMaskFilename = config.get("display:initialPosMask").str();
     loadInitialPosMask = true;
   }
+  
+  if(config.isSet("display:flipInitialPosMask") 
+     && config.get("display:flipInitialPosMask") == true) {  
+    flipInitialPosMask = true;
+  }
 
   if(config.isSet("display:initialNegMask")) {
     initialNegMaskFilename = config.get("display:initialNegMask").str();
     loadInitialNegMask = true;
+  }
+
+  if(config.isSet("display:flipInitialNegMask") 
+     && config.get("display:flipInitialNegMask") == true) {  
+    flipInitialNegMask = true;
   }
 
   if(config.isSet("display:overlayID")) {
@@ -342,6 +361,9 @@ bool RtDisplayImage::init() {
       if(posMask->getDims().size() > 2) {
 	posMask->mosaic();
       }
+      if(flipInitialPosMask) {
+	posMask->flipLR();
+      }
       newPosMask = true;
     }
   }
@@ -355,6 +377,9 @@ bool RtDisplayImage::init() {
       // unmosaic?
       if(negMask->getDims().size() > 2) {
 	negMask->mosaic();
+      }
+      if(flipInitialNegMask) {
+	 negMask->flipLR();
       }
       newNegMask = true;
     }

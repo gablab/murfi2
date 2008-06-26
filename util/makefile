@@ -1,4 +1,4 @@
-all: thresholdnifti threshold2masknifti flipnifti intersectniftimask
+all: thresholdnifti threshold2masknifti flipnifti intersectniftimask make_design_matrix  make_stim_design
 clean: 
 	rm *.o thresholdnifti threshold2masknifti flipnifti
 
@@ -14,3 +14,8 @@ flipnifti: flipnifti.cpp
 intersectniftimask: intersectniftimask.cpp
 	g++ -g -o intersectniftimask intersectniftimask.cpp -lniftiio -I/usr/include/nifti
 
+make_design_matrix: make_design_matrix.cpp
+	g++ -g -o make_design_matrix make_design_matrix.cpp -lvnl -lvnl_algo -I/usr/local/include/vxl/core -I/usr/local/include/vxl/vcl
+
+make_stim_design: make_stim_design.cpp
+	g++ -g -o make_stim_design make_stim_design.cpp -lvnl -I/usr/local/include/vxl/core -I/usr/local/include/vxl/vcl

@@ -101,10 +101,12 @@ protected:
   RtMaskImage *posMask;
   bool loadInitialPosMask;
   string initialPosMaskFilename;
+  bool flipInitialPosMask;
 
   RtMaskImage *negMask;
   bool loadInitialNegMask;
   string initialNegMaskFilename;
+  bool flipInitialNegMask;
 
   RtActivation *posOverlay;
   RtActivation *negOverlay;

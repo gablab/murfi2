@@ -71,6 +71,9 @@ protected:
   RtActivation *absEstErrSum;
   int numDataInErrSum;
 
+  // the amount of data to use in the estimation of the error
+  int numDataPointsForErrEst;
+
   // for task triggering based on activation sum
   bool triggerStim;
   bool isTriggered;  

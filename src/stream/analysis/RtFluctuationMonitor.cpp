@@ -25,6 +25,7 @@ RtFluctuationMonitor::RtFluctuationMonitor() : RtActivationEstimator() {
   numData = 0;
   absEstErrSum = NULL;
   numDataInErrSum = 0;
+  numDataPointsForErrEst = INT_MAX;
 
   triggerStim = false;
   isTriggered = false;
@@ -73,6 +74,9 @@ bool RtFluctuationMonitor::processOption(const string &name, const string &text)
   }
   if(name == "afterTriggerSkip") {
     return RtConfigVal::convert<int>(afterTriggerSkip,text);
+  }
+  if(name == "numDataPointsForErrEst") {
+    return RtConfigVal::convert<int>(numDataPointsForErrEst,text);    
   }
 
   return RtActivationEstimator::processOption(name, text);
@@ -136,16 +140,21 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   //// element independent setup
 
-  // check the time since triggers
+  
   bool dontInclude = false;
-  if(isTriggered && afterTriggerSkip >= numImagesSinceTrigger++) {
-    cout << "waiting for triggered stim... " << numImagesSinceTrigger << " of "  << afterTriggerSkip << endl;
-
+  if(numTimepoints > numDataPointsForErrEst) { // check for out of error est region
     dontInclude = true;
   }
-  else if(isTriggered) {
-    isTriggered = false;
-    dontInclude = false;
+  else { // check the time since triggers
+    if(isTriggered && afterTriggerSkip >= numImagesSinceTrigger++) {
+      cout << "waiting for triggered stim... " << numImagesSinceTrigger << " of "  << afterTriggerSkip << endl;
+      
+      dontInclude = true;
+    }
+    else if(isTriggered) {
+      isTriggered = false;
+      dontInclude = false;
+    }
   }
 
   // increment the number of included points

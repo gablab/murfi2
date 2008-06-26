@@ -64,11 +64,21 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
   RtActivation *negact 
     = (RtActivation*) msg->getDataByIDAndRoiID(negActivationSumID,negRoiID);
 
-  if(posact == NULL || negact == NULL) {
-    cout << "activation-sum-difference: couldn't find required rois" << endl;
-    ACE_DEBUG((LM_INFO, "RtActivationSumDifference::process: pos or neg activation passed is NULL\n"));
-    return 0;
+  double p = 0;
+  if(posact != NULL) {
+    p = posact->getPixel(0);
   }
+
+  double n = 0;
+  if(negact != NULL) {
+    n = negact->getPixel(0);
+  }
+
+ //  if(posact == NULL || negact == NULL) {
+//     cout << "activation-sum-difference: couldn't find required rois" << endl;
+//     ACE_DEBUG((LM_INFO, "RtActivationSumDifference::process: pos or neg activation passed is NULL\n"));
+//     return 0;
+//   }
   
   ACE_DEBUG((LM_DEBUG, "differencing  activations for image %d\n", 
 	     img->getAcquisitionNum()));
@@ -77,10 +87,9 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
   RtActivation *diff = new RtActivation(1);
 
   // compute the difference
-  diff->setPixel(0, posact->getPixel(0) - negact->getPixel(0));
+  diff->setPixel(0,  p - n);
 
-  cout << diff->getPixel(0) << " = " << posact->getPixel(0) << " - " 
-       << negact->getPixel(0) << endl;
+  cout << diff->getPixel(0) << " = " << p << " - " << n << endl;
 
   // set the image id for handling
   diff->addToID("activation-sum-difference");

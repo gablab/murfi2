@@ -1,4 +1,4 @@
-all: thresholdnifti threshold2masknifti flipnifti intersectniftimask make_design_matrix  make_stim_design
+all: thresholdnifti threshold2masknifti flipnifti intersectniftimask unmosaic_nifti
 clean: 
 	rm *.o thresholdnifti threshold2masknifti flipnifti
 
@@ -10,6 +10,9 @@ threshold2masknifti: threshold2masknifti.cpp
 
 flipnifti: flipnifti.cpp
 	g++ -g -o flipnifti flipnifti.cpp -lniftiio -I/usr/include/nifti
+
+unmosaic_nifti: unmosaic_nifti.cpp
+	g++ -g -o unmosaic_nifti unmosaic_nifti.cpp -lniftiio -I/usr/include/nifti
 
 intersectniftimask: intersectniftimask.cpp
 	g++ -g -o intersectniftimask intersectniftimask.cpp -lniftiio -I/usr/include/nifti

@@ -6,7 +6,6 @@ Installation Instructions
 Requirements:
 *************************
   -cvs
-    -sudo apt-get install cvs
   -libraries
     -libace-dev
     -freeglut3-dev
@@ -15,24 +14,22 @@ Requirements:
     -libxi-dev
     -libxmu-dev
     -gnuplot
-  -download/build VXL (vxl.sourceforge.net)
-    -steps
-      -atighe@atighe:~$ cd /usr/local
-      -atighe@atighe:~/usr/local$ sudo mkdir vxl
-      -atighe@atighe:~/usr/local$ sudo chown atighe ./vxl/
-      -atighe@atighe:~/usr/local$ cd vxl
-      -atighe@atighe:~/usr/local/vxl$ ccmake ~/Desktop/vxl-1.10.0/ #this is the downloaded file
-      -atighe@atighe:~/usr/local/vxl$ sudo make install
+    -vxl
+    -libniftiio
   -in .bashrc file:
-    -export CVSROOT=:ext:atighe@her.mit.edu:/home/rtcvs
+    -export CVSROOT=:ext:user@her.mit.edu:/home/rtcvs
     -export CVS_RSH=ssh
     -export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 *************************
 Installation/Compilation:
 *************************
-1.  atighe@atighe:~/realtime$ cvs co system
-2.  atighe@atighe:~/realtime/system$ sudo app-get install g++
+
+-- first install required packages.
+this command will install all the apt-get-able packages you need:
+
+$ sudo apt-get install cvs g++ cmake libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev libniftiio1-dev gnuplot
+
 <snip>
 Media change: please insert the disc labeled
  'Ubuntu 7.10 _Gutsy Gibbon_ - Release amd64 (20071016)'
@@ -40,16 +37,26 @@ in the drive '/cdrom/' and press enter
 
 [Note: If you get the above message, cd to /etc/apt, comment "deb cdrom" line in sources.list, and rerun apt-get]
 
-3.  atighe@atighe:~/realtime/system$ sudo apt-get install libace-dev
-4.  Add "#define _REENTRANT" in /usr/include/ace/config-lite.h above "#include "ace/config.h""
-5.  atighe@atighe:~/realtime/system$ sudo apt-get install freeglut3-dev
-6.  atighe@atighe:~/realtime/system$ sudo apt-get install libgsl0-dev
-7.  atighe@atighe:~/realtime/system$ sudo apt-get install cmake
-8.  atighe@atighe:~/realtime/system$ sudo apt-get install libxi-dev
-9.  atighe@atighe:~/realtime/system$ sudo apt-get install libxmu-dev
-10. atighe@atighe:~/realtime/system$ sudo apt-get install gnuplot
 
-11. For 64-bit machines, make the following changes:
+-- now check out the system
+$ cvs -d :ext:user@her.mit.edu/home/rtcvs co system
+
+
+-- Add "#define _REENTRANT" in /usr/include/ace/config-lite.h above "#include "ace/config.h""
+
+
+-download/build VXL (vxl.sourceforge.net)
+  -steps
+    $ cd /usr/local
+    $ sudo mkdir vxl
+    $ sudo chown user:user ./vxl/
+    $ cd vxl
+    $ ccmake ~/Desktop/vxl-1.10.0/ #this is the downloaded file
+    $ sudo make install
+
+
+-- shouldn't need this anymore (hopefully)
+For 64-bit machines, make the following changes:
 1: ~/realtime/system/src/stream/analysis/RtActivationEstimator.cpp
 
 94c94
@@ -64,7 +71,11 @@ in the drive '/cdrom/' and press enter
 ---
 >     for(unsigned long i1 = 0, i2 = text.find(" "); 1; 
 
-12. atighe@atighe:~/realtime/system$ make
+-- make the realtime system
+
+$ cd system
+$ make
+
 make: building real for linux...
 <snip>
 ############################################

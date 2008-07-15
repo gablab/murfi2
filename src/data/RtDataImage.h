@@ -17,6 +17,7 @@
 #include<vnl/vnl_matrix_fixed.h>
 #include<gsl_vector.h>
 #include"RtData.h"
+#include"dirent.h"
 #include"nifti1_io.h"
 
 using namespace std;
@@ -170,6 +171,8 @@ public:
 
   // convert from a mosaic representation
   bool unmosaic();
+  
+  bool isMosaic();
 
   //********  methods for getting data from the image *******//
 
@@ -1176,17 +1179,22 @@ bool RtDataImage<T>::unmosaic() {
   pixdims[2] = sliceThick*(1+sliceGap);
 
   // reshape the data
+  numPix = matrixSize*matrixSize*numSlices;
   T *newdata = new T[numPix];
 
   unsigned int slc, row, col, newind;
   unsigned int sqMatrixSize = matrixSize*matrixSize;
-  for(unsigned int i = 0; i < numPix; i++) {
+  for(unsigned int i = 0; i < width*height; i++) {
     slc = (i%width)/matrixSize +
       (i/(matrixSize*width))*(width/matrixSize);
     row = (i/width)%matrixSize;
     col = i%matrixSize;
-    newind = slc*sqMatrixSize+row*matrixSize+col;
 
+    if(slc > numSlices) {
+      continue;
+    }
+
+    newind = slc*sqMatrixSize+row*matrixSize+col;
  //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
     newdata[newind] = data[i];
   }
@@ -1260,6 +1268,12 @@ bool RtDataImage<T>::mosaic() {
   data = newdata;
 
   return true;
+}
+
+// test for a mosaic representation
+template<class T>
+bool RtDataImage<T>::isMosaic() {
+  return dims[0] != matrixSize;
 }
 
 // initialize to all zeros

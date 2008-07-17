@@ -134,6 +134,11 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     return -1;
   }
 
+  //debug
+    cout << "fluct mon started at ";
+    printNow(cout);
+    cout << endl;
+
   // allocate a new data image for the estimation
   RtActivation *fluct = new RtActivation(*dat);
   fluct->initToZeros();
@@ -246,6 +251,10 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   setResult(msg,fluct);
 
+  //debug
+    cout << "fluct mon finished at ";
+    printNow(cout);
+    cout << endl;
 
   return 0;
 }

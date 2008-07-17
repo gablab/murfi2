@@ -133,8 +133,8 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     }
     
     double el;
-    unsigned int i = 0;
-    for(unsigned int i1 = 0, i2 = text.find(" "); 1; 
+    size_t i = 0;
+    for(size_t i1 = 0, i2 = text.find(" "); 1; 
 	i++, i1 = i2+1, i2 = text.find(" ", i1)) {
 
       if(!RtConfigVal::convert<double>(el, 
@@ -444,6 +444,11 @@ void RtActivationEstimator::buildConditions() {
     //printVnlMat(conditions);
   }
 
+}
+
+// test if a condition index is a derivative (index ignores trend regressors)
+bool RtActivationEstimator::conditionIsDerivative(unsigned int index) {
+  return modelTemporalDerivatives && index % 2;
 }
 
 // build the trend regressors

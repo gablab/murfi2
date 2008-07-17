@@ -88,7 +88,7 @@ bool unmosaic(nifti_image *img, int matrixSize, int numSlices, double sliceVoxDi
 
   img->data = (void*) newdata;
 
-  nifti_image_infodump(img);
+  //nifti_image_infodump(img);
   
 
   return true;
@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
   strcpy(img->fname, outfile.c_str());  
 
   // debugging
-  nifti_image_infodump(img);
+  //nifti_image_infodump(img);
 
   // write the file
   nifti_image_write(img);

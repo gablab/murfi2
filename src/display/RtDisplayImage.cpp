@@ -344,7 +344,7 @@ bool RtDisplayImage::init() {
     }
     else { // success
       // unmosaic?
-      if(img->getDims().size() > 2) {
+      if(img->isMosaic()) {
 	img->mosaic();
       }
       newTex = true;
@@ -358,7 +358,7 @@ bool RtDisplayImage::init() {
     }
     else { // success
       // unmosaic?
-      if(posMask->getDims().size() > 2) {
+      if(posMask->isMosaic()) {
 	posMask->mosaic();
       }
       if(flipInitialPosMask) {
@@ -375,7 +375,7 @@ bool RtDisplayImage::init() {
     }
     else { // success
       // unmosaic?
-      if(negMask->getDims().size() > 2) {
+      if(negMask->isMosaic()) {
 	negMask->mosaic();
       }
       if(flipInitialNegMask) {
@@ -531,7 +531,6 @@ void RtDisplayImage::makeTexture() {
     glPixelTransferf(GL_GREEN_SCALE, contrast);
     glPixelTransferf(GL_BLUE_SCALE,  contrast);
 
-
     /* brightness */
     float brightness = img->getAutoBrightness();
     glPixelTransferf(GL_RED_BIAS,   brightness);
@@ -549,9 +548,21 @@ void RtDisplayImage::makeTexture() {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  // unmosaic if needed
+//  bool remosaic = false;
+//  if(!img->isMosaic()) {
+//    img->mosaic();
+//    remosaic = true;
+//  }
+
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 1, img->getDim(0),
 	       img->getDim(1), 0, GL_LUMINANCE,
 	       GL_SHORT, img->getData());
+
+//  if(remosaic) {
+//    img->unmosaic();
+//  }
 
   //cout << "making texture " << imageTex << " from " << img << endl;
 
@@ -641,8 +652,8 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   }
 
   // debugging
-  cout << "thresh=" << overlay->getThreshold() << endl 
-       << "min=" << min << endl << "max=" << max << endl;
+//  cout << "thresh=" << overlay->getThreshold() << endl 
+//       << "min=" << min << endl << "max=" << max << endl;
 
   /* create the image texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_EXT, *overlayTex);
@@ -650,6 +661,7 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 4, overlay->getDim(0),
 	       overlay->getDim(1), 0, GL_RGBA,
 	       GL_SHORT, overlayImg);
@@ -691,9 +703,11 @@ void RtDisplayImage::makePosMaskTexture() {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 4, posMask->getDim(0),
 	       posMask->getDim(1), 0, GL_RGBA,
 	       GL_SHORT, posMaskImg);
+
 
   delete posMaskImg;
 
@@ -731,6 +745,7 @@ void RtDisplayImage::makeNegMaskTexture() {
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_RECTANGLE_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
   glTexImage2D(GL_TEXTURE_RECTANGLE_EXT, 0, 4, negMask->getDim(0),
 	       negMask->getDim(1), 0, GL_RGBA,
 	       GL_SHORT, negMaskImg);

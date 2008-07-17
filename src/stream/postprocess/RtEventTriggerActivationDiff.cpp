@@ -40,6 +40,11 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
 
   static int trsSinceTrigger = afterTriggerSkipTRs;
   
+  //debug
+    cout << "event trigger started at ";
+    printNow(cout);
+    cout << endl;
+
   // check if we need to skip triggers
   if(trsSinceTrigger < afterTriggerSkipTRs) {
     trsSinceTrigger++;
@@ -91,11 +96,12 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
 
     // log the trigger
     stringstream logs("");
-    logs << "trigger event good: " 
+    logs << "trigger event good at tr " << tr << ": " 
 	 << posact->getPixel(0) - negact->getPixel(0) << " >= " 
 	 << diffThresh << endl;
     log(logs);
 
+    // debug
     cout << "GOOD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
     cout << posact->getPixel(0) - negact->getPixel(0) << " " 
 	 << diffThresh << endl;
@@ -117,13 +123,20 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
 	 << posact->getPixel(0) - negact->getPixel(0) << " <= " 
 	 << -diffThresh << endl;
     log(logs);
-
+    
+    // debug
     cout << "BAD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
     cout << posact->getPixel(0) - negact->getPixel(0) 
 	 << " " << diffThresh << endl;
 
     trsSinceTrigger = 0;
   }
+
+  //debug
+    cout << "event trigger finished at ";
+    printNow(cout);
+    cout << endl;
+
   
   return 0;
 }

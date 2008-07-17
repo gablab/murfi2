@@ -90,6 +90,9 @@ protected:
   // build the condition regressors
   virtual void buildConditions();
 
+  // test if a condition index is a derivative (index ignores trend regressors)
+  virtual bool conditionIsDerivative(unsigned int index);
+
   // build the trend regressors
   virtual void buildTrends();
 

@@ -158,8 +158,10 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
 
     // check for max amplitude condition
-    if(fabs(Xrow[numTrends+i]) > fabs(Xrow[numTrends+maxMagnitudeCondInd])) {
-      maxMagnitudeCondInd = numTrends-i;
+    if(fabs(Xrow[numTrends+i]) > fabs(Xrow[numTrends+maxMagnitudeCondInd])
+       && !(modelTemporalDerivatives && conditionIsDerivative(i))
+       ) {
+      maxMagnitudeCondInd = numTrends+i;
     }
     // check for on condition for any stimulus
     if(Xrow[i+numTrends] > 0) {

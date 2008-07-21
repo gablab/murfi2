@@ -10,7 +10,7 @@
 OS=linux
 
 # project name
-export PROJECT = real
+export PROJECT = festr
 
 # whether to compile with debug, optimize flags
 export DEBUG = 0

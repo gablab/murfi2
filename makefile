@@ -157,7 +157,11 @@ setdebug:
 	export OPTIM 0
 	export STRIP 0
 
-$(PROJECT): $(OBJ_FILES)
+dirs: 
+	mkdir -p $(OBJ_DIR)
+	mkdir -p $(BIN_DIR)
+
+$(PROJECT): dirs $(OBJ_FILES)
 	@$(ECHO) 'make: building $@ for $(OS)...'
 	cd $(SRC_DIR) && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS) 

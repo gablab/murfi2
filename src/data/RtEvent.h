@@ -11,6 +11,8 @@
 #include"RtData.h"
 #include"tinyxml/tinyxml.h"
 
+#include "ace/Log_Msg.h"
+
 
 // class declaration
 class RtEvent : public RtData {

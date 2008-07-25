@@ -1,3 +1,7 @@
+#include<vnl/vnl_matrix.h>
+#include <iostream>
+
+using namespace std;
 
 void printVnlMat(vnl_matrix<double> &m) {
   for(int i = 0; i < m.rows(); i++) {

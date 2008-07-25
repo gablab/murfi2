@@ -176,7 +176,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 //    a(vi,vj,vk) = c(vi,vj,vk,L+1)/C(L+1,L+1);
 
     if(numTimepoints > numTrends+1) {
-      cor->setPixel(i, sqrt(numTimepoints-numTrends-1) 
+      cor->setPixel(i, sqrt((double)(numTimepoints-numTrends-1)) 
 		    * c->get(i,numTrends)/c->get(i,numTrends+1));
 //      cout << sqrt(numTimepoints-numTrends-1) 
 //	* c->get(i,numTrends)/c->get(i,numTrends+1) << " ";

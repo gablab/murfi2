@@ -1,4 +1,4 @@
-#include <unistd.h>
+//#include <unistd.h>
 #include "gnuplot_i_vxl.h"
 
 #define SLEEP_LGTH 1

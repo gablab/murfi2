@@ -9,6 +9,8 @@
 #define RTDATA_H
 
 #include"ace/Date_Time.h"
+#include "ace/Log_Msg.h"
+
 #include<string>
 #include"tinyxml/tinyxml.h"
 

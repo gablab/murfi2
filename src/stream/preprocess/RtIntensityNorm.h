@@ -14,6 +14,9 @@
 #include"RtMaskImage.h"
 #include"RtDataImage.h"
 
+#include <float.h>
+#include "add_functions.h"
+
 // class declaration
 class RtIntensityNorm : public RtStreamComponent {
 

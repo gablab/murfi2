@@ -31,7 +31,7 @@ public:
   //  yelem  observation vector at this timepoint
   //  xrow   design matrix row (must be p elements long)
   //  weight of this observation
-  bool include(double *yelem, double *yelem, double weight);
+  bool include(double *yelem, double *xrow, double weight);
 
   // regress using the model with data up to this point
   // in:

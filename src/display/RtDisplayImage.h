@@ -19,6 +19,7 @@
 
 #include"ace/Task.h"
 #include"ace/Asynch_IO.h"
+#include "add_functions.h"
 
 // class declaration
 class RtDisplayImage : public RtOutput, 

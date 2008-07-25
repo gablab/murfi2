@@ -15,9 +15,9 @@
 #include<iomanip>
 #include<cmath>
 #include<vnl/vnl_matrix_fixed.h>
-#include<gsl_vector.h>
+#include<gsl/gsl_vector.h>
 #include"RtData.h"
-#include"dirent.h"
+//#include"dirent.h"
 #include"nifti1_io.h"
 
 using namespace std;
@@ -1237,8 +1237,8 @@ bool RtDataImage<T>::mosaic() {
   dims.reserve(2);
 
   //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);
-  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt(numSlices)),2)));
-  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt(numSlices)),2)));
+  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
+  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
   numPix = dims[0]*dims[1];
 
   // reshape the data

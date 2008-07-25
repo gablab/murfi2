@@ -102,7 +102,7 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
     }
 
     double z = ((double) img->getPixel(i) - mean->getPixel(i)) 
-      / sqrt(var->getPixel(i));
+      / sqrt((double)var->getPixel(i));
 
     zscore->setPixel(i, z);
   }  

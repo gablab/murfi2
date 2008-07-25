@@ -24,7 +24,7 @@
 #define _GNUPLOT_PIPES_H_
 
 #include <stdarg.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #include <cstdlib>
 #include <cstdio>

@@ -64,7 +64,7 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   unsigned int numPix = 0;
   for(unsigned int i = 0; i < act->getNumPix(); i++) {
     double pix = act->getPixel(i);
-    if(!isnan(pix)) {
+    if(!_isnan(pix)) {
       sum += pix;
       numPix++;
     }

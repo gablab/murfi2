@@ -63,7 +63,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
     ? config.get("scanner:port") : DEFAULT_PORT;
 
   // build the address
-  ACE_INET_Addr address(port,INADDR_ANY);
+  ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
   if(acceptor.open(address,1) == -1) {
     ACE_DEBUG((LM_INFO, ACE_TEXT("failed to open acceptor for scanner images\n")));
     isOpen = false;

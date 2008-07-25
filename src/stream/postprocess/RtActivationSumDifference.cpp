@@ -80,8 +80,8 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
 //     return 0;
 //   }
   
-  ACE_DEBUG((LM_DEBUG, "differencing  activations for image %d\n", 
-	     img->getAcquisitionNum()));
+//  ACE_DEBUG((LM_DEBUG, "differencing  activations for image %d\n", 
+//	     img->getAcquisitionNum()));
 	    
   // create a one element activation image
   RtActivation *diff = new RtActivation(1);

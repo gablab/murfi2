@@ -8,6 +8,10 @@
 #ifndef RTCONFIGVAL_H
 #define RTCONFIGVAL_H
 
+#define dTol 0.00000000001
+
+#define fTol 0.00000000001f
+
 #include<sstream>
 #include<string>
 
@@ -167,8 +171,8 @@ private:
   bool _set;
 
   // tolerances for double and float comparison
-  static const float fTol = 0.00000000001f;
-  static const double dTol = 0.00000000001;
+  //static const float fTol = 0.00000000001f;
+  //static const double dTol = 0.00000000001;
 
 };
 

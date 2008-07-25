@@ -72,7 +72,7 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   }
 
   // look for first image, compute ROI and mean intensity
-  if(isnan(meanIntensity)) {
+  if(_isnan(meanIntensity)) {
     ACE_DEBUG((LM_DEBUG, "intensity normalization found first image\n"));
 
     // if we are getting a brain mask from bet write the first image and

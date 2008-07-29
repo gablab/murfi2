@@ -9,6 +9,7 @@
 #ifndef RTSTREAMMESSAGE_H
 #define RTSTREAMMESSAGE_H
 
+//#include<dirent.h>
 #include"RtData.h"
 #include"RtActivation.h"
 #include"RtConductor.h"

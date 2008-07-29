@@ -8,9 +8,9 @@
 #ifndef RTCODE_H
 #define RTCODE_H
 
+#include"RtData.h"
 #include<sstream>
 #include<string>
-#include"RtData.h"
 
 using namespace std;
 

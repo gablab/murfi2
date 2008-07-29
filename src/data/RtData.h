@@ -8,6 +8,7 @@
 #ifndef RTDATA_H
 #define RTDATA_H
 
+#include<dirent.h>
 #include"ace/Date_Time.h"
 #include "ace/Log_Msg.h"
 

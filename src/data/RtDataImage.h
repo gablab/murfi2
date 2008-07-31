@@ -1208,6 +1208,10 @@ bool RtDataImage<T>::unmosaic() {
 
     newind = slc*sqMatrixSize+row*matrixSize+col;
  //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
+    if(slc >= numSlices) {
+      continue;
+    }
+
     newdata[newind] = data[i];
   }
 

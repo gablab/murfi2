@@ -36,7 +36,7 @@ RtInputScannerImages::RtInputScannerImages()
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
-  unmosaic = false;
+  unmosaic = true;
   onlyReadMoCo = false;
   matrixSize = 64;
   numSlices = 32;

@@ -171,8 +171,12 @@ public:
 
   // convert from a mosaic representation
   bool unmosaic();
-  
+
+  // test for mosaic image format
   bool isMosaic();
+
+  // guess whether the image is mosaiced based on the dimensions
+  bool seemsMosaic();
 
   //********  methods for getting data from the image *******//
 
@@ -313,6 +317,7 @@ protected:
   T minVal, maxVal;
 
   // for transforming between mosaic representation
+  bool isMosaiced;
   unsigned short matrixSize;
   unsigned short numSlices;
   double sliceThick;
@@ -359,6 +364,7 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
        bytesPerPix(sizeof(unsigned short)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
+  isMosaiced = false;
   matrixSize = 64;
   numSlices = 32;
   sliceThick = 1;
@@ -745,6 +751,12 @@ template<class T>
 bool RtDataImage<T>::read(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::read"));
   bool suc = readNifti(_filename);
+
+  // decide if the image is mosaiced and unmosaic it if so
+  if(seemsMosaic()) {
+    unmosaic();
+  }
+
   return suc;
 }
 
@@ -1210,6 +1222,8 @@ bool RtDataImage<T>::unmosaic() {
   delete data;
   data = newdata;
 
+  isMosaiced = false;
+
   return true;
 }
 
@@ -1267,13 +1281,36 @@ bool RtDataImage<T>::mosaic() {
   delete data;
   data = newdata;
 
+  isMosaiced = true;
+
   return true;
 }
 
 // test for a mosaic representation
 template<class T>
 bool RtDataImage<T>::isMosaic() {
-  return dims[0] != matrixSize;
+  return isMosaiced;
+}
+
+// test whether an images dimensions seem consistent with mosaic representation
+template<class T>
+bool RtDataImage<T>::seemsMosaic() {
+  // see whether there are only two dimensions
+  bool onlyTwo = dims[0] >= 2;
+  for(int i = 3; i < dims.size(); i++) {
+    if(dims[i] > 1) {
+      onlyTwo = false;
+      break;
+    }
+  }
+  if(!onlyTwo) {
+    return false;
+  }
+
+  // see if the two dimensions look like mosaiced dimensions
+  // assumptions: if the matrix size is 32, 64, or 128 assume its a single slice
+  return (dims[1] != dims[2]) 
+    || !(dims[1] == 32 || dims[1] == 64 || dims[1] == 128);
 }
 
 // initialize to all zeros

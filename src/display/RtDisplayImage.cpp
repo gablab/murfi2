@@ -14,20 +14,43 @@
 
 #include"ace/Mutex.h"
 
-#ifdef GL_TEXTURE_2D
-#ifndef GL_TEXTURE_RECTANGLE_NV
-#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
+// scopic: #define WINDOWS
+#ifndef RT_DISPLAY_IMAGE_TEXTURE
+  #ifdef WINDOWS 
+    #define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_2D
+  #else
+     #ifdef GL_TEXTURE_RECTANGLE_EXT
+       #ifndef GL_TEXTURE_RECTANGLE_NV
+         #define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_RECTANGLE_EXT
+       #endif
+     #else
+       #ifdef GL_TEXTURE_RECTANGLE_NV
+         #ifndef GL_TEXTURE_RECTANGLE_EXT
+           #define GL_TEXTURE_RECTANGLE_EXT GL_TEXTURE_RECTANGLE_NV
+         #endif
+     //#else
+     //#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
+     //#define GL_TEXTURE_2D GL_TEXTURE_2D
+       #endif
+     #endif
+   #define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_RECTANGLE_EXT
+  #endif
 #endif
-#else
-#ifdef GL_TEXTURE_RECTANGLE_NV
-#ifndef GL_TEXTURE_2D
-#define GL_TEXTURE_2D GL_TEXTURE_RECTANGLE_NV
-#endif
-//#else
+
+//#ifdef GL_TEXTURE_2D
+//#ifndef GL_TEXTURE_RECTANGLE_NV
 //#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
-//#define GL_TEXTURE_2D GL_TEXTURE_2D
-#endif
-#endif
+//#endif
+//#else
+//#ifdef GL_TEXTURE_RECTANGLE_NV
+//#ifndef GL_TEXTURE_2D
+//#define GL_TEXTURE_2D GL_TEXTURE_RECTANGLE_NV
+//#endif
+////#else
+////#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
+////#define GL_TEXTURE_2D GL_TEXTURE_2D
+//#endif
+//#endif
 
 // defaults
 #define DEFAULT_X 400
@@ -543,11 +566,11 @@ void RtDisplayImage::makeTexture() {
   }
 
   /* create the image texture */
-  glBindTexture(GL_TEXTURE_2D, imageTex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, imageTex);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
   // unmosaic if needed
 //  bool remosaic = false;
@@ -556,7 +579,7 @@ void RtDisplayImage::makeTexture() {
 //    remosaic = true;
 //  }
 
-  glTexImage2D(GL_TEXTURE_2D, 0, 1, img->getDim(0),
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, img->getDim(0),
 	       img->getDim(1), 0, GL_LUMINANCE,
 	       GL_SHORT, img->getData());
 
@@ -656,13 +679,13 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 //       << "min=" << min << endl << "max=" << max << endl;
 
   /* create the image texture */
-  glBindTexture(GL_TEXTURE_2D, *overlayTex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, *overlayTex);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, 4, overlay->getDim(0),
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, overlay->getDim(0),
 	       overlay->getDim(1), 0, GL_RGBA,
 	       GL_SHORT, overlayImg);
 
@@ -698,13 +721,13 @@ void RtDisplayImage::makePosMaskTexture() {
   }
 
   /* create the image texture */
-  glBindTexture(GL_TEXTURE_2D, posMaskTex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posMaskTex);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, 4, posMask->getDim(0),
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, posMask->getDim(0),
 	       posMask->getDim(1), 0, GL_RGBA,
 	       GL_SHORT, posMaskImg);
 
@@ -740,13 +763,13 @@ void RtDisplayImage::makeNegMaskTexture() {
   }
 
   /* create the image texture */
-  glBindTexture(GL_TEXTURE_2D, negMaskTex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negMaskTex);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, 4, negMask->getDim(0),
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, negMask->getDim(0),
 	       negMask->getDim(1), 0, GL_RGBA,
 	       GL_SHORT, negMaskImg);
 
@@ -793,12 +816,12 @@ void RtDisplayImage::makeNegMaskTexture() {
 //   }
 //   
 //   /* create the image texture */
-//   glBindTexture(GL_TEXTURE_2D, tex);
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//   glTexImage2D(GL_TEXTURE_2D, 0, 1, width, height, 0, format, type, img); 
+//   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
+//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, width, height, 0, format, type, img); 
 //   free(img);
 // }
 
@@ -839,10 +862,10 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 //    makeTextures(width,height);
 //    
 //  /* turn on texture mapping */
-//  glEnable(GL_TEXTURE_2D);
+//  glEnable(RT_DISPLAY_IMAGE_TEXTURE);
 //
 //  /* draw the main texture */
-//  glBindTexture(GL_TEXTURE_2D, tex);
+//  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
 //
 //  int w = width;
 //  int h = height;
@@ -861,7 +884,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 //    glVertex3f(0, 0, 0.0);
 //  } glEnd();
 //
-//  glDisable(GL_TEXTURE_2D);
+//  glDisable(RT_DISPLAY_IMAGE_TEXTURE);
 
     glutSwapBuffers();
     return;
@@ -873,10 +896,10 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   int imgh = img->getDim(0);
 
   /* turn on texture mapping */
-  glEnable(GL_TEXTURE_2D);
+  glEnable(RT_DISPLAY_IMAGE_TEXTURE);
 
   /* draw the main texture */
-  glBindTexture(GL_TEXTURE_2D, imageTex);
+  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, imageTex);
 
   //cout << "drawing image tex: " << imageTex << endl;
 
@@ -897,7 +920,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   if(negMaskOn && glIsTexture(negMaskTex)) {
     //cout << "drawing neg mask tex: " << negMaskTex << endl;
 
-    glBindTexture(GL_TEXTURE_2D, negMaskTex);
+    glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negMaskTex);
 
     /* make a quadrilateral and provide texture coords */
     glBegin(GL_QUADS); {
@@ -917,7 +940,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   if(posMaskOn && glIsTexture(posMaskTex)) {
     //cout << "drawing pos mask tex: " << posMaskTex << endl;
 
-    glBindTexture(GL_TEXTURE_2D, posMaskTex);
+    glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posMaskTex);
 
     /* make a quadrilateral and provide texture coords */
     glBegin(GL_QUADS); {
@@ -937,7 +960,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   if(posOverlayOn && glIsTexture(posOverlayTex)) {
     //cout << "drawing pos overlay tex: " << posOverlayTex << endl;
 
-    glBindTexture(GL_TEXTURE_2D, posOverlayTex);
+    glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posOverlayTex);
 
     /* make a quadrilateral and provide texture coords */
     glBegin(GL_QUADS); {
@@ -957,7 +980,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   if(negOverlayOn && glIsTexture(negOverlayTex)) {
     //cout << "drawing neg overlay tex: " << negOverlayTex << endl;
 
-    glBindTexture(GL_TEXTURE_2D, negOverlayTex);
+    glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negOverlayTex);
 
     /* make a quadrilateral and provide texture coords */
     glBegin(GL_QUADS); {
@@ -973,7 +996,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   }
 
-  glDisable(GL_TEXTURE_2D);
+  glDisable(RT_DISPLAY_IMAGE_TEXTURE);
 
   // draw the strings
   drawString(10,10,bottomStr.c_str(),1,0,0);

@@ -52,6 +52,8 @@ int RtStream::configure(RtConfig &config) {
 }
 
 // exhaustive list of individual processing modules
+#include"RtMosaic.h"
+#include"RtUnmosaic.h"
 #include"RtDiff.h"
 #include"RtMean.h"
 #include"RtVar.h"
@@ -83,6 +85,12 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   // remember to modify RtDataIDs.h to add the new data id
   if(type == RtPasser::moduleString) { // for original data passer only
     ACE_NEW_NORETURN(sc, RtPasser());
+  }
+  else if(type == RtMosaic::moduleString) { // mosaic
+    ACE_NEW_NORETURN(sc, RtMosaic());
+  }
+  else if(type == RtUnmosaic::moduleString) { // unmosaic
+    ACE_NEW_NORETURN(sc, RtUnmosaic());
   }
   else if(type == RtDiff::moduleString) { // voxel time difference
     ACE_NEW_NORETURN(sc, RtDiff());

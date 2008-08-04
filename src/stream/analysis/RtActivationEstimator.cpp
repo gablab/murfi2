@@ -359,12 +359,15 @@ bool RtActivationEstimator::finishInit() {
 #include"printVnlMat.cpp"
 #include"printVnlVector.cpp"
 
+// divide by range
+#define unitDeviation(v) v/=(v.max_value()-v.min_value())
+
 // build the condition regressors
 void RtActivationEstimator::buildConditions() {
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
   buildHRF(hrf, tr, 1/16.0, 32);
-  //printVnlVector(hrf);
+  printVnlVector(hrf);
 
   // debugging
 //static Gnuplot g1;
@@ -415,6 +418,10 @@ void RtActivationEstimator::buildConditions() {
     vnl_vector<double> col = conditions.get_column(i);
     vnl_vector<double> convhrfcol = vnl_convolve(col,hrf);
     col.update(convhrfcol.extract(col.size()));
+
+    // make total deviation one
+    unitDeviation(col);
+
     conditions.set_column(i,col);
   }
 
@@ -441,8 +448,8 @@ void RtActivationEstimator::buildConditions() {
     conditions = newConds;
     numConditions*=2;    
 
-    //printVnlMat(conditions);
   }
+  printVnlMat(conditions);
 
 }
 

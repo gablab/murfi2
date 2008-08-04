@@ -112,6 +112,7 @@ protected:
   RtActivation *posOverlay;
   RtActivation *negOverlay;
   GLuint imageTex;
+  int imageW, imageH;
   GLuint posOverlayTex;
   GLuint negOverlayTex;
   GLuint posMaskTex;

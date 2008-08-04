@@ -238,6 +238,10 @@ bool RtDisplayImage::open(RtConfig &config) {
     loadInitialImage = true;
   }
 
+  if(config.isSet("display:displayType")) {
+    imageDisplayType = config.get("display:displayType").str();
+  }
+
   if(config.isSet("display:initialPosMask")) {
     initialPosMaskFilename = config.get("display:initialPosMask").str();
     loadInitialPosMask = true;
@@ -433,7 +437,7 @@ void RtDisplayImage::setData(RtData *data) {
 //  static Gnuplot gp = Gnuplot("lines");
   static unsigned int numTimepoints = 0;
 
-  //cout << "got data: " << data->getID() << ":" << data->getRoiID() << endl;
+  cout << "got data: " << data->getID() << ":" << data->getRoiID() << endl;
 
   // handle activation sum
   if(data->getID() == posActivationSumID 
@@ -540,6 +544,7 @@ void RtDisplayImage::setData(RtData *data) {
 // makes a texture from the image data and prepares it for display
 void RtDisplayImage::makeTexture() {
   ACE_TRACE(("RtDisplayImage::makeTexture"));
+  ACE_Mutex mut; // for potential mosaic
 
   /* delete the old texture if there is one */
   if(glIsTexture(imageTex)) {
@@ -575,37 +580,43 @@ void RtDisplayImage::makeTexture() {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
   // unmosaic if needed
-//  bool remosaic = false;
-//  if(!img->isMosaic()) {
-//    img->mosaic();
-//    remosaic = true;
-//  }
+  short *imageData;
+  if(!img->isMosaic()) {
+    mut.acquire();
+    img->mosaic();
+    imageData = new short[img->getNumEl()];
+    imageW = img->getDim(0);
+    imageH = img->getDim(1);
+    memcpy(imageData, img->getData(), sizeof(short)*img->getNumEl());
+    img->unmosaic();
+    mut.release();
+  }
+  else {
+    imageData = new short[img->getNumEl()];
+    imageW = img->getDim(0);
+    imageH = img->getDim(1);
+    memcpy(imageData, img->getData(), sizeof(short)*img->getNumEl());
+  }
 
-  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, img->getDim(0),
-	       img->getDim(1), 0, GL_LUMINANCE,
-	       GL_SHORT, img->getData());
-
-//  if(remosaic) {
-//    img->unmosaic();
-//  }
-
-  //cout << "making texture " << imageTex << " from " << img << endl;
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, imageW, imageH,
+	       0, GL_LUMINANCE, GL_SHORT, imageData);
 
   if(!glIsTexture(imageTex)) {
     cerr << "ERROR: could not generate a new texture" << endl;
   }
 
+  delete imageData;
   needsRepaint = true;
-  //CallBackDisplayFunc();
 }
 
 // makes a texture from the overlay data and prepares it for display
 void RtDisplayImage::makeOverlayTexture(bool pos) {
   ACE_TRACE(("RtDisplayImage::makeOverlayTexture"));
+  ACE_Mutex mut; // for potential mosaic
 
   GLuint *overlayTex = pos ? &posOverlayTex : &negOverlayTex;
   RtActivation *overlay = pos ? posOverlay : negOverlay;
-
+  
   /* delete the old texture if there is one */
   if(glIsTexture(*overlayTex)) {
     glDeleteTextures(1, overlayTex);
@@ -614,31 +625,49 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   /* get the id for the texture */
   glGenTextures(1, overlayTex);
 
+  // mosaic if needed
+  double *imageData;
+  int numImageData;
+  if(!overlay->isMosaic()) {
+    mut.acquire();
+    overlay->mosaic();
+    imageData = new double[overlay->getNumEl()];
+    numImageData = overlay->getNumEl();
+    memcpy(imageData, overlay->getData(), sizeof(double)*numImageData);
+    overlay->unmosaic();
+    mut.release();
+  }
+  else {
+    imageData = new double[overlay->getNumEl()];
+    numImageData = overlay->getNumEl();
+    memcpy(imageData, overlay->getData(), sizeof(double)*numImageData);
+  }
+
   // convert overlay data into a displayable image
-  short *overlayImg = new short[4*overlay->getNumPix()];
+  short *overlayImg = new short[4*numImageData];
 
   // debugging
   double min = 1000000, max = -1000000;
 
-  for(unsigned int i = 0; i < overlay->getNumPix(); i++) {
+  for(unsigned int i = 0; i < numImageData; i++) {
     // debugging
-      if(min > overlay->getPixel(i)) {
-	min = overlay->getPixel(i);
+      if(min > imageData[i]) {
+	min = imageData[i];
       }
-      if(max < overlay->getPixel(i)) {
-	max = overlay->getPixel(i);
+      if(max < imageData[i]) {
+	max = imageData[i];
       }
 
     // use a cheap heat colormap
     if(!overlay->getScaleIsInverted() 
-       && overlay->getPixel(i) > overlay->getThreshold()) {
+       && imageData[i] > overlay->getThreshold()) {
       overlayImg[4*i+0] = SHRT_MAX; // r
-      overlayImg[4*i+1] = (short) rint(min(1,((overlay->getPixel(i)
+      overlayImg[4*i+1] = (short) rint(min(1,((imageData[i]
 			     -overlay->getThreshold())/overlay->getCeiling()))
 				       *SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
-//      cout << overlay->getPixel(i) << " " << overlay->getThreshold() 
+//      cout << imageData[i] << " " << overlay->getThreshold() 
 //	   << " " << overlay->getCeiling() << " " 
 //	   << overlayImg[4*i+1] << " "
 //	   << overlayImg[4*i+0] << "," 
@@ -648,22 +677,22 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 //	   << endl;
     }
     else if(!overlay->getScaleIsInverted() 
-	    && overlay->getPixel(i) < -overlay->getThreshold()) {
+	    && imageData[i] < -overlay->getThreshold()) {
       overlayImg[4*i+0] = 0; // r
-      overlayImg[4*i+1] = (short) rint(min(1,-1*((overlay->getPixel(i)
+      overlayImg[4*i+1] = (short) rint(min(1,-1*((imageData[i]
 			     +overlay->getThreshold())/overlay->getCeiling()))
 				       *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
-//      cout << overlay->getPixel(i) << " " << overlay->getThreshold() 
+//      cout << imageData[i] << " " << overlay->getThreshold() 
 //	   << " " << overlay->getCeiling() << " " 
 //	   << overlayImg[4*i+1] << endl;
     }
     else if(overlay->getScaleIsInverted() 
-	    && fabs(overlay->getPixel(i)) < overlay->getThreshold()) {
+	    && fabs(imageData[i]) < overlay->getThreshold()) {
       overlayImg[4*i+0] = SHRT_MAX; // r
       overlayImg[4*i+1] = (short) 
-	(1 - (fabs(overlay->getPixel(i))/overlay->getThreshold()))
+	(1 - (fabs(imageData[i])/overlay->getThreshold()))
 	*SHRT_MAX; // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
@@ -675,6 +704,7 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
       overlayImg[4*i+3] = 0; // a
     }
   }
+  delete [] imageData;
 
   // debugging
 //  cout << "thresh=" << overlay->getThreshold() << endl 
@@ -687,8 +717,7 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, overlay->getDim(0),
-	       overlay->getDim(1), 0, GL_RGBA,
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, imageW, imageH, 0, GL_RGBA,
 	       GL_SHORT, overlayImg);
 
   delete overlayImg;
@@ -698,7 +727,6 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   }
 
   needsRepaint = true;
-  //CallBackDisplayFunc();
 }
 
 // makes a texture from a pos mask and prepares it for display
@@ -894,8 +922,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   //  ACE_DEBUG((LM_DEBUG, "showing image %d\n", img->getAcquisitionNum()));
 
-  int imgw = img->getDim(1);
-  int imgh = img->getDim(0);
+//  int imgw = img->getDim(1);
+//  int imgh = img->getDim(0);
 
   /* turn on texture mapping */
   glEnable(RT_DISPLAY_IMAGE_TEXTURE);
@@ -909,11 +937,11 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   glBegin(GL_QUADS); {
     glTexCoord2d(0.0,0.0);
     glVertex3f(0.0, height, 0.0);
-    glTexCoord2d(imgw,0.0);
+    glTexCoord2d(imageW,0.0);
     glVertex3f(width, height, 0.0);
-    glTexCoord2d(imgw, imgh);
+    glTexCoord2d(imageW, imageH);
     glVertex3f(width, 0.0, 0.0);
-    glTexCoord2d(0.0,imgh);
+    glTexCoord2d(0.0,imageH);
     glVertex3f(0.0, 0.0, 0.0);
   } glEnd();
 
@@ -928,11 +956,11 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     glBegin(GL_QUADS); {
       glTexCoord2d(0.0,0.0);
       glVertex3f(0.0, height, 0.0);
-      glTexCoord2d(imgw,0.0);
+      glTexCoord2d(imageW,0.0);
       glVertex3f(width, height, 0.0);
-      glTexCoord2d(imgw, imgh);
+      glTexCoord2d(imageW, imageH);
       glVertex3f(width, 0.0, 0.0);
-      glTexCoord2d(0.0,imgh);
+      glTexCoord2d(0.0,imageH);
       glVertex3f(0.0, 0.0, 0.0);
     } glEnd();
 
@@ -948,11 +976,11 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     glBegin(GL_QUADS); {
       glTexCoord2d(0.0,0.0);
       glVertex3f(0.0, height, 0.0);
-      glTexCoord2d(imgw,0.0);
+      glTexCoord2d(imageW,0.0);
       glVertex3f(width, height, 0.0);
-      glTexCoord2d(imgw, imgh);
+      glTexCoord2d(imageW, imageH);
       glVertex3f(width, 0.0, 0.0);
-      glTexCoord2d(0.0,imgh);
+      glTexCoord2d(0.0,imageH);
       glVertex3f(0.0, 0.0, 0.0);
     } glEnd();
 
@@ -968,11 +996,11 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     glBegin(GL_QUADS); {
       glTexCoord2d(0.0,0.0);
       glVertex3f(0.0, height, 0.0);
-      glTexCoord2d(imgw,0.0);
+      glTexCoord2d(imageW,0.0);
       glVertex3f(width, height, 0.0);
-      glTexCoord2d(imgw, imgh);
+      glTexCoord2d(imageW, imageH);
       glVertex3f(width, 0.0, 0.0);
-      glTexCoord2d(0.0,imgh);
+      glTexCoord2d(0.0,imageH);
       glVertex3f(0.0, 0.0, 0.0);
     } glEnd();
 
@@ -988,11 +1016,11 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     glBegin(GL_QUADS); {
       glTexCoord2d(0.0,0.0);
       glVertex3f(0.0, height, 0.0);
-      glTexCoord2d(imgw,0.0);
+      glTexCoord2d(imageW,0.0);
       glVertex3f(width, height, 0.0);
-      glTexCoord2d(imgw, imgh);
+      glTexCoord2d(imageW, imageH);
       glVertex3f(width, 0.0, 0.0);
-      glTexCoord2d(0.0,imgh);
+      glTexCoord2d(0.0,imageH);
       glVertex3f(0.0, 0.0, 0.0);
     } glEnd();
 

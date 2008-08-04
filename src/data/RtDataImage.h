@@ -1236,8 +1236,8 @@ bool RtDataImage<T>::unmosaic() {
 template<class T>
 bool RtDataImage<T>::mosaic() {
   // validate
-  if(dims.size() != 3 && !(dims.size() == 4 && dims[3] == 1)) { // dims
-    cerr << "can't mosaic an image with " << dims.size() << " dimensions"
+  if(seemsMosaic()) {
+    cerr << "can't mosaic an image that already seems to be"
 	 << endl;
     return false;
   }
@@ -1303,7 +1303,7 @@ template<class T>
 bool RtDataImage<T>::seemsMosaic() {
   // see whether there are only two dimensions
   bool onlyTwo = dims[0] >= 2;
-  for(int i = 3; i < dims.size(); i++) {
+  for(int i = 2; i < dims.size(); i++) {
     if(dims[i] > 1) {
       onlyTwo = false;
       break;

@@ -11,6 +11,8 @@
 // remember to modify RtStream.cpp to add the new module type
 
 #define ID_SCANNERIMG                 "data.image.mri"
+#define ID_MOSAIC                     "data.image.mri.mosaic"
+#define ID_UNMOSAIC                   "data.image.mri.unmosaic"
 #define ID_DIFFIMG                    "data.image.mri.voxel-difference"
 #define ID_MEANIMG                    "data.image.mri.voxel-mean"
 #define ID_VARIMG                     "data.image.mri.voxel-variance"

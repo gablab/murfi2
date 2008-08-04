@@ -113,7 +113,7 @@ protected:
 
   // parms for image saving to disk
   bool   saveImagesToFile;
-  bool unmosaic;
+  bool unmosaicInputImages;
   string savePath;
   string saveDir;
   string saveFilestem;

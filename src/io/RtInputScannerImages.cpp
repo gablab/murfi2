@@ -36,7 +36,7 @@ RtInputScannerImages::RtInputScannerImages()
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
-  unmosaic = true;
+  unmosaicInputImages = true;
   onlyReadMoCo = false;
   matrixSize = 64;
   numSlices = 32;
@@ -103,9 +103,8 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
 
  // see if we should unmosaic the images
-  if(config.isSet("scanner:unmosaic") 
-     && config.get("scanner:unmosaic")==true) {
-    unmosaic = true;
+  if(config.isSet("scanner:unmosaic")) {
+      unmosaicInputImages = (bool) config.get("scanner:unmosaic");
   }
  
   // see if we should save images to a file
@@ -193,7 +192,7 @@ int RtInputScannerImages::svc() {
 //    rti->setPixDim(1,voxDim[1]);
 //    rti->setPixDim(2,voxDim[2]);
 
-    if(unmosaic) {
+    if(unmosaicInputImages) {
       rti->unmosaic();
     }
 

@@ -1193,6 +1193,7 @@ bool RtDataImage<T>::unmosaic() {
   // reshape the data
   numPix = matrixSize*matrixSize*numSlices;
   T *newdata = new T[numPix];
+  imgDataLen = numPix*sizeof(T);
 
   unsigned int slc, row, col, newind;
   unsigned int sqMatrixSize = matrixSize*matrixSize;
@@ -1226,7 +1227,7 @@ bool RtDataImage<T>::unmosaic() {
   delete data;
   data = newdata;
 
-  isMosaiced = false;
+  isMosaiced = false;  
 
   return true;
 }
@@ -1261,6 +1262,7 @@ bool RtDataImage<T>::mosaic() {
 
   // reshape the data
   T *newdata = new T[numPix];
+  imgDataLen = numPix*sizeof(T);
 
   unsigned int newrow, newcol, oldslc, newind;
   unsigned int sqMatrixSize = matrixSize*matrixSize;

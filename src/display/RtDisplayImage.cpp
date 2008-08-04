@@ -37,6 +37,9 @@
   #endif
 #endif
 
+// debuging
+#define DISPLAY_THREAD_HACK
+
 //#ifdef GL_TEXTURE_2D
 //#ifndef GL_TEXTURE_RECTANGLE_NV
 //#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
@@ -537,7 +540,6 @@ void RtDisplayImage::setData(RtData *data) {
 // makes a texture from the image data and prepares it for display
 void RtDisplayImage::makeTexture() {
   ACE_TRACE(("RtDisplayImage::makeTexture"));
-
 
   /* delete the old texture if there is one */
   if(glIsTexture(imageTex)) {

@@ -1152,8 +1152,8 @@ bool RtDataImage<T>::flipLR() {
 template<class T>
 bool RtDataImage<T>::unmosaic() {
   // validate
-  if(dims.size() != 2) { // dims
-    cerr << "can't unmosaic an image with " << dims.size() << " dimensions"
+  if(!seemsMosaic()) { // dims
+    cerr << "can't unmosaic an image that seemsMosaic()"
 	 << endl;
     return false;
   }

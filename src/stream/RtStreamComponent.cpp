@@ -58,7 +58,7 @@ void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
     }
 
     // figure out which option we have and process it
-    processOption(name, optionElmt->GetText());
+    processOption(name, optionElmt->GetText(), optionElmt);
   }
 
   // open outfile if name set

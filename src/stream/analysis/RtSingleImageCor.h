@@ -1,7 +1,7 @@
 /******************************************************************************
  * RtSingleImageCor.h is the header for a class that estimates the
  * activation at each voxel in a single image using a GLM-based
- * correlation analysis based on Hids, et al., 2008
+ * correlation analysis based on Hinds, et al., 2008
  *
  * Oliver Hinds <ohinds@mit.edu> 2008-01-16
  *

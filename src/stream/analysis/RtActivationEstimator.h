@@ -20,7 +20,7 @@
 #include<fstream>
 using namespace std;
 
-#define MAX_CONDITIONS 1
+#define MAX_CONDITIONS 1024
 
 // class declaration
 class RtActivationEstimator : public RtStreamComponent {
@@ -120,6 +120,7 @@ protected:
   // condition regressors
   unsigned int numConditions;
   vnl_matrix<double> conditions;
+  vector<string> conditionNames;
   unsigned int conditionShift;  // shift all condition regressors
 
   bool modelTemporalDerivatives;

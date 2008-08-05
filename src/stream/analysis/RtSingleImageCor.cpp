@@ -128,16 +128,20 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     return -1;
   }
 
-  // allocate a new data image for the correlation
-  RtActivation *cor = new RtActivation(*dat);
-  cor->initToZeros();
+  // allocate a new data images for the stats
+  RtActivation **stats = new RtActivation*[numConditions];
+  for(unsigned int i = 0; i < numConditions; i++) {
+    stats[i] = new RtActivation(*dat);
+    stats[i]->initToZeros();
 
-  // set threshold
-  if(numTimepoints > numTrends+1) {
-    cor->setThreshold(getTStatThreshold(1));
-//    cout << "single image est: using t threshold of " 
-//	 << cor->getThreshold() << endl;
+    // set threshold
+    if(numTimepoints > numTrends+1) {
+      stats[i]->setThreshold(getTStatThreshold(1));
+      //    cout << "single image est: using t threshold of " 
+      //	 << cor->getThreshold() << endl;
+    }
   }
+
 
   //// element independent setup
 
@@ -189,7 +193,9 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     if(!mask.getPixel(i)) {
-      cor->setPixel(i,fmod(1.0,0.0)); // assign nan
+      for(int c = 0; c < numConditions; c++) {
+	stats[c]->setPixel(i,fmod(1.0,0.0)); // assign nan
+      }
       continue;
     }
 
@@ -197,7 +203,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     double y = dat->getElement(i);
     solvers[i]->include(&y,Xrow,1.0);
 
-    // get betas
+    // get stats
     double *beta = solvers[i]->regress(0);
 
     // get activation signal take out everything except regressor of interest
@@ -214,60 +220,72 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     }
     regressorOfInterestIndex+=numTrends;
 
-    double err = y;
-    for(unsigned int j = 0; j < numTrends+numConditions; j++) {
-      if(j == regressorOfInterestIndex) {
-	continue;
+    // compute stats for each condition
+    for(int c = 0; c < numConditions; c++) {
+      int condIndex = c + numTrends;
+      double err = y;
+      for(unsigned int j = 0; j < numTrends+numConditions; j++) {
+	if(j == condIndex) {
+	  continue;
+	}
+	err -= beta[j]*Xrow[j];
       }
-      err -= beta[j]*Xrow[j];
-    }
 
-    // get estimation error
-    double esterr = err;
-    //for(unsigned int j = numTrends; j < numTrends+numConditions; j++) {
-    esterr -= beta[regressorOfInterestIndex]*Xrow[regressorOfInterestIndex];
-    //}
+      // get estimation error
+      double esterr = err;
+      //for(unsigned int j = numTrends; j < numTrends+numConditions; j++) {
+      esterr -= beta[condIndex]*Xrow[condIndex];
+      //}
     
-    // update the error in the estimate for the voxel
-    double stdDev;
-    // check if we should include this timepoint in the error estimate
-    if(includeInErr) {
-      absEstErrSum->setPixel(i, absEstErrSum->getPixel(i) + fabs(esterr));
-    }
-    stdDev = absEstErrSum->getPixel(i)/(numDataPointsInErrEst-1);
-
-    // compute the sds away from the mean
-    cor->setPixel(i, err / stdDev);
-
-    if(dumpAlgoVars && numTimepoints > 2) {
-      dumpFile 
-	<< numTimepoints << " " 
-	<< i << " " 
-	<< y << " "
-	<< err << " "
-	<< conditions.get(numTimepoints-1,0) << " "
-	<< esterr << " "
-	<< stdDev << " "
-	<< cor->getPixel(i) << " ";
-      for(int b = 0; b < numTrends+numConditions; b++) {
-	dumpFile << beta[b] << " ";
+      // update the error in the estimate for the voxel
+      double stdDev;
+      // check if we should include this timepoint in the error estimate
+      if(includeInErr) {
+	absEstErrSum->setPixel(i, absEstErrSum->getPixel(i) + fabs(esterr));
       }
-      dumpFile << endl;
+      stdDev = absEstErrSum->getPixel(i)/(numDataPointsInErrEst-1);
+
+      // compute the sds away from the mean
+      stats[c]->setPixel(i, err / stdDev);
+
+      if(dumpAlgoVars && numTimepoints > 2) {
+	dumpFile 
+	  << numTimepoints << " " 
+	  << i << " " 
+	  << y << " "
+	  << err << " "
+	  << conditions.get(numTimepoints-1,0) << " "
+	  << esterr << " "
+	  << stdDev << " "
+	  << stats[c]->getPixel(i) << " ";
+	for(int b = 0; b < numTrends+numConditions; b++) {
+	  dumpFile << beta[b] << " ";
+	}
+	dumpFile << endl;
+      }
     }
 
     delete beta;
-
   }
-
-  // set the image id for handling
-  cor->addToID("voxel-singleimcor");
-  cor->setRoiID(roiID);
 
   cout << "done processing single image correlation at ";
   printNow(cout);
   cout << endl;
 
-  setResult(msg,cor);
+  // set the image ids for handling
+  for(int c = 0; c < numConditions; c++) {
+    // give the image a name
+    stringstream fn;
+    fn << "voxel-singleimcor-stat" << c;
+    string name = fn.str();
+    stats[c]->addToID(name);
+    stats[c]->setRoiID(roiID);
+
+    // set the result
+    setResult(msg,stats[c]);
+  }
+
+  delete [] stats;
 
   return 0;
 }

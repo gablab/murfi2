@@ -367,7 +367,7 @@ void RtActivationEstimator::buildConditions() {
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
   buildHRF(hrf, tr, 1/16.0, 32);
-  printVnlVector(hrf);
+  //  printVnlVector(hrf);
 
   // debugging
 //static Gnuplot g1;
@@ -449,7 +449,7 @@ void RtActivationEstimator::buildConditions() {
     numConditions*=2;    
 
   }
-  printVnlMat(conditions);
+  //printVnlMat(conditions);
 
 }
 

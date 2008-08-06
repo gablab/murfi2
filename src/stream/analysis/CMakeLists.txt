@@ -17,7 +17,6 @@ SET(analysis_library_SRCS
     RtImageAccumCor.cpp
     RtSingleImageCor.cpp
     RtImageSlideWinCor.cpp
-    RtAnalysor.cpp
 )
 
 # Headers:
@@ -26,7 +25,6 @@ SET(analysis_library_HDRS
     RtFluctuationMonitor.h
     RtImageAccumCor.h
     RtActivationEstimator.h
-    RtAnalysor.h
     RtLeastSquaresSolve.h
     RtAccumCor.h
     RtImageSlideWinCor.h

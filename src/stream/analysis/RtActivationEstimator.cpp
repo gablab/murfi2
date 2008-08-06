@@ -117,7 +117,9 @@ double RtActivationEstimator::getTStatThreshold(unsigned int dof) {
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtActivationEstimator::processOption(const string &name, const string &text) {
+bool RtActivationEstimator::processOption(const string &name, 
+					  const string &text,
+					  const map<string,string> &attrMap) {
 
   // look for known options
   if(name == "condition") { // load the condition vector
@@ -126,12 +128,26 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     if(numConditions == 1) { // allocate condition matrix
       conditions.clear();
       conditions.set_size(numMeas,MAX_CONDITIONS);
+      conditionNames.reserve(MAX_CONDITIONS);
     }
     else if(numConditions > MAX_CONDITIONS) {
       cerr << "warning: max number of conditions exceeded." << endl;
       return false;
     }
     
+    // find the name, or just name it a number
+    map<string,string>::const_iterator condName 
+      = attrMap.find("conditionName");
+    if(condName == attrMap.end()) {
+      string nameNum = "condition";
+      nameNum+=numConditions;
+      conditionNames.push_back(nameNum);
+    }
+    else {
+      conditionNames.push_back((*condName).second);
+    }
+    
+    // parse the text string into a condition vector
     double el;
     size_t i = 0;
     for(size_t i1 = 0, i2 = text.find(" "); 1; 
@@ -251,7 +267,7 @@ bool RtActivationEstimator::processOption(const string &name, const string &text
     return true;
   }
 
-  return RtStreamComponent::processOption(name, text);
+  return RtStreamComponent::processOption(name, text, attrMap);
 }  
 
 

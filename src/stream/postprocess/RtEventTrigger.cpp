@@ -33,7 +33,8 @@ RtEventTrigger::~RtEventTrigger() {}
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtEventTrigger::processOption(const string &name, const string &text) {
+bool RtEventTrigger::processOption(const string &name, const string &text,
+				   const map<string,string> &attrMap) {
   if(name == "posroiID") {
     posroiID = text;
     return true;
@@ -60,7 +61,7 @@ bool RtEventTrigger::processOption(const string &name, const string &text) {
   if(name == "initialSkipTRs") {
     return RtConfigVal::convert<int>(initialSkipTRs,text);
   }
-  return RtStreamComponent::processOption(name, text);
+  return RtStreamComponent::processOption(name, text, attrMap);
 }  
 
 // process a single acquisition

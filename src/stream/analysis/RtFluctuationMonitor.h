@@ -50,8 +50,9 @@ protected:
   // process an option
   //  in 
   //   name of the option to process
-  //   val  text of the option node
-  virtual bool processOption(const string &name, const string &text);
+  //   attr map bettwen attribute names and values
+  virtual bool processOption(const string &name, const string &text, 
+			     const map<string,string> &attr);
 
   // start a logfile 
   virtual void startDumpAlgoVarsFile();

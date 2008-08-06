@@ -27,7 +27,9 @@ RtActivationSumDifference::~RtActivationSumDifference() {}
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtActivationSumDifference::processOption(const string &name, const string &text) {
+bool RtActivationSumDifference::processOption(const string &name, 
+					  const string &text,
+					  const map<string,string> &attrMap) {
 
   // look for options
   if(name == "posActivationID") {
@@ -47,7 +49,7 @@ bool RtActivationSumDifference::processOption(const string &name, const string &
     return true;
   }
 
-  return RtStreamComponent::processOption(name,text);
+  return RtStreamComponent::processOption(name,text,attrMap);
 }  
 
 // process a single acquisition

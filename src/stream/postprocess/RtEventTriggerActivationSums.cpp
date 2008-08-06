@@ -24,8 +24,10 @@ RtEventTriggerActivationSums::~RtEventTriggerActivationSums() {}
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtEventTriggerActivationSums::processOption(const string &name, const string &text) {
-  return RtStreamComponent::processOption(name, text);
+bool RtEventTriggerActivationSums::processOption(const string &name, 
+					  const string &text,
+					  const map<string,string> &attrMap) {
+  return RtStreamComponent::processOption(name, text, attrMap);
 }  
 
 // process a single acquisition

@@ -26,14 +26,15 @@ RtImageAccumCor::~RtImageAccumCor() {
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtImageAccumCor::processOption(const string &name, const string &text) {
+bool RtImageAccumCor::processOption(const string &name, const string &text,
+				    const map<string,string> &attrMap) {
   // look for known options
   if(name == "nothing") {
 
     return true;
   }
 
-  return RtStreamComponent::processOption(name, text);
+  return RtStreamComponent::processOption(name, text, attrMap);
 }  
 
 // process a single acquisition

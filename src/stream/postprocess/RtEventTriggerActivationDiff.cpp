@@ -26,12 +26,14 @@ RtEventTriggerActivationDiff::~RtEventTriggerActivationDiff() {}
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtEventTriggerActivationDiff::processOption(const string &name, const string &text) {
+bool RtEventTriggerActivationDiff::processOption(const string &name, 
+					   const string &text,
+					   const map<string,string> &attrMap) {
   if(name == "diffThresh") {
     return RtConfigVal::convert<double>(diffThresh,text);
   }
 
-  return RtEventTrigger::processOption(name, text);
+  return RtEventTrigger::processOption(name, text, attrMap);
 }  
 
 // process a single acquisition

@@ -57,8 +57,11 @@ void RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
       continue;
     }
 
+    // build the map between atrribute names and values
+    map<string,string> attr = RtConfig::getAttributeMap(*optionElmt);
+
     // figure out which option we have and process it
-    processOption(name, optionElmt->GetText(), optionElmt);
+    processOption(name, optionElmt->GetText(), attr);
   }
 
   // open outfile if name set
@@ -87,7 +90,9 @@ bool RtStreamComponent::processConfig(RtConfig &config) {
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtStreamComponent::processOption(const string &name, const string &text) {
+//   attr map betwen attribute names and values
+bool RtStreamComponent::processOption(const string &name, const string &text,
+				      const map<string,string> &attrMap) {
   if(name == "input") {
     inputDataID = text;
     return true;
@@ -289,6 +294,7 @@ string RtStreamComponent::getInputDataID() {
 void RtStreamComponent::setInputDataID(string id) {
   inputDataID = id;;
 }
+
 
 /*****************************************************************************
  * $Source$

@@ -16,6 +16,7 @@
 #include<cstring>
 #include"tinyxml/tinyxml.h"
 #include"RtConfigVal.h"
+#include<map>
 
 using namespace std;
 
@@ -131,6 +132,9 @@ public:
   // validate the configuration
   // checks for valid setup of different parts of the program
   bool validateConfig();
+
+  // utility function to build a map between attribute names and values
+  static map<string,string> getAttributeMap(TiXmlElement &ele);
 
 private:
 

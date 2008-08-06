@@ -23,7 +23,8 @@ RtActivationSum::~RtActivationSum() {}
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtActivationSum::processOption(const string &name, const string &text) {
+bool RtActivationSum::processOption(const string &name, const string &text,
+				    const map<string,string> &attrMap) {
   if(name == "roiID") {
     roiID = text;
     return true;
@@ -33,7 +34,7 @@ bool RtActivationSum::processOption(const string &name, const string &text) {
     return true;
   }
 
-  return RtStreamComponent::processOption(name, text);
+  return RtStreamComponent::processOption(name, text, attrMap);
 }  
 
 // process a single acquisition

@@ -20,7 +20,6 @@ static char *VERSION = "$Id$";
 #include<sstream>
 #include<cstdlib>
 
-
 // defaults
 #define DEFAULT_SUBJECTSDIR  "/data/subjects"
 #define DEFAULT_CONFFILENAME "conf/example.xml"
@@ -472,6 +471,7 @@ void RtConfig::dumpConfig(ostream &os) {
 // some taken from the tinyXml examples
 //
 
+// get the attribute with a certain name
 TiXmlAttribute *RtConfig::getElementAttribute(TiXmlElement *elmt,
 					      const string &name) {
   if(elmt == NULL) {
@@ -488,6 +488,20 @@ TiXmlAttribute *RtConfig::getElementAttribute(TiXmlElement *elmt,
   return NULL;
 }
 
+// build a map between attribute names and values
+map<string,string> RtConfig::getAttributeMap(TiXmlElement &ele) {
+  map<string,string> attrMap;
+  
+  // find all attributes
+  for(TiXmlAttribute *attr = ele.FirstAttribute(); attr; attr = attr->Next()) {
+    string name = attr->Name();
+    attrMap[name] = attr->ValueStr();
+  }
+  
+  return attrMap;
+}
+
+// get the indent for printing 
 const char *RtConfig::getIndent(unsigned int numIndents) {
   static const char *pINDENT="                                      + ";
   static const unsigned int LENGTH=strlen(pINDENT);

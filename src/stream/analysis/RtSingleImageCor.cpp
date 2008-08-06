@@ -50,7 +50,8 @@ RtSingleImageCor::~RtSingleImageCor() {
 //  in
 //   name of the option to process
 //   val  text of the option node
-bool RtSingleImageCor::processOption(const string &name, const string &text) {
+bool RtSingleImageCor::processOption(const string &name, const string &text,
+				     const map<string,string> &attrMap) {
 
   // look for known options
   if(name == "numDataPointsForErrEst") {
@@ -66,7 +67,7 @@ bool RtSingleImageCor::processOption(const string &name, const string &text) {
     return RtConfigVal::convert<bool>(feedbackConditionSwitching,text);    
   }
 
-  return RtActivationEstimator::processOption(name, text);
+  return RtActivationEstimator::processOption(name, text, attrMap);
 }
 
 // initialize the estimation algorithm for a particular image size

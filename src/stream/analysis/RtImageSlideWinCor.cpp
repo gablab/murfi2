@@ -26,33 +26,33 @@ RtImageSlideWinCor::~RtImageSlideWinCor() {
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtImageSlideWinCor::processOption(const string &name, const string &text) {
-  // look for known options
-  if(name == "regressor") {
-    
-    double regel;
-    for(unsigned int i1 = 0, i2 = text.find(" "); 1; 
-	i1 = i2+1, i2 = text.find(" ", i1)) {
-
-      if(!RtConfigVal::convert<double>(regel, 
-		text.substr(i1,i2 == string::npos ? text.size()-i1 : i2-i1))) {
-	continue;
-      }
-      regressor.push_back(regel);
-
-      if(i2 == string::npos) {
-	break;
-      }
-    }
-
-    return true;
-  }
-  else if(name == "windowLen") {
-    return RtConfigVal::convert<unsigned int>(windowLen, text);    
-  }
-
-  return RtStreamComponent::processOption(name, text);
-}  
+//bool RtImageSlideWinCor::processOption(const string &name, const string &text) {
+//  // look for known options
+//  if(name == "regressor") {
+//    
+//    double regel;
+//    for(unsigned int i1 = 0, i2 = text.find(" "); 1; 
+//	i1 = i2+1, i2 = text.find(" ", i1)) {
+//
+//      if(!RtConfigVal::convert<double>(regel, 
+//		text.substr(i1,i2 == string::npos ? text.size()-i1 : i2-i1))) {
+//	continue;
+//      }
+//      regressor.push_back(regel);
+//
+//      if(i2 == string::npos) {
+//	break;
+//      }
+//    }
+//
+//    return true;
+//  }
+//  else if(name == "windowLen") {
+//    return RtConfigVal::convert<unsigned int>(windowLen, text);    
+//  }
+//
+//  return RtStreamComponent::processOption(name, text);
+//}  
 
 // process a single acquisition
 int RtImageSlideWinCor::process(ACE_Message_Block *mb) {

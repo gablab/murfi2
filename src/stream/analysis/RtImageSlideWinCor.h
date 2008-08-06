@@ -37,7 +37,7 @@ protected:
   //  in 
   //   name of the option to process
   //   val  text of the option node
-  virtual bool processOption(const string &name, const string &text);
+  //virtual bool processOption(const string &name, const string &text);
 
   bool needsInit;
 

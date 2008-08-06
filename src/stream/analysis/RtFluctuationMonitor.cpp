@@ -67,7 +67,8 @@ void RtFluctuationMonitor::receiveStimTriggered() {
 //  in
 //   name of the option to process
 //   val  text of the option node
-bool RtFluctuationMonitor::processOption(const string &name, const string &text) {
+bool RtFluctuationMonitor::processOption(const string &name, const string &text,
+					 const map<string,string> &attrMap) {
   // look for known options
   if(name == "triggerStim") {
     return RtConfigVal::convert<bool>(triggerStim,text);
@@ -79,7 +80,7 @@ bool RtFluctuationMonitor::processOption(const string &name, const string &text)
     return RtConfigVal::convert<int>(numDataPointsForErrEst,text);    
   }
 
-  return RtActivationEstimator::processOption(name, text);
+  return RtActivationEstimator::processOption(name, text, attrMap);
 }
 
 // process a single acquisition

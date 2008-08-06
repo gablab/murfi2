@@ -46,10 +46,11 @@ RtAccumCor::~RtAccumCor() {
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtAccumCor::processOption(const string &name, const string &text) {
+bool RtAccumCor::processOption(const string &name, const string &text,
+				      const map<string,string> &attrMap) {
   // look for known options
 
-  return RtActivationEstimator::processOption(name, text);
+  return RtActivationEstimator::processOption(name, text, attrMap);
 }  
 
 //#include "gnuplot_i_vxl.h"

@@ -27,7 +27,8 @@ RtImageZScore::~RtImageZScore() {
 //  in
 //   name of the option to process
 //   val  text of the option node
-bool RtImageZScore::processOption(const string &name, const string &text) {
+bool RtImageZScore::processOption(const string &name, const string &text,
+				  const map<string,string> &attrMap) {
   if(name == "meanDataID") {
     meanDataID = text;
     return true;
@@ -37,7 +38,7 @@ bool RtImageZScore::processOption(const string &name, const string &text) {
     return true;
   }
 
-  return RtActivationEstimator::processOption(name, text);
+  return RtActivationEstimator::processOption(name, text, attrMap);
 }
 
 // process a single acquisition

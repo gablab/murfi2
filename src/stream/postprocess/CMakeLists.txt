@@ -11,7 +11,6 @@ SET(postprocess_library_SRCS
     RtEventTriggerActivationDiff.cpp
     RtActivationSum.cpp
     RtEventTrigger.cpp
-    RtPostprocessor.cpp
     RtActivationSumDifference.cpp
     RtEventTriggerActivationSums.cpp
 )
@@ -21,7 +20,6 @@ SET(postprocess_library_HDRS
     RtEventTriggerActivationSums.h
     RtEventTriggerActivationDiff.h
     RtActivationSum.h
-    RtPostprocessor.h
     RtEventTrigger.h
     RtActivationSumDifference.h
 )

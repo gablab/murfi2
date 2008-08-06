@@ -9,7 +9,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
 # Sources:
 SET(preprocess_library_SRCS
     RtVar.cpp
-    RtPreprocessor.cpp
     RtIntensityNorm.cpp
     RtMean.cpp
     RtDiff.cpp
@@ -21,7 +20,6 @@ SET(preprocess_library_HDRS
     RtIntensityNorm.h
     RtVar.h
     RtDiff.h
-    RtPreprocessor.h
 )
 
 

@@ -175,7 +175,7 @@ bool RtConfig::validateConfig() {
 // get a parm value.
 //  in
 //   name is a ':' delimited string spcifying a path into the XML configuration
-//        for example preprocessor:module:name
+//        for example processor:module:name
 //  out
 //   string representing the value
 RtConfigVal RtConfig::get(const char *name) {
@@ -185,7 +185,7 @@ RtConfigVal RtConfig::get(const char *name) {
 // get a parm value. start searching from a specified node
 //  in
 //   name is a ':' delimited string spcifying a path into the XML configuration
-//        for example preprocessor:module:name
+//        for example processor:module:name
 //   node is a xml node to start looking at
 //  out
 //   string representing the value

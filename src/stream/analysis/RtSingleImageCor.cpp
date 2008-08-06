@@ -276,9 +276,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // set the image ids for handling
   for(int c = 0; c < numConditions; c++) {
     // give the image a name
-    stringstream fn;
-    fn << "voxel-singleimcor-stat" << c;
-    string name = fn.str();
+    string name = "voxel-singleimcor-stat_" + conditionNames[c];
     stats[c]->addToID(name);
     stats[c]->setRoiID(roiID);
 

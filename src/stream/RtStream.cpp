@@ -10,9 +10,7 @@ static char *VERSION = "$Id$";
 
 #include"RtStream.h"
 #include"RtCode.h"
-#include"RtPreprocessor.h"
-#include"RtAnalysor.h"
-#include"RtPostprocessor.h"
+#include"RtProcessor.h"
 
 #include"RtDataIDs.h"
 
@@ -151,42 +149,16 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
 int RtStream::addModules(RtConfig &config) {
   ACE_TRACE(("RtStream::addModules"));
 
-  // add the preprocessing module
-  Module *preprocMod;
-  RtPreprocessor *preproc = new RtPreprocessor();
-  ACE_NEW_RETURN(preprocMod, Module(ACE_TEXT("preprocessing module"),
-				    preproc),-1);
+  // add the processing module
+  Module *procMod;
+  RtProcessor *proc = new RtProcessor();
+  ACE_NEW_RETURN(procMod, Module(ACE_TEXT("processing module"), proc),-1);
 
-  preproc->setStreamConductor(streamConductor);
-  preproc->configure(config);
+  proc->setStreamConductor(streamConductor);
+  proc->configure(config);
 
-  // add the analysis module
-//  Module *analysMod;
-//  RtAnalysor *analys = new RtAnalysor();
-//  ACE_NEW_RETURN(analysMod, Module("analysis module", analys), -1);
-//  analys->configure(config);
-//  
-//  // add the postprocessing module
-//  Module *postprocMod;
-//  RtPostprocessor *postproc = new RtPostprocessor();
-//  ACE_NEW_RETURN(postprocMod, Module("postprocessing module", postproc), -1);
-//  postproc->configure(config);
-//  
-//  
-//  // push the modules into the processing queue
-//  if(this->push(postprocMod) == -1) {
-//    ACE_ERROR_RETURN((LM_ERROR, 
-//		     ACE_TEXT("failed to add postprocessor to stream\n")),-1);
-//  }
-//
-//  if(this->push(analysMod) == -1) {
-//    ACE_ERROR_RETURN((LM_ERROR, 
-//		     ACE_TEXT("failed to add analysis to stream\n")),-1);
-//  }
-//
-  if(this->push(preprocMod) == -1) {
-    ACE_ERROR_RETURN((LM_ERROR, 
-		     ACE_TEXT("failed to add preprocessor\n")),-1);
+  if(this->push(procMod) == -1) {
+    ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT("failed to add processor\n")),-1);
   }
 
   return 0;

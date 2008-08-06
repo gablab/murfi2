@@ -53,7 +53,7 @@ public:
   // get a parm value.
   //  in
   //   name is a ':' delimited string spcifying a path into the XML config
-  //        for example preprocessor:module:name
+  //        for example processor:module:name
   //  out
   //   string representing the value
   RtConfigVal get(const char *name);

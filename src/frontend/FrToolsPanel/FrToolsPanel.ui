@@ -1,0 +1,72 @@
+<ui version="4.0" >
+ <class>ToolsPanel</class>
+ <widget class="QDialog" name="ToolsPanel" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>254</width>
+    <height>770</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Dialog</string>
+  </property>
+  <widget class="QToolBox" name="toolBox" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>251</width>
+     <height>771</height>
+    </rect>
+   </property>
+   <property name="currentIndex" >
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="page" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>233</width>
+      <height>613</height>
+     </rect>
+    </property>
+    <attribute name="label" >
+     <string>Page 1</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="page_3" >
+    <attribute name="label" >
+     <string>Page</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="page_4" >
+    <attribute name="label" >
+     <string>Page</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="page_5" >
+    <attribute name="label" >
+     <string>Page</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="page_2" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>261</width>
+      <height>75</height>
+     </rect>
+    </property>
+    <attribute name="label" >
+     <string>Page 2</string>
+    </attribute>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

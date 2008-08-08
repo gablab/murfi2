@@ -1,7 +1,7 @@
 /********************************************************************************
-** Form generated from reading ui file 'frmainwindow.ui'
+** Form generated from reading ui file 'FrMainWindow.ui'
 **
-** Created: Fri 8. Aug 01:04:25 2008
+** Created: Fri 8. Aug 17:16:36 2008
 **      by: Qt User Interface Compiler version 4.3.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -70,7 +70,6 @@ public:
     toolBar = new QToolBar(MainWindow);
     toolBar->setObjectName(QString::fromUtf8("toolBar"));
     MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
-    MainWindow->insertToolBarBreak(toolBar);
     toolBar_2 = new QToolBar(MainWindow);
     toolBar_2->setObjectName(QString::fromUtf8("toolBar_2"));
     MainWindow->addToolBar(Qt::TopToolBarArea, toolBar_2);
@@ -85,6 +84,8 @@ public:
     menubar->addAction(menuHelp->menuAction());
     menuFile->addAction(actionExit);
     menuHelp->addAction(actionAbout);
+    toolBar_3->addAction(actionExit);
+    toolBar_3->addAction(actionAbout);
 
     retranslateUi(MainWindow);
 

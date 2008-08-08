@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -112,6 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -184,15 +185,21 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="Mocing &quot;$(InputName)&quot;"
-						CommandLine="moc &quot;$(InputPath)&quot; -o ../../moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs=""
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\frontend\FrApplication\frapplication_moc.cpp"
-				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc &quot;$(InputPath)&quot; -o ../moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="../moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -210,13 +217,32 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="Mocing &quot;$(InputName)&quot;"
-						CommandLine="moc &quot;$(InputPath)&quot; -o ../../moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc &quot;$(InputPath)&quot; -o ../moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="../moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
 			</File>
+		</Filter>
+		<Filter
+			Name="moc"
+			>
 			<File
-				RelativePath=".\frontend\FrMainWindow\FrMainWindow_moc.cpp"
+				RelativePath=".\frontend\moc\frapplication_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrMainWindow_moc.cpp"
 				>
 			</File>
 		</Filter>

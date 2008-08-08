@@ -1,5 +1,5 @@
-#include "FrApplication/FrApplication.h"
-#include "FrMainWindow/FrMainWindow.h"
+#include "FrApplication.h"
+#include "FrMainWindow.h"
 
 
 int main(int argc, char **argv){

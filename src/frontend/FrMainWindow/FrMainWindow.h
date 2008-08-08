@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FR_MAIN_WINDOW
+#define FR_MAIN_WINDOW
 
 #include "ui_FrMainWindow.h"
 
@@ -16,3 +17,5 @@ protected:
 
 
 };
+
+#endif

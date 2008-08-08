@@ -1,3 +1,6 @@
+#ifndef FR_APPLICATION
+#define FR_APPLICATION
+
 #include <Qt/qapplication.h>
 
 class FrApplication : public QApplication {
@@ -13,3 +16,5 @@ private:
 
 
 };
+
+#endif

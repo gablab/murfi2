@@ -1,0 +1,41 @@
+CMake build system (Allows out of source builds)
+
+Install Cmake 2.4 or greater
+
+----
+Building a binary
+----
+Note: Currently CMake doesn't check to see if all dependencies are satisfied. So please ensure that all the required libraries are installed on the system.
+
+Now create a directory structure for building:
+build
+build/release
+build/debug
+
+Switch to the the build or debug directory and type:
+
+ccmake PATH_TO_FASTR_SRC_FOLDER
+type 'c' to configure
+and  'g' to generate Makefiles/Solution files
+
+CMAKE_BUILD_TYPE                 Debug/Release
+CMAKE_INSTALL_PREFIX             PATH_TO_INSTALL
+
+
+---- 
+Modifying CMakeLists.txt
+----
+
+Every directory in the source tree has a CMakeLists.txt file. Any file added/removed in a given directory should be added/removed inside the CMakeLists.txt file. 
+
+Any directory added/removed from the src directory should be added/removed from the SUBDIR section (see the top level CMakeLists.txt) for an example. Any new directory should contain a CMakeLists.txt file. If it's a library that gets added to fastr see a lib directory (e.g., stream). If it's an executable, see a bin directory (e.g., executive, imgserver).
+
+Currently all include directories are provided by the top level make file and sent to all make processes. As the system gets modular, this will change.
+
+----
+TODO
+----
+- Checks for dependencies via cmake (Add cmake modules if necessary)
+- config.h.in option
+
+satra@mit.edu

@@ -1,9 +1,12 @@
 // class for storing bookmark info
+#include <QtGui/QWidget>
 
-class FrBookmark
+
+class FrBookmark: public QWidget
 {
+	Q_OBJECT
 public:
-	FrBookmark();
+	FrBookmark(QWidget *parent = 0);
 
 protected:
 

@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>254</width>
-    <height>770</height>
+    <height>810</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -18,8 +18,11 @@
      <x>0</x>
      <y>0</y>
      <width>251</width>
-     <height>771</height>
+     <height>801</height>
     </rect>
+   </property>
+   <property name="frameShape" >
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="currentIndex" >
     <number>0</number>
@@ -29,8 +32,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>233</width>
-      <height>613</height>
+      <width>251</width>
+      <height>661</height>
      </rect>
     </property>
     <attribute name="label" >
@@ -38,16 +41,40 @@
     </attribute>
    </widget>
    <widget class="QWidget" name="page_3" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>96</width>
+      <height>26</height>
+     </rect>
+    </property>
     <attribute name="label" >
      <string>Page</string>
     </attribute>
    </widget>
    <widget class="QWidget" name="page_4" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>96</width>
+      <height>26</height>
+     </rect>
+    </property>
     <attribute name="label" >
      <string>Page</string>
     </attribute>
    </widget>
    <widget class="QWidget" name="page_5" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>96</width>
+      <height>26</height>
+     </rect>
+    </property>
     <attribute name="label" >
      <string>Page</string>
     </attribute>
@@ -57,8 +84,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>261</width>
-      <height>75</height>
+      <width>96</width>
+      <height>26</height>
      </rect>
     </property>
     <attribute name="label" >

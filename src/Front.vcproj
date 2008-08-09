@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -129,7 +129,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -186,7 +186,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -196,8 +196,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc &quot;$(InputPath)&quot; -o ../moc/&quot;$(InputName)&quot;_moc.cpp"
-						Outputs="../moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc &quot;$(InputPath)&quot; -o frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
 			</File>
@@ -218,7 +218,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -228,8 +228,8 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc &quot;$(InputPath)&quot; -o ../moc/&quot;$(InputName)&quot;_moc.cpp"
-						Outputs="../moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc &quot;$(InputPath)&quot; -o frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
 			</File>
@@ -238,12 +238,125 @@
 			Name="moc"
 			>
 			<File
-				RelativePath=".\frontend\moc\frapplication_moc.cpp"
+				RelativePath=".\frontend\moc\FrApplication_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrBookmark_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrBookmarkWidget_moc.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\frontend\moc\FrMainWindow_moc.cpp"
 				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrToolsPanel_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\QVTKWidget_moc.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="QVTKWidget"
+			>
+			<File
+				RelativePath=".\frontend\QVTKWidget\QVTKWidget.cxx"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\QVTKWidget\QVTKWidget.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc &quot;$(InputPath)&quot; -o frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="FrToolsPanel"
+			>
+			<File
+				RelativePath=".\frontend\FrToolsPanel\FrToolsPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrToolsPanel\FrToolsPanel.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing &quot;$(InputName)&quot;"
+						CommandLine="moc &quot;$(InputPath)&quot; -o ../../moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc &quot;$(InputPath)&quot; -o frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="FrBookmarkWidget"
+			>
+			<File
+				RelativePath=".\frontend\FrBookmarkWidget\FrBookmarkWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrBookmarkWidget\FrBookmarkWidget.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc &quot;$(InputPath)&quot; -o frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="FrBookmark"
+			>
+			<File
+				RelativePath=".\frontend\FrBookmark\FrBookmark.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrBookmark\FrBookmark.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc &quot;$(InputPath)&quot; -o frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<File

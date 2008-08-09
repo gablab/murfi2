@@ -1,5 +1,5 @@
 #include "FrBookmark.h"
 
-FrBookmark::FrBookmark(){
+FrBookmark::FrBookmark(QWidget *parent):QWidget(parent){
 
 }

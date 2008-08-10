@@ -470,7 +470,7 @@ void RtDisplayImage::setData(RtData *data) {
   if(data->getID() == posOverlayID && data->getRoiID() == posOverlayRoiID) {
     posOverlay = (RtActivation*) data;
     newPosOverlay = true;
-  //cout << "display got a pos overlay " << img->getID() << endl;
+    //cout << "display got a pos overlay " << img->getID() << endl;
     return;
   }
 
@@ -529,7 +529,7 @@ void RtDisplayImage::setData(RtData *data) {
   img = (RtMRIImage*) data;
 
   ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getAcquisitionNum()));
-  cout << "display got an image " << img->getID() << endl;
+  //cout << "display got an image " << img->getID() << endl;
 
   // set the info strings
   bottomStr = img->getID();
@@ -707,8 +707,8 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   delete [] imageData;
 
   // debugging
-//  cout << "thresh=" << overlay->getThreshold() << endl 
-//       << "min=" << min << endl << "max=" << max << endl;
+  cout << "thresh=" << overlay->getThreshold() << endl 
+       << "min=" << min << endl << "max=" << max << endl;
 
   /* create the image texture */
   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, *overlayTex);

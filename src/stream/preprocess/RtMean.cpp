@@ -42,11 +42,7 @@ int RtMean::process(ACE_Message_Block *mb) {
   if(numTimePoints == 0 || storemean.getSeriesNum() != img->getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "mean found first image\n"));
     storemean = (*img);
-
-    cout << "storing mean: " << storemean.getPixel(300) << endl;
   }
-
-  cout << "storemean.data: " << storemean.getData() << endl;
 
   // validate sizes
   if(img->getNumPix() != storemean.getNumPix()) {
@@ -75,7 +71,6 @@ int RtMean::process(ACE_Message_Block *mb) {
 
   // set the image id for handling
   mean->addToID("voxel-mean");
-  //cout << "mean id " << mean->getID() << endl;
   setResult(msg,mean);
 
   return 0;

@@ -41,15 +41,22 @@ int RtProcessor::addModules(RtConfig &config) {
   }
 
   // get the node for preprocessing 
-  TiXmlNode *preprocNode = config.getNode("processor");
+  TiXmlNode *procNode = config.getNode("processor");
+
+  // check for preprocessor node (backward compatibility)
+  if(procNode == NULL) {
+    procNode = config.getNode("preprocessor");
+  }  
 
   // if no preprocessing was specified, just pass the data
-  if(preprocNode == NULL || preprocNode->Type() != TiXmlNode::ELEMENT) {
-    addSingleModule(RtPasser::moduleString, "original data passer")
-      ->addOutput(config.getConductor()->getDisplay());
+  if(procNode == NULL || procNode->Type() != TiXmlNode::ELEMENT) {    
+    if(config.getConductor()->getDisplay() != NULL) {
+      addSingleModule(RtPasser::moduleString, "original data passer")
+	->addOutput(config.getConductor()->getDisplay());
+    }
   }
   else { // find modules in the node and add each
-    addModulesFromNode((TiXmlElement*) preprocNode, &config);
+    addModulesFromNode((TiXmlElement*) procNode, &config);
   }
     // all modules are now added to the stream
   pushAllModules();

@@ -177,7 +177,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // switch conditions to max magnitude if condition switching on
   if(feedbackConditionSwitching) {
     conditionOfInterest = maxMagnitudeCondInd;
-    cout << "condition of interest is " << conditionOfInterest << endl;
+    //cout << "condition of interest is " << conditionOfInterest << endl;
   }
 
   // check if we should include this timepoint in variance computation
@@ -269,9 +269,9 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     delete beta;
   }
 
-  cout << "done processing single image correlation at ";
-  printNow(cout);
-  cout << endl;
+//  cout << "done processing single image correlation at ";
+//  printNow(cout);
+//  cout << endl;
 
   // set the image ids for handling
   for(int c = 0; c < numConditions; c++) {

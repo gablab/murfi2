@@ -150,6 +150,7 @@ protected:
   /// mask ///
   RtMaskImage mask;
   enum MaskSource {
+    NO_MASK,
     THRESHOLD_FIRST_IMAGE_INTENSITY,
     LOAD_FROM_FILE,
     PASSED_FROM_INSIDE

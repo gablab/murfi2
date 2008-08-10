@@ -219,9 +219,9 @@ int RtInputScannerImages::svc() {
 	  << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
     
-    cout << "started processing image at ";
-    printNow(cout);
-    cout << endl;
+//    cout << "started processing image at ";
+//    printNow(cout);
+//    cout << endl;
 
     // clean up
     delete ei;

@@ -1,6 +1,6 @@
 /******************************************************************************
  * RtActivationSum.h is the header for a class that computes the sum over
- * all voxels in an activation map
+ * voxels in an activation map 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-05
  *
@@ -9,11 +9,11 @@
 #ifndef RTACTIVATIONSUM_H
 #define RTACTIVATIONSUM_H
 
-#include"RtStreamComponent.h"
+#include"RtActivationEstimator.h"
 #include"RtActivation.h"
 
 // class declaration
-class RtActivationSum : public RtStreamComponent {
+class RtActivationSum : public RtActivationEstimator {
 
 public:
 
@@ -42,8 +42,8 @@ protected:
   // data ID for the activation we will sum
   string activationID;
 
-  // roiID for the activation we will sum
-  string roiID;
+  // roi ID for the activation we will sum
+  string activationRoiID;
 
 };
 

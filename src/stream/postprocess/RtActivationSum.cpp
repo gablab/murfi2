@@ -10,10 +10,11 @@
 string RtActivationSum::moduleString("activation-sum");
 
 // default constructor
-RtActivationSum::RtActivationSum() : RtStreamComponent() {
+RtActivationSum::RtActivationSum() : RtActivationEstimator() {
   componentID = moduleString;
 
-  activationID = "data.image.activation.voxel-singleimcor";
+  activationID = "data.image.activation.voxel-singleimcor-stat_0";
+  activationRoiID = "unset";
 }
 
 // destructor
@@ -25,16 +26,16 @@ RtActivationSum::~RtActivationSum() {}
 //   val  text of the option node
 bool RtActivationSum::processOption(const string &name, const string &text,
 				    const map<string,string> &attrMap) {
-  if(name == "roiID") {
-    roiID = text;
-    return true;
-  }
   if(name == "activationID") {
     activationID = text;
     return true;
   }
+  else if(name == "activationRoiID") {
+    activationRoiID = text;
+    return true;
+  }
 
-  return RtStreamComponent::processOption(name, text, attrMap);
+  return RtActivationEstimator::processOption(name, text, attrMap);
 }  
 
 // process a single acquisition
@@ -48,10 +49,10 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
 
   // find the activation with the right roiID
   RtActivation *act 
-    = (RtActivation*) msg->getDataByIDAndRoiID(activationID,roiID);
+    = (RtActivation*) msg->getDataByIDAndRoiID(activationID,activationRoiID);
 
   if(act == NULL) {
-    cout << "couldn't find " << activationID << ":" << roiID << endl;
+    cout << "couldn't find " << activationID << ":" << activationRoiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtActivationSum:process: activation passed is NULL\n"));
     return 0;
@@ -60,7 +61,7 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   ACE_DEBUG((LM_DEBUG, "summing activation in image %d\n", 
 	     img->getAcquisitionNum()));
 	    
-  // compute the absolute difference
+  // compute the sum
   double sum = 0;
   unsigned int numPix = 0;
   for(unsigned int i = 0; i < act->getNumPix(); i++) {
@@ -78,7 +79,7 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   
   // set the image id for handling
   mean->addToID("activation-sum");
-  mean->setRoiID(act->getRoiID());
+  mean->setRoiID(roiID);
 
   setResult(msg, mean);
 
@@ -94,9 +95,9 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
     ofile.flush();
   }
 
-  cout << "done processing activation sum at ";
-  printNow(cout);
-  cout << endl;
+//  cout << "done processing activation sum at ";
+//  printNow(cout);
+//  cout << endl;
 
   return 0;
 }

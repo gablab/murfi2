@@ -17,11 +17,6 @@
 // mutex
 #include"ace/Mutex.h"
 
-// debugging
-//#define DUMP 1
-#ifdef DUMP
-#include"dump.c"
-#endif 
 
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
@@ -32,7 +27,7 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   // standard init
   componentID = moduleString;
 
-  //trends = conditions = NULL;
+  // modeling 
   numTrends = numConditions = numMeas = 0;
   numTimepoints = 0;
   conditionShift = 0;
@@ -42,13 +37,15 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   modelEachBlock = false;
   blockLen = 0;
 
+  roiID = "unset";
+
   // default values for probability thresholding
   probThreshold = 0.05;
   numComparisons = 0;
   correctForMultiComps = true;
 
   // default values for mask
-  maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
+  maskSource = NO_MASK;
   mosaicMask = false;
   flipLRMask = false;
   maskIntensityThreshold = 0.5;
@@ -199,7 +196,10 @@ bool RtActivationEstimator::processOption(const string &name,
   }  
   if(name == "maskSource") {
     // match type string
-    if(text == "thresholdFirstImageIntensity") {
+    if(text == "none") {
+      maskSource = NO_MASK;
+    }
+    else if(text == "thresholdFirstImageIntensity") {
       maskSource = THRESHOLD_FIRST_IMAGE_INTENSITY;
     }
     else if(text == "loadFromFile") {
@@ -501,6 +501,13 @@ void RtActivationEstimator::buildTrends() {
 //  first acquired image to use as a template for parameter inits
 void RtActivationEstimator::initEstimation(RtMRIImage &image) {
   // mask from intensity threshold
+  if(maskSource == NO_MASK) {
+    mask.setInfo(image);
+    numComparisons = image.getNumEl();
+    mask.setAll(1);
+    cout << "setting all voxels to 1" << endl;
+    cout << "mv " << mask.getPixel(0) << endl;
+  }
   if(maskSource == THRESHOLD_FIRST_IMAGE_INTENSITY) {
     numComparisons 
       = mask.initByMeanIntensityThreshold(image, maskIntensityThreshold);

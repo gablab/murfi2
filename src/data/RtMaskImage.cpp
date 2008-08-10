@@ -188,6 +188,15 @@ bool RtMaskImage::read(const string &_filename) {
 }
 
 
+// sets all voxels 
+// in:
+//  val: value to set all voxels to
+void RtMaskImage::setAll(unsigned short val) {
+  for(unsigned int i = 0; i < getNumEl(); i++) {
+    setPixel(i,val);
+  }
+}
+
 // set the info based on a generic data image info
 void RtMaskImage::setInfo(RtMRIImage &img) {
   ACE_TRACE(("RtDataImage<T>::getAutoContrast"));

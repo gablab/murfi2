@@ -60,6 +60,23 @@ public:
   //  thresh: mean intensity multiplier to threshold at
   unsigned int initByMeanIntensityThreshold(RtActivation &img, double threshold);
 
+  // set the info based on an activation's image info
+  // NOTE: will change mask geometry must match the img
+  // in:
+  //  img:    image to build mask from
+  void setInfo(RtActivation &img);
+
+  // set the info based on a mri image's info
+  // NOTE: will change mask geometry must match the img
+  // in:
+  //  img:    image to build mask from
+  void setInfo(RtMRIImage &img);
+
+  // sets all voxels 
+  // in:
+  //  val: value to set all voxels to
+  void setAll(unsigned short val);
+
   // compute the number of "on" voxels
   void computeNumberOfOnVoxels();
 
@@ -75,12 +92,6 @@ public:
   bool read(const string &_filename);
 
 protected:
-
-  // set the info based on an activation's image info
-  void setInfo(RtActivation &img);
-
-  // set the info based on a mri image's info
-  void setInfo(RtMRIImage &img);
 
   // number of "on" voxels
   unsigned int numOnVoxels;

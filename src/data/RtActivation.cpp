@@ -18,6 +18,8 @@ RtActivation::RtActivation() : RtDataImage<double>() {
   threshold = 10.0;
   ceiling = 50.0;
   bytesPerPix = sizeof(double);
+
+  scaleIsInverted = false;
 }
 
 // constructor with MRIInfo
@@ -31,6 +33,8 @@ RtActivation::RtActivation(RtMRIImage &img)
   bytesPerPix = sizeof(double);
   threshold = 10.0;
   ceiling = 50.0;
+
+  scaleIsInverted = false;
 }
 
 // constructor with number of elements 
@@ -52,6 +56,8 @@ RtActivation::RtActivation(unsigned int numElements)
 
   threshold = 0.0;
   ceiling = 50.0;
+
+  scaleIsInverted = false;
 }
 
 // destructor

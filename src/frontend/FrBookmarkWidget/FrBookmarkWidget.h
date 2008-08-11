@@ -8,7 +8,7 @@
 #include "Qt/qboxlayout.h"
 #include "Qt/QMessageBox.h"
 
-#include "../FrBookmark/FrBookmark.h"
+#include "FrBookmark.h"
 
 #include <vector>
 using namespace std;

@@ -249,6 +249,17 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
       // compute the sds away from the mean
       stats[c]->setPixel(i, err / stdDev);
 
+//	cout 
+//	  << numTimepoints << " " 
+//	  << i << " " 
+//	  << y << " "
+//	  << err << " "
+//	  << conditions.get(numTimepoints-1,0) << " "
+//	  << esterr << " "
+//	  << stdDev << " "
+//	  << stats[c]->getPixel(i) << " " << endl;
+	//      cout << err << "/" << stdDev << "=" <<  stats[c]->getPixel(i) << endl;
+
       if(dumpAlgoVars && numTimepoints > 2) {
 	dumpFile 
 	  << numTimepoints << " " 

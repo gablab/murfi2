@@ -1,4 +1,4 @@
-all: thresholdnifti threshold2masknifti flipnifti intersectniftimask unmosaic_nifti
+all: thresholdnifti threshold2masknifti flipnifti intersectniftimask unmosaic_nifti mosaic_nifti
 clean: 
 	rm *.o thresholdnifti threshold2masknifti flipnifti
 
@@ -13,6 +13,9 @@ flipnifti: flipnifti.cpp
 
 unmosaic_nifti: unmosaic_nifti.cpp
 	g++ -g -o unmosaic_nifti unmosaic_nifti.cpp -lniftiio -I/usr/include/nifti
+
+mosaic_nifti: mosaic_nifti.cpp
+	g++ -g -o mosaic_nifti mosaic_nifti.cpp -lniftiio -I/usr/include/nifti
 
 intersectniftimask: intersectniftimask.cpp
 	g++ -g -o intersectniftimask intersectniftimask.cpp -lniftiio -I/usr/include/nifti

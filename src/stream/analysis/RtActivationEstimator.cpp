@@ -125,6 +125,7 @@ bool RtActivationEstimator::processOption(const string &name,
     if(numConditions == 1) { // allocate condition matrix
       conditions.clear();
       conditions.set_size(numMeas,MAX_CONDITIONS);
+      conditions.fill(0);
       conditionNames.reserve(MAX_CONDITIONS);
     }
     else if(numConditions > MAX_CONDITIONS) {
@@ -169,10 +170,8 @@ bool RtActivationEstimator::processOption(const string &name,
 
     // fill the rest of the measurements as periodic stim
     for(; i < numMeas; i++) {
-      conditions.put(i,numConditions-1,conditions.get(i%blockLen,0));
+      conditions.put(i,numConditions-1,conditions.get(i%blockLen,numConditions-1));
     }
-
-
 
     return true;
   }
@@ -313,9 +312,11 @@ void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
   double posToNegRatio = 6;
 
   double dt = tr*samplePeriod;
-  hrf.set_size((int)ceil(length/tr+1));
+  hrf.set_size((int)floor(length/tr+1));
+  hrf.fill(0);
   for(unsigned int i = 0, t = 0; t <= (unsigned int) ceil(length/samplePeriod); 
       t += (unsigned int) ceil(tr/samplePeriod), i++) {
+
     hrf.put(i, gammaPDF(t/tr,timeToPeakPos,dt)
   	    - gammaPDF(t/tr,timeToPeakNeg,dt)/posToNegRatio);
       
@@ -383,7 +384,7 @@ void RtActivationEstimator::buildConditions() {
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
   buildHRF(hrf, tr, 1/16.0, 32);
-  //  printVnlVector(hrf);
+  //printVnlVector(hrf);
 
   // debugging
 //static Gnuplot g1;

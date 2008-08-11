@@ -352,6 +352,8 @@ RtDataImage<T>::RtDataImage() : RtData(),
   sliceGap = 0.1;
   dims.reserve(4);
   pixdims.reserve(4);
+
+  isMosaiced = false;
 }
 
 // constructor that accepts a filename to read an image from
@@ -377,6 +379,8 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
 
   vxl2ras.set_identity();
   ras2ref.set_identity();
+
+  isMosaiced = false;
 }
 
 // construct from raw bytes sent by RtInputScannerImages
@@ -753,7 +757,7 @@ bool RtDataImage<T>::read(const string &_filename) {
   bool suc = readNifti(_filename);
 
   // decide if the image is mosaiced and unmosaic it if so
-  if(seemsMosaic()) {
+  if(suc && seemsMosaic()) {
     unmosaic();
   }
 

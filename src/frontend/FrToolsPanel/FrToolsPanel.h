@@ -1,3 +1,6 @@
+#ifndef FR_TOOLSPANEL
+#define FR_TOOLSPANEL
+
 #include "ui_FrToolsPanel.h"
 
 class FrToolsPanel: public QDialog, public Ui::ToolsPanel
@@ -13,3 +16,5 @@ private:
 
 
 };
+
+#endif

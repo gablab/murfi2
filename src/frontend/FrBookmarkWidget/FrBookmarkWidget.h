@@ -1,9 +1,17 @@
 // class for displaying bookmarks
 
+#ifndef FR_BOOKMARKWIDGET
+#define FR_BOOKMARKWIDGET
+
 #include <QtGui/QDialog>
 #include <QtGui/QPushButton>
 #include "Qt/qboxlayout.h"
 #include "Qt/QMessageBox.h"
+
+#include "../FrBookmark/FrBookmark.h"
+
+#include <vector>
+using namespace std;
 
 
 class FrBookmarkWidget: public QDialog
@@ -14,11 +22,19 @@ public:
 
 	public slots:
 		void addBookmark();
+		void bookmarkClicked(FrBookmark &bookmark);
 
 protected:
 
 
 private:
 	QPushButton* addBookmarkButton;
-	
+	QHBoxLayout *layout;
+	//FrBookmark* bookmarks[100];
+	vector<FrBookmark*> bookmarks;
+	FrBookmark* defaultTab;
+	int nob;	// nummber of bookmarks
+
 };
+
+#endif

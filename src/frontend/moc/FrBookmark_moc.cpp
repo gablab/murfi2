@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrBookmark.h'
 **
-** Created: Sat 9. Aug 14:02:49 2008
+** Created: Mon 11. Aug 18:50:25 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,15 +22,18 @@ static const uint qt_meta_data_FrBookmark[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       1,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
+
+ // signals: signature, parameters, type, tag, flags
+      21,   12,   11,   11, 0x05,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrBookmark[] = {
-    "FrBookmark\0"
+    "FrBookmark\0\0bookmark\0bmClicked(FrBookmark&)\0"
 };
 
 const QMetaObject FrBookmark::staticMetaObject = {
@@ -56,5 +59,18 @@ int FrBookmark::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: bmClicked((*reinterpret_cast< FrBookmark(*)>(_a[1]))); break;
+        }
+        _id -= 1;
+    }
     return _id;
+}
+
+// SIGNAL 0
+void FrBookmark::bmClicked(FrBookmark & _t1)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }

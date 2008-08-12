@@ -39,6 +39,7 @@ public slots:
 	void mode1Clicked();
 	void mode2Clicked();
 	void mode3Clicked();
+	void tabChanged(int index);
 
 
 signals:
@@ -55,7 +56,9 @@ public:
 	FrToolsPanel* myToolsPanel;
 	FrLowPanel* myLowPanel;
 	FrBookmarkWidget* myBookmarkWidget;
-
+	QTabWidget*  myTabWidget;
+	QWidget* slice2DWidget;
+	QWidget* graphWidget;
 
 
 };

@@ -3,9 +3,9 @@
 FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	setupUi(this);
 	
-	QTabWidget*  myTabWidget = new QTabWidget(this);
-	QWidget* slice2DWidget = new QWidget;
-	QWidget* graphWidget = new QWidget;
+	myTabWidget = new QTabWidget(this);
+	slice2DWidget = new QWidget;
+	graphWidget = new QWidget;
 	
 	myQVTKWidget = new QVTKWidget(this);
 	myQVTKWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -106,6 +106,9 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	connect(myLowPanel, SIGNAL(contrastValueChanged(int)), this, SLOT(contrastValueChanged(int)));
 	connect(myLowPanel, SIGNAL(thresholdValueChanged(int)), this, SLOT(thresholdValueChanged(int)));
 
+	// actions of Tab widget
+	connect(myTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+
 }
 
 // change brightness of the scene
@@ -148,4 +151,22 @@ void FrMainWindow::mode2Clicked(){
 void FrMainWindow::mode3Clicked(){
 	QMessageBox::information(this, "Info", "mode 3 clicked");
 
+}
+
+void FrMainWindow::tabChanged(int index){
+	// disable some tools at toolbar
+	switch (index)
+	{
+			case 0:		// 2D image view
+				this->actionTool1->setDisabled(false);
+				this->actionTool2->setDisabled(false);
+				this->actionTool3->setDisabled(false);
+				break;
+
+			case 1:		// Graphics/calculations view
+				this->actionTool1->setDisabled(true);
+				this->actionTool2->setDisabled(true);
+				this->actionTool3->setDisabled(true);
+				break;
+	}
 }

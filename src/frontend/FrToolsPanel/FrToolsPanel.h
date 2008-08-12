@@ -9,6 +9,12 @@ class FrToolsPanel: public QWidget, public Ui::ToolsPanel
 public:
 	FrToolsPanel(QWidget *parent = 0);
 
+public slots:
+
+
+signals:
+	
+
 protected:
 
 

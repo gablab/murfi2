@@ -5,17 +5,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>233</width>
+    <width>176</width>
     <height>714</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pushButton" >
+  <widget class="QPushButton" name="mode1Button" >
    <property name="geometry" >
     <rect>
-     <x>50</x>
+     <x>20</x>
      <y>40</y>
      <width>131</width>
      <height>91</height>
@@ -25,10 +25,10 @@
     <string>Mode 1</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2" >
+  <widget class="QPushButton" name="mode2Button" >
    <property name="geometry" >
     <rect>
-     <x>50</x>
+     <x>20</x>
      <y>150</y>
      <width>131</width>
      <height>91</height>
@@ -38,10 +38,10 @@
     <string>Mode 2</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3" >
+  <widget class="QPushButton" name="mode3Button" >
    <property name="geometry" >
     <rect>
-     <x>50</x>
+     <x>20</x>
      <y>260</y>
      <width>131</width>
      <height>91</height>

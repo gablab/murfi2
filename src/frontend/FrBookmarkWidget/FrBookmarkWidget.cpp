@@ -12,7 +12,7 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QDialog(parent){
 	layout->setContentsMargins(0, 0, 0, 0);
 	//layout->setDirection(QBoxLayout::TopToBottom);
 
-	addBookmarkButton = new QPushButton("Add bookmark", this);
+/*	addBookmarkButton = new QPushButton("Add bookmark", this);
 	addBookmarkButton->setMaximumHeight(30);
 	addBookmarkButton->setFixedWidth(80);
 
@@ -35,7 +35,7 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QDialog(parent){
 	layout->addItem(spacerItem);
 
 	connect(this->addBookmarkButton, SIGNAL(clicked()), this, SLOT(addBookmark()));
-
+*/
 	bookmarks.clear();
 	nob = 0;
 }

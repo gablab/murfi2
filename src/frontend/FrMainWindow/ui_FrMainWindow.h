@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'frmainwindow.ui'
 **
-** Created: Wed 13. Aug 01:02:52 2008
+** Created: Wed 13. Aug 01:30:20 2008
 **      by: Qt User Interface Compiler version 4.3.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -99,7 +99,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-    MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
+    MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MRI", 0, QApplication::UnicodeUTF8));
     actionExit->setText(QApplication::translate("MainWindow", "Exit", 0, QApplication::UnicodeUTF8));
     actionAbout->setText(QApplication::translate("MainWindow", "About", 0, QApplication::UnicodeUTF8));
     actionTool1->setText(QApplication::translate("MainWindow", "Tool1", 0, QApplication::UnicodeUTF8));
@@ -110,7 +110,7 @@ public:
     menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
     menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0, QApplication::UnicodeUTF8));
     menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0, QApplication::UnicodeUTF8));
-    toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar_3", 0, QApplication::UnicodeUTF8));
+    toolBar->setWindowTitle(QApplication::translate("MainWindow", "MRI", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

@@ -1,36 +1,38 @@
 #include "FrBookmarkWidget.h"
 
 FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QDialog(parent){
-	setMinimumHeight(30);
+	setMinimumWidth(100);
 //	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 //	QWidget *horizontalLayout;
 //  horizontalLayout = new QWidget(this);
 //    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
 //    horizontalLayout->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);;
 
-	layout = new QHBoxLayout(this);
+	layout = new QVBoxLayout(this);
 	layout->setContentsMargins(0, 0, 0, 0);
+	//layout->setDirection(QBoxLayout::TopToBottom);
 
 	addBookmarkButton = new QPushButton("Add bookmark", this);
-	addBookmarkButton->setMaximumWidth(80);
-	addBookmarkButton->setFixedHeight(30);
+	addBookmarkButton->setMaximumHeight(30);
+	addBookmarkButton->setFixedWidth(80);
 
+	//QPushButton* addBookmarkButton2 = new QPushButton("Add bookmark", this);
+	//addBookmarkButton2->setMaximumHeight(30);
+	//addBookmarkButton2->setFixedWidth(80);
 
-/*	bookmarks[0] = new FrBookmark("Test", this);
-	bookmarks[0]->setFixedWidth(80);
-	bookmarks[0]->setFixedHeight(30);
-
-	layout->addWidget(bookmarks[0]);*/
 	defaultTab = new FrBookmark("Default", this);
-	defaultTab->setMaximumWidth(80);
-	defaultTab->setFixedHeight(30);
+	defaultTab->setMaximumHeight(30);
+	defaultTab->setFixedWidth(80);
 
 	connect(this->defaultTab, SIGNAL(bmClicked(FrBookmark &)), this, SLOT(bookmarkClicked(FrBookmark &)));
 
 	layout->addWidget(addBookmarkButton);
-	layout->setAlignment(addBookmarkButton, Qt::AlignLeft);
+//	layout->addWidget(addBookmarkButton2);
+	//layout->setAlignment(addBookmarkButton, Qt::AlignTop);
 	layout->addWidget(defaultTab);
-//	layout->setAlignment(defaultTab, Qt::AlignRight);
+	//layout->setAlignment(defaultTab, Qt::AlignTop);
+    spacerItem = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	layout->addItem(spacerItem);
 
 	connect(this->addBookmarkButton, SIGNAL(clicked()), this, SLOT(addBookmark()));
 
@@ -38,22 +40,25 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QDialog(parent){
 	nob = 0;
 }
 
-void FrBookmarkWidget::addBookmark()
-{
+void FrBookmarkWidget::addBookmark(){
 	//QMessageBox::information(this, "Info", "Add bookmark button clicked");
 
 	FrBookmark* bookmark = new FrBookmark("Test", this);
-	bookmark->setMaximumWidth(80);
-	bookmark->setFixedHeight(30);
-	
+	bookmark->setMaximumHeight(30);
+	bookmark->setFixedWidth(80);
+
 	layout->addWidget(bookmark);
+	layout->removeItem(spacerItem);
+//	spacerItem = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	layout->addItem(spacerItem);
+
+	//layout->setAlignment(bookmark, Qt::AlignTop);
 	bookmarks.push_back(bookmark);
 
 	connect(this->bookmarks[nob], SIGNAL(bmClicked(FrBookmark &)), this, SLOT(bookmarkClicked(FrBookmark &)));
 	nob++;
 }
 
-void FrBookmarkWidget::bookmarkClicked(FrBookmark &bookmark)
-{
+void FrBookmarkWidget::bookmarkClicked(FrBookmark &bookmark){
 	QMessageBox::information(this, "Info", "bookmark clicked");
 }

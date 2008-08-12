@@ -90,6 +90,10 @@
    </attribute>
    <addaction name="actionExit" />
    <addaction name="actionAbout" />
+   <addaction name="separator" />
+   <addaction name="actionTool1" />
+   <addaction name="actionTool2" />
+   <addaction name="actionTool3" />
   </widget>
   <action name="actionExit" >
    <property name="text" >
@@ -99,6 +103,21 @@
   <action name="actionAbout" >
    <property name="text" >
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionTool1" >
+   <property name="text" >
+    <string>Tool1</string>
+   </property>
+  </action>
+  <action name="actionTool2" >
+   <property name="text" >
+    <string>Tool2</string>
+   </property>
+  </action>
+  <action name="actionTool3" >
+   <property name="text" >
+    <string>Tool3</string>
    </property>
   </action>
  </widget>

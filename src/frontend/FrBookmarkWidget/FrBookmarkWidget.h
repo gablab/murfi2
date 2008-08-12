@@ -29,8 +29,8 @@ protected:
 
 private:
 	QPushButton* addBookmarkButton;
-	QHBoxLayout *layout;
-	//FrBookmark* bookmarks[100];
+	QVBoxLayout *layout;
+	QSpacerItem *spacerItem;
 	vector<FrBookmark*> bookmarks;
 	FrBookmark* defaultTab;
 	int nob;	// nummber of bookmarks

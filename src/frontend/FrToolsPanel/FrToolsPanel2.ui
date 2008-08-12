@@ -1,23 +1,23 @@
 <ui version="4.0" >
  <class>ToolsPanel</class>
- <widget class="QDialog" name="ToolsPanel" >
+ <widget class="QWidget" name="ToolsPanel" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
-    <height>810</height>
+    <width>233</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Dialog</string>
+   <string>Form</string>
   </property>
   <widget class="QPushButton" name="pushButton" >
    <property name="geometry" >
     <rect>
-     <x>80</x>
-     <y>30</y>
-     <width>151</width>
+     <x>50</x>
+     <y>40</y>
+     <width>131</width>
      <height>91</height>
     </rect>
    </property>
@@ -28,10 +28,10 @@
   <widget class="QPushButton" name="pushButton_2" >
    <property name="geometry" >
     <rect>
-     <x>80</x>
-     <y>140</y>
-     <width>151</width>
-     <height>101</height>
+     <x>50</x>
+     <y>150</y>
+     <width>131</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text" >
@@ -41,10 +41,10 @@
   <widget class="QPushButton" name="pushButton_3" >
    <property name="geometry" >
     <rect>
-     <x>80</x>
+     <x>50</x>
      <y>260</y>
-     <width>151</width>
-     <height>101</height>
+     <width>131</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text" >

@@ -31,28 +31,30 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	myToolsPanel = new FrToolsPanel(this);
 	myToolsPanel->setFixedWidth(myToolsPanel->width());
 
-	scrollAreaOfToolsPanel = new QScrollArea;
-	scrollAreaOfToolsPanel->setWidget(myToolsPanel);
-	scrollAreaOfToolsPanel->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	scrollAreaOfToolsPanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-	myToolsPanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+//	scrollAreaOfToolsPanel = new QScrollArea;
+//	scrollAreaOfToolsPanel->setWidget(myToolsPanel);
+//	scrollAreaOfToolsPanel->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+//	scrollAreaOfToolsPanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	myToolsPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
 	myBookmarkWidget = new FrBookmarkWidget(this);
-	myBookmarkWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	myBookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
-	QVBoxLayout *verticalLayout = new QVBoxLayout;
-	verticalLayout->addWidget(myBookmarkWidget);
+//	QVBoxLayout *verticalLayout = new QVBoxLayout;
+//	verticalLayout->addWidget(myBookmarkWidget);
 
 	// horizontal layout
 	QHBoxLayout *layout = new QHBoxLayout;
-	layout->addWidget(scrollAreaOfToolsPanel);
+//	layout->addWidget(scrollAreaOfToolsPanel);
+	layout->addWidget(myToolsPanel);
 	layout->addWidget(myQVTKWidget);
+	layout->addWidget(myBookmarkWidget);
 
-	verticalLayout->addLayout(layout);
+//	verticalLayout->addLayout(layout);
 
 	// central widget
 	QWidget *centralWidget = new QWidget;
-	centralWidget->setLayout(verticalLayout);
+	centralWidget->setLayout(layout);
 
 	setCentralWidget(centralWidget);
 

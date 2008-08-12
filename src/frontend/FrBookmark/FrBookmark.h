@@ -9,7 +9,7 @@
 #include "Qt/QMessageBox.h"
 
 
-class FrBookmark: public QWidget
+class FrBookmark: public QPushButton
 {
 	Q_OBJECT
 public:

@@ -1,7 +1,7 @@
 /********************************************************************************
-** Form generated from reading ui file 'FrMainWindow.ui'
+** Form generated from reading ui file 'frmainwindow.ui'
 **
-** Created: Fri 8. Aug 17:16:36 2008
+** Created: Tue 12. Aug 01:15:39 2008
 **      by: Qt User Interface Compiler version 4.3.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -26,6 +26,9 @@ class Ui_MainWindow
 public:
     QAction *actionExit;
     QAction *actionAbout;
+    QAction *actionTool1;
+    QAction *actionTool2;
+    QAction *actionTool3;
     QWidget *centralwidget;
     QMenuBar *menubar;
     QMenu *menuFile;
@@ -47,6 +50,12 @@ public:
     actionExit->setObjectName(QString::fromUtf8("actionExit"));
     actionAbout = new QAction(MainWindow);
     actionAbout->setObjectName(QString::fromUtf8("actionAbout"));
+    actionTool1 = new QAction(MainWindow);
+    actionTool1->setObjectName(QString::fromUtf8("actionTool1"));
+    actionTool2 = new QAction(MainWindow);
+    actionTool2->setObjectName(QString::fromUtf8("actionTool2"));
+    actionTool3 = new QAction(MainWindow);
+    actionTool3->setObjectName(QString::fromUtf8("actionTool3"));
     centralwidget = new QWidget(MainWindow);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     MainWindow->setCentralWidget(centralwidget);
@@ -86,6 +95,10 @@ public:
     menuHelp->addAction(actionAbout);
     toolBar_3->addAction(actionExit);
     toolBar_3->addAction(actionAbout);
+    toolBar_3->addSeparator();
+    toolBar_3->addAction(actionTool1);
+    toolBar_3->addAction(actionTool2);
+    toolBar_3->addAction(actionTool3);
 
     retranslateUi(MainWindow);
 
@@ -97,6 +110,9 @@ public:
     MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
     actionExit->setText(QApplication::translate("MainWindow", "Exit", 0, QApplication::UnicodeUTF8));
     actionAbout->setText(QApplication::translate("MainWindow", "About", 0, QApplication::UnicodeUTF8));
+    actionTool1->setText(QApplication::translate("MainWindow", "Tool1", 0, QApplication::UnicodeUTF8));
+    actionTool2->setText(QApplication::translate("MainWindow", "Tool2", 0, QApplication::UnicodeUTF8));
+    actionTool3->setText(QApplication::translate("MainWindow", "Tool3", 0, QApplication::UnicodeUTF8));
     menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
     menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0, QApplication::UnicodeUTF8));
     menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));

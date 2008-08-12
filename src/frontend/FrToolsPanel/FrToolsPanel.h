@@ -3,7 +3,7 @@
 
 #include "ui_FrToolsPanel.h"
 
-class FrToolsPanel: public QDialog, public Ui::ToolsPanel
+class FrToolsPanel: public QWidget, public Ui::ToolsPanel
 {
 	Q_OBJECT
 public:

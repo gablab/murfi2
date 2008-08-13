@@ -1,5 +1,8 @@
 #include "FrMainWindow.h"
 
+#include "vtkInteractorStyleImage.h"
+#include "vtkRenderWindowInteractor.h"
+
 FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	setupUi(this);
 	
@@ -18,13 +21,19 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	vtkImageViewer2* image_view = vtkImageViewer2::New();
 	image_view->SetSize(640, 480);
 	myQVTKWidget->SetRenderWindow(image_view->GetRenderWindow());
-	image_view->SetupInteractor(myQVTKWidget->GetRenderWindow()->GetInteractor());
+
+    vtkRenderWindowInteractor* rwi = myQVTKWidget->GetRenderWindow()->GetInteractor();
+    vtkInteractorStyleImage* style = vtkInteractorStyleImage::New();
+    rwi->SetInteractorStyle(style);
+	image_view->SetupInteractor(rwi);
 
 	vtkRenderer *ren1= vtkRenderer::New();
 	ren1->SetBackground( 0.1, 0.2, 0.4 );
 	vtkImageActor *image = vtkImageActor::New();
+
 	image->SetInput(reader->GetOutput());
 	image_view->GetRenderWindow()->AddRenderer(ren1);
+
 	ren1->AddActor(image);
 
 	image_view->SetColorLevel(138.5);

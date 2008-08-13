@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools"
+				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -112,7 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools"
+				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -259,6 +259,10 @@
 			</File>
 			<File
 				RelativePath=".\frontend\moc\FrToolsPanel_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrView2D_moc.cpp"
 				>
 			</File>
 			<File
@@ -440,6 +444,28 @@
 			<File
 				RelativePath=".\frontend\Document\FrDocumentObj.h"
 				>
+			</File>
+		</Filter>
+		<Filter
+			Name="FrView2D"
+			>
+			<File
+				RelativePath=".\frontend\FrView2D\FrView2D.cxx"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrView2D\FrView2D.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<File

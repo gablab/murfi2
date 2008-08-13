@@ -4,7 +4,7 @@
 <!--  NOTE... ':' characters are not allowed in any names or values -->
 <!--  Oliver Hinds <ohinds@mit.edu> 2007-09-12                      -->
 
-<study 
+<study
     subject="foobar"
     subjectsDir="/data/subjects"
     > </study>
@@ -14,7 +14,7 @@
       verbose="true"
       debug="false"
       > </terminal>
-  
+
   <log
       filename="log/log.rtl"
       disabled="false"
@@ -41,10 +41,14 @@
     triggerCode="83"
 
     tr="2.0"
-    measurements="64"
-    matrixSize="64"
-    slices="64"
+    measurements="153"
 
+    matrixSize="64"
+    slices="32"
+
+    voxdim1="3.13"
+    voxdim2="3.13"
+    voxdim3="3.85"
 > </scanner>
 
 <display
@@ -54,29 +58,36 @@
     imageWinW="1000"
     imageWinH="1000"
 
+    displayType="data.image.mri"
+
     posOverlayID="data.image.activation.voxel-fluctmon"
     posOverlayRoiID="active"
     negOverlayID="data.image.activation.voxel-fluctmon"
     negOverlayRoiID="deactive"
+
     posMaskID="data.image.mask"
     posMaskRoiID="active"
     negMaskID="data.image.mask"
     negMaskRoiID="deactive"
+
     posActivationSumID="data.image.activation.activation-sum"
     posActivationSumRoiID="active"
     negActivationSumID="data.image.activation.activation-sum"
     negActivationSumRoiID="deactive"
+
+    makeMovie="false"
+    framePrefix="movie/frame"
+
 >
 </display>
 
-<socket
-    host="192.168.1.5"
+<infoserver
     port="15001"
 >
-</socket>
+</infoserver>
 
-<!-- preprocessing steps -->
-<preprocessor>
+<!-- data processing steps -->
+<processor>
   <output>display</output>
 
   <!-- intensity normalization-->
@@ -136,7 +147,7 @@
   <module name="singleimcor">
      <output>display</output>
 
-     <option name="condition">
+     <option name="condition" conditionName="condName">
         0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
      </option>
 
@@ -144,6 +155,16 @@
      <option name="baselineThreshold">0.00001</option>
      <option name="probThreshold">0.10</option>
      <option name="correctForMultiComps">0</option>
+
+     <option name="maskSource">loadFromFile</option>
+     <option name="maskFilename">mask</option>
+     <option name="maskToDisplay">true</option>
+
+     <option name="roiID">active</option>
+ 
+     <option name="dumpAlgoVars">false</option>
+     <option name="dumpAlgoVarsFilename">log/algovars.txt</option>
+      
   </module>
 
   <!-- deviation of voxel intensity from expected value with no regressors -->
@@ -220,5 +241,5 @@
     <option name="afterTriggerSkipTRs">20</option>
   </module>
 
-</preprocessor>
+</processor>
 

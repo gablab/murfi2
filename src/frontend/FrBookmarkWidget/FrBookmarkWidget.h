@@ -7,6 +7,7 @@
 #include <QtGui/QPushButton>
 #include "Qt/qboxlayout.h"
 #include "Qt/QMessageBox.h"
+#include "Qt/qtabwidget.h"
 
 #include "FrBookmark.h"
 
@@ -14,7 +15,7 @@
 using namespace std;
 
 
-class FrBookmarkWidget: public QDialog
+class FrBookmarkWidget: public QTabWidget
 {
 	Q_OBJECT
 public:

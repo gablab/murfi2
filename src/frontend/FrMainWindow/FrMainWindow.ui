@@ -72,6 +72,8 @@
    <addaction name="actionTool1" />
    <addaction name="actionTool2" />
    <addaction name="actionTool3" />
+   <addaction name="separator" />
+   <addaction name="actionSaveToTab" />
   </widget>
   <action name="actionExit" >
    <property name="text" >
@@ -96,6 +98,11 @@
   <action name="actionTool3" >
    <property name="text" >
     <string>Tool3</string>
+   </property>
+  </action>
+  <action name="actionSaveToTab" >
+   <property name="text" >
+    <string>SaveToTab</string>
    </property>
   </action>
  </widget>

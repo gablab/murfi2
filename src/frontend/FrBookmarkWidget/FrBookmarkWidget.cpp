@@ -1,15 +1,19 @@
 #include "FrBookmarkWidget.h"
 
-FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QDialog(parent){
-	setMinimumWidth(100);
+FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QTabWidget(parent){
+	setTabPosition(QTabWidget::East);
+	setTabShape(QTabWidget::Rounded);
+	setMaximumWidth(50);
+	
+//	setMinimumWidth(100);
 //	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 //	QWidget *horizontalLayout;
 //  horizontalLayout = new QWidget(this);
 //    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
 //    horizontalLayout->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);;
 
-	layout = new QVBoxLayout(this);
-	layout->setContentsMargins(0, 0, 0, 0);
+//	layout = new QVBoxLayout(this);
+//	layout->setContentsMargins(0, 0, 0, 0);
 	//layout->setDirection(QBoxLayout::TopToBottom);
 
 /*	addBookmarkButton = new QPushButton("Add bookmark", this);
@@ -36,26 +40,46 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QDialog(parent){
 
 	connect(this->addBookmarkButton, SIGNAL(clicked()), this, SLOT(addBookmark()));
 */
+
+	//--------------------------------- test area -----------------------------------
+/*	QTabWidget* tabWidget = new QTabWidget(parent);
+    tabWidget->setTabPosition(QTabWidget::East);
+    tabWidget->setTabShape(QTabWidget::Rounded);
+    QWidget* tab = new QWidget();
+    tab->setObjectName(QString::fromUtf8("tab"));
+    tabWidget->addTab(tab, "Tab 1");
+    QWidget* tab_2 = new QWidget();
+    tab_2->setObjectName(QString::fromUtf8("tab_2"));
+    tabWidget->addTab(tab_2, "Tab 2");*/
+//	layout->addWidget(tabWidget);
+	//--------------------------------- test area -----------------------------------
 	bookmarks.clear();
-	nob = 0;
+
+    defaultTab = new FrBookmark(this);
+	addTab(defaultTab, "Default");
+	bookmarks.push_back(defaultTab);
+	nob = 1;
 }
 
+// this method should be modified - we can send any data via this method 
+// to create FrBookmark object with properties that we need
+// (or send the whole FrBookmark object
 void FrBookmarkWidget::addBookmark(){
 	//QMessageBox::information(this, "Info", "Add bookmark button clicked");
 
-	FrBookmark* bookmark = new FrBookmark("Test", this);
-	bookmark->setMaximumHeight(30);
-	bookmark->setFixedWidth(80);
+	FrBookmark* bookmark = new FrBookmark(this);
 
-	layout->addWidget(bookmark);
-	layout->removeItem(spacerItem);
+//	layout->addWidget(bookmark);
+//	layout->removeItem(spacerItem);
 //	spacerItem = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	layout->addItem(spacerItem);
+//	layout->addItem(spacerItem);
 
 	//layout->setAlignment(bookmark, Qt::AlignTop);
 	bookmarks.push_back(bookmark);
 
-	connect(this->bookmarks[nob], SIGNAL(bmClicked(FrBookmark &)), this, SLOT(bookmarkClicked(FrBookmark &)));
+//	connect(this->bookmarks[nob], SIGNAL(bmClicked(FrBookmark &)), this, SLOT(bookmarkClicked(FrBookmark &)));
+
+	addTab(bookmark, "Test"+QString::number(nob));
 	nob++;
 }
 

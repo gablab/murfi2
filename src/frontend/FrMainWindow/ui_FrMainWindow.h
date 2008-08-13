@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'frmainwindow.ui'
 **
-** Created: Wed 13. Aug 01:30:20 2008
+** Created: Wed 13. Aug 23:03:33 2008
 **      by: Qt User Interface Compiler version 4.3.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -29,6 +29,7 @@ public:
     QAction *actionTool1;
     QAction *actionTool2;
     QAction *actionTool3;
+    QAction *actionSaveToTab;
     QWidget *centralwidget;
     QMenuBar *menubar;
     QMenu *menuFile;
@@ -54,6 +55,8 @@ public:
     actionTool2->setObjectName(QString::fromUtf8("actionTool2"));
     actionTool3 = new QAction(MainWindow);
     actionTool3->setObjectName(QString::fromUtf8("actionTool3"));
+    actionSaveToTab = new QAction(MainWindow);
+    actionSaveToTab->setObjectName(QString::fromUtf8("actionSaveToTab"));
     centralwidget = new QWidget(MainWindow);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     MainWindow->setCentralWidget(centralwidget);
@@ -91,6 +94,8 @@ public:
     toolBar->addAction(actionTool1);
     toolBar->addAction(actionTool2);
     toolBar->addAction(actionTool3);
+    toolBar->addSeparator();
+    toolBar->addAction(actionSaveToTab);
 
     retranslateUi(MainWindow);
 
@@ -105,6 +110,7 @@ public:
     actionTool1->setText(QApplication::translate("MainWindow", "Tool1", 0, QApplication::UnicodeUTF8));
     actionTool2->setText(QApplication::translate("MainWindow", "Tool2", 0, QApplication::UnicodeUTF8));
     actionTool3->setText(QApplication::translate("MainWindow", "Tool3", 0, QApplication::UnicodeUTF8));
+    actionSaveToTab->setText(QApplication::translate("MainWindow", "SaveToTab", 0, QApplication::UnicodeUTF8));
     menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
     menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0, QApplication::UnicodeUTF8));
     menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));

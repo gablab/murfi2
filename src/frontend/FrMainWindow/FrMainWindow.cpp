@@ -9,9 +9,17 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	myTabWidget = new QTabWidget(this);
 	slice2DWidget = new QWidget;
 	graphWidget = new QWidget;
-	
-	myQVTKWidget = new QVTKWidget(this);
+	QGroupBox* groupBox = new QGroupBox(this);
+//	QWidget* groupBoxWidget = new QWidget(groupBox);
+//	groupBoxWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QHBoxLayout *groupBoxLayout = new QHBoxLayout(groupBox);
+	//groupBoxLayout->setContentsMargins(0, 0, 0, 0);
+	groupBoxLayout->setSpacing(0);
+
+	myQVTKWidget = new QVTKWidget(groupBox);
 	myQVTKWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	myBookmarkWidget = new FrBookmarkWidget(groupBox);
+	myBookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
 //----------------------------- test area --------------------
 	vtkPNGReader* reader = vtkPNGReader::New();
@@ -43,22 +51,29 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 
 	myToolsPanel = new FrToolsPanel(this);
 	myToolsPanel->setFixedWidth(myToolsPanel->width());
+	myToolsPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
 //	scrollAreaOfToolsPanel = new QScrollArea;
 //	scrollAreaOfToolsPanel->setWidget(myToolsPanel);
 //	scrollAreaOfToolsPanel->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 //	scrollAreaOfToolsPanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-	myToolsPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-
-	myBookmarkWidget = new FrBookmarkWidget(this);
-	myBookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
 	myLowPanel = new FrLowPanel(this);
 	myLowPanel->setFixedHeight(myLowPanel->height());
 
 	QVBoxLayout *verticalLayout = new QVBoxLayout;
+	verticalLayout->setContentsMargins(0, 0, 0, 0);
+
 //	verticalLayout->addWidget(myBookmarkWidget);
-	verticalLayout->addWidget(myQVTKWidget);
+//	verticalLayout->addWidget(myQVTKWidget);
+	
+	groupBoxLayout->addWidget(myQVTKWidget);
+
+//	groupBoxLayout->addWidget(tabWidget);
+	groupBoxLayout->addWidget(myBookmarkWidget);
+
+	verticalLayout->addWidget(groupBox);
+//	verticalLayout->addLayout(groupBoxLayout);
 	verticalLayout->addWidget(myLowPanel);
 
 	// horizontal layout
@@ -67,7 +82,7 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	layout->addWidget(myToolsPanel);
 	//layout->addWidget(myQVTKWidget);
 	layout->addLayout(verticalLayout);
-	layout->addWidget(myBookmarkWidget);
+//	layout->addWidget(myBookmarkWidget);
 
 //	verticalLayout->addLayout(layout);
 	
@@ -100,6 +115,7 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	connect(actionTool1, SIGNAL(triggered()), this, SLOT(tool1Triggered()));
 	connect(actionTool2, SIGNAL(triggered()), this, SLOT(tool2Triggered()));
 	connect(actionTool3, SIGNAL(triggered()), this, SLOT(tool3Triggered()));
+	connect(actionSaveToTab, SIGNAL(triggered()), this, SLOT(saveToTab()));
 
 	// actions of tools panel
 	connect(myToolsPanel->mode1Button, SIGNAL(clicked()), this, SLOT(mode1Clicked()));
@@ -113,6 +129,9 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 
 	// actions of Tab widget
 	connect(myTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+
+	// actions of Bookmark Widget
+	connect(myBookmarkWidget, SIGNAL(currentChanged(int)), this, SLOT(bookmarkChanged(int)));
 
 }
 
@@ -174,4 +193,17 @@ void FrMainWindow::tabChanged(int index){
 				this->actionTool3->setDisabled(true);
 				break;
 	}
+}
+
+// this slot indicates to what tab user switched
+void FrMainWindow::bookmarkChanged(int index){
+	
+}
+
+void FrMainWindow::saveToTab(){
+    //QWidget* tab = new QWidget();
+    //tab->setObjectName(QString::fromUtf8("tab"));
+    //myBookmarkWidget->addTab(tab, "test");
+	myBookmarkWidget->addBookmark();
+
 }

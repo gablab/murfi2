@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrBookmark.h'
 **
-** Created: Wed 13. Aug 12:06:40 2008
+** Created: Wed 13. Aug 23:34:01 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -37,7 +37,7 @@ static const char qt_meta_stringdata_FrBookmark[] = {
 };
 
 const QMetaObject FrBookmark::staticMetaObject = {
-    { &QPushButton::staticMetaObject, qt_meta_stringdata_FrBookmark,
+    { &QWidget::staticMetaObject, qt_meta_stringdata_FrBookmark,
       qt_meta_data_FrBookmark, 0 }
 };
 
@@ -51,12 +51,12 @@ void *FrBookmark::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrBookmark))
 	return static_cast<void*>(const_cast< FrBookmark*>(this));
-    return QPushButton::qt_metacast(_clname);
+    return QWidget::qt_metacast(_clname);
 }
 
 int FrBookmark::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QPushButton::qt_metacall(_c, _id, _a);
+    _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

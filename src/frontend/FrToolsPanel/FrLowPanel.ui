@@ -39,6 +39,9 @@
          <height>16</height>
         </rect>
        </property>
+       <property name="maximum" >
+        <number>100</number>
+       </property>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
@@ -72,6 +75,9 @@
          <height>16</height>
         </rect>
        </property>
+       <property name="maximum" >
+        <number>100</number>
+       </property>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
@@ -104,6 +110,9 @@
          <width>181</width>
          <height>16</height>
         </rect>
+       </property>
+       <property name="maximum" >
+        <number>100</number>
        </property>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>

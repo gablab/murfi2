@@ -1,6 +1,6 @@
 #include "FrBookmark.h"
 
-FrBookmark::FrBookmark(const QString &text ,QWidget *parent):QPushButton(text, parent){
+FrBookmark::FrBookmark(QWidget *parent):QWidget(parent){
 
 	//QLabel *label = new QLabel(this);
 	//label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
@@ -9,6 +9,7 @@ FrBookmark::FrBookmark(const QString &text ,QWidget *parent):QPushButton(text, p
 //	label->setFixedWidth(80);
 //	label->setMaximumHeight(30);
 	//setFlat(true);
+	//setGeometry(0, 0, 0, 0);
 }
 
 void FrBookmark::mousePressEvent(QMouseEvent *event){

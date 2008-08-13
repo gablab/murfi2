@@ -9,11 +9,11 @@
 #include "Qt/QMessageBox.h"
 
 
-class FrBookmark: public QPushButton
+class FrBookmark: public QWidget
 {
 	Q_OBJECT
 public:
-	FrBookmark(const QString &text, QWidget *parent = 0);
+	FrBookmark(QWidget *parent = 0);
 	
 public slots:
 

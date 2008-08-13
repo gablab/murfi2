@@ -10,6 +10,8 @@
 #include "Qt/qboxlayout.h"
 #include "Qt/qscrollarea.h"
 #include "Qt/qtabwidget.h"
+#include <QtGui/QPushButton>
+#include <QtGui/QGroupBox>
 
 // VTK stuff
 #include "vtkImageViewer2.h"
@@ -40,6 +42,8 @@ public slots:
 	void mode2Clicked();
 	void mode3Clicked();
 	void tabChanged(int index);
+	void bookmarkChanged(int index);
+	void saveToTab();
 
 
 signals:

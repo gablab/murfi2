@@ -107,13 +107,9 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 	connect(myToolsPanel->mode3Button, SIGNAL(clicked()), this, SLOT(mode3Clicked()));
 
 	// actions of Low panel
-	connect(myLowPanel->brightnessSlider, SIGNAL(sliderReleased()), myLowPanel, SLOT(brightnessSliderPositionChanged()));
-	connect(myLowPanel->contrastSlider, SIGNAL(sliderReleased()), myLowPanel, SLOT(contrastSliderPositionChanged()));
-	connect(myLowPanel->thresholdSlider, SIGNAL(sliderReleased()), myLowPanel, SLOT(thresholdSliderPositionChanged()));
-	
-	connect(myLowPanel, SIGNAL(brightnessValueChanged(int)), this, SLOT(brightnessValueChanged(int)));
-	connect(myLowPanel, SIGNAL(contrastValueChanged(int)), this, SLOT(contrastValueChanged(int)));
-	connect(myLowPanel, SIGNAL(thresholdValueChanged(int)), this, SLOT(thresholdValueChanged(int)));
+	connect(myLowPanel->brightnessSlider, SIGNAL(sliderReleased()), this, SLOT(brightnessValueChanged()));
+	connect(myLowPanel->contrastSlider, SIGNAL(sliderReleased()), this, SLOT(contrastValueChanged()));
+	connect(myLowPanel->thresholdSlider, SIGNAL(sliderReleased()), this, SLOT(thresholdValueChanged()));
 
 	// actions of Tab widget
 	connect(myTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
@@ -121,15 +117,15 @@ FrMainWindow::FrMainWindow(QWidget *parent): QMainWindow(parent){
 }
 
 // change brightness of the scene
-void FrMainWindow::brightnessValueChanged(int value){
+void FrMainWindow::brightnessValueChanged(){
 }
 
 // change contrast of the scene
-void FrMainWindow::contrastValueChanged(int value){
+void FrMainWindow::contrastValueChanged(){
 }
 
 // change threshold of the scene
-void FrMainWindow::thresholdValueChanged(int value){
+void FrMainWindow::thresholdValueChanged(){
 }
 
 void FrMainWindow::tool1Triggered(){

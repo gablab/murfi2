@@ -29,9 +29,9 @@ public:
 	FrMainWindow(QWidget *parent = 0);
 
 public slots:
-	void brightnessValueChanged(int value);
-	void contrastValueChanged(int value);
-	void thresholdValueChanged(int value);
+	void brightnessValueChanged();
+	void contrastValueChanged();
+	void thresholdValueChanged();
 
 	void tool1Triggered();
 	void tool2Triggered();

@@ -17,9 +17,9 @@ public slots:
 	void thresholdSliderPositionChanged();
 
 signals:
-	void brightnessValueChanged(int value);
-	void contrastValueChanged(int value);
-	void thresholdValueChanged(int value);
+//	void brightnessValueChanged(int value);
+//	void contrastValueChanged(int value);
+//	void thresholdValueChanged(int value);
 
 
 protected:

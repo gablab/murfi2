@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrLowPanel.h'
 **
-** Created: Tue 12. Aug 22:37:08 2008
+** Created: Wed 13. Aug 13:18:41 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,28 +22,20 @@ static const uint qt_meta_data_FrLowPanel[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   10, // methods
+       3,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
- // signals: signature, parameters, type, tag, flags
-      18,   12,   11,   11, 0x05,
-      46,   12,   11,   11, 0x05,
-      72,   12,   11,   11, 0x05,
-
  // slots: signature, parameters, type, tag, flags
-      99,   11,   11,   11, 0x0a,
-     133,   11,   11,   11, 0x0a,
-     165,   11,   11,   11, 0x0a,
+      12,   11,   11,   11, 0x0a,
+      46,   11,   11,   11, 0x0a,
+      78,   11,   11,   11, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrLowPanel[] = {
-    "FrLowPanel\0\0value\0brightnessValueChanged(int)\0"
-    "contrastValueChanged(int)\0"
-    "thresholdValueChanged(int)\0"
-    "brightnessSliderPositionChanged()\0"
+    "FrLowPanel\0\0brightnessSliderPositionChanged()\0"
     "contrastSliderPositionChanged()\0"
     "thresholdSliderPositionChanged()\0"
 };
@@ -75,35 +67,11 @@ int FrLowPanel::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: brightnessValueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 1: contrastValueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 2: thresholdValueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 3: brightnessSliderPositionChanged(); break;
-        case 4: contrastSliderPositionChanged(); break;
-        case 5: thresholdSliderPositionChanged(); break;
+        case 0: brightnessSliderPositionChanged(); break;
+        case 1: contrastSliderPositionChanged(); break;
+        case 2: thresholdSliderPositionChanged(); break;
         }
-        _id -= 6;
+        _id -= 3;
     }
     return _id;
-}
-
-// SIGNAL 0
-void FrLowPanel::brightnessValueChanged(int _t1)
-{
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 0, _a);
-}
-
-// SIGNAL 1
-void FrLowPanel::contrastValueChanged(int _t1)
-{
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 1, _a);
-}
-
-// SIGNAL 2
-void FrLowPanel::thresholdValueChanged(int _t1)
-{
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }

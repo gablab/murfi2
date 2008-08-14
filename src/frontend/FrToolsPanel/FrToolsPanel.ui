@@ -24,6 +24,12 @@
    <property name="text" >
     <string>Mode 1</string>
    </property>
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="pushButton_2" >
    <property name="geometry" >
@@ -37,6 +43,9 @@
    <property name="text" >
     <string>Mode 2</string>
    </property>
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="pushButton_3" >
    <property name="geometry" >
@@ -49,6 +58,15 @@
    </property>
    <property name="text" >
     <string>Mode 3</string>
+   </property>
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>false</bool>
+   </property>
+   <property name="flat" >
+    <bool>false</bool>
    </property>
   </widget>
  </widget>

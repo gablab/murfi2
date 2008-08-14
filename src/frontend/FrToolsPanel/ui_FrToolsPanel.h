@@ -1,8 +1,8 @@
 /********************************************************************************
-** Form generated from reading ui file 'frtoolspanel2.ui'
+** Form generated from reading ui file 'FrToolsPanel2.ui'
 **
-** Created: Wed 13. Aug 00:33:58 2008
-**      by: Qt User Interface Compiler version 4.3.3
+** Created: Thu 14. Aug 22:40:59 2008
+**      by: Qt User Interface Compiler version 4.4.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 ********************************************************************************/
@@ -16,6 +16,8 @@
 #include <QtGui/QButtonGroup>
 #include <QtGui/QPushButton>
 #include <QtGui/QWidget>
+
+QT_BEGIN_NAMESPACE
 
 class Ui_ToolsPanel
 {
@@ -58,5 +60,7 @@ public:
 namespace Ui {
     class ToolsPanel: public Ui_ToolsPanel {};
 } // namespace Ui
+
+QT_END_NAMESPACE
 
 #endif // UI_FRTOOLSPANEL_H

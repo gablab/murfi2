@@ -11,8 +11,9 @@ class FrDocumentObj
 public: // Object types
     enum ObjType{
         BaseObject,
-        SomeType1,
-        SomeType2 // etc
+        ImageObject,
+        TabSettings,
+        OtherType    // etc
     };
 
 public:

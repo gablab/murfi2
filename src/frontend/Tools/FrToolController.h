@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FR_TOOL_CONTROLLER
+#define FR_TOOL_CONTROLLER
 
 #include <vector>
 
@@ -26,3 +27,5 @@ private:
     // use it as stack
     std::vector<FrTool*> m_tools;
 };
+
+#endif

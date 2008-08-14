@@ -2,8 +2,6 @@
 #define FR_DOCUMENT
 
 // STL includes
-#include <set>
-#include <map>
 #include <vector>
 
 #include "FrDocumentObj.h"
@@ -18,7 +16,7 @@ public:
     bool Remove(FrDocumentObj* obj);
     void DeleteAll();
     
-private:
+protected:
     void GetObjectsByType(std::vector<FrDocumentObj*>& objects, 
                           FrDocumentObj::ObjType type);
 

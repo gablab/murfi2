@@ -1,8 +1,8 @@
 /********************************************************************************
-** Form generated from reading ui file 'frlowpanel.ui'
+** Form generated from reading ui file 'FrLowPanel.ui'
 **
-** Created: Tue 12. Aug 21:55:20 2008
-**      by: Qt User Interface Compiler version 4.3.3
+** Created: Thu 14. Aug 22:35:36 2008
+**      by: Qt User Interface Compiler version 4.4.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 ********************************************************************************/
@@ -19,6 +19,8 @@
 #include <QtGui/QLCDNumber>
 #include <QtGui/QSlider>
 #include <QtGui/QWidget>
+
+QT_BEGIN_NAMESPACE
 
 class Ui_LowPanel
 {
@@ -52,10 +54,12 @@ public:
     brightnessSlider = new QSlider(groupBox);
     brightnessSlider->setObjectName(QString::fromUtf8("brightnessSlider"));
     brightnessSlider->setGeometry(QRect(10, 60, 181, 16));
+    brightnessSlider->setMinimum(-100);
+    brightnessSlider->setMaximum(100);
     brightnessSlider->setOrientation(Qt::Horizontal);
     lcdBrightness = new QLCDNumber(groupBox);
     lcdBrightness->setObjectName(QString::fromUtf8("lcdBrightness"));
-    lcdBrightness->setGeometry(QRect(10, 20, 64, 23));
+    lcdBrightness->setGeometry(QRect(130, 20, 64, 23));
     lcdBrightness->setSegmentStyle(QLCDNumber::Flat);
 
     hboxLayout->addWidget(groupBox);
@@ -65,10 +69,13 @@ public:
     contrastSlider = new QSlider(groupBox_3);
     contrastSlider->setObjectName(QString::fromUtf8("contrastSlider"));
     contrastSlider->setGeometry(QRect(10, 60, 181, 16));
+    contrastSlider->setMinimum(-100);
+    contrastSlider->setMaximum(100);
     contrastSlider->setOrientation(Qt::Horizontal);
+    contrastSlider->setTickPosition(QSlider::NoTicks);
     lcdContrast = new QLCDNumber(groupBox_3);
     lcdContrast->setObjectName(QString::fromUtf8("lcdContrast"));
-    lcdContrast->setGeometry(QRect(10, 20, 64, 23));
+    lcdContrast->setGeometry(QRect(130, 20, 64, 23));
     lcdContrast->setSegmentStyle(QLCDNumber::Flat);
 
     hboxLayout->addWidget(groupBox_3);
@@ -78,11 +85,14 @@ public:
     thresholdSlider = new QSlider(groupBox_2);
     thresholdSlider->setObjectName(QString::fromUtf8("thresholdSlider"));
     thresholdSlider->setGeometry(QRect(10, 60, 181, 16));
+    thresholdSlider->setMaximum(100);
+    thresholdSlider->setValue(50);
     thresholdSlider->setOrientation(Qt::Horizontal);
     lcdThreshold = new QLCDNumber(groupBox_2);
     lcdThreshold->setObjectName(QString::fromUtf8("lcdThreshold"));
-    lcdThreshold->setGeometry(QRect(10, 20, 64, 23));
+    lcdThreshold->setGeometry(QRect(130, 20, 64, 23));
     lcdThreshold->setSegmentStyle(QLCDNumber::Flat);
+    lcdThreshold->setProperty("intValue", QVariant(50));
 
     hboxLayout->addWidget(groupBox_2);
 
@@ -106,5 +116,7 @@ public:
 namespace Ui {
     class LowPanel: public Ui_LowPanel {};
 } // namespace Ui
+
+QT_END_NAMESPACE
 
 #endif // UI_FRLOWPANEL_H

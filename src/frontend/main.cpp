@@ -1,15 +1,22 @@
 #include "FrApplication.h"
 #include "FrMainWindow.h"
-
+#include "FrMainDocument.h"
+#include "FrMainController.h"
 
 int main(int argc, char **argv){
-	FrApplication app(argc, argv);
+	FrApplication application(argc, argv);
+    
+    // Create document
+    FrMainDocument document;
 
-	FrMainWindow mainWidget;
-	mainWidget.showMaximized();
+    // Create view
+	FrMainWindow mainWindow(&document);
+	mainWindow.showMaximized();
 
-	if(!app.exec())
-		return 1;
+    // Create controller
+    FrMainController controller(&mainWindow, &document);
+    controller.Initialize();
 
+	if(!application.exec()) return 1;
 	return 0;
 }

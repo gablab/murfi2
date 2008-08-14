@@ -3,32 +3,28 @@
 
 
 #include "ui_FrMainWindow.h"
-#include "../QVTKWidget/QVTKWidget.h"
-#include "../FrToolsPanel/FrToolsPanel.h"
-#include "../FrToolsPanel/FrLowPanel.h"
-#include "../FrBookmarkWidget/FrBookmarkWidget.h"
-#include "Qt/qboxlayout.h"
-#include "Qt/qscrollarea.h"
-#include "Qt/qtabwidget.h"
-#include <QtGui/QPushButton>
-#include <QtGui/QGroupBox>
 
-// VTK stuff
-#include "vtkImageViewer2.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkInteractorStyleImage.h"
-#include "vtkRenderer.h"
-#include "vtkPNGReader.h"
-#include "vtkImageActor.h"
-#include "vtkRenderWindow.h"
+// Forward declaration
+class QTabWidget;
+
+class FrView2D;
+class FrMainDocument;
+class FrMainController;
+class FrLowPanel;
+class FrToolsPanel;
+class FrBookmarkWidget;
 
 
-
-class FrMainWindow: public QMainWindow, public Ui::MainWindow
-{
+class FrMainWindow: public QMainWindow, public Ui::MainWindow {
 	Q_OBJECT
 public:
-	FrMainWindow(QWidget *parent = 0);
+	FrMainWindow(FrMainDocument* document=0, FrMainController* controller=0);
+    ~FrMainWindow();
+
+    void SetDocument(FrMainDocument* doc);
+    FrMainDocument* GetDocument();
+
+    FrView2D* GetView2D();
 
 public slots:
 	void brightnessValueChanged();
@@ -44,27 +40,24 @@ public slots:
 	void tabChanged(int index);
 	void bookmarkChanged(int index);
 	void saveToTab();
-
+    void openImage();
 
 signals:
 
 
 private:
-	QScrollArea	*scrollAreaOfToolsPanel;
-
-protected:
-
+    FrMainController* m_controller;
+    FrMainDocument* m_document;
+    FrView2D* m_view2D;
 
 public:
-	QVTKWidget* myQVTKWidget;
-	FrToolsPanel* myToolsPanel;
-	FrLowPanel* myLowPanel;
-	FrBookmarkWidget* myBookmarkWidget;
-	QTabWidget*  myTabWidget;
-	QWidget* slice2DWidget;
-	QWidget* graphWidget;
+    QTabWidget* m_tabWidget;
+	QWidget*    m_slice2DWidget;
+	QWidget*    m_graphWidget;
 
-
+	FrToolsPanel*   m_toolsPanel;
+	FrLowPanel*     m_lowPanel;
+	FrBookmarkWidget* m_bookmarkWidget;
 };
 
 #endif

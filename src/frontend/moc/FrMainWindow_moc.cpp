@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrMainWindow.h'
 **
-** Created: Wed 13. Aug 23:40:00 2008
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
+** Created: Thu 14. Aug 23:52:59 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,18 +11,19 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrMainWindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.3.3. It"
+#error "This file was generated using the moc from 4.4.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
+QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_FrMainWindow[] = {
 
  // content:
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   10, // methods
+      13,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -39,6 +40,7 @@ static const uint qt_meta_data_FrMainWindow[] = {
      188,  182,   13,   13, 0x0a,
      204,  182,   13,   13, 0x0a,
      225,   13,   13,   13, 0x0a,
+     237,   13,   13,   13, 0x0a,
 
        0        // eod
 };
@@ -50,7 +52,7 @@ static const char qt_meta_stringdata_FrMainWindow[] = {
     "tool3Triggered()\0mode1Clicked()\0"
     "mode2Clicked()\0mode3Clicked()\0index\0"
     "tabChanged(int)\0bookmarkChanged(int)\0"
-    "saveToTab()\0"
+    "saveToTab()\0openImage()\0"
 };
 
 const QMetaObject FrMainWindow::staticMetaObject = {
@@ -67,9 +69,9 @@ void *FrMainWindow::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrMainWindow))
-	return static_cast<void*>(const_cast< FrMainWindow*>(this));
+        return static_cast<void*>(const_cast< FrMainWindow*>(this));
     if (!strcmp(_clname, "Ui::MainWindow"))
-	return static_cast< Ui::MainWindow*>(const_cast< FrMainWindow*>(this));
+        return static_cast< Ui::MainWindow*>(const_cast< FrMainWindow*>(this));
     return QMainWindow::qt_metacast(_clname);
 }
 
@@ -92,8 +94,10 @@ int FrMainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 9: tabChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 10: bookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 11: saveToTab(); break;
+        case 12: openImage(); break;
         }
-        _id -= 12;
+        _id -= 13;
     }
     return _id;
 }
+QT_END_MOC_NAMESPACE

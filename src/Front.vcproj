@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D"
+				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/QVTKWidget;./frontend/Controllers;./frontend/FrToolsPanel;./frontend/FrBookmarkWidget"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -112,7 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D"
+				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/QVTKWidget;./frontend/Controllers"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -318,7 +318,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -328,7 +328,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -430,6 +430,22 @@
 			Name="Tools"
 			>
 			<File
+				RelativePath=".\frontend\Tools\FrPanTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrPanTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrSliceScrollTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrSliceScrollTool.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Tools\FrTool.cpp"
 				>
 			</File>
@@ -443,6 +459,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\tools\FrToolController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrZoomTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrZoomTool.h"
 				>
 			</File>
 		</Filter>
@@ -463,6 +487,30 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Document\FrDocumentObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrImageDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrImageDocObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrMainDocument.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrMainDocument.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrTabSettingsDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrTabSettingsDocObj.h"
 				>
 			</File>
 		</Filter>
@@ -486,6 +534,26 @@
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Controllers"
+			>
+			<File
+				RelativePath=".\frontend\Controllers\FrInteractorStyle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Controllers\FrInteractorStyle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Controllers\FrMainController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Controllers\FrMainController.h"
+				>
 			</File>
 		</Filter>
 		<File

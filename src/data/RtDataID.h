@@ -23,8 +23,14 @@ public:
   // comparison
   bool operator==(const RtDataID &other);
 
+  // less
+  bool operator<(const RtDataID &other);
+
   // get a string version of the ID
   string toString();
+
+  // set the ID from a string
+  string setFromString(const string &id);
 
 protected:
 
@@ -34,6 +40,14 @@ protected:
   string       roiID;
   string       processModuleID;
 
+};
+
+// comparison class for storing ids in a map (see RtDataStore.h) 
+class RtDataIDCompare {
+public:
+  bool operator()(const RtDataID* one, const RtDataID* two) const {
+    return (*one) < (*two);
+  }
 };
 
 #endif

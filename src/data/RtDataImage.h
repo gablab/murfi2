@@ -22,6 +22,25 @@
 
 using namespace std;
 
+/*
+  Notes about conversion of this type to use itk::Image internally
+  IF WE SHOULD REALLY DO THIS.
+  
+  - probably use itk::Image<T,4> to represent 4D images, where T will be short
+    or double
+ 
+  - use smartpointers
+
+  - use itk::ImportImageFilter to convert from scanner data array
+
+  - got to use iterators to tranverse data sequentially
+
+  - use itk::PointSet to represent masks (make sure to insert and retrieve
+    using iterators)
+
+  - 
+ */
+
 
 // class declaration
 template<class T>

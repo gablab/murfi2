@@ -10,6 +10,7 @@
 
 #include<iostream>
 #include"ace/Date_Time.h"
+#include"ace/Mutex.h"
 #include<iostream>
 #include<vector>
 #include<iomanip>
@@ -41,6 +42,10 @@ using namespace std;
   - 
  */
 
+// helper for shared memory locking
+class RtMutex : public ACE_Mutex {
+  public: void operator=(RtMutex &other) {}
+};
 
 // class declaration
 template<class T>
@@ -250,7 +255,7 @@ public:
   void setPixel(unsigned int i, T v);
 
   // set pixel value when locked
-  void setPixelLocked(RtLocker *locker, unsigned int i, T v);
+  //void setPixelLocked(RtLocker *locker, unsigned int i, T v);
 
   // sets the min and max pixel value for this data image
   void setMinMax();
@@ -309,6 +314,9 @@ protected:
 
   // image data
   T *data;
+
+  // for managing shared memory access
+  RtMutex mutex;
 
   // magic number for this image type
   unsigned int magicNumber;
@@ -480,9 +488,9 @@ RtDataImage<T>::~RtDataImage() {
   ACE_TRACE(("RtDataImage<T>::~RtDataImage"));
 
   // notify our locker that we are being deleted
-  if(lock != NULL) {
-    lock->beingDeleted();
-  }
+//  if(lock != NULL) {
+//    lock->beingDeleted();
+//  }
 
   // free data
   if(data != NULL) {
@@ -515,6 +523,7 @@ RtDataImage<T>::~RtDataImage() {
 template<class T>
 void RtDataImage<T>::printInfo(ostream &os) {
   ACE_TRACE(("RtDataImageInfo::print"));
+  mutex.acquire();
 
   int wid = 30;
 
@@ -565,6 +574,7 @@ void RtDataImage<T>::printInfo(ostream &os) {
 
   os << "---------------------------" << endl;
 
+  mutex.release();
 }
 
 // serialize the data as xml for transmission or saving to a file
@@ -621,19 +631,23 @@ bool RtDataImage<T>::writeRaw(const string &_filename) {
     return false;
   }
 
-  // write info
-  if(!writeInfo(imgFile)) {
-    ACE_DEBUG((LM_DEBUG, ACE_TEXT("couldnt write info to %s\n"),_filename));
-    imgFile.close();
-    return false;
-  }
+  mutex.acquire(); {
 
-  // write data
-  if(!writeData(imgFile)) {
-    ACE_DEBUG((LM_DEBUG,ACE_TEXT("couldnt write img data to %s\n"),_filename));
-    imgFile.close();
-    return false;
-  }
+    // write info
+    if(!writeInfo(imgFile)) {
+      ACE_DEBUG((LM_DEBUG, ACE_TEXT("couldnt write info to %s\n"),_filename));
+      imgFile.close();
+      return false;
+    }
+
+    // write data
+    if(!writeData(imgFile)) {
+      ACE_DEBUG((LM_DEBUG,ACE_TEXT("couldnt write img data to %s\n"),_filename));
+      imgFile.close();
+      return false;
+    }
+
+  } mutex.release();
 
   imgFile.close();
 
@@ -660,17 +674,21 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
 
   // fill the nifti struct with our data
   nifti_image *img = (nifti_image*) malloc(sizeof(nifti_image));
-  copyInfo(img);
 
-  // allocate and copy data
-  img->data = (void*) malloc(img->nbyper*img->nvox);
-  memcpy(img->data, data, img->nbyper*img->nvox);
+  mutex.acquire(); {
 
-  // debugging
-  //nifti_image_infodump(img);
+    copyInfo(img);
 
-  // write the file
-  nifti_image_write(img);
+    // allocate and copy data
+    img->data = (void*) malloc(img->nbyper*img->nvox);
+    memcpy(img->data, data, img->nbyper*img->nvox);
+
+    // debugging
+    //nifti_image_infodump(img);
+
+    // write the file
+    nifti_image_write(img);
+  } mutex.release();
 
   nifti_image_free(img);
 
@@ -806,24 +824,27 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     return false;
   }
 
-  // read the image info
-  if(!readInfo(imgFile)) {
-    ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image info from %s\n"),
-				  _filename));
-    imgFile.close();
-    return false;
-  }
+  mutex.acquire(); {
 
-  // allocate new data
-  data = new T[numPix];
+    // read the image info
+    if(!readInfo(imgFile)) {
+      ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image info from %s\n"),
+		 _filename));
+      imgFile.close();
+      return false;
+    }
 
-  // read the image data
-  if(!readData(imgFile)) {
-    ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image data from %s\n"),
-				  _filename));
-    imgFile.close();
-    return false;
-  }
+    // allocate new data
+    data = new T[numPix];
+
+    // read the image data
+    if(!readData(imgFile)) {
+      ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image data from %s\n"),
+		 _filename));
+      imgFile.close();
+      return false;
+    }
+  } mutex.release();
 
   imgFile.close();
 
@@ -859,20 +880,24 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
     return false;
   }
 
-  // transform nifti header into our image info struct
-  setInfo(img);
+  mutex.acquire(); {
 
-  // delete our current image data, if we have it
-  if(data != NULL) {
-    delete [] data;
-  }
+    // transform nifti header into our image info struct
+    setInfo(img);
 
-  // read the image data
-  nifti_image_load(img);
+    // delete our current image data, if we have it
+    if(data != NULL) {
+      delete [] data;
+    }
 
-  // allocate new data
-  data = new T[img->nvox];
-  memcpy(data, img->data, img->nbyper * img->nvox);
+    // read the image data
+    nifti_image_load(img);
+
+    // allocate new data
+    data = new T[img->nvox];
+    memcpy(data, img->data, img->nbyper * img->nvox);
+
+  }  mutex.release();
 
   // store filename if its not set
   if(filename.empty()) {
@@ -1146,13 +1171,18 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 // flip each slice LR
 template<class T>
 bool RtDataImage<T>::flipLR() {
-  for(unsigned int row = 0; row < getNumPix()/matrixSize; row++) {
-    for(unsigned int j = 0, begInd = row*matrixSize; j < matrixSize/2; j++) {
-      T tmp = data[begInd+j];
-      data[begInd+j] = data[begInd+matrixSize-1-j];
-      data[begInd+matrixSize-1-j] = tmp;
+  mutex.acquire(); {
+
+    for(unsigned int row = 0; row < getNumPix()/matrixSize; row++) {
+      for(unsigned int j = 0, begInd = row*matrixSize; j < matrixSize/2; j++) {
+	T tmp = data[begInd+j];
+	data[begInd+j] = data[begInd+matrixSize-1-j];
+	data[begInd+matrixSize-1-j] = tmp;
+      }
     }
-  }
+
+  }  mutex.release();
+
 
   return true;
 }
@@ -1193,64 +1223,69 @@ bool RtDataImage<T>::unmosaic() {
 //    return false;
 //  }
 
-  // build a new dim array
-  int width = dims[0];
-  int height = dims[1];
+  mutex.acquire(); {
 
-  dims.clear();
-  dims.reserve(4);
 
-  dims.push_back(matrixSize);
-  dims.push_back(matrixSize);
+    // build a new dim array
+    int width = dims[0];
+    int height = dims[1];
 
-  if(numSlices > 0) {
-    dims.push_back(numSlices);
-  }
-  else {
-    dims.push_back(width/matrixSize * height/matrixSize);
-  }
+    dims.clear();
+    dims.reserve(4);
 
-  // build a new pixdim
-  pixdims[2] = sliceThick*(1+sliceGap);
+    dims.push_back(matrixSize);
+    dims.push_back(matrixSize);
 
-  // reshape the data
-  numPix = matrixSize*matrixSize*numSlices;
-  T *newdata = new T[numPix];
-  imgDataLen = numPix*sizeof(T);
-
-  unsigned int slc, row, col, newind;
-  unsigned int sqMatrixSize = matrixSize*matrixSize;
-  for(unsigned int i = 0; i < width*height; i++) {
-    slc = (i%width)/matrixSize +
-      (i/(matrixSize*width))*(width/matrixSize);
-    row = (i/width)%matrixSize;
-    col = i%matrixSize;
-
-    if(slc > numSlices) {
-      continue;
+    if(numSlices > 0) {
+      dims.push_back(numSlices);
+    }
+    else {
+      dims.push_back(width/matrixSize * height/matrixSize);
     }
 
-    newind = slc*sqMatrixSize+row*matrixSize+col;
- //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
-    if(slc >= numSlices) {
-      continue;
+    // build a new pixdim
+    pixdims[2] = sliceThick*(1+sliceGap);
+
+    // reshape the data
+    numPix = matrixSize*matrixSize*numSlices;
+    T *newdata = new T[numPix];
+    imgDataLen = numPix*sizeof(T);
+
+    unsigned int slc, row, col, newind;
+    unsigned int sqMatrixSize = matrixSize*matrixSize;
+    for(unsigned int i = 0; i < width*height; i++) {
+      slc = (i%width)/matrixSize +
+	(i/(matrixSize*width))*(width/matrixSize);
+      row = (i/width)%matrixSize;
+      col = i%matrixSize;
+
+      if(slc > numSlices) {
+	continue;
+      }
+
+      newind = slc*sqMatrixSize+row*matrixSize+col;
+      //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
+      if(slc >= numSlices) {
+	continue;
+      }
+
+      newdata[newind] = data[i];
     }
 
-    newdata[newind] = data[i];
-  }
+    //  ofstream of;
+    //  of.open("/tmp/imgarr.txt");
+    //  for(unsigned int i=0; i < numPix; i++) {
+    //    of << newdata[i] << endl;
+    //    //cout << newdata[i] << endl;
+    //  }
+    //  of.close();
 
-//  ofstream of;
-//  of.open("/tmp/imgarr.txt");
-//  for(unsigned int i=0; i < numPix; i++) {
-//    of << newdata[i] << endl;
-//    //cout << newdata[i] << endl;
-//  }
-//  of.close();
+    delete data;
+    data = newdata;
 
-  delete data;
-  data = newdata;
+    isMosaiced = false;  
 
-  isMosaiced = false;  
+  }  mutex.release();
 
   return true;
 }
@@ -1271,46 +1306,50 @@ bool RtDataImage<T>::mosaic() {
     return false;
   }
 
-  // set the matrix size and number of slices
-  matrixSize = dims[0];
-  numSlices = dims[2];
+  mutex.acquire(); {
 
-  dims.clear();
-  dims.reserve(2);
+    // set the matrix size and number of slices
+    matrixSize = dims[0];
+    numSlices = dims[2];
 
-  //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);
-  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
-  dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
-  numPix = dims[0]*dims[1];
+    dims.clear();
+    dims.reserve(2);
 
-  // reshape the data
-  T *newdata = new T[numPix];
-  imgDataLen = numPix*sizeof(T);
+    //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);
+    dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
+    dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
+    numPix = dims[0]*dims[1];
 
-  unsigned int newrow, newcol, oldslc, newind;
-  unsigned int sqMatrixSize = matrixSize*matrixSize;
-  for(unsigned int i = 0; i < numPix; i++) {
-    oldslc = i/sqMatrixSize;
+    // reshape the data
+    T *newdata = new T[numPix];
+    imgDataLen = numPix*sizeof(T);
 
-    // these expressions are bracketed carefully to truncate
-    // DO NOT SIMPLIFY THESE EXPRESSIONS
-    newrow = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
-    newcol = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
-    newind = newrow*dims[1]+newcol;
+    unsigned int newrow, newcol, oldslc, newind;
+    unsigned int sqMatrixSize = matrixSize*matrixSize;
+    for(unsigned int i = 0; i < numPix; i++) {
+      oldslc = i/sqMatrixSize;
 
-    // copy if within slices
-    if(oldslc < numSlices) {
-      newdata[newind] = data[i];
+      // these expressions are bracketed carefully to truncate
+      // DO NOT SIMPLIFY THESE EXPRESSIONS
+      newrow = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
+      newcol = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
+      newind = newrow*dims[1]+newcol;
+
+      // copy if within slices
+      if(oldslc < numSlices) {
+	newdata[newind] = data[i];
+      }
+      else { // fill the blank panels with zeros
+	newdata[newind] = 0;
+      }
     }
-    else { // fill the blank panels with zeros
-      newdata[newind] = 0;
-    }
-  }
 
-  delete data;
-  data = newdata;
+    delete data;
+    data = newdata;
 
-  isMosaiced = true;
+    isMosaiced = true;
+
+  }  mutex.release();
 
   return true;
 }
@@ -1349,9 +1388,11 @@ void RtDataImage<T>::initToZeros() {
     return;
   }
 
-  for(unsigned int i = 0; i < numPix; i++) {
-    data[i] = 0;
-  }
+  mutex.acquire(); {
+    for(unsigned int i = 0; i < numPix; i++) {
+      data[i] = 0;
+    }
+  }  mutex.release();
 }
 
 //************ sets *****************//
@@ -1383,7 +1424,11 @@ vnl_matrix_fixed<double,4,4> &RtDataImage<T>::getRas2Ref() {
 // get dimensions
 template<class T>
 int RtDataImage<T>::getDim(int i) {
-  return (int)dims.size() > i && i >= 0 ? dims[i] : -1;
+  int ret;
+  mutex.acquire(); {
+    ret = (int)dims.size() > i && i >= 0 ? dims[i] : -1;
+  }  mutex.release();
+  return ret;
 }
 
 // get voxel dimensions
@@ -1395,13 +1440,21 @@ vector<double> &RtDataImage<T>::getPixDims() {
 // get vox dimensions
 template<class T>
 double RtDataImage<T>::getPixDim(int i) {
-  return pixdims.size() > i && i >= 0 ? pixdims[i] : -1;
+  double ret;
+  mutex.acquire(); {
+    ret = pixdims.size() > i && i >= 0 ? pixdims[i] : -1; 
+  }  mutex.release();
+  return ret;
 }
 
 // get number of pix
 template<class T>
 unsigned int RtDataImage<T>::getNumPix() {
-  return numPix;
+  unsigned int ret;
+  mutex.acquire(); {
+    ret = numPix;
+  }  mutex.release();
+  return ret;
 }
 
 // get number of elements (same as num pix)
@@ -1413,13 +1466,21 @@ unsigned int RtDataImage<T>::getNumEl() {
 // get number of bytes per pix
 template<class T>
 unsigned short RtDataImage<T>::getBytesPerPix() {
-  return bytesPerPix;
+  unsigned short ret;
+  mutex.acquire(); {
+    ret = bytesPerPix;
+  }  mutex.release();
+  return ret;
 }
 
 // get pixel value
 template<class T>
 T RtDataImage<T>::getPixel(unsigned int i) {
-  return i < numPix ? data[i] : 0;
+  T ret;
+  mutex.acquire(); {
+    ret = i < numPix ? data[i] : 0; 
+  }  mutex.release();
+  return ret;
 }
 
 // get element value (same as pixel)
@@ -1431,7 +1492,11 @@ T RtDataImage<T>::getElement(unsigned int i) {
 // get data size
 template<class T>
 unsigned int RtDataImage<T>::getImgDataLen() {
-  return imgDataLen;
+  unsigned int ret;
+  mutex.acquire(); {
+    ret = imgDataLen; 
+  }  mutex.release();
+  return ret;
 }
 
 // get a pointer to the image data
@@ -1460,19 +1525,21 @@ void RtDataImage<T>::setPixDim(unsigned int i, double dim) {
 // set pixel value
 template<class T>
 void RtDataImage<T>::setPixel(unsigned int i, T v) {
-  if(lock == NULL && i < numPix) {
+  mutex.acquire(); {
+    //if(lock == NULL && i < numPix) {
     data[i] = v;
-  }
+      //}
+  }  mutex.release();
 }
 
 // set pixel value when locked
-template<class T>
-void RtDataImage<T>::setPixelLocked(RtLocker *locker,
-				 unsigned int i, T v) {
-  if((lock == NULL || lock == locker) && i < numPix) {
-    data[i] = v;
-  }
-}
+//template<class T>
+//void RtDataImage<T>::setPixelLocked(RtLocker *locker,
+//				 unsigned int i, T v) {
+//  if((lock == NULL || lock == locker) && i < numPix) {
+//    data[i] = v;
+//  }
+//}
 
 
 // sets the min and max pixel value for this data image
@@ -1482,20 +1549,23 @@ void RtDataImage<T>::setMinMax() {
 
   int mini = -1, maxi = -1;
 
-  if(numPix < 1) return;
+  mutex.acquire(); {
 
-  maxVal = data[0];
-  minVal = data[0];
-  for(unsigned int i = 0; i < numPix; i++) {
-    if(data[i] > maxVal) {
-      maxVal = data[i];
-      maxi = i;
+    if(numPix < 1) return;
+
+    maxVal = data[0];
+    minVal = data[0];
+    for(unsigned int i = 0; i < numPix; i++) {
+      if(data[i] > maxVal) {
+	maxVal = data[i];
+	maxi = i;
+      }
+      if(data[i] < minVal) {
+	minVal = data[i];
+	mini = i;
+      }
     }
-    if(data[i] < minVal) {
-      minVal = data[i];
-      mini = i;
-    }
-  }
+  }  mutex.release();
 
   minMaxSet = true;
 }

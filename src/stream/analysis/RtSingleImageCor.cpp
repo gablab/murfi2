@@ -11,6 +11,8 @@
 #include"RtActivation.h"
 #include<limits>
 
+#include"debug_levels.h"
+
 string RtSingleImageCor::moduleString("singleimcor");
 
 // default constructor
@@ -137,8 +139,10 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     // set threshold
     if(numTimepoints > numTrends+1) {
       stats[i]->setThreshold(getTStatThreshold(1));
-      //    cout << "single image est: using t threshold of " 
-      //	 << cor->getThreshold() << endl;
+      if(DEBUG_LEVEL & BASIC) {
+	cerr << "single image est: using t threshold of " 
+	     << stats[i]->getThreshold() << endl;
+      }
     }
   }
 
@@ -176,7 +180,9 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // switch conditions to max magnitude if condition switching on
   if(feedbackConditionSwitching) {
     conditionOfInterest = maxMagnitudeCondInd;
-    //cout << "condition of interest is " << conditionOfInterest << endl;
+    if(DEBUG_LEVEL & ADVANCED) {
+      cerr << "condition of interest is " << conditionOfInterest << endl;
+    }
   }
 
   // check if we should include this timepoint in variance computation
@@ -248,16 +254,20 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
       // compute the sds away from the mean
       stats[c]->setPixel(i, err / stdDev);
 
-//	cout 
-//	  << numTimepoints << " " 
-//	  << i << " " 
-//	  << y << " "
-//	  << err << " "
-//	  << conditions.get(numTimepoints-1,0) << " "
-//	  << esterr << " "
-//	  << stdDev << " "
-//	  << stats[c]->getPixel(i) << " " << endl;
-	//      cout << err << "/" << stdDev << "=" <<  stats[c]->getPixel(i) << endl;
+      if(DEBUG_LEVEL & ADVANCED) {
+  	cerr 
+	  << numTimepoints << " " 
+	  << i << " " 
+	  << y << " "
+	  << err << " "
+	  << conditions.get(numTimepoints-1,0) << " "
+	  << esterr << " "
+	  << stdDev << " "
+	  << stats[c]->getPixel(i) << " " << endl;
+      }
+      if(DEBUG_LEVEL & MODERATE) {        
+	cerr << err << "/" << stdDev << "=" <<  stats[c]->getPixel(i) << endl;
+      }
 
       if(dumpAlgoVars && numTimepoints > 2) {
 	dumpFile 
@@ -279,9 +289,11 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     delete beta;
   }
 
-//  cout << "done processing single image correlation at ";
-//  printNow(cout);
-//  cout << endl;
+  if(DEBUG_LEVEL & BASIC) {
+    cout << "done processing single image correlation at ";
+    printNow(cout);
+    cout << endl;
+  }
 
   // set the image ids for handling
   for(int c = 0; c < numConditions; c++) {

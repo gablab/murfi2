@@ -90,7 +90,7 @@ RtDisplayImage::RtDisplayImage() {
 
   img = NULL; 
   imageTex = 0; 
-  imageDisplayType = ID_SCANNERIMG;
+  imageDisplayType = ID_MOSAIC;
 
   loadInitialImage = false;
   initialImageFilename = "";
@@ -437,7 +437,7 @@ void RtDisplayImage::setData(RtData *data) {
   static Gnuplot gp = Gnuplot("lines");
   static unsigned int numTimepoints = 0;
 
-  //cout << "got data: " << data->getID() << ":" << data->getRoiID() << endl;
+  cout << "got data: " << data->getID() << ":" << data->getRoiID() << endl;
 
   // handle activation sum
   if(data->getID() == posActivationSumID 
@@ -544,7 +544,6 @@ void RtDisplayImage::setData(RtData *data) {
 // makes a texture from the image data and prepares it for display
 void RtDisplayImage::makeTexture() {
   ACE_TRACE(("RtDisplayImage::makeTexture"));
-  ACE_Mutex mut; // for potential mosaic
 
   /* delete the old texture if there is one */
   if(glIsTexture(imageTex)) {
@@ -582,20 +581,15 @@ void RtDisplayImage::makeTexture() {
   // unmosaic if needed
   short *imageData;
   if(!img->isMosaic()) {
-    mut.acquire();
-    img->mosaic();
-    imageData = new short[img->getNumEl()];
-    imageW = img->getDim(0);
-    imageH = img->getDim(1);
-    memcpy(imageData, img->getData(), sizeof(short)*img->getNumEl());
-    img->unmosaic();
-    mut.release();
+    imageData = img->getMosaicedCopy();
+    imageW = img->getMosaicedWidth();
+    imageH = img->getMosaicedHeight();
   }
   else {
     imageData = new short[img->getNumEl()];
     imageW = img->getDim(0);
     imageH = img->getDim(1);
-    memcpy(imageData, img->getData(), sizeof(short)*img->getNumEl());
+    imageData = img->getDataCopy();
   }
 
   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, imageW, imageH,
@@ -605,14 +599,13 @@ void RtDisplayImage::makeTexture() {
     cerr << "ERROR: could not generate a new texture" << endl;
   }
 
-  delete imageData;
+  delete [] imageData;
   needsRepaint = true;
 }
 
 // makes a texture from the overlay data and prepares it for display
 void RtDisplayImage::makeOverlayTexture(bool pos) {
   ACE_TRACE(("RtDisplayImage::makeOverlayTexture"));
-  ACE_Mutex mut; // for potential mosaic
 
   GLuint *overlayTex = pos ? &posOverlayTex : &negOverlayTex;
   RtActivation *overlay = pos ? posOverlay : negOverlay;
@@ -629,18 +622,15 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   double *imageData;
   int numImageData;
   if(!overlay->isMosaic()) {
-    mut.acquire();
-    overlay->mosaic();
-    imageData = new double[overlay->getNumEl()];
-    numImageData = overlay->getNumEl();
-    memcpy(imageData, overlay->getData(), sizeof(double)*numImageData);
-    overlay->unmosaic();
-    mut.release();
+    imageData = overlay->getMosaicedCopy();
+    imageW = overlay->getMosaicedWidth();
+    imageH = overlay->getMosaicedHeight();
+    numImageData = imageW*imageH;
   }
   else {
     imageData = new double[overlay->getNumEl()];
     numImageData = overlay->getNumEl();
-    memcpy(imageData, overlay->getData(), sizeof(double)*numImageData);
+    imageData = overlay->getDataCopy();
   }
 
   // convert overlay data into a displayable image
@@ -1110,7 +1100,7 @@ void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
     exit(0);
     break;
   case 's':
-    imageDisplayType = ID_SCANNERIMG;
+    imageDisplayType = ID_MOSAIC;
     break;
   case 'd':
     imageDisplayType = ID_DIFFIMG;

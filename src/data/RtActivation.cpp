@@ -207,12 +207,15 @@ void RtActivation::setInfo(RtMRIImage &img) {
 // reallocate data array based on current number of pixels
 void RtActivation::reallocateData() {
   if(data != NULL) {
-    cerr << "ac1 deleting data for " << this << endl; cerr.flush();
-
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "ac1 deleting data for " << this << endl; cerr.flush();
+    }
     delete [] data;
   }
 
-  cerr << "ac1 allocating data for " << this << endl; cerr.flush();
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "ac1 allocating data for " << this << endl; cerr.flush();
+  }
 
   data = new double[numPix];
 }

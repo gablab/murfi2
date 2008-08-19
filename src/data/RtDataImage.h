@@ -79,12 +79,11 @@ public:
   // destructor
   virtual ~RtDataImage();
 
-  // set this image based on a passed image info and data
-  //  in
-  //   info: struct
-  //   data: array (optional, image data will be  allocated and set
-  //         to all zeros if null)
-  //void setImage(RtDataImageInfo &_info, T*_data = NULL);
+  // lock the data (read/write) 
+  virtual void lock();
+
+  // unlock the data
+  virtual void unlock();
 
   // save the image to a file (already set filename)
   //  out
@@ -197,11 +196,22 @@ public:
   // convert from a mosaic representation
   bool unmosaic();
 
+  // get a copy of the data in mosaiced format
+  //  out
+  //   copy: pointer to the data that will be created
+  T* getMosaicedCopy();
+
   // test for mosaic image format
   bool isMosaic();
 
   // guess whether the image is mosaiced based on the dimensions
   bool seemsMosaic();
+
+  // get the width of a potential mosaiced version of this data
+  unsigned int getMosaicedWidth();
+
+  // get the height of a potential mosaiced version of this data
+  unsigned int getMosaicedHeight();
 
   //********  methods for getting data from the image *******//
 
@@ -244,8 +254,8 @@ public:
   // get data size
   unsigned int getImgDataLen();
 
-  // get a pointer to the image data
-  T *getData();
+  // get a copy of the image data
+  T *getDataCopy();
 
   //*** sets  ***//
 
@@ -254,9 +264,6 @@ public:
 
   // set pixel value
   void setPixel(unsigned int i, T v);
-
-  // set pixel value when locked
-  //void setPixelLocked(RtLocker *locker, unsigned int i, T v);
 
   // sets the min and max pixel value for this data image
   void setMinMax();
@@ -350,6 +357,13 @@ protected:
   unsigned short numSlices;
   double sliceThick;
   double sliceGap;
+
+private:
+  // convert to a mosaic representation
+  bool mosaicUnlocked();
+
+  // convert from a mosaic representation
+  bool unmosaicUnlocked();
 
 };
 
@@ -494,11 +508,6 @@ template<class T>
 RtDataImage<T>::~RtDataImage() {
   ACE_TRACE(("RtDataImage<T>::~RtDataImage"));
 
-  // notify our locker that we are being deleted
-//  if(lock != NULL) {
-//    lock->beingDeleted();
-//  }
-
   // free data
   if(data != NULL) {
     if(DEBUG_LEVEL & ALLOC) {
@@ -508,32 +517,24 @@ RtDataImage<T>::~RtDataImage() {
   }
 }
 
+// lock the data (read/write)
+template<class T>
+void RtDataImage<T>::lock() {
+  ACE_TRACE(("RtDataImage::lock"));
+  mutex.acquire();
+}
 
-// set this image based on a passed image info and data
-//  in
-//   info: struct
-//   data: array (optional, image data will be  allocated and set
-//         to all zeros if null)
-//template<class T>
-//void RtDataImage<T>::setImage(RtDataImageInfo &_info, T *_data) {
-//  info = _info;
-//  data = new T[info.numPix];
-//
-//  if(_data != NULL) {
-//    memcpy(data, _data, info.imgDataLen);
-//  }
-//  else {
-//    for(unsigned int i = 0; i < info.numPix; i++) {
-//      data[i] = 0;
-//    }
-//  }
-//}
+// unlock the data
+template<class T>
+void RtDataImage<T>::unlock() {
+  ACE_TRACE(("RtDataImage::unlock"));
+  mutex.release();
+}
 
 // print info about this image
 template<class T>
 void RtDataImage<T>::printInfo(ostream &os) {
   ACE_TRACE(("RtDataImageInfo::print"));
-  mutex.acquire();
 
   int wid = 30;
 
@@ -583,8 +584,6 @@ void RtDataImage<T>::printInfo(ostream &os) {
   }
 
   os << "---------------------------" << endl;
-
-  mutex.release();
 }
 
 // serialize the data as xml for transmission or saving to a file
@@ -641,7 +640,7 @@ bool RtDataImage<T>::writeRaw(const string &_filename) {
     return false;
   }
 
-  mutex.acquire(); {
+  lock(); {
 
     // write info
     if(!writeInfo(imgFile)) {
@@ -657,7 +656,7 @@ bool RtDataImage<T>::writeRaw(const string &_filename) {
       return false;
     }
 
-  } mutex.release();
+  } unlock();
 
   imgFile.close();
 
@@ -685,7 +684,7 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
   // fill the nifti struct with our data
   nifti_image *img = (nifti_image*) malloc(sizeof(nifti_image));
 
-  mutex.acquire(); {
+  lock(); {
 
     copyInfo(img);
 
@@ -698,7 +697,7 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
 
     // write the file
     nifti_image_write(img);
-  } mutex.release();
+  } unlock();
 
   nifti_image_free(img);
 
@@ -837,7 +836,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     return false;
   }
 
-  mutex.acquire(); {
+  lock(); {
 
     // read the image info
     if(!readInfo(imgFile)) {
@@ -860,7 +859,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
       imgFile.close();
       return false;
     }
-  } mutex.release();
+  } unlock();
 
   imgFile.close();
 
@@ -896,7 +895,7 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
     return false;
   }
 
-  mutex.acquire(); {
+  lock(); {
 
     // transform nifti header into our image info struct
     setInfo(img);
@@ -919,7 +918,7 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
     data = new T[img->nvox];
     memcpy(data, img->data, img->nbyper * img->nvox);
 
-  }  mutex.release();
+  }  unlock();
 
   // store filename if its not set
   if(filename.empty()) {
@@ -1193,7 +1192,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 // flip each slice LR
 template<class T>
 bool RtDataImage<T>::flipLR() {
-  mutex.acquire(); {
+  lock(); {
 
     for(unsigned int row = 0; row < getNumPix()/matrixSize; row++) {
       for(unsigned int j = 0, begInd = row*matrixSize; j < matrixSize/2; j++) {
@@ -1203,25 +1202,11 @@ bool RtDataImage<T>::flipLR() {
       }
     }
 
-  }  mutex.release();
+  }  unlock();
 
 
   return true;
 }
-
-// flip each slice AP
-//template<class T>
-//bool RtDataImage<T>::flipAP() {
-//  for(unsigned int col = 0; col < getNumPix()/matrixSize; col++) {
-//    for(unsigned int j = 0, begInd = col*matrixSize; j < matrixSize/2; j++) {
-//      T tmp = data[begInd+j];
-//      data[begInd+j] = data[begInd+matrixSize-1-j];
-//      data[begInd+matrixSize-1-j] = tmp;
-//    }
-//  }
-//
-//  return true;
-//}
 
 // convert from a mosaic representation
 template<class T>
@@ -1239,82 +1224,96 @@ bool RtDataImage<T>::unmosaic() {
     return false;
   }
 
-//  if(numSlices == 0) { // num slices set
-//    cerr << "can't mosaic an image if i don't know the number of slices"
-//	 << endl;
-//    return false;
-//  }
+  bool ret;
+  lock(); {
+    ret = unmosaicUnlocked();
+  } unlock();
 
-  mutex.acquire(); {
+  return ret;
+}
+
+// convert from a mosaic representation
+template<class T>
+bool RtDataImage<T>::unmosaicUnlocked() {
+  // validate
+  if(!seemsMosaic()) { // dims
+    cerr << "can't unmosaic an image that seemsMosaic()"
+	 << endl;
+    return false;
+  }
+
+  if(matrixSize == 0) { // matrix size set
+    cerr << "can't unmosaic an image if i don't know the matrix size"
+	 << endl;
+    return false;
+  }
 
 
-    // build a new dim array
-    int width = dims[0];
-    int height = dims[1];
+  // build a new dim array
+  int width = dims[0];
+  int height = dims[1];
 
-    dims.clear();
-    dims.reserve(4);
+  dims.clear();
+  dims.reserve(4);
 
-    dims.push_back(matrixSize);
-    dims.push_back(matrixSize);
+  dims.push_back(matrixSize);
+  dims.push_back(matrixSize);
 
-    if(numSlices > 0) {
-      dims.push_back(numSlices);
+  if(numSlices > 0) {
+    dims.push_back(numSlices);
+  }
+  else {
+    dims.push_back(width/matrixSize * height/matrixSize);
+  }
+
+  // build a new pixdim
+  pixdims[2] = sliceThick*(1+sliceGap);
+
+  // reshape the data
+  numPix = matrixSize*matrixSize*numSlices;
+  T *newdata = new T[numPix];
+  imgDataLen = numPix*sizeof(T);
+
+  unsigned int slc, row, col, newind;
+  unsigned int sqMatrixSize = matrixSize*matrixSize;
+  for(unsigned int i = 0; i < width*height; i++) {
+    slc = (i%width)/matrixSize +
+      (i/(matrixSize*width))*(width/matrixSize);
+    row = (i/width)%matrixSize;
+    col = i%matrixSize;
+
+    if(slc > numSlices) {
+      continue;
     }
-    else {
-      dims.push_back(width/matrixSize * height/matrixSize);
+
+    newind = slc*sqMatrixSize+row*matrixSize+col;
+    //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
+    if(slc >= numSlices) {
+      continue;
     }
 
-    // build a new pixdim
-    pixdims[2] = sliceThick*(1+sliceGap);
+    newdata[newind] = data[i];
+  }
 
-    // reshape the data
-    numPix = matrixSize*matrixSize*numSlices;
-    T *newdata = new T[numPix];
-    imgDataLen = numPix*sizeof(T);
+  //  ofstream of;
+  //  of.open("/tmp/imgarr.txt");
+  //  for(unsigned int i=0; i < numPix; i++) {
+  //    of << newdata[i] << endl;
+  //    //cout << newdata[i] << endl;
+  //  }
+  //  of.close();
 
-    unsigned int slc, row, col, newind;
-    unsigned int sqMatrixSize = matrixSize*matrixSize;
-    for(unsigned int i = 0; i < width*height; i++) {
-      slc = (i%width)/matrixSize +
-	(i/(matrixSize*width))*(width/matrixSize);
-      row = (i/width)%matrixSize;
-      col = i%matrixSize;
-
-      if(slc > numSlices) {
-	continue;
-      }
-
-      newind = slc*sqMatrixSize+row*matrixSize+col;
-      //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
-      if(slc >= numSlices) {
-	continue;
-      }
-
-      newdata[newind] = data[i];
-    }
-
-    //  ofstream of;
-    //  of.open("/tmp/imgarr.txt");
-    //  for(unsigned int i=0; i < numPix; i++) {
-    //    of << newdata[i] << endl;
-    //    //cout << newdata[i] << endl;
-    //  }
-    //  of.close();
-
-    if(DEBUG_LEVEL & ALLOC) {
-      cerr << "4 deleting data for " << this << endl; cerr.flush();
-    }
-    delete [] data;
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "4 deleting data for " << this << endl; cerr.flush();
+  }
+  delete [] data;
 
 
-    if(DEBUG_LEVEL & ALLOC) {
-      cerr << "4 allocating data for " << this << endl; cerr.flush();
-    }
-    data = newdata;
-    isMosaiced = false;  
-
-  }  mutex.release();
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "4 allocating data for " << this << endl; cerr.flush();
+  }
+  data = newdata;
+  isMosaiced = false;  
 
   return true;
 }
@@ -1335,60 +1334,122 @@ bool RtDataImage<T>::mosaic() {
     return false;
   }
 
-  mutex.acquire(); {
+  bool ret;
+  lock(); {
+    ret = mosaicUnlocked();
+  } unlock();
 
-    // set the matrix size and number of slices
-    matrixSize = dims[0];
-    numSlices = dims[2];
+  return ret;
+}
 
-    dims.clear();
-    dims.reserve(2);
+// convert to a mosaic representation (private unlocked version)
+template<class T>
+bool RtDataImage<T>::mosaicUnlocked() {
+  // validate
+  if(seemsMosaic()) {
+    cerr << "can't mosaic an image that already seems to be"
+	 << endl;
+    return false;
+  }
 
-    //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);
-    dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
-    dims.push_back((int)sqrt(matrixSize*matrixSize*pow(ceil(sqrt((double)numSlices)),2)));
-    numPix = dims[0]*dims[1];
+  if(dims[0] != dims[1]) { // must be same size
+    cerr << "can't mosaic an image with different row and column sizes"
+	 << endl;
+    return false;
+  }
 
-    // reshape the data
-    T *newdata = new T[numPix];
-    imgDataLen = numPix*sizeof(T);
+  // set the matrix size and number of slices
+  matrixSize = dims[0];
+  numSlices = dims[2];
 
-    unsigned int newrow, newcol, oldslc, newind;
-    unsigned int sqMatrixSize = matrixSize*matrixSize;
-    for(unsigned int i = 0; i < numPix; i++) {
-      oldslc = i/sqMatrixSize;
+  dims.clear();
+  dims.reserve(2);
 
-      // these expressions are bracketed carefully to truncate
-      // DO NOT SIMPLIFY THESE EXPRESSIONS
-      newrow = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
-      newcol = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
-      newind = newrow*dims[1]+newcol;
+  //sqrt(matrixSize^2*ceil(sqrt(numSlices))^2);
+  dims.push_back(getMosaicedWidth());
+  dims.push_back(getMosaicedHeight());
+  numPix = dims[0]*dims[1];
 
-      // copy if within slices
-      if(oldslc < numSlices) {
-	newdata[newind] = data[i];
-      }
-      else { // fill the blank panels with zeros
-	newdata[newind] = 0;
-      }
+  // reshape the data
+  T *newdata = new T[numPix];
+  imgDataLen = numPix*sizeof(T);
+
+  unsigned int newrow, newcol, oldslc, newind;
+  unsigned int sqMatrixSize = matrixSize*matrixSize;
+  for(unsigned int i = 0; i < numPix; i++) {
+    oldslc = i/sqMatrixSize;
+
+    // these expressions are bracketed carefully to truncate
+    // DO NOT SIMPLIFY THESE EXPRESSIONS
+    newrow = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
+    newcol = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
+    newind = newrow*dims[1]+newcol;
+
+    // copy if within slices
+    if(oldslc < numSlices) {
+      newdata[newind] = data[i];
     }
-
-    if(DEBUG_LEVEL & ALLOC) {
-      cerr << "5 deleting data for " << this << endl; cerr.flush();
+    else { // fill the blank panels with zeros
+      newdata[newind] = 0;
     }
-    delete [] data;
+  }
+
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "5 deleting data for " << this << endl; cerr.flush();
+  }
+  delete [] data;
 
 
-    if(DEBUG_LEVEL & ALLOC) {
-      cerr << "5 allocating data for " << this << endl; cerr.flush();
-    }
-    data = newdata;
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "5 allocating data for " << this << endl; cerr.flush();
+  }
+  data = newdata;
 
-    isMosaiced = true;
-
-  }  mutex.release();
+  isMosaiced = true;
 
   return true;
+}
+
+
+// get a copy of the data in mosaiced format 
+// (use getMosaicedWidth/Height to get size)
+//  out
+//   copy: pointer to the data that will be created
+template<class T>
+T* RtDataImage<T>::getMosaicedCopy() {
+  T* copy;
+  lock(); {
+
+    mosaicUnlocked();
+    copy = new T[numPix];
+    memcpy(copy, data, numPix*sizeof(T));
+    unmosaicUnlocked();
+
+  } unlock();
+
+  return copy;
+}
+
+// get the width of a potential mosaiced version of this data
+template<class T>
+unsigned int RtDataImage<T>::getMosaicedWidth() {
+  if(matrixSize < 1 || numSlices < 1) {
+    return 0;
+  }
+
+  return (int) sqrt( matrixSize*matrixSize 
+		     * pow(ceil(sqrt((double)numSlices)), 2) );
+}
+
+// get the height of a potential mosaiced version of this data
+template<class T>
+unsigned int RtDataImage<T>::getMosaicedHeight() {
+  if(matrixSize < 1 || numSlices < 1) {
+    return 0;
+  }
+
+  return (int) matrixSize * ceil((double)numSlices 
+				 / (getMosaicedWidth() / matrixSize));
 }
 
 // test for a mosaic representation
@@ -1425,11 +1486,11 @@ void RtDataImage<T>::initToZeros() {
     return;
   }
 
-  mutex.acquire(); {
+  lock(); {
     for(unsigned int i = 0; i < numPix; i++) {
       data[i] = 0;
     }
-  }  mutex.release();
+  }  unlock();
 }
 
 //************ sets *****************//
@@ -1462,9 +1523,9 @@ vnl_matrix_fixed<double,4,4> &RtDataImage<T>::getRas2Ref() {
 template<class T>
 int RtDataImage<T>::getDim(int i) {
   int ret;
-  mutex.acquire(); {
+  lock(); {
     ret = (int)dims.size() > i && i >= 0 ? dims[i] : -1;
-  }  mutex.release();
+  }  unlock();
   return ret;
 }
 
@@ -1478,9 +1539,9 @@ vector<double> &RtDataImage<T>::getPixDims() {
 template<class T>
 double RtDataImage<T>::getPixDim(int i) {
   double ret;
-  mutex.acquire(); {
+  lock(); {
     ret = pixdims.size() > i && i >= 0 ? pixdims[i] : -1; 
-  }  mutex.release();
+  }  unlock();
   return ret;
 }
 
@@ -1488,9 +1549,9 @@ double RtDataImage<T>::getPixDim(int i) {
 template<class T>
 unsigned int RtDataImage<T>::getNumPix() {
   unsigned int ret;
-  mutex.acquire(); {
+  lock(); {
     ret = numPix;
-  }  mutex.release();
+  }  unlock();
   return ret;
 }
 
@@ -1504,9 +1565,9 @@ unsigned int RtDataImage<T>::getNumEl() {
 template<class T>
 unsigned short RtDataImage<T>::getBytesPerPix() {
   unsigned short ret;
-  mutex.acquire(); {
+  lock(); {
     ret = bytesPerPix;
-  }  mutex.release();
+  }  unlock();
   return ret;
 }
 
@@ -1514,9 +1575,9 @@ unsigned short RtDataImage<T>::getBytesPerPix() {
 template<class T>
 T RtDataImage<T>::getPixel(unsigned int i) {
   T ret;
-  mutex.acquire(); {
+  lock(); {
     ret = i < numPix ? data[i] : 0; 
-  }  mutex.release();
+  }  unlock();
   return ret;
 }
 
@@ -1530,16 +1591,18 @@ T RtDataImage<T>::getElement(unsigned int i) {
 template<class T>
 unsigned int RtDataImage<T>::getImgDataLen() {
   unsigned int ret;
-  mutex.acquire(); {
+  lock(); {
     ret = imgDataLen; 
-  }  mutex.release();
+  }  unlock();
   return ret;
 }
 
 // get a pointer to the image data
 template<class T>
-T *RtDataImage<T>::getData() {
-  return data;
+T *RtDataImage<T>::getDataCopy() {
+  T* copy = new T[numPix];
+  memcpy(copy, data, numPix*sizeof(T));
+  return copy;
 }
 
 //************ sets *****************//
@@ -1562,22 +1625,10 @@ void RtDataImage<T>::setPixDim(unsigned int i, double dim) {
 // set pixel value
 template<class T>
 void RtDataImage<T>::setPixel(unsigned int i, T v) {
-  mutex.acquire(); {
-    //if(lock == NULL && i < numPix) {
+  lock(); {
     data[i] = v;
-      //}
-  }  mutex.release();
+  }  unlock();
 }
-
-// set pixel value when locked
-//template<class T>
-//void RtDataImage<T>::setPixelLocked(RtLocker *locker,
-//				 unsigned int i, T v) {
-//  if((lock == NULL || lock == locker) && i < numPix) {
-//    data[i] = v;
-//  }
-//}
-
 
 // sets the min and max pixel value for this data image
 template<class T>
@@ -1586,23 +1637,20 @@ void RtDataImage<T>::setMinMax() {
 
   int mini = -1, maxi = -1;
 
-  mutex.acquire(); {
+  if(numPix < 1) return;
 
-    if(numPix < 1) return;
-
-    maxVal = data[0];
-    minVal = data[0];
-    for(unsigned int i = 0; i < numPix; i++) {
-      if(data[i] > maxVal) {
-	maxVal = data[i];
-	maxi = i;
-      }
-      if(data[i] < minVal) {
-	minVal = data[i];
-	mini = i;
-      }
+  maxVal = data[0];
+  minVal = data[0];
+  for(unsigned int i = 0; i < numPix; i++) {
+    if(data[i] > maxVal) {
+      maxVal = data[i];
+      maxi = i;
     }
-  }  mutex.release();
+    if(data[i] < minVal) {
+      minVal = data[i];
+      mini = i;
+    }
+  }
 
   minMaxSet = true;
 }

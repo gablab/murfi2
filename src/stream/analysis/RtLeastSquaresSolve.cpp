@@ -22,10 +22,6 @@ RtLeastSquaresSolve::RtLeastSquaresSolve(unsigned int _numCols) {
   numCols = _numCols;
   numMeas = 1;
 
-  if(numCols > 3) {
-    cout << " more than three!!!" << endl;
-  }
-
   init();
 }
 

@@ -50,7 +50,9 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   setInfo(extinfo);
 
   // allocate and copy the img data
-  cerr << "mr1 allocating data for " << this << endl; cerr.flush();
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "mr1 allocating data for " << this << endl; cerr.flush();
+  }
 
   data = new short[numPix];
 
@@ -80,7 +82,9 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
   magicNumber = MAGIC_NUMBER;
 
   // copy the data 
-  cerr << "mr2 allocating data for " << this << endl; cerr.flush();
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "mr2 allocating data for " << this << endl; cerr.flush();
+  }
 
   data = new short[numPix];
   memcpy(data, img.data, imgDataLen);
@@ -249,9 +253,9 @@ RtMRIImage::~RtMRIImage() {
   ACE_TRACE(("RtMRIImage::~RtMRIImage"));
 
   // notify our locker that we are being deleted
-  if(lock != NULL) {
-    lock->beingDeleted();
-  }
+//  if(lock != NULL) {
+//    lock->beingDeleted();
+//  }
 
   // don't need this cause our parent will delete the data
 //  if(data != NULL) {

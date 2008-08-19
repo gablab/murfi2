@@ -14,9 +14,7 @@
 // for gamma functions
 #include<vnl/vnl_gamma.h>
 
-// mutex
-#include"ace/Mutex.h"
-
+#include"debug_levels.h"
 
 string RtActivationEstimator::moduleString("voxel-accumcor");
 
@@ -323,10 +321,13 @@ void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
   }
   hrf.normalize();
 
-//  // sum
-//  for(unsigned int i = 0; i < hrf.size(); i++) {
-//    cout << hrf[i] << endl;
-//  }
+  if(DEBUG_LEVEL & MODERATE) {
+    cerr << "hrf: ";
+    for(unsigned int i = 0; i < hrf.size(); i++) {
+      cerr << hrf[i] << " ";
+    }
+    cerr << endl;
+  }
 }
 
 // finish initialization and prepare to run
@@ -348,7 +349,7 @@ bool RtActivationEstimator::finishInit() {
     // mosaic if we need to
     if(mosaicMask 
        || ((int) mask.getNumPix() > mask.getDim(0) * mask.getDim(1))) {
-      //cout << "warning: auto mosaic" << endl;
+      cout << "warning: auto mosaic" << endl;
       mask.mosaic();
     }
 
@@ -419,16 +420,20 @@ void RtActivationEstimator::buildConditions() {
 	newConds.put(meas, cond*numBlocks+block, conditions[meas][cond]);
       }
     }
-//     cout << "conds" << endl;
-//     printVnlMat(conditions);
-//    cout << endl;
+    if(DEBUG_LEVEL & ADVANCED) {
+      cerr << "condition matrix before modeling each block" << endl;
+      printVnlMat(conditions);
+      cerr << endl;
+    }
 
     conditions = newConds;
     numConditions*=numBlocks;
 
-//     cout << "new conds" << endl;
-//     printVnlMat(conditions);
-//     cout << endl;
+    if(DEBUG_LEVEL & ADVANCED) {
+      cerr << "condition matrix after modeling each block" << endl;
+      printVnlMat(conditions);
+      cerr << endl;
+    }
   }
 
   // convolve each condition with the hrf
@@ -459,16 +464,22 @@ void RtActivationEstimator::buildConditions() {
 		     conditions[meas][cond]-conditions[meas-1][cond]);
       }
     }
-//     cout << "conds" << endl;
-//     printVnlMat(conditions);
-//    cout << endl;
+    if(DEBUG_LEVEL & ADVANCED) {
+      cerr << "condition matrix after modeling temporal derivatives" << endl;
+      printVnlMat(conditions);
+      cerr << endl;
+    }
 
     conditions = newConds;
     numConditions*=2;    
 
   }
-  //printVnlMat(conditions);
 
+  if(DEBUG_LEVEL & MODERATE) {
+    cerr << "final condition matrix" << endl;
+    printVnlMat(conditions);
+    cerr << endl;
+  }
 }
 
 // test if a condition index is a derivative (index ignores trend regressors)
@@ -507,8 +518,6 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
     mask.setInfo(image);
     numComparisons = image.getNumEl();
     mask.setAll(1);
-    cout << "setting all voxels to 1" << endl;
-    cout << "mv " << mask.getPixel(0) << endl;
   }
   if(maskSource == THRESHOLD_FIRST_IMAGE_INTENSITY) {
     numComparisons 
@@ -525,12 +534,7 @@ void RtActivationEstimator::setResult(RtStreamMessage *msg, RtData *data) {
   // send the mask if desired 
   if(putMaskOnMessage) {
     mask.setRoiID(roiID);
-    //cout << "sending mask: " << mask.getID() << ":" << roiID << endl;
-
-    ACE_Mutex mut;
-    mut.acquire();
     passData(&mask);
-    mut.release();
   }
 
   RtStreamComponent::setResult(msg,data);

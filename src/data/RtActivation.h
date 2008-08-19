@@ -16,6 +16,7 @@
 #include"RtMaskImage.h"
 #include"RtTypes.h"
 
+#include"debug_levels.h"
 
 class RtMaskImage;
 

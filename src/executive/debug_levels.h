@@ -13,6 +13,6 @@
 #define ALLOC    16
 #define ADVANCED 32
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 0x002
 
 #endif

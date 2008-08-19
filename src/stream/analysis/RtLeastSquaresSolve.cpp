@@ -7,6 +7,7 @@
 
 #include"RtLeastSquaresSolve.h"
 #include<cstring>
+#include<iostream>
 using namespace std;
 
 // constructors
@@ -20,6 +21,11 @@ RtLeastSquaresSolve::RtLeastSquaresSolve() {
 RtLeastSquaresSolve::RtLeastSquaresSolve(unsigned int _numCols) {
   numCols = _numCols;
   numMeas = 1;
+
+  if(numCols > 3) {
+    cout << " more than three!!!" << endl;
+  }
+
   init();
 }
 

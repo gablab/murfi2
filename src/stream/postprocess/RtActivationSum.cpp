@@ -57,6 +57,12 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
     ACE_DEBUG((LM_INFO, "RtActivationSum:process: activation passed is NULL\n"));
     return 0;
   }
+
+  // check that the mri image and activation are the same size
+  if(act->getNumEl() != img->getNumEl()) {
+    cout << "activation and image are different sizes! skipping." << endl;
+    return 0;
+  }
   
   ACE_DEBUG((LM_DEBUG, "summing activation in image %d\n", 
 	     img->getAcquisitionNum()));
@@ -65,6 +71,10 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   double sum = 0;
   unsigned int numPix = 0;
   for(unsigned int i = 0; i < act->getNumPix(); i++) {
+    if(!mask.getPixel(i)) {
+      continue;
+    }
+
     double pix = act->getPixel(i);
     if(!isnan(pix)) {
       sum += pix;

@@ -50,6 +50,8 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   setInfo(extinfo);
 
   // allocate and copy the img data
+  cerr << "mr1 allocating data for " << this << endl; cerr.flush();
+
   data = new short[numPix];
 
   if(bytes != NULL) {
@@ -78,6 +80,8 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
   magicNumber = MAGIC_NUMBER;
 
   // copy the data 
+  cerr << "mr2 allocating data for " << this << endl; cerr.flush();
+
   data = new short[numPix];
   memcpy(data, img.data, imgDataLen);
 }

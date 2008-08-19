@@ -434,10 +434,10 @@ void RtDisplayImage::setData(RtData *data) {
   // plot activation sum over time // DEBUGGING ONLY
   static vnl_vector<double> postc(numMeas,0.0);
   static vnl_vector<double> negtc(numMeas,0.0);
-//  static Gnuplot gp = Gnuplot("lines");
+  static Gnuplot gp = Gnuplot("lines");
   static unsigned int numTimepoints = 0;
 
-  cout << "got data: " << data->getID() << ":" << data->getRoiID() << endl;
+  //cout << "got data: " << data->getID() << ":" << data->getRoiID() << endl;
 
   // handle activation sum
   if(data->getID() == posActivationSumID 
@@ -447,21 +447,21 @@ void RtDisplayImage::setData(RtData *data) {
 //       << " " << numTimepoints << endl;
     // plot the sum
     postc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
- //   gp.reset_plot();
- //   gp.plot_x(postc,posActivationSumRoiID.c_str());
+    gp.reset_plot();
+    gp.plot_x(postc,posActivationSumRoiID.c_str());
     numTimepoints++;
     return;
   }
 
   if(data->getID() == negActivationSumID 
      && data->getRoiID() == negActivationSumRoiID) {
-//  cout << "display got a neg activation sum: " 
-//       << ((RtActivation*)data)->getPixel(0) 
-//       << endl;
+  cout << "display got a neg activation sum: " 
+       << ((RtActivation*)data)->getPixel(0) 
+       << endl;
     // plot the sum
     negtc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
-    //gp.reset_plot();
-//    gp.plot_x(negtc,negActivationSumRoiID.c_str());
+    gp.reset_plot();
+    gp.plot_x(negtc,negActivationSumRoiID.c_str());
     //numTimepoints++;
     return;
   }

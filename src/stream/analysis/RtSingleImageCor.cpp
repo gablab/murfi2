@@ -39,7 +39,6 @@ RtSingleImageCor::~RtSingleImageCor() {
     delete solvers;
   }
 
-
   if(absEstErrSum != NULL) {
     delete absEstErrSum;
   }

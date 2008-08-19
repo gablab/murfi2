@@ -52,6 +52,8 @@ RtActivation::RtActivation(unsigned int numElements)
   bytesPerPix = sizeof(double);
   imgDataLen = numPix * bytesPerPix;
 
+  data = NULL;
+
   reallocateData();
 
   threshold = 0.0;
@@ -205,8 +207,13 @@ void RtActivation::setInfo(RtMRIImage &img) {
 // reallocate data array based on current number of pixels
 void RtActivation::reallocateData() {
   if(data != NULL) {
+    cerr << "ac1 deleting data for " << this << endl; cerr.flush();
+
     delete [] data;
   }
+
+  cerr << "ac1 allocating data for " << this << endl; cerr.flush();
+
   data = new double[numPix];
 }
 

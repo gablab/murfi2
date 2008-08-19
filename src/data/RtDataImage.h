@@ -18,8 +18,9 @@
 #include<vnl/vnl_matrix_fixed.h>
 #include<gsl/gsl_vector.h>
 #include"RtData.h"
-//#include"dirent.h"
 #include"nifti1_io.h"
+
+#include"debug_levels.h"
 
 using namespace std;
 
@@ -402,6 +403,8 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
   pixdims.reserve(4);
   addToID("image");
   bytesPerPix = sizeof(T);
+  data = NULL;
+
   read(filename);
 
   vxl2ras.set_identity();
@@ -476,6 +479,10 @@ RtDataImage<T>::RtDataImage(RtDataImage &img) : RtData() {
   ras2ref = img.ras2ref;
 
   // allocate and copy the data
+  if(DEBUG_LEVEL & ALLOC) {
+    cerr << "1 allocating data for " << this << endl; cerr.flush();
+  }
+
   data = new T[numPix];
   if(img.bytesPerPix == bytesPerPix) {
     memcpy(data, img.data, imgDataLen);
@@ -494,6 +501,9 @@ RtDataImage<T>::~RtDataImage() {
 
   // free data
   if(data != NULL) {
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "1 deleting data for " << this << endl; cerr.flush();
+    }
     delete [] data;
   }
 }
@@ -812,6 +822,9 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
 
   // delete our current image data, if we have it
   if(data != NULL) {
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "2 deleting data for " << this << endl; cerr.flush();
+    }
     delete [] data;
   }
 
@@ -835,6 +848,9 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     }
 
     // allocate new data
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "2 allocating data for " << this << endl; cerr.flush();
+    }
     data = new T[numPix];
 
     // read the image data
@@ -868,7 +884,7 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
   nifti_image *img = nifti_image_read(_filename.c_str(), 0);
   if(img == NULL) {
     cerr << "could not open " << _filename << " for reading a nifti image"
-	 << endl;
+	 << endl; 
     return false;
   }
 
@@ -887,6 +903,9 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
 
     // delete our current image data, if we have it
     if(data != NULL) {
+      if(DEBUG_LEVEL & ALLOC) {
+        cerr << "3 deleting data for " << this << endl; cerr.flush();
+      }
       delete [] data;
     }
 
@@ -894,6 +913,9 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
     nifti_image_load(img);
 
     // allocate new data
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "3 allocating data for " << this << endl; cerr.flush();
+    }
     data = new T[img->nvox];
     memcpy(data, img->data, img->nbyper * img->nvox);
 
@@ -1280,9 +1302,16 @@ bool RtDataImage<T>::unmosaic() {
     //  }
     //  of.close();
 
-    delete data;
-    data = newdata;
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "4 deleting data for " << this << endl; cerr.flush();
+    }
+    delete [] data;
 
+
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "4 allocating data for " << this << endl; cerr.flush();
+    }
+    data = newdata;
     isMosaiced = false;  
 
   }  mutex.release();
@@ -1344,7 +1373,15 @@ bool RtDataImage<T>::mosaic() {
       }
     }
 
-    delete data;
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "5 deleting data for " << this << endl; cerr.flush();
+    }
+    delete [] data;
+
+
+    if(DEBUG_LEVEL & ALLOC) {
+      cerr << "5 allocating data for " << this << endl; cerr.flush();
+    }
     data = newdata;
 
     isMosaiced = true;

@@ -342,6 +342,7 @@ bool RtActivationEstimator::finishInit() {
     else {
       cout << "failed to load mask from " << mask.getFilename() << endl;
       putMaskOnMessage = false;
+      maskSource = NO_MASK;
     }
 
     // mosaic if we need to

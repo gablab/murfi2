@@ -17,7 +17,7 @@ FrMainWindow::FrMainWindow(FrMainDocument* document, FrMainController* controlle
     setupUi(this);
 		
 	QGroupBox* groupBox = new QGroupBox(this);	
-    m_view2D = new FrView2D(groupBox);
+    m_view2D = new FrView2D(this, groupBox);
     
     m_bookmarkWidget = new FrBookmarkWidget(groupBox);
 	m_bookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -171,4 +171,5 @@ void FrMainWindow::openImage(){
 
     //fileName = "test.png";
     //m_controller.LoadImage(fileName);
+    GetView2D()->UpdateScene();
 }

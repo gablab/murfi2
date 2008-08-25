@@ -1,8 +1,8 @@
 #ifndef FR_TOOL
 #define FR_TOOL
 
-
 class FrToolController;
+class FrInteractorStyle;
 
 // Params of mouse event
 typedef struct _frMouseParams {
@@ -30,10 +30,10 @@ class FrTool
 public:
 	virtual void Start() = 0;
 	virtual void Stop() = 0;
-    virtual bool OnMouseUp(FrMouseParams& params) = 0;
-	virtual bool OnMouseDown(FrMouseParams& params) = 0;
-	virtual bool OnMouseMove(FrMouseParams& params) = 0;
-	virtual bool OnMouseDrag(FrMouseParams& params) = 0;
+    virtual bool OnMouseUp(FrInteractorStyle* is, FrMouseParams& params) = 0;
+	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params) = 0;
+	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params) = 0;
+	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params) = 0;
 
 public:
 	/// Default constructor
@@ -43,6 +43,9 @@ public:
 
     FrToolController* GetController();
     void SetController(FrToolController* ctrl);
+
+protected:
+    bool m_isStarted;
 
 private:
 	/// Controller owning the tool.

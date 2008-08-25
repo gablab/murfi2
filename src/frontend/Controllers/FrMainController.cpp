@@ -4,6 +4,8 @@
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrView2D.h"
+#include "FrPanTool.h"
+#include "FrZoomTool.h"
 
 #include "vtkRenderWindowInteractor.h"
 
@@ -12,6 +14,10 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
     : m_view(view), m_document(doc), m_toolController(0){
 
     m_toolController = new FrToolController();
+
+    //FrPanTool* tool = new FrPanTool();
+    FrZoomTool* tool = new FrZoomTool();
+    m_toolController->PushTool(tool);
 }
 
 FrMainController::~FrMainController(){

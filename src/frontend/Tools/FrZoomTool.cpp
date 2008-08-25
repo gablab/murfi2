@@ -1,8 +1,16 @@
 #include "FrZoomTool.h"
 #include "FrToolController.h"
+#include "FrInteractorStyle.h"
 
+#include "vtkCamera.h"
+#include "vtkRenderer.h"
 
-FrZoomTool::FrZoomTool(){
+#define DEFAULT_ZOOM_FACTOR 10.0
+#define DEFAULT_BASE 1.1
+
+FrZoomTool::FrZoomTool()
+: m_oldX(0), m_oldY(0), 
+  m_zoomFactor(DEFAULT_ZOOM_FACTOR){
 }
 
 FrZoomTool::~FrZoomTool(){
@@ -16,18 +24,49 @@ void FrZoomTool::Stop(){
 
 }
 
-bool FrZoomTool::OnMouseUp(FrMouseParams& params){
+bool FrZoomTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrZoomTool::OnMouseDown(FrMouseParams& params){
+bool FrZoomTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
+    if(params.Button == FrMouseParams.LeftButton){
+        m_oldX = params.X;
+        m_oldY = params.Y;
+    }    
     return false;
 }
 
-bool FrZoomTool::OnMouseMove(FrMouseParams& params){
+bool FrZoomTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrZoomTool::OnMouseDrag(FrMouseParams& params){
-    return false;
+bool FrZoomTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
+
+    if (params.Button != FrMouseParams.LeftButton ||
+        is->CurrentRenderer == NULL) return false;
+        
+    double deltaY = params.Y - m_oldY;
+    m_oldX = params.X;
+    m_oldY = params.Y;
+
+    double centerY = is->CurrentRenderer->GetCenter()[1];
+    double dyFactor = this->m_zoomFactor * deltaY / centerY;
+
+    this->ZoomByScaling(pow(DEFAULT_BASE, dyFactor), is);
+
+    return true;
+}
+
+void FrZoomTool::ZoomByScaling(double factor, FrInteractorStyle* is){
+  
+    vtkCamera *camera = is->CurrentRenderer->GetActiveCamera();
+    if (camera->GetParallelProjection()) {
+        camera->SetParallelScale(camera->GetParallelScale() / factor);
+    }
+    else{
+        camera->Dolly(factor);
+        if (is->AutoAdjustCameraClippingRange) {
+            is->CurrentRenderer->ResetCameraClippingRange();
+        }
+    }
 }

@@ -3,6 +3,7 @@
 
 // Forward declaration
 class FrMainController;
+class FrPanTool;
 
 // Includes
 #include <vtkInteractorStyle.h>
@@ -23,6 +24,12 @@ public:
     virtual void OnRightButtonUp();
     virtual void OnMouseWheelForward();
     virtual void OnMouseWheelBackward();
+
+protected:
+    // Declare tools as friends to get full access
+    friend class FrTool;
+    friend class FrPanTool;
+    friend class FrZoomTool;
 
 private:
     enum State{

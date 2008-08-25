@@ -24,6 +24,7 @@ public:
     virtual void OnRemove(FrDocument* doc);
 
     virtual ObjType GetType();
+    virtual void UpdateObject();
 };
 
 #endif

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrMainWindow.h'
 **
-** Created: Thu 14. Aug 23:52:59 2008
+** Created: Fri 15. Aug 22:57:52 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!

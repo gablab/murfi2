@@ -16,11 +16,14 @@ public:
 
 	virtual void Start();
 	virtual void Stop();
-    virtual bool OnMouseUp(FrMouseParams& params);
-	virtual bool OnMouseDown(FrMouseParams& params);
-	virtual bool OnMouseMove(FrMouseParams& params);
-	virtual bool OnMouseDrag(FrMouseParams& params);
+    virtual bool OnMouseUp(FrInteractorStyle* is, FrMouseParams& params);
+	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params);
+	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
+	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
+private:
+    int m_oldX;
+    int m_oldY;
 };
 
 #endif

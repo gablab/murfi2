@@ -1,7 +1,9 @@
 #include "FrTool.h"
 #include "FrToolController.h"
+#include "FrInteractorStyle.h"
 
-FrTool::FrTool() : m_controller(0){
+FrTool::FrTool() 
+    : m_isStarted(false), m_controller(0){
 
 }
 

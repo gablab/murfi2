@@ -15,18 +15,18 @@ void FrSliceScrollTool::Stop(){
 
 }
 
-bool FrSliceScrollTool::OnMouseUp(FrMouseParams& params){
+bool FrSliceScrollTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrSliceScrollTool::OnMouseDown(FrMouseParams& params){
+bool FrSliceScrollTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrSliceScrollTool::OnMouseMove(FrMouseParams& params){
+bool FrSliceScrollTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrSliceScrollTool::OnMouseDrag(FrMouseParams& params){
+bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }

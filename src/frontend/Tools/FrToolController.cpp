@@ -7,12 +7,16 @@ FrToolController::FrToolController(){
 }
 
 FrToolController::~FrToolController(){
-    ClearAll();
+    ClearAll(true);
 }
 
-void FrToolController::ClearAll(){    
+void FrToolController::ClearAll(bool doDelete){    
     while(true){
         FrTool* tool = PopTool();
+        if(tool && doDelete){
+            delete tool;
+        } 
+        
         if(!tool) break;
     }
 }
@@ -27,8 +31,13 @@ FrTool* FrToolController::GetCurrentTool(){
 
 void FrToolController::PushTool(FrTool* tool){
     if(tool){
-        GetCurrentTool()->Stop();
+        // Stop current tool first
+        FrTool* currentTool = GetCurrentTool();
+        if(currentTool){
+            currentTool->Stop();
+        }
 
+        // setup new one
         tool->SetController(this);
         tool->Start();
 

@@ -12,7 +12,7 @@ public:
     ~FrToolController();
 
     // Delete all registered tools
-    void ClearAll();
+    void ClearAll(bool doDelete = false);
 
     // Returns tool at the bottom of stack
     FrTool* GetCurrentTool();

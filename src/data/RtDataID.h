@@ -16,7 +16,7 @@ class RtDataID {
 public:
 
   RtDataID();
-  ~RtDataID();
+  virtual ~RtDataID();
   
   //*** operators ***//
   
@@ -35,10 +35,14 @@ public:
 protected:
 
   // fields
-  unsigned int timePoint;
-  RtDataID     inputDataID;
-  string       roiID;
-  string       processModuleID;
+  unsigned int siteIDNum;        // id of study site
+  unsigned int studyNum;         // study number (date and time study started)
+  unsigned int seriesNum;        // image series (count up from 1)
+  unsigned int timePoint;        // image number (count up from 1)
+  RtDataID     inputDataID;      // id of data that served as input here
+  string       processModuleID;  // id of this processing module
+  string       dataID;           // id representing the particular data kind 
+  string       roiID;            // if this was processed on a particular ROI
 
 };
 

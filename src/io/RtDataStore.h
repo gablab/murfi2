@@ -40,7 +40,7 @@ public:
   virtual void setData(RtData *data);
 
   // get data by id
-  virtual RtData *getData(RtDataID id);
+  virtual RtData *getData(const RtDataID &id);
 
   // get the version
   //  out: char array that represents the cvs version

@@ -1,6 +1,14 @@
 //#include <unistd.h>
 #include "gnuplot_i_vxl.h"
 
+#ifdef WIN32
+#include <windows.h>
+    #ifndef sleep
+
+        #define sleep(x) Sleep(x)
+    #endif
+#endif
+
 #define SLEEP_LGTH 1
 #define NPOINTS    50
 
@@ -191,7 +199,8 @@ int main(int argc, char *argv[])
 	g1.set_yrange(0,iHeight);
 	g1.set_cbrange(0,255);
 	g1.cmd("set palette gray");
-	unsigned char ucPicBuf[iWidth*iHeight];
+
+	unsigned char* ucPicBuf = new unsigned char[iWidth*iHeight];
 	// generate a greyscale image
 	for(int iIndex = 0; iIndex < iHeight*iWidth; iIndex++)
 	{
@@ -200,7 +209,7 @@ int main(int argc, char *argv[])
 	g1.plot_image(ucPicBuf,iWidth,iHeight,"greyscale");
     sleep(SLEEP_LGTH+10);	
 	
-
+    delete[] ucPicBuf;
     cout << endl << "*** end of gnuplot example" << endl;
 
     return 0;

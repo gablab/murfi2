@@ -6,6 +6,7 @@
 #include "FrView2D.h"
 #include "FrPanTool.h"
 #include "FrZoomTool.h"
+#include "FrImageDocObj.h"
 
 #include "vtkRenderWindowInteractor.h"
 
@@ -27,7 +28,10 @@ FrMainController::~FrMainController(){
 void FrMainController::Initialize(){
     
     // Initialize view
-    if(m_view){
+    if(m_view){        
+        m_view->SetController(this);
+        m_view->SetDocument(m_document);
+
         // Setup interactor style
         if(m_view->GetView2D()) {
             FrInteractorStyle* style = new FrInteractorStyle(this);
@@ -37,7 +41,7 @@ void FrMainController::Initialize(){
 
     // Initialize document
     if(m_document){
-        // TODO: some initialization
+       // TODO: initialize document
     }
 }
 
@@ -57,6 +61,16 @@ FrTool* FrMainController::GetCurrentTool(){
     return result;
 }
 
-//void FrMainController::LoadImage(QString& fileName){
-//
-//}
+#include <Qt/QString.h>
+void FrMainController::LoadImage(QString& fileName){
+        
+    FrImageDocObj* imgObj = new FrImageDocObj();
+
+    if(imgObj->LoadFromFile(fileName)){
+        m_document->Add(imgObj);
+    }
+    else{
+        // TODO: process error
+    }    
+    m_view->GetView2D()->UpdateScene();
+}

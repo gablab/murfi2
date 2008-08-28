@@ -184,6 +184,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\data\RtDataID.h"
+				>
+			</File>
+			<File
 				RelativePath=".\data\RtDataIDs.h"
 				>
 			</File>
@@ -264,6 +268,10 @@
 			Name="executive"
 			>
 			<File
+				RelativePath=".\executive\debug_levels.h"
+				>
+			</File>
+			<File
 				RelativePath=".\executive\RtCode.cpp"
 				>
 			</File>
@@ -325,6 +333,10 @@
 			>
 			<File
 				RelativePath=".\io\ExternalSenderImageInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\io\RtDataStore.h"
 				>
 			</File>
 			<File
@@ -420,6 +432,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\stream\RtProcessor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stream\RtProcessor.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stream\RtStream.cpp"
 				>
 			</File>
@@ -460,14 +480,6 @@
 				</File>
 				<File
 					RelativePath=".\stream\analysis\RtActivationEstimator.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\analysis\RtAnalysor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\analysis\RtAnalysor.h"
 					>
 				</File>
 				<File
@@ -570,14 +582,6 @@
 					RelativePath=".\stream\postprocess\RtEventTriggerActivationSums.h"
 					>
 				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtPostprocessor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtPostprocessor.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="preprocess"
@@ -607,11 +611,19 @@
 					>
 				</File>
 				<File
-					RelativePath=".\stream\preprocess\RtPreprocessor.cpp"
+					RelativePath=".\stream\preprocess\RtMosaic.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\stream\preprocess\RtPreprocessor.h"
+					RelativePath=".\stream\preprocess\RtMosaic.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\preprocess\RtUnmosaic.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\preprocess\RtUnmosaic.h"
 					>
 				</File>
 				<File
@@ -641,6 +653,18 @@
 			</File>
 			<File
 				RelativePath=".\util\constants.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util\printVnl44Mat.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\util\printVnlMat.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\util\printVnlVector.cpp"
 				>
 			</File>
 			<File

@@ -8,6 +8,8 @@ class FrToolController;
 class FrInteractorStyle;
 class FrTool;
 
+class QString;
+
 class FrMainController {
 public:
     FrMainController(FrMainWindow* view = 0, FrMainDocument* doc = 0);
@@ -15,12 +17,14 @@ public:
     
     void Initialize();
 
+public:
     // Interface to tools
     bool HasActiveTool();
     FrTool* GetCurrentTool();
 
+public:
     // Interface for MainWindow
-    //void LoadImage(QString& fileName);
+    void LoadImage(QString& fileName);
 
 private:
     friend class FrInteractorStyle;

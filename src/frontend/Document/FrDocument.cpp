@@ -38,9 +38,8 @@ void FrDocument::DeleteAll(){
         FrDocumentObj* docObj = (*it);
         docObj->OnRemove(this);
         delete docObj;
-
-        m_objects.erase(it);
     }
+    m_objects.clear();
 }
     
 void FrDocument::GetObjectsByType(std::vector<FrDocumentObj*>& objects, 

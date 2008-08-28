@@ -25,6 +25,12 @@ public:
 
     virtual ObjType GetType();
     virtual void UpdateObject();
+
+    bool IsUpdateNeeded(){ return m_updateNeeded; }
+    void SetUpdateNeeded(bool value){ m_updateNeeded = value; }
+
+private:
+    bool m_updateNeeded;
 };
 
 #endif

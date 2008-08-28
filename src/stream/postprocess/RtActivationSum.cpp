@@ -5,7 +5,7 @@
  *
  *****************************************************************************/
 
-#include"RtActivationSum.h"
+#include "RtActivationSum.h"
 
 string RtActivationSum::moduleString("activation-sum");
 

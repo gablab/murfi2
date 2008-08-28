@@ -12,6 +12,15 @@
 #include"RtActivationEstimator.h"
 #include"RtActivation.h"
 
+// scopic alexsid: #define WIN32
+#ifdef WIN32
+    // MS VS2005 provides _isnan function not isnan
+    // as it is in *nix system. So add this fix.
+    #ifndef isnan
+        #define isnan(x) _isnan(x)
+    #endif
+#endif
+
 // class declaration
 class RtActivationSum : public RtActivationEstimator {
 

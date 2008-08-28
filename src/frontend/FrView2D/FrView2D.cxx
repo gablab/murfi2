@@ -1,6 +1,8 @@
 #include "FrView2D.h"
 #include "QVTKWidget.h"
 #include "FrMainWindow.h"
+#include "FrMainDocument.h"
+#include "FrImageDocObj.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -16,7 +18,6 @@
 #include "vtkImageActor.h"
 #include "vtkRenderWindow.h"
 #include "vtkActorCollection.h"
-#include "vtkCollectionIterator.h"
 
 
 // Default constructor
@@ -64,17 +65,52 @@ void FrView2D::SetInteractorStyle(vtkInteractorStyle* style){
 
 void FrView2D::UpdateScene(){
 	
-    // Read from file
-    vtkPNGReader* reader = vtkPNGReader::New();
-	reader->SetDataScalarTypeToUnsignedChar();
-	reader->SetFileName("test.png");
-	
-	vtkImageActor *image = vtkImageActor::New();
-	image->SetInput(reader->GetOutput());
-
-	m_renderer->AddActor(image);
+    // Clear scene
+    m_renderer->RemoveAllViewProps();
+    m_renderer->ResetCamera();
     m_imageViewer->GetRenderWindow()->Render();
 
-	reader->Delete();
-    image->Delete();
+    // NOTE: Possible setup of rendering pipline
+    //// Update scene by adding new actors
+    //// Single 2D slice logic
+    //
+    //FrDocumentReader* reader = FrDocumentReader::New();
+    //reader->SetDataScalarTypeToUnsignedChar();
+
+    //vtkImageActor* image = vtkImageActor::New();
+    //image->SetInput(reader->GetImageData());
+    //m_renderer->AddActor(image);
+    //m_imageViewer->GetRenderWindow()->Render();
+
+    //image->Delete();
+    //reader->Delete();
+
+    FrMainDocument* doc = m_mainWindow->GetDocument();
+    if(doc){
+        typedef std::vector<FrDocumentObj*> ImageVector;
+        ImageVector images;
+        doc->GetAllImages(images);
+        
+        ImageVector::iterator it, itEnd(images.end());
+        for(it = images.begin(); it != itEnd; ++it){
+            FrImageDocObj* img = reinterpret_cast<FrImageDocObj*>(*it);
+            if(img->IsUpdateNeeded()){
+                img->UpdateObject();
+            }
+
+            // Add new actor (for single slice view)
+            vtkImageActor* ia = vtkImageActor::New();
+            ia->SetInput(img->GetImageData());
+
+            // set image in the center of screen
+            double* center = ia->GetCenter();
+            ia->AddPosition(-center[0], -center[1], 0);
+            m_renderer->AddActor(ia);
+            m_renderer->GetActiveCamera()->SetParallelScale(100);
+                        
+            // redraw scene
+            m_imageViewer->GetRenderWindow()->Render();
+            ia->Delete();
+        }
+    }
 }

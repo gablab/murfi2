@@ -14,9 +14,9 @@
 
 #include"ace/Mutex.h"
 
-// scopic: #define WINDOWS
+// scopic alexsid: #define WIN32
 #ifndef RT_DISPLAY_IMAGE_TEXTURE
-  #ifdef WINDOWS 
+  #ifdef WIN32 
     #define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_2D
   #else
      #ifdef GL_TEXTURE_RECTANGLE_EXT

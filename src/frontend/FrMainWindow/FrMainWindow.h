@@ -18,13 +18,16 @@ class FrBookmarkWidget;
 class FrMainWindow: public QMainWindow, public Ui::MainWindow {
 	Q_OBJECT
 public:
-	FrMainWindow(FrMainDocument* document=0, FrMainController* controller=0);
+	FrMainWindow();
     ~FrMainWindow();
 
-    void SetDocument(FrMainDocument* doc);
-    FrMainDocument* GetDocument();
+    void SetDocument(FrMainDocument* value){ m_document = value; }
+    FrMainDocument* GetDocument(){ return m_document; }
 
-    FrView2D* GetView2D();
+    void SetController(FrMainController* value){ m_controller = value; }
+    FrMainController* GetController() { return m_controller; }
+
+    FrView2D* GetView2D(){ return m_view2D; }
 
 public slots:
 	void brightnessValueChanged();

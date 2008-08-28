@@ -2,7 +2,8 @@
 #include "FrDocument.h"
 
 
-FrDocumentObj::FrDocumentObj(){
+FrDocumentObj::FrDocumentObj()
+: m_updateNeeded(false) {
 }
 
 FrDocumentObj::~FrDocumentObj(){

@@ -3,7 +3,6 @@
 
 // STL includes
 #include <vector>
-
 #include "FrDocumentObj.h"
 
 class FrDocument

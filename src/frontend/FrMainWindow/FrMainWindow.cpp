@@ -10,9 +10,8 @@
 #include "vtkRenderWindowInteractor.h"
 
 
-FrMainWindow::FrMainWindow(FrMainDocument* document, FrMainController* controller)
-    :  QMainWindow(0), 
-       m_document(document), m_controller(controller), m_view2D(0){
+FrMainWindow::FrMainWindow()
+    :  QMainWindow(0), m_document(0), m_controller(0), m_view2D(0){
 	
     setupUi(this);
 		
@@ -87,10 +86,6 @@ FrMainWindow::FrMainWindow(FrMainDocument* document, FrMainController* controlle
 FrMainWindow::~FrMainWindow(){
 }
 
-FrView2D* FrMainWindow::GetView2D(){
-    return m_view2D;
-}
-
 // change brightness of the scene
 void FrMainWindow::brightnessValueChanged(){
 }
@@ -161,15 +156,18 @@ void FrMainWindow::saveToTab(){
     //tab->setObjectName(QString::fromUtf8("tab"));
     //myBookmarkWidget->addTab(tab, "test");
 	m_bookmarkWidget->addBookmark();
-
 }
 
+#include <Qt/QString.h>
 #include <QtGUI/QFileDialog.h>
 void FrMainWindow::openImage(){
-    //QString fileName;
-    //fileName= QFileDialog::getOpenFileName();
+    QString fileName;
+    fileName = QFileDialog::getOpenFileName(this, 
+        QString("Open MRI data"), QString(), 
+        QString("NIfTI Image (*.nii)"));
 
-    //fileName = "test.png";
-    //m_controller.LoadImage(fileName);
-    GetView2D()->UpdateScene();
+    if(!fileName.isNull() && !fileName.isEmpty()){
+        //fileName = "test.png";
+        m_controller->LoadImage(fileName);
+    }
 }

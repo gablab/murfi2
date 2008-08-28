@@ -5,18 +5,20 @@
 
 int main(int argc, char **argv){
 	FrApplication application(argc, argv);
-    
     // Create document
     FrMainDocument document;
 
     // Create view
-	FrMainWindow mainWindow(&document);
+	FrMainWindow mainWindow;
 	mainWindow.showMaximized();
 
     // Create controller
     FrMainController controller(&mainWindow, &document);
     controller.Initialize();
 
-	if(!application.exec()) return 1;
-	return 0;
+    int result = 0;
+    if(!application.exec()){
+        result = 1;
+    }
+	return result;
 }

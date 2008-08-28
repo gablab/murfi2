@@ -46,7 +46,7 @@ void FrImageDocObj::UpdateObject(){
 
     m_copy->SetNumberOfScalarComponents(1);
     m_copy->SetScalarTypeToUnsignedChar();
-    m_copy->SetExtent(0, 63, 0, 63, 0, 0);
+    //m_copy->SetExtent(0, 63, 0, 63, 0, 0);
     //m_copy->SetWholeExtent();
     m_copy->AllocateScalars();
     

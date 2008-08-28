@@ -11,6 +11,10 @@ class FrLowPanel: public QWidget, public Ui::LowPanel
 public:
 	FrLowPanel(QWidget *parent = 0);
 
+    int GetThresholdValue();
+    int GetBrightnessValue();
+    int GetContrastValue();
+
 public slots:
 	void brightnessSliderPositionChanged();
 	void contrastSliderPositionChanged();

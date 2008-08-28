@@ -88,14 +88,44 @@ FrMainWindow::~FrMainWindow(){
 
 // change brightness of the scene
 void FrMainWindow::brightnessValueChanged(){
+    // should be in the range [-1..+1]
+    double value = m_lowPanel->GetBrightnessValue();
+    value /= 100.0;
+
+    //QString message("Brightness Value: ");
+    //message += QString::number(value);
+    //QMessageBox::information(this, "Info", message);
+
+    m_view2D->SetBrightness(value);
+    m_view2D->UpdateTBC();
 }
 
 // change contrast of the scene
-void FrMainWindow::contrastValueChanged(){
+void FrMainWindow::contrastValueChanged(){    
+    // should be in the range [-1..+1]
+    double value = m_lowPanel->GetContrastValue();
+    value /= 100.0;
+
+    //QString message("Contrast Value: ");
+    //message += QString::number(value);
+    //QMessageBox::information(this, "Info", message);
+
+    m_view2D->SetContrast(value);
+    m_view2D->UpdateTBC();
 }
 
 // change threshold of the scene
 void FrMainWindow::thresholdValueChanged(){
+    // should be in the range [0..+1]
+    double value = m_lowPanel->GetThresholdValue();
+    value /= 100.0;
+
+    //QString message("Threshold Value: ");
+    //message += QString::number(value);
+    //QMessageBox::information(this, "Info", message);
+
+    m_view2D->SetThreshold(value);
+    m_view2D->UpdateTBC();
 }
 
 void FrMainWindow::tool1Triggered(){

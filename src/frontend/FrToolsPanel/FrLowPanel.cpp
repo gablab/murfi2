@@ -2,31 +2,47 @@
 
 FrLowPanel::FrLowPanel(QWidget *parent): QWidget(parent){
 	setupUi(this);
-
-	
-	connect(brightnessSlider, SIGNAL(sliderMoved(int)), this, SLOT(brightnessSliderPositionChanged()));
-	connect(contrastSlider, SIGNAL(sliderMoved(int)), this, SLOT(contrastSliderPositionChanged()));
-	connect(thresholdSlider, SIGNAL(sliderMoved(int)), this, SLOT(thresholdSliderPositionChanged()));
+ 
+    connect(brightnessSlider, SIGNAL(valueChanged(int)), 
+            this, SLOT(brightnessSliderPositionChanged()));
+	connect(contrastSlider,   SIGNAL(valueChanged(int)), 
+            this, SLOT(contrastSliderPositionChanged()));
+	connect(thresholdSlider,  SIGNAL(valueChanged(int)), 
+            this, SLOT(thresholdSliderPositionChanged()));
 }
 
 void FrLowPanel::brightnessSliderPositionChanged(){
-	lcdBrightness->display(brightnessSlider->value());
+    int value = brightnessSlider->value();
+	lcdBrightness->display(value);
 	
 	// here is the signal changing the current brightness of the scene
 //	emit brightnessValueChanged(brightnessSlider->value());
 }
 
 void FrLowPanel::contrastSliderPositionChanged(){
-	lcdContrast->display(contrastSlider->value());
-	
+    int value = contrastSlider->value();
+	lcdContrast->display(value);
+    	
 	// here is the signal changing the current contras of the scene
 //	emit contrastValueChanged(contrastSlider->value());
 }
 
 void FrLowPanel::thresholdSliderPositionChanged(){
-	lcdThreshold->display(thresholdSlider->value());
+    int value = thresholdSlider->value();
+	lcdThreshold->display(value);
 	
 	// here is the signal changing the current threshold of the scene
 //	emit thresholdValueChanged(thresholdSlider->value());
 }
 
+int FrLowPanel::GetThresholdValue(){
+    return thresholdSlider->value();
+}
+
+int FrLowPanel::GetBrightnessValue(){
+    return brightnessSlider->value();
+}
+
+int FrLowPanel::GetContrastValue(){
+    return contrastSlider->value();
+}

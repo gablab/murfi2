@@ -3,6 +3,7 @@
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 #include "FrImageDocObj.h"
+#include "FrTBCFilter.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -37,19 +38,23 @@ FrView2D::FrView2D(FrMainWindow* mainWindow, QWidget* parent)
 
     // set interactor
     vtkRenderWindowInteractor* rwi = m_qtView->GetRenderWindow()->GetInteractor();
-    //vtkInteractorStyleImage* style = vtkInteractorStyleImage::New();
-    //rwi->SetInteractorStyle(style);
-    //style->Delete();
 	m_imageViewer->SetupInteractor(rwi);
 
     // create renderer
     m_renderer = m_imageViewer->GetRenderer();
 	m_renderer->SetBackground( 0.1, 0.2, 0.4 );
+
+    // Create filter
+    m_tbcFilter = FrTBCFilter::New();
+    m_actor = vtkImageActor::New();
 }
 
 FrView2D::~FrView2D(){
+
     if(m_renderer) m_renderer->Delete();
     if(m_imageViewer) m_imageViewer->Delete();
+    if(m_tbcFilter) m_tbcFilter->Delete();
+    if(m_actor) m_actor->Delete();
 }
 
 QWidget* FrView2D::GetWidget(){
@@ -69,48 +74,66 @@ void FrView2D::UpdateScene(){
     m_renderer->RemoveAllViewProps();
     m_renderer->ResetCamera();
     m_imageViewer->GetRenderWindow()->Render();
-
-    // NOTE: Possible setup of rendering pipline
-    //// Update scene by adding new actors
-    //// Single 2D slice logic
-    //
-    //FrDocumentReader* reader = FrDocumentReader::New();
-    //reader->SetDataScalarTypeToUnsignedChar();
-
-    //vtkImageActor* image = vtkImageActor::New();
-    //image->SetInput(reader->GetImageData());
-    //m_renderer->AddActor(image);
-    //m_imageViewer->GetRenderWindow()->Render();
-
-    //image->Delete();
-    //reader->Delete();
-
-    FrMainDocument* doc = m_mainWindow->GetDocument();
-    if(doc){
+    
+    FrMainDocument* document = m_mainWindow->GetDocument();
+    if(document){
         typedef std::vector<FrDocumentObj*> ImageVector;
         ImageVector images;
-        doc->GetAllImages(images);
+        document->GetAllImages(images); 
+        // TODO: use DocumentReader here instead!!!
         
-        ImageVector::iterator it, itEnd(images.end());
-        for(it = images.begin(); it != itEnd; ++it){
+        ImageVector::iterator it(images.begin()), itEnd(images.end());
+        if(it != itEnd){
+            // Update if needed
             FrImageDocObj* img = reinterpret_cast<FrImageDocObj*>(*it);
             if(img->IsUpdateNeeded()){
                 img->UpdateObject();
             }
 
-            // Add new actor (for single slice view)
-            vtkImageActor* ia = vtkImageActor::New();
-            ia->SetInput(img->GetImageData());
+            //// Threshold/brightness/contrast filter
+            //m_tbcFilter->SetThreshold(m_threshold);
+            //m_tbcFilter->SetBrightness(m_brightness);
+            //m_tbcFilter->SetContrast(m_contrast);
+            m_tbcFilter->SetInput(img->GetImageData());
+            m_tbcFilter->Update();
+
+            m_actor->SetInput(m_tbcFilter->GetOutput());
+            m_renderer->AddActor(m_actor);
 
             // set image in the center of screen
-            double* center = ia->GetCenter();
-            ia->AddPosition(-center[0], -center[1], 0);
-            m_renderer->AddActor(ia);
+            double* center = m_actor->GetCenter();
+            m_actor->AddPosition(-center[0], -center[1], 0);
             m_renderer->GetActiveCamera()->SetParallelScale(100);
-                        
-            // redraw scene
-            m_imageViewer->GetRenderWindow()->Render();
-            ia->Delete();
-        }
+        } 
+        // redraw scene
+        m_imageViewer->GetRenderWindow()->Render();
     }
+}
+
+void FrView2D::UpdateTBC(){
+    // Just update Threshold/brightness/contrast
+    // m_tbcFilter->SetThreshold(m_threshold);
+    // m_tbcFilter->SetBrightness(m_brightness);
+    // m_tbcFilter->SetContrast(m_contrast);
+
+    // Do update only if has valid input
+    if(m_tbcFilter->GetInput()){
+        m_tbcFilter->Update();
+
+        // set new input and redraw scene
+        m_actor->SetInput(m_tbcFilter->GetOutput());
+        m_imageViewer->GetRenderWindow()->Render();
+    }
+}
+
+void FrView2D::SetThreshold(double value){
+    m_tbcFilter->SetThreshold(value);
+}
+
+void FrView2D::SetBrightness(double value){
+    m_tbcFilter->SetBrightness(value);
+}
+
+void FrView2D::SetContrast(double value){
+    m_tbcFilter->SetContrast(value);
 }

@@ -6,9 +6,11 @@ class vtkInteractorStyle;
 
 class vtkRenderer;
 class vtkImageViewer2;
+class vtkImageActor;
 
 class QVTKWidget;
 class FrMainWindow;
+class FrTBCFilter;
 
 // Wrapper for QVTKWidget.
 class FrView2D
@@ -21,6 +23,11 @@ public:
     void SetInteractorStyle(vtkInteractorStyle* style);
 
     void UpdateScene();
+    void UpdateTBC();
+
+    void SetThreshold(double value);
+    void SetBrightness(double value);
+    void SetContrast(double value);
 
 private:
     FrMainWindow* m_mainWindow;
@@ -28,6 +35,9 @@ private:
     QVTKWidget* m_qtView;
     vtkRenderer* m_renderer;
     vtkImageViewer2* m_imageViewer;
+
+    vtkImageActor* m_actor;
+    FrTBCFilter* m_tbcFilter;
 };
 
 #endif

@@ -7,7 +7,7 @@
 // not ready for prime time
 #ifdef 0
 
-static char *VERSION = "$Id: $";
+static char *VERSION = "$Id$";
 
 #include"RtDataStore.h"
 

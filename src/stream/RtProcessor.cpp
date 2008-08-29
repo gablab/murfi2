@@ -5,7 +5,7 @@
  * 
  *****************************************************************************/
 
-static char *VERSION = "$Id: RtProcessor.cpp 107 2008-04-18 02:00:17Z ohinds $";
+static char *VERSION = "$Id$";
 
 #include"RtProcessor.h"
 #include"RtDataIDs.h"

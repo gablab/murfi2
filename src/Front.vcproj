@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/QVTKWidget;./frontend/Controllers;./frontend/FrToolsPanel;./frontend/FrBookmarkWidget;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/QVTKWidget;./frontend/Controllers;./frontend/FrToolsPanel;./frontend/Filters;./frontend/FrBookmarkWidget;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -431,6 +431,14 @@
 			Name="Tools"
 			>
 			<File
+				RelativePath=".\frontend\Tools\FrCompositeTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrCompositeTool.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Tools\FrPanTool.cpp"
 				>
 			</File>
@@ -447,19 +455,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Tools\FrTBCTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrTBCTool.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Tools\FrTool.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\frontend\Tools\FrTool.h"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\tools\FrToolController.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\tools\FrToolController.h"
 				>
 			</File>
 			<File
@@ -541,6 +549,14 @@
 			Name="Controllers"
 			>
 			<File
+				RelativePath=".\frontend\Controllers\FrController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Controllers\FrController.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Controllers\FrInteractorStyle.cpp"
 				>
 			</File>
@@ -554,6 +570,64 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Controllers\FrMainController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Controllers\FrToolController.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Controllers\FrToolController.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Filters"
+			>
+			<File
+				RelativePath=".\frontend\Filters\FrTBCFilter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Filters\FrTBCFilter.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Utils"
+			>
+			<File
+				RelativePath=".\frontend\Utils\FrMacro.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrNotify.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrUtils.h"
 				>
 			</File>
 		</Filter>

@@ -29,7 +29,7 @@ bool FrZoomTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrZoomTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams.LeftButton){
+    if(params.Button == FrMouseParams::LeftButton){
         m_oldX = params.X;
         m_oldY = params.Y;
     }    
@@ -42,7 +42,7 @@ bool FrZoomTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrZoomTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 
-    if (params.Button != FrMouseParams.LeftButton ||
+    if (params.Button != FrMouseParams::LeftButton ||
         is->CurrentRenderer == NULL) return false;
         
     double deltaY = params.Y - m_oldY;

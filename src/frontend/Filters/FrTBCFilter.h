@@ -46,14 +46,12 @@ public:
                                  vtkImageData *outData,
                                  int extent[6], int threadId);
 private:
-    template<class T>
-    T ClampValue(T value, T min, T max){
-        if(value < min) value = min;
-        else if(value > max) value = max;
-        return value;
-    }
 
-    void InitLookupTable();
+    // For now
+    // Brightness have to be in the range [-255..255]
+    // Contrast have to be in the range [-255...255]
+    // Returned array have to be deleted by caller
+    void InitLookupTable(unsigned char* luTable, int brightness, int contrast);
 
 private:
     double m_threshold;

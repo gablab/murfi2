@@ -1,4 +1,5 @@
 #include "FrTBCFilter.h"
+#include "FrUtils.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
@@ -59,7 +60,7 @@ void FrTBCFilter::ThreadedExecute(vtkImageData *inData,
         return;
     }
 
-    // NOTE: Changing threshold for now.
+    // Init some data for algorithm
     int dims[3]; 
     inData->GetDimensions(dims);
     int numVoxs = dims[0] * dims[1] * dims[2];
@@ -68,91 +69,53 @@ void FrTBCFilter::ThreadedExecute(vtkImageData *inData,
     vtkDataArray* inArray = inData->GetPointData()->GetScalars();
     vtkDataArray* outArray = outData->GetPointData()->GetScalars();
 
-    double maxValue = inData->GetScalarTypeMax();
-    double threshold = maxValue * m_threshold;
+    double maxValue   = inData->GetScalarTypeMax();
     double brightness = maxValue * m_brightness;
+    double contrast   = maxValue * m_contrast;
+
+    // Create lookup table
+    unsigned char luTable[256];
+    InitLookupTable(luTable, brightness, contrast);
 
     // Process image data
+    double threshold  = maxValue * m_threshold;
     for (int component = 0; component < numComps; ++component){
         for (int voxel = 0; voxel < numVoxs; ++voxel){
-            // Check threshold and adjust brightness
+            // Check threshold 
             double out = 0.0;
             double value = inArray->GetComponent(voxel, component);
             out = (value >= threshold) ? value : 0.0;
-            out += brightness;
 
-            out = ClampValue(out, MIN_BYTE_VALUE, MAX_BYTE_VALUE);
+            // set brightness/contrast value
+            out = luTable[int(out)];
             outArray->SetComponent(voxel, component, out);
         }
     }
-
-    //if (divide == 0) {
-    //    while (dstRowPtr < dstRowEndPtr){            
-    //        int value = GetValue();
-    //        int out = luTable[value];
-    //        // Set out
-    //    }
-    //}
-    //else {
-    //    while (dstRowPtr < dstRowEndPtr) {
-    //        int value = GetValue();
-    //        int shiftIndex = value * 256;
-    //        out = luTable[shiftIndex + value];
-    //        // set out
-    //    }
-    //}
 }
 
-void FrTBCFilter::InitLookupTable(){
+void FrTBCFilter::InitLookupTable(unsigned char* luTable, int brightness, int contrast){
+    // Declare vars
+    int iMin = MIN_BYTE_VALUE;
+    int iMax = MAX_BYTE_VALUE;
+    int iOffsetX = 0;
 
-    //double contrast, brightness;
-    //double mul, div;
-
-    //// set mul and div
-    //if (contrast < 0){
-    //    mul = contrast + 100;
-    //    div = 100;
-    //}
-    //else if (contrast > 0){
-    //    mul = 100;
-    //    div = 100 - contrast;
-    //}
-    //else {
-    //    mul = 1;
-    //    div = 1;
-    //}
-
-    //// create lookup table
-    //unsigned char* luTable = 0;
-    //if (!luTable) {
-    //    luTable = new unsigned char[65536];
-    //}
-    //memset(luTable, 0, 65536);
-
-    //// Initialize lut
-    //if (div == 0){
-    //    for (int i = 0; i < 256; ++i) {
-    //        luTable[i] = ((i + brightness) < 128) ?  0 : 255;
-    //    }
-    //}
-    //else if (div == 100) {
-    //    for (int i = 0; i < 256; ++i) {
-    //        int shift = (i - 127) * mul / div + (127 - i + brightness);
-
-    //        for (int col = 0; col < 256; ++col){
-    //            int index = (i * 256) + col;
-    //            luTable[index] = ClampValue(col + shift, MIN_BYTE_VALUE, MAX_BYTE_VALUE);
-    //        }
-    //    }
-    //}
-    //else {
-    //    for (int i = 0; i < 256; ++i) {
-    //        int shift = (i - 127 + brightness) * mul / div + 127 - i;
-
-    //        for (int col = 0; col < 256; ++col) {
-    //            int index = (i * 256) + col;
-    //            luTable[index] = ClampValue(col + shift, MIN_BYTE_VALUE, MAX_BYTE_VALUE);
-    //        }
-    //    }
-    //}
+    // Init vars
+    float fContrast;
+    if (contrast < 0){
+	    fContrast = 1.0f + ((float)contrast / 255.0f);
+	    iMin = int( ((255.0f - (255.0f * fContrast)) / 2.0f) + 0.5f );
+	    iMax = 255 - iMin;
+    }
+    else{
+	    fContrast = 256.0f / (256.0f - float(contrast));
+	    iOffsetX = int(((255.0f - (255.0f * fContrast)) / 2.0f) + 0.5f);
+    }
+        
+    int iValue;
+    int iOffset = brightness + iMin + iOffsetX;
+    for (int i = 0; i < 256; i++) {
+	    // calculate & store value
+	    iValue = int((float(i) * fContrast) + 0.5f) + iOffset;
+        luTable[i] = ClampValue(iValue, iMin, iMax);
+    }
 }

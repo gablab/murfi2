@@ -1,6 +1,8 @@
 #ifndef FR_TOOL
 #define FR_TOOL
 
+#include "FrMacro.h"
+
 class FrToolController;
 class FrInteractorStyle;
 
@@ -41,8 +43,8 @@ public:
 	/// Destructor
 	virtual ~FrTool();
 
-    FrToolController* GetController();
-    void SetController(FrToolController* ctrl);
+    // Controller that's owning tool
+    FrPropMacro(FrToolController*,Controller);
 
 protected:
     bool m_isStarted;

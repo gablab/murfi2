@@ -41,6 +41,10 @@ void FrDocument::DeleteAll(){
     }
     m_objects.clear();
 }
+
+void FrDocument::SetDefaultValues(){
+    // NOTE: do notihing in the base class
+}
     
 void FrDocument::GetObjectsByType(std::vector<FrDocumentObj*>& objects, 
                                   FrDocumentObj::ObjType type){

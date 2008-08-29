@@ -1,6 +1,8 @@
 #ifndef FR_MAIN_CONTROLLER
 #define FR_MAIN_CONTROLLER
 
+#include "FrController.h"
+
 // Forward declaration
 class FrMainWindow;
 class FrMainDocument;
@@ -10,7 +12,7 @@ class FrTool;
 
 class QString;
 
-class FrMainController {
+class FrMainController : public FrController {
 public:
     FrMainController(FrMainWindow* view = 0, FrMainDocument* doc = 0);
     ~FrMainController();
@@ -25,6 +27,10 @@ public:
 public:
     // Interface for MainWindow
     void LoadImage(QString& fileName);
+
+    // Threshold/brightness/contrast interface
+    enum TBC { Threshold, Brightness, Contrast };
+    void SetValueTBC(TBC target, double value);
 
 private:
     friend class FrInteractorStyle;

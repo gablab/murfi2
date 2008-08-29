@@ -4,16 +4,21 @@
 // STL includes
 #include <vector>
 #include "FrDocumentObj.h"
+#include "FrMacro.h"
+
 
 class FrDocument
 {
 public:
     FrDocument();
     virtual ~FrDocument();
-    
+        
     bool Add(FrDocumentObj* obj);
     bool Remove(FrDocumentObj* obj);
     void DeleteAll();
+
+    // To be overloaded
+    virtual void SetDefaultValues();
     
 protected:
     void GetObjectsByType(std::vector<FrDocumentObj*>& objects, 

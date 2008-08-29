@@ -90,13 +90,14 @@ void FrView2D::UpdateScene(){
                 img->UpdateObject();
             }
 
-            //// Threshold/brightness/contrast filter
-            //m_tbcFilter->SetThreshold(m_threshold);
-            //m_tbcFilter->SetBrightness(m_brightness);
-            //m_tbcFilter->SetContrast(m_contrast);
+            // Threshold/brightness/contrast filter
+            m_tbcFilter->SetThreshold(document->GetThreshold());
+            m_tbcFilter->SetBrightness(document->GetBrightness());
+            m_tbcFilter->SetContrast(document->GetContrast());
             m_tbcFilter->SetInput(img->GetImageData());
             m_tbcFilter->Update();
 
+            
             m_actor->SetInput(m_tbcFilter->GetOutput());
             m_renderer->AddActor(m_actor);
 
@@ -112,17 +113,20 @@ void FrView2D::UpdateScene(){
 
 void FrView2D::UpdateTBC(){
     // Just update Threshold/brightness/contrast
-    // m_tbcFilter->SetThreshold(m_threshold);
-    // m_tbcFilter->SetBrightness(m_brightness);
-    // m_tbcFilter->SetContrast(m_contrast);
+    FrMainDocument* document = m_mainWindow->GetDocument();
+    if(document){
+        m_tbcFilter->SetThreshold(document->GetThreshold());
+        m_tbcFilter->SetBrightness(document->GetBrightness());
+        m_tbcFilter->SetContrast(document->GetContrast());
 
-    // Do update only if has valid input
-    if(m_tbcFilter->GetInput()){
-        m_tbcFilter->Update();
+        // Do update only if has valid input
+        if(m_tbcFilter->GetInput()){
+            m_tbcFilter->Update();
 
-        // set new input and redraw scene
-        m_actor->SetInput(m_tbcFilter->GetOutput());
-        m_imageViewer->GetRenderWindow()->Render();
+            // set new input and redraw scene
+            m_actor->SetInput(m_tbcFilter->GetOutput());
+            m_imageViewer->GetRenderWindow()->Render();
+        }
     }
 }
 

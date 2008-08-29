@@ -2,13 +2,15 @@
 #define FR_TOOL_CONTROLLER
 
 #include <vector>
+#include "FrController.h"
 
 class FrTool;
+class FrMainController;
 
-class FrToolController
+class FrToolController : FrController
 {
 public:
-    FrToolController();
+    FrToolController(FrController* controller=0L);
     ~FrToolController();
 
     // Delete all registered tools
@@ -22,6 +24,9 @@ public:
 
     // Pop tools from stack
     FrTool* PopTool();
+
+    // Override from base class
+    virtual void Notify(int notifyCode);
     
 private:
     // use it as stack

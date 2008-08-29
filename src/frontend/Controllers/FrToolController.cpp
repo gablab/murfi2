@@ -2,8 +2,9 @@
 #include "FrTool.h"
 
 
-FrToolController::FrToolController(){
-
+FrToolController::FrToolController(FrController* owner)
+    : FrController(owner){
+    
 }
 
 FrToolController::~FrToolController(){
@@ -55,4 +56,13 @@ FrTool* FrToolController::PopTool(){
         m_tools.pop_back();
     }
     return tool;
+}
+
+void FrToolController::Notify(int notifyCode){
+
+    // TODO: Do some processing if needed
+    // ...
+
+    // Transfer notification to owner
+    FrController::Notify(notifyCode);
 }

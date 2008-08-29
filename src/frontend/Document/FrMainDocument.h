@@ -9,7 +9,15 @@ public:
     FrMainDocument();
     virtual ~FrMainDocument();
 
+    virtual void SetDefaultValues();
+
     void GetAllImages(std::vector<FrDocumentObj*>& images);
+
+public:
+    // Properties
+    FrPropMacro(double,Threshold);
+    FrPropMacro(double,Brightness);
+    FrPropMacro(double,Contrast);
 };
 
 #endif

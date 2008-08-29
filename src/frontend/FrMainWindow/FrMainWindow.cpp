@@ -72,9 +72,12 @@ FrMainWindow::FrMainWindow()
 	connect(m_toolsPanel->mode3Button, SIGNAL(clicked()), this, SLOT(mode3Clicked()));
 
 	// actions of Low panel
-	connect(m_lowPanel->brightnessSlider, SIGNAL(sliderReleased()), this, SLOT(brightnessValueChanged()));
-	connect(m_lowPanel->contrastSlider, SIGNAL(sliderReleased()), this, SLOT(contrastValueChanged()));
-	connect(m_lowPanel->thresholdSlider, SIGNAL(sliderReleased()), this, SLOT(thresholdValueChanged()));
+	//connect(m_lowPanel->brightnessSlider, SIGNAL(sliderReleased()), this, SLOT(brightnessValueChanged()));
+	//connect(m_lowPanel->contrastSlider, SIGNAL(sliderReleased()), this, SLOT(contrastValueChanged()));
+	//connect(m_lowPanel->thresholdSlider, SIGNAL(sliderReleased()), this, SLOT(thresholdValueChanged()));
+    connect(m_lowPanel->brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(brightnessValueChanged()));
+	connect(m_lowPanel->contrastSlider, SIGNAL(valueChanged(int)), this, SLOT(contrastValueChanged()));
+	connect(m_lowPanel->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdValueChanged()));
 
 	// actions of Tab widget
 	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
@@ -88,44 +91,35 @@ FrMainWindow::~FrMainWindow(){
 
 // change brightness of the scene
 void FrMainWindow::brightnessValueChanged(){
-    // should be in the range [-1..+1]
+    // map into range [-1..+1]
     double value = m_lowPanel->GetBrightnessValue();
     value /= 100.0;
 
-    //QString message("Brightness Value: ");
-    //message += QString::number(value);
-    //QMessageBox::information(this, "Info", message);
-
-    m_view2D->SetBrightness(value);
-    m_view2D->UpdateTBC();
+    if(m_controller){
+        m_controller->SetValueTBC(FrMainController::Brightness, value);
+    }
 }
 
 // change contrast of the scene
 void FrMainWindow::contrastValueChanged(){    
-    // should be in the range [-1..+1]
+    // map into range [-1..+1]
     double value = m_lowPanel->GetContrastValue();
     value /= 100.0;
-
-    //QString message("Contrast Value: ");
-    //message += QString::number(value);
-    //QMessageBox::information(this, "Info", message);
-
-    m_view2D->SetContrast(value);
-    m_view2D->UpdateTBC();
+    
+    if(m_controller){
+        m_controller->SetValueTBC(FrMainController::Contrast, value);
+    }
 }
 
 // change threshold of the scene
 void FrMainWindow::thresholdValueChanged(){
-    // should be in the range [0..+1]
+    // map into range [0..+1]
     double value = m_lowPanel->GetThresholdValue();
     value /= 100.0;
 
-    //QString message("Threshold Value: ");
-    //message += QString::number(value);
-    //QMessageBox::information(this, "Info", message);
-
-    m_view2D->SetThreshold(value);
-    m_view2D->UpdateTBC();
+    if(m_controller){
+        m_controller->SetValueTBC(FrMainController::Threshold, value);
+    }
 }
 
 void FrMainWindow::tool1Triggered(){

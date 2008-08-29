@@ -6,6 +6,7 @@
 #include "FrView2D.h"
 #include "FrPanTool.h"
 #include "FrZoomTool.h"
+#include "FrCompositeTool.h"
 #include "FrImageDocObj.h"
 
 #include "vtkRenderWindowInteractor.h"
@@ -17,7 +18,9 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
     m_toolController = new FrToolController();
 
     //FrPanTool* tool = new FrPanTool();
-    FrZoomTool* tool = new FrZoomTool();
+    //FrZoomTool* tool = new FrZoomTool();
+    FrCompositeTool* tool = new FrCompositeTool();
+    tool->SetDocument(m_document);
     m_toolController->PushTool(tool);
 }
 
@@ -41,7 +44,7 @@ void FrMainController::Initialize(){
 
     // Initialize document
     if(m_document){
-       // TODO: initialize document
+        m_document->SetDefaultValues();
     }
 }
 
@@ -73,4 +76,29 @@ void FrMainController::LoadImage(QString& fileName){
         // TODO: process error
     }    
     m_view->GetView2D()->UpdateScene();
+}
+
+void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
+    // Check for safty
+    if(!m_document) return;
+
+    // Setup value
+    bool isChanged = true;
+    switch(target){
+        case FrMainController::Threshold:
+            m_document->SetThreshold(value);
+            break;
+        case FrMainController::Brightness:
+            m_document->SetBrightness(value);
+            break;
+        case FrMainController::Contrast:
+            m_document->SetContrast(value);
+            break;
+        default:
+            isChanged = false;
+    }
+
+    if(isChanged && m_view){
+        m_view->GetView2D()->UpdateTBC();
+    }
 }

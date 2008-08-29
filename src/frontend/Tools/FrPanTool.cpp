@@ -42,7 +42,7 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     double viewFocus[4], viewPoint[3], focalDepth;
     double newPickPoint[4], oldPickPoint[4], motionVector[3];
     
-    if (params.Button != FrMouseParams.LeftButton ||
+    if (params.Button != FrMouseParams::LeftButton ||
         is->CurrentRenderer == NULL) return false;
 
     // Calculate the focal depth

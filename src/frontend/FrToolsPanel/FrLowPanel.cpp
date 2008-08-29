@@ -9,6 +9,8 @@ FrLowPanel::FrLowPanel(QWidget *parent): QWidget(parent){
             this, SLOT(contrastSliderPositionChanged()));
 	connect(thresholdSlider,  SIGNAL(valueChanged(int)), 
             this, SLOT(thresholdSliderPositionChanged()));
+
+    thresholdSlider->setValue(0);
 }
 
 void FrLowPanel::brightnessSliderPositionChanged(){

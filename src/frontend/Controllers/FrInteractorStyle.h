@@ -30,6 +30,7 @@ protected:
     friend class FrTool;
     friend class FrPanTool;
     friend class FrZoomTool;
+    friend class FrTBCTool;
 
 private:
     enum State{

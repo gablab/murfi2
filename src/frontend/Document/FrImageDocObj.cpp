@@ -91,6 +91,7 @@ bool FrImageDocObj::LoadFromFile(QString& fileName){
             }
 
             m_origin = img;
+		
             SetUpdateNeeded(true);
             result = true;
         }

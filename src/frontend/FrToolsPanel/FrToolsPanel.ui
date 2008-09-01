@@ -1,72 +1,54 @@
 <ui version="4.0" >
  <class>ToolsPanel</class>
- <widget class="QDialog" name="ToolsPanel" >
+ <widget class="QWidget" name="ToolsPanel" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
-    <height>810</height>
+    <width>176</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Dialog</string>
+   <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pushButton" >
+  <widget class="QPushButton" name="mode1Button" >
    <property name="geometry" >
     <rect>
-     <x>80</x>
-     <y>30</y>
-     <width>151</width>
+     <x>20</x>
+     <y>40</y>
+     <width>131</width>
      <height>91</height>
     </rect>
    </property>
    <property name="text" >
     <string>Mode 1</string>
    </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <property name="checked" >
-    <bool>false</bool>
-   </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2" >
+  <widget class="QPushButton" name="mode2Button" >
    <property name="geometry" >
     <rect>
-     <x>80</x>
-     <y>140</y>
-     <width>151</width>
-     <height>101</height>
+     <x>20</x>
+     <y>150</y>
+     <width>131</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text" >
     <string>Mode 2</string>
    </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3" >
+  <widget class="QPushButton" name="mode3Button" >
    <property name="geometry" >
     <rect>
-     <x>80</x>
+     <x>20</x>
      <y>260</y>
-     <width>151</width>
-     <height>101</height>
+     <width>131</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text" >
     <string>Mode 3</string>
-   </property>
-   <property name="checkable" >
-    <bool>true</bool>
-   </property>
-   <property name="checked" >
-    <bool>false</bool>
-   </property>
-   <property name="flat" >
-    <bool>false</bool>
    </property>
   </widget>
  </widget>

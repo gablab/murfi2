@@ -5,7 +5,7 @@
  *
  *****************************************************************************/
 // not ready for prime time
-#ifdef 0
+#if 0
 
 static char *VERSION = "$Id$";
 

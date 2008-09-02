@@ -6,26 +6,28 @@
  *****************************************************************************/
 
 // not ready for prime time
-#ifdef 0
+#if 0
 
 #include"RtDataID.h"
 #include"site_config.h"
 
+// default constructor
 RtDataID::RtDataID() {
   siteIDNum = MY_SITE_ID_NUMBER;
   studyNum = 0;
   seriesNum = 0;
   timePoint = 0;
-  inputDataID = "";
+  history = "";
   processModuleID = "";
   dataID = "";
   roiID = "";
 }
 
+// constructor with known fields
 RtDataID::RtDataID(unsigned int _studyNum,
 		   unsigned int _seriesNum,
 		   unsigned int timePoint,
-		   const RtDataID &_inputID,
+		   const string &_history,
 		   const string &_processModuleID,
 		   const string &_dataID,
 		   const string &_roiID) {
@@ -33,7 +35,20 @@ RtDataID::RtDataID(unsigned int _studyNum,
   studyNum = _studyNum;
   seriesNum = _seriesNum;
   timePoint = _timePoint;
-  inputDataID = _inputID;
+  history = _history;
+  processModuleID = _processModuleID;
+  dataID = _dataID;
+  roiID = _roiID;
+}
+
+// constructor from a data id from a previous module
+RtDataID::RtDataID(const RtDataID &prevModuleData,
+		   const RtStreamComponent &_thisModule) {
+  siteIDNum = MY_SITE_ID_NUMBER;
+  studyNum = _studyNum;
+  seriesNum = _seriesNum;
+  timePoint = _timePoint;
+  history = _history;
   processModuleID = _processModuleID;
   dataID = _dataID;
   roiID = _roiID;
@@ -50,7 +65,7 @@ bool RtDataID::operator==(const RtDataID &other) {
     && studyNum        == other.studyNum
     && seriesNum       == other.seriesNum
     && timePoint       == other.timePoint
-    && inputDataID     == other.inputDataID
+    && history         == other.history
     && processModuleID == other.processModuleID
     && dataID          == other.dataID
     && roiID           == other.roiID
@@ -64,7 +79,7 @@ bool RtDataID::operator<(const RtDataID &other) {
     || studyNum        < other.studyNum
     || seriesNum       < other.seriesNum
     || timePoint       < other.timePoint
-    || inputDataID     < other.inputDataID
+    || history     < other.history
     || processModuleID < other.processModuleID
     || dataID          < other.dataID
     || roiID           < other.roiID
@@ -81,10 +96,11 @@ string RtDataID::toString() {
     << ":" << studyNum
     << ":" << seriesNum
     << ":" << timePoint
-    << ":" << inputDataID
+    << ":" << history
     << ":" << processModuleID
     << ":" << dataID
-    << ":" << roiID;
+    << ":" << roiID
+    << ":";
   return sstr.str();
 }
 

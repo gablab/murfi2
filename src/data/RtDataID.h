@@ -6,7 +6,7 @@
  *****************************************************************************/
 
 // not ready for prime time
-#ifdef 0
+#if 0
 
 #ifndef RTDATAID_H
 #define RTDATAID_H
@@ -39,7 +39,7 @@ protected:
   unsigned int studyNum;         // study number (date and time study started)
   unsigned int seriesNum;        // image series (count up from 1)
   unsigned int timePoint;        // image number (count up from 1)
-  RtDataID     inputDataID;      // id of data that served as input here
+  string       history;          // ids of modules already used on this data
   string       processModuleID;  // id of this processing module
   string       dataID;           // id representing the particular data kind 
   string       roiID;            // if this was processed on a particular ROI

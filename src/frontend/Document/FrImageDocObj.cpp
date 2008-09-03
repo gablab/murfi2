@@ -38,16 +38,19 @@ void FrImageDocObj::UpdateObject(){
 
     double dimW = m_origin->getDim(0);
     double dimH = m_origin->getDim(1);
-    m_copy->SetDimensions(dimW, dimH, 1.0);
+	m_copy->SetDimensions(dimW, dimH, 1.0);
+//	m_copy->SetDimensions(64, 64, 36);
 
     double w = m_origin->getPixDim(0);
     double h = m_origin->getPixDim(1);
-    m_copy->SetSpacing(w, h, 1.0);
+	m_copy->SetSpacing(w, h, 1.0);
 
-    m_copy->SetNumberOfScalarComponents(1);
+//	m_copy->SetExtent(0, 63, 0, 63, 0, 35);
+//	m_copy->SetWholeExtent(0, 63, 0, 63, 0, 35);
+//	m_copy->SetUpdateExtentToWholeExtent();
+  
+	m_copy->SetNumberOfScalarComponents(1);
     m_copy->SetScalarTypeToUnsignedChar();
-    //m_copy->SetExtent(0, 63, 0, 63, 0, 0);
-    //m_copy->SetWholeExtent();
     m_copy->AllocateScalars();
     
     //m_copy->GetPointData()->GetScalars()->FillComponent(0, 0);
@@ -56,7 +59,9 @@ void FrImageDocObj::UpdateObject(){
         GetPointData()->GetScalars()->GetVoidPointer(0);
 
     short* srcPtr = dataPtr;
-    for(int i=0; i < m_origin->getNumPix(); ++i){
+	int num = m_origin->getNumPix();
+	//num = 64*64*36;
+    for(int i=0; i < num; i++){
         *dstPtr = (unsigned char)(*srcPtr);
         dstPtr++;
         srcPtr++;

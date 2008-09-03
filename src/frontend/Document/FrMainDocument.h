@@ -18,6 +18,7 @@ public:
     FrPropMacro(double,Threshold);
     FrPropMacro(double,Brightness);
     FrPropMacro(double,Contrast);
+	FrPropMacro(int, Slice);
 };
 
 #endif

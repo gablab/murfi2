@@ -6,6 +6,7 @@
 #include "FrView2D.h"
 #include "FrPanTool.h"
 #include "FrZoomTool.h"
+#include "FrSliceScrollTool.h"
 #include "FrImageDocObj.h"
 
 #include "vtkRenderWindowInteractor.h"

@@ -1,6 +1,7 @@
 #include "FrTBCTool.h"
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
+#include "FrMainDocument.h"
 
 FrTBCTool::FrTBCTool(FrMainDocument* doc)
     : m_Document(0), m_downX(0), m_downY(0) {
@@ -32,11 +33,11 @@ bool FrTBCTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
-    // Check for safty
+    // Check for safety
     if(!is->CurrentRenderer || !m_Document == NULL) return false;
         
     // TODO: implement
-    
+
     this->GetController()->Notify(FRN_TCB_UPDATE);
     return true;
 }

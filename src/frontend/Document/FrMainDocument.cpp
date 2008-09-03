@@ -18,4 +18,6 @@ void FrMainDocument::SetDefaultValues(){
     m_Threshold = DEF_THRESHOLD;
     m_Brightness = DEF_BRIGHTNESS;
     m_Contrast = DEF_CONTRAST;
+	
+	m_Slice = 0;
 }

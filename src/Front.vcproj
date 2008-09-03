@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/FrBookmark;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/QVTKWidget;./frontend/Controllers;./frontend/FrToolsPanel;./frontend/Filters;./frontend/FrBookmarkWidget;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -272,162 +272,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="QVTKWidget"
-			>
-			<File
-				RelativePath=".\frontend\QVTKWidget\QVTKWidget.cxx"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\QVTKWidget\QVTKWidget.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
-			Name="FrToolsPanel"
-			>
-			<File
-				RelativePath=".\frontend\FrToolsPanel\FrLowPanel.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\FrToolsPanel\FrLowPanel.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\frontend\FrToolsPanel\FrToolsPanel.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\FrToolsPanel\FrToolsPanel.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
-			Name="FrBookmarkWidget"
-			>
-			<File
-				RelativePath=".\frontend\FrBookmarkWidget\FrBookmarkWidget.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\FrBookmarkWidget\FrBookmarkWidget.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
-			Name="FrBookmark"
-			>
-			<File
-				RelativePath=".\frontend\FrBookmark\FrBookmark.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\FrBookmark\FrBookmark.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
 			Name="Tools"
 			>
 			<File
@@ -603,6 +447,14 @@
 			Name="Filters"
 			>
 			<File
+				RelativePath=".\frontend\Filters\FrMosaicFilter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Filters\FrMosaicFilter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Filters\FrTBCFilter.cpp"
 				>
 			</File>
@@ -629,6 +481,190 @@
 			<File
 				RelativePath=".\frontend\Utils\FrUtils.h"
 				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Widgets"
+			>
+			<File
+				RelativePath=".\frontend\Widgets\FrBookmark.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrBookmark.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrBookmarkWidget.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrBookmarkWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrLowPanel.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrLowPanel.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrToolsPanel.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrToolsPanel.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\QVTKWidget.cxx"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\QVTKWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<File

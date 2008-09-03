@@ -31,6 +31,10 @@ public:
     // Threshold/brightness/contrast interface
     enum TBC { Threshold, Brightness, Contrast };
     void SetValueTBC(TBC target, double value);
+	void SetNextSlice();
+    
+	// Override from base class
+    virtual void Notify(int notifyCode);
 
 private:
     friend class FrInteractorStyle;

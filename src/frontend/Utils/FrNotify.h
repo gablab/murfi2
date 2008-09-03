@@ -13,6 +13,7 @@
 // Pipline update notification
 #define FRN_PIPLINE_UPDATE 1    // Force reinstall render pipline
 #define FRN_TCB_UPDATE 2        // Update threshold/brightnesss/contrast
+#define FRN_SETNEXTSLICE 3	// set next slice in multi-slice image
 
 // Some other notification codes
 

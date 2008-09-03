@@ -4,6 +4,7 @@
 #include "FrMainDocument.h"
 #include "FrImageDocObj.h"
 #include "FrTBCFilter.h"
+#include "FrMosaicFilter.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -17,8 +18,16 @@
 #include "vtkCamera.h"
 #include "vtkPNGReader.h"
 #include "vtkImageActor.h"
+#include "vtkImageData.h"
+#include "vtkImageReslice.h"
 #include "vtkRenderWindow.h"
 #include "vtkActorCollection.h"
+#include "vtkBMPWriter.h"
+#include "vtkImageWriter.h"
+#include "vtkDataWriter.h"
+#include "vtkImagePadFilter.h"
+#include "vtkPointData.h"
+
 
 
 // Default constructor
@@ -41,12 +50,16 @@ FrView2D::FrView2D(FrMainWindow* mainWindow, QWidget* parent)
 	m_imageViewer->SetupInteractor(rwi);
 
     // create renderer
-    m_renderer = m_imageViewer->GetRenderer();
+	m_renderer = vtkRenderer::New();//m_imageViewer->GetRenderer();
+	//m_imageViewer->GetRenderWindow()->AddRenderer(m_renderer);
+	m_imageViewer->SetRenderer(m_renderer);
 	m_renderer->SetBackground( 0.1, 0.2, 0.4 );
 
     // Create filter
     m_tbcFilter = FrTBCFilter::New();
     m_actor = vtkImageActor::New();
+
+	m_slice = 0;
 }
 
 FrView2D::~FrView2D(){
@@ -94,17 +107,34 @@ void FrView2D::UpdateScene(){
             m_tbcFilter->SetThreshold(document->GetThreshold());
             m_tbcFilter->SetBrightness(document->GetBrightness());
             m_tbcFilter->SetContrast(document->GetContrast());
-            m_tbcFilter->SetInput(img->GetImageData());
+            vtkImageData* data = img->GetImageData();
+			
+			FrMosaicFilter* m_MosaicFilter = FrMosaicFilter::New();
+			m_MosaicFilter->SetInput(data);
+			m_MosaicFilter->SetOutputDimensions(64, 64, 36);
+				
+			//vtkImageWriter* writer = vtkImageWriter::New();
+			//writer->SetFileName("test.img");
+			//writer->SetFileDimensionality(3);
+			//writer->SetInput(m_MosaicFilter->GetOutput());
+			//writer->Write();
+
+			m_tbcFilter->SetInput(m_MosaicFilter->GetOutput());
             m_tbcFilter->Update();
 
-            
             m_actor->SetInput(m_tbcFilter->GetOutput());
-            m_renderer->AddActor(m_actor);
+			m_tbcFilter->GetOutput()->GetDimensions(m_dims);
+			m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
 
-            // set image in the center of screen
+			m_renderer->AddActor(m_actor);
+			//m_imageViewer->GetRenderWindow()->AddRenderer(m_renderer);
+			//m_imageViewer->GetRenderer()->AddActor(m_actor);
+
+			// set image in the center of screen
             double* center = m_actor->GetCenter();
             m_actor->AddPosition(-center[0], -center[1], 0);
-            m_renderer->GetActiveCamera()->SetParallelScale(100);
+			m_renderer->GetActiveCamera()->SetParallelScale(100);
+			//m_imageViewer->GetRenderer()->GetActiveCamera()->SetParallelScale(100);
         } 
         // redraw scene
         m_imageViewer->GetRenderWindow()->Render();
@@ -128,6 +158,23 @@ void FrView2D::UpdateTBC(){
             m_imageViewer->GetRenderWindow()->Render();
         }
     }
+}
+
+void FrView2D::UpdateSlice(){
+    FrMainDocument* document = m_mainWindow->GetDocument();
+    if(document){
+		// check input data
+		int slice = document->GetSlice();
+		m_slice += slice;
+		if (m_slice>35)
+			m_slice = 35;
+		if (m_slice<0)
+			m_slice = 0;
+
+		m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
+		m_renderer->ResetCameraClippingRange();
+		m_imageViewer->GetRenderWindow()->Render();
+	}	
 }
 
 void FrView2D::SetThreshold(double value){

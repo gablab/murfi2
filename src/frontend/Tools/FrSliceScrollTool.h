@@ -1,8 +1,11 @@
 #ifndef FR_SLICE_SCROLL_TOOL
 #define FR_SLICE_SCROLL_TOOL
 
-
 #include "FrTool.h"
+#include "FrMacro.h"
+
+// Forward declaration
+class FrMainDocument;
 
 /// abstract class for all tools
 // used by application
@@ -10,7 +13,7 @@ class FrSliceScrollTool : public FrTool
 {
 public:
     /// Default constructor
-	FrSliceScrollTool();
+	FrSliceScrollTool(FrMainDocument* document=0);
 	/// Destructor
 	virtual ~FrSliceScrollTool();
 	
@@ -20,7 +23,16 @@ public:
 	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
-	
+
+    FrPropMacro(FrMainDocument*, Document);
+
+private:
+	bool SetSlice(int inc, FrInteractorStyle* is);
+
+private:
+    int m_oldX;
+    int m_oldY;
+	int m_sliceNumber;
 };
 
 #endif

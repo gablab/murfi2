@@ -15,7 +15,7 @@
 FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
     : m_view(view), m_document(doc), m_toolController(0){
 
-    m_toolController = new FrToolController();
+    m_toolController = new FrToolController(this);
 
     //FrPanTool* tool = new FrPanTool();
     //FrZoomTool* tool = new FrZoomTool();
@@ -79,7 +79,7 @@ void FrMainController::LoadImage(QString& fileName){
 }
 
 void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
-    // Check for safty
+    // Check for safety
     if(!m_document) return;
 
     // Setup value
@@ -101,4 +101,29 @@ void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
     if(isChanged && m_view){
         m_view->GetView2D()->UpdateTBC();
     }
+}
+
+void FrMainController::SetNextSlice(){
+    if(!m_document) return;
+
+	//m_document->SetSlice(value);
+	
+	if(m_view){
+		m_view->GetView2D()->UpdateSlice();
+	}
+}
+
+void FrMainController::Notify(int notifyCode){
+
+	switch(notifyCode){
+		case FRN_PIPLINE_UPDATE:
+			// TODO: implement..
+			break;
+		case FRN_TCB_UPDATE:
+			// TODO: implement..
+			break;
+		case FRN_SETNEXTSLICE:
+			SetNextSlice();
+			break;
+	}
 }

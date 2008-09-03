@@ -7,6 +7,7 @@
 class FrPanTool;
 class FrZoomTool;
 class FrTBCTool;
+class FrSliceScrollTool;
 class FrMainDocument;
 
 // Composite tool. This tool delagate
@@ -33,6 +34,7 @@ private:
     FrPanTool*  m_panTool;
     FrZoomTool* m_zoomTool;
     FrTBCTool*  m_tbcTool;
+	FrSliceScrollTool* m_ssTool;
 };
 
 #endif

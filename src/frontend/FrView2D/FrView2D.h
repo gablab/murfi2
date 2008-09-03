@@ -24,6 +24,7 @@ public:
 
     void UpdateScene();
     void UpdateTBC();
+	void UpdateSlice();
 
     void SetThreshold(double value);
     void SetBrightness(double value);
@@ -38,6 +39,10 @@ private:
 
     vtkImageActor* m_actor;
     FrTBCFilter* m_tbcFilter;
+
+	int m_slice;
+	int m_dims[3];
+
 };
 
 #endif

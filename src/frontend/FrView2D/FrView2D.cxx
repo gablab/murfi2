@@ -125,7 +125,7 @@ void FrView2D::UpdateScene(){
             m_actor->SetInput(m_tbcFilter->GetOutput());
 			m_tbcFilter->GetOutput()->GetDimensions(m_dims);
 			m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
-
+ 
 			m_renderer->AddActor(m_actor);
 			//m_imageViewer->GetRenderWindow()->AddRenderer(m_renderer);
 			//m_imageViewer->GetRenderer()->AddActor(m_actor);
@@ -133,7 +133,7 @@ void FrView2D::UpdateScene(){
 			// set image in the center of screen
             double* center = m_actor->GetCenter();
             m_actor->AddPosition(-center[0], -center[1], 0);
-			m_renderer->GetActiveCamera()->SetParallelScale(100);
+			//m_renderer->GetActiveCamera()->SetParallelScale(100);
 			//m_imageViewer->GetRenderer()->GetActiveCamera()->SetParallelScale(100);
         } 
         // redraw scene
@@ -170,9 +170,11 @@ void FrView2D::UpdateSlice(){
 			m_slice = 35;
 		if (m_slice<0)
 			m_slice = 0;
-
+		
+		
 		m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
-		m_renderer->ResetCameraClippingRange();
+		//m_renderer->ResetCameraClippingRange();
+		m_renderer->ResetCamera();
 		m_imageViewer->GetRenderWindow()->Render();
 	}	
 }

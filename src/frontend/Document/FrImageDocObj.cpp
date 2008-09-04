@@ -103,3 +103,7 @@ bool FrImageDocObj::LoadFromFile(QString& fileName){
     }
     return result;
 }
+
+unsigned int FrImageDocObj::GetMatrixSize(){
+	return m_origin->getMatrixSize();
+}

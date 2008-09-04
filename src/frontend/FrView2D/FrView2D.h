@@ -42,6 +42,7 @@ private:
 
 	int m_slice;
 	int m_dims[3];
+	unsigned int matrixSize, numSlices;
 
 };
 

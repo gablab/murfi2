@@ -26,10 +26,12 @@ public:
     virtual bool LoadFromFile(QString& fileName);
 
     vtkImageData* GetImageData(){ return m_copy; }
+	unsigned int GetMatrixSize();
 
 private:
     RtMRIImage* m_origin;
     vtkImageData* m_copy;
+
 };
 
 #endif

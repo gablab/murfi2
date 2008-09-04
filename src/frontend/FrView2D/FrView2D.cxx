@@ -5,6 +5,7 @@
 #include "FrImageDocObj.h"
 #include "FrTBCFilter.h"
 #include "FrMosaicFilter.h"
+#include "FrInteractorStyle.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -108,10 +109,14 @@ void FrView2D::UpdateScene(){
             m_tbcFilter->SetBrightness(document->GetBrightness());
             m_tbcFilter->SetContrast(document->GetContrast());
             vtkImageData* data = img->GetImageData();
-			
+			matrixSize = img->GetMatrixSize();
+			int oldDims[3];
+			data->GetDimensions(oldDims);
+			numSlices = (oldDims[0]/matrixSize)*(oldDims[1]/matrixSize);
+
 			FrMosaicFilter* m_MosaicFilter = FrMosaicFilter::New();
 			m_MosaicFilter->SetInput(data);
-			m_MosaicFilter->SetOutputDimensions(64, 64, 36);
+			m_MosaicFilter->SetOutputDimensions(matrixSize, matrixSize, numSlices);
 				
 			//vtkImageWriter* writer = vtkImageWriter::New();
 			//writer->SetFileName("test.img");
@@ -133,7 +138,12 @@ void FrView2D::UpdateScene(){
 			// set image in the center of screen
             double* center = m_actor->GetCenter();
             m_actor->AddPosition(-center[0], -center[1], 0);
-			//m_renderer->GetActiveCamera()->SetParallelScale(100);
+			m_renderer->GetActiveCamera()->ParallelProjectionOn();
+			m_renderer->GetActiveCamera()->SetParallelScale(120);
+			
+			//FrInteractorStyle* is = (FrInteractorStyle*)m_qtView->GetInteractor()->GetInteractorStyle();
+			//is->CurrentRenderer->GetActiveCamera()->SetParallelScale(100);
+			//m_imageViewer->GetInteractorStyle()->GetCurrentRenderer()->GetActiveCamera()->SetParallelScale(100);
 			//m_imageViewer->GetRenderer()->GetActiveCamera()->SetParallelScale(100);
         } 
         // redraw scene
@@ -166,15 +176,17 @@ void FrView2D::UpdateSlice(){
 		// check input data
 		int slice = document->GetSlice();
 		m_slice += slice;
-		if (m_slice>35)
-			m_slice = 35;
+		if (m_slice>numSlices)
+			m_slice = numSlices;
 		if (m_slice<0)
 			m_slice = 0;
 		
 		
 		m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
 		//m_renderer->ResetCameraClippingRange();
+		double scale = m_renderer->GetActiveCamera()->GetParallelScale();
 		m_renderer->ResetCamera();
+		m_renderer->GetActiveCamera()->SetParallelScale(scale);
 		m_imageViewer->GetRenderWindow()->Render();
 	}	
 }

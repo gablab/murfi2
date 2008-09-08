@@ -1,5 +1,5 @@
-#ifndef FR_VIEW_2D
-#define FR_VIEW_2D
+#ifndef FR_MOSAIC_VIEW
+#define FR_MOSAIC_VIEW
 
 class QWidget;
 class vtkInteractorStyle;
@@ -13,11 +13,11 @@ class FrMainWindow;
 class FrTBCFilter;
 
 // Wrapper for QVTKWidget.
-class FrView2D
+class FrMosaicView
 { 
 public:
-    FrView2D(FrMainWindow* mainWindow, QWidget* parent);
-    virtual ~FrView2D();
+    FrMosaicView(FrMainWindow* mainWindow, QWidget* parent);
+    virtual ~FrMosaicView();
 
     QWidget* GetWidget();
     void SetInteractorStyle(vtkInteractorStyle* style);

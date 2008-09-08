@@ -1,22 +1,27 @@
 #ifndef FR_MOSAIC_FILTER
 #define FR_MOSAIC_FILTER
 
-// Forward declarations
-class vtkImageData;
+#include "FrBaseFilter.h"
 
-class FrMosaicFilter{
+class FrMosaicFilter : public FrBaseFilter {
 public:
     static FrMosaicFilter* New();
-	void SetInput(vtkImageData* data);
+
+	virtual void SetInput(vtkImageData* data);
 	void SetOutputDimensions(int w, int h, int num);
-	vtkImageData* GetOutput();
+	
+    virtual void ExecuteInformation();
+    virtual void SimpleExecute(vtkImageData* input, vtkImageData* output);
 
 private:
+    // VTK style
     FrMosaicFilter();
+    FrMosaicFilter(const FrMosaicFilter&);  // Not implemented.
+    void operator=(const FrMosaicFilter&);  // Not implemented.  
+
 	int GetNewId(int slice, int x, int y);
 
 private:
-	vtkImageData* m_data;
 	int m_newDims[3];
 	int m_oldDims[3];
 

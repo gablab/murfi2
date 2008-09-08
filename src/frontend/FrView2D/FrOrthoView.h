@@ -1,5 +1,5 @@
-#ifndef FR_VIEW_2D
-#define FR_VIEW_2D
+#ifndef FR_ORTHO_VIEW
+#define FR_ORTHO_VIEW
 
 class QWidget;
 class vtkInteractorStyle;
@@ -13,11 +13,11 @@ class FrMainWindow;
 class FrTBCFilter;
 
 // Wrapper for QVTKWidget.
-class FrView2D
+class FrOrthoView
 { 
 public:
-    FrView2D(FrMainWindow* mainWindow, QWidget* parent);
-    virtual ~FrView2D();
+    FrOrthoView(FrMainWindow* mainWindow, QWidget* parent);
+    virtual ~FrOrthoView();
 
     QWidget* GetWidget();
     void SetInteractorStyle(vtkInteractorStyle* style);

@@ -371,6 +371,22 @@
 			Name="FrView2D"
 			>
 			<File
+				RelativePath=".\frontend\FrView2D\FrMosaicView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrView2D\FrMosaicView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrView2D\FrOrthoView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrView2D\FrOrthoView.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\FrView2D\FrView2D.cxx"
 				>
 			</File>
@@ -446,6 +462,14 @@
 		<Filter
 			Name="Filters"
 			>
+			<File
+				RelativePath=".\frontend\Filters\FrBaseFilter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Filters\FrBaseFilter.h"
+				>
+			</File>
 			<File
 				RelativePath=".\frontend\Filters\FrMosaicFilter.cpp"
 				>

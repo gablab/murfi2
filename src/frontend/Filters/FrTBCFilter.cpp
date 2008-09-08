@@ -51,9 +51,8 @@ void FrTBCFilter::SetContrast(double value){
 }
 
 // The execute method created by the subclass.
-void FrTBCFilter::ThreadedExecute(vtkImageData *inData, 
-                                  vtkImageData *outData, 
-                                  int extent[6], int threadId){
+void FrTBCFilter::SimpleExecute(vtkImageData *inData, 
+                                vtkImageData *outData){
     // Check for valid data type
     if (inData->GetScalarType() != VTK_UNSIGNED_CHAR){
         vtkErrorMacro(<<"FrTBCFilter: vtkImageData has to have only unsigned char data type.");

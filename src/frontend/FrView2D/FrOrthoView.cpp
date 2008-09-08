@@ -1,4 +1,4 @@
-#include "FrView2D.h"
+#include "FrOrthoView.h"
 #include "QVTKWidget.h"
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
@@ -32,7 +32,7 @@
 
 
 // Default constructor
-FrView2D::FrView2D(FrMainWindow* mainWindow, QWidget* parent)
+FrOrthoView::FrOrthoView(FrMainWindow* mainWindow, QWidget* parent)
 : m_mainWindow(mainWindow) {
    
     // Create qt widget to render
@@ -63,7 +63,7 @@ FrView2D::FrView2D(FrMainWindow* mainWindow, QWidget* parent)
 	m_slice = 0;
 }
 
-FrView2D::~FrView2D(){
+FrOrthoView::~FrOrthoView(){
 
     if(m_renderer) m_renderer->Delete();
     if(m_imageViewer) m_imageViewer->Delete();
@@ -71,18 +71,18 @@ FrView2D::~FrView2D(){
     if(m_actor) m_actor->Delete();
 }
 
-QWidget* FrView2D::GetWidget(){
+QWidget* FrOrthoView::GetWidget(){
     return m_qtView;
 }
 
-void FrView2D::SetInteractorStyle(vtkInteractorStyle* style){
+void FrOrthoView::SetInteractorStyle(vtkInteractorStyle* style){
 
     if(style && m_qtView->GetInteractor()){
         m_qtView->GetInteractor()->SetInteractorStyle(style);
     }
 }
 
-void FrView2D::UpdateScene(){
+void FrOrthoView::UpdateScene(){
 	
     // Clear scene
     m_renderer->RemoveAllViewProps();
@@ -126,7 +126,6 @@ void FrView2D::UpdateScene(){
 
 			m_tbcFilter->SetInput(m_MosaicFilter->GetOutput());
             m_tbcFilter->Update();
-            m_MosaicFilter->Delete();
 
             m_actor->SetInput(m_tbcFilter->GetOutput());
 			m_tbcFilter->GetOutput()->GetDimensions(m_dims);
@@ -152,7 +151,7 @@ void FrView2D::UpdateScene(){
     }
 }
 
-void FrView2D::UpdateTBC(){
+void FrOrthoView::UpdateTBC(){
     // Just update Threshold/brightness/contrast
     FrMainDocument* document = m_mainWindow->GetDocument();
     if(document){
@@ -171,7 +170,7 @@ void FrView2D::UpdateTBC(){
     }
 }
 
-void FrView2D::UpdateSlice(){
+void FrOrthoView::UpdateSlice(){
     FrMainDocument* document = m_mainWindow->GetDocument();
     if(document){
 		// check input data

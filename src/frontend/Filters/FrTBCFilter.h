@@ -1,12 +1,8 @@
 #ifndef FR_TBC_FILTER
 #define FR_TBC_FILTER
 
-// Forward declarations
-class vtkImageData;
-
 // Includes
-#include "vtkImageToImageFilter.h"
-
+#include "FrBaseFilter.h"
 
 // some values
 #define MIN_THRESHOLD   0.0
@@ -25,9 +21,10 @@ class vtkImageData;
 // This class is used to change 
 // threshold, brightness and contrast
 // of rendered image data
-class FrTBCFilter : public vtkImageToImageFilter {
+class FrTBCFilter : public FrBaseFilter {
 public:
     static FrTBCFilter* New();
+
 public:
     // Get/Set threshold (in the range [0 .. 1])
     double GetThreshold(){ return m_threshold; }
@@ -42,9 +39,8 @@ public:
     void SetContrast(double value);
 
     // Overrides of base class
-    virtual void ThreadedExecute(vtkImageData *inData, 
-                                 vtkImageData *outData,
-                                 int extent[6], int threadId);
+    virtual void SimpleExecute(vtkImageData *inData, 
+                              vtkImageData *outData);
 private:
 
     // For now
@@ -59,7 +55,7 @@ private:
     double m_contrast;
 
 private:
-    FrTBCFilter();
+    FrTBCFilter(); // Do not allow using new
     FrTBCFilter(const FrTBCFilter&);  // Not implemented.
     void operator=(const FrTBCFilter&);  // Not implemented.
 };

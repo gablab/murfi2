@@ -25,6 +25,7 @@ Fr2DSliceActor::Fr2DSliceActor(){
 	this->ImagePlane = NULL;         
 	this->ImageTexture = NULL; 
 	this->CurrentImage = NULL;
+	this->ImageVOI = NULL;
 
 	this->Level = -1;              
 	this->Opacity = 1.0;            
@@ -33,6 +34,7 @@ Fr2DSliceActor::Fr2DSliceActor(){
 	this->OwnsColorMap = 1;   
 
 	this->CurrentPlane = 2;
+	this->CurrentFrame = 0;
 
 	this->ColorMap = vtkLookupTable::New();
 	this->ColorMap->SetNumberOfTableValues(256);
@@ -65,6 +67,10 @@ Fr2DSliceActor::~Fr2DSliceActor(){
 	if (this->OwnsColorMap){
 		if (this->ColorMap)
 			this->ColorMap->Delete();
+
+	if (this->ImageVOI)
+		this->ImageVOI->Delete();
+	
 	}
 }
 
@@ -87,6 +93,10 @@ void Fr2DSliceActor::SetInput(vtkImageData* image){
 	BuildImageSlice();
 	if (this->OwnsColorMap)
 		AutoUpdateColormapRange(this->ColorMap, this->CurrentImage);
+
+	// Create New Image Voi and Texture 
+	this->ImageVOI->SetInput(this->CurrentImage);
+	this->ImageVOI->Modified();
 
 	UpdateSlice();
 }
@@ -151,6 +161,14 @@ void Fr2DSliceActor::SetLevel(int level){
 	}
 }
 
+void Fr2DSliceActor::SetCurrentFrame(int currentframe){
+	if (currentframe!=this->CurrentFrame){
+		this->CurrentFrame = currentframe;
+		if (this->ImageSlice && this->AutoUpdate==1)
+			UpdateSlice();
+	}
+}
+
 void Fr2DSliceActor::SetCurrentPlane(int currentplane){
 	if (currentplane!=this->CurrentPlane){
 		this->CurrentPlane = currentplane;
@@ -170,8 +188,14 @@ void Fr2DSliceActor::BuildImageSlice()
 		this->ImageSlice = vtkActor::New();
 		this->ImageSlice->PickableOff();
 		this->ImageTexture = vtkTexture::New();
+		
+		this->ImageVOI = vtkExtractVOI::New();
+		this->ImageVOI->SetInput(this->CurrentImage);
+		this->ImageVOI->SetVOI(0, 63, 0, 63, this->CurrentFrame, this->CurrentFrame);
+		this->ImageVOI->Update();
 
-		this->ImageTexture->SetInput(this->CurrentImage);
+		this->ImageTexture->SetInput(this->ImageVOI->GetOutput());
+		//this->ImageTexture->SetInput(this->CurrentImage);
 		if (this->Interpolation==0)
 			this->ImageTexture->InterpolateOn();
 		else
@@ -257,6 +281,10 @@ void Fr2DSliceActor::UpdateSlice(){
 			this->ImagePlane->SetPoint2(d0[0] , d1[1] , d1[2]);
 		break;
 	}
+
+	this->ImageVOI->SetVOI(0, 63, 0, 63, this->CurrentFrame, this->CurrentFrame);
+	this->ImageVOI->Modified();
+
 	this->ImagePlane->Update();
 }
 

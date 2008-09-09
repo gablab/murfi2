@@ -161,8 +161,9 @@ void FrView2D::UpdateScene(){
 			//m_imageViewer->GetRenderer()->AddActor(m_actor);
 
 			// set image in the center of screen
-            double* center = m_actor->GetCenter();
-            m_actor->AddPosition(-center[0], -center[1], 0);
+      //     double* center = m_actor->GetCenter();
+      //      m_actor->AddPosition(-center[0], -center[1], 0);
+			m_renderer->ResetCamera();
 			m_renderer->GetActiveCamera()->ParallelProjectionOn();
 			m_renderer->GetActiveCamera()->SetParallelScale(120);
 			
@@ -205,8 +206,8 @@ void FrView2D::UpdateTCB(){
             m_tbcFilter->Update();
 
             // set new input and redraw scene
-			m_actor->SetInput(m_tbcFilter->GetOutput());
-			m_actor->Modified();
+			m_actor2->SetInput(m_tbcFilter->GetOutput());
+			m_actor2->Modified();
 		//	m_actor->SetDisplayExtent(-1, 0, 0, 0, 0, 0);
 		//	m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
             m_imageViewer->GetRenderWindow()->Render();
@@ -225,7 +226,8 @@ void FrView2D::UpdateSlice(){
 		if (m_slice < 0)
 			m_slice = numSlices-1;//0;
 			
-		m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
+		m_actor2->SetCurrentFrame(m_slice);
+		//m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
 		//m_renderer->ResetCameraClippingRange();
 		double scale = m_renderer->GetActiveCamera()->GetParallelScale();
 		m_renderer->ResetCamera();

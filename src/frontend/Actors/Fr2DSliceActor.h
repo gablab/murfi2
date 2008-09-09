@@ -11,6 +11,7 @@
 #include "vtkPlaneSource.h"
 #include "vtkTexture.h"
 #include "vtkProperty.h"
+#include "vtkExtractVOI.h"
 
 class Fr2DSliceActor : public FrBaseActor
 {
@@ -28,11 +29,13 @@ public:
 	// Description:
 	// Set Key Location Parameters 
 	virtual void SetLevel(int level);
+	virtual void SetCurrentFrame(int CurrentFrame);
 	virtual void SetCurrentPlane(int CurrentPlane);
 
 	virtual void SetPolarMode(int mode);
 	virtual void SetPolarMiddle(float polarmiddle=-1);
 
+	vtkGetMacro(CurrentFrame,int);
 	vtkGetMacro(CurrentPlane,int);
 	vtkGetMacro(Level,int);
 
@@ -59,10 +62,12 @@ protected:
 	vtkPlaneSource*              ImagePlane;
 	vtkImageData*                CurrentImage;
 	vtkTexture*                  ImageTexture;
+	vtkExtractVOI*				 ImageVOI;
 	int                          Level;
 
 	float                        OutlineBounds[6];
 	int                          CurrentPlane;
+	int							 CurrentFrame;
 
 	float                        Opacity;
 	int                          Interpolation;

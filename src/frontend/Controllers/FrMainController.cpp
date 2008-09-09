@@ -99,7 +99,7 @@ void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
     }
 
     if(isChanged && m_view){
-        m_view->GetView2D()->UpdateTBC();
+        m_view->GetView2D()->UpdateTCB();
     }
 }
 
@@ -113,6 +113,15 @@ void FrMainController::SetNextSlice(){
 	}
 }
 
+void FrMainController::UpdateTCB(){
+    if(!m_document) return;
+	
+	if(m_view){
+		m_view->GetView2D()->UpdateTCB();
+	}
+
+}
+
 void FrMainController::Notify(int notifyCode){
 
 	switch(notifyCode){
@@ -121,6 +130,7 @@ void FrMainController::Notify(int notifyCode){
 			break;
 		case FRN_TCB_UPDATE:
 			// TODO: implement..
+			UpdateTCB();
 			break;
 		case FRN_SETNEXTSLICE:
 			SetNextSlice();

@@ -32,6 +32,7 @@ public:
     enum TBC { Threshold, Brightness, Contrast };
     void SetValueTBC(TBC target, double value);
 	void SetNextSlice();
+	void UpdateTCB();
     
 	// Override from base class
     virtual void Notify(int notifyCode);

@@ -32,8 +32,13 @@ public:
     FrPropMacro(FrMainDocument*, Document);
 
 private:
-    int m_downX;
-    int m_downY;
+    int m_oldX;
+    int m_oldY;
+
+private:
+	bool SetBrightness(double inc, FrInteractorStyle* is);
+	bool SetContrast(double inc, FrInteractorStyle* is);
+
 };
 
 #endif

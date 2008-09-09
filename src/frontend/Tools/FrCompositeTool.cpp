@@ -59,10 +59,10 @@ bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
         params.Button = FrMouseParams::MidButton;
         m_ssTool->OnMouseUp(is, params);
     }
-/*    else if(params.Button == FrMouseParams::RightButton){
+    else if(params.Button == FrMouseParams::RightButton){
         params.Button = FrMouseParams::LeftButton;
         m_tbcTool->OnMouseUp(is, params);
-    }   */ 
+    }    
     
     return false;
 }
@@ -80,10 +80,10 @@ bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         params.Button = FrMouseParams::MidButton;
         m_ssTool->OnMouseDown(is, params);
     }
- /*   else if(params.Button == FrMouseParams::RightButton){
+    else if(params.Button == FrMouseParams::RightButton){
         params.Button = FrMouseParams::LeftButton;
         m_tbcTool->OnMouseDown(is, params);
-    }*/
+    }
     return false;
 }
 
@@ -106,20 +106,23 @@ bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
         params.Button = FrMouseParams::MidButton;
         result = m_ssTool->OnMouseDrag(is, params);
     }
-    //else if(params.Button == FrMouseParams::RightButton){
-    //    int x = params.X;
-    //    int y = params.Y;
+    else if(params.Button == FrMouseParams::RightButton){
+        int x = params.X;
+        int y = params.Y;
+		
+		params.Button = FrMouseParams::RightButton;
+		result = m_tbcTool->OnMouseDrag(is, params);
 
-    //    // First change brightness
-    //    params.Y = x;
-    //    params.Button = FrMouseParams::LeftButton;
-    //    result = m_tbcTool->OnMouseDrag(is, params);
+        //// First change brightness
+        //params.X = x;
+        //params.Button = FrMouseParams::RightButton;
+        //result = m_tbcTool->OnMouseDrag(is, params);
 
-    //    // Then change contrast
-    //    params.Y = y;
-    //    params.Button = FrMouseParams::RightButton;
-    //    result |= m_tbcTool->OnMouseDrag(is, params);
-    //}
+        //// Then change contrast
+        //params.Y = y;
+        //params.Button = FrMouseParams::RightButton;
+        //result = m_tbcTool->OnMouseDrag(is, params);
+    }
 
     return result;
 }

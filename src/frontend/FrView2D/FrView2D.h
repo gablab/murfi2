@@ -7,10 +7,12 @@ class vtkInteractorStyle;
 class vtkRenderer;
 class vtkImageViewer2;
 class vtkImageActor;
+class vtkTextActor;
 
 class QVTKWidget;
 class FrMainWindow;
 class FrTBCFilter;
+class Fr2DSliceActor;
 
 // Wrapper for QVTKWidget.
 class FrView2D
@@ -23,7 +25,7 @@ public:
     void SetInteractorStyle(vtkInteractorStyle* style);
 
     void UpdateScene();
-    void UpdateTBC();
+    void UpdateTCB();
 	void UpdateSlice();
 
 private:
@@ -34,6 +36,9 @@ private:
     vtkImageViewer2* m_imageViewer;
 
     vtkImageActor* m_actor;
+	Fr2DSliceActor* m_actor2;
+
+	vtkTextActor* m_tactor;
     FrTBCFilter* m_tbcFilter;
 
 	int m_slice;

@@ -6,6 +6,7 @@
 #include "FrTBCFilter.h"
 #include "FrMosaicFilter.h"
 #include "FrInteractorStyle.h"
+#include "Fr2DSliceActor.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -19,6 +20,8 @@
 #include "vtkCamera.h"
 #include "vtkPNGReader.h"
 #include "vtkImageActor.h"
+#include "vtkTextActor.h"
+#include "vtkTextProperty.h"
 #include "vtkImageData.h"
 #include "vtkImageReslice.h"
 #include "vtkRenderWindow.h"
@@ -59,6 +62,8 @@ FrView2D::FrView2D(FrMainWindow* mainWindow, QWidget* parent)
     // Create filter
     m_tbcFilter = FrTBCFilter::New();
     m_actor = vtkImageActor::New();
+	m_tactor = vtkTextActor::New();
+	m_actor2 = Fr2DSliceActor::New();
 
 	m_slice = 0;
 }
@@ -69,6 +74,8 @@ FrView2D::~FrView2D(){
     if(m_imageViewer) m_imageViewer->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
     if(m_actor) m_actor->Delete();
+	if(m_tactor) m_tactor->Delete();
+	if(m_actor2) m_actor2->Delete();
 }
 
 QWidget* FrView2D::GetWidget(){
@@ -115,9 +122,17 @@ void FrView2D::UpdateScene(){
 			numSlices = (oldDims[0]/matrixSize)*(oldDims[1]/matrixSize);
 
 			FrMosaicFilter* m_MosaicFilter = FrMosaicFilter::New();
-			m_MosaicFilter->SetInput(data);
 			m_MosaicFilter->SetOutputDimensions(matrixSize, matrixSize, numSlices);
+			m_MosaicFilter->SetInput(data);
+			m_MosaicFilter->Update();
 				
+			//vtkImageReslice* reslice = vtkImageReslice::New();
+			//reslice->SetOutputExtent(0, 63, 0, 63, 0, 35);
+			//reslice->SetOutputOrigin(data->GetOrigin());
+			//reslice->SetOutputSpacing(data->GetSpacing());
+			//reslice->SetInput(data);
+			//reslice->Update();
+
 			//vtkImageWriter* writer = vtkImageWriter::New();
 			//writer->SetFileName("test.img");
 			//writer->SetFileDimensionality(3);
@@ -125,14 +140,23 @@ void FrView2D::UpdateScene(){
 			//writer->Write();
 
 			m_tbcFilter->SetInput(m_MosaicFilter->GetOutput());
-            m_tbcFilter->Update();
-            m_MosaicFilter->Delete();
+			//m_tbcFilter->SetInput(reslice->GetOutput());
+			m_tbcFilter->Update();
+            //m_MosaicFilter->Delete();
 
-            m_actor->SetInput(m_tbcFilter->GetOutput());
+			m_actor2->SetInput(m_tbcFilter->GetOutput());
+     //       m_actor->SetInput(m_tbcFilter->GetOutput());
 			m_tbcFilter->GetOutput()->GetDimensions(m_dims);
-			m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
+	//		m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
  
-			m_renderer->AddActor(m_actor);
+			m_tactor->SetInput("Test text");
+			m_tactor->ScaledTextOn();
+			m_tactor->GetTextProperty()->SetFontSize(20);
+			m_tactor->GetTextProperty()->SetBold(4);
+			
+			m_renderer->AddActor(m_actor2);
+			m_renderer->AddActor(m_tactor);
+	//		m_renderer->AddActor(m_actor);
 			//m_imageViewer->GetRenderWindow()->AddRenderer(m_renderer);
 			//m_imageViewer->GetRenderer()->AddActor(m_actor);
 
@@ -152,20 +176,39 @@ void FrView2D::UpdateScene(){
     }
 }
 
-void FrView2D::UpdateTBC(){
+void FrView2D::UpdateTCB(){
     // Just update Threshold/brightness/contrast
     FrMainDocument* document = m_mainWindow->GetDocument();
     if(document){
-        m_tbcFilter->SetThreshold(document->GetThreshold());
-        m_tbcFilter->SetBrightness(document->GetBrightness());
-        m_tbcFilter->SetContrast(document->GetContrast());
+		double threshold = document->GetThreshold();
+		if (threshold > 100)
+			threshold = 100;
+		if (threshold < 0)
+			threshold = 0;
+		double brightness = document->GetBrightness();
+		if (brightness > 100)
+			brightness = 100;
+		if (brightness < -100)
+			brightness = -100;
+		double contrast = document->GetContrast();
+		if (contrast > 100)
+			contrast = 100;
+		if (contrast < -100)
+			contrast = -100;
+
+		m_tbcFilter->SetThreshold(threshold);
+        m_tbcFilter->SetBrightness(brightness);
+        m_tbcFilter->SetContrast(contrast);
 
         // Do update only if has valid input
         if(m_tbcFilter->GetInput()){
             m_tbcFilter->Update();
 
             // set new input and redraw scene
-            m_actor->SetInput(m_tbcFilter->GetOutput());
+			m_actor->SetInput(m_tbcFilter->GetOutput());
+			m_actor->Modified();
+		//	m_actor->SetDisplayExtent(-1, 0, 0, 0, 0, 0);
+		//	m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
             m_imageViewer->GetRenderWindow()->Render();
         }
     }
@@ -175,14 +218,13 @@ void FrView2D::UpdateSlice(){
     FrMainDocument* document = m_mainWindow->GetDocument();
     if(document){
 		// check input data
-		int slice = document->GetSlice();
+		int slice = document->GetSlice();	// actually we get not slice number but slice increment, it can be positive or negative
 		m_slice += slice;
-		if (m_slice>numSlices)
-			m_slice = numSlices;
-		if (m_slice<0)
-			m_slice = 0;
-		
-		
+		if (m_slice > numSlices-1)
+			m_slice = 0;//numSlices-1;
+		if (m_slice < 0)
+			m_slice = numSlices-1;//0;
+			
 		m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
 		//m_renderer->ResetCameraClippingRange();
 		double scale = m_renderer->GetActiveCamera()->GetParallelScale();

@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -689,6 +689,34 @@
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Actors"
+			>
+			<File
+				RelativePath=".\frontend\Actors\Fr2DSliceActor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\Fr2DSliceActor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrBaseActor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrBaseActor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrMosaicSliceActor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrMosaicSliceActor.h"
+				>
 			</File>
 		</Filter>
 		<File

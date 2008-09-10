@@ -718,6 +718,14 @@
 				RelativePath=".\frontend\Actors\FrMosaicSliceActor.h"
 				>
 			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrOrthoSliceActor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrOrthoSliceActor.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\frontend\main.cpp"

@@ -189,9 +189,12 @@ void Fr2DSliceActor::BuildImageSlice()
 		this->ImageSlice->PickableOff();
 		this->ImageTexture = vtkTexture::New();
 		
+		int dims[3];  
+		this->CurrentImage->GetDimensions(dims);
+
 		this->ImageVOI = vtkExtractVOI::New();
 		this->ImageVOI->SetInput(this->CurrentImage);
-		this->ImageVOI->SetVOI(0, 63, 0, 63, this->CurrentFrame, this->CurrentFrame);
+		this->ImageVOI->SetVOI(0, dims[0]-1, 0, dims[1]-1, this->CurrentFrame, this->CurrentFrame);
 		this->ImageVOI->Update();
 
 		this->ImageTexture->SetInput(this->ImageVOI->GetOutput());
@@ -213,7 +216,7 @@ void Fr2DSliceActor::BuildImageSlice()
 		this->ImageSlice->SetTexture(this->ImageTexture);
 
 		AddPart(this->ImageSlice);
-		imageMapper->Delete();  
+		imageMapper->Delete();
     }
 }
 
@@ -235,8 +238,8 @@ void Fr2DSliceActor::UpdateSlice(){
 	}
 
 	vtkImageData* img = this->CurrentImage;
-	int range[3];  
-	img->GetDimensions(range);
+	int dim[3];  
+	img->GetDimensions(dim);
 	double sp[3];   
 	img->GetSpacing(sp);
 	double ori[3];  
@@ -245,15 +248,15 @@ void Fr2DSliceActor::UpdateSlice(){
 	this->CurrentPlane = Irange(this->CurrentPlane, 0,2);
 
 	if (this->Level==-1)
-		this->Level = range[this->CurrentPlane]/2;
+		this->Level = dim[this->CurrentPlane]/2;
 
-	this->Level = Irange(this->Level,0,range[this->CurrentPlane]-1);
+	this->Level = Irange(this->Level, 0, dim[this->CurrentPlane]-1);
 
 	double d1[3];
 	double d0[3];
-	for (int i = 0;i<=2;i++){
+	for (int i = 0; i<=2; i++){
 		if (i!=this->CurrentPlane){
-			d1[i] = sp[i]*double(range[i]-0.5)+ori[i];
+			d1[i] = sp[i]*double(dim[i]-0.5)+ori[i];
 			d0[i] = sp[i]*double(-0.5)+ori[i];
 		}
 		else{
@@ -267,24 +270,25 @@ void Fr2DSliceActor::UpdateSlice(){
 			this->ImagePlane->SetOrigin(d1[0] , d0[1] , d0[2]);
 			this->ImagePlane->SetPoint1(d1[0] , d1[1] , d0[2]);
 			this->ImagePlane->SetPoint2(d1[0] , d0[1] , d1[2]);
+			this->ImageVOI->SetVOI(this->CurrentFrame, this->CurrentFrame, 0, dim[1]-1, 0, dim[2]-1);
 		break;
 
 		case 1: // xz
 			this->ImagePlane->SetOrigin(d0[0] , d1[1] , d0[2]);
 			this->ImagePlane->SetPoint1(d1[0] , d1[1] , d0[2]);
 			this->ImagePlane->SetPoint2(d0[0] , d1[1] , d1[2]);
+			this->ImageVOI->SetVOI(0, dim[0]-1, this->CurrentFrame, this->CurrentFrame, 0, dim[2]-1);
 		break;
 
 		case 2: // xy
 			this->ImagePlane->SetOrigin(d0[0] , d0[1] , d1[2]);
 			this->ImagePlane->SetPoint1(d1[0] , d0[1] , d1[2]);
 			this->ImagePlane->SetPoint2(d0[0] , d1[1] , d1[2]);
+			this->ImageVOI->SetVOI(0, dim[0]-1, 0, dim[1]-1, this->CurrentFrame, this->CurrentFrame);
 		break;
 	}
 
-	this->ImageVOI->SetVOI(0, 63, 0, 63, this->CurrentFrame, this->CurrentFrame);
 	this->ImageVOI->Modified();
-
 	this->ImagePlane->Update();
 }
 
@@ -313,21 +317,21 @@ void Fr2DSliceActor::UpdateSlicePolar(){
 		this->Level = dim[2]-1;
 	}
 
-	double r=0.5*double(dim[0])*sp[0];
-	double ox=ori[0]+double(sp[0]*(dim[0]-1))*0.5;
+	double r = 0.5*double(dim[0])*sp[0];
+	double ox = ori[0]+double(sp[0]*(dim[0]-1))*0.5;
 
 	if (this->CurrentPlane>0){
 		double theta = 180.0*double(this->Level)/double(dim[2]);
 		theta *= M_PI/180.0;
-		this->ImagePlane->SetOrigin(ox-r*cos(theta),ox-r*sin(theta),ori[1]-0.5*sp[0]);
-		this->ImagePlane->SetPoint1(ox+r*cos(theta),ox+r*sin(theta),ori[1]-0.5*sp[0]);
-		this->ImagePlane->SetPoint2(ox-r*cos(theta),ox-r*sin(theta),ori[1]+(dim[1]-0.5)*sp[0]);
+		this->ImagePlane->SetOrigin(ox-r*cos(theta), ox-r*sin(theta), ori[1]-0.5*sp[0]);
+		this->ImagePlane->SetPoint1(ox+r*cos(theta), ox+r*sin(theta), ori[1]-0.5*sp[0]);
+		this->ImagePlane->SetPoint2(ox-r*cos(theta), ox-r*sin(theta), ori[1]+(dim[1]-0.5)*sp[0]);
 	}
 	else{
 		double z = sp[0]*double(this->Level)+ori[1];
-		this->ImagePlane->SetOrigin(ox-r,ox-r,z);
-		this->ImagePlane->SetPoint1(ox+r,ox-r,z);
-		this->ImagePlane->SetPoint2(ox-r,ox+r,z);
+		this->ImagePlane->SetOrigin(ox-r, ox-r, z);
+		this->ImagePlane->SetPoint1(ox+r, ox-r, z);
+		this->ImagePlane->SetPoint2(ox-r, ox+r, z);
 	}
 
 	this->ImagePlane->Update();

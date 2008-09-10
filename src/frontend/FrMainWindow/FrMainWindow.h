@@ -1,18 +1,21 @@
 #ifndef FR_MAIN_WINDOW
 #define FR_MAIN_WINDOW
 
-
-#include "ui_FrMainWindow.h"
-
 // Forward declaration
 class QTabWidget;
 
 class FrView2D;
+class FrMosaicView;
+class FrOrthoView;
 class FrMainDocument;
 class FrMainController;
 class FrLowPanel;
 class FrToolsPanel;
 class FrBookmarkWidget;
+class QVTKWidget;
+
+#include "ui_FrMainWindow.h"
+#include "FrMacro.h"
 
 
 class FrMainWindow: public QMainWindow, public Ui::MainWindow {
@@ -21,13 +24,13 @@ public:
 	FrMainWindow();
     ~FrMainWindow();
 
-    void SetDocument(FrMainDocument* value){ m_document = value; }
-    FrMainDocument* GetDocument(){ return m_document; }
-
-    void SetController(FrMainController* value){ m_controller = value; }
-    FrMainController* GetController() { return m_controller; }
-
+    FrPropMacro(FrMainDocument*,MainDocument);
+    FrPropMacro(FrMainController*,MainController);
+    
     FrView2D* GetView2D(){ return m_view2D; }
+    QVTKWidget* GetQVTKWidget(){ return m_qtView; } 
+
+    void Initialize();
 
 public slots:
 	void brightnessValueChanged();
@@ -47,13 +50,17 @@ public slots:
 
 signals:
 
+private:
+    void InitializeWidgets();
+    void InitializeSignals();
 
 private:
-    FrMainController* m_controller;
-    FrMainDocument* m_document;
     FrView2D* m_view2D;
+    FrMosaicView* m_viewMosaic;
+    FrOrthoView* m_viewOrtho;
 
 public:
+    QVTKWidget* m_qtView;
     QTabWidget* m_tabWidget;
 	QWidget*    m_slice2DWidget;
 	QWidget*    m_graphWidget;

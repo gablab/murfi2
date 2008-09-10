@@ -7,7 +7,7 @@ class RtMRIImage;
 class QString;
 
 // includes
-// #include "vtkSmartPointer.h"
+#include "FrMacro.h"
 #include "FrDocumentObj.h"
 
 // One have to provide valid type system
@@ -19,19 +19,13 @@ public:
     
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
-
     virtual ObjType GetType();
-    virtual void UpdateObject();
 
-    virtual bool LoadFromFile(QString& fileName);
+    bool LoadFromFile(QString& fileName);
+    unsigned int GetMatrixSize();
 
-    vtkImageData* GetImageData(){ return m_copy; }
-	unsigned int GetMatrixSize();
-
-private:
-    RtMRIImage* m_origin;
-    vtkImageData* m_copy;
-
+    // Properties
+    FrGetPropMacro(RtMRIImage*,Image);
 };
 
 #endif

@@ -43,7 +43,7 @@ void FrMosaicFilter::ExecuteInformation() {
     output->SetWholeExtent( output->GetExtent() );
     output->SetUpdateExtent( output->GetExtent() );
         
-    // Setup dimentions
+    // Setup dimentions and other params
     output->SetSpacing( input->GetSpacing() );
     output->SetNumberOfScalarComponents(1);
     output->SetScalarTypeToUnsignedChar();

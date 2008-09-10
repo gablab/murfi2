@@ -19,8 +19,6 @@ public:
 
     // To be overloaded
     virtual void SetDefaultValues();
-    
-protected:
     void GetObjectsByType(std::vector<FrDocumentObj*>& objects, 
                           FrDocumentObj::ObjType type);
 

@@ -20,7 +20,3 @@ void FrDocumentObj::OnRemove(FrDocument* doc){
 FrDocumentObj::ObjType FrDocumentObj::GetType(){
     return FrDocumentObj::BaseObject;
 }
-
-void FrDocumentObj::UpdateObject(){
-    // NOTE: do nothing in base class
-}

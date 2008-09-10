@@ -22,9 +22,7 @@ public:
 
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
-
     virtual ObjType GetType();
-    virtual void UpdateObject();
 
     bool IsUpdateNeeded(){ return m_updateNeeded; }
     void SetUpdateNeeded(bool value){ m_updateNeeded = value; }

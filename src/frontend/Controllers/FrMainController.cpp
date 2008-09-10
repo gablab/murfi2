@@ -8,6 +8,7 @@
 #include "FrZoomTool.h"
 #include "FrCompositeTool.h"
 #include "FrImageDocObj.h"
+#include "QVTKWidget.h"
 
 #include "vtkRenderWindowInteractor.h"
 
@@ -16,6 +17,7 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
     : m_view(view), m_document(doc), m_toolController(0){
 
     m_toolController = new FrToolController(this);
+    m_document->SetBrightness(1.0);
 
     //FrPanTool* tool = new FrPanTool();
     //FrZoomTool* tool = new FrZoomTool();
@@ -32,18 +34,20 @@ void FrMainController::Initialize(){
     
     // Initialize view
     if(m_view){        
-        m_view->SetController(this);
-        m_view->SetDocument(m_document);
+        m_view->SetMainController(this);
+        m_view->SetMainDocument(m_document);
+        m_view->Initialize();
 
         // Setup interactor style
-        if(m_view->GetView2D()) {
+        if(m_view->GetQVTKWidget()) {
             FrInteractorStyle* style = new FrInteractorStyle(this);
-            m_view->GetView2D()->SetInteractorStyle(style);
+            m_view->GetQVTKWidget()->GetInteractor()->SetInteractorStyle(style);
         }
     }
-
+    
     // Initialize document
     if(m_document){
+        // TODO: Som initialization
         m_document->SetDefaultValues();
     }
 }
@@ -75,7 +79,7 @@ void FrMainController::LoadImage(QString& fileName){
     else{
         // TODO: process error
     }    
-    m_view->GetView2D()->UpdateScene();
+    m_view->GetView2D()->SetupPipeline();
 }
 
 void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
@@ -99,7 +103,7 @@ void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
     }
 
     if(isChanged && m_view){
-        m_view->GetView2D()->UpdateTCB();
+        //m_view->GetView2D()->UpdateTCB();
     }
 }
 
@@ -109,7 +113,7 @@ void FrMainController::SetNextSlice(){
 	//m_document->SetSlice(value);
 	
 	if(m_view){
-		m_view->GetView2D()->UpdateSlice();
+		//m_view->GetView2D()->UpdateSlice();
 	}
 }
 
@@ -117,7 +121,7 @@ void FrMainController::UpdateTCB(){
     if(!m_document) return;
 	
 	if(m_view){
-		m_view->GetView2D()->UpdateTCB();
+		//m_view->GetView2D()->UpdateTCB();
 	}
 
 }

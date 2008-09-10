@@ -14,37 +14,33 @@ class FrMainWindow;
 class FrTBCFilter;
 class Fr2DSliceActor;
 
+#include "FrBaseView.h"
+
 // Wrapper for QVTKWidget.
-class FrView2D
+class FrView2D : public FrBaseView
 { 
 public:
-    FrView2D(FrMainWindow* mainWindow, QWidget* parent);
+    FrView2D(FrMainWindow* mainWindowt);
     virtual ~FrView2D();
 
-    QWidget* GetWidget();
-    void SetInteractorStyle(vtkInteractorStyle* style);
-
-    void UpdateScene();
-    void UpdateTCB();
-	void UpdateSlice();
+    virtual void Initialize();
+    virtual void SetupPipeline();
+    virtual void UpdatePipeline();
+    virtual void SetupRenderers();
+    virtual void RemoveRenderers();
 
 private:
-    FrMainWindow* m_mainWindow;
-
-    QVTKWidget* m_qtView;
+    // Pipeline
+    FrTBCFilter* m_tbcFilter;
     vtkRenderer* m_renderer;
-    vtkImageViewer2* m_imageViewer;
-
+    // Actors
     vtkImageActor* m_actor;
 	Fr2DSliceActor* m_actor2;
-
 	vtkTextActor* m_tactor;
-    FrTBCFilter* m_tbcFilter;
 
 	int m_slice;
 	int m_dims[3];
 	unsigned int matrixSize, numSlices;
-
 };
 
 #endif

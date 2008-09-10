@@ -2,21 +2,42 @@
 #include "FrMainDocument.h"
 #include "FrMainController.h"
 #include "FrView2D.h"
+#include "FrMosaicView.h"
+#include "FrOrthoView.h"
 #include "FrToolsPanel.h"
 #include "FrLowPanel.h"
 #include "FrBookmarkWidget.h"
+#include "QVTKWidget.h"
 
 #include "vtkInteractorStyleImage.h"
 #include "vtkRenderWindowInteractor.h"
 
 
 FrMainWindow::FrMainWindow()
-    :  QMainWindow(0), m_document(0), m_controller(0), m_view2D(0){
+    :  QMainWindow(0), m_MainDocument(0), m_MainController(0), 
+    m_view2D(0), m_viewMosaic(0), m_viewOrtho(0){
 	
     setupUi(this);
-		
-	QGroupBox* groupBox = new QGroupBox(this);	
-    m_view2D = new FrView2D(this, groupBox);
+    InitializeWidgets();
+    InitializeSignals();
+}
+
+FrMainWindow::~FrMainWindow(){
+    if(m_view2D) delete m_view2D;
+    if(m_viewMosaic) delete m_viewMosaic;
+    if(m_viewOrtho) delete m_viewOrtho;
+}
+
+void FrMainWindow::InitializeWidgets(){
+    QGroupBox* groupBox = new QGroupBox(this);
+
+    // Create 3D View
+    m_qtView = new QVTKWidget(groupBox);
+    m_qtView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_view2D = new FrView2D(this);
+    m_viewMosaic = new FrMosaicView(this);
+    m_viewOrtho = new FrOrthoView(this);;
     
     m_bookmarkWidget = new FrBookmarkWidget(groupBox);
 	m_bookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -24,7 +45,7 @@ FrMainWindow::FrMainWindow()
     QHBoxLayout *groupBoxLayout = new QHBoxLayout(groupBox);
 	groupBoxLayout->setContentsMargins(0, 0, 0, 0);
 	groupBoxLayout->setSpacing(0);
-    groupBoxLayout->addWidget(m_view2D->GetWidget());
+    groupBoxLayout->addWidget(m_qtView);
     groupBoxLayout->addWidget(m_bookmarkWidget);
 
     m_toolsPanel = new FrToolsPanel(this);
@@ -52,8 +73,10 @@ FrMainWindow::FrMainWindow()
 	m_tabWidget->addTab(m_slice2DWidget, "2D Slice View");
 	m_tabWidget->addTab(m_graphWidget, "Graphs and calculations");
 	setCentralWidget(m_tabWidget);
+}
 
-	// actions of File-menu
+void FrMainWindow::InitializeSignals(){
+    // actions of File-menu
 	connect(actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(actionLoadImage, SIGNAL(triggered()), this, SLOT(openImage())); 
 
@@ -86,7 +109,15 @@ FrMainWindow::FrMainWindow()
 	connect(m_bookmarkWidget, SIGNAL(currentChanged(int)), this, SLOT(bookmarkChanged(int)));
 }
 
-FrMainWindow::~FrMainWindow(){
+void FrMainWindow::Initialize(){
+    m_viewOrtho->Initialize();
+    m_viewOrtho->RemoveRenderers();
+
+    m_viewMosaic->Initialize();
+    m_viewMosaic->RemoveRenderers();
+
+    m_view2D->Initialize();
+    m_view2D->SetupPipeline();
 }
 
 // change brightness of the scene
@@ -95,8 +126,8 @@ void FrMainWindow::brightnessValueChanged(){
     double value = m_lowPanel->GetBrightnessValue();
     value /= 100.0;
 
-    if(m_controller){
-        m_controller->SetValueTBC(FrMainController::Brightness, value);
+    if(m_MainController){
+        m_MainController->SetValueTBC(FrMainController::Brightness, value);
     }
 }
 
@@ -106,8 +137,8 @@ void FrMainWindow::contrastValueChanged(){
     double value = m_lowPanel->GetContrastValue();
     value /= 100.0;
     
-    if(m_controller){
-        m_controller->SetValueTBC(FrMainController::Contrast, value);
+    if(m_MainController){
+        m_MainController->SetValueTBC(FrMainController::Contrast, value);
     }
 }
 
@@ -117,8 +148,8 @@ void FrMainWindow::thresholdValueChanged(){
     double value = m_lowPanel->GetThresholdValue();
     value /= 100.0;
 
-    if(m_controller){
-        m_controller->SetValueTBC(FrMainController::Threshold, value);
+    if(m_MainController){
+        m_MainController->SetValueTBC(FrMainController::Threshold, value);
     }
 }
 
@@ -192,6 +223,6 @@ void FrMainWindow::openImage(){
 
     if(!fileName.isNull() && !fileName.isEmpty()){
         //fileName = "test.png";
-        m_controller->LoadImage(fileName);
+        m_MainController->LoadImage(fileName);
     }
 }

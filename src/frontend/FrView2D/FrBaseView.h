@@ -3,6 +3,7 @@
 
 class QVTKWidget;
 class FrMainWindow;
+class vtkRenderWindow;
 
 #include "FrMacro.h"
 
@@ -28,8 +29,9 @@ public:
     virtual void RemoveRenderers() = 0;
 
     // Properties
-    FrGetPropMacro(QVTKWidget*, QtView);
+    FrGetPropMacro(QVTKWidget*,QtView);
     FrGetPropMacro(FrMainWindow*,MainWindow);
+    FrGetPropMacro(vtkRenderWindow*,RenderWindow);
 };
 
 #endif

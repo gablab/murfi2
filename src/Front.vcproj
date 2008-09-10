@@ -263,10 +263,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\moc\FrView2D_moc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\frontend\moc\QVTKWidget_moc.cpp"
 				>
 			</File>
@@ -368,7 +364,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="FrView2D"
+			Name="Views"
 			>
 			<File
 				RelativePath=".\frontend\FrView2D\FrBaseView.cpp"
@@ -406,9 +402,9 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Description=""
+						CommandLine=""
+						Outputs=""
 					/>
 				</FileConfiguration>
 			</File>

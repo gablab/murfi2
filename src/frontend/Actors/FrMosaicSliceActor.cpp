@@ -235,50 +235,6 @@ void FrMosaicSliceActor::UpdateSlice(){
 	this->ImagePlane->Update();
 }
 
-void FrMosaicSliceActor::UpdateSlicePolar(){
-	vtkImageData* img = this->CurrentImage;
-	int dim[3];  
-	img->GetDimensions(dim);
-	double sp[3]; 
-	img->GetSpacing(sp);
-	double ori[3];
-	img->GetOrigin(ori);
-
-	this->CurrentPlane = Irange(this->CurrentPlane,0,2);
-
-	if (this->Level<0){
-		if (this->CurrentPlane == 0)
-			this->Level = dim[1]/2;
-		else
-			this->Level = dim[2]/2;
-	}
-
-	if (this->CurrentPlane==0 && this->Level>=dim[1]){
-		this->Level = dim[1]-1;
-	}
-	else if (this->CurrentPlane>0 && this->Level>=dim[2]){
-		this->Level = dim[2]-1;
-	}
-
-	double r=0.5*double(dim[0])*sp[0];
-	double ox=ori[0]+double(sp[0]*(dim[0]-1))*0.5;
-
-	if (this->CurrentPlane>0){
-		double theta = 180.0*double(this->Level)/double(dim[2]);
-		theta *= M_PI/180.0;
-		this->ImagePlane->SetOrigin(ox-r*cos(theta),ox-r*sin(theta),ori[1]-0.5*sp[0]);
-		this->ImagePlane->SetPoint1(ox+r*cos(theta),ox+r*sin(theta),ori[1]-0.5*sp[0]);
-		this->ImagePlane->SetPoint2(ox-r*cos(theta),ox-r*sin(theta),ori[1]+(dim[1]-0.5)*sp[0]);
-	}
-	else{
-		double z = sp[0]*double(this->Level)+ori[1];
-		this->ImagePlane->SetOrigin(ox-r,ox-r,z);
-		this->ImagePlane->SetPoint1(ox+r,ox-r,z);
-		this->ImagePlane->SetPoint2(ox-r,ox+r,z);
-	}
-
-	this->ImagePlane->Update();
-}
 
 void FrMosaicSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img){
 	if (img==NULL)

@@ -32,9 +32,6 @@ public:
 	virtual void SetCurrentFrame(int CurrentFrame);
 	virtual void SetCurrentPlane(int CurrentPlane);
 
-	virtual void SetPolarMode(int mode);
-	virtual void SetPolarMiddle(float polarmiddle=-1);
-
 	vtkGetMacro(CurrentFrame,int);
 	vtkGetMacro(CurrentPlane,int);
 	vtkGetMacro(Level,int);
@@ -43,9 +40,6 @@ public:
 	vtkGetMacro(Interpolation,int);
 
 	vtkGetMacro(OwnsColorMap,int);
-
-	vtkGetMacro(PolarMode,int);
-	vtkGetMacro(PolarMiddle,float);
 
 	vtkSetClampMacro(AutoUpdate,int,0,1);
 	vtkGetMacro(AutoUpdate,int);
@@ -76,9 +70,6 @@ protected:
 	vtkLookupTable*              ColorMap;
 	int                          OwnsColorMap;   
 
-	int                          PolarMode;
-	float                        PolarMiddle;
-
 	Fr2DSliceActor();
 	virtual ~Fr2DSliceActor();
 	Fr2DSliceActor(const Fr2DSliceActor&) {};
@@ -87,7 +78,6 @@ protected:
 	// Slice Stuff
 	virtual void BuildImageSlice();
 	virtual void UpdateSlice();
-	virtual void UpdateSlicePolar();
 
 private:
 	void AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img);

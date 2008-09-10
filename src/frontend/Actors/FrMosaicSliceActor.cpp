@@ -38,9 +38,6 @@ FrMosaicSliceActor::FrMosaicSliceActor(){
 	this->ColorMap->SetNumberOfTableValues(256);
 	this->ColorMap->SetTableRange(0, 255);
 
-	this->PolarMode = 0;
-	this->PolarMiddle = -1.0;
-
 	for (int i = 0; i<=255; i++){
 		float v = float(i)/float(255.0);
 		this->ColorMap->SetTableValue(i, v, v, v, 1.0);
@@ -126,23 +123,6 @@ void FrMosaicSliceActor::SetOpacity(float opacity){
 		this->ImageSlice->GetProperty()->SetOpacity(this->Opacity);
 }
 
-void FrMosaicSliceActor::SetPolarMode(int mode){
-	int p = (mode>0);
-	if (p!=this->PolarMode){
-		this->PolarMode=p;
-		if (this->ImageSlice && this->AutoUpdate)
-			UpdateSlice();
-	}
-}
-
-void FrMosaicSliceActor::SetPolarMiddle(float pm){
-	if (pm!=this->PolarMiddle){
-		this->PolarMiddle = pm;
-		if (this->PolarMode && this->ImageSlice)
-			UpdateSlice();
-	}
-}
-
 void FrMosaicSliceActor::SetLevel(int level){
 	if (this->Level!=level){
 		this->Level = level;
@@ -204,11 +184,6 @@ void FrMosaicSliceActor::UpdateTexture(){
 void FrMosaicSliceActor::UpdateSlice(){
 	if (!this->CurrentImage)
 		return;
-
-	if (this->PolarMode){
-		UpdateSlicePolar();
-		return;
-	}
 
 	vtkImageData* img = this->CurrentImage;
 	int range[3];  

@@ -1,4 +1,4 @@
-#include "Fr2DSliceActor.h"
+#include "FrOrthoSliceActor.h"
 #include "FrUtils.h"
 
 // VTK stuff
@@ -9,18 +9,18 @@
 #include "vtkActor.h"
 #include "vtkPointData.h"
 
-Fr2DSliceActor* Fr2DSliceActor::New(){
+FrOrthoSliceActor* FrOrthoSliceActor::New(){
 	// First try to create the object from the vtkObjectFactory
-	vtkObject* ret = vtkObjectFactory::CreateInstance("Fr2DSliceActor");
+	vtkObject* ret = vtkObjectFactory::CreateInstance("FrOrthoSliceActor");
 	if(ret){
-		return (Fr2DSliceActor*)ret;
+		return (FrOrthoSliceActor*)ret;
 	}
 	// If the factory was unable to create the object, then create it here.
-	return new Fr2DSliceActor;
+	return new FrOrthoSliceActor;
 }
 
 // Construct object with no children.
-Fr2DSliceActor::Fr2DSliceActor(){
+FrOrthoSliceActor::FrOrthoSliceActor(){
 	this->ImageSlice = NULL;         
 	this->ImagePlane = NULL;         
 	this->ImageTexture = NULL; 
@@ -40,6 +40,9 @@ Fr2DSliceActor::Fr2DSliceActor(){
 	this->ColorMap->SetNumberOfTableValues(256);
 	this->ColorMap->SetTableRange(0, 255);
 
+	this->PolarMode = 0;
+	this->PolarMiddle = -1.0;
+
 	for (int i = 0; i<=255; i++){
 		float v = float(i)/float(255.0);
 		this->ColorMap->SetTableValue(i, v, v, v, 1.0);
@@ -48,7 +51,7 @@ Fr2DSliceActor::Fr2DSliceActor(){
 	this->AutoUpdate = 1;
 }
 
-Fr2DSliceActor::~Fr2DSliceActor(){
+FrOrthoSliceActor::~FrOrthoSliceActor(){
 	if (this->CurrentImage)
 		this->CurrentImage->Delete();
 
@@ -71,7 +74,7 @@ Fr2DSliceActor::~Fr2DSliceActor(){
 	}
 }
 
-void Fr2DSliceActor::SetInput(vtkImageData* image){
+void FrOrthoSliceActor::SetInput(vtkImageData* image){
 	if (image==NULL)
 		return;
 
@@ -98,7 +101,7 @@ void Fr2DSliceActor::SetInput(vtkImageData* image){
 	UpdateSlice();
 }
 
-void Fr2DSliceActor::SetLookupTable(vtkLookupTable* table){
+void FrOrthoSliceActor::SetLookupTable(vtkLookupTable* table){
 	if (!table)
 		return;
 
@@ -117,7 +120,7 @@ void Fr2DSliceActor::SetLookupTable(vtkLookupTable* table){
 	this->Update();
 }
 
-void Fr2DSliceActor::SetInterpolation(int on){
+void FrOrthoSliceActor::SetInterpolation(int on){
 	this->Interpolation = on>0;
 	if (this->ImageTexture){
 		if (this->Interpolation==1)
@@ -127,13 +130,30 @@ void Fr2DSliceActor::SetInterpolation(int on){
 	}
 }
 
-void Fr2DSliceActor::SetOpacity(float opacity){
+void FrOrthoSliceActor::SetOpacity(float opacity){
 	this->Opacity=Frange(opacity,0.0,1.0);
 	if (this->ImageSlice)
 		this->ImageSlice->GetProperty()->SetOpacity(this->Opacity);
 }
 
-void Fr2DSliceActor::SetLevel(int level){
+void FrOrthoSliceActor::SetPolarMode(int mode){
+	int p = (mode>0);
+	if (p!=this->PolarMode){
+		this->PolarMode=p;
+		if (this->ImageSlice && this->AutoUpdate)
+			UpdateSlice();
+	}
+}
+
+void FrOrthoSliceActor::SetPolarMiddle(float pm){
+	if (pm!=this->PolarMiddle){
+		this->PolarMiddle = pm;
+		if (this->PolarMode && this->ImageSlice)
+			UpdateSlice();
+	}
+}
+
+void FrOrthoSliceActor::SetLevel(int level){
 	if (this->Level!=level){
 		this->Level = level;
 		if (this->ImageSlice && this->AutoUpdate==1)
@@ -141,7 +161,7 @@ void Fr2DSliceActor::SetLevel(int level){
 	}
 }
 
-void Fr2DSliceActor::SetCurrentFrame(int currentframe){
+void FrOrthoSliceActor::SetCurrentFrame(int currentframe){
 	if (currentframe!=this->CurrentFrame){
 		this->CurrentFrame = currentframe;
 		if (this->ImageSlice && this->AutoUpdate==1)
@@ -149,7 +169,7 @@ void Fr2DSliceActor::SetCurrentFrame(int currentframe){
 	}
 }
 
-void Fr2DSliceActor::SetCurrentPlane(int currentplane){
+void FrOrthoSliceActor::SetCurrentPlane(int currentplane){
 	if (currentplane!=this->CurrentPlane){
 		this->CurrentPlane = currentplane;
 		if (this->ImageSlice && this->AutoUpdate==1)
@@ -157,7 +177,7 @@ void Fr2DSliceActor::SetCurrentPlane(int currentplane){
 	}
 }
 
-void Fr2DSliceActor::BuildImageSlice()
+void FrOrthoSliceActor::BuildImageSlice()
 {
 	if (!this->ImageSlice){
 		this->ImagePlane = vtkPlaneSource::New();
@@ -196,11 +216,11 @@ void Fr2DSliceActor::BuildImageSlice()
 		this->ImageSlice->SetTexture(this->ImageTexture);
 
 		AddPart(this->ImageSlice);
-		imageMapper->Delete();
+		imageMapper->Delete();  
     }
 }
 
-void Fr2DSliceActor::UpdateTexture(){
+void FrOrthoSliceActor::UpdateTexture(){
 	if (!this->CurrentImage || !this->ImageSlice)
 		return;
 
@@ -208,9 +228,14 @@ void Fr2DSliceActor::UpdateTexture(){
 	this->ImageSlice->Modified();
 }
 
-void Fr2DSliceActor::UpdateSlice(){
+void FrOrthoSliceActor::UpdateSlice(){
 	if (!this->CurrentImage)
 		return;
+
+	if (this->PolarMode){
+		UpdateSlicePolar();
+		return;
+	}
 
 	vtkImageData* img = this->CurrentImage;
 	int dim[3];  
@@ -267,7 +292,52 @@ void Fr2DSliceActor::UpdateSlice(){
 	this->ImagePlane->Update();
 }
 
-void Fr2DSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img){
+void FrOrthoSliceActor::UpdateSlicePolar(){
+	vtkImageData* img = this->CurrentImage;
+	int dim[3];  
+	img->GetDimensions(dim);
+	double sp[3]; 
+	img->GetSpacing(sp);
+	double ori[3];
+	img->GetOrigin(ori);
+
+	this->CurrentPlane = Irange(this->CurrentPlane,0,2);
+
+	if (this->Level<0){
+		if (this->CurrentPlane == 0)
+			this->Level = dim[1]/2;
+		else
+			this->Level = dim[2]/2;
+	}
+
+	if (this->CurrentPlane==0 && this->Level>=dim[1]){
+		this->Level = dim[1]-1;
+	}
+	else if (this->CurrentPlane>0 && this->Level>=dim[2]){
+		this->Level = dim[2]-1;
+	}
+
+	double r = 0.5*double(dim[0])*sp[0];
+	double ox = ori[0]+double(sp[0]*(dim[0]-1))*0.5;
+
+	if (this->CurrentPlane>0){
+		double theta = 180.0*double(this->Level)/double(dim[2]);
+		theta *= M_PI/180.0;
+		this->ImagePlane->SetOrigin(ox-r*cos(theta), ox-r*sin(theta), ori[1]-0.5*sp[0]);
+		this->ImagePlane->SetPoint1(ox+r*cos(theta), ox+r*sin(theta), ori[1]-0.5*sp[0]);
+		this->ImagePlane->SetPoint2(ox-r*cos(theta), ox-r*sin(theta), ori[1]+(dim[1]-0.5)*sp[0]);
+	}
+	else{
+		double z = sp[0]*double(this->Level)+ori[1];
+		this->ImagePlane->SetOrigin(ox-r, ox-r, z);
+		this->ImagePlane->SetPoint1(ox+r, ox-r, z);
+		this->ImagePlane->SetPoint2(ox-r, ox+r, z);
+	}
+
+	this->ImagePlane->Update();
+}
+
+void FrOrthoSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img){
 	if (img==NULL)
 		return;
 
@@ -277,7 +347,7 @@ void Fr2DSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData*
 	SetStepColorMap(cmap, range[0], range[1], range[0], range[1], 256);
 }
 
-void Fr2DSliceActor::SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
+void FrOrthoSliceActor::SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
 				      int num_colors, int vol){
 	double gap = fabs(min_value-max_value)*0.1;
 	if (gap<1e-7){

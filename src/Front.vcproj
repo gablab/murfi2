@@ -371,6 +371,14 @@
 			Name="FrView2D"
 			>
 			<File
+				RelativePath=".\frontend\FrView2D\FrBaseView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\FrView2D\FrBaseView.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\FrView2D\FrMosaicView.cpp"
 				>
 			</File>
@@ -490,6 +498,14 @@
 		<Filter
 			Name="Utils"
 			>
+			<File
+				RelativePath=".\frontend\Utils\FrDocumentReader.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrDocumentReader.h"
+				>
+			</File>
 			<File
 				RelativePath=".\frontend\Utils\FrMacro.h"
 				>

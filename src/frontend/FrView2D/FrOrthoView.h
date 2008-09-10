@@ -1,45 +1,30 @@
 #ifndef FR_ORTHO_VIEW
 #define FR_ORTHO_VIEW
 
-class QWidget;
-class vtkInteractorStyle;
-
 class vtkRenderer;
-class vtkImageViewer2;
-class vtkImageActor;
 
-class QVTKWidget;
-class FrMainWindow;
-class FrTBCFilter;
+#include "FrBaseView.h"
+
+#define RENDERER_COUNT 3
+#define CORONAL_RENDERER 0
+#define SAGITAL_RENDERER 1
+#define AXIAL_RENDERER   2
+
 
 // Wrapper for QVTKWidget.
-class FrOrthoView
+class FrOrthoView : public FrBaseView
 { 
 public:
-    FrOrthoView(FrMainWindow* mainWindow, QWidget* parent);
+    FrOrthoView(FrMainWindow* mainWindow);
     virtual ~FrOrthoView();
 
-    QWidget* GetWidget();
-    void SetInteractorStyle(vtkInteractorStyle* style);
-
-    void UpdateScene();
-    void UpdateTBC();
-	void UpdateSlice();
+    virtual void Initialize();
+    virtual void UpdateScene();
+    virtual void SetupRenderers();
+    virtual void RemoveRenderers();
 
 private:
-    FrMainWindow* m_mainWindow;
-
-    QVTKWidget* m_qtView;
-    vtkRenderer* m_renderer;
-    vtkImageViewer2* m_imageViewer;
-
-    vtkImageActor* m_actor;
-    FrTBCFilter* m_tbcFilter;
-
-	int m_slice;
-	int m_dims[3];
-	unsigned int matrixSize, numSlices;
-
+    vtkRenderer* m_renderer[RENDERER_COUNT];
 };
 
 #endif

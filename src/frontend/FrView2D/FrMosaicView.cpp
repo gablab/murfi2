@@ -1,38 +1,11 @@
 #include "FrMosaicView.h"
 #include "QVTKWidget.h"
 #include "FrMainWindow.h"
-#include "FrMainDocument.h"
-#include "FrImageDocObj.h"
-#include "FrTBCFilter.h"
-#include "FrMosaicFilter.h"
-#include "FrInteractorStyle.h"
-
-// Qt
-#include "Qt/QWidget.h"
-#include "QtGUI/QSizePolicy.h"
-
-// VTK
-#include "vtkImageViewer2.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkInteractorStyleImage.h"
-#include "vtkRenderer.h"
-#include "vtkCamera.h"
-#include "vtkPNGReader.h"
-#include "vtkImageActor.h"
-#include "vtkImageData.h"
-#include "vtkImageReslice.h"
-#include "vtkRenderWindow.h"
-#include "vtkActorCollection.h"
-#include "vtkBMPWriter.h"
-#include "vtkImageWriter.h"
-#include "vtkDataWriter.h"
-#include "vtkImagePadFilter.h"
-#include "vtkPointData.h"
 
 
 
 // Default constructor
-FrMosaicView::FrMosaicView(FrMainWindow* mainWindow, QWidget* parent)
+FrMosaicView::FrMosaicView(FrMainWindow* mainWindow)
 : m_mainWindow(mainWindow) {
    
     // Create qt widget to render

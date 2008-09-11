@@ -42,11 +42,7 @@ void FrMosaicView::RemoveRenderers(){
     QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
 }
 
-void FrMosaicView::SetupPipeline(){
-    // TODO: implement!!!
-}
-
-void FrMosaicView::UpdatePipeline(){
+void FrMosaicView::UpdatePipeline(int point){
 
     // TODO: implement!!!
 }

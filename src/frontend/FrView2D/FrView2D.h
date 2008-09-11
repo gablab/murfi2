@@ -13,6 +13,7 @@ class QVTKWidget;
 class FrMainWindow;
 class FrTBCFilter;
 class Fr2DSliceActor;
+class FrDocumentReader;
 
 #include "FrBaseView.h"
 
@@ -24,13 +25,13 @@ public:
     virtual ~FrView2D();
 
     virtual void Initialize();
-    virtual void SetupPipeline();
-    virtual void UpdatePipeline();
+    virtual void UpdatePipeline(int point);
     virtual void SetupRenderers();
     virtual void RemoveRenderers();
 
 private:
     // Pipeline
+    FrDocumentReader* m_docReader;
     FrTBCFilter* m_tbcFilter;
     vtkRenderer* m_renderer;
     // Actors

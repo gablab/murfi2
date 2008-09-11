@@ -19,10 +19,8 @@ public:
     // Virtual methods
     // This method is called when initialization is needed
     virtual void Initialize() = 0;
-    // This methosd is called whenever 
-    virtual void SetupPipeline() = 0;
     // This method is called when update needed
-    virtual void UpdatePipeline() = 0;
+    virtual void UpdatePipeline(int point) = 0;
     // This method setups renderers
     virtual void SetupRenderers() = 0;
     // This method removes renderers

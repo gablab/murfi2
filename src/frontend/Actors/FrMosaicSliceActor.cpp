@@ -235,7 +235,6 @@ void FrMosaicSliceActor::UpdateSlice(){
 	this->ImagePlane->Update();
 }
 
-
 void FrMosaicSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img){
 	if (img==NULL)
 		return;

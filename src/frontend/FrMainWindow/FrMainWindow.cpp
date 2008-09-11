@@ -117,7 +117,7 @@ void FrMainWindow::Initialize(){
     m_viewMosaic->RemoveRenderers();
 
     m_view2D->Initialize();
-    m_view2D->SetupPipeline();
+    m_view2D->UpdatePipeline(0);
 }
 
 // change brightness of the scene

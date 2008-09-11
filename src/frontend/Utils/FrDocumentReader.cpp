@@ -65,14 +65,16 @@ vtkImageData* FrDocumentReader::AllocateOutputData(vtkDataObject* data){
         // setup extent & dims
         double dimW = img->getDim(0);
         double dimH = img->getDim(1);
-        output->SetDimensions(dimW, dimH, 1.0);
+        double dimZ = (img->getDims().size() > 2) ? img->getDim(2) : 1.0;
+        output->SetDimensions(dimW, dimH, dimZ);
         output->SetWholeExtent( output->GetExtent() );
         output->SetUpdateExtent( output->GetExtent() );
 
         // setup spacing
         double w = img->getPixDim(0);
         double h = img->getPixDim(1);
-        output->SetSpacing(w, h, 1.0);
+        double z = (img->getPixDims().size() > 2) ? img->getPixDim(2) : 1.0;
+        output->SetSpacing(w, h, z);
                 
         // setup other params
         output->SetNumberOfScalarComponents(1);

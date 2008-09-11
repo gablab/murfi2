@@ -79,7 +79,7 @@ void FrMainController::LoadImage(QString& fileName){
     else{
         // TODO: process error
     }    
-    m_view->GetView2D()->SetupPipeline();
+    m_view->GetView2D()->UpdatePipeline(FRP_FULL);
 }
 
 void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
@@ -103,41 +103,24 @@ void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
     }
 
     if(isChanged && m_view){
-        //m_view->GetView2D()->UpdateTCB();
+       m_view->GetView2D()->UpdatePipeline(FRP_TBC);
     }
 }
 
-void FrMainController::SetNextSlice(){
-    if(!m_document) return;
-
-	//m_document->SetSlice(value);
-	
-	if(m_view){
-		//m_view->GetView2D()->UpdateSlice();
-	}
-}
-
-void FrMainController::UpdateTCB(){
-    if(!m_document) return;
-	
-	if(m_view){
-		//m_view->GetView2D()->UpdateTCB();
-	}
-
-}
 
 void FrMainController::Notify(int notifyCode){
 
 	switch(notifyCode){
 		case FRN_PIPLINE_UPDATE:
 			// TODO: implement..
+            m_view->GetView2D()->UpdatePipeline(FRP_FULL);
 			break;
-		case FRN_TCB_UPDATE:
+		case FRN_TBC_UPDATE:
 			// TODO: implement..
-			UpdateTCB();
+			m_view->GetView2D()->UpdatePipeline(FRP_TBC);
 			break;
 		case FRN_SETNEXTSLICE:
-			SetNextSlice();
+            m_view->GetView2D()->UpdatePipeline(FRP_SLICE);
 			break;
 	}
 }

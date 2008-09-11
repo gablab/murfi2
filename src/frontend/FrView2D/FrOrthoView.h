@@ -19,8 +19,7 @@ public:
     virtual ~FrOrthoView();
 
     virtual void Initialize();
-    virtual void SetupPipeline();
-    virtual void UpdatePipeline();
+    virtual void UpdatePipeline(int point);
     virtual void SetupRenderers();
     virtual void RemoveRenderers();
 

@@ -8,6 +8,7 @@
 #include "FrInteractorStyle.h"
 #include "Fr2DSliceActor.h"
 #include "FrDocumentReader.h"
+#include "FrNotify.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -37,13 +38,14 @@
 // Default constructor
 FrView2D::FrView2D(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
-    // create renderer
-	m_renderer = 0;
-	
-    // Create filter
+    	
+    // Create pipline stuff
+    m_docReader = FrDocumentReader::New();
     m_tbcFilter = FrTBCFilter::New();
 	m_tactor = vtkTextActor::New();
 	m_actor2 = Fr2DSliceActor::New();
+    m_actor = vtkImageActor::New();
+    m_renderer = vtkRenderer::New();
 
 	m_slice = 0;
 }
@@ -54,6 +56,8 @@ FrView2D::~FrView2D(){
     if(m_tbcFilter) m_tbcFilter->Delete();
 	if(m_tactor) m_tactor->Delete();
 	if(m_actor2) m_actor2->Delete();
+    if(m_actor) m_actor->Delete();
+    if(m_docReader) m_docReader->Delete();
 }
 
 //void FrView2D::UpdateSlice(){
@@ -79,9 +83,11 @@ FrView2D::~FrView2D(){
 //-----------------------------------------------------------------------
 void FrView2D::Initialize(){
     // create renderer
-    m_renderer = vtkRenderer::New();
     m_renderer->GetActiveCamera()->ParallelProjectionOn();
     m_renderer->SetBackground( 0.1, 0.2, 0.4 );
+
+    // add all actors here
+    m_renderer->AddActor(m_actor);
 
     SetupRenderers();
 }
@@ -100,64 +106,91 @@ void FrView2D::RemoveRenderers(){
     QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
 }
 
-void FrView2D::SetupPipeline(){
-    // Clear scene
-    m_renderer->RemoveAllViewProps();
-    m_renderer->ResetCamera();
-    GetRenderWindow()->Render();
+void FrView2D::UpdatePipeline(int point){
+
+    // Setup some vars
+    int slice = 0;
+    int maxSliceNumber = 0;
+    bool isCleared = false;
+    FrMainDocument* document = GetMainWindow()->GetMainDocument();    
+
+    // Update pipeline
+    //switch(point)
+    {
+    //case FRP_FULL:
+        {
+            // Clear scene
+            m_renderer->RemoveAllViewProps();
+            m_renderer->ResetCamera();
+            GetRenderWindow()->Render();
+
+            isCleared = true;
+        }
+
+    //case FRP_READIMAGE:
+        {
+            // read document and connect filter
+            //m_docReader->SetDocument(document);
+            //m_docReader->Update();
+            vtkPNGReader* rd = vtkPNGReader::New();
+            rd->SetFileName("test.png");
+            rd->Update();
+
+            
+            m_actor->SetInput(rd->GetOutput());
+            m_renderer->AddActor(m_actor);
+            m_renderer->Render();
+            //m_tbcFilter->SetInput(m_docReader->GetOutput());
+        }
     
-    FrMainDocument* document = GetMainWindow()->GetMainDocument();
-    FrDocumentReader* docReader = FrDocumentReader::New();
-    docReader->SetDocument(document);
-    docReader->Update();
-
-    // Threshold/brightness/contrast filter            
-    m_tbcFilter->SetInput(docReader->GetOutput());
-    m_tbcFilter->SetThreshold(document->GetThreshold());
-    m_tbcFilter->SetBrightness(document->GetBrightness());
-    m_tbcFilter->SetContrast(document->GetContrast());            
-    m_tbcFilter->Update();
-
-    vtkImageData* data = m_tbcFilter->GetOutput();
-    m_actor = vtkImageActor::New();
-    m_actor->SetInput(data);
-     
-    /*m_tactor->SetInput("Test text");
-    m_tactor->ScaledTextOn();
-    m_tactor->GetTextProperty()->SetFontSize(20);
-    m_tactor->GetTextProperty()->SetBold(4);*/
-
-    //m_actor2->SetInterpolation(0);
-    //m_actor2->Update();
-
-    m_renderer->AddActor(m_actor);
-    //m_renderer->AddActor(m_tactor);
-    //actor->Delete();
-
-    //m_renderer->ResetCamera();
-    //vtkCamera* cam = m_renderer->GetActiveCamera();
-    //cam->ParallelProjectionOn();
-    //cam->SetParallelScale(60); // 120
-    //cam->SetFocalPoint(0,0,0);
-    //cam->SetPosition(0,0,1);
-    //cam->SetViewUp(0,1,0);
+    //case FRP_TBC:
+        {
+            //// Threshold/brightness/contrast filter
+            //m_tbcFilter->SetThreshold(document->GetThreshold());
+            //m_tbcFilter->SetBrightness(document->GetBrightness());
+            //m_tbcFilter->SetContrast(document->GetContrast());            
+            //            
+            //if(m_tbcFilter->GetInput()){
+            //    m_tbcFilter->Update();
+            //    m_actor->SetInput(m_tbcFilter->GetOutput());
+            //}
+        }
     
-    // redraw scene
-    GetRenderWindow()->Render();
-}
+    //case FRP_SLICE:
+        {   
+            if (m_actor->GetInput())
+            {
+                //slice = document->GetSlice();
+                //slice += m_actor->GetZSlice();
+                //maxSliceNumber = m_actor->GetInput()->GetDimensions()[2];
 
-void FrView2D::UpdatePipeline(){
+                //// clamp value and set it
+                //if(slice > maxSliceNumber) slice = maxSliceNumber;
+                //else if(slice < 0) slice = 0;
 
-    if(m_tbcFilter->GetInput() != 0){
-        
-        FrMainDocument* document = GetMainWindow()->GetMainDocument();
-
-        m_tbcFilter->SetThreshold(document->GetThreshold());
-        m_tbcFilter->SetBrightness(document->GetBrightness());
-        m_tbcFilter->SetContrast(document->GetContrast());
-        m_tbcFilter->Update();
-
-        m_actor->SetInput(m_tbcFilter->GetOutput());
+                //m_actor->SetZSlice(slice);
+            }
+        }
+    
+    //default:
+        // do nothing
+        //break;
     }
+
+    if(isCleared) {
+        m_actor->SetOrigin(0, 0, 0);
+        //m_renderer->AddActor(m_actor);
+
+        // Some presets... Do we need them?
+        m_renderer->ResetCamera();
+        vtkCamera* cam = m_renderer->GetActiveCamera();
+        cam->ParallelProjectionOn();
+        //cam->SetParallelScale(60); // 120
+        cam->SetFocalPoint(0,0,0);
+        cam->SetPosition(0,0,1);
+        cam->SetViewUp(0,1,0);
+    }
+
+    // redraw scene
     GetRenderWindow()->Render();
 }

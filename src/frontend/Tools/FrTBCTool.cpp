@@ -70,7 +70,7 @@ bool FrTBCTool::SetBrightness(double inc, FrInteractorStyle* is){
      
 	m_Document->SetBrightness(m_Document->GetBrightness() + inc/100.0);
 
-	this->GetController()->Notify(FRN_TCB_UPDATE);
+	this->GetController()->Notify(FRN_TBC_UPDATE);
     return true;
 }
 
@@ -80,6 +80,6 @@ bool FrTBCTool::SetContrast(double inc, FrInteractorStyle* is){
      
 	m_Document->SetContrast(m_Document->GetContrast() + inc/100.0);
 
-	this->GetController()->Notify(FRN_TCB_UPDATE);
+	this->GetController()->Notify(FRN_TBC_UPDATE);
     return true;
 }

@@ -60,11 +60,7 @@ void FrOrthoView::RemoveRenderers(){
     QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
 }
 
-void FrOrthoView::SetupPipeline(){
-    // TODO: implement!!!
-}
-
-void FrOrthoView::UpdatePipeline(){
+void FrOrthoView::UpdatePipeline(int point){
 
     // TODO: implement!!!
 }

@@ -86,9 +86,6 @@ void FrView2D::Initialize(){
     m_renderer->GetActiveCamera()->ParallelProjectionOn();
     m_renderer->SetBackground( 0.1, 0.2, 0.4 );
 
-    // add all actors here
-    m_renderer->AddActor(m_actor);
-
     SetupRenderers();
 }
 
@@ -112,12 +109,13 @@ void FrView2D::UpdatePipeline(int point){
     int slice = 0;
     int maxSliceNumber = 0;
     bool isCleared = false;
-    FrMainDocument* document = GetMainWindow()->GetMainDocument();    
+    FrMainDocument* document = GetMainWindow()->GetMainDocument();
+    vtkImageData* data;
 
     // Update pipeline
-    //switch(point)
+    switch(point)
     {
-    //case FRP_FULL:
+    case FRP_FULL:
         {
             // Clear scene
             m_renderer->RemoveAllViewProps();
@@ -127,39 +125,32 @@ void FrView2D::UpdatePipeline(int point){
             isCleared = true;
         }
 
-    //case FRP_READIMAGE:
-        {
+    case FRP_READIMAGE:
+        {  
             // read document and connect filter
-            //m_docReader->SetDocument(document);
-            //m_docReader->Update();
-            vtkPNGReader* rd = vtkPNGReader::New();
-            rd->SetFileName("test.png");
-            rd->Update();
-
-            
-            m_actor->SetInput(rd->GetOutput());
-            m_renderer->AddActor(m_actor);
-            m_renderer->Render();
-            //m_tbcFilter->SetInput(m_docReader->GetOutput());
+            m_docReader->SetDocument(document);
+            m_docReader->Update();            
+                        
+            m_tbcFilter->SetInput(m_docReader->GetOutput());
         }
     
-    //case FRP_TBC:
+    case FRP_TBC:
         {
-            //// Threshold/brightness/contrast filter
-            //m_tbcFilter->SetThreshold(document->GetThreshold());
-            //m_tbcFilter->SetBrightness(document->GetBrightness());
-            //m_tbcFilter->SetContrast(document->GetContrast());            
-            //            
-            //if(m_tbcFilter->GetInput()){
-            //    m_tbcFilter->Update();
-            //    m_actor->SetInput(m_tbcFilter->GetOutput());
-            //}
+            // Threshold/brightness/contrast filter
+            m_tbcFilter->SetThreshold(document->GetThreshold());
+            m_tbcFilter->SetBrightness(document->GetBrightness());
+            m_tbcFilter->SetContrast(document->GetContrast());            
+                        
+            if(m_tbcFilter->GetInput()){
+                m_tbcFilter->Update();
+                m_actor->SetInput(m_tbcFilter->GetOutput());
+            }
         }
     
-    //case FRP_SLICE:
+    case FRP_SLICE:
         {   
-            if (m_actor->GetInput())
-            {
+            // Setup slice
+            if (m_actor->GetInput()) {
                 //slice = document->GetSlice();
                 //slice += m_actor->GetZSlice();
                 //maxSliceNumber = m_actor->GetInput()->GetDimensions()[2];
@@ -172,23 +163,22 @@ void FrView2D::UpdatePipeline(int point){
             }
         }
     
-    //default:
+    default:
         // do nothing
-        //break;
+        break;
     }
 
     if(isCleared) {
-        m_actor->SetOrigin(0, 0, 0);
-        //m_renderer->AddActor(m_actor);
+        m_renderer->AddActor(m_actor);
 
         // Some presets... Do we need them?
-        m_renderer->ResetCamera();
+        //m_renderer->ResetCamera();
         vtkCamera* cam = m_renderer->GetActiveCamera();
-        cam->ParallelProjectionOn();
-        //cam->SetParallelScale(60); // 120
-        cam->SetFocalPoint(0,0,0);
-        cam->SetPosition(0,0,1);
-        cam->SetViewUp(0,1,0);
+        //cam->ParallelProjectionOn();
+        cam->SetParallelScale(60); // 120
+        //cam->SetFocalPoint(0,0,0);
+        //cam->SetPosition(0,0,1);
+        //cam->SetViewUp(0,1,0);
     }
 
     // redraw scene

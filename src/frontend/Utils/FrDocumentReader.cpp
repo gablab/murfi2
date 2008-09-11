@@ -22,92 +22,82 @@ FrDocumentReader* FrDocumentReader::New(){
 
 
 FrDocumentReader::FrDocumentReader()
-:m_Document(0){
-    this->SetNumberOfInputPorts(0);    
+: m_Document(0), m_Output(0){
 }
 
 FrDocumentReader::~FrDocumentReader(){
+    if(m_Output) m_Output->Delete();
 }
 
-int FrDocumentReader::RequestInformation (vtkInformation* vtkNotUsed(request),
-                                          vtkInformationVector** vtkNotUsed(inputVector),
-                                          vtkInformationVector* outputVector) {    
-    // NOTE: Set dummmy extent to allow process
-    // go down the processing pipeline...
-    int extent[6] = { 1, 1, 1, 1, 1, 1 };
-    vtkInformation* outInfo = outputVector->GetInformationObject(0);
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
-
-    return 1;
-}
-
-vtkImageData* FrDocumentReader::AllocateOutputData(vtkDataObject* data){
-    // Check for conditions
-    if(m_Document == 0L){
-        vtkErrorMacro(<<"AllocateOutputData(): m_Document is not valid.");
-        return 0L;
+void FrDocumentReader::Update(){
+    
+    if(!m_Document){
+        vtkErrorMacro(<<"Update(): m_Document is not set.");
+        return;
     }
 
-    // Init output image data
-    vtkImageData *output = 0;
-    if ( !(output = vtkImageData::SafeDownCast(data)) ){
-        return 0L;
-    }
+    // Clear output
+    this->SetOutput(0);
 
-    // Fill output image data
+    // Read images from document
     std::vector<FrDocumentObj*> images;
     m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+    
     if(images.size() > 0){
         FrImageDocObj* ido = (FrImageDocObj*)images[0];
         RtMRIImage* img = ido->GetImage();
-        if(!img) return 0L;
-
-        // setup extent & dims
+        
+        // create output object
+        vtkImageData* output = vtkImageData::New();
+        
+        // Init params
         double dimW = img->getDim(0);
         double dimH = img->getDim(1);
-        double dimZ = (img->getDims().size() > 2) ? img->getDim(2) : 1.0;
+        double dimZ = img->getDim(2) < 0 ? 1.0 : img->getDim(2);
         output->SetDimensions(dimW, dimH, dimZ);
-        output->SetWholeExtent( output->GetExtent() );
-        output->SetUpdateExtent( output->GetExtent() );
 
-        // setup spacing
-        double w = img->getPixDim(0);
-        double h = img->getPixDim(1);
-        double z = (img->getPixDims().size() > 2) ? img->getPixDim(2) : 1.0;
-        output->SetSpacing(w, h, z);
-                
-        // setup other params
+        double pxW = img->getPixDim(0);
+        double pxH = img->getPixDim(1);
+        double pxZ = img->getPixDim(2) < 0 ? 1.0 : img->getPixDim(2);
+        output->SetSpacing(pxW, pxH, pxZ);
+
         output->SetNumberOfScalarComponents(1);
-        output->SetScalarTypeToUnsignedChar();
+        output->SetScalarTypeToUnsignedChar();        
         output->AllocateScalars();
-    }
-    return output;
-}
-
-void FrDocumentReader::ExecuteData(vtkDataObject* data){
-    // Get output data
-    vtkImageData* output = this->AllocateOutputData(data);
-    if (!output || this->UpdateExtentIsEmpty(output)) return;
-
-    // Init output data with image data
-    std::vector<FrDocumentObj*> images;
-    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
-    if(images.size() > 0){
-        FrImageDocObj* ido = (FrImageDocObj*)images[0];
-        RtMRIImage* img = ido->GetImage();
-
-        // Copy image data to output
+                
+        // Copy image data
         short* dataPtr = img->getDataCopy();
-        short* srcPtr = dataPtr;
-        unsigned char* dstPtr = (unsigned char*)output->
-            GetPointData()->GetScalars()->GetVoidPointer(0);
+        unsigned char* dstPtr = (unsigned char*)output->GetScalarPointer();
 
-        int num = img->getNumPix();
-        for(int i=0; i < num; i++){
-            *dstPtr = unsigned char(*srcPtr);
+        short* srcPtr = dataPtr;
+        for(int i=0; i < img->getNumPix(); ++i){
+            *dstPtr = (unsigned char)(*srcPtr);
             dstPtr++;
             srcPtr++;
         }
         delete[] dataPtr;
+
+        // Set output
+        this->SetOutput(output);
+    }    
+}
+
+void FrDocumentReader::SetDocument(FrDocument* document){
+    m_Document = document;
+    // Clear output
+    SetOutput(0);
+}
+    
+void FrDocumentReader::SetOutput(vtkImageData* output){
+    // Delete prev output if any
+    if(m_Output){
+        m_Output->Delete();
+        m_Output = 0L;
+    }
+
+    // Setup output
+    if(output){
+        m_Output = output;
+        m_Output->Register(this);
     }
 }

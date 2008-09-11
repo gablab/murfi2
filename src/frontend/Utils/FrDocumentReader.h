@@ -2,33 +2,29 @@
 #define FR_DOC_READER
 
 class FrDocument;
-class vtkDataObject;
-class vtkInformationVector;
+class vtkImageData;
 
 #include "FrMacro.h"
-#include "vtkImageAlgorithm.h"
+#include "vtkObject.h"
 
-class FrDocumentReader : public vtkImageAlgorithm {
+class FrDocumentReader : public vtkObject {
 public:
     static FrDocumentReader* New();
 
+    // Makes output out-to-date. 
+    // You should override this method
+    virtual void Update();
+
     // Properties
-    FrPropMacro(FrDocument*,Document);
+    FrGetPropMacro(FrDocument*,Document);
+    void SetDocument(FrDocument* document);
+    FrGetPropMacro(vtkImageData*,Output);
+    void SetOutput(vtkImageData* output);
 
 protected:
     FrDocumentReader();
     ~FrDocumentReader();
-
-    // Execute method
-    //virtual void ExecuteInformation();
-    virtual void ExecuteData(vtkDataObject* data);
-    virtual vtkImageData* AllocateOutputData(vtkDataObject* data);
-
-    // Request info. You do not need to override it.
-    virtual int RequestInformation(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector);
-       
+    
 private:
     FrDocumentReader(const FrDocumentReader&);  // Not implemented.
     void operator=(const FrDocumentReader&);  // Not implemented.

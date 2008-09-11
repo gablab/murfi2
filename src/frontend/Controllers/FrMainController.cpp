@@ -17,7 +17,6 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
     : m_view(view), m_document(doc), m_toolController(0){
 
     m_toolController = new FrToolController(this);
-    m_document->SetBrightness(1.0);
 
     //FrPanTool* tool = new FrPanTool();
     //FrZoomTool* tool = new FrZoomTool();

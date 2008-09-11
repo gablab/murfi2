@@ -1,6 +1,9 @@
 #ifndef FR_ZOOM_TOOL
 #define FR_ZOOM_TOOL
 
+#define MAX_ZOOM 1000
+#define MIN_ZOOM 5.0
+
 #include "FrTool.h"
 
 /// abstract class for all tools
@@ -27,6 +30,7 @@ private:
     int m_oldX;
     int m_oldY;
     double m_zoomFactor;
+
 };
 
 #endif

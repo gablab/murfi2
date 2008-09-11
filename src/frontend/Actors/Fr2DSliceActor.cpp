@@ -88,8 +88,8 @@ void Fr2DSliceActor::SetInput(vtkImageData* image){
 	this->CurrentImage->ShallowCopy(image);
 
 	BuildImageSlice();
-	if (this->OwnsColorMap)
-		AutoUpdateColormapRange(this->ColorMap, this->CurrentImage);
+//	if (this->OwnsColorMap)
+//		AutoUpdateColormapRange(this->ColorMap, this->CurrentImage);
 
 	// Create New Image Voi and Texture 
 	this->ImageVOI->SetInput(this->CurrentImage);

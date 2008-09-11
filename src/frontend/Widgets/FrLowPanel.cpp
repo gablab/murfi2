@@ -48,3 +48,11 @@ int FrLowPanel::GetBrightnessValue(){
 int FrLowPanel::GetContrastValue(){
     return contrastSlider->value();
 }
+
+void FrLowPanel::SetBrightnessValue(double value){
+	brightnessSlider->setValue(value*100);
+}
+
+void FrLowPanel::SetContrastValue(double value){
+	contrastSlider->setValue(value*100);
+}

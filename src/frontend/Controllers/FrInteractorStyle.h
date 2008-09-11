@@ -32,6 +32,7 @@ protected:
     friend class FrZoomTool;
 	friend class FrSliceScrollTool;
     friend class FrTBCTool;
+	friend class FrCompositeTool;
 	friend class FrView2D;	// test
 
 private:

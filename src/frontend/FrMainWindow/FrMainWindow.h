@@ -28,7 +28,8 @@ public:
     FrPropMacro(FrMainController*,MainController);
     
     FrView2D* GetView2D(){ return m_view2D; }
-    QVTKWidget* GetQVTKWidget(){ return m_qtView; } 
+    QVTKWidget* GetQVTKWidget(){ return m_qtView; }
+	void UpdateTBCValues(double contrast, double brightness);
 
     void Initialize();
 

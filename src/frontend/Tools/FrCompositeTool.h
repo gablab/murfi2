@@ -29,12 +29,16 @@ public:
     
     // Set document
     void SetDocument(FrMainDocument* document);
+	// Check mouse coordinates for zoom/pan tool selection
+	bool CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params);
 
 private:
     FrPanTool*  m_panTool;
     FrZoomTool* m_zoomTool;
     FrTBCTool*  m_tbcTool;
 	FrSliceScrollTool* m_ssTool;
+	bool isZoom;
+
 };
 
 #endif

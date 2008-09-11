@@ -117,6 +117,7 @@ void FrMainController::Notify(int notifyCode){
 		case FRN_TBC_UPDATE:
 			// TODO: implement..
 			m_view->GetView2D()->UpdatePipeline(FRP_TBC);
+			m_view->UpdateTBCValues(m_document->GetContrast(), m_document->GetBrightness());
 			break;
 		case FRN_SETNEXTSLICE:
             m_view->GetView2D()->UpdatePipeline(FRP_SLICE);

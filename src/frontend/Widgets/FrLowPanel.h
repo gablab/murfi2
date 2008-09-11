@@ -14,6 +14,8 @@ public:
     int GetThresholdValue();
     int GetBrightnessValue();
     int GetContrastValue();
+	void SetBrightnessValue(double value);
+	void SetContrastValue(double value);
 
 public slots:
 	void brightnessSliderPositionChanged();

@@ -117,7 +117,7 @@ void FrMainWindow::Initialize(){
     m_viewMosaic->RemoveRenderers();
 
     m_view2D->Initialize();
-    m_view2D->UpdatePipeline(0);
+  //  m_view2D->UpdatePipeline(0);
 }
 
 // change brightness of the scene
@@ -225,4 +225,9 @@ void FrMainWindow::openImage(){
         //fileName = "test.png";
         m_MainController->LoadImage(fileName);
     }
+}
+
+void FrMainWindow::UpdateTBCValues(double contrast, double brightness){
+	m_lowPanel->SetContrastValue(contrast);	
+	m_lowPanel->SetBrightnessValue(brightness);
 }

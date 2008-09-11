@@ -157,14 +157,17 @@ void FrView2D::UpdatePipeline(int point){
     case FRP_SLICE:
         {   
             // Setup slice
-           // if (m_actor2->GetInput()) {
-                //slice = document->GetSlice();
-                //slice += m_actor->GetZSlice();
-                //maxSliceNumber = m_actor->GetInput()->GetDimensions()[2];
-                //// clamp value and set it
-                //if(slice > maxSliceNumber) slice = maxSliceNumber;
-                //else if(slice < 0) slice = 0;
-			//}
+            if (true){//m_actor2->GetInput()) {
+                slice = document->GetSlice();
+                slice += m_actor2->GetCurrentFrame();
+
+                maxSliceNumber = 170; //m_actor->GetInput()->GetDimensions()[2]-1;
+                // clamp value and set it
+                if(slice > maxSliceNumber) slice = maxSliceNumber;
+                else if(slice < 0) slice = 0;
+
+                m_actor2->SetCurrentFrame(slice);
+			}
         }
     default:
         // do nothing

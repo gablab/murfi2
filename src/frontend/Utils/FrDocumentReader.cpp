@@ -22,7 +22,8 @@ FrDocumentReader* FrDocumentReader::New(){
 
 
 FrDocumentReader::FrDocumentReader()
-: m_Document(0), m_Output(0){
+: m_Document(0), m_Output(0), 
+  m_MosaicOn(false), m_UnMosaicOn(false){
 }
 
 FrDocumentReader::~FrDocumentReader(){
@@ -45,7 +46,20 @@ void FrDocumentReader::Update(){
     
     if(images.size() > 0){
         FrImageDocObj* ido = (FrImageDocObj*)images[0];
+        
+        // Init image
+        bool deleteImage = false;
         RtMRIImage* img = ido->GetImage();
+        if(m_UnMosaicOn && img->seemsMosaic()){
+            img = new RtMRIImage(*img);
+            img->unmosaic();
+            deleteImage = true;
+        }
+        else if(m_MosaicOn && !img->seemsMosaic()) {
+            img = new RtMRIImage(*img);
+            img->mosaic();
+            deleteImage = true;
+        }
         
         // create output object
         vtkImageData* output = vtkImageData::New();
@@ -75,7 +89,9 @@ void FrDocumentReader::Update(){
             dstPtr++;
             srcPtr++;
         }
+        // clear all
         delete[] dataPtr;
+        if(deleteImage) delete img;
 
         // Set output
         this->SetOutput(output);
@@ -83,6 +99,7 @@ void FrDocumentReader::Update(){
 }
 
 void FrDocumentReader::SetDocument(FrDocument* document){
+    // if document is being changed then clear output!
     m_Document = document;
     // Clear output
     SetOutput(0);
@@ -99,5 +116,33 @@ void FrDocumentReader::SetOutput(vtkImageData* output){
     if(output){
         m_Output = output;
         m_Output->Register(this);
+    }
+}
+
+void FrDocumentReader::SetMosaicOn(bool isOn){
+    // Change only if different value's set
+    if(m_MosaicOn != isOn){
+        m_MosaicOn = isOn;
+        
+        if(m_MosaicOn){
+            m_UnMosaicOn = false;
+        }
+        
+        // Clear output
+        SetOutput(0);
+    }
+}
+
+void FrDocumentReader::SetUnMosaicOn(bool isOn){
+    // Change only if different value's set
+    if(m_UnMosaicOn != isOn){
+        m_UnMosaicOn = isOn;
+        
+        if(m_UnMosaicOn){
+            m_MosaicOn = false;
+        }
+        
+        // Clear output
+        SetOutput(0);
     }
 }

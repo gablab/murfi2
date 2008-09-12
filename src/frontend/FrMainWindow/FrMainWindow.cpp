@@ -15,7 +15,7 @@
 
 FrMainWindow::FrMainWindow()
     :  QMainWindow(0), m_MainDocument(0), m_MainController(0), 
-    m_view2D(0), m_viewMosaic(0), m_viewOrtho(0){
+    m_view2D(0), m_viewMosaic(0), m_viewOrtho(0), m_currentView(0){
 	
     setupUi(this);
     InitializeWidgets();
@@ -115,9 +115,12 @@ void FrMainWindow::Initialize(){
 
     m_viewMosaic->Initialize();
     m_viewMosaic->RemoveRenderers();
-
+    
     m_view2D->Initialize();
-  //  m_view2D->UpdatePipeline(0);
+    m_view2D->UpdatePipeline(0);
+
+    // make it as current
+    m_currentView = m_view2D;
 }
 
 // change brightness of the scene
@@ -169,18 +172,33 @@ void FrMainWindow::tool3Triggered(){
 }
 
 void FrMainWindow::mode1Clicked(){
-	QMessageBox::information(this, "Info", "mode 1 clicked");
-
+	
+    if(m_currentView != m_view2D){
+        m_currentView->RemoveRenderers();
+        m_currentView = m_view2D;
+        m_currentView->SetupRenderers();
+        m_currentView->UpdatePipeline(0);
+    }
 }
 
 void FrMainWindow::mode2Clicked(){
-	QMessageBox::information(this, "Info", "mode 2 clicked");
-
+	
+    if(m_currentView != m_viewMosaic){
+        m_currentView->RemoveRenderers();
+        m_currentView = m_viewMosaic;
+        m_currentView->SetupRenderers();
+        m_currentView->UpdatePipeline(0);
+    }
 }
 
 void FrMainWindow::mode3Clicked(){
-	QMessageBox::information(this, "Info", "mode 3 clicked");
-
+	
+    if(m_currentView != m_viewOrtho){
+        m_currentView->RemoveRenderers();
+        m_currentView = m_viewOrtho;
+        m_currentView->SetupRenderers();
+        m_currentView->UpdatePipeline(0);
+    }
 }
 
 void FrMainWindow::tabChanged(int index){

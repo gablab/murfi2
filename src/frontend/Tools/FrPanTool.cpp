@@ -3,6 +3,7 @@
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 FrPanTool::FrPanTool()
 : m_oldX(0), m_oldY(0){
@@ -20,6 +21,7 @@ void FrPanTool::Stop(){
 
 bool FrPanTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     // NOTE: do nothing here
+    is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
     return false;
 }
 
@@ -28,6 +30,8 @@ bool FrPanTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         m_oldX = params.X;
         m_oldY = params.Y;
+
+        is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_HAND);
     }
     return false;
 }

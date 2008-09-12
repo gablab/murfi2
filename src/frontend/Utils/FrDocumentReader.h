@@ -16,8 +16,17 @@ public:
     virtual void Update();
 
     // Properties
+
+    // MosaicOn and UnMosaicOn are selfexculed.
+    // i.e. they canot be both true.
+    FrGetPropMacro(bool,MosaicOn);
+    void SetMosaicOn(bool isOn);
+    FrGetPropMacro(bool,UnMosaicOn);
+    void SetUnMosaicOn(bool isOn);
+
     FrGetPropMacro(FrDocument*,Document);
     void SetDocument(FrDocument* document);
+
     FrGetPropMacro(vtkImageData*,Output);
     void SetOutput(vtkImageData* output);
 

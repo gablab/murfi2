@@ -2,9 +2,12 @@
 #define FR_MOSAIC_VIEW
 
 class vtkRenderer;
+class vtkImageActor;
 
 class QVTKWidget;
 class FrMainWindow;
+class FrDocumentReader;
+class FrTBCFilter;
 
 #include "FrBaseView.h"
 
@@ -21,7 +24,10 @@ public:
     virtual void RemoveRenderers();
 
 private:
+    FrDocumentReader* m_docReader;
+    FrTBCFilter* m_tbcFilter;
     vtkRenderer* m_renderer;
+    vtkImageActor* m_actor;
 };
 
 #endif

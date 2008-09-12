@@ -51,6 +51,9 @@ public:
 
 	vtkGetObjectMacro(CurrentImage,vtkImageData);
 
+    // Returns Max number of slices
+    int GetMaxSliceNumber();
+
 protected:
 	vtkActor*                    ImageSlice;
 	vtkPlaneSource*              ImagePlane;

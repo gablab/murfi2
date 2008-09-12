@@ -118,10 +118,10 @@ void FrView2D::UpdatePipeline(int point){
     {
     case FRP_FULL:
         {
-            // Clear scene
-            m_renderer->RemoveAllViewProps();
-            m_renderer->ResetCamera();
-            GetRenderWindow()->Render();
+                // Clear scene
+                m_renderer->RemoveAllViewProps();
+                m_renderer->ResetCamera();
+                GetRenderWindow()->Render();
 
             isCleared = true;
         }
@@ -129,6 +129,7 @@ void FrView2D::UpdatePipeline(int point){
         {
             // read document and connect filter
             m_docReader->SetDocument(document);
+            m_docReader->SetUnMosaicOn(true);
             m_docReader->Update();
             m_tbcFilter->SetInput(m_docReader->GetOutput());
 
@@ -157,17 +158,16 @@ void FrView2D::UpdatePipeline(int point){
     case FRP_SLICE:
         {   
             // Setup slice
-            if (true){//m_actor2->GetInput()) {
-                slice = document->GetSlice();
-                slice += m_actor2->GetCurrentFrame();
+            slice = document->GetSlice(); // actually, this is delta
+            slice += m_actor2->GetCurrentFrame();
 
-                maxSliceNumber = 170; //m_actor->GetInput()->GetDimensions()[2]-1;
-                // clamp value and set it
-                if(slice > maxSliceNumber) slice = maxSliceNumber;
-                else if(slice < 0) slice = 0;
+            // clamp value and set it
+            maxSliceNumber = m_actor2->GetMaxSliceNumber();
+            if(slice > maxSliceNumber) slice = maxSliceNumber;
+            if(slice < 0) slice = 0;
 
-                m_actor2->SetCurrentFrame(slice);
-			}
+            m_actor2->SetCurrentFrame(slice);
+            document->SetSlice(0); // reset slice delta
         }
     default:
         // do nothing

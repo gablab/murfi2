@@ -4,6 +4,7 @@
 // Forward declaration
 class QTabWidget;
 
+class FrBaseView;
 class FrView2D;
 class FrMosaicView;
 class FrOrthoView;
@@ -59,6 +60,7 @@ private:
     FrView2D* m_view2D;
     FrMosaicView* m_viewMosaic;
     FrOrthoView* m_viewOrtho;
+    FrBaseView* m_currentView;
 
 public:
     QVTKWidget* m_qtView;

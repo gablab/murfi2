@@ -4,6 +4,7 @@
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 #define DEFAULT_ZOOM_FACTOR 10.0
 #define DEFAULT_BASE 1.1
@@ -17,14 +18,13 @@ FrZoomTool::~FrZoomTool(){
 }
 
 void FrZoomTool::Start(){
-
 }
 
 void FrZoomTool::Stop(){
-
 }
 
 bool FrZoomTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
+    is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
     return false;
 }
 
@@ -32,6 +32,8 @@ bool FrZoomTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         m_oldX = params.X;
         m_oldY = params.Y;
+
+        is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_SIZENS);
     }    
     return false;
 }

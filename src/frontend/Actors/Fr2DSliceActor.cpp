@@ -320,3 +320,14 @@ void Fr2DSliceActor::SetStepColorMap(vtkLookupTable *cmap, float min, float max,
 			cmap->SetTableValue(i,v,v,v,0.5);
 	}
 }
+
+int Fr2DSliceActor::GetMaxSliceNumber(){
+    int result = -1;
+    if(this->CurrentImage){
+        int dims[3];
+        this->CurrentImage->GetDimensions(dims);
+
+        result = dims[2]-1;
+    }
+    return result;
+}

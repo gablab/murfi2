@@ -2,6 +2,11 @@
 #define FR_ORTHO_VIEW
 
 class vtkRenderer;
+class vtkImageActor;
+
+class FrMainWindow;
+class FrDocumentReader;
+class FrTBCFilter;
 
 #include "FrBaseView.h"
 
@@ -25,6 +30,9 @@ public:
 
 private:
     vtkRenderer* m_renderer[RENDERER_COUNT];
+    FrDocumentReader* m_docReader;
+    FrTBCFilter* m_tbcFilter;    
+    vtkImageActor* m_actor;
 };
 
 #endif

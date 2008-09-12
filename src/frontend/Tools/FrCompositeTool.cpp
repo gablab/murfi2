@@ -146,10 +146,10 @@ bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& par
 	int XBorder = size[0];
 	int YBorder = size[0]/aspect[0];
 
-	if ((params.X+40 >= XBorder) || (params.X <= 40))
-		return true;
-	if ((params.Y+40 >= YBorder) || (params.Y <= 40))
-		return true;
+    // Leave side only
+    int xDelta = size[0] / 10; // delta is 10%
+	if ((params.X >= (XBorder-xDelta)) || (params.X <= xDelta)) return true;
+	/*if ((params.Y+40 >= YBorder) || (params.Y <= 40)) return true;*/
 
 	return false;
 }

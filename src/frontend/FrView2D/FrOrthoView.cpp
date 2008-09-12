@@ -56,21 +56,25 @@ void FrOrthoView::SetupRenderers(){
     
     RemoveRenderers();
     
-    //QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[CORONAL_RENDERER]);
-    //m_renderer[CORONAL_RENDERER]->SetViewport(0.0, 0.5, 0.5, 1.0);
-    //m_renderer[CORONAL_RENDERER]->SetBackground(1.0, 1.0, 1.0);
-    //m_renderer[CORONAL_RENDERER]->Render();
+    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[CORONAL_RENDERER]);
+    m_renderer[CORONAL_RENDERER]->SetViewport(0.0, 0.5, 0.5, 1.0);
+    m_renderer[CORONAL_RENDERER]->SetBackground(0.8, 0.1, 0.1);
+    m_renderer[CORONAL_RENDERER]->Render();
     
-    //QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[SAGITAL_RENDERER]);
-	//m_renderer[SAGITAL_RENDERER]->SetViewport(0.5, 1.0, 0.5, 1.0);
-    //m_renderer[SAGITAL_RENDERER]->SetBackground(0.0, 0.0, 0.0);
-    //m_renderer[SAGITAL_RENDERER]->Render();
+    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[SAGITAL_RENDERER]);
+	m_renderer[SAGITAL_RENDERER]->SetViewport(0.5, 0.5, 1.0, 1.0);
+    m_renderer[SAGITAL_RENDERER]->SetBackground(0.1, 0.8, 0.1);
+    m_renderer[SAGITAL_RENDERER]->Render();
     
-    
-	//m_renderer[AXIAL_RENDERER]->SetViewport(0.0, 0.5, 0.0, 0.5);
-    //m_renderer[AXIAL_RENDERER]->SetBackground(0.5, 0.5, 0.5);
-    //QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[AXIAL_RENDERER]);
-    //m_renderer[AXIAL_RENDERER]->Render();
+    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[AXIAL_RENDERER]);
+	m_renderer[AXIAL_RENDERER]->SetViewport(0.0, 0.0, 0.5, 0.5);
+    m_renderer[AXIAL_RENDERER]->SetBackground(0.1, 0.1, 0.8);    
+    m_renderer[AXIAL_RENDERER]->Render();
+
+    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[DUMMY_RENDERER]);
+	m_renderer[DUMMY_RENDERER]->SetViewport(0.5, 0.0, 1.0, 0.5);
+    m_renderer[DUMMY_RENDERER]->SetBackground(0.1, 0.1, 0.1);    
+    m_renderer[DUMMY_RENDERER]->Render();
     
 }
 
@@ -85,58 +89,58 @@ void FrOrthoView::RemoveRenderers(){
 
 void FrOrthoView::UpdatePipeline(int point){
 
-    //// TODO: implement!!!
-    //bool isCleared = false;
-    //FrMainDocument* document = GetMainWindow()->GetMainDocument();
+    // TODO: implement!!!
+    bool isCleared = false;
+    FrMainDocument* document = GetMainWindow()->GetMainDocument();
 
-    //switch(point){
-    //case FRP_FULL:
-    //    {
-    //        // Clear scene
-    //        for(int i=0; i < RENDERER_COUNT; ++i){
-    //            m_renderer[i]->RemoveAllViewProps();
-    //            m_renderer[i]->ResetCamera();
-    //        }
-    //        GetRenderWindow()->Render();
+    switch(point){
+    case FRP_FULL:
+        {
+            // Clear scene
+            for(int i=0; i < RENDERER_COUNT; ++i){
+                m_renderer[i]->RemoveAllViewProps();
+                m_renderer[i]->ResetCamera();
+            }
+            GetRenderWindow()->Render();
 
-    //        isCleared = true;
-    //    }
-    //case FRP_READIMAGE:
-    //    {
-    //        m_docReader->SetDocument(document);
-    //        m_docReader->SetMosaicOn(true);
-    //        m_docReader->Update();
+            isCleared = true;
+        }
+    case FRP_READIMAGE:
+        {
+            m_docReader->SetDocument(document);
+            m_docReader->SetMosaicOn(true);
+            m_docReader->Update();
 
-    //        m_tbcFilter->SetInput(m_docReader->GetOutput());
-    //    }
-    //case FRP_TBC:
-    //    {
-    //        // Setup brightness contrast
-    //        m_tbcFilter->SetThreshold(document->GetThreshold());
-    //        m_tbcFilter->SetBrightness(document->GetBrightness());
-    //        m_tbcFilter->SetContrast(document->GetContrast());
+            m_tbcFilter->SetInput(m_docReader->GetOutput());
+        }
+    case FRP_TBC:
+        {
+            // Setup brightness contrast
+            m_tbcFilter->SetThreshold(document->GetThreshold());
+            m_tbcFilter->SetBrightness(document->GetBrightness());
+            m_tbcFilter->SetContrast(document->GetContrast());
 
-    //        if(m_tbcFilter->GetInput()){                
-    //            m_tbcFilter->Update();
+            if(m_tbcFilter->GetInput()){                
+                m_tbcFilter->Update();
 
-    //            m_actor->SetInput(m_tbcFilter->GetOutput());
-    //        }
-    //    }
-    //case FRP_SLICE:
-    //    {
-    //        // DO nothing here for a while
-    //    }
+                m_actor->SetInput(m_tbcFilter->GetOutput());
+            }
+        }
+    case FRP_SLICE:
+        {
+            // DO nothing here for a while
+        }
 
-    //default:
-    //    // do nothing
-    //    break;
-    //}    
-    //
-    //if(isCleared){
-    //    for(int i=0; i < RENDERER_COUNT; ++i){
-    //        m_renderer[i]->AddActor(m_actor);
-    //    }
-    //}
+    default:
+        // do nothing
+        break;
+    }    
+    
+    if(isCleared){
+        for(int i=0; i < RENDERER_COUNT; ++i){
+            m_renderer[i]->AddActor(m_actor);
+        }
+    }
 
     GetRenderWindow()->Render();
 }

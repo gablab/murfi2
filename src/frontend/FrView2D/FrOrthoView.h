@@ -10,10 +10,11 @@ class FrTBCFilter;
 
 #include "FrBaseView.h"
 
-#define RENDERER_COUNT 3
+#define RENDERER_COUNT   4
 #define CORONAL_RENDERER 0
 #define SAGITAL_RENDERER 1
 #define AXIAL_RENDERER   2
+#define DUMMY_RENDERER   3
 
 
 // Wrapper for QVTKWidget.

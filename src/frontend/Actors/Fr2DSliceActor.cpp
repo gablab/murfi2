@@ -33,7 +33,7 @@ Fr2DSliceActor::Fr2DSliceActor(){
 	this->ColorMap = NULL;           
 	this->OwnsColorMap = 1;   
 
-	this->CurrentPlane = 2;
+	this->CurrentPlane = 2;		// 2
 	this->CurrentFrame = 0;
 
 	this->ColorMap = vtkLookupTable::New();
@@ -44,6 +44,12 @@ Fr2DSliceActor::Fr2DSliceActor(){
 		float v = float(i)/float(255.0);
 		this->ColorMap->SetTableValue(i, v, v, v, 1.0);
 	}
+
+	//bwLut = vtkLookupTable::New();
+	//bwLut->SetTableRange (0, 2000);
+	//bwLut->SetSaturationRange (0, 0);
+	//bwLut->SetHueRange (0, 0);
+	//bwLut->SetValueRange (0, 1);
 
 	this->AutoUpdate = 1;
 }
@@ -90,10 +96,11 @@ void Fr2DSliceActor::SetInput(vtkImageData* image){
 	BuildImageSlice();
 //	if (this->OwnsColorMap)
 //		AutoUpdateColormapRange(this->ColorMap, this->CurrentImage);
+//	SetStepColorMap(this->ColorMap, 0, 255, 0, 255, 256, 0);
 
 	// Create New Image Voi and Texture 
-	this->ImageVOI->SetInput(this->CurrentImage);
-	this->ImageVOI->Modified();
+//	this->ImageVOI->SetInput(this->CurrentImage);
+//	this->ImageVOI->Modified();
 
 	UpdateSlice();
 }
@@ -128,7 +135,7 @@ void Fr2DSliceActor::SetInterpolation(int on){
 }
 
 void Fr2DSliceActor::SetOpacity(float opacity){
-	this->Opacity=Frange(opacity,0.0,1.0);
+	this->Opacity = Frange(opacity, 0.0, 1.0);
 	if (this->ImageSlice)
 		this->ImageSlice->GetProperty()->SetOpacity(this->Opacity);
 }
@@ -144,8 +151,8 @@ void Fr2DSliceActor::SetLevel(int level){
 void Fr2DSliceActor::SetCurrentFrame(int currentframe){
 	if (currentframe!=this->CurrentFrame){
 		this->CurrentFrame = currentframe;
-		if (this->ImageSlice && this->AutoUpdate==1)
-			UpdateSlice();
+	//	if (this->ImageSlice && this->AutoUpdate==1)
+	//		UpdateSlice();
 	}
 }
 
@@ -172,18 +179,18 @@ void Fr2DSliceActor::BuildImageSlice()
 		int dims[3];  
 		this->CurrentImage->GetDimensions(dims);
 
-		this->ImageVOI = vtkExtractVOI::New();
-		this->ImageVOI->SetInput(this->CurrentImage);
-		this->ImageVOI->SetVOI(0, dims[0]-1, 0, dims[1]-1, this->CurrentFrame, this->CurrentFrame);
-		this->ImageVOI->Update();
+		//this->ImageVOI = vtkExtractVOI::New();
+		//this->ImageVOI->SetInput(this->CurrentImage);
+		//this->ImageVOI->SetVOI(0, dims[0]-1, 0, dims[1]-1, this->CurrentFrame, this->CurrentFrame);
+		//this->ImageVOI->Update();
 
-		this->ImageTexture->SetInput(this->ImageVOI->GetOutput());
-		//this->ImageTexture->SetInput(this->CurrentImage);
+		//this->ImageTexture->SetInput(this->ImageVOI->GetOutput());
+		this->ImageTexture->SetInput(this->CurrentImage);
 		if (this->Interpolation==0)
 			this->ImageTexture->InterpolateOn();
 		else
 			this->ImageTexture->InterpolateOff();
-		this->ImageTexture->SetLookupTable(this->ColorMap);
+		this->ImageTexture->SetLookupTable(this->ColorMap); 
 		this->ImageTexture->MapColorScalarsThroughLookupTableOn();
 		this->ImageTexture->RepeatOff();
 
@@ -245,81 +252,81 @@ void Fr2DSliceActor::UpdateSlice(){
 			this->ImagePlane->SetOrigin(d1[0] , d0[1] , d0[2]);
 			this->ImagePlane->SetPoint1(d1[0] , d1[1] , d0[2]);
 			this->ImagePlane->SetPoint2(d1[0] , d0[1] , d1[2]);
-			this->ImageVOI->SetVOI(this->CurrentFrame, this->CurrentFrame, 0, dim[1]-1, 0, dim[2]-1);
+		//	this->ImageVOI->SetVOI(this->CurrentFrame, this->CurrentFrame, 0, dim[1]-1, 0, dim[2]-1);
 		break;
 
 		case 1: // xz
 			this->ImagePlane->SetOrigin(d0[0] , d1[1] , d0[2]);
 			this->ImagePlane->SetPoint1(d1[0] , d1[1] , d0[2]);
 			this->ImagePlane->SetPoint2(d0[0] , d1[1] , d1[2]);
-			this->ImageVOI->SetVOI(0, dim[0]-1, this->CurrentFrame, this->CurrentFrame, 0, dim[2]-1);
+		//	this->ImageVOI->SetVOI(0, dim[0]-1, this->CurrentFrame, this->CurrentFrame, 0, dim[2]-1);
 		break;
 
 		case 2: // xy
 			this->ImagePlane->SetOrigin(d0[0] , d0[1] , d1[2]);
 			this->ImagePlane->SetPoint1(d1[0] , d0[1] , d1[2]);
 			this->ImagePlane->SetPoint2(d0[0] , d1[1] , d1[2]);
-			this->ImageVOI->SetVOI(0, dim[0]-1, 0, dim[1]-1, this->CurrentFrame, this->CurrentFrame);
+		//	this->ImageVOI->SetVOI(0, dim[0]-1, 0, dim[1]-1, this->CurrentFrame, this->CurrentFrame);
 		break;
 	}
 
-	this->ImageVOI->Modified();
+	//this->ImageVOI->Modified();
 	this->ImagePlane->Update();
 }
 
-void Fr2DSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img){
-	if (img==NULL)
-		return;
-
-	double range[2];
-	img->GetPointData()->GetScalars()->GetRange(range);
-
-	SetStepColorMap(cmap, range[0], range[1], range[0], range[1], 256);
-}
-
-void Fr2DSliceActor::SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
-				      int num_colors, int vol){
-	double gap = fabs(min_value-max_value)*0.1;
-	if (gap<1e-7){
-		max=min+1e-7;
-		gap=(min_value-max_value)*0.1;
-	}
-
-	min = Frange(min,min_value,max_value-gap);
-	max = Frange(max,min_value+gap,max_value);
-
-	if (max_value<(min_value+gap))
-		max_value+=gap;
-
-	float range = max_value-min_value;
-
-	if (num_colors!=cmap->GetNumberOfColors() && num_colors>0)
-		cmap->SetNumberOfTableValues(num_colors);
-
-	cmap->SetTableRange(min_value,max_value);
-
-	float numc = float(num_colors-1);
-
-	int imin = int(0.5+numc*float(min-min_value)/range);
-	int imax = int(0.5+numc*float(max-min_value)/range);
-
-	for (int i = 0;i<num_colors;i++){
-		float v = 0.0;
-		if (i<=imin)
-			v = 0.0;
-		else if (i>=imax)
-			v = 1.0;
-		else
-			v = float(i-imin)/float(imax-imin);
-
-		if (vol)
-			cmap->SetTableValue(i,v,v,v,v*0.5);
-		else if (v>0.0)
-			cmap->SetTableValue(i,v,v,v,1.0);
-		else
-			cmap->SetTableValue(i,v,v,v,0.5);
-	}
-}
+//void Fr2DSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img){
+//	if (img==NULL)
+//		return;
+//
+//	double range[2];
+//	img->GetPointData()->GetScalars()->GetRange(range);
+//
+//	SetStepColorMap(cmap, range[0], range[1], range[0], range[1], 256);
+//}
+//
+//void Fr2DSliceActor::SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
+//				      int num_colors, int vol){
+//	double gap = fabs(min_value-max_value)*0.1;
+//	if (gap<1e-7){
+//		max=min+1e-7;
+//		gap=(min_value-max_value)*0.1;
+//	}
+//
+//	min = Frange(min,min_value,max_value-gap);
+//	max = Frange(max,min_value+gap,max_value);
+//
+//	if (max_value<(min_value+gap))
+//		max_value+=gap;
+//
+//	float range = max_value-min_value;
+//
+//	if (num_colors!=cmap->GetNumberOfColors() && num_colors>0)
+//		cmap->SetNumberOfTableValues(num_colors);
+//
+//	cmap->SetTableRange(min_value,max_value);
+//
+//	float numc = float(num_colors-1);
+//
+//	int imin = int(0.5+numc*float(min-min_value)/range);
+//	int imax = int(0.5+numc*float(max-min_value)/range);
+//
+//	for (int i = 0;i<num_colors;i++){
+//		float v = 0.0;
+//		if (i<=imin)
+//			v = 0.0;
+//		else if (i>=imax)
+//			v = 1.0;
+//		else
+//			v = float(i-imin)/float(imax-imin);
+//
+//		if (vol)
+//			cmap->SetTableValue(i,v,v,v,v*0.5);
+//		else if (v>0.0)
+//			cmap->SetTableValue(i,v,v,v,1.0);
+//		else
+//			cmap->SetTableValue(i,v,v,v,0.5);
+//	}
+//}
 
 int Fr2DSliceActor::GetMaxSliceNumber(){
     int result = -1;

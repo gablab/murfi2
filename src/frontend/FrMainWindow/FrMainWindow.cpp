@@ -117,7 +117,7 @@ void FrMainWindow::Initialize(){
     m_viewMosaic->RemoveRenderers();
     
     m_view2D->Initialize();
-    m_view2D->UpdatePipeline(0);
+    //m_view2D->UpdatePipeline(0);
 
     // make it as current
     m_currentView = m_view2D;

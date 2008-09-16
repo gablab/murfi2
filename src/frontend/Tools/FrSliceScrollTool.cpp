@@ -33,6 +33,7 @@ bool FrSliceScrollTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params
     }
 
 	//this->SetSlice(1, is);
+	this->SetMousePosition(params.X, params.Y);
 
     return false;
 }
@@ -62,6 +63,8 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
 		this->SetSlice(inc, is);
 	}
 
+	this->SetMousePosition(params.X, params.Y);
+
     return true;
 }
 
@@ -75,3 +78,9 @@ bool FrSliceScrollTool::SetSlice(int inc, FrInteractorStyle* is){
     return true;
 }
 
+bool FrSliceScrollTool::SetMousePosition(int x, int y){
+	m_Document->SetXCoord(x);
+	m_Document->SetYCoord(y);
+	
+	return true;
+}

@@ -483,6 +483,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Filters\FrSliceExtractor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Filters\FrSliceExtractor.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Filters\FrTBCFilter.cpp"
 				>
 			</File>

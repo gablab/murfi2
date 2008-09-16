@@ -7,6 +7,8 @@ class vtkImageActor;
 class FrMainWindow;
 class FrDocumentReader;
 class FrTBCFilter;
+class FrSliceExtractor;
+class Fr2DSliceActor;
 
 #include "FrBaseView.h"
 
@@ -32,8 +34,14 @@ public:
 private:
     vtkRenderer* m_renderer[RENDERER_COUNT];
     FrDocumentReader* m_docReader;
-    FrTBCFilter* m_tbcFilter;    
+    FrTBCFilter* m_tbcFilter[RENDERER_COUNT];    
     vtkImageActor* m_actor;
+
+	Fr2DSliceActor* m_actor2[RENDERER_COUNT];
+	FrSliceExtractor* m_SliceExtractor[RENDERER_COUNT];
+
+	int x, y;
+	
 };
 
 #endif

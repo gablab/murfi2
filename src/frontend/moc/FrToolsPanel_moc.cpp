@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrToolsPanel.h'
 **
-** Created: Thu 11. Sep 11:49:11 2008
+** Created: Tue 16. Sep 18:10:43 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -28,6 +28,7 @@ public:
 
 private:
 	bool SetSlice(int inc, FrInteractorStyle* is);
+	bool SetMousePosition(int x, int y);
 
 private:
     int m_oldX;

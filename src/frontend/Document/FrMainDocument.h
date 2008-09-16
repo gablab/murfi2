@@ -19,6 +19,9 @@ public:
     FrPropMacro(double,Brightness);
     FrPropMacro(double,Contrast);
 	FrPropMacro(int, Slice);
+	FrPropMacro(int, XCoord);
+	FrPropMacro(int, YCoord);
+
 };
 
 #endif

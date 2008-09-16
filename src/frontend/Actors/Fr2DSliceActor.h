@@ -71,6 +71,7 @@ protected:
 	int                          AutoUpdate;
 
 	vtkLookupTable*              ColorMap;
+	vtkLookupTable *bwLut;
 	int                          OwnsColorMap;   
 
 	Fr2DSliceActor();
@@ -83,9 +84,9 @@ protected:
 	virtual void UpdateSlice();
 
 private:
-	void AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img);
-	void SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
-		int num_colors, int vol = 0);
+//	void AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img);
+//	void SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
+//		int num_colors, int vol = 0);
 
 };
 

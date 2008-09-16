@@ -142,13 +142,16 @@ void FrCompositeTool::SetDocument(FrMainDocument* document){
 bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params){
 	// check if coordinates are near left/right border of viewport
 	int *size = is->CurrentRenderer->GetSize();
-	double *aspect = is->CurrentRenderer->GetAspect();
+	int *origin = is->CurrentRenderer->GetOrigin();
+
 	int XBorder = size[0];
-	int YBorder = size[0]/aspect[0];
+	int YBorder = size[1];
+	int XOrigin = origin[0];
+	int YOrigin = origin[0];
 
     // Leave side only
     int xDelta = size[0] / 10; // delta is 10%
-	if ((params.X >= (XBorder-xDelta)) || (params.X <= xDelta)) return true;
+	if (( (params.X - XOrigin) >= (XBorder-xDelta)) || ( (params.X - XOrigin) <= xDelta)) return true;
 	/*if ((params.Y+40 >= YBorder) || (params.Y <= 40)) return true;*/
 
 	return false;

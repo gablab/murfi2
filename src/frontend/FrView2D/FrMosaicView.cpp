@@ -35,7 +35,7 @@ void FrMosaicView::Initialize()
 {
     // create renderer
     m_renderer->GetActiveCamera()->ParallelProjectionOn();
-    m_renderer->SetBackground( 0.1, 0.2, 0.4 );
+    m_renderer->SetBackground( 0.0, 0.0, 0.0 );
 
     SetupRenderers();    
 }
@@ -103,7 +103,14 @@ void FrMosaicView::UpdatePipeline(int point){
     
     if(isCleared){
         m_renderer->AddActor(m_actor);
-    }
+        double* center = m_actor->GetCenter();
+        m_actor->AddPosition(-center[0], -center[1], 0);
+		
+		m_renderer->ResetCamera();
+		m_renderer->GetActiveCamera()->ParallelProjectionOn();
+		m_renderer->GetActiveCamera()->SetParallelScale(200);
+		m_renderer->Render();
+	}
 
     // render scene
     GetRenderWindow()->Render();

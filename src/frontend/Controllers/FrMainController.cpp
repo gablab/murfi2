@@ -78,7 +78,7 @@ void FrMainController::LoadImage(QString& fileName){
     else{
         // TODO: process error
     }    
-    m_view->GetView2D()->UpdatePipeline(FRP_FULL);
+    m_view->GetCurrentView()->UpdatePipeline(FRP_FULL);
 }
 
 void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
@@ -102,7 +102,7 @@ void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
     }
 
     if(isChanged && m_view){
-       m_view->GetView2D()->UpdatePipeline(FRP_TBC);
+       m_view->GetCurrentView()->UpdatePipeline(FRP_TBC);
     }
 }
 
@@ -112,15 +112,15 @@ void FrMainController::Notify(int notifyCode){
 	switch(notifyCode){
 		case FRN_PIPLINE_UPDATE:
 			// TODO: implement..
-            m_view->GetView2D()->UpdatePipeline(FRP_FULL);
+            m_view->GetCurrentView()->UpdatePipeline(FRP_FULL);
 			break;
 		case FRN_TBC_UPDATE:
 			// TODO: implement..
-			m_view->GetView2D()->UpdatePipeline(FRP_TBC);
+			m_view->GetCurrentView()->UpdatePipeline(FRP_TBC);
 			m_view->UpdateTBCValues(m_document->GetContrast(), m_document->GetBrightness());
 			break;
 		case FRN_SETNEXTSLICE:
-            m_view->GetView2D()->UpdatePipeline(FRP_SLICE);
+            m_view->GetCurrentView()->UpdatePipeline(FRP_SLICE);
 			break;
 	}
 }

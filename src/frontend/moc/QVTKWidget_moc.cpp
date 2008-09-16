@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'QVTKWidget.h'
 **
-** Created: Thu 11. Sep 11:49:10 2008
+** Created: Tue 16. Sep 18:10:42 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

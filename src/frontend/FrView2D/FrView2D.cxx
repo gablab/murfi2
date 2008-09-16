@@ -9,6 +9,7 @@
 #include "Fr2DSliceActor.h"
 #include "FrDocumentReader.h"
 #include "FrNotify.h"
+#include "FrSliceExtractor.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -42,6 +43,8 @@ FrView2D::FrView2D(FrMainWindow* mainWindow)
     // Create pipline stuff
     m_docReader = FrDocumentReader::New();
     m_tbcFilter = FrTBCFilter::New();
+	m_SliceExtractor = FrSliceExtractor::New();
+	m_MosaicFilter = FrMosaicFilter::New();
 	m_tactor = vtkTextActor::New();
 	m_actor2 = Fr2DSliceActor::New();
     m_actor = vtkImageActor::New();
@@ -54,6 +57,7 @@ FrView2D::~FrView2D(){
 
     if(m_renderer) m_renderer->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
+	if(m_SliceExtractor) m_SliceExtractor->Delete();
 	if(m_tactor) m_tactor->Delete();
 	if(m_actor2) m_actor2->Delete();
     if(m_actor) m_actor->Delete();
@@ -84,7 +88,7 @@ FrView2D::~FrView2D(){
 void FrView2D::Initialize(){
     // create renderer
     m_renderer->GetActiveCamera()->ParallelProjectionOn();
-    m_renderer->SetBackground( 0.1, 0.2, 0.4 );
+    m_renderer->SetBackground( 0.0, 0.0, 0.0 );
 
     SetupRenderers();
 //	GetRenderWindow()->SetCurrentCursor(5);
@@ -118,29 +122,41 @@ void FrView2D::UpdatePipeline(int point){
     {
     case FRP_FULL:
         {
-                // Clear scene
-                m_renderer->RemoveAllViewProps();
-                m_renderer->ResetCamera();
-                GetRenderWindow()->Render();
+            // Clear scene
+            m_renderer->RemoveAllViewProps();
+            m_renderer->ResetCamera();
+            GetRenderWindow()->Render();
 
             isCleared = true;
         }
     case FRP_READIMAGE:
         {
-            // read document and connect filter
+            // read document and connect filters
             m_docReader->SetDocument(document);
             m_docReader->SetUnMosaicOn(true);
             m_docReader->Update();
-            m_tbcFilter->SetInput(m_docReader->GetOutput());
 
-            m_actor2->SetInput(m_docReader->GetOutput());
-            m_renderer->AddActor(m_actor2);
+			// test part
+//			m_MosaicFilter->SetOutputDimensions(64, 64, 36);
+//			m_MosaicFilter->SetInput(m_docReader->GetOutput());
+//			m_MosaicFilter->Update();			
+			
+			m_SliceExtractor->SetInput(m_docReader->GetOutput());
+			//m_SliceExtractor->SetCurrentFrame(5);
+			m_SliceExtractor->Update();
+
+			//m_SliceExtractor->SetInput(m_docReader->GetOutput());
+            m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());
+
+            m_actor2->SetInput(m_SliceExtractor->GetOutput());
+			m_renderer->AddActor(m_actor2);
+
             double* center = m_actor2->GetCenter();
             m_actor2->AddPosition(-center[0], -center[1], 0);
-
+			
 			m_renderer->ResetCamera();
 			m_renderer->GetActiveCamera()->ParallelProjectionOn();
-			m_renderer->GetActiveCamera()->SetParallelScale(500);
+			m_renderer->GetActiveCamera()->SetParallelScale(200);
 			m_renderer->Render();
         }
     case FRP_TBC:
@@ -152,6 +168,7 @@ void FrView2D::UpdatePipeline(int point){
                         
             if(m_tbcFilter->GetInput()){
                 m_tbcFilter->Update();
+
                 m_actor2->SetInput(m_tbcFilter->GetOutput());
             }
         }
@@ -162,11 +179,19 @@ void FrView2D::UpdatePipeline(int point){
             slice += m_actor2->GetCurrentFrame();
 
             // clamp value and set it
-            maxSliceNumber = m_actor2->GetMaxSliceNumber();
+            maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
             if(slice > maxSliceNumber) slice = maxSliceNumber;
             if(slice < 0) slice = 0;
+			
+			m_SliceExtractor->SetCurrentFrame(slice);
+			m_SliceExtractor->Update();
 
-            m_actor2->SetCurrentFrame(slice);
+			m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());
+			m_tbcFilter->Update();
+			
+			m_actor2->SetInput(m_tbcFilter->GetOutput());
+			m_actor2->SetCurrentFrame(slice);
+			
             document->SetSlice(0); // reset slice delta
         }
     default:

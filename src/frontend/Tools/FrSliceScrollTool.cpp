@@ -75,12 +75,15 @@ bool FrSliceScrollTool::SetSlice(int inc, FrInteractorStyle* is){
 	m_Document->SetSlice(inc);
 
 	this->GetController()->Notify(FRN_SETNEXTSLICE);
-    return true;
+
+	return true;
 }
 
 bool FrSliceScrollTool::SetMousePosition(int x, int y){
 	m_Document->SetXCoord(x);
 	m_Document->SetYCoord(y);
-	
+
+	this->GetController()->Notify(FRN_SETNEXTSLICE);
+
 	return true;
 }

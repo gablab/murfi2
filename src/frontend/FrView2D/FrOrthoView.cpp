@@ -17,6 +17,7 @@
 #include "vtkPNGReader.h"
 #include "vtkImageActor.h"
 #include "vtkRenderWindow.h"
+#include "vtkCoordinate.h"
 
 
 // Default constructor
@@ -103,6 +104,11 @@ void FrOrthoView::UpdatePipeline(int point){
     // TODO: implement!!!
     bool isCleared = false;
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
+	
+	int ren = -1;
+	double* local;
+	double localx, localy;
+	int coor[3];
 
     switch(point){
     case FRP_FULL:
@@ -126,7 +132,7 @@ void FrOrthoView::UpdatePipeline(int point){
 			
 			for(int i = 0; i < RENDERER_COUNT-1; i++){
 				m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
-				m_SliceExtractor[i]->SetOutputOrientation(i);
+				m_SliceExtractor[i]->SetAxis(i);
 				m_SliceExtractor[i]->Update();
 
 				m_tbcFilter[i]->SetInput(m_SliceExtractor[i]->GetOutput());
@@ -166,7 +172,39 @@ void FrOrthoView::UpdatePipeline(int point){
 			x = document->GetXCoord();
 			y = document->GetYCoord();
 
+			// search for renderer that was activated
+			for (int i = 0; i < RENDERER_COUNT; i++){
+				if (m_renderer[i]->IsInViewport(x, y))
+					ren = i;
+			}
+			
+			// get lolal coordinates for found renderer
+			if (ren != -1){
+				local = GetLocalRendererPoint(m_renderer[ren], x, y);
+				coor[0] = local[0];
+				coor[1] = local[1];
+				coor[2] = local[2];				
+
+				switch (ren)
+				{
+					case 0: // yz plane
+						localx = local[1];
+						localy = local[2];
+						break;
+					case 1: // xz plane
+						localx = local[0];
+						localy = local[2];
+						break;
+					case 2: // xy plane
+						localx = local[0];
+						localy = local[1];
+						break;
+				}
+			}
+
+			ren = 5;
 			// Implement...
+
         }
 
     default:
@@ -181,4 +219,15 @@ void FrOrthoView::UpdatePipeline(int point){
     }
 
     GetRenderWindow()->Render();
+}
+
+double* FrOrthoView::GetLocalRendererPoint(vtkRenderer *ren, int x, int y){
+	vtkCoordinate* coord = vtkCoordinate::New();
+	coord->SetCoordinateSystemToDisplay();
+	coord->SetValue(x, y, 0.0);
+	double* out = coord->GetComputedWorldValue(ren);
+
+	coord->Delete();
+
+	return out;
 }

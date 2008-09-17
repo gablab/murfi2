@@ -41,6 +41,9 @@ private:
 	FrSliceExtractor* m_SliceExtractor[RENDERER_COUNT];
 
 	int x, y;
+
+private:
+	double* GetLocalRendererPoint(vtkRenderer* ren, int x, int y);
 	
 };
 

@@ -183,7 +183,7 @@ void FrView2D::UpdatePipeline(int point){
             if(slice > maxSliceNumber) slice = maxSliceNumber;
             if(slice < 0) slice = 0;
 			
-			m_SliceExtractor->SetCurrentFrame(slice);
+			m_SliceExtractor->SetFrame(slice);
 			m_SliceExtractor->Update();
 
 			m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());

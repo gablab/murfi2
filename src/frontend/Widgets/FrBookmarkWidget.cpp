@@ -1,88 +1,80 @@
 #include "FrBookmarkWidget.h"
+#include "FrBookmark.h"
 
-FrBookmarkWidget::FrBookmarkWidget(QWidget *parent):QTabWidget(parent){
-	setTabPosition(QTabWidget::East);
-	setTabShape(QTabWidget::Rounded);
-	setMaximumWidth(50);
+#include "Qt/QToolButton.h"
+#include "Qt/QTabWidget.h"
+#include "QtGui/QDialog"
+#include "Qt/QBoxLayout.h"
+#include "Qt/QMessageBox.h"
+#include "Qt/QAction.h"
+
+// STL stuff
+#include <algorithm>
+
+
+FrBookmarkWidget::FrBookmarkWidget(QWidget *parent)
+: QWidget(parent){
+
+    m_tabWidget = new QTabWidget(this);
+    m_tabWidget->setTabPosition(QTabWidget::East);
+	m_tabWidget->setTabShape(QTabWidget::Rounded);
+	m_tabWidget->setMaximumWidth(50);
 	
-//	setMinimumWidth(100);
-//	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-//	QWidget *horizontalLayout;
-//  horizontalLayout = new QWidget(this);
-//    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-//    horizontalLayout->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);;
+    m_btnCloseTab = new QToolButton(this);
+    m_btnCloseTab->setText(trUtf8("x"));
+    m_btnCloseTab->setToolTip(trUtf8("Close current tab"));
+    connect( m_btnCloseTab, SIGNAL(clicked()), 
+             this, SLOT(OnCloseButtonClicked()) ); 
 
-//	layout = new QVBoxLayout(this);
-//	layout->setContentsMargins(0, 0, 0, 0);
-	//layout->setDirection(QBoxLayout::TopToBottom);
+    m_layout = new QVBoxLayout(this);
+    m_layout->setSpacing(1);
+    m_layout->addWidget(m_tabWidget);
+    m_layout->addWidget(m_btnCloseTab);
+    this->setLayout(m_layout);
 
-/*	addBookmarkButton = new QPushButton("Add bookmark", this);
-	addBookmarkButton->setMaximumHeight(30);
-	addBookmarkButton->setFixedWidth(80);
+	m_bookmarks.clear();
 
-	//QPushButton* addBookmarkButton2 = new QPushButton("Add bookmark", this);
-	//addBookmarkButton2->setMaximumHeight(30);
-	//addBookmarkButton2->setFixedWidth(80);
-
-	defaultTab = new FrBookmark("Default", this);
-	defaultTab->setMaximumHeight(30);
-	defaultTab->setFixedWidth(80);
-
-	connect(this->defaultTab, SIGNAL(bmClicked(FrBookmark &)), this, SLOT(bookmarkClicked(FrBookmark &)));
-
-	layout->addWidget(addBookmarkButton);
-//	layout->addWidget(addBookmarkButton2);
-	//layout->setAlignment(addBookmarkButton, Qt::AlignTop);
-	layout->addWidget(defaultTab);
-	//layout->setAlignment(defaultTab, Qt::AlignTop);
-    spacerItem = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	layout->addItem(spacerItem);
-
-	connect(this->addBookmarkButton, SIGNAL(clicked()), this, SLOT(addBookmark()));
-*/
-
-	//--------------------------------- test area -----------------------------------
-/*	QTabWidget* tabWidget = new QTabWidget(parent);
-    tabWidget->setTabPosition(QTabWidget::East);
-    tabWidget->setTabShape(QTabWidget::Rounded);
-    QWidget* tab = new QWidget();
-    tab->setObjectName(QString::fromUtf8("tab"));
-    tabWidget->addTab(tab, "Tab 1");
-    QWidget* tab_2 = new QWidget();
-    tab_2->setObjectName(QString::fromUtf8("tab_2"));
-    tabWidget->addTab(tab_2, "Tab 2");*/
-//	layout->addWidget(tabWidget);
-	//--------------------------------- test area -----------------------------------
-	bookmarks.clear();
-
-    defaultTab = new FrBookmark(this);
-	addTab(defaultTab, "Default");
-	bookmarks.push_back(defaultTab);
-	nob = 1;
+    m_defaultTab = new FrBookmark(this);    
+    m_bookmarks.push_back(m_defaultTab);
+	m_tabWidget->addTab(m_defaultTab, "Default");
 }
 
-// this method should be modified - we can send any data via this method 
-// to create FrBookmark object with properties that we need
-// (or send the whole FrBookmark object
-void FrBookmarkWidget::addBookmark(){
-	//QMessageBox::information(this, "Info", "Add bookmark button clicked");
+void FrBookmarkWidget::AddBookmark(QString& tabName, QString& tabDescription){
 
-	FrBookmark* bookmark = new FrBookmark(this);
-
-//	layout->addWidget(bookmark);
-//	layout->removeItem(spacerItem);
-//	spacerItem = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-//	layout->addItem(spacerItem);
-
-	//layout->setAlignment(bookmark, Qt::AlignTop);
-	bookmarks.push_back(bookmark);
-
-//	connect(this->bookmarks[nob], SIGNAL(bmClicked(FrBookmark &)), this, SLOT(bookmarkClicked(FrBookmark &)));
-
-	addTab(bookmark, "Test"+QString::number(nob));
-	nob++;
+    FrBookmark* bookmark = new FrBookmark(this);
+    bookmark->SetName(tabName);
+    bookmark->SetDescription(tabDescription);
+	m_bookmarks.push_back(bookmark);
+        
+    int idx = m_tabWidget->addTab(bookmark, bookmark->GetName());
+    //m_tabWidget->setToolTip(idx, bookmark->GetDescription());
 }
 
-void FrBookmarkWidget::bookmarkClicked(FrBookmark &bookmark){
+void FrBookmarkWidget::BookmarkClicked(FrBookmark &bookmark){
 	QMessageBox::information(this, "Info", "bookmark clicked");
+}
+
+void FrBookmarkWidget::OnCloseButtonClicked(){
+    // Close currently selected tab 
+    FrBookmark* currentTab = dynamic_cast<FrBookmark*>(m_tabWidget->currentWidget());
+    if(currentTab){
+        if(currentTab != m_defaultTab){
+                       
+            // delete from internal list
+            std::vector<FrBookmark*>::iterator elem;
+            elem = std::find(m_bookmarks.begin(), m_bookmarks.end(), currentTab);
+            m_bookmarks.erase(elem);
+            
+            // delete tab from TabWidget
+            int idx = m_tabWidget->currentIndex();
+            //m_tabWidget->removeToolTip(idx);
+            m_tabWidget->removeTab(idx);
+
+            // inform others
+            emit DeleteTab(currentTab->GetID());
+        }
+        else{
+            QMessageBox::information(this, "Information", "Can't close default tab...");
+        }
+    }
 }

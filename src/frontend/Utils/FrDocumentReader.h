@@ -33,6 +33,10 @@ public:
 protected:
     FrDocumentReader();
     ~FrDocumentReader();
+
+    // Lut has always 256 byte size
+    void InitLookupTable(short* data, unsigned int dataSize, 
+                         unsigned char** outLUT);
     
 private:
     FrDocumentReader(const FrDocumentReader&);  // Not implemented.

@@ -17,7 +17,13 @@ public:
     virtual ObjType GetType();
 
 private:
+    int m_ID;
+    int m_currentMode;
+    int m_sliceNumber;
+    int m_tbcFilterSetting;
+    int m_cameraSettings;
 
+    bool m_isCurrent;
 };
 
 #endif

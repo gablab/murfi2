@@ -3,39 +3,40 @@
 #ifndef FR_BOOKMARKWIDGET
 #define FR_BOOKMARKWIDGET
 
-#include <QtGui/QDialog>
-#include <QtGui/QPushButton>
-#include "Qt/qboxlayout.h"
-#include "Qt/QMessageBox.h"
-#include "Qt/qtabwidget.h"
+class QAction;
+class QTabWidget;
+class QToolButton;
+class QVBoxLayout;
 
-#include "FrBookmark.h"
+class FrBookmark;
 
+#include "Qt/QWidget.h"
 #include <vector>
 using namespace std;
 
 
-class FrBookmarkWidget: public QTabWidget
+class FrBookmarkWidget: public QWidget
 {
 	Q_OBJECT
 public:
 	FrBookmarkWidget(QWidget *parent = 0);
 
-	public slots:
-		void addBookmark();
-		void bookmarkClicked(FrBookmark &bookmark);
+public slots:
+    // Add slots here
+    void AddBookmark(QString& tabName, QString& tabDescription);
+	void BookmarkClicked(FrBookmark &bookmark);
+    void OnCloseButtonClicked();
 
-protected:
-
+signals:
+    void DeleteTab(int tabID);
 
 private:
-	QPushButton* addBookmarkButton;
-	QVBoxLayout *layout;
-	QSpacerItem *spacerItem;
-	vector<FrBookmark*> bookmarks;
-	FrBookmark* defaultTab;
-	int nob;	// nummber of bookmarks
-
+    QTabWidget*         m_tabWidget;
+    QToolButton*        m_btnCloseTab;
+	QVBoxLayout*        m_layout;
+	
+	FrBookmark*         m_defaultTab;
+    vector<FrBookmark*> m_bookmarks;
 };
 
 #endif

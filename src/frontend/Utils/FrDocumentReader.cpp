@@ -52,12 +52,12 @@ void FrDocumentReader::Update(){
         RtMRIImage* img = ido->GetImage();
         if(m_UnMosaicOn && img->seemsMosaic()){
             img = new RtMRIImage(*img);
-            img->unmosaic();
+            if(!img->unmosaic()) vtkErrorMacro(<<"Can't unmosaic image.");
             deleteImage = true;
         }
         else if(m_MosaicOn && !img->seemsMosaic()) {
             img = new RtMRIImage(*img);
-            img->mosaic();
+            if(img->mosaic()) vtkErrorMacro(<<"Can't mosaic image.");
             deleteImage = true;
         }
         
@@ -79,17 +79,22 @@ void FrDocumentReader::Update(){
         output->SetScalarTypeToUnsignedChar();        
         output->AllocateScalars();
                 
-        // Copy image data
+        // Copy image data with mapping into 0..255 range
         short* dataPtr = img->getDataCopy();
+        unsigned int dataSize = img->getNumPix();
         unsigned char* dstPtr = (unsigned char*)output->GetScalarPointer();
 
+        unsigned char* lut = 0;
+        InitLookupTable(dataPtr, dataSize, &lut);
+
         short* srcPtr = dataPtr;
-        for(int i=0; i < img->getNumPix(); ++i){
-            *dstPtr = (unsigned char)(*srcPtr);
+        for(int i=0; i < dataSize; ++i){
+            *dstPtr = lut[*srcPtr];
             dstPtr++;
             srcPtr++;
         }
         // clear all
+        delete[] lut;
         delete[] dataPtr;
         if(deleteImage) delete img;
 
@@ -97,6 +102,32 @@ void FrDocumentReader::Update(){
         this->SetOutput(output);
     }    
 }
+
+void FrDocumentReader::InitLookupTable(short* data, unsigned int dataSize,
+                                       unsigned char** outLUT){    
+    // assume that values cannot be negative
+    short max = data[0]; 
+    short min = data[0];
+
+    // find max and min
+    short* ptr = data;
+    short* pEnd = data + dataSize;
+    while(ptr != pEnd){
+        if(*ptr > max) max = *ptr;
+        else if(*ptr < min) min = *ptr;
+        ++ptr;
+    }
+
+    // create lut     
+    (*outLUT) = new unsigned char[VTK_SHORT_MAX];
+
+    float mult = 255.0f / float(max - min);
+    for(int i=0; i < VTK_SHORT_MAX; ++i){
+        (*outLUT)[i] = (min <= i && i <= max) ?  
+            unsigned char((i - min) * mult) : 0;
+    }
+}
+
 
 void FrDocumentReader::SetDocument(FrDocument* document){
     // if document is being changed then clear output!

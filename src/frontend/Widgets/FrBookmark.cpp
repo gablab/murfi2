@@ -1,19 +1,56 @@
 #include "FrBookmark.h"
 
-FrBookmark::FrBookmark(QWidget *parent):QWidget(parent){
+#include "Qt/QMessageBox.h"
 
-	//QLabel *label = new QLabel(this);
-	//label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-	//label->setText(text);
-	//label->setAlignment(Qt::AlignBottom | Qt::AlignRight);
-//	label->setFixedWidth(80);
-//	label->setMaximumHeight(30);
-	//setFlat(true);
-	//setGeometry(0, 0, 0, 0);
+// Defines
+#define DEF_TAB_NAME        "NoName"
+#define DEF_TAB_DESCRIPTION "No description"
+
+// NOTE: assume that int will be enought
+int FrBookmark::currentID = 0;
+
+FrBookmark::FrBookmark(QWidget *parent)
+: QWidget(parent){
+
+    //setup id
+    m_ID = currentID;
+    currentID++;
+
+    // set up default name and description
+    m_name = DEF_TAB_NAME;
+    m_name += QString::number(m_ID);
+
+    m_description = DEF_TAB_DESCRIPTION;
 }
 
-void FrBookmark::mousePressEvent(QMouseEvent *event){
-	//QMessageBox::information(this, "inside bookmark class", "bookmark clicked");
-	
-	emit bmClicked(*this);
+void FrBookmark::mousePressEvent(QMouseEvent *event){		
+	emit Clicked(*this);
+}
+
+int FrBookmark::GetID(){ 
+    return m_ID;
+}
+        
+QString& FrBookmark::GetName(){
+    return m_name;
+}
+
+void FrBookmark::SetName(QString& value){    
+    if(!value.isEmpty()){
+        m_name = value;
+    }
+    else{
+        m_name = DEF_TAB_NAME;
+        m_name += QString::number(m_ID);
+    }
+    emit NameChanged(value);
+}
+
+QString& FrBookmark::GetDescription(){
+    return m_description;
+}
+
+void FrBookmark::SetDescription(QString& value){
+    m_description = ( value.isEmpty() ) ? 
+        DEF_TAB_DESCRIPTION : value;
 }

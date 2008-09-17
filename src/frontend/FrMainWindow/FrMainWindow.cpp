@@ -8,6 +8,10 @@
 #include "FrLowPanel.h"
 #include "FrBookmarkWidget.h"
 #include "QVTKWidget.h"
+#include "FrTabInfoDialog.h"
+
+#include "Qt/QMessageBox.h"
+#include "Qt/QTabWidget.h"
 
 #include "vtkInteractorStyleImage.h"
 #include "vtkRenderWindowInteractor.h"
@@ -41,7 +45,7 @@ void FrMainWindow::InitializeWidgets(){
     
     m_bookmarkWidget = new FrBookmarkWidget(groupBox);
 	m_bookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-
+            
     QHBoxLayout *groupBoxLayout = new QHBoxLayout(groupBox);
 	groupBoxLayout->setContentsMargins(0, 0, 0, 0);
 	groupBoxLayout->setSpacing(0);
@@ -224,11 +228,14 @@ void FrMainWindow::bookmarkChanged(int index){
 	
 }
 
-void FrMainWindow::saveToTab(){
-    //QWidget* tab = new QWidget();
-    //tab->setObjectName(QString::fromUtf8("tab"));
-    //myBookmarkWidget->addTab(tab, "test");
-	m_bookmarkWidget->addBookmark();
+void FrMainWindow::saveToTab(){    
+    FrTabInfoDialog dlg(this, true);
+    dlg.SetCaption(tr("Save to tab"));
+    dlg.SetInfo(tr("Input name and shot descritpion of tab"));
+    
+    if(dlg.SimpleExec()){
+	    m_bookmarkWidget->AddBookmark(dlg.GetName(), dlg.GetDescription());
+    }
 }
 
 #include <Qt/QString.h>

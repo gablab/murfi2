@@ -2,7 +2,7 @@
 #define FR_ORTHO_VIEW
 
 class vtkRenderer;
-class vtkImageActor;
+class vtkTextActor;
 
 class FrMainWindow;
 class FrDocumentReader;
@@ -35,9 +35,9 @@ private:
     vtkRenderer* m_renderer[RENDERER_COUNT];
     FrDocumentReader* m_docReader;
     FrTBCFilter* m_tbcFilter[RENDERER_COUNT];    
-    vtkImageActor* m_actor;
 
-	Fr2DSliceActor* m_actor2[RENDERER_COUNT];
+	Fr2DSliceActor* m_actor[RENDERER_COUNT];
+	vtkTextActor* m_tactor[RENDERER_COUNT];
 	FrSliceExtractor* m_SliceExtractor[RENDERER_COUNT];
 
 	int x, y;

@@ -34,6 +34,9 @@
 #include "vtkImagePadFilter.h"
 #include "vtkPointData.h"
 #include "vtkRendererCollection.h"
+#include "vtkOutlineFilter.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkFollower.h"
 
 
 // Default constructor
@@ -116,6 +119,8 @@ void FrView2D::UpdatePipeline(int point){
     int maxSliceNumber = 0;
     bool isCleared = false;
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
+	char text[20] = "";
+	char tmp[5];
 
     // Update pipeline
     switch(point)
@@ -137,10 +142,17 @@ void FrView2D::UpdatePipeline(int point){
             m_docReader->Update();
 			
 			m_SliceExtractor->SetInput(m_docReader->GetOutput());
+
+			// set text actor
+			m_tactor->GetTextProperty()->SetColor(100, 100, 0);
+			m_tactor->GetTextProperty()->SetBold(5);
+			m_tactor->GetTextProperty()->SetFontSize(20);
+			m_tactor->SetPosition(20, 20);
+			m_renderer->AddActor(m_tactor);	
         }
     case FRP_SLICE:
         {
-            // Extrac slice to be rendered
+            // Extract slice to be rendered
             slice = m_SliceExtractor->GetSlice();
             slice += document->GetSlice(); // this is delta
 
@@ -154,6 +166,12 @@ void FrView2D::UpdatePipeline(int point){
 			    m_SliceExtractor->Update();
                 m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());
             }
+			
+			strcat(text, "Slice ");
+			itoa(slice, tmp, 10);
+			strcat(text, tmp);
+
+			m_tactor->SetInput(text);
         }
     case FRP_TBC:
         {
@@ -178,6 +196,7 @@ void FrView2D::UpdatePipeline(int point){
             m_renderer->ResetCamera();
 			m_renderer->GetActiveCamera()->ParallelProjectionOn();
 			m_renderer->GetActiveCamera()->SetParallelScale(200);
+		
 			m_renderer->Render();
         }
     default:

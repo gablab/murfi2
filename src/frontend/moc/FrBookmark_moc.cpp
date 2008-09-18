@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrBookmark.h'
 **
-** Created: Wed 17. Sep 23:04:32 2008
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
+** Created: Thu 18. Sep 22:38:23 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,12 +11,11 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrBookmark.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.4.1. It"
+#error "This file was generated using the moc from 4.3.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
-QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_FrBookmark[] = {
 
  // content:
@@ -53,7 +52,7 @@ void *FrBookmark::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrBookmark))
-        return static_cast<void*>(const_cast< FrBookmark*>(this));
+	return static_cast<void*>(const_cast< FrBookmark*>(this));
     return QWidget::qt_metacast(_clname);
 }
 
@@ -85,4 +84,3 @@ void FrBookmark::NameChanged(QString & _t1)
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
-QT_END_MOC_NAMESPACE

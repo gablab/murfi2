@@ -12,6 +12,10 @@
 #include "vtkTexture.h"
 #include "vtkProperty.h"
 #include "vtkExtractVOI.h"
+#include "vtkOutlineFilter.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkFollower.h"
+
 
 class Fr2DSliceActor : public FrBaseActor
 {
@@ -29,11 +33,7 @@ public:
 	// Description:
 	// Set Key Location Parameters 
 	virtual void SetLevel(int level);
-	virtual void SetCurrentFrame(int CurrentFrame);
-	virtual void SetCurrentPlane(int CurrentPlane);
 
-	vtkGetMacro(CurrentFrame,int);
-	vtkGetMacro(CurrentPlane,int);
 	vtkGetMacro(Level,int);
 
 	vtkGetMacro(Opacity,float);
@@ -51,27 +51,19 @@ public:
 
 	vtkGetObjectMacro(CurrentImage,vtkImageData);
 
-    // Returns Max number of slices
-    int GetMaxSliceNumber();
-
 protected:
 	vtkActor*                    ImageSlice;
 	vtkPlaneSource*              ImagePlane;
 	vtkImageData*                CurrentImage;
 	vtkTexture*                  ImageTexture;
-	vtkExtractVOI*				 ImageVOI;
+	vtkFollower*				 ImageOutline;
+
 	int                          Level;
-
-	float                        OutlineBounds[6];
-	int                          CurrentPlane;
-	int							 CurrentFrame;
-
 	float                        Opacity;
 	int                          Interpolation;
 	int                          AutoUpdate;
 
 	vtkLookupTable*              ColorMap;
-	vtkLookupTable *bwLut;
 	int                          OwnsColorMap;   
 
 	Fr2DSliceActor();
@@ -82,11 +74,6 @@ protected:
 	// Slice Stuff
 	virtual void BuildImageSlice();
 	virtual void UpdateSlice();
-
-private:
-//	void AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageData* img);
-//	void SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
-//		int num_colors, int vol = 0);
 
 };
 

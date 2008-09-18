@@ -15,9 +15,11 @@
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkPNGReader.h"
-#include "vtkImageActor.h"
+#include "vtkTextActor.h"
 #include "vtkRenderWindow.h"
 #include "vtkCoordinate.h"
+#include "vtkTextProperty.h"
+
 
 FrSliceExtractor::Orientation g_Orientation[] =
     { FrSliceExtractor::YZ, FrSliceExtractor::XZ, FrSliceExtractor::XY };
@@ -26,31 +28,27 @@ FrSliceExtractor::Orientation g_Orientation[] =
 FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
        
-    m_actor = vtkImageActor::New();
     m_docReader = FrDocumentReader::New();
-    //m_tbcFilter = FrTBCFilter::New();
-	//m_SliceExtractor = FrSliceExtractor::New();
 
     // create renderers
 	for(int i = 0; i < RENDERER_COUNT; i++){
         m_renderer[i] = vtkRenderer::New();
-		m_actor2[i] = Fr2DSliceActor::New();
+		m_actor[i] = Fr2DSliceActor::New();
+		m_tactor[i] = vtkTextActor::New();
 		m_SliceExtractor[i] = FrSliceExtractor::New();
-		m_tbcFilter[i] = FrTBCFilter::New();	// testing
+		m_tbcFilter[i] = FrTBCFilter::New();	
     }
 }
 
 FrOrthoView::~FrOrthoView(){
-
-    if(m_actor) m_actor->Delete();
-    //if(m_tbcFilter) m_tbcFilter->Delete();
     if(m_docReader) m_docReader->Delete();
 
     for(int i = 0; i < RENDERER_COUNT; i++){
         if(m_renderer[i]) m_renderer[i]->Delete();
-		if(m_actor2[i]) m_actor2[i]->Delete(); 
+		if(m_actor[i]) m_actor[i]->Delete();
+		if(m_tactor[i]) m_tactor[i]->Delete();
 		if(m_SliceExtractor[i]) m_SliceExtractor[i]->Delete();
-		if(m_tbcFilter[i]) m_tbcFilter[i]->Delete();	// testing
+		if(m_tbcFilter[i]) m_tbcFilter[i]->Delete();	
     }    
 }
 
@@ -72,24 +70,15 @@ void FrOrthoView::SetupRenderers(){
     
     QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[CORONAL_RENDERER]);
     m_renderer[CORONAL_RENDERER]->SetViewport(0.0, 0.5, 0.5, 1.0);
-//    m_renderer[CORONAL_RENDERER]->SetBackground(0.8, 0.1, 0.1);
-    //m_renderer[CORONAL_RENDERER]->Render();
     
     QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[SAGITAL_RENDERER]);
 	m_renderer[SAGITAL_RENDERER]->SetViewport(0.5, 0.5, 1.0, 1.0);
-//    m_renderer[SAGITAL_RENDERER]->SetBackground(0.1, 0.8, 0.1);
-    //m_renderer[SAGITAL_RENDERER]->Render();
     
     QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[AXIAL_RENDERER]);
 	m_renderer[AXIAL_RENDERER]->SetViewport(0.0, 0.0, 0.5, 0.5);
-//    m_renderer[AXIAL_RENDERER]->SetBackground(0.1, 0.1, 0.8);    
-    //m_renderer[AXIAL_RENDERER]->Render();
 
     QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[DUMMY_RENDERER]);
 	m_renderer[DUMMY_RENDERER]->SetViewport(0.5, 0.0, 1.0, 0.5);
- //   m_renderer[DUMMY_RENDERER]->SetBackground(0.1, 0.1, 0.1);    
- //   m_renderer[DUMMY_RENDERER]->Render();
-    
 }
 
 void FrOrthoView::RemoveRenderers(){
@@ -130,47 +119,53 @@ void FrOrthoView::UpdatePipeline(int point){
             m_docReader->SetUnMosaicOn(true);
             m_docReader->Update();
 
-            //m_tbcFilter->SetInput(m_docReader->GetOutput());
-			
 			for(int i = 0; i < RENDERER_COUNT-1; i++){
 				m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
 				m_SliceExtractor[i]->SetOrientation(g_Orientation[i]);
-				m_SliceExtractor[i]->Update();
 
-				m_tbcFilter[i]->SetInput(m_SliceExtractor[i]->GetOutput());
-				m_tbcFilter[i]->Update();
-				
-				m_actor2[i]->SetInput(m_SliceExtractor[i]->GetOutput());
-				//m_actor2[i]->SetCurrentPlane(i);
-				m_renderer[i]->AddActor(m_actor2[i]);
-
-				double* center = m_actor2[i]->GetCenter();
-		        m_actor2[i]->AddPosition(-center[0], -center[1], 0);
-
-				m_renderer[i]->ResetCamera();
-				m_renderer[i]->GetActiveCamera()->ParallelProjectionOn();
-				m_renderer[i]->GetActiveCamera()->SetParallelScale(120);
-				m_renderer[i]->Render();
+				// set text actors
+				m_tactor[i]->GetTextProperty()->SetColor(100, 100, 0);
+				m_tactor[i]->GetTextProperty()->SetBold(5);
+				m_tactor[i]->GetTextProperty()->SetFontSize(20);
+				m_tactor[i]->SetPosition(20, 20);
+				m_renderer[i]->AddActor(m_tactor[i]);	
 			}
-        }
-    case FRP_TBC:
-        {
-            for(int i = 0; i < RENDERER_COUNT-1; i++){
-				// Setup brightness contrast
-				m_tbcFilter[i]->SetThreshold(document->GetThreshold());
-				m_tbcFilter[i]->SetBrightness(document->GetBrightness());
-				m_tbcFilter[i]->SetContrast(document->GetContrast());
 
-				if(m_tbcFilter[i]->GetInput()){                
-					m_tbcFilter[i]->Update();
-					
-					m_actor2[i]->SetInput(m_tbcFilter[i]->GetOutput());
-				}
-            }
+			m_tactor[0]->SetInput("Coronal");
+			m_tactor[1]->SetInput("Sagital");
+			m_tactor[2]->SetInput("Axial");
         }
     case FRP_SLICE:
         {
-            // get absolute mouse position
+            // NOTE: !!! We need update only dependent renderers
+            //clickXY = GetClickPoint();
+            //clickedRenderer = GetClickedRenderer(clickXY);
+            // for(int i=0; i < RENDERER_COUNT-1; ++i){
+            //  if(m_renderer[i] != clickedRenderer){
+            //      switch(i){
+            //        case SAGITAL_RENDERER: 
+            //              m_SliceExtractor[i]->SetSlice(GetSagitalSlice(clickedRenderer, clickXY))
+            //            break;
+            //        case CORONAL_RENDERER:
+            //              ... 
+            //            break;
+            //        case AXIAL_RENDERER:
+            //              ...
+            //            break;
+            //        }
+            //  }
+            //}
+
+            // Need this to allow working process
+            for(int i=0; i < RENDERER_COUNT-1; ++i){
+                                
+                if(m_SliceExtractor[i]->GetInput() != 0L){
+                    m_SliceExtractor[i]->Update();
+				    m_tbcFilter[i]->SetInput(m_SliceExtractor[i]->GetOutput());
+                }
+            }
+
+			// get absolute mouse position
 			x = document->GetXCoord();
 			y = document->GetYCoord();
 
@@ -207,8 +202,37 @@ void FrOrthoView::UpdatePipeline(int point){
 			ren = 5;
 			// Implement...
 
-        }
+        }   
+	case FRP_TBC:
+        {
+            for(int i = 0; i < RENDERER_COUNT-1; i++){
+				// Setup brightness contrast
+				m_tbcFilter[i]->SetThreshold(document->GetThreshold());
+				m_tbcFilter[i]->SetBrightness(document->GetBrightness());
+				m_tbcFilter[i]->SetContrast(document->GetContrast());
 
+				if(m_tbcFilter[i]->GetInput()){                
+					m_tbcFilter[i]->Update();
+					
+					m_actor[i]->SetInput(m_tbcFilter[i]->GetOutput());
+
+                    // Add actors if they were removed
+                    if(isCleared){
+                        m_renderer[i]->AddActor(m_actor[i]);
+					}
+				}
+            }
+        }
+    case  FRP_SETCAM:
+        {
+            // TODO: Setup camera here 
+            for(int i=0; i < RENDERER_COUNT; ++i){
+                m_renderer[i]->ResetCamera();
+			    m_renderer[i]->GetActiveCamera()->ParallelProjectionOn();
+			    m_renderer[i]->GetActiveCamera()->SetParallelScale(200);
+			    m_renderer[i]->Render();
+            }
+        }
     default:
         // do nothing
         break;

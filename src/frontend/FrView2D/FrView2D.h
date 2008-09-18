@@ -7,7 +7,11 @@ class vtkInteractorStyle;
 class vtkRenderer;
 class vtkImageViewer2;
 class vtkImageActor;
+class vtkActor;
 class vtkTextActor;
+class vtkOutlineFilter;
+class vtkPolyDataMapper;
+class vtkFollower;
 
 class QVTKWidget;
 class FrMainWindow;

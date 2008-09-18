@@ -6,6 +6,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageReslice.h"
 
+// Defines
+#define DEF_SPACING 1.0
+#define DEF_FRAME 0
+
+
 FrSliceExtractor* FrSliceExtractor::New(){  
   vtkObject* result = vtkObjectFactory::CreateInstance("FrSliceExtractor");
   
@@ -16,65 +21,72 @@ FrSliceExtractor* FrSliceExtractor::New(){
 }
 
 FrSliceExtractor::FrSliceExtractor(){
-//	this->ImageVOI = vtkExtractVOI::New();
-	this->m_Reslice = vtkImageReslice::New();
-
-	m_Axis = 2; //	default orientation - 2 XY
-	m_Frame = 0;
+    // Create reslicer
+	m_Reslicer = vtkImageReslice::New();
+    
+	m_Slice = DEF_FRAME;    
+    m_Orientation = FrSliceExtractor::XY;
+    m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = DEF_SPACING;
 }
 
 FrSliceExtractor::~FrSliceExtractor(){
-    if(m_Input) m_Input->Delete();
-    if(m_Output) m_Output->Delete();
+    if(m_Reslicer) m_Reslicer->Delete();
 }
 
 void FrSliceExtractor::SetInput(vtkImageData *input){
-	m_Input = input;
-	m_Input->GetDimensions(m_Dims);
-
-//	this->ImageVOI->SetInput(data);
-//	this->ImageVOI->Update();
+    if(input == m_Reslicer->GetInput()) return;
+    m_Reslicer->SetInput(input);
+    this->Modified();
+    
+    if(input != 0L){
+        input->GetSpacing(m_Spacing);
+    }
+    else {
+        m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = DEF_SPACING;
+    }
 }
 
-//void FrSliceExtractor::SetOutputDimensions(int w, int h, int num){
-//	m_newDims[0] = w;
-//	m_newDims[1] = h;
-//	m_newDims[2] = num;
-//}
+vtkImageData* FrSliceExtractor::GetInput(){
+    return (vtkImageData*)m_Reslicer->GetInput();
+}
 
-//void FrSliceExtractor::SetOutputOrientation(int axis){
-//	m_axis = axis;
-//	this->Modified();
-//}
-//
-//void FrSliceExtractor::SetCurrentFrame(int frame){
-//	m_frame = frame;
-//	this->Modified();
-//}
+vtkImageData* FrSliceExtractor::GetOutput(){    
+    return m_Reslicer->GetOutput();
+}
+
+void FrSliceExtractor::SetOrientation(FrSliceExtractor::Orientation orient){
+    if(m_Orientation != orient){
+        m_Orientation = orient;
+        this->Modified();
+    }
+}
+
+void FrSliceExtractor::SetSlice(int slice){
+    if(m_Slice != slice){
+        m_Slice = slice;
+	    this->Modified();
+    }
+}
 
 void FrSliceExtractor::Update(){
-	
-	m_Output = vtkImageData::New();
-	m_Output->SetDimensions(m_Dims[0], m_Dims[1], 1);
-	
-	switch (m_Axis)
+    // For safty
+    if(!m_Reslicer->GetInput()) return;
+
+	switch (m_Orientation)
 	{
-		case 2:		// XY
-			//this->ImageVOI->SetVOI(0, m_Dims[0]-1, 0, m_Dims[1]-1, m_frame, m_frame);
-			m_Reslice->SetResliceAxesOrigin(0, 0, m_Frame);
-			m_Reslice->SetResliceAxesDirectionCosines(1,0,0, 0,1,0, 0,0,1);
+    case FrSliceExtractor::XY:		// XY
+			m_Reslicer->SetResliceAxesOrigin(0, 0, m_Slice);
+			m_Reslicer->SetResliceAxesDirectionCosines(1,0,0, 0,1,0, 0,0,1);
 			break;
 
-		case 1:		// XZ
-			//this->ImageVOI->SetVOI(0, m_Dims[0]-1, m_frame, m_frame, 0, m_Dims[2]-1);
-			m_Reslice->SetResliceAxesOrigin(m_Frame, 0, 0);
-			m_Reslice->SetResliceAxesDirectionCosines(0,1,0, 0,0,1, 1,0,0);
+    case FrSliceExtractor::XZ:		// XZ
+			m_Reslicer->SetResliceAxesOrigin(m_Slice, 0, 0);
+			m_Reslicer->SetResliceAxesDirectionCosines(0,1,0, 0,0,1, 1,0,0);
 			break;
 
-		case 0:		// YZ
-			//this->ImageVOI->SetVOI(m_frame, m_frame, 0, m_Dims[1]-1, 0, m_Dims[2]-1);
-			m_Reslice->SetResliceAxesOrigin(0, m_Frame, 0);
-			m_Reslice->SetResliceAxesDirectionCosines(1,0,0, 0,0,1, 0,-1,0);
+    case FrSliceExtractor::YZ:		// YZ
+			m_Reslicer->SetResliceAxesOrigin(0, m_Slice, 0);
+			m_Reslicer->SetResliceAxesDirectionCosines(1,0,0, 0,0,1, 0,-1,0);
 			break;
 
 		default:
@@ -82,41 +94,32 @@ void FrSliceExtractor::Update(){
 			break;
 	}
 	
-//	ImageVOI->Modified();
-//	ImageVOI->Update();
-
-//	vtkImageData* tmp = input;//ImageVOI->GetOutput();
-	
-	m_Reslice->SetInput(m_Input);
-	m_Reslice->SetOutputDimensionality(2);
-	m_Reslice->InterpolateOn();
-	m_Reslice->SetOutputSpacing(m_Input->GetSpacing());
-	//reslice->SetOutputExtent(0, m_Dims[0]-1, 0, m_Dims[1]-1, 0, m_Dims[2]-1);
-	m_Reslice->Update();
-
-	m_Output = m_Reslice->GetOutput();
-	//output2 = ImageVOI->GetOutput();
+    m_Reslicer->InterpolateOn();
+	m_Reslicer->SetOutputDimensionality(2);
+	m_Reslicer->SetOutputSpacing(m_Spacing);
+	m_Reslicer->Update();
 }
 
-//vtkImageData* FrSliceExtractor::GetOutput(){
-//	return output2;	
-//}
-
 int FrSliceExtractor::GetMaxSliceNumber(){
-	int maxSlice = m_Dims[2];
+    int result = -1;
+
+    if(m_Reslicer->GetInput() != 0L){
+        int dimentions[3];
+        vtkImageData* img = (vtkImageData*)m_Reslicer->GetInput();
+        img->GetDimensions( dimentions);	
 	
-	switch (m_Axis)
-	{
-	case 2:		// XY
-		maxSlice = m_Dims[2]; 
-		break;
-	case 1:		// XZ	
-		maxSlice = m_Dims[1];
-		break;
-	case 0:		// YZ
-		maxSlice = m_Dims[0];
-		break;
-	}
-	
-	return maxSlice;
+	    switch (m_Orientation)
+	    {
+	    case FrSliceExtractor::XY:		// XY
+		    result = dimentions[2]; 
+		    break;
+	    case FrSliceExtractor::XZ:		// XZ	
+		    result = dimentions[1];
+		    break;
+	    case FrSliceExtractor::YZ:		// YZ
+		    result = dimentions[0];
+		    break;
+	    }
+    }
+	return result;
 }

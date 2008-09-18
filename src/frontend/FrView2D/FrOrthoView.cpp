@@ -19,6 +19,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkCoordinate.h"
 
+FrSliceExtractor::Orientation g_Orientation[] =
+    { FrSliceExtractor::YZ, FrSliceExtractor::XZ, FrSliceExtractor::XY };
 
 // Default constructor
 FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
@@ -132,7 +134,7 @@ void FrOrthoView::UpdatePipeline(int point){
 			
 			for(int i = 0; i < RENDERER_COUNT-1; i++){
 				m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
-				m_SliceExtractor[i]->SetAxis(i);
+				m_SliceExtractor[i]->SetOrientation(g_Orientation[i]);
 				m_SliceExtractor[i]->Update();
 
 				m_tbcFilter[i]->SetInput(m_SliceExtractor[i]->GetOutput());

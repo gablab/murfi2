@@ -135,29 +135,25 @@ void FrView2D::UpdatePipeline(int point){
             m_docReader->SetDocument(document);
             m_docReader->SetUnMosaicOn(true);
             m_docReader->Update();
-
-			// test part
-//			m_MosaicFilter->SetOutputDimensions(64, 64, 36);
-//			m_MosaicFilter->SetInput(m_docReader->GetOutput());
-//			m_MosaicFilter->Update();			
 			
 			m_SliceExtractor->SetInput(m_docReader->GetOutput());
-			//m_SliceExtractor->SetCurrentFrame(5);
-			m_SliceExtractor->Update();
+        }
+    case FRP_SLICE:
+        {
+            // Extrac slice to be rendered
+            slice = m_SliceExtractor->GetSlice();
+            slice += document->GetSlice(); // this is delta
 
-			//m_SliceExtractor->SetInput(m_docReader->GetOutput());
-            m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());
+            // clamp value and set it
+            maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
+            if(slice > maxSliceNumber) slice = maxSliceNumber;
+            if(slice < 0) slice = 0;
+			m_SliceExtractor->SetSlice(slice);
 
-            m_actor2->SetInput(m_SliceExtractor->GetOutput());
-			m_renderer->AddActor(m_actor2);
-
-            double* center = m_actor2->GetCenter();
-            m_actor2->AddPosition(-center[0], -center[1], 0);
-			
-			m_renderer->ResetCamera();
-			m_renderer->GetActiveCamera()->ParallelProjectionOn();
-			m_renderer->GetActiveCamera()->SetParallelScale(200);
-			m_renderer->Render();
+            if(m_SliceExtractor->GetInput()){
+			    m_SliceExtractor->Update();
+                m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());
+            }
         }
     case FRP_TBC:
         {
@@ -170,46 +166,23 @@ void FrView2D::UpdatePipeline(int point){
                 m_tbcFilter->Update();
 
                 m_actor2->SetInput(m_tbcFilter->GetOutput());
+                // Add actor
+                if(isCleared) {
+                    m_renderer->AddActor(m_actor2);
+                }
             }
         }
-    case FRP_SLICE:
-        {   
-            // Setup slice
-            slice = document->GetSlice(); // actually, this is delta
-            slice += m_actor2->GetCurrentFrame();
-
-            // clamp value and set it
-            maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
-            if(slice > maxSliceNumber) slice = maxSliceNumber;
-            if(slice < 0) slice = 0;
-			
-			m_SliceExtractor->SetFrame(slice);
-			m_SliceExtractor->Update();
-
-			m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());
-			m_tbcFilter->Update();
-			
-			m_actor2->SetInput(m_tbcFilter->GetOutput());
-			m_actor2->SetCurrentFrame(slice);
-			
-            document->SetSlice(0); // reset slice delta
+    case FRP_SETCAM:
+        {
+            // TODO: Setup camera here 
+            m_renderer->ResetCamera();
+			m_renderer->GetActiveCamera()->ParallelProjectionOn();
+			m_renderer->GetActiveCamera()->SetParallelScale(200);
+			m_renderer->Render();
         }
     default:
         // do nothing
         break;
-    }
-
-    if(isCleared) {
- //       m_renderer->AddActor(m_actor2);
-
-        // Some presets... Do we need them?
-        //m_renderer->ResetCamera();
- //       vtkCamera* cam = m_renderer->GetActiveCamera();
-        //cam->ParallelProjectionOn();
- //       cam->SetParallelScale(60); // 120
-        //cam->SetFocalPoint(0,0,0);
-        //cam->SetPosition(0,0,1);
-        //cam->SetViewUp(0,1,0);
     }
 
     // redraw scene

@@ -1,14 +1,17 @@
 #ifndef FR_SLICE_EXTRACTOR
 #define FR_SLICE_EXTRACTOR
 
+class vtkImageReslice;
+class vtkImageData;
+
 #include "FrMacro.h"
 
 // VTK stuff
-#include "vtkExtractVOI.h"
-#include "vtkImageReslice.h"
-#include "vtkImageData.h"
 #include "vtkObject.h"
 
+// This class extract specified image from 
+// 3D volum image. It is simple wrapper for 
+// vtkImageReslice class.
 class FrSliceExtractor : public vtkObject {
 public:
     static FrSliceExtractor* New();
@@ -17,20 +20,20 @@ public:
     // You should override this method
     virtual void Update();
 
-	// Properties
-	
-	FrGetPropMacro(vtkImageData*, Input);
+    // input / output managing
 	void SetInput(vtkImageData* input);
+    vtkImageData* GetInput();
+    vtkImageData* GetOutput();
 	
-	FrSetPropMacro(int, Axis);
-	FrSetPropMacro(int, Frame);
-	FrGetPropMacro(vtkImageData*, Output);
+    // Properties
+    enum Orientation { YZ = 0, XZ = 1, XY = 2 };
+	FrGetPropMacro(Orientation, Orientation);
+    void SetOrientation(Orientation orient);
 
-//	void SetOutputOrientation(int axis);
-//	void SetCurrentFrame(int frame);
+	FrGetPropMacro(int, Slice);
+    void SetSlice(int slice);
 
-//  virtual void SimpleExecute(vtkImageData* input, vtkImageData* output);
-//	vtkImageData* GetOutput();
+    // Returns max slice number
 	int GetMaxSliceNumber();
 
 protected:
@@ -42,16 +45,10 @@ private:
     void operator=(const FrSliceExtractor&);  // Not implemented.
 
 private:
-//	int m_newDims[3];
-	int m_Dims[3];
-//	int m_frame;
-//	int m_axis;
 	int m_maxSliceNUmber;
-	
-//	vtkImageData* output2;
-//	vtkExtractVOI* ImageVOI;
-	vtkImageReslice* m_Reslice;
+    double m_Spacing[3];
 
+	vtkImageReslice* m_Reslicer;
 };
 
 

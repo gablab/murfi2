@@ -96,10 +96,15 @@ void FrOrthoView::UpdatePipeline(int point){
     bool isCleared = false;
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
 	
-	int ren = -1;
+	int clickedRenderer = -1;
 	double* local;
-	double localx, localy;
+	double localx, localy, localz;
+	double* bounds;
+	double maxX, maxY;
 	int coor[3];
+
+	char text[50] = "";
+	char tmp[10];
 
     switch(point){
     case FRP_FULL:
@@ -134,28 +139,16 @@ void FrOrthoView::UpdatePipeline(int point){
 			m_tactor[0]->SetInput("Coronal");
 			m_tactor[1]->SetInput("Sagital");
 			m_tactor[2]->SetInput("Axial");
+
+			// test
+			m_tactor[3]->GetTextProperty()->SetColor(100, 100, 0);
+			m_tactor[3]->GetTextProperty()->SetBold(5);
+			m_tactor[3]->GetTextProperty()->SetFontSize(20);
+			m_tactor[3]->SetPosition(50, 200);
+			m_renderer[3]->AddActor(m_tactor[3]);	
         }
     case FRP_SLICE:
         {
-            // NOTE: !!! We need update only dependent renderers
-            //clickXY = GetClickPoint();
-            //clickedRenderer = GetClickedRenderer(clickXY);
-            // for(int i=0; i < RENDERER_COUNT-1; ++i){
-            //  if(m_renderer[i] != clickedRenderer){
-            //      switch(i){
-            //        case SAGITAL_RENDERER: 
-            //              m_SliceExtractor[i]->SetSlice(GetSagitalSlice(clickedRenderer, clickXY))
-            //            break;
-            //        case CORONAL_RENDERER:
-            //              ... 
-            //            break;
-            //        case AXIAL_RENDERER:
-            //              ...
-            //            break;
-            //        }
-            //  }
-            //}
-
             // Need this to allow working process
             for(int i=0; i < RENDERER_COUNT-1; ++i){
                                 
@@ -172,37 +165,45 @@ void FrOrthoView::UpdatePipeline(int point){
 			// search for renderer that was activated
 			for (int i = 0; i < RENDERER_COUNT; i++){
 				if (m_renderer[i]->IsInViewport(x, y))
-					ren = i;
+					clickedRenderer = i;
 			}
 			
-			// get lolal coordinates for found renderer
-			if (ren != -1){
-				local = GetLocalRendererPoint(m_renderer[ren], x, y);
-				coor[0] = local[0];
-				coor[1] = local[1];
-				coor[2] = local[2];				
+			// get local coordinates for found renderer
+			if (clickedRenderer != -1){
+				local = GetLocalRendererPoint(m_renderer[clickedRenderer], x, y);
+				localx = local[0];
+				localy = local[1];
 
-				switch (ren)
-				{
-					case 0: // yz plane
-						localx = local[1];
-						localy = local[2];
-						break;
-					case 1: // xz plane
-						localx = local[0];
-						localy = local[2];
-						break;
-					case 2: // xy plane
-						localx = local[0];
-						localy = local[1];
-						break;
+				//// output some slice info in 4th renderer
+				//strcat(text, "X = ");
+				//itoa(localx, tmp, 10);
+				//strcat(text, tmp);
+				//strcat(text, " , Y = ");
+				//itoa(localy, tmp, 10);
+				//strcat(text, tmp);
+				//strcat(text, " , Z = ");
+				//itoa(coor[2], tmp, 10);
+				//strcat(text, tmp);
+				//
+				//m_tactor[3]->SetInput(text);
+
+				for(int i = 0; i < RENDERER_COUNT-1; ++i){
+					if(i != clickedRenderer){
+						switch(i){
+							case CORONAL_RENDERER: 
+								m_SliceExtractor[i]->SetSlice(GetCoronalSlice(clickedRenderer, localx, localy));
+								break;
+							case SAGITAL_RENDERER:
+								m_SliceExtractor[i]->SetSlice(GetSagitalSlice(clickedRenderer, localx, localy));
+								break;
+							case AXIAL_RENDERER:
+								m_SliceExtractor[i]->SetSlice(GetAxialSlice(clickedRenderer, localx, localy));
+								break;
+						}
+					}
 				}
 			}
-
-			ren = 5;
-			// Implement...
-
-        }   
+		}   
 	case FRP_TBC:
         {
             for(int i = 0; i < RENDERER_COUNT-1; i++){
@@ -229,7 +230,7 @@ void FrOrthoView::UpdatePipeline(int point){
             for(int i=0; i < RENDERER_COUNT; ++i){
                 m_renderer[i]->ResetCamera();
 			    m_renderer[i]->GetActiveCamera()->ParallelProjectionOn();
-			    m_renderer[i]->GetActiveCamera()->SetParallelScale(200);
+			    m_renderer[i]->GetActiveCamera()->SetParallelScale(150);
 			    m_renderer[i]->Render();
             }
         }
@@ -256,4 +257,67 @@ double* FrOrthoView::GetLocalRendererPoint(vtkRenderer *ren, int x, int y){
 	coord->Delete();
 
 	return out;
+}
+
+int FrOrthoView::GetCoronalSlice(int ren, int dx, int dy){
+	double* bounds = m_actor[ren]->GetBounds();	
+	int max, slice;			
+
+	switch(ren)
+	{
+		case AXIAL_RENDERER:
+			max = bounds[3];
+			slice = dy;
+			break;
+		case SAGITAL_RENDERER:
+			max = bounds[1];
+			slice = dx;
+			break;
+	}
+
+	if (slice > max)
+		slice = max;
+	if (slice < 0)
+		slice = 0;
+
+	return slice;
+}
+
+int FrOrthoView::GetSagitalSlice(int ren, int dx, int dy){
+	double* bounds = m_actor[ren]->GetBounds();	
+	int max, slice;			
+
+	switch(ren)
+	{
+		case AXIAL_RENDERER:
+			max = bounds[1];
+			slice = dx;
+			break;
+		case CORONAL_RENDERER:
+			max = bounds[1];
+			slice = dx;
+			break;
+	}
+
+	if (slice > max)
+		slice = max;
+	if (slice < 0)
+		slice = 0;
+
+	return slice;
+}
+
+int FrOrthoView::GetAxialSlice(int ren, int dx, int dy){
+	double* bounds = m_actor[ren]->GetBounds();	
+	int max, slice;			
+
+	max = bounds[3];
+	slice = dy;		
+
+	if (slice > max)
+		slice = max;
+	if (slice < 0)
+		slice = 0;
+
+	return slice;
 }

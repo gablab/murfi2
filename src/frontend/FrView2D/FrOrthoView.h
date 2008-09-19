@@ -44,6 +44,9 @@ private:
 
 private:
 	double* GetLocalRendererPoint(vtkRenderer* ren, int x, int y);
+	int GetCoronalSlice(int ren, int dx, int dy);
+	int GetSagitalSlice(int ren, int dx, int dy);
+	int GetAxialSlice(int ren, int dx, int dy);
 	
 };
 

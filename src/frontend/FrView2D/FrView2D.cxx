@@ -25,7 +25,6 @@
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkImageData.h"
-#include "vtkImageReslice.h"
 #include "vtkRenderWindow.h"
 #include "vtkActorCollection.h"
 #include "vtkBMPWriter.h"
@@ -47,13 +46,9 @@ FrView2D::FrView2D(FrMainWindow* mainWindow)
     m_docReader = FrDocumentReader::New();
     m_tbcFilter = FrTBCFilter::New();
 	m_SliceExtractor = FrSliceExtractor::New();
-	m_MosaicFilter = FrMosaicFilter::New();
-	m_tactor = vtkTextActor::New();
-	m_actor2 = Fr2DSliceActor::New();
-    m_actor = vtkImageActor::New();
+	m_actor = Fr2DSliceActor::New();
+    m_tactor = vtkTextActor::New();
     m_renderer = vtkRenderer::New();
-
-	m_slice = 0;
 }
 
 FrView2D::~FrView2D(){
@@ -61,32 +56,10 @@ FrView2D::~FrView2D(){
     if(m_renderer) m_renderer->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
 	if(m_SliceExtractor) m_SliceExtractor->Delete();
-	if(m_tactor) m_tactor->Delete();
-	if(m_actor2) m_actor2->Delete();
-    if(m_actor) m_actor->Delete();
+	if(m_actor) m_actor->Delete();
+    if(m_tactor) m_tactor->Delete();
     if(m_docReader) m_docReader->Delete();
 }
-
-//void FrView2D::UpdateSlice(){
-//    FrMainDocument* document = m_mainWindow->GetDocument();
-//    if(document){
-//		// check input data
-//		int slice = document->GetSlice();	// actually we get not slice number but slice increment, it can be positive or negative
-//		m_slice += slice;
-//		if (m_slice > numSlices-1)
-//			m_slice = 0;//numSlices-1;
-//		if (m_slice < 0)
-//			m_slice = numSlices-1;//0;
-//			
-//		m_actor2->SetCurrentFrame(m_slice);
-//		//m_actor->SetDisplayExtent(0, m_dims[0]-1, 0, m_dims[1]-1, m_slice, m_slice);
-//		//m_renderer->ResetCameraClippingRange();
-//		double scale = m_renderer->GetActiveCamera()->GetParallelScale();
-//		m_renderer->ResetCamera();
-//		m_renderer->GetActiveCamera()->SetParallelScale(scale);
-//		GetRenderWindow()->Render();
-//	}	
-//}
 
 void FrView2D::Initialize(){
     // create renderer
@@ -94,8 +67,6 @@ void FrView2D::Initialize(){
     m_renderer->SetBackground( 0.0, 0.0, 0.0 );
 
     SetupRenderers();
-//	GetRenderWindow()->SetCurrentCursor(5);
-//	GetRenderWindow()->ShowCursor();
 	GetRenderWindow()->Render();
 }
 
@@ -115,9 +86,9 @@ void FrView2D::RemoveRenderers(){
 
 void FrView2D::UpdatePipeline(int point){
     // Setup some vars
-    int slice = 0;
-    int maxSliceNumber = 0;
-    bool isCleared = false;
+    int slice           = 0;
+    int maxSliceNumber  = 0;
+    bool isCleared      = false;
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
 	char text[20] = "";
 	char tmp[5];
@@ -144,11 +115,13 @@ void FrView2D::UpdatePipeline(int point){
 			m_SliceExtractor->SetInput(m_docReader->GetOutput());
 
 			// set text actor
-			m_tactor->GetTextProperty()->SetColor(100, 100, 0);
-			m_tactor->GetTextProperty()->SetBold(5);
-			m_tactor->GetTextProperty()->SetFontSize(20);
-			m_tactor->SetPosition(20, 20);
-			m_renderer->AddActor(m_tactor);	
+            if(isCleared){
+			    m_tactor->GetTextProperty()->SetColor(100, 100, 0);
+			    m_tactor->GetTextProperty()->SetBold(5);
+			    m_tactor->GetTextProperty()->SetFontSize(20);
+			    m_tactor->SetPosition(20, 20);
+                m_renderer->AddActor(m_tactor);
+            }
         }
     case FRP_SLICE:
         {
@@ -167,10 +140,10 @@ void FrView2D::UpdatePipeline(int point){
                 m_tbcFilter->SetInput(m_SliceExtractor->GetOutput());
             }
 			
+            // Set tactor input
 			strcat(text, "Slice ");
 			itoa(slice, tmp, 10);
 			strcat(text, tmp);
-
 			m_tactor->SetInput(text);
         }
     case FRP_TBC:
@@ -182,11 +155,10 @@ void FrView2D::UpdatePipeline(int point){
                         
             if(m_tbcFilter->GetInput()){
                 m_tbcFilter->Update();
-
-                m_actor2->SetInput(m_tbcFilter->GetOutput());
+                m_actor->SetInput(m_tbcFilter->GetOutput());
                 // Add actor
                 if(isCleared) {
-                    m_renderer->AddActor(m_actor2);
+                    m_renderer->AddActor(m_actor);
                 }
             }
         }

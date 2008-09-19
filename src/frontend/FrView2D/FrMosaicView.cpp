@@ -78,6 +78,10 @@ void FrMosaicView::UpdatePipeline(int point){
 
             m_tbcFilter->SetInput(m_docReader->GetOutput());
         }
+    case FRP_SLICE:
+        {
+            // NOTE: Do nothing here for a while
+        }
     case FRP_TBC:
         {
             // Setup brightness contrast
@@ -91,11 +95,6 @@ void FrMosaicView::UpdatePipeline(int point){
                 m_actor->SetInput(m_tbcFilter->GetOutput());
             }
         }
-    case FRP_SLICE:
-        {
-            // DO nothing here for a while
-        }
-
     default:
         // do nothing
         break;

@@ -19,7 +19,7 @@
 
 FrMainWindow::FrMainWindow()
     :  QMainWindow(0), m_MainDocument(0), m_MainController(0), 
-    m_view2D(0), m_viewMosaic(0), m_viewOrtho(0), m_currentView(0){
+    m_SliceView(0), m_MosaicView(0), m_OrthoView(0), m_CurrentView(0){
 	
     setupUi(this);
     InitializeWidgets();
@@ -27,9 +27,9 @@ FrMainWindow::FrMainWindow()
 }
 
 FrMainWindow::~FrMainWindow(){
-    if(m_view2D) delete m_view2D;
-    if(m_viewMosaic) delete m_viewMosaic;
-    if(m_viewOrtho) delete m_viewOrtho;
+    if(m_SliceView) delete m_SliceView;
+    if(m_MosaicView) delete m_MosaicView;
+    if(m_OrthoView) delete m_OrthoView;
 }
 
 void FrMainWindow::InitializeWidgets(){
@@ -39,9 +39,9 @@ void FrMainWindow::InitializeWidgets(){
     m_qtView = new QVTKWidget(groupBox);
     m_qtView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_view2D = new FrView2D(this);
-    m_viewMosaic = new FrMosaicView(this);
-    m_viewOrtho = new FrOrthoView(this);;
+    m_SliceView = new FrView2D(this);
+    m_MosaicView = new FrMosaicView(this);
+    m_OrthoView = new FrOrthoView(this);;
     
     m_bookmarkWidget = new FrBookmarkWidget(groupBox);
 	m_bookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -114,17 +114,17 @@ void FrMainWindow::InitializeSignals(){
 }
 
 void FrMainWindow::Initialize(){
-    m_viewOrtho->Initialize();
-    m_viewOrtho->RemoveRenderers();
+    m_OrthoView->Initialize();
+    m_OrthoView->RemoveRenderers();
 
-    m_viewMosaic->Initialize();
-    m_viewMosaic->RemoveRenderers();
+    m_MosaicView->Initialize();
+    m_MosaicView->RemoveRenderers();
     
-    m_view2D->Initialize();
-    //m_view2D->UpdatePipeline(0);
+    m_SliceView->Initialize();
+    //m_SliceView->UpdatePipeline(0);
 
     // make it as current
-    m_currentView = m_view2D;
+    m_CurrentView = m_SliceView;
 }
 
 // change brightness of the scene
@@ -177,31 +177,31 @@ void FrMainWindow::tool3Triggered(){
 
 void FrMainWindow::mode1Clicked(){
 	
-    if(m_currentView != m_view2D){
-        m_currentView->RemoveRenderers();
-        m_currentView = m_view2D;
-        m_currentView->SetupRenderers();
-        m_currentView->UpdatePipeline(0);
+    if(m_CurrentView != m_SliceView){
+        m_CurrentView->RemoveRenderers();
+        m_CurrentView = m_SliceView;
+        m_CurrentView->SetupRenderers();
+        m_CurrentView->UpdatePipeline(0);
     }
 }
 
 void FrMainWindow::mode2Clicked(){
 	
-    if(m_currentView != m_viewMosaic){
-        m_currentView->RemoveRenderers();
-        m_currentView = m_viewMosaic;
-        m_currentView->SetupRenderers();
-        m_currentView->UpdatePipeline(0);
+    if(m_CurrentView != m_MosaicView){
+        m_CurrentView->RemoveRenderers();
+        m_CurrentView = m_MosaicView;
+        m_CurrentView->SetupRenderers();
+        m_CurrentView->UpdatePipeline(0);
     }
 }
 
 void FrMainWindow::mode3Clicked(){
 	
-    if(m_currentView != m_viewOrtho){
-        m_currentView->RemoveRenderers();
-        m_currentView = m_viewOrtho;
-        m_currentView->SetupRenderers();
-        m_currentView->UpdatePipeline(0);
+    if(m_CurrentView != m_OrthoView){
+        m_CurrentView->RemoveRenderers();
+        m_CurrentView = m_OrthoView;
+        m_CurrentView->SetupRenderers();
+        m_CurrentView->UpdatePipeline(0);
     }
 }
 
@@ -228,14 +228,8 @@ void FrMainWindow::bookmarkChanged(int index){
 	
 }
 
-void FrMainWindow::saveToTab(){    
-    FrTabInfoDialog dlg(this, true);
-    dlg.SetCaption(tr("Save to tab"));
-    dlg.SetInfo(tr("Input name and shot descritpion of tab"));
-    
-    if(dlg.SimpleExec()){
-	    m_bookmarkWidget->AddBookmark(dlg.GetName(), dlg.GetDescription());
-    }
+void FrMainWindow::saveToTab(){
+    this->GetMainController()->SaveCurrentViewToTab();
 }
 
 #include <Qt/QString.h>

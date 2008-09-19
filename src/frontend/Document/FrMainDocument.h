@@ -11,7 +11,7 @@ public:
 
     virtual void SetDefaultValues();
 
-    void GetAllImages(std::vector<FrDocumentObj*>& images);
+    void GetAllImages(std::vector<FrDocumentObj*>& images);    
 
 public:
     // Properties

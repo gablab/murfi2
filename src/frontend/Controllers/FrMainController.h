@@ -34,15 +34,19 @@ public:
 	void SetNextSlice();
 	void UpdateTCB();
     
+    void SaveCurrentViewToTab();
+
 	// Override from base class
     virtual void Notify(int notifyCode);
+
+    // Properties
+    FrGetPropMacro(FrMainWindow*, MainView);
+    FrGetPropMacro(FrMainDocument*, MainDocument);
 
 private:
     friend class FrInteractorStyle;
 
 private:
-    FrMainWindow* m_view;
-    FrMainDocument* m_document;
     FrToolController* m_toolController;
 };
 

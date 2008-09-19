@@ -66,3 +66,4 @@ void FrToolController::Notify(int notifyCode){
     // Transfer notification to owner
     FrController::Notify(notifyCode);
 }
+

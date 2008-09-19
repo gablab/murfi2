@@ -7,7 +7,6 @@ class vtkInteractorStyle;
 class vtkRenderer;
 class vtkImageViewer2;
 class vtkImageActor;
-class vtkActor;
 class vtkTextActor;
 class vtkOutlineFilter;
 class vtkPolyDataMapper;
@@ -35,23 +34,21 @@ public:
     virtual void SetupRenderers();
     virtual void RemoveRenderers();
 
+    FrSliceExtractor* GetSliceExtractor() { return m_SliceExtractor; }
+    FrTBCFilter* GetTBCFilter() { return m_tbcFilter; }
+    vtkRenderer* GetRenderer(){ return m_renderer; }
+    
+
 private:
     // Pipeline
     FrDocumentReader* m_docReader;
+    FrSliceExtractor* m_SliceExtractor;
     FrTBCFilter* m_tbcFilter;
-	FrMosaicFilter* m_MosaicFilter; /// test
-	FrSliceExtractor* m_SliceExtractor;
-
     vtkRenderer* m_renderer;
-    // Actors
-    vtkImageActor* m_actor;
-	Fr2DSliceActor* m_actor2;
-	vtkTextActor* m_tactor;
 
-	int m_slice;
-	int m_dims[3];
-	unsigned int matrixSize, numSlices;
-	int maxSliceNumber;
+    // Actors
+	Fr2DSliceActor* m_actor;
+    vtkTextActor* m_tactor;
 };
 
 #endif

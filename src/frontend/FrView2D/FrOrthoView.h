@@ -31,14 +31,20 @@ public:
     virtual void SetupRenderers();
     virtual void RemoveRenderers();
 
-private:
-    vtkRenderer* m_renderer[RENDERER_COUNT];
-    FrDocumentReader* m_docReader;
-    FrTBCFilter* m_tbcFilter[RENDERER_COUNT];    
+    FrSliceExtractor* GetSliceExtractor(int i) { return m_SliceExtractor[i]; }
+    FrTBCFilter* GetTBCFilter(int i) { return m_tbcFilter[i]; }
+    vtkRenderer* GetRenderer(int i){ return m_renderer[i]; }
 
+private:
+    // Render pipline
+    FrDocumentReader* m_docReader;
+    FrSliceExtractor* m_SliceExtractor[RENDERER_COUNT];
+    FrTBCFilter* m_tbcFilter[RENDERER_COUNT];
+    vtkRenderer* m_renderer[RENDERER_COUNT];
+
+    // Actors
 	Fr2DSliceActor* m_actor[RENDERER_COUNT];
-	vtkTextActor* m_tactor[RENDERER_COUNT];
-	FrSliceExtractor* m_SliceExtractor[RENDERER_COUNT];
+	vtkTextActor* m_tactor[RENDERER_COUNT];	
 
 	int x, y;
 

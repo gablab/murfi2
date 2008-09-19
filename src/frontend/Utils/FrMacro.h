@@ -20,4 +20,10 @@
     public: \
         Type Get##Name () { return m_##Name; }
 
+// This allow fast defining of property in class
+#define FrGetRefPropMacro(Type, Name) \
+    private: Type m_##Name; \
+    public: \
+        Type& Get##Name () { return m_##Name; }
+
 #endif

@@ -14,7 +14,7 @@ public:
     virtual void Notify(int notifyCode);
 
     // Owner controller
-    FrSetPropMacro(FrController*,Owner);
+    FrPropMacro(FrController*,Owner);
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "FrMainController.h"
+#include "FrCommandController.h"
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 #include "FrToolController.h"
@@ -14,14 +15,12 @@
 
 // Implementation of FrMainController
 FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
-    : m_view(view), m_document(doc), m_toolController(0){
+    : m_MainView(view), m_MainDocument(doc), m_toolController(0){
 
     m_toolController = new FrToolController(this);
 
-    //FrPanTool* tool = new FrPanTool();
-    //FrZoomTool* tool = new FrZoomTool();
     FrCompositeTool* tool = new FrCompositeTool();
-    tool->SetDocument(m_document);
+    tool->SetDocument(m_MainDocument);
     m_toolController->PushTool(tool);
 }
 
@@ -31,23 +30,26 @@ FrMainController::~FrMainController(){
 
 void FrMainController::Initialize(){
     
+    // Initialize FrCommandController
+    FrCommandController::Instance()->SetOwner(this);
+
     // Initialize view
-    if(m_view){        
-        m_view->SetMainController(this);
-        m_view->SetMainDocument(m_document);
-        m_view->Initialize();
+    if(m_MainView){        
+        m_MainView->SetMainController(this);
+        m_MainView->SetMainDocument(m_MainDocument);
+        m_MainView->Initialize();
 
         // Setup interactor style
-        if(m_view->GetQVTKWidget()) {
+        if(m_MainView->GetQVTKWidget()) {
             FrInteractorStyle* style = new FrInteractorStyle(this);
-            m_view->GetQVTKWidget()->GetInteractor()->SetInteractorStyle(style);
+            m_MainView->GetQVTKWidget()->GetInteractor()->SetInteractorStyle(style);
         }
     }
     
     // Initialize document
-    if(m_document){
+    if(m_MainDocument){
         // TODO: Som initialization
-        m_document->SetDefaultValues();
+        m_MainDocument->SetDefaultValues();
     }
 }
 
@@ -73,36 +75,36 @@ void FrMainController::LoadImage(QString& fileName){
     FrImageDocObj* imgObj = new FrImageDocObj();
 
     if(imgObj->LoadFromFile(fileName)){
-        m_document->Add(imgObj);
+        m_MainDocument->Add(imgObj);
     }
     else{
         // TODO: process error
     }    
-    m_view->GetCurrentView()->UpdatePipeline(FRP_FULL);
+    m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
 }
 
 void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
     // Check for safety
-    if(!m_document) return;
+    if(!m_MainDocument) return;
 
     // Setup value
     bool isChanged = true;
     switch(target){
         case FrMainController::Threshold:
-            m_document->SetThreshold(value);
+            m_MainDocument->SetThreshold(value);
             break;
         case FrMainController::Brightness:
-            m_document->SetBrightness(value);
+            m_MainDocument->SetBrightness(value);
             break;
         case FrMainController::Contrast:
-            m_document->SetContrast(value);
+            m_MainDocument->SetContrast(value);
             break;
         default:
             isChanged = false;
     }
 
-    if(isChanged && m_view){
-       m_view->GetCurrentView()->UpdatePipeline(FRP_TBC);
+    if(isChanged && m_MainView){
+       m_MainView->GetCurrentView()->UpdatePipeline(FRP_TBC);
     }
 }
 
@@ -112,15 +114,24 @@ void FrMainController::Notify(int notifyCode){
 	switch(notifyCode){
 		case FRN_PIPLINE_UPDATE:
 			// TODO: implement..
-            m_view->GetCurrentView()->UpdatePipeline(FRP_FULL);
+            m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
 			break;
 		case FRN_TBC_UPDATE:
 			// TODO: implement..
-			m_view->GetCurrentView()->UpdatePipeline(FRP_TBC);
-			m_view->UpdateTBCValues(m_document->GetContrast(), m_document->GetBrightness());
+			m_MainView->GetCurrentView()->UpdatePipeline(FRP_TBC);
+			m_MainView->UpdateTBCValues(m_MainDocument->GetContrast(), 
+                                        m_MainDocument->GetBrightness());
 			break;
 		case FRN_SETNEXTSLICE:
-            m_view->GetCurrentView()->UpdatePipeline(FRP_SLICE);
+            m_MainView->GetCurrentView()->UpdatePipeline(FRP_SLICE);
 			break;
 	}
+}
+
+void FrMainController::SaveCurrentViewToTab(){
+
+    FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+    cmd->Execute();
+
+    delete cmd;
 }

@@ -18,7 +18,6 @@ class QVTKWidget;
 #include "ui_FrMainWindow.h"
 #include "FrMacro.h"
 
-
 class FrMainWindow: public QMainWindow, public Ui::MainWindow {
 	Q_OBJECT
 public:
@@ -28,11 +27,19 @@ public:
     FrPropMacro(FrMainDocument*,MainDocument);
     FrPropMacro(FrMainController*,MainController);
     
-    FrBaseView* GetCurrentView(){ return m_currentView; }
     QVTKWidget* GetQVTKWidget(){ return m_qtView; }
 	void UpdateTBCValues(double contrast, double brightness);
 
     void Initialize();
+
+    // Properties
+    FrGetPropMacro(FrBaseView*, CurrentView);
+    FrGetPropMacro(FrView2D*, SliceView);
+    FrGetPropMacro(FrMosaicView*, MosaicView);
+    FrGetPropMacro(FrOrthoView*,  OrthoView);
+
+    // GUI elements
+    FrGetPropMacro(FrBookmarkWidget*,  BookmarkWidget);
 
 public slots:
 	void brightnessValueChanged();
@@ -55,12 +62,6 @@ signals:
 private:
     void InitializeWidgets();
     void InitializeSignals();
-
-private:
-    FrView2D* m_view2D;
-    FrMosaicView* m_viewMosaic;
-    FrOrthoView* m_viewOrtho;
-    FrBaseView* m_currentView;
 
 public:
     QVTKWidget* m_qtView;

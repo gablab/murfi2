@@ -23,10 +23,17 @@ public:
     virtual void SetupRenderers();
     virtual void RemoveRenderers();
 
+    // Accessors
+    FrTBCFilter* GetTBCFilter() { return m_tbcFilter; }
+    vtkRenderer* GetRenderer(){ return m_renderer; }
+
 private:
+    // Pipline 
     FrDocumentReader* m_docReader;
     FrTBCFilter* m_tbcFilter;
     vtkRenderer* m_renderer;
+
+    // Actors
     vtkImageActor* m_actor;
 };
 

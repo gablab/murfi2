@@ -21,3 +21,7 @@ void FrMainDocument::SetDefaultValues(){
 	
 	m_Slice = 0;
 }
+
+FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
+    return 0L;
+}

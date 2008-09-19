@@ -16,10 +16,11 @@ class FrMainController;
 // and manage commands. Organised like singletone;
 class FrCommandController : public FrController {
 public:
-    // TODO: Add some undo / redo methods
-    bool HasUndo();
-    bool HasRedo();
-
+    //// TODO: Add some undo / redo methods
+    //bool HasUndo();
+    //bool HasRedo();
+    //bool Undo();
+    //bool Redo();
 
 public:
     // static methods

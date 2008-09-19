@@ -26,4 +26,4 @@ public:
     FrPropMacro(FrMainController*, MainController);
 };
 
-#endif // AKL_COMMAND_H
+#endif // FR_BASE_CMD

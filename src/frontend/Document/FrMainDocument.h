@@ -1,6 +1,8 @@
 #ifndef FR_MAIN_DOCUMENT
 #define FR_MAIN_DOCUMENT
 
+class FrTabSettingsDocObj;
+
 #include <vector>
 #include "FrDocument.h"
 
@@ -11,7 +13,8 @@ public:
 
     virtual void SetDefaultValues();
 
-    void GetAllImages(std::vector<FrDocumentObj*>& images);    
+    void GetAllImages(std::vector<FrDocumentObj*>& images);
+    FrTabSettingsDocObj* GetCurrentTabSettings();
 
 public:
     // Properties

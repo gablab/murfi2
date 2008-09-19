@@ -163,7 +163,7 @@ void FrOrthoView::UpdatePipeline(int point){
 			y = document->GetYCoord();
 
 			// search for renderer that was activated
-			for (int i = 0; i < RENDERER_COUNT; i++){
+			for (int i = 0; i < RENDERER_COUNT-1; i++){
 				if (m_renderer[i]->IsInViewport(x, y))
 					clickedRenderer = i;
 			}

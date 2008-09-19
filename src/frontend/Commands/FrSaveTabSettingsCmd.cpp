@@ -15,7 +15,8 @@
 
 #include "Qt/QString.h"
 
-FrSaveTabSettingsCmd::FrSaveTabSettingsCmd(){
+FrSaveTabSettingsCmd::FrSaveTabSettingsCmd()
+: m_IsDefault(false) {
 }
 
 bool FrSaveTabSettingsCmd::Execute(){
@@ -30,7 +31,7 @@ bool FrSaveTabSettingsCmd::Execute(){
     bool result = false;
     if(dlg.SimpleExec()){
         // Create doc object
-        FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj();
+        FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj(m_IsDefault);
         docObj->SetName(dlg.GetName());
         docObj->SetDescription(dlg.GetDescription());
 

@@ -1,5 +1,6 @@
 #include "FrMainDocument.h"
 #include "FrTBCFilter.h"
+#include "FrTabSettingsDocObj.h"
 
 FrMainDocument::FrMainDocument() 
 : FrDocument(){
@@ -23,5 +24,22 @@ void FrMainDocument::SetDefaultValues(){
 }
 
 FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
-    return 0L;
+    typedef std::vector<FrDocumentObj*> TSVector;
+    TSVector tabSettings;
+    GetObjectsByType(tabSettings, FrDocumentObj::TabSettings);
+    
+    FrTabSettingsDocObj* result = 0L;
+    if(tabSettings.size() > 0){
+
+        TSVector::iterator it, itEnd(tabSettings.end());
+        for(it = tabSettings.begin(); it != itEnd; ++it){
+
+            FrTabSettingsDocObj* ts = (FrTabSettingsDocObj*)(*it);
+            if(ts->GetIsCurrent()){
+                result = ts;
+                break;
+            }
+        }
+    }
+    return result;
 }

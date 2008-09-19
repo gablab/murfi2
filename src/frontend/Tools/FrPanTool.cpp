@@ -1,5 +1,6 @@
 #include "FrPanTool.h"
 #include "FrInteractorStyle.h"
+#include "FrCommandController.h"
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -68,14 +69,21 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     motionVector[2] = oldPickPoint[2] - newPickPoint[2];
     
     camera->GetFocalPoint(viewFocus);
+    double newFocus[3] = { motionVector[0] + viewFocus[0], 
+                           motionVector[0] + viewFocus[0], 
+                           motionVector[0] + viewFocus[0] }; 
+    
     camera->GetPosition(viewPoint);
-    camera->SetFocalPoint(motionVector[0] + viewFocus[0],
-                          motionVector[1] + viewFocus[1],
-                          motionVector[2] + viewFocus[2]);
+    double newPos[3] = { motionVector[0] + viewFocus[0],
+                         motionVector[1] + viewFocus[1],
+                         motionVector[2] + viewFocus[2] };
 
-    camera->SetPosition(motionVector[0] + viewPoint[0],
-                        motionVector[1] + viewPoint[1],
-                        motionVector[2] + viewPoint[2]);
+    
+    FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
+    cmd->SetFocalPoint(newFocus);
+    cmd->SetPosition(newPos);
+    cmd->Execute();
+    delete cmd;
   
     return true;
 }

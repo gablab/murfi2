@@ -48,8 +48,13 @@ void FrMainController::Initialize(){
     
     // Initialize document
     if(m_MainDocument){
-        // TODO: Som initialization
+        // TODO: Some initialization
         m_MainDocument->SetDefaultValues();
+
+        FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+        cmd->SetIsDefault(true);
+        cmd->Execute();
+        delete cmd;
     }
 }
 
@@ -132,6 +137,5 @@ void FrMainController::SaveCurrentViewToTab(){
 
     FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
     cmd->Execute();
-
     delete cmd;
 }

@@ -10,6 +10,7 @@
 #include "FrDocumentReader.h"
 #include "FrNotify.h"
 #include "FrSliceExtractor.h"
+#include "FrTabSettingsDocObj.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -89,7 +90,12 @@ void FrView2D::UpdatePipeline(int point){
     int slice           = 0;
     int maxSliceNumber  = 0;
     bool isCleared      = false;
+
+    vtkCamera* cam = 0L;    
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
+    ViewSettings& settings = document->GetCurrentTabSettings()->GetSliceViewSettings();
+    CameraSettings& camSettings = settings.CamSettings;
+
 	char text[20] = "";
 	char tmp[5];
 
@@ -165,10 +171,15 @@ void FrView2D::UpdatePipeline(int point){
     case FRP_SETCAM:
         {
             // TODO: Setup camera here 
-            m_renderer->ResetCamera();
-			m_renderer->GetActiveCamera()->ParallelProjectionOn();
-			m_renderer->GetActiveCamera()->SetParallelScale(200);
+            cam = m_renderer->GetActiveCamera();
+            
+            cam->ParallelProjectionOn();
+            cam->SetParallelScale(camSettings.Scale);
+            cam->SetFocalPoint(camSettings.FocalPoint);
+            cam->SetPosition(camSettings.Position);
+            cam->SetViewUp(camSettings.ViewUp);
 		
+            // Do we need this?
 			m_renderer->Render();
         }
     default:

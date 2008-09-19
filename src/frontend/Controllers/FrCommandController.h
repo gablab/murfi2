@@ -10,7 +10,9 @@ class FrMainController;
 // include all commands header files
 #include "FrBaseCmd.h"
 #include "FrMultiCmd.h"
+#include "FrChangeCamCmd.h"
 #include "FrSaveTabSettingsCmd.h"
+
 
 // This class allow user to create 
 // and manage commands. Organised like singletone;

@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/Commands;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -848,6 +848,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrBaseCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrChangeCamCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrChangeCamCmd.h"
 				>
 			</File>
 			<File

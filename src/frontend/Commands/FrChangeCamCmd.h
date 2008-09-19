@@ -11,6 +11,15 @@ public:
     // Constructor/destructor
     FrChangeCamCmd();
     
+    // Modifiers
+    void SetFocalPoint(double* value);
+    void SetPosition(double* value);
+    void SetViewUp(double* value);
+    void SetScale(double value);
+
+    //
+    // Overrides
+    //
 	virtual bool Execute();
 
     // Undo/redo section
@@ -19,10 +28,20 @@ public:
 	virtual bool Redo();
 
 private:
+    void SetupCameraSettings(void* settings);
+
+private:
     bool m_isPosition;
+    double m_Position[3];
+
     bool m_isFocalPoint;
+    double m_FocalPoint[3];
+
     bool m_isViewUp;
+    double m_ViewUp[3];
+
     bool m_isScale;
+    double m_Scale;
 };
 
 #endif // FR_CHANGECAM_CMD

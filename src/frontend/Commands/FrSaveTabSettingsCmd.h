@@ -23,6 +23,9 @@ public:
 	virtual bool Undo();
 	virtual bool Redo();
 
+    // Properties
+    FrSetPropMacro(bool, IsDefault);
+
 private:
     void InitializeDocumentObj(FrTabSettingsDocObj* docObj, FrMainWindow* mv);
     void InitCamSettings(void* settings, vtkCamera* cam);

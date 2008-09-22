@@ -43,14 +43,14 @@ void FrMainWindow::InitializeWidgets(){
     m_MosaicView = new FrMosaicView(this);
     m_OrthoView = new FrOrthoView(this);;
     
-    m_bookmarkWidget = new FrBookmarkWidget(groupBox);
-	m_bookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    m_BookmarkWidget = new FrBookmarkWidget(groupBox);
+	m_BookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
             
     QHBoxLayout *groupBoxLayout = new QHBoxLayout(groupBox);
 	groupBoxLayout->setContentsMargins(0, 0, 0, 0);
 	groupBoxLayout->setSpacing(0);
     groupBoxLayout->addWidget(m_qtView);
-    groupBoxLayout->addWidget(m_bookmarkWidget);
+    groupBoxLayout->addWidget(m_BookmarkWidget);
 
     m_toolsPanel = new FrToolsPanel(this);
 	m_toolsPanel->setFixedWidth(m_toolsPanel->width());
@@ -110,7 +110,7 @@ void FrMainWindow::InitializeSignals(){
 	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
 	// actions of Bookmark Widget
-	connect(m_bookmarkWidget, SIGNAL(currentChanged(int)), this, SLOT(bookmarkChanged(int)));
+	connect(m_BookmarkWidget, SIGNAL(currentChanged(int)), this, SLOT(bookmarkChanged(int)));
 }
 
 void FrMainWindow::Initialize(){

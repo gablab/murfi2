@@ -9,6 +9,7 @@ class QToolButton;
 class QVBoxLayout;
 
 class FrBookmark;
+class FrTabSettingsDocObj;
 
 #include "Qt/QWidget.h"
 #include <vector>
@@ -21,11 +22,13 @@ class FrBookmarkWidget: public QWidget
 public:
 	FrBookmarkWidget(QWidget *parent = 0);
 
+    bool AddBookmark(FrTabSettingsDocObj* ts);
+    bool RemoveBookmark(FrTabSettingsDocObj* ts);
+
 public slots:
     // Add slots here
-    void AddBookmark(QString& tabName, QString& tabDescription);
-	void BookmarkClicked(FrBookmark &bookmark);
     void OnCloseButtonClicked();
+    void OnCurrentChanged(QWidget* page);
 
 signals:
     void DeleteTab(int tabID);

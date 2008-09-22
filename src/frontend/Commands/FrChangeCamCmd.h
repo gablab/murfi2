@@ -13,8 +13,14 @@ public:
     
     // Modifiers
     void SetFocalPoint(double* value);
+    void SetFocalPoint(double x, double y, double z);
+
     void SetPosition(double* value);
+    void SetPosition(double x, double y, double z);
+
     void SetViewUp(double* value);
+    void SetViewUp(double x, double y, double z);
+
     void SetScale(double value);
 
     //

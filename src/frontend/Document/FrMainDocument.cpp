@@ -24,16 +24,17 @@ void FrMainDocument::SetDefaultValues(){
 }
 
 FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
-    typedef std::vector<FrDocumentObj*> TSVector;
-    TSVector tabSettings;
-    GetObjectsByType(tabSettings, FrDocumentObj::TabSettings);
-    
+    std::vector<FrDocumentObj*>& objects = this->GetObjects();
+        
     FrTabSettingsDocObj* result = 0L;
-    if(tabSettings.size() > 0){
+    if(objects.size() > 0){
 
-        TSVector::iterator it, itEnd(tabSettings.end());
-        for(it = tabSettings.begin(); it != itEnd; ++it){
-
+        std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+        for(it = objects.begin(); it != itEnd; ++it){
+            // Check for type 
+            if((*it)->GetType() != FrDocumentObj::TabSettings) continue;
+            
+            // returns first current
             FrTabSettingsDocObj* ts = (FrTabSettingsDocObj*)(*it);
             if(ts->GetIsCurrent()){
                 result = ts;

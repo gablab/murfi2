@@ -1,5 +1,7 @@
 #include "FrBookmarkWidget.h"
 #include "FrBookmark.h"
+#include "FrTabSettingsDocObj.h"
+#include "FrCommandController.h"
 
 #include "Qt/QToolButton.h"
 #include "Qt/QTabWidget.h"
@@ -19,6 +21,8 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent)
     m_tabWidget->setTabPosition(QTabWidget::East);
 	m_tabWidget->setTabShape(QTabWidget::Rounded);
 	m_tabWidget->setMaximumWidth(50);
+    connect( m_tabWidget, SIGNAL(currentChanged(QWidget*)), 
+             this, SLOT(OnCurrentChanged(QWidget*)) );
 	
     m_btnCloseTab = new QToolButton(this);
     m_btnCloseTab->setText(trUtf8("x"));
@@ -31,27 +35,27 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent)
     m_layout->addWidget(m_tabWidget);
     m_layout->addWidget(m_btnCloseTab);
     this->setLayout(m_layout);
-
-	m_bookmarks.clear();
-
-    m_defaultTab = new FrBookmark(this);    
-    m_bookmarks.push_back(m_defaultTab);
-	m_tabWidget->addTab(m_defaultTab, "Default");
 }
 
-void FrBookmarkWidget::AddBookmark(QString& tabName, QString& tabDescription){
-
+bool FrBookmarkWidget::AddBookmark(FrTabSettingsDocObj* ts){
     FrBookmark* bookmark = new FrBookmark(this);
-    bookmark->SetName(tabName);
-    bookmark->SetDescription(tabDescription);
-	m_bookmarks.push_back(bookmark);
-        
-    int idx = m_tabWidget->addTab(bookmark, bookmark->GetName());
-    //m_tabWidget->setToolTip(idx, bookmark->GetDescription());
+    bookmark->SetIsDefault(ts->GetIsDefault());
+    ts->SetID(bookmark->GetID());
+    
+    m_tabWidget->addTab(bookmark, ts->GetName());
+    // TODO: find the way how to setup tooltips
+    //int idx = m_tabWidget->addTab(bookmark, ts->GetName());
+    //m_tabWidget->setToolTip(idx, ts->GetDescription());
+
+    if(ts->GetIsCurrent()){
+        m_tabWidget->setCurrentWidget(bookmark);
+    }
+    return true;
 }
 
-void FrBookmarkWidget::BookmarkClicked(FrBookmark &bookmark){
-	QMessageBox::information(this, "Info", "bookmark clicked");
+bool FrBookmarkWidget::RemoveBookmark(FrTabSettingsDocObj* ts){
+
+    return true;    
 }
 
 void FrBookmarkWidget::OnCloseButtonClicked(){
@@ -76,5 +80,18 @@ void FrBookmarkWidget::OnCloseButtonClicked(){
         else{
             QMessageBox::information(this, "Information", "Can't close default tab...");
         }
+    }
+}
+
+void FrBookmarkWidget::OnCurrentChanged(QWidget* page){
+    // TODO: pass signal to document to keep track about current page
+    FrBookmark* currentTab = dynamic_cast<FrBookmark*>(page);
+    if(currentTab){
+        FrUpdateTabsCmd* cmd = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
+        cmd->SetAction(FrUpdateTabsCmd::UpdateCurrent);
+        cmd->SetTabSettingsDocObj(0L);
+        cmd->SetTabID( currentTab->GetID() );
+        cmd->Execute();
+        delete cmd;
     }
 }

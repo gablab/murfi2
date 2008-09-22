@@ -25,6 +25,7 @@ public:
 
     // Properties
     FrSetPropMacro(bool, IsDefault);
+    FrSetPropMacro(bool, IsCurrent);
 
 private:
     void InitializeDocumentObj(FrTabSettingsDocObj* docObj, FrMainWindow* mv);

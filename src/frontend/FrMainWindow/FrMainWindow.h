@@ -33,13 +33,13 @@ public:
     void Initialize();
 
     // Properties
-    FrGetPropMacro(FrBaseView*, CurrentView);
-    FrGetPropMacro(FrView2D*, SliceView);
+    FrGetPropMacro(FrBaseView*,   CurrentView);
+    FrGetPropMacro(FrView2D*,     SliceView);
     FrGetPropMacro(FrMosaicView*, MosaicView);
     FrGetPropMacro(FrOrthoView*,  OrthoView);
 
     // GUI elements
-    FrGetPropMacro(FrBookmarkWidget*,  BookmarkWidget);
+    FrGetPropMacro(FrBookmarkWidget*, BookmarkWidget);
 
 public slots:
 	void brightnessValueChanged();
@@ -71,7 +71,6 @@ public:
 
 	FrToolsPanel*   m_toolsPanel;
 	FrLowPanel*     m_lowPanel;
-	FrBookmarkWidget* m_bookmarkWidget;
 };
 
 #endif

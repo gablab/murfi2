@@ -6,7 +6,7 @@
 class QLabel;
 class QLineEdit;
 class QPushButton;
-class QVboxLayout;
+class QVBoxLayout;
 class QHBoxLayout;
 
 
@@ -20,7 +20,6 @@ public:
     FrTabInfoDialog(QWidget* parent = 0L, bool isModal = true);
 
     void SetCaption(QString& caption);
-    void SetInfo(QString& value);
 
     QString GetName();
     void SetName(QString& value);
@@ -31,11 +30,12 @@ public:
     bool SimpleExec();
     
 private:
-    QVboxLayout* m_vLayout;
-    QHBoxLayout* m_hLayout;
+    QVBoxLayout* m_vLayout;
+    QHBoxLayout* m_btnLayout;
 
-    QLabel* m_lblInfo;
+    QLabel* m_lblName;
     QLineEdit* m_txtName;
+    QLabel* m_lblDescription;
     QLineEdit* m_txtDescription;
 
     QPushButton* m_btnOk;

@@ -18,6 +18,13 @@ void FrChangeCamCmd::SetFocalPoint(double* value){
     m_isFocalPoint = true;
 }
 
+void FrChangeCamCmd::SetFocalPoint(double x, double y, double z){
+    m_FocalPoint[0] = x;
+    m_FocalPoint[1] = y;
+    m_FocalPoint[2] = z;
+    m_isFocalPoint = true;
+}
+
 void FrChangeCamCmd::SetPosition(double* value){
     m_Position[0] = value[0];
     m_Position[1] = value[1];
@@ -25,10 +32,24 @@ void FrChangeCamCmd::SetPosition(double* value){
     m_isPosition = true;
 }
 
+void FrChangeCamCmd::SetPosition(double x, double y, double z){
+    m_Position[0] = x;
+    m_Position[1] = y;
+    m_Position[2] = z;
+    m_isPosition = true;
+}
+
 void FrChangeCamCmd::SetViewUp(double* value){
     m_ViewUp[0] = value[0];
     m_ViewUp[1] = value[1];
     m_ViewUp[2] = value[2];
+    m_isViewUp = true;
+}
+
+void FrChangeCamCmd::SetViewUp(double x, double y, double z){
+    m_ViewUp[0] = x;
+    m_ViewUp[1] = y;
+    m_ViewUp[2] = z;
     m_isViewUp = true;
 }
 

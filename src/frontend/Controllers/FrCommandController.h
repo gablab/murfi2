@@ -12,6 +12,7 @@ class FrMainController;
 #include "FrMultiCmd.h"
 #include "FrChangeCamCmd.h"
 #include "FrSaveTabSettingsCmd.h"
+#include "FrUpdateTabsCmd.h"
 
 
 // This class allow user to create 

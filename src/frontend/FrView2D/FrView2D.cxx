@@ -172,15 +172,12 @@ void FrView2D::UpdatePipeline(int point){
         {
             // TODO: Setup camera here 
             cam = m_renderer->GetActiveCamera();
-            
             cam->ParallelProjectionOn();
             cam->SetParallelScale(camSettings.Scale);
             cam->SetFocalPoint(camSettings.FocalPoint);
-            cam->SetPosition(camSettings.Position);
             cam->SetViewUp(camSettings.ViewUp);
-		
-            // Do we need this?
-			m_renderer->Render();
+
+            cam->SetPosition(camSettings.Position);
         }
     default:
         // do nothing

@@ -16,29 +16,39 @@
 #include "Qt/QString.h"
 
 FrSaveTabSettingsCmd::FrSaveTabSettingsCmd()
-: m_IsDefault(false) {
+: m_IsDefault(false), m_IsCurrent(false) {
 }
 
 bool FrSaveTabSettingsCmd::Execute(){
     // Check for safety
     if(!this->GetMainController()) return false;
 
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrMainWindow* mv = this->GetMainController()->GetMainView();
+
     FrTabInfoDialog dlg(mv, true);
     dlg.SetCaption(QString("Save view to tab"));
-    dlg.SetInfo(QString("Enter name and short description of tab"));
 
     bool result = false;
-    if(dlg.SimpleExec()){
-        // Create doc object
-        FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj(m_IsDefault);
+    if(!m_IsDefault && dlg.SimpleExec()){
+        // Create doc object & set params
+        FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj();
+        docObj->SetIsCurrent(false);
         docObj->SetName(dlg.GetName());
-        docObj->SetDescription(dlg.GetDescription());
-
+        docObj->SetDescription(dlg.GetDescription());        
         InitializeDocumentObj(docObj, mv);
 
         // add to main document
-        FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+        result = doc->Add(docObj);
+    }
+    else if(m_IsDefault){
+        // Create default doc object and set params
+        FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj(true);
+        docObj->SetIsCurrent(false);
+        docObj->SetName(QString("Deafult"));
+        docObj->SetDescription(QString("Default tab"));
+        
+        // add to main document
         result = doc->Add(docObj);
     }
     return result;
@@ -46,7 +56,7 @@ bool FrSaveTabSettingsCmd::Execute(){
 
 void FrSaveTabSettingsCmd::InitializeDocumentObj(FrTabSettingsDocObj* docObj, 
                                                  FrMainWindow* mv){
-    
+    // Init slice view settings
     FrView2D* sliceView = mv->GetSliceView();
     ViewSettings& svSettings = docObj->GetSliceViewSettings();
     svSettings.SliceNumber = sliceView->GetSliceExtractor()->GetSlice();
@@ -55,6 +65,7 @@ void FrSaveTabSettingsCmd::InitializeDocumentObj(FrTabSettingsDocObj* docObj,
     InitTBCSettings(&svSettings.TbcSetting, 
                     sliceView->GetTBCFilter());
 
+    // Init mosaic view settings
     FrMosaicView* mosaicView = mv->GetMosaicView();
     ViewSettings& mvSettings = docObj->GetMosaicViewSettings();
     InitCamSettings(&mvSettings.CamSettings, 
@@ -62,7 +73,7 @@ void FrSaveTabSettingsCmd::InitializeDocumentObj(FrTabSettingsDocObj* docObj,
     InitTBCSettings(&mvSettings.TbcSetting, 
                     mosaicView->GetTBCFilter());
 
-    // Do nothing here (with ORTHO VIEW)
+    // Do nothing here (with ORTHO VIEW) for a while
     // ViewSettings& ovSettings = docObj->GetOrthoViewSettings();    
 }
 

@@ -18,13 +18,11 @@ public:
     void DeleteAll();
 
     // To be overloaded
-    virtual void SetDefaultValues();
     void GetObjectsByType(std::vector<FrDocumentObj*>& objects, 
                           FrDocumentObj::ObjType type);
 
-private:
-    // Objects in document
-    std::vector< FrDocumentObj* > m_objects;
+    // Properties
+    FrGetRefPropMacro(std::vector< FrDocumentObj* >, Objects);
 };
 
 #endif

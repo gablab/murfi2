@@ -9,48 +9,37 @@
 
 
 FrTabInfoDialog::FrTabInfoDialog(QWidget* parent, bool isModal)
-: QDialog(parent){
-    
+: QDialog(parent){    
     this->setModal(isModal);
-    // this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    
+    this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+        
+    // create lables and text edits
+    m_lblName = new QLabel(tr("Tab Name:"), this);
+    m_txtName = new QLineEdit(tr(""), this);
+    m_lblDescription = new QLabel(tr("Tab Description:"), this); 
+    m_txtDescription = new QLineEdit(tr(""), this);
+
+    m_vLayout = new QVBoxLayout(this);
+    m_vLayout->addWidget(m_lblName);
+    m_vLayout->addWidget(m_txtName);
+    m_vLayout->addWidget(m_lblDescription);
+    m_vLayout->addWidget(m_txtDescription);
+
+    // create buttons
     m_btnOk = new QPushButton(tr("OK"), this);
     m_btnCancel = new QPushButton(tr("Cancel"), this);
     connect( m_btnOk, SIGNAL( clicked() ), this, SLOT( accept() ) );
     connect( m_btnCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
-    QHBoxLayout* m_hLayout = new QHBoxLayout(this);
-    m_hLayout->addStretch();    
-    m_hLayout->addWidget(m_btnOk);
-    m_hLayout->addWidget(m_btnCancel);
-
-    m_lblInfo = new QLabel(this);
-    m_lblInfo->setText("Some information");
-
-    m_txtName = new QLineEdit(this);
-    m_txtDescription = new QLineEdit(this);
-
-    QVBoxLayout* m_vLayout = new QVBoxLayout(this);
-    m_vLayout->addSpacing(6);
-    m_vLayout->addWidget(m_lblInfo);
-    m_vLayout->addSpacing(6);
-    m_vLayout->addWidget(m_txtName);
-    m_vLayout->addSpacing(6);
-    m_vLayout->addWidget(m_txtDescription);
-    m_vLayout->addSpacing(6);
-    m_vLayout->addLayout(m_hLayout, Qt::AlignRight);
-    
-    //QSize sh = sizeHint().expandedTo( QSize(300, 10) );
-    //resize( sh.width(), m_vLayout->heightForWidth(sh.width()) );
-
+    m_btnLayout = new QHBoxLayout();
+    m_btnLayout->addStretch();    
+    m_btnLayout->addWidget(m_btnOk);
+    m_btnLayout->addWidget(m_btnCancel);
+    m_vLayout->addLayout(m_btnLayout);
 }
 
 void FrTabInfoDialog::SetCaption(QString& caption){
     this->setWindowTitle(caption);
-}
-
-void FrTabInfoDialog::SetInfo(QString& value){
-    m_lblInfo->setText(value);
 }
 
 QString FrTabInfoDialog::GetName(){

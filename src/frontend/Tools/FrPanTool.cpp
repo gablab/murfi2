@@ -44,6 +44,7 @@ bool FrPanTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     // Do pan here    
+    // Do pan here    
     double viewFocus[4], viewPoint[3], focalDepth;
     double newPickPoint[4], oldPickPoint[4], motionVector[3];
     
@@ -69,19 +70,16 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     motionVector[2] = oldPickPoint[2] - newPickPoint[2];
     
     camera->GetFocalPoint(viewFocus);
-    double newFocus[3] = { motionVector[0] + viewFocus[0], 
-                           motionVector[0] + viewFocus[0], 
-                           motionVector[0] + viewFocus[0] }; 
-    
     camera->GetPosition(viewPoint);
-    double newPos[3] = { motionVector[0] + viewFocus[0],
-                         motionVector[1] + viewFocus[1],
-                         motionVector[2] + viewFocus[2] };
-
     
     FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
-    cmd->SetFocalPoint(newFocus);
-    cmd->SetPosition(newPos);
+    cmd->SetPosition(motionVector[0] + viewPoint[0],
+                     motionVector[1] + viewPoint[1],
+                     motionVector[2] + viewPoint[2]);
+
+    cmd->SetFocalPoint( motionVector[0] + viewFocus[0],
+                        motionVector[1] + viewFocus[1],
+                        motionVector[2] + viewFocus[2] );
     cmd->Execute();
     delete cmd;
   

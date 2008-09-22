@@ -10,7 +10,7 @@ class FrTabSettingsDocObj;
 class FrUpdateTabsCmd : public FrBaseCmd
 {
 public:
-    enum CmdType { None, Add, Remove, Update, UpdateCurrent };
+    enum CmdType { None, Add, Remove, Update, SetCurrentTab };
 
 public:
     // Constructor/destructor
@@ -30,7 +30,7 @@ public:
 	bool Redo();
 
 private:
-    bool UpdateDocument();
+    bool SetupTab();
     bool UpdateView();
 };
 

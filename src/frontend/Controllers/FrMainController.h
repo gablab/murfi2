@@ -35,6 +35,7 @@ public:
 	void UpdateTCB();
     
     void SaveCurrentViewToTab();
+    void ChangeView(int view);
 
 	// Override from base class
     virtual void Notify(int notifyCode);

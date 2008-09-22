@@ -139,3 +139,20 @@ void FrMainController::SaveCurrentViewToTab(){
     cmd->Execute();
     delete cmd;
 }
+
+void FrMainController::ChangeView(int view){
+    FrChangeViewCmd::View targetView = FrChangeViewCmd::Unknown;
+    switch(view){
+    case 0: view = FrChangeViewCmd::Slice;
+        break;
+    case 1: view = FrChangeViewCmd::Mosaic;
+        break;
+    case 2: view = FrChangeViewCmd::Ortho;
+        break;
+    }
+
+    FrChangeViewCmd* cmd = FrCommandController::CreateCmd<FrChangeViewCmd>();
+    cmd->SetTargetView(targetView);
+    cmd->Execute();
+    delete cmd;    
+}

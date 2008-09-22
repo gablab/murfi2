@@ -176,58 +176,36 @@ void FrMainWindow::tool3Triggered(){
 }
 
 void FrMainWindow::mode1Clicked(){
-	
-    if(m_CurrentView != m_SliceView){
-        m_CurrentView->RemoveRenderers();
-        m_CurrentView = m_SliceView;
-        m_CurrentView->SetupRenderers();
-        m_CurrentView->UpdatePipeline(0);
-    }
+	this->GetMainController()->ChangeView(0);    
 }
 
 void FrMainWindow::mode2Clicked(){
-	
-    if(m_CurrentView != m_MosaicView){
-        m_CurrentView->RemoveRenderers();
-        m_CurrentView = m_MosaicView;
-        m_CurrentView->SetupRenderers();
-        m_CurrentView->UpdatePipeline(0);
-    }
+    this->GetMainController()->ChangeView(1);    
 }
 
 void FrMainWindow::mode3Clicked(){
-	
-    if(m_CurrentView != m_OrthoView){
-        m_CurrentView->RemoveRenderers();
-        m_CurrentView = m_OrthoView;
-        m_CurrentView->SetupRenderers();
-        m_CurrentView->UpdatePipeline(0);
-    }
+    this->GetMainController()->ChangeView(2);
 }
 
 void FrMainWindow::tabChanged(int index){
 	// disable some tools at toolbar
 	switch (index)
 	{
-			case 0:		// 2D image view
-				this->actionTool1->setDisabled(false);
-				this->actionTool2->setDisabled(false);
-				this->actionTool3->setDisabled(false);
-				break;
+		case 0:		// 2D image view
+			this->actionTool1->setDisabled(false);
+			this->actionTool2->setDisabled(false);
+			this->actionTool3->setDisabled(false);
+			break;
 
-			case 1:		// Graphics/calculations view
-				this->actionTool1->setDisabled(true);
-				this->actionTool2->setDisabled(true);
-				this->actionTool3->setDisabled(true);
-				break;
+		case 1:		// Graphics/calculations view
+			this->actionTool1->setDisabled(true);
+			this->actionTool2->setDisabled(true);
+			this->actionTool3->setDisabled(true);
+			break;
 	}
 }
 
 // this slot indicates to what tab user switched
-void FrMainWindow::bookmarkChanged(int index){
-	
-}
-
 void FrMainWindow::saveToTab(){
     this->GetMainController()->SaveCurrentViewToTab();
 }

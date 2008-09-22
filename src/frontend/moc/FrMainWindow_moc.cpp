@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrMainWindow.h'
 **
-** Created: Mon 22. Sep 12:26:29 2008
+** Created: Mon 22. Sep 20:03:12 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_FrMainWindow[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   10, // methods
+      12,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -38,9 +38,8 @@ static const uint qt_meta_data_FrMainWindow[] = {
      152,   13,   13,   13, 0x0a,
      167,   13,   13,   13, 0x0a,
      188,  182,   13,   13, 0x0a,
-     204,  182,   13,   13, 0x0a,
-     225,   13,   13,   13, 0x0a,
-     237,   13,   13,   13, 0x0a,
+     204,   13,   13,   13, 0x0a,
+     216,   13,   13,   13, 0x0a,
 
        0        // eod
 };
@@ -51,8 +50,7 @@ static const char qt_meta_stringdata_FrMainWindow[] = {
     "tool1Triggered()\0tool2Triggered()\0"
     "tool3Triggered()\0mode1Clicked()\0"
     "mode2Clicked()\0mode3Clicked()\0index\0"
-    "tabChanged(int)\0bookmarkChanged(int)\0"
-    "saveToTab()\0openImage()\0"
+    "tabChanged(int)\0saveToTab()\0openImage()\0"
 };
 
 const QMetaObject FrMainWindow::staticMetaObject = {
@@ -92,11 +90,10 @@ int FrMainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 7: mode2Clicked(); break;
         case 8: mode3Clicked(); break;
         case 9: tabChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 10: bookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 11: saveToTab(); break;
-        case 12: openImage(); break;
+        case 10: saveToTab(); break;
+        case 11: openImage(); break;
         }
-        _id -= 13;
+        _id -= 12;
     }
     return _id;
 }

@@ -33,7 +33,7 @@ public:
     void Initialize();
 
     // Properties
-    FrGetPropMacro(FrBaseView*,   CurrentView);
+    FrPropMacro(FrBaseView*,      CurrentView);
     FrGetPropMacro(FrView2D*,     SliceView);
     FrGetPropMacro(FrMosaicView*, MosaicView);
     FrGetPropMacro(FrOrthoView*,  OrthoView);
@@ -53,7 +53,6 @@ public slots:
 	void mode2Clicked();
 	void mode3Clicked();
 	void tabChanged(int index);
-	void bookmarkChanged(int index);
 	void saveToTab();
     void openImage();
 

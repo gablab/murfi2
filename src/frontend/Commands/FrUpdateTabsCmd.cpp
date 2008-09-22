@@ -18,8 +18,8 @@ bool FrUpdateTabsCmd::Execute(){
     if(!this->GetMainController() || m_Action == FrUpdateTabsCmd::None) return false;
 
     bool result = false;
-    if(m_Action == FrUpdateTabsCmd::UpdateCurrent){
-        result = this->UpdateDocument();
+    if(m_Action == FrUpdateTabsCmd::SetCurrentTab){
+        result = this->SetupTab();
     }
     else {
         result = this->UpdateView();
@@ -27,7 +27,7 @@ bool FrUpdateTabsCmd::Execute(){
     return result;
 }
 
-bool FrUpdateTabsCmd::UpdateDocument(){
+bool FrUpdateTabsCmd::SetupTab(){
     // check params
     if(m_TabID == BAD_TAB_ID) return false;
 

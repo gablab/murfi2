@@ -6,7 +6,7 @@
 
 // This command support manipulation with several commands
 // as if they were a single command.
-class FrMultiCmd : FrBaseCmd
+class FrMultiCmd : public FrBaseCmd
 {
 public:
     // Constructor/destructor

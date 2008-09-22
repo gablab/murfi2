@@ -72,7 +72,7 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     camera->GetFocalPoint(viewFocus);
     camera->GetPosition(viewPoint);
     
-    FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
+    FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();    
     cmd->SetPosition(motionVector[0] + viewPoint[0],
                      motionVector[1] + viewPoint[1],
                      motionVector[2] + viewPoint[2]);

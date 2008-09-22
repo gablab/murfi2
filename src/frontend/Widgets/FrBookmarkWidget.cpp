@@ -87,11 +87,19 @@ void FrBookmarkWidget::OnCurrentChanged(QWidget* page){
     // TODO: pass signal to document to keep track about current page
     FrBookmark* currentTab = dynamic_cast<FrBookmark*>(page);
     if(currentTab){
-        FrUpdateTabsCmd* cmd = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
-        cmd->SetAction(FrUpdateTabsCmd::UpdateCurrent);
-        cmd->SetTabSettingsDocObj(0L);
-        cmd->SetTabID( currentTab->GetID() );
+        FrUpdateTabsCmd* cmd1 = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
+        cmd1->SetAction(FrUpdateTabsCmd::SetCurrentTab);
+        cmd1->SetTabSettingsDocObj(0L);
+        cmd1->SetTabID( currentTab->GetID() );
+
+        FrUpdatePipelineCmd* cmd2 = FrCommandController::CreateCmd<FrUpdatePipelineCmd>();
+        cmd2->SetPipelinePoint(FRP_SETCAM);
+        
+        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        cmd->AddCommand(cmd1);
+        cmd->AddCommand(cmd2);
         cmd->Execute();
+
         delete cmd;
     }
 }

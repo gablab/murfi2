@@ -859,6 +859,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrChangeViewCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrChangeViewCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrMultiCmd.cpp"
 				>
 			</File>
@@ -872,6 +880,22 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrSaveTabSettingsCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrUpdatePipelineCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrUpdatePipelineCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrUpdateTabsCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrUpdateTabsCmd.h"
 				>
 			</File>
 		</Filter>

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrBookmark.h'
 **
-** Created: Mon 22. Sep 15:32:52 2008
+** Created: Tue 23. Sep 20:14:11 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -37,6 +37,9 @@ public:
     void SaveCurrentViewToTab();
     void ChangeView(int view);
 
+    void ChangeBookmark(int id);
+    void DeleteBookmark(int id);
+
 	// Override from base class
     virtual void Notify(int notifyCode);
 

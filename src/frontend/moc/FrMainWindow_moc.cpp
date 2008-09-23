@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrMainWindow.h'
 **
-** Created: Tue 23. Sep 16:10:43 2008
+** Created: Tue 23. Sep 20:56:42 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_FrMainWindow[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   10, // methods
+      13,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -37,9 +37,10 @@ static const uint qt_meta_data_FrMainWindow[] = {
      137,   13,   13,   13, 0x0a,
      152,   13,   13,   13, 0x0a,
      167,   13,   13,   13, 0x0a,
-     188,  182,   13,   13, 0x0a,
-     204,   13,   13,   13, 0x0a,
-     216,   13,   13,   13, 0x0a,
+     182,   13,   13,   13, 0x0a,
+     194,   13,   13,   13, 0x0a,
+     209,  206,   13,   13, 0x0a,
+     232,  206,   13,   13, 0x0a,
 
        0        // eod
 };
@@ -49,8 +50,9 @@ static const char qt_meta_stringdata_FrMainWindow[] = {
     "contrastValueChanged()\0thresholdValueChanged()\0"
     "tool1Triggered()\0tool2Triggered()\0"
     "tool3Triggered()\0mode1Clicked()\0"
-    "mode2Clicked()\0mode3Clicked()\0index\0"
-    "tabChanged(int)\0saveToTab()\0openImage()\0"
+    "mode2Clicked()\0mode3Clicked()\0saveToTab()\0"
+    "openImage()\0id\0OnBookmarkChanged(int)\0"
+    "OnBookmarkDelete(int)\0"
 };
 
 const QMetaObject FrMainWindow::staticMetaObject = {
@@ -89,11 +91,12 @@ int FrMainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 6: mode1Clicked(); break;
         case 7: mode2Clicked(); break;
         case 8: mode3Clicked(); break;
-        case 9: tabChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 10: saveToTab(); break;
-        case 11: openImage(); break;
+        case 9: saveToTab(); break;
+        case 10: openImage(); break;
+        case 11: OnBookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 12: OnBookmarkDelete((*reinterpret_cast< int(*)>(_a[1]))); break;
         }
-        _id -= 12;
+        _id -= 13;
     }
     return _id;
 }

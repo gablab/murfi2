@@ -49,12 +49,16 @@ public slots:
 	void tool1Triggered();
 	void tool2Triggered();
 	void tool3Triggered();
+
 	void mode1Clicked();
 	void mode2Clicked();
-	void mode3Clicked();
-	void tabChanged(int index);
+	void mode3Clicked();	
+
 	void saveToTab();
     void openImage();
+
+    void OnBookmarkChanged(int id);
+    void OnBookmarkDelete(int id);
 
 signals:
 

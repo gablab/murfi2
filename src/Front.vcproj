@@ -873,6 +873,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrDeleteTabSettingsCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrDeleteTabSettingsCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrMultiCmd.cpp"
 				>
 			</File>

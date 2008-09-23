@@ -104,7 +104,8 @@ void FrMainWindow::InitializeSignals(){
 	connect(m_lowPanel->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdValueChanged()));
 
 	// actions of Bookmark Widget
-	connect(m_BookmarkWidget, SIGNAL(currentChanged(int)), this, SLOT(bookmarkChanged(int)));
+	connect(m_BookmarkWidget, SIGNAL(CurrentChanged(int)), this, SLOT(OnBookmarkChanged(int)));
+    connect(m_BookmarkWidget, SIGNAL(DeleteTab(int)), this, SLOT(OnBookmarkDelete(int)));
 }
 
 void FrMainWindow::Initialize(){
@@ -181,22 +182,12 @@ void FrMainWindow::mode3Clicked(){
     this->GetMainController()->ChangeView(2);
 }
 
-void FrMainWindow::tabChanged(int index){
-	// disable some tools at toolbar
-	switch (index)
-	{
-		case 0:		// 2D image view
-			this->actionTool1->setDisabled(false);
-			this->actionTool2->setDisabled(false);
-			this->actionTool3->setDisabled(false);
-			break;
+void FrMainWindow::OnBookmarkChanged(int id){
+    this->GetMainController()->ChangeBookmark(id);
+}
 
-		case 1:		// Graphics/calculations view
-			this->actionTool1->setDisabled(true);
-			this->actionTool2->setDisabled(true);
-			this->actionTool3->setDisabled(true);
-			break;
-	}
+void FrMainWindow::OnBookmarkDelete(int id){
+    this->GetMainController()->DeleteBookmark(id);
 }
 
 // this slot indicates to what tab user switched
@@ -213,7 +204,6 @@ void FrMainWindow::openImage(){
         QString("NIfTI Image (*.nii)"));
 
     if(!fileName.isNull() && !fileName.isEmpty()){
-        //fileName = "test.png";
         m_MainController->LoadImage(fileName);
     }
 }

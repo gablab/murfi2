@@ -34,4 +34,4 @@ private:
     void InitTBCSettings(void* settings, FrTBCFilter* tbcFilter);
 };
 
-#endif // AKL_COMMAND_H
+#endif // FR_SAVETABSET_CMD

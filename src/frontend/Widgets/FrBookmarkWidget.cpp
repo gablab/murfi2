@@ -1,7 +1,6 @@
 #include "FrBookmarkWidget.h"
 #include "FrBookmark.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrCommandController.h"
 
 #include "Qt/QToolButton.h"
 #include "Qt/QTabWidget.h"
@@ -55,6 +54,16 @@ bool FrBookmarkWidget::AddBookmark(FrTabSettingsDocObj* ts){
 
 bool FrBookmarkWidget::RemoveBookmark(FrTabSettingsDocObj* ts){
 
+    // delete tab from TabWidget
+    int idx = ts->GetID();
+    for(int i=0; i < m_tabWidget->count(); ++i){
+        FrBookmark* bmw = dynamic_cast<FrBookmark*>(m_tabWidget->widget(i));
+        if(bmw != 0L && idx == bmw->GetID()){
+            // TODO: find somethinig for tooltip
+            //m_tabWidget->removeToolTip(i);
+            m_tabWidget->removeTab(i);
+        }
+    }    
     return true;    
 }
 
@@ -62,24 +71,8 @@ void FrBookmarkWidget::OnCloseButtonClicked(){
     // Close currently selected tab 
     FrBookmark* currentTab = dynamic_cast<FrBookmark*>(m_tabWidget->currentWidget());
     if(currentTab){
-        if(currentTab != m_defaultTab){
-                       
-            // delete from internal list
-            std::vector<FrBookmark*>::iterator elem;
-            elem = std::find(m_bookmarks.begin(), m_bookmarks.end(), currentTab);
-            m_bookmarks.erase(elem);
-            
-            // delete tab from TabWidget
-            int idx = m_tabWidget->currentIndex();
-            //m_tabWidget->removeToolTip(idx);
-            m_tabWidget->removeTab(idx);
-
-            // inform others
-            emit DeleteTab(currentTab->GetID());
-        }
-        else{
-            QMessageBox::information(this, "Information", "Can't close default tab...");
-        }
+        // inform others
+        emit DeleteTab( currentTab->GetID() );
     }
 }
 
@@ -87,19 +80,7 @@ void FrBookmarkWidget::OnCurrentChanged(QWidget* page){
     // TODO: pass signal to document to keep track about current page
     FrBookmark* currentTab = dynamic_cast<FrBookmark*>(page);
     if(currentTab){
-        FrUpdateTabsCmd* cmd1 = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
-        cmd1->SetAction(FrUpdateTabsCmd::SetCurrentTab);
-        cmd1->SetTabSettingsDocObj(0L);
-        cmd1->SetTabID( currentTab->GetID() );
-
-        FrChangeViewCmd* cmd2 = FrCommandController::CreateCmd<FrChangeViewCmd>();
-        cmd2->SetTargetView(FrChangeViewCmd::Synchronize);
-        
-        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-        cmd->AddCommand(cmd1);
-        cmd->AddCommand(cmd2);
-        cmd->Execute();
-
-        delete cmd;
+        // inform others
+        emit CurrentChanged( currentTab->GetID() );
     }
 }

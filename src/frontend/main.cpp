@@ -5,13 +5,14 @@
 
 int main(int argc, char **argv){
 	FrApplication application(argc, argv);
-    // Create document
-    FrMainDocument document;
-    document.SetDefaultValues();
-
+    
     // Create view
 	FrMainWindow mainWindow;
 	mainWindow.showMaximized();
+    
+    // Create document
+    FrMainDocument document;
+    document.SetDefaultValues();
 
     // Create controller
     FrMainController controller(&mainWindow, &document);

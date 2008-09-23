@@ -32,6 +32,7 @@ public slots:
 
 signals:
     void DeleteTab(int tabID);
+    void CurrentChanged(int tabID);
 
 private:
     QTabWidget*         m_tabWidget;

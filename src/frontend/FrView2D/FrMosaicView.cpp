@@ -6,6 +6,7 @@
 #include "FrMainDocument.h"
 #include "FrTBCFilter.h"
 #include "FrNotify.h"
+#include "FrTabSettingsDocObj.h"
 
 #include "vtkPNGReader.h"
 #include "vtkCamera.h"
@@ -57,7 +58,12 @@ void FrMosaicView::RemoveRenderers(){
 void FrMosaicView::UpdatePipeline(int point){
 
     bool isCleared = false;
+
+    vtkCamera* cam = 0L; 
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
+    ViewSettings& settings = document->GetCurrentTabSettings()->GetMosaicViewSettings();
+    TBCSettings& tbcSettings = settings.TbcSetting;
+    CameraSettings& camSettings = settings.CamSettings;
 
     switch(point){
     case FRP_FULL:
@@ -85,31 +91,40 @@ void FrMosaicView::UpdatePipeline(int point){
     case FRP_TBC:
         {
             // Setup brightness contrast
-            m_tbcFilter->SetThreshold(document->GetThreshold());
-            m_tbcFilter->SetBrightness(document->GetBrightness());
-            m_tbcFilter->SetContrast(document->GetContrast());
+            m_tbcFilter->SetThreshold(tbcSettings.Threshold);
+            m_tbcFilter->SetBrightness(tbcSettings.Brightness);
+            m_tbcFilter->SetContrast(tbcSettings.Contrast);
+
+            // Keep data up-to-date
+            tbcSettings.Threshold  = m_tbcFilter->GetThreshold();
+            tbcSettings.Brightness = m_tbcFilter->GetBrightness();
+            tbcSettings.Contrast   = m_tbcFilter->GetContrast();
 
             if(m_tbcFilter->GetInput()){                
                 m_tbcFilter->Update();
-
                 m_actor->SetInput(m_tbcFilter->GetOutput());
+
+                // Add actor
+                if(isCleared) {
+                    m_renderer->AddActor(m_actor);
+                }
             }
+        }
+    case FRP_SETCAM:
+        {
+            // Setup camera here 
+            cam = m_renderer->GetActiveCamera();
+            cam->ParallelProjectionOn();
+            cam->SetParallelScale(camSettings.Scale);
+            cam->SetFocalPoint(camSettings.FocalPoint);
+            cam->SetViewUp(camSettings.ViewUp);
+
+            cam->SetPosition(camSettings.Position);
         }
     default:
         // do nothing
         break;
-    }    
-    
-    if(isCleared){
-        m_renderer->AddActor(m_actor);
-        double* center = m_actor->GetCenter();
-        m_actor->AddPosition(-center[0], -center[1], 0);
-		
-		m_renderer->ResetCamera();
-		m_renderer->GetActiveCamera()->ParallelProjectionOn();
-		m_renderer->GetActiveCamera()->SetParallelScale(200);
-		m_renderer->Render();
-	}
+    }  
 
     // render scene
     GetRenderWindow()->Render();

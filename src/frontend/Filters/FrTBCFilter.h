@@ -3,6 +3,7 @@
 
 // Includes
 #include "FrBaseFilter.h"
+#include "FrMacro.h"
 
 // some values
 #define MIN_THRESHOLD   0.0
@@ -27,20 +28,20 @@ public:
 
 public:
     // Get/Set threshold (in the range [0 .. 1])
-    double GetThreshold(){ return m_threshold; }
+    FrGetPropMacro(double, Threshold);
     void SetThreshold(double value);
 
     // Get/Set brightness (in the range [-1 .. 1])
-    double GetBrightness(){ return m_brightness; }
+    FrGetPropMacro(double, Brightness);
     void SetBrightness(double value);
 
     // Get/Set contrast (int the range [-1 .. 1])
-    double GetContrast(){ return m_contrast; }
+    FrGetPropMacro(double, Contrast);
     void SetContrast(double value);
 
     // Overrides of base class
     virtual void SimpleExecute(vtkImageData *inData, 
-                              vtkImageData *outData);
+                               vtkImageData *outData);
 private:
 
     // For now
@@ -48,11 +49,6 @@ private:
     // Contrast have to be in the range [-255...255]
     // Returned array have to be deleted by caller
     void InitLookupTable(unsigned char* luTable, int brightness, int contrast);
-
-private:
-    double m_threshold;
-    double m_brightness;
-    double m_contrast;
 
 private:
     FrTBCFilter(); // Do not allow using new

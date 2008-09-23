@@ -4,7 +4,8 @@
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 
-#include "FrView2D.h"
+#include "FrBaseView.h"
+#include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
 #include "FrTBCFilter.h"
@@ -56,8 +57,12 @@ bool FrSaveTabSettingsCmd::Execute(){
 
 void FrSaveTabSettingsCmd::InitializeDocumentObj(FrTabSettingsDocObj* docObj, 
                                                  FrMainWindow* mv){
+    
+    // Setup common settings
+    SetActiveViewSettings(docObj, mv);
+
     // Init slice view settings
-    FrView2D* sliceView = mv->GetSliceView();
+    FrSliceView* sliceView = mv->GetSliceView();
     ViewSettings& svSettings = docObj->GetSliceViewSettings();
     svSettings.SliceNumber = sliceView->GetSliceExtractor()->GetSlice();
     InitCamSettings(&svSettings.CamSettings, 
@@ -75,6 +80,24 @@ void FrSaveTabSettingsCmd::InitializeDocumentObj(FrTabSettingsDocObj* docObj,
 
     // Do nothing here (with ORTHO VIEW) for a while
     // ViewSettings& ovSettings = docObj->GetOrthoViewSettings();    
+}
+
+void FrSaveTabSettingsCmd::SetActiveViewSettings(FrTabSettingsDocObj* docObj, 
+                                                 FrMainWindow* mv){
+    ActiveView::View activeView = ActiveView::Unknown;
+    
+    FrBaseView* currentView = mv->GetCurrentView();
+    if(currentView == mv->GetSliceView()){
+        activeView = ActiveView::Slice; 
+    }
+    else if(currentView == mv->GetMosaicView()){
+        activeView = ActiveView::Mosaic;
+    }
+    else if(currentView == mv->GetOrthoView()){
+        activeView = ActiveView::Ortho;
+    }
+
+    docObj->SetActiveView(activeView);
 }
 
 void FrSaveTabSettingsCmd::InitCamSettings(void* settings, vtkCamera* cam){

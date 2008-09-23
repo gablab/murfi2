@@ -15,6 +15,8 @@ class FrMainController;
 #include "FrUpdateTabsCmd.h"
 #include "FrUpdatePipelineCmd.h"
 #include "FrChangeViewCmd.h"
+#include "FrChangeTbcCmd.h"
+#include "FrChangeSliceCmd.h"
 
 // This class allow user to create 
 // and manage commands. Organised like singletone;

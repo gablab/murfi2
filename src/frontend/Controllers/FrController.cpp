@@ -1,15 +1,5 @@
 #include "FrMainController.h"
-#include "FrMainWindow.h"
-#include "FrMainDocument.h"
-#include "FrToolController.h"
-#include "FrInteractorStyle.h"
-#include "FrView2D.h"
-#include "FrPanTool.h"
-#include "FrZoomTool.h"
-#include "FrSliceScrollTool.h"
-#include "FrImageDocObj.h"
 
-#include "vtkRenderWindowInteractor.h"
 
 // Implementation of FrMainController
 FrController::FrController(FrController* controller)

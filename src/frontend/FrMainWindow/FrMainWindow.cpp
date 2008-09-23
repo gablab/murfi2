@@ -1,7 +1,7 @@
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 #include "FrMainController.h"
-#include "FrView2D.h"
+#include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
 #include "FrToolsPanel.h"
@@ -39,9 +39,9 @@ void FrMainWindow::InitializeWidgets(){
     m_qtView = new QVTKWidget(groupBox);
     m_qtView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_SliceView = new FrView2D(this);
+    m_SliceView  = new FrSliceView(this);
     m_MosaicView = new FrMosaicView(this);
-    m_OrthoView = new FrOrthoView(this);;
+    m_OrthoView  = new FrOrthoView(this);;
     
     m_BookmarkWidget = new FrBookmarkWidget(groupBox);
 	m_BookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -99,15 +99,9 @@ void FrMainWindow::InitializeSignals(){
 	connect(m_toolsPanel->mode3Button, SIGNAL(clicked()), this, SLOT(mode3Clicked()));
 
 	// actions of Low panel
-	//connect(m_lowPanel->brightnessSlider, SIGNAL(sliderReleased()), this, SLOT(brightnessValueChanged()));
-	//connect(m_lowPanel->contrastSlider, SIGNAL(sliderReleased()), this, SLOT(contrastValueChanged()));
-	//connect(m_lowPanel->thresholdSlider, SIGNAL(sliderReleased()), this, SLOT(thresholdValueChanged()));
     connect(m_lowPanel->brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(brightnessValueChanged()));
 	connect(m_lowPanel->contrastSlider, SIGNAL(valueChanged(int)), this, SLOT(contrastValueChanged()));
 	connect(m_lowPanel->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdValueChanged()));
-
-	// actions of Tab widget
-	connect(m_tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
 	// actions of Bookmark Widget
 	connect(m_BookmarkWidget, SIGNAL(currentChanged(int)), this, SLOT(bookmarkChanged(int)));

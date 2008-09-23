@@ -1,6 +1,7 @@
 #include "FrZoomTool.h"
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
+#include "FrCommandController.h"
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -68,11 +69,14 @@ void FrZoomTool::ZoomByScaling(double factor, FrInteractorStyle* is){
 		curScale = MAX_ZOOM;
 	if (curScale < MIN_ZOOM)
 		curScale = MIN_ZOOM;
-
+        
 	if (camera->GetParallelProjection()) {
-        camera->SetParallelScale(curScale);
+        FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
+        cmd->SetScale(curScale);
+        cmd->Execute();
     }
     else{
+        // For perspective projection do not support command yet
         camera->Dolly(factor);
         if (is->AutoAdjustCameraClippingRange) {
             is->CurrentRenderer->ResetCameraClippingRange();

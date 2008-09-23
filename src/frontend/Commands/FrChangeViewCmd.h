@@ -10,7 +10,7 @@ class FrBaseView;
 class FrChangeViewCmd : public FrBaseCmd 
 {
 public:
-    enum View { Unknown, Slice, Mosaic, Ortho };
+    enum View { Unknown, Slice, Mosaic, Ortho, Synchronize };
 
 public:
     // Constructor/destructor
@@ -27,7 +27,8 @@ public:
     FrSetPropMacro(View, TargetView);
 
 private:
-    FrBaseView* GetTargetView();
+    int GetActiveViewType();
+    FrBaseView* GetTargetView(int viewType);
 };
 
 #endif // FR_BASE_CMD

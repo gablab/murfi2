@@ -1,4 +1,4 @@
-#include "FrView2D.h"
+#include "FrSliceView.h"
 #include "QVTKWidget.h"
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
@@ -9,6 +9,7 @@
 #include "Fr2DSliceActor.h"
 #include "FrDocumentReader.h"
 #include "FrNotify.h"
+#include "FrUtils.h"
 #include "FrSliceExtractor.h"
 #include "FrTabSettingsDocObj.h"
 
@@ -40,7 +41,7 @@
 
 
 // Default constructor
-FrView2D::FrView2D(FrMainWindow* mainWindow)
+FrSliceView::FrSliceView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
     	
     // Create pipline stuff
@@ -52,7 +53,7 @@ FrView2D::FrView2D(FrMainWindow* mainWindow)
     m_renderer = vtkRenderer::New();
 }
 
-FrView2D::~FrView2D(){
+FrSliceView::~FrSliceView(){
 
     if(m_renderer) m_renderer->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
@@ -62,7 +63,7 @@ FrView2D::~FrView2D(){
     if(m_docReader) m_docReader->Delete();
 }
 
-void FrView2D::Initialize(){
+void FrSliceView::Initialize(){
     // create renderer
     m_renderer->GetActiveCamera()->ParallelProjectionOn();
     m_renderer->SetBackground( 0.0, 0.0, 0.0 );
@@ -71,29 +72,29 @@ void FrView2D::Initialize(){
 	GetRenderWindow()->Render();
 }
 
-void FrView2D::SetupRenderers(){
+void FrSliceView::SetupRenderers(){
     
     RemoveRenderers();
     
     QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer);
 }
 
-void FrView2D::RemoveRenderers(){
+void FrSliceView::RemoveRenderers(){
 
     // Remove all renderers
     QTVIEW3D->GetRenderWindow()->GetRenderers()->RemoveItem(m_renderer);
     QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
 }
 
-void FrView2D::UpdatePipeline(int point){
+void FrSliceView::UpdatePipeline(int point){
     // Setup some vars
-    int slice           = 0;
-    int maxSliceNumber  = 0;
-    bool isCleared      = false;
+    int sliceNumber = 0;
+    bool isCleared  = false;
 
     vtkCamera* cam = 0L;    
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
     ViewSettings& settings = document->GetCurrentTabSettings()->GetSliceViewSettings();
+    TBCSettings& tbcSettings = settings.TbcSetting;
     CameraSettings& camSettings = settings.CamSettings;
 
 	char text[20] = "";
@@ -131,15 +132,10 @@ void FrView2D::UpdatePipeline(int point){
         }
     case FRP_SLICE:
         {
-            // Extract slice to be rendered
-            slice = m_SliceExtractor->GetSlice();
-            slice += document->GetSlice(); // this is delta
-
-            // clamp value and set it
-            maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
-            if(slice > maxSliceNumber) slice = maxSliceNumber;
-            if(slice < 0) slice = 0;
-			m_SliceExtractor->SetSlice(slice);
+            // set slice to be rendered
+            settings.SliceNumber = ClampValue(settings.SliceNumber, 
+                0, m_SliceExtractor->GetMaxSliceNumber());
+            m_SliceExtractor->SetSlice(settings.SliceNumber);
 
             if(m_SliceExtractor->GetInput()){
 			    m_SliceExtractor->Update();
@@ -148,17 +144,22 @@ void FrView2D::UpdatePipeline(int point){
 			
             // Set tactor input
 			strcat(text, "Slice ");
-			itoa(slice, tmp, 10);
+            itoa(settings.SliceNumber, tmp, 10);
 			strcat(text, tmp);
 			m_tactor->SetInput(text);
         }
     case FRP_TBC:
         {
             // Threshold/brightness/contrast filter
-            m_tbcFilter->SetThreshold(document->GetThreshold());
-            m_tbcFilter->SetBrightness(document->GetBrightness());
-            m_tbcFilter->SetContrast(document->GetContrast());            
-                        
+            m_tbcFilter->SetThreshold(tbcSettings.Threshold);
+            m_tbcFilter->SetBrightness(tbcSettings.Brightness);
+            m_tbcFilter->SetContrast(tbcSettings.Contrast);
+            
+            // Keep data up-to-date
+            tbcSettings.Threshold  = m_tbcFilter->GetThreshold();
+            tbcSettings.Brightness = m_tbcFilter->GetBrightness();
+            tbcSettings.Contrast   = m_tbcFilter->GetContrast();
+
             if(m_tbcFilter->GetInput()){
                 m_tbcFilter->Update();
                 m_actor->SetInput(m_tbcFilter->GetOutput());
@@ -170,7 +171,7 @@ void FrView2D::UpdatePipeline(int point){
         }
     case FRP_SETCAM:
         {
-            // TODO: Setup camera here 
+            // Setup camera here 
             cam = m_renderer->GetActiveCamera();
             cam->ParallelProjectionOn();
             cam->SetParallelScale(camSettings.Scale);

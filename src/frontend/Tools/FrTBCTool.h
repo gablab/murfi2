@@ -34,11 +34,6 @@ public:
 private:
     int m_oldX;
     int m_oldY;
-
-private:
-	bool SetBrightness(double inc, FrInteractorStyle* is);
-	bool SetContrast(double inc, FrInteractorStyle* is);
-
 };
 
 #endif

@@ -92,8 +92,8 @@ void FrBookmarkWidget::OnCurrentChanged(QWidget* page){
         cmd1->SetTabSettingsDocObj(0L);
         cmd1->SetTabID( currentTab->GetID() );
 
-        FrUpdatePipelineCmd* cmd2 = FrCommandController::CreateCmd<FrUpdatePipelineCmd>();
-        cmd2->SetPipelinePoint(FRP_SETCAM);
+        FrChangeViewCmd* cmd2 = FrCommandController::CreateCmd<FrChangeViewCmd>();
+        cmd2->SetTargetView(FrChangeViewCmd::Synchronize);
         
         FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
         cmd->AddCommand(cmd1);

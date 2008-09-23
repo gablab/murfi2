@@ -5,7 +5,7 @@
 class QTabWidget;
 
 class FrBaseView;
-class FrView2D;
+class FrSliceView;
 class FrMosaicView;
 class FrOrthoView;
 class FrMainDocument;
@@ -34,7 +34,7 @@ public:
 
     // Properties
     FrPropMacro(FrBaseView*,      CurrentView);
-    FrGetPropMacro(FrView2D*,     SliceView);
+    FrGetPropMacro(FrSliceView*,  SliceView);
     FrGetPropMacro(FrMosaicView*, MosaicView);
     FrGetPropMacro(FrOrthoView*,  OrthoView);
 

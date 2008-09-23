@@ -34,7 +34,7 @@ typedef struct _viewSettings {
 } ViewSettings;
 
 typedef struct _activeView {
-    enum View { Slice, Mosaic, Ortho };
+    enum View { Slice, Mosaic, Ortho, Unknown };
 }ActiveView;
 
 // One have to provide valid type system

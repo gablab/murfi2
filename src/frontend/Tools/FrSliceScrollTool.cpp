@@ -2,13 +2,17 @@
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrMainDocument.h"
+#include "FrCommandController.h"
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkImageActor.h"
 
+#define MOUSE_MOVE_THRESHOLD 0.0 
+
+
 FrSliceScrollTool::FrSliceScrollTool(FrMainDocument* doc)
-	: m_Document(0), m_sliceNumber(0){
+: m_Document(0), m_sliceNumber(0){
 }
 
 FrSliceScrollTool::~FrSliceScrollTool(){
@@ -47,20 +51,17 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
         is->CurrentRenderer == NULL) return false;
         
     int deltaY = params.Y - m_oldY;
-//    m_oldX = params.X;
-//    m_oldY = params.Y;
 
-  //  double centerY = is->CurrentRenderer->GetCenter()[1];
-  //  double dyFactor = deltaY / centerY;
-	if ((abs(deltaY/20)) > 0){
+	if ((abs(deltaY / 20)) > 0){
 		m_oldY = params.Y;
-		int inc;
-		if (deltaY<0)
-			inc = -1;
-		else
-			inc = 1;
+        int inc = (deltaY < 0) ? -1 : inc = 1;
 
-		this->SetSlice(inc, is);
+        FrChangeSliceCmd* cmd = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+        cmd->SetSliceDelta(inc);
+        cmd->Execute();
+        delete cmd;
+
+		//this->SetSlice(inc, is);
 	}
 
 	this->SetMousePosition(params.X, params.Y);

@@ -18,34 +18,34 @@ FrTBCFilter* FrTBCFilter::New(){
 }
 
 FrTBCFilter::FrTBCFilter()
-: m_threshold(DEF_THRESHOLD),
-  m_brightness(DEF_BRIGHTNESS),
-  m_contrast(DEF_CONTRAST){
+: m_Threshold(DEF_THRESHOLD),
+  m_Brightness(DEF_BRIGHTNESS),
+  m_Contrast(DEF_CONTRAST){
 }
 
 void FrTBCFilter::SetThreshold(double value){
     // need to set?    
-    if(value != m_threshold){
+    if(value != m_Threshold){
         // change threshold
-        m_threshold = ClampValue(value, MIN_THRESHOLD, MAX_THRESHOLD);
+        m_Threshold = ClampValue(value, MIN_THRESHOLD, MAX_THRESHOLD);
         this->Modified();
     }
 }
 
 void FrTBCFilter::SetBrightness(double value){
     // need to set?    
-    if(value != m_brightness){
+    if(value != m_Brightness){
         // change threshold
-        m_brightness = ClampValue(value, MIN_BRIGHTNESS, MAX_BRIGHTNESS);
+        m_Brightness = ClampValue(value, MIN_BRIGHTNESS, MAX_BRIGHTNESS);
         this->Modified();
     }
 }
 
 void FrTBCFilter::SetContrast(double value){
     // need to set?    
-    if(value != m_contrast){
+    if(value != m_Contrast){
         // change threshold
-        m_contrast = ClampValue(value, MIN_CONTRAST, MAX_CONTRAST);
+        m_Contrast = ClampValue(value, MIN_CONTRAST, MAX_CONTRAST);
         this->Modified();
     }
 }
@@ -69,15 +69,15 @@ void FrTBCFilter::SimpleExecute(vtkImageData *inData,
     vtkDataArray* outArray = outData->GetPointData()->GetScalars();
 
     double maxValue   = inData->GetScalarTypeMax();
-    double brightness = maxValue * m_brightness;
-    double contrast   = maxValue * m_contrast;
+    double brightness = maxValue * m_Brightness;
+    double contrast   = maxValue * m_Contrast;
 
     // Create lookup table
     unsigned char luTable[256];
     InitLookupTable(luTable, brightness, contrast);
 
     // Process image data
-    double threshold  = maxValue * m_threshold;
+    double threshold  = maxValue * m_Threshold;
     for (int component = 0; component < numComps; ++component){
         for (int voxel = 0; voxel < numVoxs; ++voxel){
             // Check threshold 

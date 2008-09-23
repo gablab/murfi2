@@ -1,5 +1,5 @@
-#ifndef FR_VIEW_2D
-#define FR_VIEW_2D
+#ifndef FR_SLICE_VIEW
+#define FR_SLICE_VIEW
 
 class QWidget;
 class vtkInteractorStyle;
@@ -23,11 +23,11 @@ class FrSliceExtractor;
 #include "FrBaseView.h"
 
 // Wrapper for QVTKWidget.
-class FrView2D : public FrBaseView
+class FrSliceView : public FrBaseView
 { 
 public:
-    FrView2D(FrMainWindow* mainWindowt);
-    virtual ~FrView2D();
+    FrSliceView(FrMainWindow* mainWindow);
+    virtual ~FrSliceView();
 
     virtual void Initialize();
     virtual void UpdatePipeline(int point);

@@ -4,7 +4,7 @@
 #include "FrMainDocument.h"
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
-#include "FrView2D.h"
+#include "FrBaseView.h"
 #include "FrPanTool.h"
 #include "FrZoomTool.h"
 #include "FrCompositeTool.h"
@@ -143,11 +143,11 @@ void FrMainController::SaveCurrentViewToTab(){
 void FrMainController::ChangeView(int view){
     FrChangeViewCmd::View targetView = FrChangeViewCmd::Unknown;
     switch(view){
-    case 0: view = FrChangeViewCmd::Slice;
+    case 0: targetView = FrChangeViewCmd::Slice;
         break;
-    case 1: view = FrChangeViewCmd::Mosaic;
+    case 1: targetView = FrChangeViewCmd::Mosaic;
         break;
-    case 2: view = FrChangeViewCmd::Ortho;
+    case 2: targetView = FrChangeViewCmd::Ortho;
         break;
     }
 

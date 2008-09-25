@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/FrView2D;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -381,35 +381,35 @@
 			Name="Views"
 			>
 			<File
-				RelativePath=".\frontend\FrView2D\FrBaseView.cpp"
+				RelativePath=".\frontend\Views\FrBaseView.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrView2D\FrBaseView.h"
+				RelativePath=".\frontend\Views\FrBaseView.h"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrView2D\FrMosaicView.cpp"
+				RelativePath=".\frontend\Views\FrMosaicView.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrView2D\FrMosaicView.h"
+				RelativePath=".\frontend\Views\FrMosaicView.h"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrView2D\FrOrthoView.cpp"
+				RelativePath=".\frontend\Views\FrOrthoView.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrView2D\FrOrthoView.h"
+				RelativePath=".\frontend\Views\FrOrthoView.h"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrView2D\FrSliceView.cpp"
+				RelativePath=".\frontend\Views\FrSliceView.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrView2D\FrSliceView.h"
+				RelativePath=".\frontend\FrViews\FrSliceView.h"
 				>
 			</File>
 		</Filter>

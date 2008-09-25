@@ -6,11 +6,11 @@
 #include "FrMainDocument.h"
 #include "FrTBCFilter.h"
 #include "FrNotify.h"
+#include "Fr2DSliceActor.h"
 #include "FrTabSettingsDocObj.h"
 
 #include "vtkPNGReader.h"
 #include "vtkCamera.h"
-#include "vtkImageActor.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
@@ -21,7 +21,7 @@ FrMosaicView::FrMosaicView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
     m_docReader = FrDocumentReader::New();
     m_renderer = vtkRenderer::New();
-    m_actor = vtkImageActor::New();
+    m_actor = Fr2DSliceActor::New();
     m_tbcFilter = FrTBCFilter::New();
 }
 

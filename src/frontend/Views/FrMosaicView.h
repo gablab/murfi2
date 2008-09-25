@@ -2,12 +2,12 @@
 #define FR_MOSAIC_VIEW
 
 class vtkRenderer;
-class vtkImageActor;
 
 class QVTKWidget;
 class FrMainWindow;
 class FrDocumentReader;
 class FrTBCFilter;
+class Fr2DSliceActor;
 
 #include "FrBaseView.h"
 
@@ -34,7 +34,7 @@ private:
     vtkRenderer* m_renderer;
 
     // Actors
-    vtkImageActor* m_actor;
+    Fr2DSliceActor* m_actor;
 };
 
 #endif

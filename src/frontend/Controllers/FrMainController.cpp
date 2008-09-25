@@ -91,49 +91,8 @@ void FrMainController::LoadImage(QString& fileName){
     m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
 }
 
-void FrMainController::SetValueTBC(FrMainController::TBC target, double value){
-    // Check for safety
-    if(!m_MainDocument) return;
-
-    // Setup value
-    bool isChanged = true;
-    switch(target){
-        case FrMainController::Threshold:
-            m_MainDocument->SetThreshold(value);
-            break;
-        case FrMainController::Brightness:
-            m_MainDocument->SetBrightness(value);
-            break;
-        case FrMainController::Contrast:
-            m_MainDocument->SetContrast(value);
-            break;
-        default:
-            isChanged = false;
-    }
-
-    if(isChanged && m_MainView){
-       m_MainView->GetCurrentView()->UpdatePipeline(FRP_TBC);
-    }
-}
-
-
 void FrMainController::Notify(int notifyCode){
-
-	switch(notifyCode){
-		case FRN_PIPLINE_UPDATE:
-			// TODO: implement..
-            m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
-			break;
-		case FRN_TBC_UPDATE:
-			// TODO: implement..
-			m_MainView->GetCurrentView()->UpdatePipeline(FRP_TBC);
-			m_MainView->UpdateTBCValues(m_MainDocument->GetContrast(), 
-                                        m_MainDocument->GetBrightness());
-			break;
-		case FRN_SETNEXTSLICE:
-            m_MainView->GetCurrentView()->UpdatePipeline(FRP_SLICE);
-			break;
-	}
+	// Do nothing here
 }
 
 void FrMainController::SaveCurrentViewToTab(){

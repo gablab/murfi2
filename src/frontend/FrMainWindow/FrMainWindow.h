@@ -2,7 +2,8 @@
 #define FR_MAIN_WINDOW
 
 // Forward declaration
-class QTabWidget;
+class QWidget;
+class QStatusBar;
 
 class FrBaseView;
 class FrSliceView;
@@ -10,15 +11,19 @@ class FrMosaicView;
 class FrOrthoView;
 class FrMainDocument;
 class FrMainController;
-class FrLowPanel;
-class FrToolsPanel;
+class FrToolBar;
+class FrMainMenu;
 class FrBookmarkWidget;
 class QVTKWidget;
+class FrActionManager;
+class FrMainWindowSignalManager;
 
-#include "ui_FrMainWindow.h"
+// Includes
 #include "FrMacro.h"
+#include "Qt/QMainWindow.h"
 
-class FrMainWindow: public QMainWindow, public Ui::MainWindow {
+// This is main window of application
+class FrMainWindow: public QMainWindow {
 	Q_OBJECT
 public:
 	FrMainWindow();
@@ -27,8 +32,6 @@ public:
     FrPropMacro(FrMainDocument*,MainDocument);
     FrPropMacro(FrMainController*,MainController);
     
-    QVTKWidget* GetQVTKWidget(){ return m_qtView; }
-	void UpdateTBCValues(double contrast, double brightness);
 
     void Initialize();
 
@@ -39,41 +42,27 @@ public:
     FrGetPropMacro(FrOrthoView*,  OrthoView);
 
     // GUI elements
+    FrGetPropMacro(QVTKWidget*, QVTKWidget);
     FrGetPropMacro(FrBookmarkWidget*, BookmarkWidget);
 
 public slots:
-	void brightnessValueChanged();
-	void contrastValueChanged();
-	void thresholdValueChanged();
-
-	void tool1Triggered();
-	void tool2Triggered();
-	void tool3Triggered();
-
-	void mode1Clicked();
-	void mode2Clicked();
-	void mode3Clicked();	
-
-	void saveToTab();
-    void openImage();
-
     void OnBookmarkChanged(int id);
     void OnBookmarkDelete(int id);
 
-signals:
+private:
+    void SetupUi(QMainWindow* mainWindow);
+    void RetranslateUi(QMainWindow* mainWindow);
+    void InitializeWidgets();
 
 private:
-    void InitializeWidgets();
-    void InitializeSignals();
+    FrActionManager* m_actManager;
+    QWidget*    m_centralWidget;
+    FrMainMenu* m_mainMenu;
+    FrToolBar*  m_toolBar;
+    QStatusBar* m_statusBar;
 
-public:
-    QVTKWidget* m_qtView;
-    QTabWidget* m_tabWidget;
-	QWidget*    m_slice2DWidget;
-	QWidget*    m_graphWidget;
-
-	FrToolsPanel*   m_toolsPanel;
-	FrLowPanel*     m_lowPanel;
+    friend class FrActionSignalManager;
+    FrActionSignalManager* m_signalManager;
 };
 
 #endif

@@ -77,7 +77,7 @@ void FrBookmarkWidget::OnCloseButtonClicked(){
 }
 
 void FrBookmarkWidget::OnCurrentChanged(QWidget* page){
-    // TODO: pass signal to document to keep track about current page
+    // pass signal to document to keep track about current page
     FrBookmark* currentTab = dynamic_cast<FrBookmark*>(page);
     if(currentTab){
         // inform others

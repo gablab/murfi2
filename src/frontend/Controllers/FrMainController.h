@@ -27,12 +27,6 @@ public:
 public:
     // Interface for MainWindow
     void LoadImage(QString& fileName);
-
-    // Threshold/brightness/contrast interface
-    enum TBC { Threshold, Brightness, Contrast };
-    void SetValueTBC(TBC target, double value);
-	void SetNextSlice();
-	void UpdateTCB();
     
     void SaveCurrentViewToTab();
     void ChangeView(int view);

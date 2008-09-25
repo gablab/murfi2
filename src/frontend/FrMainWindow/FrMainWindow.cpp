@@ -4,108 +4,132 @@
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
-#include "FrToolsPanel.h"
-#include "FrLowPanel.h"
 #include "FrBookmarkWidget.h"
 #include "QVTKWidget.h"
-#include "FrTabInfoDialog.h"
+#include "FrToolBar.h"
+#include "FrMainMenu.h"
+#include "FrActionManager.h"
+#include "FrActionSignalManager.h"
 
+#include "Qt/QGroupBox.h"
+#include "Qt/QBoxLayout.h"
+#include "Qt/QApplication.h"
 #include "Qt/QMessageBox.h"
 #include "Qt/QTabWidget.h"
-
-#include "vtkInteractorStyleImage.h"
-#include "vtkRenderWindowInteractor.h"
+#include "Qt/QTextEdit.h"
+#include "QtGui/QStatusBar.h"
 
 
 FrMainWindow::FrMainWindow()
     :  QMainWindow(0), m_MainDocument(0), m_MainController(0), 
     m_SliceView(0), m_MosaicView(0), m_OrthoView(0), m_CurrentView(0){
 	
-    setupUi(this);
+    SetupUi(this);
     InitializeWidgets();
-    InitializeSignals();
+    
+    // Initialize signals
+    m_signalManager = new FrActionSignalManager(this);
 }
 
 FrMainWindow::~FrMainWindow(){
     if(m_SliceView) delete m_SliceView;
     if(m_MosaicView) delete m_MosaicView;
     if(m_OrthoView) delete m_OrthoView;
+    if(m_signalManager) delete m_signalManager;
+}
+
+void FrMainWindow::SetupUi(QMainWindow* mainWindow){
+    // Main window
+    mainWindow->resize(600, 800);
+    if (mainWindow->objectName().isEmpty())
+        mainWindow->setObjectName(QString::fromUtf8("MainWindow"));
+
+    // Central widget
+    m_centralWidget = new QWidget(mainWindow);
+    m_centralWidget->setObjectName(QString::fromUtf8("m_centralWidget"));
+    mainWindow->setCentralWidget(m_centralWidget);
+
+    // Action manager
+    m_actManager = new FrActionManager(mainWindow);
+
+    // Main menu
+    m_mainMenu = new FrMainMenu(mainWindow, m_actManager);
+    m_mainMenu->setObjectName(QString::fromUtf8("m_mainMenu"));
+    m_mainMenu->setGeometry(QRect(0, 0, 800, 21));
+    mainWindow->setMenuBar(m_mainMenu);
+
+    // Tool bar
+    m_toolBar = new FrToolBar(mainWindow, m_actManager);
+    m_toolBar->setObjectName(QString::fromUtf8("m_toolBar"));
+    mainWindow->addToolBar(Qt::TopToolBarArea, m_toolBar);
+
+    // Status bar        
+    m_statusBar = new QStatusBar(mainWindow);
+    m_statusBar->setObjectName(QString::fromUtf8("m_statusBar"));
+    mainWindow->setStatusBar(m_statusBar);
+
+    RetranslateUi(mainWindow);
+    QMetaObject::connectSlotsByName(mainWindow);
+}
+
+
+void FrMainWindow::RetranslateUi(QMainWindow* mainWindow){
+    // Performe retranslation
+    mainWindow->setWindowTitle(
+        QApplication::translate("MainWindow", "MRI", 0, 
+        QApplication::UnicodeUTF8));
+    
+    m_actManager->Retranslate();
+    m_mainMenu->Retranslate();
+    m_toolBar->Retranslate();
 }
 
 void FrMainWindow::InitializeWidgets(){
-    QGroupBox* groupBox = new QGroupBox(this);
-
-    // Create 3D View
-    m_qtView = new QVTKWidget(groupBox);
-    m_qtView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
+    
+    QWidget* centralWidget = this->centralWidget();
+    
+    QWidget* topPane = new QWidget(centralWidget);
+    topPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QWidget* btmPane = new QWidget(centralWidget);
+    btmPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    
+    // Create 3D view and logical views 
+    m_QVTKWidget = new QVTKWidget(topPane);
+    m_QVTKWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);    
     m_SliceView  = new FrSliceView(this);
     m_MosaicView = new FrMosaicView(this);
-    m_OrthoView  = new FrOrthoView(this);;
-    
-    m_BookmarkWidget = new FrBookmarkWidget(groupBox);
+    m_OrthoView  = new FrOrthoView(this);
+
+    // Create bookmark widget
+    m_BookmarkWidget = new FrBookmarkWidget(topPane);
 	m_BookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-            
-    QHBoxLayout *groupBoxLayout = new QHBoxLayout(groupBox);
-	groupBoxLayout->setContentsMargins(0, 0, 0, 0);
-	groupBoxLayout->setSpacing(0);
-    groupBoxLayout->addWidget(m_qtView);
-    groupBoxLayout->addWidget(m_BookmarkWidget);
 
-    m_toolsPanel = new FrToolsPanel(this);
-	m_toolsPanel->setFixedWidth(m_toolsPanel->width());
-	m_toolsPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    QHBoxLayout* viewLayout = new QHBoxLayout();
+	viewLayout->setContentsMargins(0, 0, 0, 0);
+	viewLayout->setSpacing(0);
+    viewLayout->addWidget(m_QVTKWidget);
+    viewLayout->addWidget(m_BookmarkWidget);
+    
+    QTabWidget* viewInfoControl = new QTabWidget(topPane);
+    viewInfoControl->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    viewInfoControl->addTab(new QWidget(viewInfoControl), QString("Info1"));
+    viewInfoControl->addTab(new QWidget(viewInfoControl), QString("Info2"));
 
-    m_lowPanel = new FrLowPanel(this);
-	m_lowPanel->setFixedHeight(m_lowPanel->height());
+    QHBoxLayout* vcLayout = new QHBoxLayout();
+    vcLayout->addLayout(viewLayout);
+    vcLayout->addWidget(viewInfoControl);
+    topPane->setLayout(vcLayout);
 
-	QVBoxLayout *verticalLayout = new QVBoxLayout;
-	verticalLayout->setContentsMargins(0, 0, 0, 0);
-    verticalLayout->addWidget(groupBox);
-	verticalLayout->addWidget(m_lowPanel);
+    QHBoxLayout* graphLayout = new QHBoxLayout();
+    graphLayout->addWidget(new QGroupBox(QString("Graph View"), btmPane));
+    btmPane->setLayout(graphLayout);
 
-	// horizontal layout
-	QHBoxLayout *layout = new QHBoxLayout;
-	layout->addWidget(m_toolsPanel);
-	layout->addLayout(verticalLayout);
-	
-    m_graphWidget = new QWidget;
-    m_slice2DWidget = new QWidget;
-    m_tabWidget = new QTabWidget(this);
+    // Setup layout to  central widget
+    QVBoxLayout* vLayout = new  QVBoxLayout();
+    vLayout->addWidget(topPane);
+    vLayout->addWidget(btmPane);
 
-	m_slice2DWidget->setLayout(layout);
-	m_tabWidget->addTab(m_slice2DWidget, "2D Slice View");
-	m_tabWidget->addTab(m_graphWidget, "Graphs and calculations");
-	setCentralWidget(m_tabWidget);
-}
-
-void FrMainWindow::InitializeSignals(){
-    // actions of File-menu
-	connect(actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
-    connect(actionLoadImage, SIGNAL(triggered()), this, SLOT(openImage())); 
-
-	// actions of Help-menu
-	connect(actionAbout, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-
-	// toolbar actions
-	connect(actionTool1, SIGNAL(triggered()), this, SLOT(tool1Triggered()));
-	connect(actionTool2, SIGNAL(triggered()), this, SLOT(tool2Triggered()));
-	connect(actionTool3, SIGNAL(triggered()), this, SLOT(tool3Triggered()));
-	connect(actionSaveToTab, SIGNAL(triggered()), this, SLOT(saveToTab()));
-
-	// actions of tools panel
-	connect(m_toolsPanel->mode1Button, SIGNAL(clicked()), this, SLOT(mode1Clicked()));
-	connect(m_toolsPanel->mode2Button, SIGNAL(clicked()), this, SLOT(mode2Clicked()));
-	connect(m_toolsPanel->mode3Button, SIGNAL(clicked()), this, SLOT(mode3Clicked()));
-
-	// actions of Low panel
-    connect(m_lowPanel->brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(brightnessValueChanged()));
-	connect(m_lowPanel->contrastSlider, SIGNAL(valueChanged(int)), this, SLOT(contrastValueChanged()));
-	connect(m_lowPanel->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdValueChanged()));
-
-	// actions of Bookmark Widget
-	connect(m_BookmarkWidget, SIGNAL(CurrentChanged(int)), this, SLOT(OnBookmarkChanged(int)));
-    connect(m_BookmarkWidget, SIGNAL(DeleteTab(int)), this, SLOT(OnBookmarkDelete(int)));
+    centralWidget->setLayout(vLayout);
 }
 
 void FrMainWindow::Initialize(){
@@ -122,93 +146,10 @@ void FrMainWindow::Initialize(){
     m_CurrentView = m_SliceView;
 }
 
-// change brightness of the scene
-void FrMainWindow::brightnessValueChanged(){
-    // map into range [-1..+1]
-    double value = m_lowPanel->GetBrightnessValue();
-    value /= 100.0;
-
-    if(m_MainController){
-        m_MainController->SetValueTBC(FrMainController::Brightness, value);
-    }
-}
-
-// change contrast of the scene
-void FrMainWindow::contrastValueChanged(){    
-    // map into range [-1..+1]
-    double value = m_lowPanel->GetContrastValue();
-    value /= 100.0;
-    
-    if(m_MainController){
-        m_MainController->SetValueTBC(FrMainController::Contrast, value);
-    }
-}
-
-// change threshold of the scene
-void FrMainWindow::thresholdValueChanged(){
-    // map into range [0..+1]
-    double value = m_lowPanel->GetThresholdValue();
-    value /= 100.0;
-
-    if(m_MainController){
-        m_MainController->SetValueTBC(FrMainController::Threshold, value);
-    }
-}
-
-void FrMainWindow::tool1Triggered(){
-	QMessageBox::information(this, "Info", "tool 1 triggered");
-
-}
-
-void FrMainWindow::tool2Triggered(){
-	QMessageBox::information(this, "Info", "tool 2 triggered");
-
-}
-
-void FrMainWindow::tool3Triggered(){
-	QMessageBox::information(this, "Info", "tool 3 clicked");
-
-}
-
-void FrMainWindow::mode1Clicked(){
-	this->GetMainController()->ChangeView(0);    
-}
-
-void FrMainWindow::mode2Clicked(){
-    this->GetMainController()->ChangeView(1);    
-}
-
-void FrMainWindow::mode3Clicked(){
-    this->GetMainController()->ChangeView(2);
-}
-
 void FrMainWindow::OnBookmarkChanged(int id){
     this->GetMainController()->ChangeBookmark(id);
 }
 
 void FrMainWindow::OnBookmarkDelete(int id){
     this->GetMainController()->DeleteBookmark(id);
-}
-
-// this slot indicates to what tab user switched
-void FrMainWindow::saveToTab(){
-    this->GetMainController()->SaveCurrentViewToTab();
-}
-
-#include <Qt/QString.h>
-#include <QtGUI/QFileDialog.h>
-void FrMainWindow::openImage(){
-    QString fileName;
-    fileName = QFileDialog::getOpenFileName(this, 
-        QString("Open MRI data"), QString(), 
-        QString("NIfTI Image (*.nii)"));
-
-    if(!fileName.isNull() && !fileName.isEmpty()){
-        m_MainController->LoadImage(fileName);
-    }
-}
-
-void FrMainWindow::UpdateTBCValues(double contrast, double brightness){
-	m_lowPanel->SetContrastValue(contrast);	
-	m_lowPanel->SetBrightnessValue(brightness);
 }

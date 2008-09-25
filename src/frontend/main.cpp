@@ -8,7 +8,7 @@ int main(int argc, char **argv){
     
     // Create view
 	FrMainWindow mainWindow;
-	mainWindow.showMaximized();
+	mainWindow.show();
     
     // Create document
     FrMainDocument document;

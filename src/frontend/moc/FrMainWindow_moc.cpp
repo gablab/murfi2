@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrMainWindow.h'
 **
-** Created: Tue 23. Sep 20:56:42 2008
+** Created: Thu 25. Sep 17:05:03 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,35 +23,19 @@ static const uint qt_meta_data_FrMainWindow[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   10, // methods
+       2,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
  // slots: signature, parameters, type, tag, flags
-      14,   13,   13,   13, 0x0a,
-      39,   13,   13,   13, 0x0a,
-      62,   13,   13,   13, 0x0a,
-      86,   13,   13,   13, 0x0a,
-     103,   13,   13,   13, 0x0a,
-     120,   13,   13,   13, 0x0a,
-     137,   13,   13,   13, 0x0a,
-     152,   13,   13,   13, 0x0a,
-     167,   13,   13,   13, 0x0a,
-     182,   13,   13,   13, 0x0a,
-     194,   13,   13,   13, 0x0a,
-     209,  206,   13,   13, 0x0a,
-     232,  206,   13,   13, 0x0a,
+      17,   14,   13,   13, 0x0a,
+      40,   14,   13,   13, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrMainWindow[] = {
-    "FrMainWindow\0\0brightnessValueChanged()\0"
-    "contrastValueChanged()\0thresholdValueChanged()\0"
-    "tool1Triggered()\0tool2Triggered()\0"
-    "tool3Triggered()\0mode1Clicked()\0"
-    "mode2Clicked()\0mode3Clicked()\0saveToTab()\0"
-    "openImage()\0id\0OnBookmarkChanged(int)\0"
+    "FrMainWindow\0\0id\0OnBookmarkChanged(int)\0"
     "OnBookmarkDelete(int)\0"
 };
 
@@ -70,8 +54,6 @@ void *FrMainWindow::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrMainWindow))
         return static_cast<void*>(const_cast< FrMainWindow*>(this));
-    if (!strcmp(_clname, "Ui::MainWindow"))
-        return static_cast< Ui::MainWindow*>(const_cast< FrMainWindow*>(this));
     return QMainWindow::qt_metacast(_clname);
 }
 
@@ -82,21 +64,10 @@ int FrMainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: brightnessValueChanged(); break;
-        case 1: contrastValueChanged(); break;
-        case 2: thresholdValueChanged(); break;
-        case 3: tool1Triggered(); break;
-        case 4: tool2Triggered(); break;
-        case 5: tool3Triggered(); break;
-        case 6: mode1Clicked(); break;
-        case 7: mode2Clicked(); break;
-        case 8: mode3Clicked(); break;
-        case 9: saveToTab(); break;
-        case 10: openImage(); break;
-        case 11: OnBookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 12: OnBookmarkDelete((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 0: OnBookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 1: OnBookmarkDelete((*reinterpret_cast< int(*)>(_a[1]))); break;
         }
-        _id -= 13;
+        _id -= 2;
     }
     return _id;
 }

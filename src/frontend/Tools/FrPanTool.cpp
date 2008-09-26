@@ -44,7 +44,6 @@ bool FrPanTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     // Do pan here    
-    // Do pan here    
     double viewFocus[4], viewPoint[3], focalDepth;
     double newPickPoint[4], oldPickPoint[4], motionVector[3];
     
@@ -55,8 +54,7 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     vtkCamera *camera = is->CurrentRenderer->GetActiveCamera();
     camera->GetFocalPoint(viewFocus);
     focalDepth = viewFocus[2];
-    is->ComputeWorldToDisplay(viewFocus[0], viewFocus[1], viewFocus[2], viewFocus);
-    
+    is->ComputeWorldToDisplay(viewFocus[0], viewFocus[1], viewFocus[2], viewFocus);    
     is->ComputeDisplayToWorld(double(params.X), double(params.Y), focalDepth, newPickPoint);
     
     // Has to recalc old mouse point since the viewport has moved
@@ -72,7 +70,8 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     camera->GetFocalPoint(viewFocus);
     camera->GetPosition(viewPoint);
     
-    FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();    
+    FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
+    cmd->SetRenderer(is->CurrentRenderer);
     cmd->SetPosition(motionVector[0] + viewPoint[0],
                      motionVector[1] + viewPoint[1],
                      motionVector[2] + viewPoint[2]);

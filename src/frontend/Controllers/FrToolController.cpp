@@ -55,6 +55,11 @@ FrTool* FrToolController::PopTool(){
 
         m_tools.pop_back();
     }
+
+    // have to start current tool
+    if(GetCurrentTool() != 0){
+        GetCurrentTool()->Start();
+    }
     return tool;
 }
 

@@ -1,18 +1,11 @@
-#ifndef FR_PAN_TOOL
-#define FR_PAN_TOOL
-
+#ifndef FR_ROI_TOOL
+#define FR_ROI_TOOL
 
 #include "FrTool.h"
 
-/// abstract class for all tools
-// used by application
-class FrPanTool : public FrTool {
+// ROI tool
+class FrRoiTool : public FrTool {
 public:
-	/// Default constructor
-	FrPanTool();
-	/// Destructor
-	virtual ~FrPanTool();
-
 	virtual void Start();
 	virtual void Stop();
     virtual bool OnMouseUp(FrInteractorStyle* is, FrMouseParams& params);
@@ -20,9 +13,11 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
-private:
-    int m_oldX;
-    int m_oldY;
+public:
+	// Default constructor
+	FrRoiTool();
+	// Destructor
+	virtual ~FrRoiTool();
 };
 
 #endif

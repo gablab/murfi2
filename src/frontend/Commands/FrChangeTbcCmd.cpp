@@ -41,7 +41,10 @@ bool FrChangeTbcCmd::Execute(){
         SetupTbcSettings(&sets->GetMosaicViewSettings().TbcSetting);
         break;
     case ActiveView::Ortho:
-        SetupTbcSettings(&sets->GetOrthoViewSettings().TbcSetting);
+        // change for all views
+        SetupTbcSettings(&sets->GetOrthoViewSettings().TbcSettings[0]);
+        SetupTbcSettings(&sets->GetOrthoViewSettings().TbcSettings[1]);
+        SetupTbcSettings(&sets->GetOrthoViewSettings().TbcSettings[2]);
         break;
     default:
         return false;
@@ -54,10 +57,18 @@ bool FrChangeTbcCmd::Execute(){
 void FrChangeTbcCmd::SetupTbcSettings(void* settings){
     // Assume that settings can only be camera settings
     TBCSettings* tbcSettings = (TBCSettings*)settings;
-    if(m_isThreshold)  tbcSettings->Threshold  += m_Threshold;
-    if(m_isBrightness) tbcSettings->Brightness += m_Brightness;
-    if(m_isContrast)   tbcSettings->Contrast   += m_Contrast;
-    
+    if(m_isThreshold)  {
+        tbcSettings->Threshold  += m_Threshold;
+        m_isThreshold = false;
+    }
+    if(m_isBrightness) {
+        tbcSettings->Brightness += m_Brightness;
+        m_isBrightness = false;;
+    }
+    if(m_isContrast) {
+        tbcSettings->Contrast   += m_Contrast;
+        m_isContrast = false;
+    }
 }
 
 ///////////////////////////////////////////////////////////////

@@ -34,6 +34,7 @@ public:
     FrSliceExtractor* GetSliceExtractor(int i) { return m_SliceExtractor[i]; }
     FrTBCFilter* GetTBCFilter(int i) { return m_tbcFilter[i]; }
     vtkRenderer* GetRenderer(int i){ return m_renderer[i]; }
+    Fr2DSliceActor* GetActor(int i){ return m_actor[i]; }
 
 private:
     // Render pipline

@@ -11,24 +11,28 @@
 #include "FrImageDocObj.h"
 #include "QVTKWidget.h"
 
+// VTK stuff
 #include "vtkRenderWindowInteractor.h"
 
+// Qt stuff
 #include "Qt/QMessageBox.h"
+#include "Qt/QString.h"
 
 
 // Implementation of FrMainController
 FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
-    : m_MainView(view), m_MainDocument(doc), m_toolController(0){
+    : m_MainView(view), m_MainDocument(doc), m_ToolController(0){
 
-    m_toolController = new FrToolController(this);
-
-    FrCompositeTool* tool = new FrCompositeTool();
-    tool->SetDocument(m_MainDocument);
-    m_toolController->PushTool(tool);
+    m_ToolController = new FrToolController(this);
 }
 
-FrMainController::~FrMainController(){
-    if(m_toolController) delete m_toolController;
+FrMainController::~FrMainController(){    
+    if(m_ToolController) {
+        delete m_ToolController;
+    }
+    
+    if(m_MainDocument) delete m_MainDocument;
+    if(m_MainView) delete m_MainView;
 }
 
 void FrMainController::Initialize(){
@@ -47,37 +51,40 @@ void FrMainController::Initialize(){
             FrInteractorStyle* style = new FrInteractorStyle(this);
             m_MainView->GetQVTKWidget()->GetInteractor()->SetInteractorStyle(style);
         }
+        m_MainView->show();
     }
     
     // Initialize document
     if(m_MainDocument){
-        // TODO: Some initialization
-        m_MainDocument->SetDefaultValues();
-
         FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
         cmd->SetIsDefault(true);
         cmd->Execute();
         delete cmd;
     }
+
+    // Initialize Controller itself
+    FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
+    cmd->SetToolType(FrManageToolCmd::ManipulationTool);
+    cmd->SetToolAction(FrManageToolCmd::NewToolAct);
+    cmd->Execute();
 }
 
 bool FrMainController::HasActiveTool(){
     bool result = false;
-    if(m_toolController){
-        result = (m_toolController->GetCurrentTool() != 0);
+    if(m_ToolController){
+        result = (m_ToolController->GetCurrentTool() != 0);
     }
     return result;
 }
 
 FrTool* FrMainController::GetCurrentTool(){
     FrTool* result = 0;
-    if(m_toolController){
-        result = m_toolController->GetCurrentTool();
+    if(m_ToolController){
+        result = m_ToolController->GetCurrentTool();
     }
     return result;
 }
 
-#include <Qt/QString.h>
 void FrMainController::LoadImage(QString& fileName){
         
     FrImageDocObj* imgObj = new FrImageDocObj();
@@ -145,5 +152,26 @@ void FrMainController::DeleteBookmark(int id){
                               "Error Closing Tab",
                               "Can't close this tab...");
     }
+    delete cmd;
+}
+
+void FrMainController::SetCurrentTool(int tool){
+    FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
+    cmd->SetToolAction(FrManageToolCmd::NewToolAct);
+
+    switch(tool)
+    {
+    case 0: cmd->SetToolType(FrManageToolCmd::ManipulationTool);
+        break;
+    case 1: cmd->SetToolType(FrManageToolCmd::VoxelTool);
+        break;
+    case 2: cmd->SetToolType(FrManageToolCmd::RoiTool);
+        break;
+    default:
+        // do nothing
+        break;
+    }
+
+    cmd->Execute();
     delete cmd;
 }

@@ -8,8 +8,7 @@
 
 /// abstract class for all tools
 // used by application
-class FrZoomTool : public FrTool
-{
+class FrZoomTool : public FrTool {
 public:
 	/// Default constructor
 	FrZoomTool();

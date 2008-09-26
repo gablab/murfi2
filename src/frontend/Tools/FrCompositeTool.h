@@ -27,8 +27,6 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
     
-    // Set document
-    void SetDocument(FrMainDocument* document);
 	// Check mouse coordinates for zoom/pan tool selection
 	bool CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params);
 

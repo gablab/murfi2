@@ -19,7 +19,7 @@ class FrMainDocument;
 class FrTBCTool : public FrTool
 {
 public:
-    FrTBCTool(FrMainDocument* document=0);
+    FrTBCTool();
     virtual ~FrTBCTool();
 
 	virtual void Start();
@@ -28,8 +28,6 @@ public:
 	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
-
-    FrPropMacro(FrMainDocument*, Document);
 
 private:
     int m_oldX;

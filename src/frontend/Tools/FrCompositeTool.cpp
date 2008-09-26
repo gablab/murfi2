@@ -5,6 +5,7 @@
 #include "FrZoomTool.h"
 #include "FrSliceScrollTool.h"
 #include "FrInteractorStyle.h"
+#include "FrCommandController.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -36,6 +37,14 @@ void FrCompositeTool::Start(){
     m_tbcTool->Start();
     m_zoomTool->Start();
 	m_ssTool->Start();
+
+    // Update interface to ensure tool is checked
+    FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
+    cmd->SetToolType(FrManageToolCmd::ManipulationTool);
+    cmd->SetToolAction(FrManageToolCmd::UpdateAct);
+    cmd->SetIsChecked(true);
+    cmd->Execute();
+    delete cmd;
 }
 
 void FrCompositeTool::Stop(){
@@ -50,6 +59,14 @@ void FrCompositeTool::Stop(){
     m_tbcTool->Stop();
     m_zoomTool->Stop();
 	m_ssTool->Stop();
+
+    // Update interface to ensure tool is unchecked
+    FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
+    cmd->SetToolType(FrManageToolCmd::ManipulationTool);
+    cmd->SetToolAction(FrManageToolCmd::UpdateAct);
+    cmd->SetIsChecked(false);
+    cmd->Execute();
+    delete cmd;
 }
 
 bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
@@ -61,7 +78,7 @@ bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 			m_panTool->OnMouseUp(is, params);
 	}
 	else if(params.Button == FrMouseParams::MidButton){
-        params.Button = FrMouseParams::MidButton;
+        params.Button = FrMouseParams::LeftButton;
         m_ssTool->OnMouseUp(is, params);
     }
     else if(params.Button == FrMouseParams::RightButton){
@@ -84,7 +101,7 @@ bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 			m_panTool->OnMouseDown(is, params);
 	}
     else if(params.Button == FrMouseParams::MidButton){
-        params.Button = FrMouseParams::MidButton;
+        params.Button = FrMouseParams::LeftButton;
         m_ssTool->OnMouseDown(is, params);
     }
     else if(params.Button == FrMouseParams::RightButton){
@@ -109,7 +126,7 @@ bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 			result = m_panTool->OnMouseDrag(is, params);
 	}
     else if(params.Button == FrMouseParams::MidButton){
-        params.Button = FrMouseParams::MidButton;
+        params.Button = FrMouseParams::LeftButton;
         result = m_ssTool->OnMouseDrag(is, params);
     }
     else if(params.Button == FrMouseParams::RightButton){
@@ -133,12 +150,6 @@ bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return result;
 }
 
-void FrCompositeTool::SetDocument(FrMainDocument* document){
-    // Set to tcb tool
-    m_tbcTool->SetDocument(document);
-	m_ssTool->SetDocument(document);
-}
-
 bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params){
 	// check if coordinates are near left/right border of viewport
 	int *size = is->CurrentRenderer->GetSize();
@@ -150,8 +161,9 @@ bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& par
 	int YOrigin = origin[0];
 
     // Leave side only
-    int xDelta = size[0] / 10; // delta is 10%
-	if (( (params.X - XOrigin) >= (XBorder-xDelta)) || ( (params.X - XOrigin) <= xDelta)) return true;
+    int xDelta = size[0] / 6; // delta is about 15%
+	if (( (params.X - XOrigin) >= (XBorder-xDelta)) ||
+        ( (params.X - XOrigin) <= xDelta)) return true;
 	/*if ((params.Y+40 >= YBorder) || (params.Y <= 40)) return true;*/
 
 	return false;

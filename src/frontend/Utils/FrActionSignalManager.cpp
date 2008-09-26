@@ -23,7 +23,7 @@ FrActionSignalManager::FrActionSignalManager(FrMainWindow* mainWindow)
 
 void FrActionSignalManager::Initialize(){
     // Connect signals
-    FrActionManager* am = m_mainWindow->m_actManager;
+    FrActionManager* am = m_mainWindow->m_ActionManager;
 
     // File 
     CONNECT_ACTION_TRIGGERED(am->GetOpenImageAction(), OnOpenImageAction());
@@ -102,21 +102,15 @@ void FrActionSignalManager::OnViewOrthoAction(){
 
 // Tools 
 void FrActionSignalManager::OnManipulatorToolAction(){
-    QMessageBox::information(m_mainWindow, 
-        tr("To be implemented"),
-        tr("This selects Manipulation tool..."));
+    m_mainWindow->GetMainController()->SetCurrentTool(0);
 }
 
 void FrActionSignalManager::OnVoxelToolAction(){
-    QMessageBox::information(m_mainWindow, 
-        tr("To be implemented"),
-        tr("This selects Voxel Info/Modification tool..."));
+    m_mainWindow->GetMainController()->SetCurrentTool(1);
 }
 
 void FrActionSignalManager::OnRoiToolAction(){
-    QMessageBox::information(m_mainWindow, 
-        tr("To be implemented"),
-        tr("This selects ROI tool..."));
+    m_mainWindow->GetMainController()->SetCurrentTool(2);
 }
 
 // Help

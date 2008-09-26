@@ -25,10 +25,9 @@ public:
     }
 } FrMouseParams;
 
-/// abstract class for all tools
+// abstract class for all tools
 // used by application
-class FrTool
-{
+class FrTool {
 public:
 	virtual void Start() = 0;
 	virtual void Stop() = 0;

@@ -11,8 +11,6 @@ public:
     FrMainDocument();
     virtual ~FrMainDocument();
 
-    virtual void SetDefaultValues();
-
     void GetAllImages(std::vector<FrDocumentObj*>& images);
     FrTabSettingsDocObj* GetCurrentTabSettings();
 

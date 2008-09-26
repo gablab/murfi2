@@ -1,7 +1,10 @@
 #ifndef FR_CHANGECAM_CMD
 #define FR_CHANGECAM_CMD
 
+class vtkRenderer;
+
 #include "FrBaseCmd.h"
+#include "FrMacro.h"
 
 // This command changes settings of camera
 // of current view and then update view.
@@ -23,6 +26,9 @@ public:
 
     void SetScale(double value);
 
+    // Property
+    FrSetPropMacro(vtkRenderer*, Renderer);
+
     //
     // Overrides
     //
@@ -35,6 +41,7 @@ public:
 
 private:
     void SetupCameraSettings(void* settings);
+    bool SetupOrthoViewCamSettings();
 
 private:
     bool m_isPosition;

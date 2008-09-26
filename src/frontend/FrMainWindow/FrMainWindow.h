@@ -45,6 +45,11 @@ public:
     FrGetPropMacro(QVTKWidget*, QVTKWidget);
     FrGetPropMacro(FrBookmarkWidget*, BookmarkWidget);
 
+    // Some others
+private: friend class FrActionSignalManager;
+    FrGetPropMacro(FrActionSignalManager*, SignalManager);
+    FrGetPropMacro(FrActionManager*, ActionManager);
+
 public slots:
     void OnBookmarkChanged(int id);
     void OnBookmarkDelete(int id);
@@ -55,14 +60,10 @@ private:
     void InitializeWidgets();
 
 private:
-    FrActionManager* m_actManager;
     QWidget*    m_centralWidget;
     FrMainMenu* m_mainMenu;
     FrToolBar*  m_toolBar;
     QStatusBar* m_statusBar;
-
-    friend class FrActionSignalManager;
-    FrActionSignalManager* m_signalManager;
 };
 
 #endif

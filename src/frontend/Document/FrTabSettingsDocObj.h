@@ -26,12 +26,18 @@ typedef struct _camSettings {
 // Contains almost everything...
 typedef struct _viewSettings {
     int SliceNumber;
-    int CoronalSlice;
-    int SagitalSlice;
-    int AxialSlice;
     TBCSettings TbcSetting;
     CameraSettings CamSettings;
 } ViewSettings;
+
+#define ORTHO_VIEW_NUM 3
+typedef struct _orthoViewSettings {
+    int CoronalSlice;
+    int SagitalSlice;
+    int AxialSlice;
+    TBCSettings TbcSettings[ORTHO_VIEW_NUM];
+    CameraSettings CamSettings[ORTHO_VIEW_NUM];
+}OViewSettings;
 
 typedef struct _activeView {
     enum View { Slice, Mosaic, Ortho, Unknown };
@@ -44,10 +50,13 @@ public:
     FrTabSettingsDocObj(bool isDefault = false);
     virtual ~FrTabSettingsDocObj();
 
+    // Base class overrides
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
-
     virtual ObjType GetType();
+    
+    // Initialization
+    void InitFrom(FrTabSettingsDocObj* docObj);
 
     // Properties
     FrPropMacro(int,ID);
@@ -59,8 +68,8 @@ public:
     FrPropMacro(ActiveView::View,ActiveView);
 
     FrGetRefPropMacro(ViewSettings,SliceViewSettings);
-    FrGetRefPropMacro(ViewSettings,OrthoViewSettings);
     FrGetRefPropMacro(ViewSettings,MosaicViewSettings);
+    FrGetRefPropMacro(OViewSettings,OrthoViewSettings);
 };
 
 #endif

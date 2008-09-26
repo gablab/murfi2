@@ -6,16 +6,13 @@
 int main(int argc, char **argv){
 	FrApplication application(argc, argv);
     
-    // Create view
-	FrMainWindow mainWindow;
-	mainWindow.show();
-    
-    // Create document
-    FrMainDocument document;
-    document.SetDefaultValues();
+    // Create main view and document of app
+	FrMainWindow* mainWindow = new FrMainWindow();
+    FrMainDocument* document = new FrMainDocument();
 
-    // Create controller
-    FrMainController controller(&mainWindow, &document);
+    // Create main controller.
+    // It take care about all the stuff.
+    FrMainController controller(mainWindow, document);
     controller.Initialize();
 
     int result = 0;

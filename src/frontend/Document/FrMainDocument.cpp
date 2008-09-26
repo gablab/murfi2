@@ -14,15 +14,6 @@ void FrMainDocument::GetAllImages(std::vector<FrDocumentObj*>& images){
     GetObjectsByType(images, FrDocumentObj::ImageObject);
 }
 
-void FrMainDocument::SetDefaultValues(){
-    // Setup threshold/brightness/contrast values
-    m_Threshold = DEF_THRESHOLD;
-    m_Brightness = DEF_BRIGHTNESS;
-    m_Contrast = DEF_CONTRAST;
-	
-	m_Slice = 0;
-}
-
 FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
     std::vector<FrDocumentObj*>& objects = this->GetObjects();
         

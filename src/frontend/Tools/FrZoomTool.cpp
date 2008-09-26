@@ -72,6 +72,7 @@ void FrZoomTool::ZoomByScaling(double factor, FrInteractorStyle* is){
         
 	if (camera->GetParallelProjection()) {
         FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
+        cmd->SetRenderer(is->CurrentRenderer);
         cmd->SetScale(curScale);
         cmd->Execute();
     }

@@ -36,8 +36,10 @@ bool FrSaveTabSettingsCmd::Execute(){
         FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj();
         docObj->SetIsCurrent(false);
         docObj->SetName(dlg.GetName());
-        docObj->SetDescription(dlg.GetDescription());        
-        InitializeDocumentObj(docObj, mv);
+        docObj->SetDescription(dlg.GetDescription());
+        // Use new instead
+        // InitDocObjFromView(docObj, mv);
+        InitDocObjFromActive(docObj);
 
         // add to main document
         result = doc->Add(docObj);
@@ -55,9 +57,14 @@ bool FrSaveTabSettingsCmd::Execute(){
     return result;
 }
 
-void FrSaveTabSettingsCmd::InitializeDocumentObj(FrTabSettingsDocObj* docObj, 
-                                                 FrMainWindow* mv){
-    
+void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrTabSettingsDocObj* source = doc->GetCurrentTabSettings();
+    docObj->InitFrom(source);
+}
+
+void FrSaveTabSettingsCmd::InitDocObjFromView(FrTabSettingsDocObj* docObj, 
+                                              FrMainWindow* mv){
     // Setup common settings
     SetActiveViewSettings(docObj, mv);
 
@@ -78,8 +85,20 @@ void FrSaveTabSettingsCmd::InitializeDocumentObj(FrTabSettingsDocObj* docObj,
     InitTBCSettings(&mvSettings.TbcSetting, 
                     mosaicView->GetTBCFilter());
 
-    // Do nothing here (with ORTHO VIEW) for a while
-    // ViewSettings& ovSettings = docObj->GetOrthoViewSettings();    
+    // Init ortho view settings
+    FrOrthoView* orthoView = mv->GetOrthoView();
+    OViewSettings& ovSettings = docObj->GetOrthoViewSettings();
+
+    ovSettings.CoronalSlice = orthoView->GetSliceExtractor(CORONAL_RENDERER)->GetSlice();
+    ovSettings.SagitalSlice = orthoView->GetSliceExtractor(SAGITAL_RENDERER)->GetSlice();
+    ovSettings.AxialSlice   = orthoView->GetSliceExtractor(AXIAL_RENDERER)->GetSlice();
+
+    for(int i=0; i < RENDERER_COUNT-1; ++i){
+        InitCamSettings(&ovSettings.CamSettings[i], 
+                        orthoView->GetRenderer(i)->GetActiveCamera());
+        InitTBCSettings(&ovSettings.TbcSettings[i], 
+                        orthoView->GetTBCFilter(i));
+    }
 }
 
 void FrSaveTabSettingsCmd::SetActiveViewSettings(FrTabSettingsDocObj* docObj, 

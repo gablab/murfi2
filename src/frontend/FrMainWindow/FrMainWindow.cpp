@@ -28,14 +28,14 @@ FrMainWindow::FrMainWindow()
     InitializeWidgets();
     
     // Initialize signals
-    m_signalManager = new FrActionSignalManager(this);
+    m_SignalManager = new FrActionSignalManager(this);
 }
 
 FrMainWindow::~FrMainWindow(){
     if(m_SliceView) delete m_SliceView;
     if(m_MosaicView) delete m_MosaicView;
     if(m_OrthoView) delete m_OrthoView;
-    if(m_signalManager) delete m_signalManager;
+    if(m_SignalManager) delete m_SignalManager;
 }
 
 void FrMainWindow::SetupUi(QMainWindow* mainWindow){
@@ -50,16 +50,16 @@ void FrMainWindow::SetupUi(QMainWindow* mainWindow){
     mainWindow->setCentralWidget(m_centralWidget);
 
     // Action manager
-    m_actManager = new FrActionManager(mainWindow);
+    m_ActionManager = new FrActionManager(mainWindow);
 
     // Main menu
-    m_mainMenu = new FrMainMenu(mainWindow, m_actManager);
+    m_mainMenu = new FrMainMenu(mainWindow, m_ActionManager);
     m_mainMenu->setObjectName(QString::fromUtf8("m_mainMenu"));
     m_mainMenu->setGeometry(QRect(0, 0, 800, 21));
     mainWindow->setMenuBar(m_mainMenu);
 
     // Tool bar
-    m_toolBar = new FrToolBar(mainWindow, m_actManager);
+    m_toolBar = new FrToolBar(mainWindow, m_ActionManager);
     m_toolBar->setObjectName(QString::fromUtf8("m_toolBar"));
     mainWindow->addToolBar(Qt::TopToolBarArea, m_toolBar);
 
@@ -79,7 +79,7 @@ void FrMainWindow::RetranslateUi(QMainWindow* mainWindow){
         QApplication::translate("MainWindow", "MRI", 0, 
         QApplication::UnicodeUTF8));
     
-    m_actManager->Retranslate();
+    m_ActionManager->Retranslate();
     m_mainMenu->Retranslate();
     m_toolBar->Retranslate();
 }

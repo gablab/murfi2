@@ -177,7 +177,6 @@ void FrSliceView::UpdatePipeline(int point){
             cam->SetParallelScale(camSettings.Scale);
             cam->SetFocalPoint(camSettings.FocalPoint);
             cam->SetViewUp(camSettings.ViewUp);
-
             cam->SetPosition(camSettings.Position);
         }
     default:

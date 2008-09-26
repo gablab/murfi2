@@ -29,6 +29,7 @@ public:
 private:
     int GetActiveViewType();
     FrBaseView* GetTargetView(int viewType);
+    void UpdateViewUI();
 };
 
 #endif // FR_BASE_CMD

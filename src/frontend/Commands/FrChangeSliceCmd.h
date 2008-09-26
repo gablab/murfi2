@@ -3,8 +3,9 @@
 
 #include "FrBaseCmd.h"
 
-// This command changes settings of camera
-// of current view and then update view.
+// This command changes current slice number
+// it responsible for support of single slice view
+// as well as orthogonal slice view.
 class FrChangeSliceCmd : public FrBaseCmd
 {
 public:
@@ -13,10 +14,9 @@ public:
     
     // Modifiers
     void SetSliceDelta(double value);
+    void SetMouseXY(int x, int y);
 
-    //
     // Overrides
-    //
 	virtual bool Execute();
 
     // Undo/redo section
@@ -25,8 +25,20 @@ public:
 	virtual bool Redo();
 
 private:
+    bool ChangeOrthoViewSliceNums();
+    int GetCoronalSlice(int x, int y, int renNum);
+	int GetSagitalSlice(int x, int y, int renNum);
+	int GetAxialSlice(int x, int y, int renNum);
+
+private:
+    // Params for simple views 
     bool m_isSlice;
     double m_Slice;
+
+    // Params for ortho view
+    bool m_isXY;
+    int m_X;
+    int m_Y;
 };
 
 #endif // FR_CHANGESLICE_CMD

@@ -28,7 +28,9 @@ public:
     FrSetPropMacro(bool, IsCurrent);
 
 private:
-    void InitializeDocumentObj(FrTabSettingsDocObj* docObj, FrMainWindow* mv);
+    void InitDocObjFromActive(FrTabSettingsDocObj* docObj);
+    // Use better InitDocObjFromActive(FrTabSettingsDocObj* docObj) instead.
+    void InitDocObjFromView(FrTabSettingsDocObj* docObj, FrMainWindow* mv);
     void SetActiveViewSettings(FrTabSettingsDocObj* docObj, FrMainWindow* mv);
     void InitCamSettings(void* settings, vtkCamera* cam);
     void InitTBCSettings(void* settings, FrTBCFilter* tbcFilter);

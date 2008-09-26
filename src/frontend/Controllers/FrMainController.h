@@ -4,11 +4,11 @@
 #include "FrController.h"
 
 // Forward declaration
+class FrTool;
 class FrMainWindow;
 class FrMainDocument;
 class FrToolController;
 class FrInteractorStyle;
-class FrTool;
 
 class QString;
 
@@ -34,18 +34,18 @@ public:
     void ChangeBookmark(int id);
     void DeleteBookmark(int id);
 
+    void SetCurrentTool(int tool);
+
 	// Override from base class
     virtual void Notify(int notifyCode);
 
     // Properties
     FrGetPropMacro(FrMainWindow*, MainView);
     FrGetPropMacro(FrMainDocument*, MainDocument);
+    FrGetPropMacro(FrToolController*, ToolController);
 
 private:
     friend class FrInteractorStyle;
-
-private:
-    FrToolController* m_toolController;
 };
 
 #endif

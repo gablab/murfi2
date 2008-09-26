@@ -30,17 +30,23 @@ void FrActionManager::Initialize(QObject* parent){
     // View
     m_ViewSliceAction = new QAction(parent);
     m_ViewSliceAction->setObjectName(QString::fromUtf8("m_ViewSliceAction"));
+    m_ViewSliceAction->setCheckable(true);
     m_ViewMosaicAction = new QAction(parent);
     m_ViewMosaicAction->setObjectName(QString::fromUtf8("m_ViewMosaicAction"));
+    m_ViewMosaicAction->setCheckable(true);
     m_ViewOrthoAction = new QAction(parent);
     m_ViewOrthoAction->setObjectName(QString::fromUtf8("m_ViewOrthoAction"));
+    m_ViewOrthoAction->setCheckable(true);
     // Tool
     m_ManipulatorToolAction = new QAction(parent);
     m_ManipulatorToolAction->setObjectName(QString::fromUtf8("m_ManipulatorToolAction"));
+    m_ManipulatorToolAction->setCheckable(true);
     m_VoxelToolAction = new QAction(parent);
     m_VoxelToolAction->setObjectName(QString::fromUtf8("m_VoxelToolAction"));
+    m_VoxelToolAction->setCheckable(true);
     m_RoiToolAction = new QAction(parent);
     m_RoiToolAction->setObjectName(QString::fromUtf8("m_RoiToolAction"));
+    m_RoiToolAction->setCheckable(true);
     // Help
     m_ShowHelpAction = new QAction(parent);
     m_ShowHelpAction->setObjectName(QString::fromUtf8("m_ShowHelpAction"));

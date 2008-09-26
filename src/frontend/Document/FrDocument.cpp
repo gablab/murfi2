@@ -1,5 +1,5 @@
 #include "FrDocument.h"
-
+#include <algorithm>
 
 FrDocument::FrDocument(){
 }
@@ -16,32 +16,27 @@ bool FrDocument::Add(FrDocumentObj* obj){
 }
 
 bool FrDocument::Remove(FrDocumentObj* obj){
-    // find appropriate object and renmove it
-    std::vector<FrDocumentObj*>::iterator it, itEnd(m_Objects.end());
+    // find appropriate object and remove it
+    std::vector<FrDocumentObj*>::iterator it;
+    it = std::find(m_Objects.begin(), m_Objects.end(), obj);
+    
+    bool result = false;
+    if(it != m_Objects.end()){
+        m_Objects.erase(it);
+        obj->OnRemove(this);
+        delete obj;
 
-    for(it = m_Objects.begin(); it != itEnd; ++it){
-        
-        if(obj == (*it)){
-            FrDocumentObj* docObj = (*it);
-            m_Objects.erase(it);
-
-            docObj->OnRemove(this);
-            delete docObj;
-            break;
-        }
+        result = true;
     }
-    return true;
+    return result;
 }
 
 void FrDocument::DeleteAll(){
     std::vector<FrDocumentObj*>::iterator it, itEnd(m_Objects.end());
 
-    for(it = m_Objects.begin(); it != itEnd; ++it){
-        FrDocumentObj* docObj = (*it);        
-        docObj->OnRemove(this);
-        delete docObj;
+    while(m_Objects.size() > 0){
+        Remove( (*m_Objects.begin()) );
     }
-    m_Objects.clear();
 }
     
 void FrDocument::GetObjectsByType(std::vector<FrDocumentObj*>& objects, 

@@ -18,7 +18,10 @@
 // init helper
 inline void INIT_ARR3(double arr[], double a0, double a1, double a2){
     arr[0] = a0; arr[1] = a1; arr[2] = a2;
-} 
+}
+inline void INIT_ARR_ARR(double arr0[], double arr1[]){
+    arr0[0] = arr1[0]; arr0[1] = arr1[1]; arr0[2] = arr1[2];
+}
 
 // Implementation
 FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
@@ -26,13 +29,11 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
     m_IsDefault = isDefault;
     m_ActiveView = DEF_VIEW;
 
-    ViewSettings* vs[] = { &m_SliceViewSettings, &m_MosaicViewSettings, &m_OrthoViewSettings };
-    for(int i=0; i < 3; ++i){
+    //  Setup simple views
+    ViewSettings* vs[] = { &m_SliceViewSettings, &m_MosaicViewSettings };
+    for(int i=0; i < 2; ++i){
         vs[i]->SliceNumber  = DEF_SLICE_NUMBER;
-        vs[i]->CoronalSlice = DEF_SLICE_NUMBER;
-        vs[i]->SagitalSlice = DEF_SLICE_NUMBER;
-        vs[i]->AxialSlice   = DEF_SLICE_NUMBER;
-        
+                
         vs[i]->TbcSetting.Contrast = DEF_CONTRAST;
         vs[i]->TbcSetting.Threshold = DEF_THRESHOLD;
         vs[i]->TbcSetting.Brightness = DEF_BRIGHTNESS;
@@ -41,6 +42,23 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
         INIT_ARR3(vs[i]->CamSettings.ViewUp, DEF_CAM_VIEWUP);
         INIT_ARR3(vs[i]->CamSettings.FocalPoint, DEF_CAM_FOCUS);
         INIT_ARR3(vs[i]->CamSettings.Position, DEF_CAM_POSITION);
+    }
+
+    // Setup ortho view
+    OViewSettings* ovs = &m_OrthoViewSettings;
+    ovs->CoronalSlice = DEF_SLICE_NUMBER;
+    ovs->SagitalSlice = DEF_SLICE_NUMBER;
+    ovs->AxialSlice   = DEF_SLICE_NUMBER;
+
+    for(int i=0; i < ORTHO_VIEW_NUM; ++i){
+        ovs->TbcSettings[i].Contrast = DEF_CONTRAST;
+        ovs->TbcSettings[i].Threshold = DEF_THRESHOLD;
+        ovs->TbcSettings[i].Brightness = DEF_BRIGHTNESS;
+
+        ovs->CamSettings[i].Scale = DEF_CAM_SCALE;
+        INIT_ARR3(ovs->CamSettings[i].ViewUp, DEF_CAM_VIEWUP);
+        INIT_ARR3(ovs->CamSettings[i].FocalPoint, DEF_CAM_FOCUS);
+        INIT_ARR3(ovs->CamSettings[i].Position, DEF_CAM_POSITION);
     }
 }
 
@@ -67,4 +85,46 @@ void FrTabSettingsDocObj::OnRemove(FrDocument* doc){
 
 FrDocumentObj::ObjType FrTabSettingsDocObj::GetType(){
     return FrDocumentObj::TabSettings;
+}
+
+void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
+    // Do not need copy this
+    // Have to be set by user manually
+    //m_IsCurrent = docObj->m_IsCurrent;
+    //m_IsDefault = docObj->m_IsDefault;
+    m_ActiveView = docObj->m_ActiveView;
+
+    //  Setup simple views
+    ViewSettings* vs[] = { &m_SliceViewSettings, &m_MosaicViewSettings };
+    ViewSettings* vsSrc[] = { &docObj->m_SliceViewSettings, &docObj->m_MosaicViewSettings };
+    for(int i=0; i < 2; ++i){
+        vs[i]->SliceNumber  = vsSrc[i]->SliceNumber;
+                
+        vs[i]->TbcSetting.Contrast = vsSrc[i]->TbcSetting.Contrast;
+        vs[i]->TbcSetting.Threshold = vsSrc[i]->TbcSetting.Threshold;
+        vs[i]->TbcSetting.Brightness = vsSrc[i]->TbcSetting.Brightness;
+
+        vs[i]->CamSettings.Scale = vsSrc[i]->CamSettings.Scale;
+        INIT_ARR_ARR(vs[i]->CamSettings.ViewUp, vsSrc[i]->CamSettings.ViewUp);
+        INIT_ARR_ARR(vs[i]->CamSettings.Position, vsSrc[i]->CamSettings.Position);
+        INIT_ARR_ARR(vs[i]->CamSettings.FocalPoint, vsSrc[i]->CamSettings.FocalPoint);
+    }
+
+    // Setup ortho view
+    OViewSettings* ovs = &m_OrthoViewSettings;
+    OViewSettings* ovsSrc = &docObj->m_OrthoViewSettings;
+    ovs->CoronalSlice = ovsSrc->CoronalSlice;
+    ovs->SagitalSlice = ovsSrc->SagitalSlice;
+    ovs->AxialSlice   = ovsSrc->AxialSlice;
+
+    for(int i=0; i < ORTHO_VIEW_NUM; ++i){
+        ovs->TbcSettings[i].Contrast = ovsSrc->TbcSettings[i].Contrast;
+        ovs->TbcSettings[i].Threshold = ovsSrc->TbcSettings[i].Threshold;
+        ovs->TbcSettings[i].Brightness = ovsSrc->TbcSettings[i].Brightness;
+
+        ovs->CamSettings[i].Scale = ovsSrc->CamSettings[i].Scale;
+        INIT_ARR_ARR(ovs->CamSettings[i].ViewUp, ovsSrc->CamSettings[i].ViewUp);
+        INIT_ARR_ARR(ovs->CamSettings[i].Position, ovsSrc->CamSettings[i].Position);
+        INIT_ARR_ARR(ovs->CamSettings[i].FocalPoint, ovsSrc->CamSettings[i].FocalPoint);
+    }
 }

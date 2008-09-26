@@ -6,8 +6,8 @@
 
 #define MOUSE_MOVE_THRESHOLD 0.0
 
-FrTBCTool::FrTBCTool(FrMainDocument* doc)
-    : m_Document(0), m_oldX(0), m_oldY(0) {
+FrTBCTool::FrTBCTool()
+    : m_oldX(0), m_oldY(0) {
 }
 
 FrTBCTool::~FrTBCTool(){
@@ -37,7 +37,7 @@ bool FrTBCTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     // Check for safety
-    if(!is->CurrentRenderer || m_Document == NULL) return false;
+    if(!is->CurrentRenderer) return false;
     		
     // create and init command
     int inc;

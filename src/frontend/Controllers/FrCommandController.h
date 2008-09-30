@@ -19,6 +19,8 @@ class FrMainController;
 #include "FrSaveTabSettingsCmd.h"
 #include "FrUpdateTabsCmd.h"
 #include "FrUpdatePipelineCmd.h"
+#include "FrVoxelInfoCmd.h"
+#include "FrResetImageCmd.h"
 
 // This class allow user to create 
 // and manage commands. Organised like singletone;

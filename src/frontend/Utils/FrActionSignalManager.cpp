@@ -54,6 +54,9 @@ void FrActionSignalManager::Initialize(){
              m_mainWindow, SLOT(OnBookmarkChanged(int)) );
     connect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(int)),
              m_mainWindow, SLOT(OnBookmarkDelete(int)) );
+
+    // Connect test action
+    CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
 }
 
  // File 
@@ -122,4 +125,9 @@ void FrActionSignalManager::OnShowHelpAction(){
 
 void FrActionSignalManager::OnShowAboutAction(){
     QApplication::aboutQt();
+}
+
+//Test
+void FrActionSignalManager::OnTestAction(){
+    m_mainWindow->GetMainController()->Test();
 }

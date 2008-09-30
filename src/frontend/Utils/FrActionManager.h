@@ -36,6 +36,9 @@ public:
     FrGetPropMacro(QAction*, ShowHelpAction);
     FrGetPropMacro(QAction*, ShowAboutAction);
 
+    // Test
+    FrGetPropMacro(QAction*, TestAction);
+
 private:
     void Initialize(QObject* parent);
 };

@@ -8,8 +8,7 @@
 // Base abstract class for commands.  Supports undo and redo
 // features.  Command is called by Execute() method.
 // You should derive all your commans from this.
-class FrBaseCmd
-{
+class FrBaseCmd {
 public:
     // Constructor/destructor
     FrBaseCmd() : m_MainController(0) { }

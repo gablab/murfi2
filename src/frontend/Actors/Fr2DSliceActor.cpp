@@ -134,12 +134,12 @@ void Fr2DSliceActor::BuildImageSlice()
 		this->ImagePlane = vtkPlaneSource::New();
 		this->ImagePlane->SetXResolution(1);
 		this->ImagePlane->SetYResolution(1);
-
+        
 		// ImageSlice
 		this->ImageSlice = vtkActor::New();
 		this->ImageSlice->PickableOff();
 		this->ImageTexture = vtkTexture::New();
-		
+        		
 		int dims[3];  
 		this->CurrentImage->GetDimensions(dims);
 
@@ -159,12 +159,14 @@ void Fr2DSliceActor::BuildImageSlice()
 		this->ImageSlice->GetProperty()->SetOpacity(this->Opacity);
 		this->ImageSlice->GetProperty()->SetInterpolationToFlat();
 		this->ImageSlice->SetTexture(this->ImageTexture);
+        this->ImageSlice->SetPickable(this->Pickable);
 
 		// build image outline
 		vtkOutlineFilter* outlineFilter = vtkOutlineFilter::New();
 		vtkPolyDataMapper* mapOutline = vtkPolyDataMapper::New();
-		ImageOutline = vtkFollower::New();
-
+		this->ImageOutline = vtkFollower::New();
+        this->ImageOutline->PickableOff();
+            
 		outlineFilter->SetInput(this->CurrentImage);
 		outlineFilter->Update();
 
@@ -181,7 +183,11 @@ void Fr2DSliceActor::BuildImageSlice()
 
 		AddPart(this->ImageSlice);
 		AddPart(this->ImageOutline);
-		imageMapper->Delete();
+
+        // clear all the stuff		
+        mapOutline->Delete();
+        outlineFilter->Delete();
+        imageMapper->Delete();
     }
 }
 

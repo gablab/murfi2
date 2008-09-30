@@ -52,6 +52,9 @@ void FrActionManager::Initialize(QObject* parent){
     m_ShowHelpAction->setObjectName(QString::fromUtf8("m_ShowHelpAction"));
     m_ShowAboutAction = new QAction(parent);
     m_ShowAboutAction->setObjectName(QString::fromUtf8("m_ShowAboutAction"));
+    // Test
+    m_TestAction = new QAction(parent);
+    m_TestAction->setObjectName(QString::fromUtf8("m_TestAction"));
 }
 
 void FrActionManager::Retranslate(){
@@ -86,4 +89,6 @@ void FrActionManager::Retranslate(){
     m_ShowHelpAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Help"));
     m_ShowAboutAction->setText(DO_TRANSLATE(TR_CONTEXT, "About"));
     m_ShowAboutAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "About"));
+    //Test
+    m_TestAction->setText(DO_TRANSLATE(TR_CONTEXT, "Test"));
 }

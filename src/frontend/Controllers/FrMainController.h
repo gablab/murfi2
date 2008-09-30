@@ -25,6 +25,9 @@ public:
     FrTool* GetCurrentTool();
 
 public:
+    // Testing ... 
+    void Test();
+
     // Interface for MainWindow
     void LoadImage(QString& fileName);
     
@@ -38,6 +41,7 @@ public:
 
 	// Override from base class
     virtual void Notify(int notifyCode);
+   
 
     // Properties
     FrGetPropMacro(FrMainWindow*, MainView);

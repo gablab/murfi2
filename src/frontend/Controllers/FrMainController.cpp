@@ -175,3 +175,10 @@ void FrMainController::SetCurrentTool(int tool){
     cmd->Execute();
     delete cmd;
 }
+
+void FrMainController::Test(){    
+    FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
+    cmd->SetTargetView(FrResetImageCmd::Current);
+    cmd->Execute();
+    delete cmd;
+}

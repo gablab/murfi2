@@ -1,6 +1,11 @@
 #ifndef FR_VOXEL_TOOL
 #define FR_VOXEL_TOOL
 
+// Forward declaration
+class vtkRenderer;
+class vtkPointPicker;
+
+// Some includes
 #include "FrTool.h"
 
 // Voxel tool
@@ -18,6 +23,12 @@ public:
 	FrVoxelTool();
 	/// Destructor
 	virtual ~FrVoxelTool();
+
+private:
+    int GetPickedPointIndex(int x, int y, vtkRenderer* renderer);
+
+private:
+    vtkPointPicker* m_pointPicker;
 };
 
 #endif

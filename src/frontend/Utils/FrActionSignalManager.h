@@ -34,6 +34,8 @@ public slots:
     // Help
     void OnShowHelpAction();
     void OnShowAboutAction();
+    //Test
+    void OnTestAction();
 
 private:
     void Initialize();

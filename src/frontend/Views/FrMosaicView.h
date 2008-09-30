@@ -26,6 +26,7 @@ public:
     // Accessors
     FrTBCFilter* GetTBCFilter() { return m_tbcFilter; }
     vtkRenderer* GetRenderer(){ return m_renderer; }
+    Fr2DSliceActor* GetActor(){ return m_actor; }
 
 private:
     // Pipline 

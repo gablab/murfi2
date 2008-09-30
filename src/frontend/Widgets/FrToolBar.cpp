@@ -35,4 +35,8 @@ void FrToolBar::SetupActions(){
 
     // Help 
     this->addAction(m_actManager->GetShowAboutAction());
+    this->addSeparator();
+
+    // Test
+    this->addAction(m_actManager->GetTestAction());
 }

@@ -1,4 +1,3 @@
-// TODO: Fix slicing!
 #include "FrChangeSliceCmd.h"
 #include "FrMainDocument.h"
 #include "FrMainWindow.h"
@@ -11,6 +10,7 @@
 // VTK stuff
 #include "vtkRenderer.h"
 #include "vtkCoordinate.h"
+#include "vtkPointPicker.h"
 
 //Some defines
 #define INVALIDE_RENDERER_NUM -1
@@ -74,6 +74,11 @@ bool FrChangeSliceCmd::Execute(){
     return result;
 }
 
+typedef union dbl3{
+    struct{ double x, y, z; };
+    double raw[3];
+} Dbl3;
+std::vector<Dbl3> pts;
 bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
     if( !m_isXY ) return false;
 
@@ -90,7 +95,7 @@ bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
     }
 
     bool result = false;
-    if(renNumber != INVALIDE_RENDERER_NUM){
+    if(renNumber != INVALIDE_RENDERER_NUM){        
         // Get local renderer point
         double* point;
         double localPoint[3];
@@ -98,6 +103,14 @@ bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
 	    coordinate->SetCoordinateSystemToDisplay();
 	    coordinate->SetValue(m_X, m_Y, 0.0);
 	    point = coordinate->GetComputedWorldValue(ov->GetRenderer(renNumber));
+
+        double* bounds = ov->GetActor(renNumber)->GetBounds();
+        double b0 = bounds[0];
+        double b1 = bounds[1];
+        double b2 = bounds[2];
+        double b3 = bounds[3];
+        double b4 = bounds[4];
+        double b5 = bounds[5];
 
         localPoint[0] = point[0];
         localPoint[1] = point[1];
@@ -159,7 +172,7 @@ int FrChangeSliceCmd::GetAxialSlice(int x, int y, int renNum){
 	{	
 	    case CORONAL_RENDERER: result = ClampValue(y, 0, int(bounds[3]));
 			break;
-		case SAGITAL_RENDERER: result = ClampValue(y, 0, int(bounds[1]));
+		case SAGITAL_RENDERER: result = ClampValue(y, 0, int(bounds[3]));
 			break;
 	}
     return result;

@@ -49,6 +49,8 @@ bool FrBookmarkWidget::AddBookmark(FrTabSettingsDocObj* ts){
     if(ts->GetIsCurrent()){
         m_tabWidget->setCurrentWidget(bookmark);
     }
+	if(m_tabWidget->count()==1) 
+		emit CurrentChanged(bookmark->GetID());
     return true;
 }
 

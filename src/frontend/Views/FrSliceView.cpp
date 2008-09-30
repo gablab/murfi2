@@ -12,6 +12,7 @@
 #include "FrUtils.h"
 #include "FrSliceExtractor.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrLayeredImage.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -44,46 +45,50 @@
 FrSliceView::FrSliceView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
     	
-    // Create pipline stuff
+    // Create pipeline stuff
     m_docReader = FrDocumentReader::New();
     m_tbcFilter = FrTBCFilter::New();
 	m_SliceExtractor = FrSliceExtractor::New();
-	m_actor = Fr2DSliceActor::New();
-    m_tactor = vtkTextActor::New();
-    m_renderer = vtkRenderer::New();
+//	m_actor = Fr2DSliceActor::New();
+//    m_tactor = vtkTextActor::New();
+//    m_renderer = vtkRenderer::New();
+
+	m_LayeredImage = new FrLayeredImage(GetRenderWindow());
 }
 
 FrSliceView::~FrSliceView(){
-
-    if(m_renderer) m_renderer->Delete();
+//    if(m_renderer) m_renderer->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
 	if(m_SliceExtractor) m_SliceExtractor->Delete();
-	if(m_actor) m_actor->Delete();
-    if(m_tactor) m_tactor->Delete();
+//	if(m_actor) m_actor->Delete();
+//    if(m_tactor) m_tactor->Delete();
     if(m_docReader) m_docReader->Delete();
 }
 
 void FrSliceView::Initialize(){
     // create renderer
-    m_renderer->GetActiveCamera()->ParallelProjectionOn();
-    m_renderer->SetBackground( 0.0, 0.0, 0.0 );
+//    m_renderer->GetActiveCamera()->ParallelProjectionOn();
+//    m_renderer->SetBackground( 0.0, 0.0, 0.0 );
 
-    SetupRenderers();
+//    SetupRenderers();
+
+	m_LayeredImage->Initialize();		// test
+
 	GetRenderWindow()->Render();
 }
 
 void FrSliceView::SetupRenderers(){
-    
     RemoveRenderers();
-    
-    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer);
+	
+	m_LayeredImage->SetupRenderers();
+//    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer);
 }
 
 void FrSliceView::RemoveRenderers(){
-
     // Remove all renderers
-    QTVIEW3D->GetRenderWindow()->GetRenderers()->RemoveItem(m_renderer);
-    QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
+	m_LayeredImage->RemoveRenderers();
+//    QTVIEW3D->GetRenderWindow()->GetRenderers()->RemoveItem(m_renderer);
+//    QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
 }
 
 void FrSliceView::UpdatePipeline(int point){
@@ -106,8 +111,8 @@ void FrSliceView::UpdatePipeline(int point){
     case FRP_FULL:
         {
             // Clear scene
-            m_renderer->RemoveAllViewProps();
-            m_renderer->ResetCamera();
+//            m_renderer->RemoveAllViewProps();
+//            m_renderer->ResetCamera();
             GetRenderWindow()->Render();
 
             isCleared = true;
@@ -123,11 +128,11 @@ void FrSliceView::UpdatePipeline(int point){
 
 			// set text actor
             if(isCleared){
-			    m_tactor->GetTextProperty()->SetColor(100, 100, 0);
-			    m_tactor->GetTextProperty()->SetBold(5);
-			    m_tactor->GetTextProperty()->SetFontSize(20);
-			    m_tactor->SetPosition(20, 20);
-                m_renderer->AddActor(m_tactor);
+			    //m_tactor->GetTextProperty()->SetColor(100, 100, 0);
+			    //m_tactor->GetTextProperty()->SetBold(5);
+			    //m_tactor->GetTextProperty()->SetFontSize(20);
+			    //m_tactor->SetPosition(20, 20);
+       //         m_renderer->AddActor(m_tactor);
             }
         }
     case FRP_SLICE:
@@ -146,7 +151,7 @@ void FrSliceView::UpdatePipeline(int point){
 			strcat(text, "Slice ");
             itoa(settings.SliceNumber, tmp, 10);
 			strcat(text, tmp);
-			m_tactor->SetInput(text);
+			//m_tactor->SetInput(text);
         }
     case FRP_TBC:
         {
@@ -162,22 +167,24 @@ void FrSliceView::UpdatePipeline(int point){
 
             if(m_tbcFilter->GetInput()){
                 m_tbcFilter->Update();
-                m_actor->SetInput(m_tbcFilter->GetOutput());
-                // Add actor
+                //m_actor->SetInput(m_tbcFilter->GetOutput());
+				m_LayeredImage->SetInput(m_tbcFilter->GetOutput());
+				// Add actor
                 if(isCleared) {
-                    m_renderer->AddActor(m_actor);
+                //    m_renderer->AddActor(m_actor);
                 }
             }
         }
     case FRP_SETCAM:
         {
             // Setup camera here 
-            cam = m_renderer->GetActiveCamera();
-            cam->ParallelProjectionOn();
-            cam->SetParallelScale(camSettings.Scale);
-            cam->SetFocalPoint(camSettings.FocalPoint);
-            cam->SetViewUp(camSettings.ViewUp);
-            cam->SetPosition(camSettings.Position);
+     //       cam = m_renderer->GetActiveCamera();
+     //       cam->ParallelProjectionOn();
+     //       cam->SetParallelScale(camSettings.Scale);
+     //       cam->SetFocalPoint(camSettings.FocalPoint);
+     //       cam->SetViewUp(camSettings.ViewUp);
+     //       cam->SetPosition(camSettings.Position);
+			m_LayeredImage->SetCamera(camSettings);	
         }
     default:
         // do nothing
@@ -185,5 +192,6 @@ void FrSliceView::UpdatePipeline(int point){
     }
 
     // redraw scene
-    GetRenderWindow()->Render();
+	//m_LayeredImage->Update();
+	GetRenderWindow()->Render();
 }

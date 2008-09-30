@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -301,6 +301,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Tools\FrRoiTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrRoiTool.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Tools\FrSliceScrollTool.cpp"
 				>
 			</File>
@@ -322,6 +330,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Tools\FrTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrVoxelTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrVoxelTool.h"
 				>
 			</File>
 			<File
@@ -409,7 +425,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\FrViews\FrSliceView.h"
+				RelativePath=".\frontend\Views\FrSliceView.h"
 				>
 			</File>
 		</Filter>
@@ -775,52 +791,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\frontend\Widgets\FrToolsPanel.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\frontend\Widgets\FrToolsPanel.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\frontend\Widgets\QVTKWidget.cxx"
 				>
 				<FileConfiguration
@@ -955,6 +925,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrManageToolCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrManageToolCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrMultiCmd.cpp"
 				>
 			</File>
@@ -984,6 +962,42 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrUpdateTabsCmd.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Layers"
+			>
+			<File
+				RelativePath=".\frontend\Layers\FrBaseLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrBaseLayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrLayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrLayeredImage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrLayeredImage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrTextLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrTextLayer.h"
 				>
 			</File>
 		</Filter>

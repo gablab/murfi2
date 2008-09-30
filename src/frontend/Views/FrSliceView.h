@@ -19,6 +19,7 @@ class FrMosaicFilter;	// test
 class Fr2DSliceActor;
 class FrDocumentReader;
 class FrSliceExtractor;
+class FrLayeredImage;	// test
 
 #include "FrBaseView.h"
 
@@ -49,6 +50,10 @@ private:
     // Actors
 	Fr2DSliceActor* m_actor;
     vtkTextActor* m_tactor;
+
+	// test
+	FrLayeredImage* m_LayeredImage;
+
 };
 
 #endif

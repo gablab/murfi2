@@ -12,12 +12,9 @@ FrLayeredImage::FrLayeredImage(vtkRenderWindow *renWindow){
 	
 	// set some vars
 	m_ActiveLayer = 0;
-	
-	this->AddLayer();	// default layer
-	this->AddLayer();	// default layer
-	this->AddLayer();	// default layer
-	this->AddLayer();	// default layer
-	this->AddLayer();	// default layer
+
+	m_defaultLayer = new FrSpecialLayer(GetRenderWindow());		// test
+	this->AddLayer();	// first layer
 }
 
 FrLayeredImage::~FrLayeredImage(){
@@ -28,6 +25,8 @@ void FrLayeredImage::Initialize(){
 	for (int i = 0; i<m_Layers.size(); i++){
 		m_Layers[i]->Initialize();
 	}
+	
+	m_defaultLayer->Initialize();	// test
 
 //	Update();
 }
@@ -36,24 +35,30 @@ void FrLayeredImage::SetupRenderers(){
 	for (int i = 0; i<m_Layers.size(); i++){
 		GetRenderWindow()->AddRenderer(m_Layers[i]->GetRenderer());
 	}
+
+	GetRenderWindow()->AddRenderer(m_defaultLayer->GetRenderer());	// test
 }
 
 void FrLayeredImage::RemoveRenderers(){
 	for (int i = 0; i<m_Layers.size(); i++){
 		GetRenderWindow()->GetRenderers()->RemoveItem(m_Layers[i]->GetRenderer());
 	}
+	
+	GetRenderWindow()->GetRenderers()->RemoveItem(m_defaultLayer->GetRenderer());	// test
+
 	GetRenderWindow()->GetRenderers()->InitTraversal();
 }
 
 
 void FrLayeredImage::AddLayer(){
 	int num = m_Layers.size();
-	FrLayer* layer = new FrLayer(m_RenderWindow, num);
+	FrLayer* layer = new FrLayer(GetRenderWindow(), num);
 
 	m_Layers.push_back(layer);
 	m_ActiveLayer = num;			// new layer becomes active by default
 	
-	GetRenderWindow()->SetNumberOfLayers(num+1);	// renew number of layers in RenderWindow	
+	GetRenderWindow()->SetNumberOfLayers(num+2);	// renew number of layers in RenderWindow	
+	m_defaultLayer->SetLayer(num+1);
 }
 
 void FrLayeredImage::RemoveLayer(){
@@ -67,6 +72,8 @@ void FrLayeredImage::SetInput(vtkImageData *input){
 		m_Layers[i]->SetInput(input);
 	}
 
+	m_defaultLayer->SetInput(input);	// test
+
 //	Update();
 }
 
@@ -75,6 +82,8 @@ void FrLayeredImage::SetCamera(CameraSettings& camSettings){
 		m_Layers[i]->SetCamera(camSettings);
 	}
 	
+	m_defaultLayer->SetCamera(camSettings);		// test
+
 //	Update();
 }
 
@@ -94,6 +103,8 @@ void FrLayeredImage::Update(){
 	for (int i = 0; i<m_Layers.size(); i++){
 		m_Layers[i]->Update();
 	}
+
+	m_defaultLayer->Update();		// test
 }
 
 

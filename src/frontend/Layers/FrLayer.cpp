@@ -13,7 +13,8 @@ FrLayer::FrLayer(vtkRenderWindow *renWindow, int layNum)
 : FrBaseLayer(renWindow){
 	//m_renderWindow = renWindow;
 
-	m_actor = Fr2DSliceActor::New();
+//	m_defaultActor = Fr2DSliceActor::New();		// test
+	m_actor = vtkImageActor::New();
 	GetRenderer()->SetLayer(layNum);
 
 	// some vars
@@ -31,6 +32,7 @@ void FrLayer::Initialize(){
 
 	// add actors
 	GetRenderer()->AddActor(m_actor);
+//	GetRenderer()->AddActor(m_defaultActor);	// test
 
 //	Update();
 }
@@ -39,6 +41,7 @@ void FrLayer::SetInput(vtkImageData* input){
 	m_inputData = input;
 	m_actor->SetInput(input);
 
+//	m_defaultActor->SetInput(input);	// test
 //	Update();
 }
 
@@ -70,7 +73,7 @@ void FrLayer::SetVisibility(bool value){
 }
 
 void FrLayer::SetLookupTable(vtkLookupTable* ltable){
-	m_actor->SetLookupTable(ltable);
+	//m_actor->SetLookupTable(ltable);
 
 	Update();
 }

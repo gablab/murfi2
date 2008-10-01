@@ -131,42 +131,42 @@ void Fr2DSliceActor::SetLevel(int level){
 void Fr2DSliceActor::BuildImageSlice()
 {
 	if (!this->ImageSlice){
-		this->ImagePlane = vtkPlaneSource::New();
-		this->ImagePlane->SetXResolution(1);
-		this->ImagePlane->SetYResolution(1);
-        
+		//this->ImagePlane = vtkPlaneSource::New();
+		//this->ImagePlane->SetXResolution(1);
+		//this->ImagePlane->SetYResolution(1);
+
 		// ImageSlice
-		this->ImageSlice = vtkActor::New();
-		this->ImageSlice->PickableOff();
-		this->ImageTexture = vtkTexture::New();
-        		
-		int dims[3];  
+		//this->ImageSlice = vtkActor::New();
+		//this->ImageSlice->PickableOff();
+		//this->ImageTexture = vtkTexture::New();
+		//
+		int dims[3]; 
+		double origin[3];
 		this->CurrentImage->GetDimensions(dims);
+		this->CurrentImage->GetOrigin(origin);
 
-		this->ImageTexture->SetInput(this->CurrentImage);
-		if (this->Interpolation==0)
-			this->ImageTexture->InterpolateOn();
-		else
-			this->ImageTexture->InterpolateOff();
-		this->ImageTexture->SetLookupTable(this->ColorMap); 
-		this->ImageTexture->MapColorScalarsThroughLookupTableOn();
-		this->ImageTexture->RepeatOff();
+		//this->ImageTexture->SetInput(this->CurrentImage);
+		//if (this->Interpolation==0)
+		//	this->ImageTexture->InterpolateOn();
+		//else
+		//	this->ImageTexture->InterpolateOff();
+		//this->ImageTexture->SetLookupTable(this->ColorMap); 
+		//this->ImageTexture->MapColorScalarsThroughLookupTableOn();
+		//this->ImageTexture->RepeatOff();
 
-		vtkPolyDataMapper* imageMapper = vtkPolyDataMapper::New();
-		imageMapper->SetInput(this->ImagePlane->GetOutput());
+		//vtkPolyDataMapper* imageMapper = vtkPolyDataMapper::New();
+		//imageMapper->SetInput(this->ImagePlane->GetOutput());
 
-		this->ImageSlice->SetMapper(imageMapper);
-		this->ImageSlice->GetProperty()->SetOpacity(this->Opacity);
-		this->ImageSlice->GetProperty()->SetInterpolationToFlat();
-		this->ImageSlice->SetTexture(this->ImageTexture);
-        this->ImageSlice->SetPickable(this->Pickable);
+		//this->ImageSlice->SetMapper(imageMapper);
+		//this->ImageSlice->GetProperty()->SetOpacity(this->Opacity);
+		//this->ImageSlice->GetProperty()->SetInterpolationToFlat();
+		//this->ImageSlice->SetTexture(this->ImageTexture);
 
 		// build image outline
 		vtkOutlineFilter* outlineFilter = vtkOutlineFilter::New();
 		vtkPolyDataMapper* mapOutline = vtkPolyDataMapper::New();
-		this->ImageOutline = vtkFollower::New();
-        this->ImageOutline->PickableOff();
-            
+		ImageOutline = vtkFollower::New();
+
 		outlineFilter->SetInput(this->CurrentImage);
 		outlineFilter->Update();
 
@@ -181,13 +181,9 @@ void Fr2DSliceActor::BuildImageSlice()
 		this->ImageOutline->GetProperty()->SetRepresentationToWireframe();
 		this->ImageOutline->PickableOff();
 
-		AddPart(this->ImageSlice);
+//		AddPart(this->ImageSlice);
 		AddPart(this->ImageOutline);
-
-        // clear all the stuff		
-        mapOutline->Delete();
-        outlineFilter->Delete();
-        imageMapper->Delete();
+//		imageMapper->Delete();
     }
 }
 
@@ -203,36 +199,36 @@ void Fr2DSliceActor::UpdateSlice(){
 	if (!this->CurrentImage)
 		return;
 
-	vtkImageData* img = this->CurrentImage;
-	int dim[3];  
-	img->GetDimensions(dim);
-	double sp[3];   
-	img->GetSpacing(sp);
-	double ori[3];  
-	img->GetOrigin(ori);
+	//vtkImageData* img = this->CurrentImage;
+	//int dim[3];  
+	//img->GetDimensions(dim);
+	//double sp[3];   
+	//img->GetSpacing(sp);
+	//double ori[3];  
+	//img->GetOrigin(ori);
 
-	if (this->Level==-1)
-		this->Level = dim[2]/2;		// only XY plane
+	//if (this->Level==-1)
+	//	this->Level = dim[2]/2;		// only XY plane
 
-	this->Level = Irange(this->Level, 0, dim[2]-1);		// only XY plane
+	//this->Level = Irange(this->Level, 0, dim[2]-1);		// only XY plane
 
-	double d1[3];
-	double d0[3];
-	for (int i = 0; i<=2; i++){
-		if (i!=2){		// only XY plane
-			d1[i] = sp[i]*double(dim[i]-0.5)+ori[i];
-			d0[i] = sp[i]*double(-0.5)+ori[i];
-		}
-		else{
-			d1[i] = sp[i]*double(this->Level)+ori[i];
-			d0[i] = d1[i];
-		}
-	}
+	//double d1[3];
+	//double d0[3];
+	//for (int i = 0; i<=2; i++){
+	//	if (i!=2){		// only XY plane
+	//		d1[i] = sp[i]*double(dim[i]-0.5)+ori[i];
+	//		d0[i] = sp[i]*double(-0.5)+ori[i];
+	//	}
+	//	else{
+	//		d1[i] = sp[i]*double(this->Level)+ori[i];
+	//		d0[i] = d1[i];
+	//	}
+	//}
 
-	this->ImagePlane->SetOrigin(d0[0] , d0[1] , d1[2]);
-	this->ImagePlane->SetPoint1(d1[0] , d0[1] , d1[2]);
-	this->ImagePlane->SetPoint2(d0[0] , d1[1] , d1[2]);
+	//this->ImagePlane->SetOrigin(d0[0] , d0[1] , d1[2]);
+	//this->ImagePlane->SetPoint1(d1[0] , d0[1] , d1[2]);
+	//this->ImagePlane->SetPoint2(d0[0] , d1[1] , d1[2]);
 
-	this->ImagePlane->Update();
+	//this->ImagePlane->Update();
 }
 

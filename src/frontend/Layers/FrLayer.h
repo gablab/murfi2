@@ -12,6 +12,7 @@
 #include "vtkImageData.h"
 #include "vtkTextActor.h"
 #include "vtkLookupTable.h"
+#include "vtkImageActor.h"
 
 
 class FrLayer : public FrBaseLayer 
@@ -33,7 +34,9 @@ public:
 
 private:
     // Actors
-	Fr2DSliceActor* m_actor;
+//	Fr2DSliceActor* m_defaultActor;
+	
+	vtkImageActor* m_actor;
 	vtkImageData* m_inputData;
 	float m_Opacity;
 

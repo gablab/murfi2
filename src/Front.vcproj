@@ -993,6 +993,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Layers\FrSpecialLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrSpecialLayer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Layers\FrTextLayer.cpp"
 				>
 			</File>

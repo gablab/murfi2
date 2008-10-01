@@ -3,6 +3,7 @@
 #define FR_LAYERED_IMAGE
 
 #include "FrLayer.h"
+#include "FrSpecialLayer.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrMacro.h"
 
@@ -44,6 +45,7 @@ public:
 private:
 	vtkRenderWindow* m_RenderWindow;
 	LayerCollection m_Layers;
+	FrSpecialLayer* m_defaultLayer;
 	vtkImageData* m_inputData;
 
 };

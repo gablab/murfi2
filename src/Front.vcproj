@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -131,7 +131,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
 				IgnoreDefaultLibraryNames="msvcp80d.lib;msvcr80d.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -610,6 +610,10 @@
 				RelativePath=".\frontend\Utils\FrUtils.h"
 				>
 			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrXmlDefs.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Widgets"
@@ -925,6 +929,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrLoadTabsCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrLoadTabsCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrManageToolCmd.cpp"
 				>
 			</File>
@@ -938,6 +950,22 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrMultiCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrResetImageCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrResetImageCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveTabsCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveTabsCmd.h"
 				>
 			</File>
 			<File
@@ -962,6 +990,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrUpdateTabsCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrVoxelInfoCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrVoxelInfoCmd.h"
 				>
 			</File>
 		</Filter>

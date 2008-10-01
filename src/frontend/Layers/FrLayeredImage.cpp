@@ -57,7 +57,7 @@ void FrLayeredImage::AddLayer(){
 	m_Layers.push_back(layer);
 	m_ActiveLayer = num;			// new layer becomes active by default
 	
-	GetRenderWindow()->SetNumberOfLayers(num+2);	// renew number of layers in RenderWindow	
+	this->GetRenderWindow()->SetNumberOfLayers(num+2);	// renew number of layers in RenderWindow	
 	m_defaultLayer->SetLayer(num+1);
 }
 

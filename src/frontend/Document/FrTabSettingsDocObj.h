@@ -40,7 +40,7 @@ typedef struct _orthoViewSettings {
 }OViewSettings;
 
 typedef struct _activeView {
-    enum View { Slice, Mosaic, Ortho, Unknown };
+    enum View { Unknown = 0, Slice, Mosaic, Ortho };
 }ActiveView;
 
 // One have to provide valid type system

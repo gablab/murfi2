@@ -29,13 +29,11 @@ public:
 	void SetOpacity(float value);
 	void SetLookupTable(vtkLookupTable* table);
 	void SetVisibility(bool value);
-
+    
 	void Update();
 
 private:
     // Actors
-//	Fr2DSliceActor* m_defaultActor;
-	
 	vtkImageActor* m_actor;
 	vtkImageData* m_inputData;
 	float m_Opacity;

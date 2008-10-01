@@ -30,6 +30,7 @@ public:
 
     // Interface for MainWindow
     void LoadImage(QString& fileName);
+    void IoTabSettings(QString& fileName, bool isInput);
     
     void SaveCurrentViewToTab();
     void ChangeView(int view);

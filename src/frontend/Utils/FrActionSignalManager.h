@@ -18,6 +18,8 @@ public:
 public slots:
     // File 
     void OnOpenImageAction();
+    void OnSaveTabsAction();
+    void OnLoadTabsAction();
     void OnExitAction();
     //Edit 
     void OnSaveToTabAction();

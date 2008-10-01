@@ -7,7 +7,8 @@ class FrMainController;
 #include "FrMacro.h"
 #include "FrNotify.h"
 
-// include all commands header files
+// include all commands header file here
+// Needed for FrCommandController::CreateCmd<T>() method.
 #include "FrBaseCmd.h"
 #include "FrChangeCamCmd.h"
 #include "FrChangeSliceCmd.h"
@@ -21,6 +22,8 @@ class FrMainController;
 #include "FrUpdatePipelineCmd.h"
 #include "FrVoxelInfoCmd.h"
 #include "FrResetImageCmd.h"
+#include "FrLoadTabsCmd.h"
+#include "FrSaveTabsCmd.h"
 
 // This class allow user to create 
 // and manage commands. Organised like singletone;

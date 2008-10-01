@@ -27,6 +27,8 @@ void FrActionSignalManager::Initialize(){
 
     // File 
     CONNECT_ACTION_TRIGGERED(am->GetOpenImageAction(), OnOpenImageAction());
+    CONNECT_ACTION_TRIGGERED(am->GetSaveTabsAction(), OnSaveTabsAction());
+    CONNECT_ACTION_TRIGGERED(am->GetLoadTabsAction(), OnLoadTabsAction());
     CONNECT_ACTION_TRIGGERED(am->GetExitAction(), OnExitAction());
      
     //Edit 
@@ -62,10 +64,30 @@ void FrActionSignalManager::Initialize(){
  // File 
 void FrActionSignalManager::OnOpenImageAction(){
     QString fileName = QFileDialog::getOpenFileName(
-        m_mainWindow, tr("Open MRI data"), tr(""), tr("NIfTI Image (*.nii)"));
+        m_mainWindow, tr("Open MRI Data"), tr(""), 
+        tr("NIfTI Image (*.nii)"));
 
     if(!fileName.isNull() && !fileName.isEmpty()){
         m_mainWindow->GetMainController()->LoadImage(fileName);
+    }
+}
+
+void FrActionSignalManager::OnSaveTabsAction(){
+    QString fileName = QFileDialog::getSaveFileName(
+        m_mainWindow, tr("Save Tabs Data"), tr(""), 
+        tr("Tabs Settings (*.tbs)"));
+
+    if(!fileName.isNull() && !fileName.isEmpty()){
+        m_mainWindow->GetMainController()->IoTabSettings(fileName, false);
+    }
+}
+
+void FrActionSignalManager::OnLoadTabsAction(){
+    QString fileName = QFileDialog::getOpenFileName(
+        m_mainWindow, tr("Load Tabs Data"), tr(""), tr("Tabs Settings (*.tbs)"));
+
+    if(!fileName.isNull() && !fileName.isEmpty()){
+        m_mainWindow->GetMainController()->IoTabSettings(fileName, true);
     }
 }
 

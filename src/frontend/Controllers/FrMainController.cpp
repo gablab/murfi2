@@ -98,6 +98,21 @@ void FrMainController::LoadImage(QString& fileName){
     m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
 }
 
+void FrMainController::IoTabSettings(QString& fileName, bool isInput){
+    if(isInput){
+        FrLoadTabsCmd* cmd = FrCommandController::CreateCmd<FrLoadTabsCmd>();
+        cmd->SetFileName(fileName);
+        cmd->Execute();
+        delete cmd;
+    }
+    else{
+        FrSaveTabsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabsCmd>();
+        cmd->SetFileName(fileName);
+        cmd->Execute();
+        delete cmd;
+    }
+}
+
 void FrMainController::Notify(int notifyCode){
 	// Do nothing here
 }
@@ -177,8 +192,13 @@ void FrMainController::SetCurrentTool(int tool){
 }
 
 void FrMainController::Test(){    
-    FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
+    /*FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
     cmd->SetTargetView(FrResetImageCmd::Current);
+    cmd->Execute();
+    delete cmd;*/
+
+    FrSaveTabsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabsCmd>();
+    cmd->SetFileName(QString("test"));
     cmd->Execute();
     delete cmd;
 }

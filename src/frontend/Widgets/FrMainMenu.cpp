@@ -60,6 +60,9 @@ void FrMainMenu::SetupActions(){
     // File
     m_menuFile->addAction(m_actManager->GetOpenImageAction());
     m_menuFile->addSeparator();
+    m_menuFile->addAction(m_actManager->GetSaveTabsAction());
+    m_menuFile->addAction(m_actManager->GetLoadTabsAction());
+    m_menuFile->addSeparator();
     m_menuFile->addAction(m_actManager->GetExitAction());
     
     // Edit

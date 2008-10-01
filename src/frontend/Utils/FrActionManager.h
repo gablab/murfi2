@@ -19,6 +19,8 @@ public:
     // Properties
     // File
     FrGetPropMacro(QAction*, OpenImageAction);
+    FrGetPropMacro(QAction*, SaveTabsAction);
+    FrGetPropMacro(QAction*, LoadTabsAction);
     FrGetPropMacro(QAction*, ExitAction);    
     // Edit
     FrGetPropMacro(QAction*, SaveToTabAction);

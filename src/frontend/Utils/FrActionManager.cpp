@@ -18,6 +18,10 @@ void FrActionManager::Initialize(QObject* parent){
     // File
     m_OpenImageAction = new QAction(parent);
     m_OpenImageAction->setObjectName(QString::fromUtf8("m_OpenImageAction"));
+    m_SaveTabsAction = new QAction(parent);
+    m_SaveTabsAction->setObjectName(QString::fromUtf8("m_SaveTabsAction"));
+    m_LoadTabsAction = new QAction(parent);
+    m_LoadTabsAction->setObjectName(QString::fromUtf8("m_LoadTabsAction"));
     m_ExitAction = new QAction(parent);
     m_ExitAction->setObjectName(QString::fromUtf8("m_ExitAction"));
     // Edit
@@ -61,6 +65,10 @@ void FrActionManager::Retranslate(){
     // File
     m_OpenImageAction->setText(DO_TRANSLATE(TR_CONTEXT, "Open Image"));
     m_OpenImageAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Open Image"));
+    m_SaveTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save Tabs"));
+    m_SaveTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save Tabs"));
+    m_LoadTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Load Tabs"));
+    m_LoadTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Load Tabs"));
     m_ExitAction->setText(DO_TRANSLATE(TR_CONTEXT, "Exit"));
     m_ExitAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Exit"));
     // Edit

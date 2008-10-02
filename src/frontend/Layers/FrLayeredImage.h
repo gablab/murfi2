@@ -27,9 +27,10 @@ public:
 
 	void SetInput(vtkImageData* input);
 	void SetCamera(CameraSettings& camSettings);
-	
-	FrPropMacro(int, ActiveLayer);
+	void SetText(const char* text);
 
+	FrPropMacro(int, ActiveLayer);
+	
 	// active layer actions
 	void SetVisibility(bool value);
 	void SetOpacity(float value);

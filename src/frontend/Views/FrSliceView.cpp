@@ -13,6 +13,7 @@
 #include "FrSliceExtractor.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
+#include "FrColormapFilter.h"
 
 // Qt
 #include "Qt/QWidget.h"
@@ -102,6 +103,8 @@ void FrSliceView::UpdatePipeline(int point){
     TBCSettings& tbcSettings = settings.TbcSetting;
     CameraSettings& camSettings = settings.CamSettings;
 
+	FrColormapFilter* cmf = FrColormapFilter::New();	// test
+
 	char text[20] = "";
 	char tmp[5];
 
@@ -151,6 +154,7 @@ void FrSliceView::UpdatePipeline(int point){
 			strcat(text, "Slice ");
             itoa(settings.SliceNumber, tmp, 10);
 			strcat(text, tmp);
+			m_LayeredImage->SetText(text);
 			//m_tactor->SetInput(text);
         }
     case FRP_TBC:
@@ -168,7 +172,11 @@ void FrSliceView::UpdatePipeline(int point){
             if(m_tbcFilter->GetInput()){
                 m_tbcFilter->Update();
                 //m_actor->SetInput(m_tbcFilter->GetOutput());
-				m_LayeredImage->SetInput(m_tbcFilter->GetOutput());
+				
+				cmf->SetInput(m_tbcFilter->GetOutput());	// test
+				cmf->Update();								// test
+
+				m_LayeredImage->SetInput(cmf->GetOutput());
 				// Add actor
                 if(isCleared) {
                 //    m_renderer->AddActor(m_actor);

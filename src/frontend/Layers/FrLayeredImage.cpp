@@ -87,6 +87,10 @@ void FrLayeredImage::SetCamera(CameraSettings& camSettings){
 //	Update();
 }
 
+void FrLayeredImage::SetText(const char* text){
+	m_defaultLayer->SetText(text);
+}
+
 void FrLayeredImage::SetVisibility(bool value){
 	m_Layers[m_ActiveLayer]->SetVisibility(value);
 }

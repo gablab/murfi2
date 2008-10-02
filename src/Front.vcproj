@@ -503,6 +503,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Filters\FrColormapFilter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Filters\FrColormapFilter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Filters\FrMosaicFilter.cpp"
 				>
 			</File>

@@ -5,6 +5,7 @@
 #include "Fr2DSliceActor.h"
 #include "FrBaseLayer.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrMacro.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -32,10 +33,19 @@ public:
     
 	void Update();
 
+	// slice parameters
+	FrPropMacro(int, CMThreshold);	// multi colormap threshold
+	FrPropMacro(int, Threshold);
+	FrPropMacro(int, Brightness);
+	FrPropMacro(int, Contrast);
+
+private:
+
 private:
     // Actors
 	vtkImageActor* m_actor;
 	vtkImageData* m_inputData;
+	
 	float m_Opacity;
 
 };

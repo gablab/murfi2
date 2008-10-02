@@ -23,12 +23,17 @@ public:
 	void SetInput(vtkImageData* input);
 	void SetCamera(CameraSettings& camSettings);
 	void SetLayer(int value);
+	void SetText(const char* text);
 
 	void Update();
 
 private:
+	// actors
 	Fr2DSliceActor* m_actor;
-	vtkImageData* m_inputData;	
+	vtkTextActor* m_tactor;
+
+	vtkImageData* m_inputData;
+	int dims[3];	// image dimensions
 
 };
 

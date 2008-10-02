@@ -12,13 +12,16 @@
 FrLayer::FrLayer(vtkRenderWindow *renWindow, int layNum)
 : FrBaseLayer(renWindow){
 	//m_renderWindow = renWindow;
-
-//	m_defaultActor = Fr2DSliceActor::New();		// test
+	
 	m_actor = vtkImageActor::New();
 	GetRenderer()->SetLayer(layNum);
 
 	// some vars
 	m_Opacity = 1.0;
+	m_CMThreshold = 128;
+	m_Threshold = 0;
+	m_Brightness = 0;
+	m_Contrast = 0;
 }
 
 FrLayer::~FrLayer(){
@@ -32,7 +35,6 @@ void FrLayer::Initialize(){
 
 	// add actors
 	GetRenderer()->AddActor(m_actor);
-//	GetRenderer()->AddActor(m_defaultActor);	// test
 
 //	Update();
 }
@@ -41,7 +43,6 @@ void FrLayer::SetInput(vtkImageData* input){
 	m_inputData = input;
 	m_actor->SetInput(input);
 
-//	m_defaultActor->SetInput(input);	// test
 //	Update();
 }
 
@@ -83,3 +84,4 @@ void FrLayer::Update(){
 //	GetRenderer()->ResetCamera();
 	GetRenderer()->Render();
 }
+

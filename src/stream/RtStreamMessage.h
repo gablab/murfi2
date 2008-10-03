@@ -59,12 +59,25 @@ public:
   //   pointer to the data or NULL, if index invalid
   RtData *getData(unsigned int index);
 
-  // get a data portion by data id (returns the first found instance)
+  // get a data portion by a template data id. uses RtDataID::operator==
   //  in
-  //   id of data to get
+  //   template id
   //  out
-  //   pointer to the data or NULL, if id doesnt exist
-  RtData *getDataByID(const string &id);
+  //   pointer to the data or NULL, if such data doesnt exist
+  RtData *getData(const RtDataID &idTemplate);
+
+  // get a data portion by module id, data name, and roi id (returns 
+  // the first found instance). note that any of these can be "" to
+  // match any string for that field
+  //  in
+  //   module id
+  //   data name 
+  //   roi id
+  //  out
+  //   pointer to the data or NULL, if such data doesnt exist
+  RtData *getData(const string &moduleId, 
+		  const string &dataName = "",
+		  const string &roiId = "");
 
   // get the current data (original data plus any desired processing up to
   // this point) 
@@ -84,7 +97,7 @@ public:
   //   roiid  id of roi
   //  out
   //   pointer to the data or NULL, if id doesnt exist
-  RtData *getDataByIDAndRoiID(const string &dataid, const string &roiid);
+  //RtData *getDataByIDAndRoiID(const string &dataid, const string &roiid);
 
   // get number of data objects currently stored
   unsigned int getNumData();

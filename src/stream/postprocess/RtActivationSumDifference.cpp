@@ -9,13 +9,17 @@
 #include"RtActivationSumDifference.h"
 #include"RtActivationSum.h"
 
-string RtActivationSumDifference::moduleString("activation-sum-difference");
+string RtActivationSumDifference::moduleString(ID_ACTIVATIONSUMDIFFERENCE);
 
 // default constructor
 RtActivationSumDifference::RtActivationSumDifference() : RtStreamComponent() {
   componentID = moduleString;
-  posActivationSumID = "data.image.activation.activation-sum";
-  negActivationSumID = "data.image.activation.activation-sum";
+  dataName = NAME_ACTIVATIONSUMDIFFERENCE;
+
+  posActivationSumModuleID = ID_ACTIVATIONSUM;
+  negActivationSumModuleID = ID_ACTIVATIONSUM;
+  posActivationSumDataName = NAME_ACTIVATIONSUM;
+  negActivationSumDataName = NAME_ACTIVATIONSUM;
   posRoiID = "active";
   negRoiID = "deactive";
 }
@@ -32,12 +36,20 @@ bool RtActivationSumDifference::processOption(const string &name,
 					  const map<string,string> &attrMap) {
 
   // look for options
-  if(name == "posActivationID") {
-    posActivationSumID = text;
+  if(name == "posActivationModuleID") {
+    posActivationSumModuleID = text;
     return true;
   }
-  else if(name == "negActivationID") {
-    negActivationSumID = text;
+  else if(name == "negActivationModuleID") {
+    negActivationSumModuleID = text;
+    return true;
+  }
+  else if(name == "posActivationDataName") {
+    posActivationSumDataName = text;
+    return true;
+  }
+  else if(name == "negActivationDataName") {
+    negActivationSumDataName = text;
     return true;
   }
   else if(name == "posRoiID") {
@@ -62,9 +74,13 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
 
   // find the data with the right data IDs
   RtActivation *posact 
-    = (RtActivation*) msg->getDataByIDAndRoiID(posActivationSumID,posRoiID);
+    = (RtActivation*) msg->getData(posActivationSumModuleID,
+				   posActivationSumDataName,
+				   posRoiID);
   RtActivation *negact 
-    = (RtActivation*) msg->getDataByIDAndRoiID(negActivationSumID,negRoiID);
+    = (RtActivation*) msg->getData(negActivationSumModuleID,
+				   negActivationSumDataName,
+				   negRoiID);
 
   double p = 0;
   if(posact != NULL) {
@@ -88,13 +104,19 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
   // create a one element activation image
   RtActivation *diff = new RtActivation(1);
 
+  // setup the data id
+  diff->getDataID().setFromInputData(*posact,*this);
+  diff->getDataID().setDataName(dataName);
+  diff->getDataID().setRoiID(roiID);
+  
+
   // compute the difference
   diff->setPixel(0,  p - n);
 
   cout << diff->getPixel(0) << " = " << p << " - " << n << endl;
 
   // set the image id for handling
-  diff->addToID("activation-sum-difference");
+  //diff->addToID("activation-sum-difference");
 
   setResult(msg, diff);
 

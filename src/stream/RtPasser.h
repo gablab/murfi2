@@ -23,25 +23,33 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
+  // all data that 
   RtPasser();
 
   // string with id constructor
   //  in
   //   dataID is a string that constrains what type of data we send, if its
   //   empty we send all the data
-  RtPasser(string _dataID);
+  //RtPasser(string _dataID);
+
+  // id constructor
+  //  in
+  //   idTemplate is a an instance of RtDataID where the fields are used as a
+  //   template to match incomming data to decide if it should be send to
+  //   the outputs or not. Empty fields are not matched and filled fields are
+  RtPasser(const RtDataID &idTemplate);
 
   // char* with id constructor
   //  in
   //   dataID is a string that constrains what type of data we send, if its
   //   empty we send all the data
-  RtPasser(char *_dataID);
+  //RtPasser(char *_dataID);
 
   // destructor
   ~RtPasser();
 
   //*** initialization routines  ***//
-  void addOutput(RtOutput *out, const string &dataId = "");
+  void addOutput(RtOutput *out);
 
   // process a single acquisition
   void sendToOutputs(RtData *d);
@@ -55,7 +63,7 @@ protected:
   vector<RtOutput*> outputs;
 
   // only pass data of this id
-  string dataID;
+  RtDataID passDataID;
   
 };
 

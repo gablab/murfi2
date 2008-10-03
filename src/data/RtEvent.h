@@ -34,7 +34,7 @@ public:
   void setTR(int _tr);
 
   // get the tr for this event
-  int getTR();
+  int getTR() const;
 
 protected:
 

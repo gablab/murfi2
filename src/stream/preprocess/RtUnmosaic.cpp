@@ -7,12 +7,14 @@
  *****************************************************************************/
 
 #include"RtUnmosaic.h"
+#include"RtDataIDs.h"
 
-string RtUnmosaic::moduleString("unmosaic");
+string RtUnmosaic::moduleString(ID_UNMOSAIC);
 
 // default constructor
 RtUnmosaic::RtUnmosaic() : RtStreamComponent() {
   componentID = moduleString;
+  dataName = ""; // unused
 }
 
 // destructor
@@ -38,10 +40,12 @@ int RtUnmosaic::process(ACE_Message_Block *mb) {
 
   // allocate a new data image for the variance
   RtMRIImage *unmosaic = new RtMRIImage(*img);
+  unmosaic->getDataID().setFromInputData(*img,*this);
+
   unmosaic->unmosaic();
 
   // set the image id for handling
-  unmosaic->addToID("unmosaic");
+  //unmosaic->addToID("unmosaic");
 
   setResult(msg,unmosaic);
 

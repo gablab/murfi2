@@ -9,16 +9,22 @@
 static char *VERSION = "$Id$";
 
 #include"RtStreamComponent.h"
+#include"RtDataIDs.h"
 #include"RtPasser.h"
 #include"ace/Mutex.h"
 
-string RtStreamComponent::moduleString("generic-stream-component");
+string RtStreamComponent::moduleString(ID_STREAM);
   
 // default constructor
 RtStreamComponent::RtStreamComponent() : super(), 
     persistent(false), putResultOnMessage(false) {
   componentID = moduleString;
-  inputDataID = "data.mri.image";
+
+  inputModuleID = "mri";
+  inputDataName = "image";
+
+  dataName = "";
+
   makeCurrentData = false;
   passer = NULL;
   outFilename = "";
@@ -94,7 +100,11 @@ bool RtStreamComponent::processConfig(RtConfig &config) {
 bool RtStreamComponent::processOption(const string &name, const string &text,
 				      const map<string,string> &attrMap) {
   if(name == "input") {
-    inputDataID = text;
+    inputModuleID = text;
+    return true;
+  }
+  if(name == "dataName") {
+    dataName = text;
     return true;
   }
   if(name == "makecurrent") {
@@ -119,7 +129,7 @@ bool RtStreamComponent::processOption(const string &name, const string &text,
 // adds an output to receive the data of this stream component
 //  in
 //   output to add
-void RtStreamComponent::addOutput(RtOutput *out, const string &dataId) {
+void RtStreamComponent::addOutput(RtOutput *out, const RtDataID &dataId) {
   if(out == NULL) return;
 
   if(passer == NULL) {
@@ -260,7 +270,7 @@ int RtStreamComponent::nextStep(ACE_Message_Block *mb) {
 
 // get the version
 //  out: char array that represents the cvs version
-char *RtStreamComponent::getVersionString() {
+char *RtStreamComponent::getVersionString() const {
   return VERSION;
 }
 
@@ -275,24 +285,34 @@ void RtStreamComponent::setPersistent(bool p) {
 }
 
 // gets whether this data should be kept around after the stream is done
-bool RtStreamComponent::getPersistent() {
+bool RtStreamComponent::getPersistent() const {
   return persistent;
 }
 
 
 // gets the id for this stream component
-string RtStreamComponent::getID() {
+string RtStreamComponent::getID() const {
   return componentID;
 }
 
 // gets the data id for the input
-string RtStreamComponent::getInputDataID() {
-  return inputDataID;
+string RtStreamComponent::getInputModuleID() const {
+  return inputModuleID;
 }
 
 // sets the data id for the input
-void RtStreamComponent::setInputDataID(string id) {
-  inputDataID = id;;
+void RtStreamComponent::setInputModuleID(string id) {
+  inputModuleID = id;;
+}
+
+// gets the data id for the input
+string RtStreamComponent::getInputDataName() const {
+  return inputDataName;
+}
+
+// sets the data id for the input
+void RtStreamComponent::setInputDataName(string id) {
+  inputDataName = id;;
 }
 
 

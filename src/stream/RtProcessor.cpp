@@ -77,7 +77,7 @@ int RtProcessor::process(ACE_Message_Block *mb) {
 
 // get the version
 //  out: char array that represents the cvs version
-char *RtProcessor::getVersionString() {
+char *RtProcessor::getVersionString() const {
   return VERSION;
 }
 

@@ -12,7 +12,9 @@
 // default constructor
 RtEvent::RtEvent() : RtData() {
   ACE_TRACE(("RtMRIImage::RtEvent()")); 
-  addToID("event");
+
+  dataID.setModuleID("event");
+
   tr = -1;
 }
 
@@ -26,7 +28,7 @@ void RtEvent::setTR(int _tr) {
 }
 
 // get the tr for this event
-int RtEvent::getTR() {
+int RtEvent::getTR() const {
   return tr;
 }
 

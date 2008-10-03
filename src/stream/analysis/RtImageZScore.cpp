@@ -8,11 +8,12 @@
 
 #include"RtImageZScore.h"
 
-string RtImageZScore::moduleString("voxel-zscore");
+string RtImageZScore::moduleString(ID_TEMPORALZSCORE);
 
 // default constructor
 RtImageZScore::RtImageZScore() : RtActivationEstimator () {
   componentID = moduleString;
+  dataName = NAME_TEMPORALZSCORE_IMG;
 
   meanDataID = "data.image.mri.voxel-mean";
   varDataID = "data.image.mri.voxel-variance";
@@ -63,7 +64,7 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   }
 
   // get the mean
-  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID(meanDataID);
+  RtMRIImage *mean = (RtMRIImage*)msg->getData(ID_TEMPMEAN);
 
   if(mean == NULL) {
     cout << "RtImageZScore:process: mean image not found" << endl;
@@ -73,7 +74,7 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   }
   
   // get the variance
-  RtMRIImage *var = (RtMRIImage*)msg->getDataByID(varDataID);
+  RtMRIImage *var = (RtMRIImage*)msg->getData(ID_TEMPVAR);
 
   if(var == NULL) {
     cout << "RtImageZScore:process: variance image not found" << endl;
@@ -95,6 +96,13 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   // allocate a new data image for the zscore
   RtActivation *zscore = new RtActivation(*img);
   
+  // setup the data id
+  zscore->getDataID().setFromInputData(*img,*this);
+  zscore->getDataID().setDataName(dataName);
+  zscore->getDataID().setRoiID(roiID);
+
+  zscore->initToZeros();
+
   // compute zscore for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     if(!mask.getPixel(i) || var->getPixel(i) < 1) {
@@ -112,10 +120,10 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
   zscore->setThreshold(getTStatThreshold(1));
 
   // roi id
-  zscore->setRoiID(roiID);
+  //zscore->setRoiID(roiID);
 
   // set the image id for handling
-  zscore->addToID("voxel-zscore");
+  //zscore->addToID("voxel-zscore");
   setResult(msg,zscore);
 
   return 0;

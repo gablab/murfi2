@@ -3,14 +3,14 @@
  * components.
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-04
- * 
+ *
  *****************************************************************************/
 
 #include"RtStreamMessage.h"
 
 
 // add a peice of data to the message
-//  in 
+//  in
 //   pointer to the data
 //  out
 //   success or failure
@@ -56,7 +56,7 @@ bool RtStreamMessage::setCurrentData(unsigned int index) {
 
   curDataIndex = index;
 
-  return true;  
+  return true;
 }
 
 // sets the last data to be current
@@ -68,8 +68,8 @@ bool RtStreamMessage::setLastDataAsCurrent() {
 }
 
 // get the current data (original data plus any desired processing up to
-// this point) 
-//  out 
+// this point)
+//  out
 //   pointer to the current data or NULL, if none
 RtData *RtStreamMessage::getCurrentData() {
   return getData(curDataIndex);
@@ -108,32 +108,62 @@ RtData *RtStreamMessage::getData(unsigned int index) {
 //   id of data to get
 //  out
 //   pointer to the data or NULL, if id doesnt exist
-RtData *RtStreamMessage::getDataByID(const string &id) {
-  for(unsigned int i = 0; i < numData; i++) {
-    if(data[i]->getID() == id) {
-      return data[i];
-    }
-  }
+//RtData *RtStreamMessage::getDataByID(const string &id) {
+//  for(unsigned int i = 0; i < numData; i++) {
+//    if(data[i]->getID() == id) {
+//      return data[i];
+//    }
+//  }
+//
+//  return NULL;
+//}
 
-  return NULL;
+// // get data by data id and roi id (returns the first found instance)
+// //  in
+// //   dataid id of data
+// //   roiid  id of roi
+// //  out
+// //   pointer to the data or NULL, if id doesnt exist
+// RtData *RtStreamMessage::getDataByIDAndRoiID(const string &dataid,
+// 					     const string &roiid) {
+//   for(unsigned int i = 0; i < numData; i++) {
+//     //cout << data[i]->getID() << " " << data[i]->getRoiID() << endl;
+//     if(data[i]->getID() == dataid && data[i]->getRoiID() == roiid) {
+//       return data[i];
+//     }
+//   }
+
+//   return NULL;
+// }
+
+// get a data portion by module id, data name, and roi id (returns
+// the first found instance). note that any of these can be "" to
+// match any string for that field
+//  in
+//   module id
+//   data name
+//   roi id
+//  out
+//   pointer to the data or NULL, if such data doesnt exist
+RtData *RtStreamMessage::getData(const string &moduleId,
+				 const string &dataName,
+				 const string &roiId) {
+  RtDataID idTemplate(DATAID_UNSET_VALUE,DATAID_UNSET_VALUE,DATAID_UNSET_VALUE,
+		      "", moduleId, dataName, roiId);
+  return getData(idTemplate);
 }
 
-// get data by data id and roi id (returns the first found instance)
+// get a data portion by a template data id. uses RtDataID::operator==
 //  in
-//   dataid id of data
-//   roiid  id of roi
+//   template id
 //  out
-//   pointer to the data or NULL, if id doesnt exist
-RtData *RtStreamMessage::getDataByIDAndRoiID(const string &dataid, 
-					     const string &roiid) {
+//   pointer to the data or NULL, if such data doesnt exist
+RtData *RtStreamMessage::getData(const RtDataID &idTemplate) {
   for(unsigned int i = 0; i < numData; i++) {
-    //cout << data[i]->getID() << " " << data[i]->getRoiID() << endl;
-    if(data[i]->getID() == dataid && data[i]->getRoiID() == roiid) {
-      return data[i];
+    if(idTemplate == data[i]->getDataID()) {
+       return data[i];
     }
   }
-
-  return NULL;
 }
 
 // get the number of data objects we currently have

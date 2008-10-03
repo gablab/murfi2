@@ -12,13 +12,15 @@
 #include"RtDataIDs.h"
 #include<limits>
 
-string RtFluctuationMonitor::moduleString("fluctuationmonitor");
+string RtFluctuationMonitor::moduleString(ID_FLUCTUATIONMONITOR);
 
 
 // default constructor
 RtFluctuationMonitor::RtFluctuationMonitor() : RtActivationEstimator() {
   componentID = moduleString;
   outputID += ":" + string(ID_FLUCTUATIONMONITOR);
+
+  dataName = NAME_FLUCTUATIONMONITOR_ACTIVATION;
 
   needsInit = true;
   solvers = NULL;
@@ -51,7 +53,8 @@ RtFluctuationMonitor::~RtFluctuationMonitor() {
 
 // look for events we triggered
 void RtFluctuationMonitor::setData(RtData *data) {
-  if(data->getID().find(ID_EVENTTRIGGER) != string::npos) {
+  if(data->getDataID().getDataName() == NAME_EVENTTRIGGER_GOOD
+     || data->getDataID().getDataName() == NAME_EVENTTRIGGER_BAD) {
     receiveStimTriggered();
   }
 }
@@ -99,7 +102,7 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  cout << "operating on image: " << dat->getID() << endl;
+  //cout << "operating on image: " << dat->getID() << endl;
 
   numTimepoints++;
 
@@ -142,6 +145,12 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   // allocate a new data image for the estimation
   RtActivation *fluct = new RtActivation(*dat);
+
+  // setup the data id
+  fluct->getDataID().setFromInputData(*dat,*this);
+  fluct->getDataID().setDataName(dataName);
+  fluct->getDataID().setRoiID(roiID);
+
   fluct->initToZeros();
 
   //// element independent setup
@@ -247,8 +256,8 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
   delete Xrow;
 
   // set the image id for handling
-  fluct->addToID("voxel-fluctmon");
-  fluct->setRoiID(roiID);
+  //fluct->addToID("voxel-fluctmon");
+  //fluct->setRoiID(roiID);
 
   setResult(msg,fluct);
 

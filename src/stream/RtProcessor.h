@@ -36,7 +36,7 @@ public:
 
   // get the version
   //  out: char array that represents the cvs version
-  virtual char *getVersionString();
+  virtual char *getVersionString() const;
 
   
 

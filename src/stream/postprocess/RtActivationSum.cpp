@@ -7,13 +7,15 @@
 
 #include "RtActivationSum.h"
 
-string RtActivationSum::moduleString("activation-sum");
+string RtActivationSum::moduleString(ID_ACTIVATIONSUM);
 
 // default constructor
 RtActivationSum::RtActivationSum() : RtActivationEstimator() {
   componentID = moduleString;
+  dataName = NAME_ACTIVATIONSUM;
 
-  activationID = "data.image.activation.voxel-singleimcor-stat_0";
+  activationModuleID = ID_SINGLEIMCOR;
+  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION) + "_0";
   activationRoiID = "unset";
 }
 
@@ -26,8 +28,12 @@ RtActivationSum::~RtActivationSum() {}
 //   val  text of the option node
 bool RtActivationSum::processOption(const string &name, const string &text,
 				    const map<string,string> &attrMap) {
-  if(name == "activationID") {
-    activationID = text;
+  if(name == "activationDataName") {
+    activationDataName = text;
+    return true;
+  }
+  if(name == "activationModuleID") {
+    activationModuleID = text;
     return true;
   }
   else if(name == "activationRoiID") {
@@ -45,14 +51,16 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   RtMRIImage *img = (RtMRIImage*)msg->getCurrentData();
-  int acqNum = img->getAcquisitionNum();
+  int acqNum = img->getDataID().getTimePoint();
 
   // find the activation with the right roiID
   RtActivation *act 
-    = (RtActivation*) msg->getDataByIDAndRoiID(activationID,activationRoiID);
+    = (RtActivation*) msg->getData(activationModuleID, 
+				   activationDataName,
+				   activationRoiID);
 
   if(act == NULL) {
-    cout << "couldn't find " << activationID << ":" << activationRoiID << endl;
+    cout << "couldn't find " << activationModuleID << ":" << activationDataName << ":" << activationRoiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtActivationSum:process: activation passed is NULL\n"));
     return 0;
@@ -65,7 +73,7 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   }
   
   ACE_DEBUG((LM_DEBUG, "summing activation in image %d\n", 
-	     img->getAcquisitionNum()));
+	     img->getDataID()->getTimepoint()));
 	    
   // compute the sum
   double sum = 0;
@@ -84,19 +92,25 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
 
   // create a one element activation image
   RtActivation *mean = new RtActivation(1);
+
+  // setup the data id
+  mean->getDataID().setFromInputData(*act,*this);
+  mean->getDataID().setDataName(dataName);
+  mean->getDataID().setRoiID(roiID);
+
   mean->setThreshold(act->getThreshold());
   mean->setPixel(0, sum/numPix);
   
   // set the image id for handling
-  mean->addToID("activation-sum");
-  mean->setRoiID(roiID);
+  //mean->addToID("activation-sum");
+  //mean->setRoiID(roiID);
 
   setResult(msg, mean);
 
   // log the sum
   stringstream logs("");
   logs << "activation sum: " << acqNum << " " 
-       << activationID << ":" << roiID  
+       << activationModuleID << ":" << activationDataName << ":" << roiID  
        << " " << mean->getPixel(0) << endl;
   log(logs);
 

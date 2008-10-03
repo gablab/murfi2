@@ -106,7 +106,7 @@ GSL_LIB=-lgsl -lgslcblas
 #ACE_HOME=/usr/local/ACE_wrappers
 #ACE_INCS=-I$(ACE_HOME)/ace
 #ACE_LIB=-L$(ACE_HOME)/lib -lACE
-ACE_FLAGS=$(ACE_NLOGGING_FLAG) $(ACE_NDEBUG_FLAG) $(ACE_NTRACE_FLAG)
+ACE_FLAGS=-D _REENTRANT $(ACE_NLOGGING_FLAG) $(ACE_NDEBUG_FLAG) $(ACE_NTRACE_FLAG)
 ACE_LIB=-lACE
 
 TINYXML_FLAGS=-DTIXML_USE_STL
@@ -119,7 +119,7 @@ VXL_LIBS=-lvnl -lvcl -lvnl_algo
 GNUPLOT_LIBS=-lgnuplot_i_vxl -L/usr/local/lib
 
 NIFTI_INCS=-I/usr/include/nifti
-NIFTI_LIBS=-lniftiio -lznz
+NIFTI_LIBS=-lniftiio -lznz -lz
 
 # build compiler flags
 

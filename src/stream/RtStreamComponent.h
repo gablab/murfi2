@@ -55,7 +55,7 @@ public:
   // adds an output to receive the data of this stream component
   //  in
   //   output to add
-  virtual void addOutput(RtOutput *out, const string &dataId = "");
+  virtual void addOutput(RtOutput *out, const RtDataID &dataId = RtDataID());
 
   // adds outputs from a vector
   //  in:
@@ -85,21 +85,28 @@ public:
 
   // get the version
   //  out: char array that represents the cvs version
-  virtual char *getVersionString();
+  virtual char *getVersionString() const;
+
   // sets whether this data should be kept around after the stream is done
   void setPersistent(bool p);
 
   // gets whether this data should be kept around after the stream is done
-  bool getPersistent();
+  bool getPersistent() const;
 
   // gets the id for this stream component
-  string getID();
+  string getID() const;
 
   // gets the data id for the input
-  string getInputDataID();
+  string getInputModuleID() const;
 
   // sets the data id for the input
-  void setInputDataID(string id);
+  void setInputModuleID(string id);
+
+  // gets the data name for the input
+  string getInputDataName() const;
+
+  // sets the data name for the input
+  void setInputDataName(string id);
 
   // module name for config
   static string moduleString;
@@ -158,10 +165,13 @@ protected:
   //RtDisplayImage *display;
 
   // id string
-  string componentID;
+  string componentID; // for the module id
+  string roiID;       // roi to be operated on
+  string dataName;    // base dataname to assign result
 
-  // input data id string
-  string inputDataID;
+  // input data
+  string inputModuleID;
+  string inputDataName;
 
   // file to log processing results to
   ofstream ofile;

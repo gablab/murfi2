@@ -9,17 +9,20 @@
 
 #include"RtIntensityNorm.h"
 #include"ace/Mutex.h"
+#include"RtDataIDs.h"
 
-string RtIntensityNorm::moduleString("intensity-norm");
+string RtIntensityNorm::moduleString(ID_SPATIAL_INTENSITYNORM);
 
 // default constructor
 RtIntensityNorm::RtIntensityNorm() : RtStreamComponent() {
   componentID = moduleString;
+  dataName = NAME_SPATIAL_INTENSITYNORM_IMG;
+
   meanIntensity = fmod(1.0,0.0); // assign nan
 
   makeBETMask = false;
   computingMask = false;
-  maskScript = "/home/ohinds/projects/realtime/system/scripts/make_bet_mask.sh";
+  maskScript = "scripts/make_bet_mask.sh";
   betParms = "-f 0.5 -g 0 -n -m";
 
   maskIntensityThreshold = 0.7;
@@ -162,6 +165,9 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   // allocate a new data image for normalized image
   RtMRIImage *inorm = new RtMRIImage(*img);
   
+  inorm->getDataID().setFromInputData(*img,*this);
+  inorm->getDataID().setDataName(dataName);
+
   // subtract the difference for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     inorm->setPixel(i, (img->getPixel(i) - intensityDiff > 0)
@@ -169,7 +175,7 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   }  
 
   // set the image id for handling
-  inorm->addToID("intensity-norm");
+  //inorm->addToID("intensity-norm");
   setResult(msg,inorm);
 
   return 0;

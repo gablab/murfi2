@@ -6,6 +6,9 @@
  *****************************************************************************/
 
 #include"RtMRIImage.h"
+
+#include"RtExperiment.h"
+
 #include"ace/Log_Msg.h"
 #include<fstream>
 
@@ -14,7 +17,9 @@ using namespace std;
 // default constructor
 RtMRIImage::RtMRIImage() : RtDataImage<short>() {
   ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
-  addToID("mri");
+
+  dataID.setModuleID("mri");
+
   magicNumber = MAGIC_NUMBER;
 }
 
@@ -44,10 +49,15 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
     : RtDataImage<short>() {
   ACE_TRACE(("RtMRIImage::RtMRIImage(RtExternalImageInfo,short*)"));
 
-  addToID("mri");
   magicNumber = MAGIC_NUMBER;
 
   setInfo(extinfo);
+
+  // fill fields of data id
+  dataID.setModuleID("mri");
+  dataID.setStudyNum(RtExperiment::getExperimentStudyID());
+  dataID.setSeriesNum
+    (RtExperiment::getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
 
   // allocate and copy the img data
   if(DEBUG_LEVEL & ALLOC) {
@@ -267,9 +277,9 @@ RtMRIImage::~RtMRIImage() {
 
 
 // get the acquisition number
-string RtMRIImage::getCreationTime() const {
-  return ACE_Date_Time2SiemensTime(creationTime);
-}
+//string RtMRIImage::getCreationTime() const {
+//  return ACE_Date_Time2SiemensTime(creationTime);
+//}
 
 // get the acquisition number
 unsigned int RtMRIImage::getAcquisitionNum() const {

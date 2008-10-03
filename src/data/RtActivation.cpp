@@ -13,8 +13,8 @@
 // default constructor
 RtActivation::RtActivation() : RtDataImage<double>() {
   ACE_TRACE(("RtMRIImage::RtActivation()")); 
-  addToID("activation");
   magicNumber = MAGIC_NUMBER;
+
   threshold = 10.0;
   ceiling = 50.0;
   bytesPerPix = sizeof(double);
@@ -26,7 +26,6 @@ RtActivation::RtActivation() : RtDataImage<double>() {
 RtActivation::RtActivation(RtMRIImage &img) 
   : RtDataImage<double>() {
   ACE_TRACE(("RtMRIImage::RtActivation(RtMRIImage)")); 
-  addToID("activation");
   magicNumber = MAGIC_NUMBER;
 
   setInfo(img);
@@ -41,7 +40,6 @@ RtActivation::RtActivation(RtMRIImage &img)
 RtActivation::RtActivation(unsigned int numElements) 
   : RtDataImage<double>() {
   ACE_TRACE(("RtMRIImage::RtActivation(unsigned int)")); 
-  addToID("activation");
   magicNumber = MAGIC_NUMBER;
 
   dims.reserve(1);
@@ -100,7 +98,7 @@ TiXmlElement *RtActivation::serializeAsXML() {
   // add an element for the data
   TiXmlElement *element = new TiXmlElement("data");
   element->SetAttribute("name","activation");
-  element->SetAttribute("roiID",roiID);
+  element->SetAttribute("roiID",dataID.getRoiID());
 
   // build text string containing all the data separated by spaces
   #define NUM_SIGFIGS 6
@@ -124,7 +122,7 @@ void RtActivation::printInfo(ostream &os) {
   
   RtDataImage<double>::printInfo(os);
   
-  os << setw(wid) << "roiID: " << roiID << endl;
+  os << setw(wid) << "roiID: " << dataID.getRoiID() << endl;
   os << setw(wid) << "threshold: " << threshold << endl;
   os << setw(wid) << "ceiling: "   << ceiling << endl;
 }

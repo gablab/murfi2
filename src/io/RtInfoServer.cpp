@@ -39,24 +39,23 @@ RtInfoServer::~RtInfoServer() {
 // each tr in an xml document 
 void RtInfoServer::setData(RtData *data) {
   //cout << data->getID() << endl;
-  if(data->getID() == ID_ACTIVATIONSUMDIFFERENCE) {
+  if(data->getDataID().getModuleID() == ID_ACTIVATIONSUMDIFFERENCE) {
     database.push_back(data);
   }
-  else if(data->getID().find(ID_EVENTTRIGGER) != string::npos) {
+  else if(data->getDataID().getModuleID() == ID_EVENTTRIGGER) {
     // note about "good" and "bad" triggers: these are just to denote two
     // types of triggers, one based on activation in the direction you
     // expect, and the other opposite. neither is an error
     
-    size_t pos = data->getID().find(ID_EVENTTRIGGER);
-    if(data->getID().substr(pos).find("bad") != string::npos) { // bad trigger
-      lastBadTriggerTR = ((RtEvent*)data)->getTR();
+    if(data->getDataID().getDataName() == NAME_EVENTTRIGGER_BAD) { // bad trigger
+      lastBadTriggerTR = data->getDataID().getTimePoint();
     }
     else { // otherwise its good
-      lastGoodTriggerTR = ((RtEvent*)data)->getTR();
+      lastGoodTriggerTR = data->getDataID().getTimePoint();
     }
   }
   else {
-    cout << "infoserver: ignoring a " << data->getID() << endl;
+    cout << "infoserver: ignoring a " << data->getDataID() << endl;
   }
 }
 

@@ -7,16 +7,20 @@
  *****************************************************************************/
 
 #include"RtVar.h"
+#include"RtDataIDs.h"
 
 #define absdiff(a,b) (a > b ? a-b : b-a)
 
-string RtVar::moduleString("voxel-variance");
+string RtVar::moduleString(ID_TEMPVAR);
 
 // default constructor
 RtVar::RtVar() : RtStreamComponent() {
   numTimePoints = 0;
   componentID = moduleString;
-  meanDataID = "data.image.mri.voxel-mean";
+  dataName = NAME_TEMPVAR_IMG;
+
+  meanModuleID = ID_TEMPMEAN;
+  meanDataName = NAME_TEMPMEAN_IMG;
 }
 
 // destructor
@@ -32,8 +36,12 @@ bool RtVar::processOption(const string &name, const string &text,
 				      const map<string,string> &attrMap) {
 
   // look for known options
-  if(name == "meanDataID") {
-    meanDataID = text;
+  if(name == "meanModuleID") {
+    meanModuleID = text;
+    return true;
+  }
+  if(name == "meanDataName") {
+    meanDataName = text;
     return true;
   }
 
@@ -58,7 +66,7 @@ int RtVar::process(ACE_Message_Block *mb) {
 
   // get the mean
   //cout << "getting mean data with id " << meanDataID << endl;
-  RtMRIImage *mean = (RtMRIImage*)msg->getDataByID(meanDataID);
+  RtMRIImage *mean = (RtMRIImage*)msg->getData(meanModuleID,meanDataName);
 
   if(mean == NULL) {
     cout << "RtVar::process: mean image not found" << endl;
@@ -97,6 +105,9 @@ int RtVar::process(ACE_Message_Block *mb) {
 
   // allocate a new data image for the variance
   RtMRIImage *var = new RtMRIImage(*img);
+  var->getDataID().setFromInputData(*img,*this);
+  var->getDataID().setDataName(dataName);
+
   
   // update the mean and variance numerator due to west (1979) for each voxel 
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
@@ -118,7 +129,7 @@ int RtVar::process(ACE_Message_Block *mb) {
   }  
 
   // set the image id for handling
-  var->addToID("voxel-variance");
+  //var->addToID("voxel-variance");
   setResult(msg,var);
 
   return 0;

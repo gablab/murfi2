@@ -10,11 +10,12 @@
 
 #include"RtEvent.h"
 
-string RtEventTriggerActivationSums::moduleString("event-trigger-activation-sums");
+string RtEventTriggerActivationSums::moduleString(ID_EVENTTRIGGER_ACTIVATIONSUMS);
 
 // default constructor
 RtEventTriggerActivationSums::RtEventTriggerActivationSums() : RtEventTrigger() {
   componentID = moduleString;
+  dataName = "";
 }
 
 // destructor
@@ -78,7 +79,7 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  int tr = ((RtMRIImage*)msg->getCurrentData())->getAcquisitionNum();
+  int tr = posAct->getDataID().getTimepoint();
   if(tr < initialSkipTRs) {
     return 0;
   }
@@ -93,9 +94,16 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
   if((!monitorPos || posact->getPixel(0) >= posThresh) 
      && (!monitorNeg || negact->getPixel(0) <= negThresh)) {
     // trigger
-    RtEvent *event = new RtEvent();
-    event->setTR(tr);
-    event->addToID("trigger.good");
+//    RtEvent *event = new RtEvent();
+//    event->setTR(tr);
+//    event->addToID("trigger.good");
+
+    RtEvent *event = new RtEvent(*posact);
+   
+    event->getDataID().setFromInputData(*posact,*this);
+    event->getDataID().setDataName(NAME_EVENTTRIGGER_GOOD);
+    event->getDataID().setTimepoint(tr);
+
     setResult(msg,event);
 
     cout << "GOOD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
@@ -108,10 +116,18 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
   if(triggerBothDirections 
      && (!monitorPos || posact->getPixel(0) <= -posThresh) 
      && (!monitorNeg || negact->getPixel(0) >= -negThresh)) {
+
     // trigger
-    RtEvent *event = new RtEvent();
-    event->setTR(tr);
-    event->addToID("trigger.bad");
+//    RtEvent *event = new RtEvent();
+//    event->setTR(tr);
+//    event->addToID("trigger.bad");
+
+    RtEvent *event = new RtEvent(*posact);
+   
+    event->getDataID().setFromInputData(*posact,*this);
+    event->getDataID().setDataName(NAME_EVENTTRIGGER_BAD);
+    event->getDataID().setTimepoint(tr);
+
     setResult(msg,event);
 
     cout << "BAD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;

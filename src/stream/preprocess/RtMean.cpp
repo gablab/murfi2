@@ -7,14 +7,17 @@
  *****************************************************************************/
 
 #include"RtMean.h"
+#include"RtDataIDs.h"
 
 #define absdiff(a,b) (a > b ? a-b : b-a)
 
-string RtMean::moduleString("voxel-mean");
+string RtMean::moduleString(ID_TEMPMEAN);
 
 // default constructor
 RtMean::RtMean() : RtStreamComponent() {
   componentID = moduleString;
+  dataName = NAME_TEMPMEAN_IMG;
+
   numTimePoints = 0;
 }
 
@@ -57,6 +60,9 @@ int RtMean::process(ACE_Message_Block *mb) {
   // allocate a new data image for the variance
   RtMRIImage *mean = new RtMRIImage(*img);
 
+  mean->getDataID().setFromInputData(*img,*this);
+  mean->getDataID().setDataName(dataName);
+
   // update the mean and variance numerator due to west (1979) for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     // trickery to allow temp negative values
@@ -70,7 +76,7 @@ int RtMean::process(ACE_Message_Block *mb) {
   }
 
   // set the image id for handling
-  mean->addToID("voxel-mean");
+  //mean->addToID("voxel-mean");
   setResult(msg,mean);
 
   return 0;

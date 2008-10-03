@@ -7,12 +7,14 @@
  *****************************************************************************/
 
 #include"RtMosaic.h"
+#include"RtDataIDs.h"
 
-string RtMosaic::moduleString("mosaic");
+string RtMosaic::moduleString(ID_MOSAIC);
 
 // default constructor
 RtMosaic::RtMosaic() : RtStreamComponent() {
   componentID = moduleString;
+  dataName = ""; // not used
 }
 
 // destructor
@@ -38,10 +40,12 @@ int RtMosaic::process(ACE_Message_Block *mb) {
 
   // allocate a new data image for the variance
   RtMRIImage *mosaic = new RtMRIImage(*img);
+  mosaic->getDataID().setFromInputData(*img,*this);
+
   mosaic->mosaic();
 
   // set the image id for handling
-  mosaic->addToID("mosaic");
+  //mosaic->addToID("mosaic");
 
   setResult(msg,mosaic);
 

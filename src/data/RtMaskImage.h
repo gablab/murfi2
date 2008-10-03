@@ -81,7 +81,7 @@ public:
   void computeNumberOfOnVoxels();
 
   // get the number of "on" voxels
-  unsigned int getNumberOfOnVoxels();
+  unsigned int getNumberOfOnVoxels() const;
 
 
   // read the image from a file

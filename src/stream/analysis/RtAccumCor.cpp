@@ -10,11 +10,13 @@
 #include"RtMRIImage.h"
 #include"gsl/gsl_cdf.h"
 
-string RtAccumCor::moduleString("accumcor");
+string RtAccumCor::moduleString(ID_ACCUMCOR);
 
 // default constructor
 RtAccumCor::RtAccumCor() : RtActivationEstimator() {
   componentID = moduleString;
+
+  dataName = NAME_ACCUMCOR_COR;
 
   needsInit = true;
 
@@ -125,6 +127,12 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   // allocate a new data image for the correlation
   RtActivation *cor = new RtActivation(*dat);
+
+  // setup the data id
+  cor->getDataID().setFromInputData(*dat,*this);
+  cor->getDataID().setDataName(dataName);
+  cor->getDataID().setRoiID(roiID);
+
   cor->initToZeros();
 
   if(numTimepoints > numTrends+1) {
@@ -205,7 +213,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 //  cout << endl;
 
   // set the image id for handling
-  cor->addToID("voxel-accumcor");
+  //cor->addToID("voxel-accumcor");
 
   setResult(msg,cor);
 

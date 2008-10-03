@@ -1,5 +1,5 @@
 /******************************************************************************
- * RtMaskImage.h declares a class for an MR image
+ * RtMaskImage.cpp defines a class for an MR image
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-10-08
  * 
@@ -15,7 +15,9 @@ using namespace std;
 // default constructor
 RtMaskImage::RtMaskImage() : RtDataImage<unsigned short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage()")); 
-  addToID("mask");
+   
+  dataID.setModuleID("mask");
+
   magicNumber = MAGIC_NUMBER;
   bytesPerPix = sizeof(unsigned short);
   numOnVoxels = 0;
@@ -49,7 +51,11 @@ RtMaskImage::RtMaskImage(RtMaskImage &img) {
 RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold) 
     : RtDataImage<unsigned short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
-  addToID("mask");
+
+  dataID.setHistory
+    (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
+  dataID.setModuleID("mask");
+
   magicNumber = MAGIC_NUMBER;
   bytesPerPix = sizeof(unsigned short);
 
@@ -68,7 +74,11 @@ RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold)
 RtMaskImage::RtMaskImage(RtActivation &img, double threshold) 
     : RtDataImage<unsigned short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
-  addToID("mask");
+
+  dataID.setHistory
+    (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
+  dataID.setModuleID("mask");
+
   magicNumber = MAGIC_NUMBER;
   bytesPerPix = sizeof(unsigned short);
 
@@ -162,7 +172,7 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtActivation &image,
 }
 
 // get the number of "on" voxels
-unsigned int RtMaskImage::getNumberOfOnVoxels() {
+unsigned int RtMaskImage::getNumberOfOnVoxels() const {
   return numOnVoxels;
 }
 

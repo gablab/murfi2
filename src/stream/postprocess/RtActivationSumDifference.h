@@ -41,8 +41,10 @@ protected:
   int process(ACE_Message_Block *mb);
 
   // dataID for the positive and negative activation sums
-  string posActivationSumID;
-  string negActivationSumID;
+  string posActivationSumModuleID;
+  string negActivationSumModuleID;
+  string posActivationSumDataName;
+  string negActivationSumDataName;
   string posRoiID;
   string negRoiID;
 

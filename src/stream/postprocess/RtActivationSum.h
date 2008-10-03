@@ -49,7 +49,10 @@ protected:
   int process(ACE_Message_Block *mb);
 
   // data ID for the activation we will sum
-  string activationID;
+  string activationModuleID;
+
+  // data name for the activation we will sum
+  string activationDataName;
 
   // roi ID for the activation we will sum
   string activationRoiID;

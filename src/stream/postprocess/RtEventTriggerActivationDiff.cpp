@@ -6,15 +6,24 @@
  *****************************************************************************/
 
 #include"RtEventTriggerActivationDiff.h"
+#include"RtDataIDs.h"
 #include"RtActivation.h"
 
 #include"RtEvent.h"
 
-string RtEventTriggerActivationDiff::moduleString("event-trigger-activation-diff");
+string RtEventTriggerActivationDiff::moduleString(ID_EVENTTRIGGER_ACTIVATIONDIFF);
 
 // default constructor
 RtEventTriggerActivationDiff::RtEventTriggerActivationDiff() : RtEventTrigger() {
   componentID = moduleString;
+  dataName = "";
+
+  posActivationSumModuleID = ID_ACTIVATIONSUM;
+  negActivationSumModuleID = ID_ACTIVATIONSUM;
+  posActivationSumDataName = NAME_ACTIVATIONSUM;
+  negActivationSumDataName = NAME_ACTIVATIONSUM;
+  posRoiID = "active";
+  negRoiID = "deactive";
 
   diffThresh = 1.0;
 }
@@ -31,6 +40,30 @@ bool RtEventTriggerActivationDiff::processOption(const string &name,
 					   const map<string,string> &attrMap) {
   if(name == "diffThresh") {
     return RtConfigVal::convert<double>(diffThresh,text);
+  }
+  else if(name == "posActivationModuleID") {
+    posActivationSumModuleID = text;
+    return true;
+  }
+  else if(name == "negActivationModuleID") {
+    negActivationSumModuleID = text;
+    return true;
+  }
+  else if(name == "posActivationDataName") {
+    posActivationSumDataName = text;
+    return true;
+  }
+  else if(name == "negActivationDataName") {
+    negActivationSumDataName = text;
+    return true;
+  }
+  else if(name == "posRoiID") {
+    posRoiID = text;
+    return true;
+  }
+  else if(name == "negRoiID") {
+    negRoiID = text;
+    return true;
   }
 
   return RtEventTrigger::processOption(name, text, attrMap);
@@ -57,19 +90,21 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
 
   // find the positive activation sum with the right roiID
   RtActivation *posact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
-						  posroiID);
+    = (RtActivation*) msg->getData(posActivationSumModuleID,
+				   posActivationSumDataName,
+				   posRoiID);
+  RtActivation *negact 
+    = (RtActivation*) msg->getData(negActivationSumModuleID,
+				   negActivationSumDataName,
+				   negRoiID);
+
   if(posact == NULL) {
     cout << "couldn't find positive roi " << posroiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtEventTriggerActivationDiff:process: no positive ROI found\n"));
     return 0;
   }
-  
-  // find the positive activation sum with the right roiID
-  RtActivation *negact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
-						  negroiID);
+
   if(negact == NULL) {
     cout << "couldn't find negative roi " << negroiID << endl;
 
@@ -77,7 +112,7 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  int tr = ((RtMRIImage*)msg->getCurrentData())->getAcquisitionNum();
+  int tr = posact->getDataID().getTimePoint();
   if(tr < initialSkipTRs) {
     return 0;
   }
@@ -91,9 +126,14 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
   // check for good trigger
   if(posact->getPixel(0) - negact->getPixel(0) >= diffThresh) {
     // trigger
-    RtEvent *event = new RtEvent();
-    event->setTR(tr);
-    event->addToID("trigger.good");
+    RtEvent *event = new RtEvent(*posact);
+   
+    event->getDataID().setFromInputData(*posact,*this);
+    event->getDataID().setDataName(NAME_EVENTTRIGGER_GOOD);
+    event->getDataID().setTimePoint(tr);
+
+//    event->setTR(tr);
+//    event->addToID("trigger.good");
     setResult(msg,event);
 
     // log the trigger
@@ -114,9 +154,14 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
   // check for bad trigger
   if(posact->getPixel(0) - negact->getPixel(0) <= -diffThresh) {
     // trigger
-    RtEvent *event = new RtEvent();
-    event->addToID("trigger.bad");
-    event->setTR(tr);
+    RtEvent *event = new RtEvent(*posact);
+   
+    event->getDataID().setFromInputData(*posact,*this);
+    event->getDataID().setDataName(NAME_EVENTTRIGGER_BAD);
+    event->getDataID().setTimepoint(tr);
+
+    //event->addToID("trigger.bad");
+    //event->setTR(tr);
     setResult(msg,event);
 
     // log the trigger

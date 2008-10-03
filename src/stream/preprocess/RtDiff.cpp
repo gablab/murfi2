@@ -8,13 +8,17 @@
 
 #include"RtDiff.h"
 
+#include"RtDataIDs.h"
+
 #define absdiff(a,b) (a > b ? a-b : b-a)
 
-string RtDiff::moduleString("voxel-difference");
+string RtDiff::moduleString(ID_TEMPDIFF);
 
 // default constructor
 RtDiff::RtDiff() : RtStreamComponent() {
   componentID = moduleString;
+  dataName = NAME_TEMPDIFF_IMG;
+
   last = NULL;
 }
 
@@ -53,6 +57,10 @@ int RtDiff::process(ACE_Message_Block *mb) {
   // allocate a new data image for the difference
   RtMRIImage *diff = new RtMRIImage(*img);
 
+  diff->getDataID().setFromInputData(*img,*this);
+  diff->getDataID().setDataName(dataName);
+
+
   // compute the absolute difference
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     unsigned short d = absdiff(img->getPixel(i),last->getPixel(i));
@@ -61,7 +69,7 @@ int RtDiff::process(ACE_Message_Block *mb) {
   }  
 
   // set the image id for handling
-  diff->addToID("voxel-difference");
+  //diff->addToID("voxel-difference");
 
 //  string fn;
 //

@@ -12,7 +12,7 @@
 string RtPasser::moduleString("passer");
 
 // default constructor
-RtPasser::RtPasser() : RtStreamComponent(), dataID("") {
+RtPasser::RtPasser() : RtStreamComponent() {
   componentID = moduleString;
 }
 
@@ -20,25 +20,38 @@ RtPasser::RtPasser() : RtStreamComponent(), dataID("") {
 //  in
 //   dataID is a string that constrains what type of data we send, if its
 //   empty we send all the data
-RtPasser::RtPasser(string _dataID) 
-  : RtStreamComponent(), dataID(_dataID) {
-  componentID = moduleString;
-}
+//RtPasser::RtPasser(string _dataID) 
+//  : RtStreamComponent(), dataID(_dataID) {
+//  componentID = moduleString;
+//}
 
 // char* with id constructor
 //  in
 //   dataID is a string that constrains what type of data we send, if its
 //   empty we send all the data
-RtPasser::RtPasser(char *_dataID) 
-  : RtStreamComponent(), dataID(_dataID) {
+//RtPasser::RtPasser(char *_dataID) 
+//  : RtStreamComponent(), dataID(_dataID) {
+//  componentID = moduleString;
+//}
+
+
+// id constructor
+//  in
+//   idTemplate is a an instance of RtDataID where the fields are used as a
+//   template to match incomming data to decide if it should be send to
+//   the outputs or not. Empty fields are not matched and filled fields are
+RtPasser::RtPasser(const RtDataID &idTemplate) : RtStreamComponent() {
   componentID = moduleString;
+
+  // setup id template
+  passDataID = idTemplate;
 }
 
 // destructor
 RtPasser::~RtPasser() {}
 
 //*** initialization routines  ***//
-void RtPasser::addOutput(RtOutput *out, const string &dataId) {
+void RtPasser::addOutput(RtOutput *out) {
   outputs.push_back(out);
 }
 
@@ -47,7 +60,7 @@ void RtPasser::sendToOutputs(RtData *d) {
   ACE_TRACE(("RtPasser::sendToOutputs"));
 
   // check if this data is our type
-  if(d == NULL || !dataID.empty() && d->getID() != dataID) {	
+  if(d == NULL || d->getDataID() != passDataID) {	
     return;
   }
 

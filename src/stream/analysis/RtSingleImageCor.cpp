@@ -13,11 +13,12 @@
 
 #include"debug_levels.h"
 
-string RtSingleImageCor::moduleString("singleimcor");
+string RtSingleImageCor::moduleString(ID_SINGLEIMCOR);
 
 // default constructor
 RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
   componentID = moduleString;
+  dataName = NAME_SINGLEIMCOR_ACTIVATION;
    
   solvers = NULL; 
   numData = 0;
@@ -134,6 +135,12 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   RtActivation **stats = new RtActivation*[numConditions];
   for(unsigned int i = 0; i < numConditions; i++) {
     stats[i] = new RtActivation(*dat);
+
+    // setup the data id
+    stats[i]->getDataID().setFromInputData(*dat,*this);
+    stats[i]->getDataID().setDataName(dataName+"_"+conditionNames[i]);
+    stats[i]->getDataID().setRoiID(roiID);
+
     stats[i]->initToZeros();
 
     // set threshold
@@ -298,9 +305,9 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   // set the image ids for handling
   for(int c = 0; c < numConditions; c++) {
     // give the image a name
-    string name = "voxel-singleimcor-stat_" + conditionNames[c];
-    stats[c]->addToID(name);
-    stats[c]->setRoiID(roiID);
+    //string name = "voxel-singleimcor-stat_" + conditionNames[c];
+    //stats[c]->addToID(name);
+    //stats[c]->setRoiID(roiID);
 
     // set the result
     setResult(msg,stats[c]);

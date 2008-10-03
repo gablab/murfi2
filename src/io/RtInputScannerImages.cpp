@@ -183,7 +183,7 @@ int RtInputScannerImages::svc() {
 
     // build data class
     rti = new RtMRIImage(*ei,img);
-    rti->setSeriesNum(seriesNum);
+    //rti->setSeriesNum(seriesNum);
     rti->setMatrixSize(matrixSize);
     rti->setNumSlices(numSlices);
 

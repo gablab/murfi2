@@ -9,11 +9,12 @@
 #include"RtIncrementalGLM.h"
 #include"RtMRIImage.h"
 
-string RtIncrementalGLM::moduleString("incrglm");
+string RtIncrementalGLM::moduleString(ID_INCREMENTALGLM);
 
 // default constructor
 RtIncrementalGLM::RtIncrementalGLM() : RtActivationEstimator() {
   componentID = moduleString;
+  dataName = NAME_INCREMENTALGLM_TSTAT;
 
   needsInit = true;
 
@@ -93,6 +94,12 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 
   // allocate a new data image for the estimation
   RtActivation *est = new RtActivation(*dat);
+
+  // setup the data id
+  est->getDataID().setFromInputData(*dat,*this);
+  est->getDataID().setDataName(dataName);
+  est->getDataID().setRoiID(roiID);
+
   est->initToZeros();
 
   if(numTimepoints > numTrends+1) {
@@ -147,7 +154,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   delete Xrow;
 
   // set the image id for handling
-  est->addToID("voxel-incrglm");
+  //est->addToID("voxel-incrglm");
 
   setResult(msg,est);
 

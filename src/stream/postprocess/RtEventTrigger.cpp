@@ -10,11 +10,12 @@
 
 #include"RtEvent.h"
 
-string RtEventTrigger::moduleString("event-trigger");
+string RtEventTrigger::moduleString(ID_EVENTTRIGGER);
 
 // default constructor
 RtEventTrigger::RtEventTrigger() : RtStreamComponent() {
   componentID = moduleString;
+  dataName =  NAME_EVENTTRIGGER_SIGNAL;
 
   posroiID = "active";
   negroiID = "deactive";

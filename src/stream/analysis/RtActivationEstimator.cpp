@@ -537,7 +537,7 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
 void RtActivationEstimator::setResult(RtStreamMessage *msg, RtData *data) {
   // send the mask if desired 
   if(putMaskOnMessage) {
-    mask.setRoiID(roiID);
+    mask.getDataID().setRoiID(roiID);
     passData(&mask);
   }
 

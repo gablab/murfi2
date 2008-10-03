@@ -15,6 +15,7 @@
 
 #include"RtStreamComponent.h"
 #include"RtDataImage.h"
+#include"RtDataIDs.h"
 #include"RtMaskImage.h"
 
 #include<vector>

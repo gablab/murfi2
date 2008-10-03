@@ -43,7 +43,8 @@ protected:
   unsigned int numTimePoints;
 
   // the mean image to use in var calculation
-  string meanDataID;  //RtMRIImage mean;
+  string meanModuleID;  
+  string meanDataName;  
 
   // saves the variance numerator image up to t-1
   RtActivation varnum;

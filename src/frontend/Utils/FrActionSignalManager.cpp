@@ -3,6 +3,7 @@
 #include "FrMainWindow.h"
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
+#include "FrAddlayerDialog.h"	// test
 
 // Qt
 #include "Qt/QString.h"
@@ -33,6 +34,7 @@ void FrActionSignalManager::Initialize(){
      
     //Edit 
     CONNECT_ACTION_TRIGGERED(am->GetSaveToTabAction(), OnSaveToTabAction());
+	CONNECT_ACTION_TRIGGERED(am->GetAddLayerAction(), OnAddLayerAction());
     CONNECT_ACTION_TRIGGERED(am->GetChangeThresholdAction(), OnChangeThresholdAction());
     CONNECT_ACTION_TRIGGERED(am->GetChangeColormapAction(), OnChangeColormapAction());
     
@@ -98,6 +100,13 @@ void FrActionSignalManager::OnExitAction(){
 //Edit 
 void FrActionSignalManager::OnSaveToTabAction(){
     m_mainWindow->GetMainController()->SaveCurrentViewToTab();
+}
+
+void FrActionSignalManager::OnAddLayerAction(){
+	m_mainWindow->GetMainController()->AddLayer();
+	// test
+//	FrAddLayerDialog dlg(m_mainWindow, true);
+//	dlg.SimpleExec();
 }
 
 void FrActionSignalManager::OnChangeThresholdAction(){

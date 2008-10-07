@@ -23,6 +23,7 @@ public slots:
     void OnExitAction();
     //Edit 
     void OnSaveToTabAction();
+	void OnAddLayerAction();
     void OnChangeThresholdAction();
     void OnChangeColormapAction();
     //View

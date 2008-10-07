@@ -11,6 +11,7 @@
 #include "vtkRenderer.h"
 #include "vtkCoordinate.h"
 #include "vtkPointPicker.h"
+#include "vtkImageActor.h"
 
 //Some defines
 #define INVALIDE_RENDERER_NUM -1

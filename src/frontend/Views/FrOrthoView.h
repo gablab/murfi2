@@ -3,6 +3,7 @@
 
 class vtkRenderer;
 class vtkTextActor;
+class vtkImageActor;
 
 class FrMainWindow;
 class FrDocumentReader;
@@ -34,7 +35,8 @@ public:
     FrSliceExtractor* GetSliceExtractor(int i) { return m_SliceExtractor[i]; }
     FrTBCFilter* GetTBCFilter(int i) { return m_tbcFilter[i]; }
     vtkRenderer* GetRenderer(int i){ return m_renderer[i]; }
-    Fr2DSliceActor* GetActor(int i){ return m_actor[i]; }
+//    Fr2DSliceActor* GetActor(int i){ return m_actor[i]; }
+    vtkImageActor* GetActor(int i){ return m_actor[i]; }
 
 private:
     // Render pipline
@@ -44,7 +46,8 @@ private:
     vtkRenderer* m_renderer[RENDERER_COUNT];
 
     // Actors
-	Fr2DSliceActor* m_actor[RENDERER_COUNT];
+	//Fr2DSliceActor* m_actor[RENDERER_COUNT];
+	vtkImageActor* m_actor[RENDERER_COUNT];
 	vtkTextActor* m_tactor[RENDERER_COUNT];	
 
 	int x, y;

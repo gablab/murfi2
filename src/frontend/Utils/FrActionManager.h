@@ -23,7 +23,8 @@ public:
     FrGetPropMacro(QAction*, LoadTabsAction);
     FrGetPropMacro(QAction*, ExitAction);    
     // Edit
-    FrGetPropMacro(QAction*, SaveToTabAction);
+    FrGetPropMacro(QAction*, AddLayerAction);
+	FrGetPropMacro(QAction*, SaveToTabAction);
     FrGetPropMacro(QAction*, ChangeThresholdAction);
     FrGetPropMacro(QAction*, ChangeColormapAction);
     //View

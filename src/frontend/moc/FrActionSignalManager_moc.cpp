@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Fri 3. Oct 00:50:54 2008
+** Created: Tue 7. Oct 20:01:10 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      16,   10, // methods
+      17,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -33,16 +33,17 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
       81,   22,   22,   22, 0x0a,
       96,   22,   22,   22, 0x0a,
      116,   22,   22,   22, 0x0a,
-     142,   22,   22,   22, 0x0a,
-     167,   22,   22,   22, 0x0a,
-     187,   22,   22,   22, 0x0a,
-     208,   22,   22,   22, 0x0a,
-     228,   22,   22,   22, 0x0a,
-     254,   22,   22,   22, 0x0a,
-     274,   22,   22,   22, 0x0a,
-     292,   22,   22,   22, 0x0a,
+     135,   22,   22,   22, 0x0a,
+     161,   22,   22,   22, 0x0a,
+     186,   22,   22,   22, 0x0a,
+     206,   22,   22,   22, 0x0a,
+     227,   22,   22,   22, 0x0a,
+     247,   22,   22,   22, 0x0a,
+     273,   22,   22,   22, 0x0a,
+     293,   22,   22,   22, 0x0a,
      311,   22,   22,   22, 0x0a,
-     331,   22,   22,   22, 0x0a,
+     330,   22,   22,   22, 0x0a,
+     350,   22,   22,   22, 0x0a,
 
        0        // eod
 };
@@ -51,7 +52,7 @@ static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "FrActionSignalManager\0\0OnOpenImageAction()\0"
     "OnSaveTabsAction()\0OnLoadTabsAction()\0"
     "OnExitAction()\0OnSaveToTabAction()\0"
-    "OnChangeThresholdAction()\0"
+    "OnAddLayerAction()\0OnChangeThresholdAction()\0"
     "OnChangeColormapAction()\0OnViewSliceAction()\0"
     "OnViewMosaicAction()\0OnViewOrthoAction()\0"
     "OnManipulatorToolAction()\0OnVoxelToolAction()\0"
@@ -89,19 +90,20 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 2: OnLoadTabsAction(); break;
         case 3: OnExitAction(); break;
         case 4: OnSaveToTabAction(); break;
-        case 5: OnChangeThresholdAction(); break;
-        case 6: OnChangeColormapAction(); break;
-        case 7: OnViewSliceAction(); break;
-        case 8: OnViewMosaicAction(); break;
-        case 9: OnViewOrthoAction(); break;
-        case 10: OnManipulatorToolAction(); break;
-        case 11: OnVoxelToolAction(); break;
-        case 12: OnRoiToolAction(); break;
-        case 13: OnShowHelpAction(); break;
-        case 14: OnShowAboutAction(); break;
-        case 15: OnTestAction(); break;
+        case 5: OnAddLayerAction(); break;
+        case 6: OnChangeThresholdAction(); break;
+        case 7: OnChangeColormapAction(); break;
+        case 8: OnViewSliceAction(); break;
+        case 9: OnViewMosaicAction(); break;
+        case 10: OnViewOrthoAction(); break;
+        case 11: OnManipulatorToolAction(); break;
+        case 12: OnVoxelToolAction(); break;
+        case 13: OnRoiToolAction(); break;
+        case 14: OnShowHelpAction(); break;
+        case 15: OnShowAboutAction(); break;
+        case 16: OnTestAction(); break;
         }
-        _id -= 16;
+        _id -= 17;
     }
     return _id;
 }

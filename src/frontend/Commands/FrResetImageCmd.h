@@ -4,6 +4,7 @@
 // Forward declarations
 class Fr2DSliceActor;
 class vtkRenderer;
+class vtkImageActor;
 
 // includes
 #include "FrMacro.h"
@@ -31,7 +32,7 @@ public:
 
 private:
     // Reset camera
-    void ResetCamera(Fr2DSliceActor* actor, vtkRenderer* renderer);
+    void ResetCamera(vtkImageActor* actor, vtkRenderer* renderer);
 };
 
 #endif // FR_RESET_IMAGE_CMD

@@ -103,7 +103,7 @@ void FrSliceView::UpdatePipeline(int point){
     TBCSettings& tbcSettings = settings.TbcSetting;
     CameraSettings& camSettings = settings.CamSettings;
 
-	FrColormapFilter* cmf = FrColormapFilter::New();	// test
+	//FrColormapFilter* cmf = FrColormapFilter::New();	// test
 
 	char text[20] = "";
 	char tmp[5];
@@ -173,10 +173,10 @@ void FrSliceView::UpdatePipeline(int point){
                 m_tbcFilter->Update();
                 //m_actor->SetInput(m_tbcFilter->GetOutput());
 				
-				cmf->SetInput(m_tbcFilter->GetOutput());	// test
-				cmf->Update();								// test
+				//cmf->SetInput(m_tbcFilter->GetOutput());	// test
+				//cmf->Update();								// test
 
-				m_LayeredImage->SetInput(cmf->GetOutput());
+				m_LayeredImage->SetInput(m_tbcFilter->GetOutput());
 				// Add actor
                 if(isCleared) {
                 //    m_renderer->AddActor(m_actor);

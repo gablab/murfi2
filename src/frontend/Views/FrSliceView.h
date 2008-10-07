@@ -38,7 +38,8 @@ public:
     FrSliceExtractor* GetSliceExtractor() { return m_SliceExtractor; }
     FrTBCFilter* GetTBCFilter() { return m_tbcFilter; }
     vtkRenderer* GetRenderer(){ return m_renderer; }
-    Fr2DSliceActor* GetActor(){ return m_actor; }
+//    Fr2DSliceActor* GetActor(){ return m_actor; }
+    vtkImageActor* GetActor(){ return m_actor; }
     
 
 private:
@@ -49,8 +50,9 @@ private:
     vtkRenderer* m_renderer;
 
     // Actors
-	Fr2DSliceActor* m_actor;
-    vtkTextActor* m_tactor;
+//	Fr2DSliceActor* m_actor;
+	vtkImageActor* m_actor;  
+	vtkTextActor* m_tactor;
 
 	// test
 	FrLayeredImage* m_LayeredImage;

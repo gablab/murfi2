@@ -35,6 +35,8 @@ public:
     void SaveCurrentViewToTab();
     void ChangeView(int view);
 
+	void AddLayer();
+
     void ChangeBookmark(int id);
     void DeleteBookmark(int id);
 

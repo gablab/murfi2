@@ -118,7 +118,6 @@ void FrMainController::Notify(int notifyCode){
 }
 
 void FrMainController::SaveCurrentViewToTab(){
-
     FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
     cmd->Execute();
     delete cmd;
@@ -139,6 +138,13 @@ void FrMainController::ChangeView(int view){
     cmd->SetTargetView(targetView);
     cmd->Execute();
     delete cmd;    
+}
+
+void FrMainController::AddLayer(){
+	// TODO: implement
+    FrAddLayerCmd* cmd = FrCommandController::CreateCmd<FrAddLayerCmd>();
+    cmd->Execute();
+    delete cmd;
 }
 
 void FrMainController::ChangeBookmark(int id){

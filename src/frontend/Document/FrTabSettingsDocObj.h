@@ -6,6 +6,8 @@
 #include "FrMacro.h"
 
 #include "Qt/QString.h"
+#include "Qt/QColor.h"
+#include <vector>
 
 // Type for threshold / brightness / contrast
 typedef struct _tbcSettings {
@@ -21,6 +23,17 @@ typedef struct _camSettings {
     double Position[3];
     double FocalPoint[3];
 } CameraSettings;
+
+// Type for layer settings
+typedef struct _layerSettings{
+	bool Visible;
+	unsigned char Opacity;			// 0..255
+	unsigned char ColormapType;		// 0, 1, 2
+	unsigned char Threshold;		// 0..255
+	QColor color;
+} LayerSettings;
+
+typedef std::vector<LayerSettings*> LayerSettingsCollection;
 
 // Type for view settings.
 // Contains almost everything...
@@ -70,6 +83,12 @@ public:
     FrGetRefPropMacro(ViewSettings,SliceViewSettings);
     FrGetRefPropMacro(ViewSettings,MosaicViewSettings);
     FrGetRefPropMacro(OViewSettings,OrthoViewSettings);
+
+	LayerSettingsCollection GetLayerSettingsCollection(){return Layers;};
+
+private:
+	LayerSettingsCollection Layers;	// list of settings for all layers in tab
+
 };
 
 #endif

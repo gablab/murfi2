@@ -60,6 +60,16 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
         INIT_ARR3(ovs->CamSettings[i].FocalPoint, DEF_CAM_FOCUS);
         INIT_ARR3(ovs->CamSettings[i].Position, DEF_CAM_POSITION);
     }
+
+	// Setup layer settings, add default layer
+	LayerSettings* ls = new LayerSettings();
+	ls->color = QColor(0, 0, 0);
+	ls->ColormapType = 0;	// no colormap
+	ls->Opacity = 255;
+	ls->Threshold = 128;
+	ls->Visible = true;
+
+	Layers.push_back(ls);
 }
 
 FrTabSettingsDocObj::~FrTabSettingsDocObj(){

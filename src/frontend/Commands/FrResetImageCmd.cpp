@@ -12,6 +12,7 @@
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkImageActor.h"
 
 
 FrResetImageCmd::FrResetImageCmd()
@@ -40,8 +41,10 @@ bool FrResetImageCmd::Execute(){
     }
 
     // Get actors and renderers
-    std::vector<Fr2DSliceActor*> actors;
-    std::vector<vtkRenderer*> renderers;
+//    std::vector<Fr2DSliceActor*> actors;
+    std::vector<vtkImageActor*> actors;
+    
+	std::vector<vtkRenderer*> renderers;
     switch(targetView){
          case FrResetImageCmd::Slice:
              actors.push_back(mv->GetSliceView()->GetActor());
@@ -71,7 +74,7 @@ bool FrResetImageCmd::Execute(){
     return result;
 }
 
-void FrResetImageCmd::ResetCamera(Fr2DSliceActor* actor, vtkRenderer* renderer){
+void FrResetImageCmd::ResetCamera(vtkImageActor* actor, vtkRenderer* renderer){		// test
     // Move camera at center of image
     double newFocalPt[3];
     double newPosition[3];

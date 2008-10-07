@@ -249,6 +249,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrAddLayerDialog_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrApplication_moc.cpp"
 				>
 			</File>
@@ -627,6 +631,24 @@
 			Name="Widgets"
 			>
 			<File
+				RelativePath=".\frontend\Widgets\FrAddLayerDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrAddLayerDialog.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrBookmark.cpp"
 				>
 				<FileConfiguration
@@ -888,6 +910,14 @@
 		<Filter
 			Name="Commands"
 			>
+			<File
+				RelativePath=".\frontend\Commands\FrAddLayerCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrAddLayerCmd.h"
+				>
+			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrBaseCmd.cpp"
 				>

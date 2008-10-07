@@ -27,6 +27,8 @@ void FrActionManager::Initialize(QObject* parent){
     // Edit
     m_SaveToTabAction = new QAction(parent);
     m_SaveToTabAction->setObjectName(QString::fromUtf8("m_SaveToTabAction"));
+    m_AddLayerAction = new QAction(parent);
+    m_AddLayerAction->setObjectName(QString::fromUtf8("m_AddLayerAction"));
     m_ChangeThresholdAction = new QAction(parent);
     m_ChangeThresholdAction->setObjectName(QString::fromUtf8("m_ChangeThresholdAction"));
     m_ChangeColormapAction = new QAction(parent);
@@ -74,6 +76,8 @@ void FrActionManager::Retranslate(){
     // Edit
     m_SaveToTabAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save To Tab"));
     m_SaveToTabAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save To Tab"));
+    m_AddLayerAction->setText(DO_TRANSLATE(TR_CONTEXT, "Add Layer"));
+    m_AddLayerAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Add Layer"));
     m_ChangeThresholdAction->setText(DO_TRANSLATE(TR_CONTEXT, "Change Threshold"));
     m_ChangeThresholdAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Change Threshold"));
     m_ChangeColormapAction->setText(DO_TRANSLATE(TR_CONTEXT, "Change Colormap/Opacity"));

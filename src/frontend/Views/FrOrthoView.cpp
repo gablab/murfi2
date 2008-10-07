@@ -16,6 +16,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkTextActor.h"
+#include "vtkImageActor.h"
 #include "vtkRenderWindow.h"
 #include "vtkCoordinate.h"
 #include "vtkTextProperty.h"
@@ -37,7 +38,8 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
     // create renderers
 	for(int i = 0; i < RENDERER_COUNT; i++){
         m_renderer[i] = vtkRenderer::New();
-		m_actor[i] = Fr2DSliceActor::New();
+//		m_actor[i] = Fr2DSliceActor::New();
+		m_actor[i] = vtkImageActor::New();
 		m_tactor[i] = vtkTextActor::New();
 		m_SliceExtractor[i] = FrSliceExtractor::New();
 		m_tbcFilter[i] = FrTBCFilter::New();	
@@ -177,6 +179,7 @@ void FrOrthoView::UpdatePipeline(int point){
 
 				if(m_tbcFilter[i]->GetInput()){                
 					m_tbcFilter[i]->Update();
+					//m_actor[i]->SetInput(m_docReader->GetOutput());
 					m_actor[i]->SetInput(m_tbcFilter[i]->GetOutput());
 
                     // Add actors if they were removed

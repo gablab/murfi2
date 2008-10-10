@@ -22,6 +22,7 @@ class FrSliceExtractor;
 class FrLayeredImage;	// test
 
 #include "FrBaseView.h"
+#include "FrTabSettingsDocObj.h"
 
 // Wrapper for QVTKWidget.
 class FrSliceView : public FrBaseView
@@ -41,6 +42,8 @@ public:
 //    Fr2DSliceActor* GetActor(){ return m_actor; }
     vtkImageActor* GetActor(){ return m_actor; }
     
+	// test
+	void AddLayer(LayerSettings ls);
 
 private:
     // Pipeline

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrAddLayerDialog.h'
 **
-** Created: Tue 7. Oct 20:01:10 2008
+** Created: Thu 9. Oct 23:08:31 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,20 +22,36 @@ static const uint qt_meta_data_FrAddLayerDialog[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   10, // methods
+      10,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
  // slots: signature, parameters, type, tag, flags
       24,   18,   17,   17, 0x0a,
       46,   17,   17,   17, 0x0a,
+      72,   66,   17,   17, 0x0a,
+     102,   66,   17,   17, 0x0a,
+     133,   66,   17,   17, 0x0a,
+     161,   66,   17,   17, 0x0a,
+     190,   66,   17,   17, 0x0a,
+     218,   66,   17,   17, 0x0a,
+     247,   66,   17,   17, 0x0a,
+     279,   66,   17,   17, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrAddLayerDialog[] = {
     "FrAddLayerDialog\0\0index\0onComboBoxChange(int)\0"
-    "onColorBtnClicked()\0"
+    "onColorBtnClicked()\0value\0"
+    "SetOpacitySliderPosition(int)\0"
+    "SetOpacitySpinBoxPosition(int)\0"
+    "SetPxMinSliderPosition(int)\0"
+    "SetPxMinSpinBoxPosition(int)\0"
+    "SetPxMaxSliderPosition(int)\0"
+    "SetPxMaxSpinBoxPosition(int)\0"
+    "SetThresholdSliderPosition(int)\0"
+    "SetThresholdSpinBoxPosition(int)\0"
 };
 
 const QMetaObject FrAddLayerDialog::staticMetaObject = {
@@ -65,8 +81,16 @@ int FrAddLayerDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: onComboBoxChange((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 1: onColorBtnClicked(); break;
+        case 2: SetOpacitySliderPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 3: SetOpacitySpinBoxPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 4: SetPxMinSliderPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 5: SetPxMinSpinBoxPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 6: SetPxMaxSliderPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: SetPxMaxSpinBoxPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 8: SetThresholdSliderPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 9: SetThresholdSpinBoxPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
         }
-        _id -= 2;
+        _id -= 10;
     }
     return _id;
 }

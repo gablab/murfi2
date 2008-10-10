@@ -22,11 +22,12 @@ public:
 
 	void Initialize();
 
-	void AddLayer();
+	void AddLayer(LayerSettings ls);
 	void RemoveLayer();
 
 	void SetInput(vtkImageData* input);
 	void SetCamera(CameraSettings& camSettings);
+	void SetParams(LayeredImageSettings& liSettings);
 	void SetText(const char* text);
 
 	FrPropMacro(int, ActiveLayer);

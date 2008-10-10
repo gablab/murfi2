@@ -33,7 +33,7 @@ typedef struct _layerSettings{
 	QColor color;
 } LayerSettings;
 
-typedef std::vector<LayerSettings*> LayerSettingsCollection;
+typedef std::vector<LayerSettings> LayeredImageSettings;
 
 // Type for view settings.
 // Contains almost everything...
@@ -84,10 +84,11 @@ public:
     FrGetRefPropMacro(ViewSettings,MosaicViewSettings);
     FrGetRefPropMacro(OViewSettings,OrthoViewSettings);
 
-	LayerSettingsCollection GetLayerSettingsCollection(){return Layers;};
+	LayeredImageSettings GetLayeredImageSettings(){return m_LayeredImageSettings;};
+	void AddLayer(LayerSettings ls);
 
 private:
-	LayerSettingsCollection Layers;	// list of settings for all layers in tab
+	LayeredImageSettings m_LayeredImageSettings;	// list of settings for all layers in tab
 
 };
 

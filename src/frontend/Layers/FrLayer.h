@@ -6,6 +6,7 @@
 #include "FrBaseLayer.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrMacro.h"
+#include "FrColormapFilter.h"	// test
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -15,11 +16,13 @@
 #include "vtkLookupTable.h"
 #include "vtkImageActor.h"
 
+#include "Qt\QColor.h"
+
 
 class FrLayer : public FrBaseLayer 
 {
 public:
-	FrLayer(vtkRenderWindow* renWindow, int layNum = 0);
+	FrLayer(LayerSettings ls, vtkRenderWindow* renWindow, int layNum = 0);
 	~FrLayer();
 	
 	void Initialize();
@@ -30,6 +33,7 @@ public:
 	void SetOpacity(float value);
 	void SetLookupTable(vtkLookupTable* table);
 	void SetVisibility(bool value);
+	void SetParams(LayerSettings& lSettings);
     
 	void Update();
 
@@ -45,8 +49,14 @@ private:
     // Actors
 	vtkImageActor* m_actor;
 	vtkImageData* m_inputData;
+	FrColormapFilter* m_cmfilter;
 	
 	float m_Opacity;
+	bool m_Visible;
+	int m_PxMin;
+	int m_PxMax;
+	int m_CMType;
+	QColor m_Color;
 
 };
 

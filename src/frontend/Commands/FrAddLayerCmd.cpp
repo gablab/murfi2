@@ -27,13 +27,16 @@ bool FrAddLayerCmd::Execute(){
 		return false;
 	
     FrTabSettingsDocObj* sets = doc->GetCurrentTabSettings();
-		
+	LayerSettings layerParams = dlg.GetLayerParams();
+	// we should update layer settings in all tabs
+	sets->AddLayer(layerParams);	// test
+	doc->SyncronyzeLayers(layerParams);
 
-	//mv->GetSliceView()->AddLayer(layerParams);	// check in each view variable to update pipeline?
+	mv->GetSliceView()->AddLayer(layerParams);	// check in each view variable to update pipeline? test
 	//mv->GetMosaicView()->AddLayer(layerParams);
 	//mv->GetOrthoView()->AddLayer(layerParams);
 		
-	mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);	// FRP_LAYER?
+	mv->GetCurrentView()->UpdatePipeline(FRP_LAYER);	// FRP_LAYER?
 
 	return true;
 }

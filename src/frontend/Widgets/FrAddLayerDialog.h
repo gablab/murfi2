@@ -9,10 +9,16 @@ class QPushButton;
 class QGroupBox;
 class QVBoxLayout;
 class QHBoxLayout;
+class QSpinBox;
+class QComboBox;
+class QCheckBox;
+class QSlider;
 
+#include "FrTabSettingsDocObj.h"
 
 #include "Qt/QString.h"
 #include "QtGui/QDialog.h"
+
 
 class FrAddLayerDialog: public QDialog
 {
@@ -22,17 +28,26 @@ public:
 
     void SetCaption(QString& caption);
 
-    QString GetName();
-    void SetName(QString& value);
+//    QString GetName();
+//    void SetName(QString& value);
 
-    QString GetDescription();
-    void SetDescription(QString& value);
+//    QString GetDescription();
+//    void SetDescription(QString& value);
+	LayerSettings GetLayerParams();
 
     bool SimpleExec();
  
 public slots:
 	void onComboBoxChange(int index);
 	void onColorBtnClicked();
+	void SetOpacitySliderPosition(int value);
+	void SetOpacitySpinBoxPosition(int value);
+	void SetPxMinSliderPosition(int value);
+	void SetPxMinSpinBoxPosition(int value);
+	void SetPxMaxSliderPosition(int value);
+	void SetPxMaxSpinBoxPosition(int value);
+	void SetThresholdSliderPosition(int value);
+	void SetThresholdSpinBoxPosition(int value);
 
 private:
     QVBoxLayout* m_vLayout;
@@ -48,6 +63,24 @@ private:
 
 	// new
 	QWidget* colorWidget;
+	QColor color;
+	QComboBox* comboBox;
+
+	// spin boxes
+	QSpinBox *OpacitySpinBox;
+	QSpinBox *PxMinSpinBox;
+	QSpinBox *PxMaxSpinBox;
+	QSpinBox *ThresholdSpinBox;
+
+	QCheckBox *checkBox;
+
+	// sliders
+    QSlider *OpacitySlider;
+    QSlider *PxMinSlider;
+    QSlider *PxMaxSlider;
+    QSlider *ThresholdSlider;
+
+	int cmType;
 
 	QGroupBox* groupBox;
 	QGroupBox* groupBox2;

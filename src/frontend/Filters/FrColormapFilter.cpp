@@ -41,8 +41,52 @@ void FrColormapFilter::ExecuteInformation() {
 }
 
 void FrColormapFilter::SimpleExecute(vtkImageData* input, vtkImageData* output){
-    // TODO: not finished
+    // TODO: not finished, we can implement different methods for different types of colormap
+	
+	switch(m_CMType){
+		case 1:
+			ProcessMultiColormap(input, output);
+			break;
+		case 2:
+			ProcessSingleColormap(input, output);
+			break;
+	}
 
+}
+
+int FrColormapFilter::GetId(int x, int y){
+	return x*m_Dims[1]+y;	
+}
+void FrColormapFilter::ProcessSingleColormap(vtkImageData* input, vtkImageData* output){
+    unsigned char* srcPtr = (unsigned char*)input->GetPointData()->GetScalars()->GetVoidPointer(0);
+    unsigned char* dstPtr = (unsigned char*)output->GetPointData()->GetScalars()->GetVoidPointer(0);
+
+	int r1, g1, b1;
+	m_Color.getRgb(&r1, &g1, &b1);
+	// HSV
+	double h, s, v; 
+	vtkMath::RGBToHSV(r1, b1, g1, &h, &s, &v);
+
+	for (int x = 0; x < m_Dims[0]; x++){
+		for (int y = 0; y < m_Dims[1]; y++){
+			int id = GetId(x, y);
+			
+			// new values for RGB
+			double r, g, b;
+			
+			// old grayscale value
+			unsigned char k = srcPtr[id];
+
+			vtkMath::HSVToRGB(h, s, k, &r, &g, &b);
+
+			*dstPtr = r;	dstPtr++;
+			*dstPtr = g;	dstPtr++;
+			*dstPtr = b;	dstPtr++;
+		}
+	}
+}
+
+void FrColormapFilter::ProcessMultiColormap(vtkImageData* input, vtkImageData* output){
     unsigned char* srcPtr = (unsigned char*)input->GetPointData()->GetScalars()->GetVoidPointer(0);
     unsigned char* dstPtr = (unsigned char*)output->GetPointData()->GetScalars()->GetVoidPointer(0);
 		
@@ -60,12 +104,12 @@ void FrColormapFilter::SimpleExecute(vtkImageData* input, vtkImageData* output){
 			double hue;
 			int min, max;
 
-			if (k>=0 && k<128){		// (min, threshold) range
+			if (k>=m_PxMin && k<m_Threshold){		// (min, threshold) range
 				// map to 240..180 range
 				min = 180;
 				max = 240;
 			}
-			else if (k>=128 && k<=255){		// (threshold, max) range
+			else if (k>=m_Threshold && k<=m_PxMax){		// (threshold, max) range
 				// map to 60..0 range
 				min = 0;
 				max = 60;
@@ -82,9 +126,4 @@ void FrColormapFilter::SimpleExecute(vtkImageData* input, vtkImageData* output){
 			*dstPtr = b;	dstPtr++;
 		}
 	}
-
-}
-
-int FrColormapFilter::GetId(int x, int y){
-	return x*m_Dims[1]+y;	
 }

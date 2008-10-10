@@ -55,20 +55,20 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 	QLineEdit *lineEdit;
 	lineEdit = new QLineEdit("New layer", this);
 
-	QSpinBox *spinBox;
-	spinBox = new QSpinBox(this);
-    spinBox->setMaximum(255);
-    spinBox->setValue(255);
+	OpacitySpinBox = new QSpinBox(this);
+    OpacitySpinBox->setMaximum(255);
+    OpacitySpinBox->setValue(255);
+	connect(OpacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(SetOpacitySliderPosition(int)));
 
-    QSlider *horizontalSlider;
-	horizontalSlider = new QSlider(this);
-    horizontalSlider->setMaximum(255);
-    horizontalSlider->setValue(255);
-    horizontalSlider->setOrientation(Qt::Horizontal);
+	OpacitySlider = new QSlider(this);
+    OpacitySlider->setMaximum(255);
+    OpacitySlider->setValue(255);
+    OpacitySlider->setOrientation(Qt::Horizontal);
+	connect(OpacitySlider, SIGNAL(valueChanged(int)), this, SLOT(SetOpacitySpinBoxPosition(int)));
 
 	QHBoxLayout* hl1 = new QHBoxLayout(this);
-	hl1->addWidget(spinBox);
-	hl1->addWidget(horizontalSlider);
+	hl1->addWidget(OpacitySpinBox);
+	hl1->addWidget(OpacitySlider);
 
 	QVBoxLayout* vl2 = new QVBoxLayout(this);
 	vl2->addWidget(lineEdit);
@@ -78,7 +78,6 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 	hl2->addLayout(vl);
 	hl2->addLayout(vl2);
 
-	QCheckBox *checkBox;
 	checkBox = new QCheckBox("Visible", this);
     checkBox->setChecked(true);
 	
@@ -107,37 +106,36 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 	vl3->addWidget(label_4);
 	vl3->addWidget(label_5);
 
-	QSpinBox *spinBox2;
-	spinBox2 = new QSpinBox(this);
-    spinBox2->setMaximum(255);
-    spinBox2->setValue(0);
+	PxMinSpinBox = new QSpinBox(this);
+    PxMinSpinBox->setMaximum(255);
+    PxMinSpinBox->setValue(0);
+	connect(PxMinSpinBox, SIGNAL(valueChanged(int)), this, SLOT(SetPxMinSliderPosition(int)));
 
-    QSlider *horizontalSlider2;
-	horizontalSlider2 = new QSlider(this);
-    horizontalSlider2->setMaximum(255);
-    horizontalSlider2->setValue(0);
-    horizontalSlider2->setOrientation(Qt::Horizontal);
+	PxMinSlider = new QSlider(this);
+    PxMinSlider->setMaximum(255);
+    PxMinSlider->setValue(0);
+    PxMinSlider->setOrientation(Qt::Horizontal);
+	connect(PxMinSlider, SIGNAL(valueChanged(int)), this, SLOT(SetPxMinSpinBoxPosition(int)));
 
 	QHBoxLayout* hl4 = new QHBoxLayout(this);
-	hl4->addWidget(spinBox2);
-	hl4->addWidget(horizontalSlider2);
+	hl4->addWidget(PxMinSpinBox);
+	hl4->addWidget(PxMinSlider);
 
-	QSpinBox *spinBox3;
-	spinBox3 = new QSpinBox(this);
-    spinBox3->setMaximum(255);
-    spinBox3->setValue(255);
+	PxMaxSpinBox = new QSpinBox(this);
+    PxMaxSpinBox->setMaximum(255);
+    PxMaxSpinBox->setValue(255);
+	connect(PxMaxSpinBox, SIGNAL(valueChanged(int)), this, SLOT(SetPxMaxSliderPosition(int)));
 
-    QSlider *horizontalSlider3;
-	horizontalSlider3 = new QSlider(this);
-    horizontalSlider3->setMaximum(255);
-    horizontalSlider3->setValue(255);
-    horizontalSlider3->setOrientation(Qt::Horizontal);
+	PxMaxSlider = new QSlider(this);
+    PxMaxSlider->setMaximum(255);
+    PxMaxSlider->setValue(255);
+    PxMaxSlider->setOrientation(Qt::Horizontal);
+	connect(PxMaxSlider, SIGNAL(valueChanged(int)), this, SLOT(SetPxMaxSpinBoxPosition(int)));
 
 	QHBoxLayout* hl5 = new QHBoxLayout(this);
-	hl5->addWidget(spinBox3);
-	hl5->addWidget(horizontalSlider3);
+	hl5->addWidget(PxMaxSpinBox);
+	hl5->addWidget(PxMaxSlider);
 
-	QComboBox* comboBox;
 	comboBox = new QComboBox(this);
     comboBox->insertItems(0, QStringList()
      << QApplication::translate("Dialog", "Multicolor", 0, QApplication::UnicodeUTF8)
@@ -161,21 +159,21 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 	QLabel *label_6;
 	label_6 = new QLabel("Threshold: ", groupBox);
 
-	QSpinBox *spinBox4;
-	spinBox4 = new QSpinBox(groupBox);
-    spinBox4->setMaximum(255);
-    spinBox4->setValue(255);
+	ThresholdSpinBox = new QSpinBox(groupBox);
+    ThresholdSpinBox->setMaximum(255);
+    ThresholdSpinBox->setValue(128);
+	connect(ThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(SetThresholdSliderPosition(int)));
 
-    QSlider *horizontalSlider4;
-	horizontalSlider4 = new QSlider(groupBox);
-    horizontalSlider4->setMaximum(255);
-    horizontalSlider4->setValue(255);
-    horizontalSlider4->setOrientation(Qt::Horizontal);
-
+	ThresholdSlider = new QSlider(groupBox);
+    ThresholdSlider->setMaximum(255);
+    ThresholdSlider->setValue(128);
+    ThresholdSlider->setOrientation(Qt::Horizontal);
+	connect(ThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(SetThresholdSpinBoxPosition(int)));
+	
 	QHBoxLayout* groupBoxLayout = new QHBoxLayout(groupBox);
 	groupBoxLayout->addWidget(label_6);
-	groupBoxLayout->addWidget(spinBox4);
-	groupBoxLayout->addWidget(horizontalSlider4);
+	groupBoxLayout->addWidget(ThresholdSpinBox);
+	groupBoxLayout->addWidget(ThresholdSlider);
 
 	// additional params group for single colormap
 	groupBox2 = new QGroupBox("Additional Params", this);
@@ -224,26 +222,39 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 
 	groupBox->setVisible(true);
 	groupBox2->setVisible(false);
+	cmType = 1;		// multi colormap
 }
 
-void FrAddLayerDialog::SetCaption(QString& caption){
-    this->setWindowTitle(caption);
-}
+//void FrAddLayerDialog::SetCaption(QString& caption){
+//    this->setWindowTitle(caption);
+//}
+//
+//QString FrAddLayerDialog::GetName(){
+//    return m_txtName->text();
+//}
+//
+//void FrAddLayerDialog::SetName(QString& value){
+//    m_txtName->setText(value);
+//}
+//
+//QString FrAddLayerDialog::GetDescription(){
+//    return m_txtDescription->text();
+//}
+//
+//void FrAddLayerDialog::SetDescription(QString& value){
+//    m_txtDescription->setText(value);
+//}
 
-QString FrAddLayerDialog::GetName(){
-    return m_txtName->text();
-}
-
-void FrAddLayerDialog::SetName(QString& value){
-    m_txtName->setText(value);
-}
-
-QString FrAddLayerDialog::GetDescription(){
-    return m_txtDescription->text();
-}
-
-void FrAddLayerDialog::SetDescription(QString& value){
-    m_txtDescription->setText(value);
+LayerSettings FrAddLayerDialog::GetLayerParams(){
+	// TODO: add pxmin pxmax 
+	LayerSettings ls;
+	ls.color = color;
+	ls.ColormapType = cmType;
+	ls.Opacity = OpacitySpinBox->value();
+	ls.Threshold = ThresholdSpinBox->value();
+	ls.Visible = checkBox->isChecked();
+	
+	return ls;
 }
 
 bool FrAddLayerDialog::SimpleExec(){
@@ -253,7 +264,7 @@ bool FrAddLayerDialog::SimpleExec(){
 
 void FrAddLayerDialog::onColorBtnClicked(){
 	//QMessageBox(QMessageBox::Icon::Information, "Test", "test");
-	QColor color = QColorDialog::getColor(Qt::white, this);
+	color = QColorDialog::getColor(Qt::white, this);
 
 	QPalette palette;
     QBrush brush(color);
@@ -268,12 +279,46 @@ void FrAddLayerDialog::onColorBtnClicked(){
 void FrAddLayerDialog::onComboBoxChange(int index){
 	switch(index){
 		case 0:		// multi colormap
+			cmType = 1;
 			groupBox->setVisible(true);
 			groupBox2->setVisible(false);
 			break;
 		case 1:		// single colormap
+			cmType = 2;
 			groupBox->setVisible(false);
 			groupBox2->setVisible(true);
 			break;
 	}
+}
+
+void FrAddLayerDialog::SetOpacitySliderPosition(int value){
+	OpacitySlider->setValue(value);
+}
+
+void FrAddLayerDialog::SetPxMinSliderPosition(int value){
+	PxMinSlider->setValue(value);
+}
+
+void FrAddLayerDialog::SetPxMaxSliderPosition(int value){
+	PxMaxSlider->setValue(value);
+}
+
+void FrAddLayerDialog::SetThresholdSliderPosition(int value){
+	ThresholdSlider->setValue(value);
+}
+
+void FrAddLayerDialog::SetOpacitySpinBoxPosition(int value){
+	OpacitySpinBox->setValue(value);
+}
+
+void FrAddLayerDialog::SetPxMinSpinBoxPosition(int value){
+	PxMinSpinBox->setValue(value);
+}
+
+void FrAddLayerDialog::SetPxMaxSpinBoxPosition(int value){
+	PxMaxSpinBox->setValue(value);
+}
+
+void FrAddLayerDialog::SetThresholdSpinBoxPosition(int value){
+	ThresholdSpinBox->setValue(value);
 }

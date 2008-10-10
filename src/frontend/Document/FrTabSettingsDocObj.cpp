@@ -62,14 +62,15 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
     }
 
 	// Setup layer settings, add default layer
-	LayerSettings* ls = new LayerSettings();
-	ls->color = QColor(0, 0, 0);
-	ls->ColormapType = 0;	// no colormap
-	ls->Opacity = 255;
-	ls->Threshold = 128;
-	ls->Visible = true;
+	LayerSettings ls;
+	ls.color = QColor(0, 0, 0);
+	ls.ColormapType = 0;			// no colormap
+	ls.Opacity = 255;
+	ls.Threshold = 128;
+	ls.Visible = true;
 
-	Layers.push_back(ls);
+	LayeredImageSettings* lis = &m_LayeredImageSettings;
+	lis->push_back(ls);
 }
 
 FrTabSettingsDocObj::~FrTabSettingsDocObj(){
@@ -137,4 +138,25 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
         INIT_ARR_ARR(ovs->CamSettings[i].Position, ovsSrc->CamSettings[i].Position);
         INIT_ARR_ARR(ovs->CamSettings[i].FocalPoint, ovsSrc->CamSettings[i].FocalPoint);
     }
+
+	// setup layered image
+	//LayeredImageSettings lis = &m_LayeredImageSettings;
+	LayeredImageSettings lisSrc = docObj->m_LayeredImageSettings;
+
+	for (int i = 0; i<lisSrc.size(); i++){
+		if (i == 0){
+			m_LayeredImageSettings[i].color = QColor(0, 0, 0);
+			m_LayeredImageSettings[i].ColormapType = 0;			// no colormap
+			m_LayeredImageSettings[i].Opacity = 255;
+			m_LayeredImageSettings[i].Threshold = 128;
+			m_LayeredImageSettings[i].Visible = true;
+		}
+		else
+			m_LayeredImageSettings.push_back(lisSrc[i]);
+	}
+}
+
+void FrTabSettingsDocObj::AddLayer(LayerSettings ls){
+	LayeredImageSettings* lis = &m_LayeredImageSettings;
+	lis->push_back(ls);
 }

@@ -5,6 +5,7 @@ class FrTabSettingsDocObj;
 
 #include <vector>
 #include "FrDocument.h"
+#include "FrTabSettingsDocObj.h"
 
 class FrMainDocument: public FrDocument {
 public:
@@ -13,6 +14,7 @@ public:
 
     void GetAllImages(std::vector<FrDocumentObj*>& images);
     FrTabSettingsDocObj* GetCurrentTabSettings();
+	void SyncronyzeLayers(LayerSettings& ls);
 
 public:
     // Properties

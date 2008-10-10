@@ -216,14 +216,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\stream\analysis\RtImageAccumCor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\analysis\RtImageAccumCor.h"
-					>
-				</File>
-				<File
 					RelativePath=".\stream\analysis\RtImageSlideWinCor.cpp"
 					>
 				</File>

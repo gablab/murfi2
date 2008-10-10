@@ -14,7 +14,16 @@ FrLayeredImage::FrLayeredImage(vtkRenderWindow *renWindow){
 	m_ActiveLayer = 0;
 
 	m_defaultLayer = new FrSpecialLayer(GetRenderWindow());		// test
-	this->AddLayer();	// first layer
+	
+	// setup background layer
+	LayerSettings ls;
+	ls.color = QColor(0, 0, 0);
+	ls.ColormapType = 0;	
+	ls.Opacity = 255.0;
+	ls.Threshold = 128;
+	ls.Visible = true;
+
+	this->AddLayer(ls);	// first layer
 }
 
 FrLayeredImage::~FrLayeredImage(){
@@ -22,9 +31,9 @@ FrLayeredImage::~FrLayeredImage(){
 }
 
 void FrLayeredImage::Initialize(){
-	for (int i = 0; i<m_Layers.size(); i++){
-		m_Layers[i]->Initialize();
-	}
+//	for (int i = 0; i<m_Layers.size(); i++){
+//		m_Layers[i]->Initialize();
+//	}
 	
 	m_defaultLayer->Initialize();	// test
 
@@ -50,9 +59,10 @@ void FrLayeredImage::RemoveRenderers(){
 }
 
 
-void FrLayeredImage::AddLayer(){
+void FrLayeredImage::AddLayer(LayerSettings ls){
 	int num = m_Layers.size();
-	FrLayer* layer = new FrLayer(GetRenderWindow(), num);
+	FrLayer* layer = new FrLayer(ls, GetRenderWindow(), num);
+	layer->Initialize();
 
 	m_Layers.push_back(layer);
 	m_ActiveLayer = num;			// new layer becomes active by default
@@ -85,6 +95,14 @@ void FrLayeredImage::SetCamera(CameraSettings& camSettings){
 	m_defaultLayer->SetCamera(camSettings);		// test
 
 //	Update();
+}
+
+void FrLayeredImage::SetParams(LayeredImageSettings& liSettings){
+//	if (m_Layers.empty())
+//		return;
+	for (int i = 0; i<m_Layers.size(); i++){
+		m_Layers[i]->SetParams(liSettings[i]);
+	}
 }
 
 void FrLayeredImage::SetText(const char* text){

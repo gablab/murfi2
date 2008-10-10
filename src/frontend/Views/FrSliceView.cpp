@@ -102,6 +102,7 @@ void FrSliceView::UpdatePipeline(int point){
     ViewSettings& settings = document->GetCurrentTabSettings()->GetSliceViewSettings();
     TBCSettings& tbcSettings = settings.TbcSetting;
     CameraSettings& camSettings = settings.CamSettings;
+	LayeredImageSettings& liSettings = document->GetCurrentTabSettings()->GetLayeredImageSettings();
 
 	//FrColormapFilter* cmf = FrColormapFilter::New();	// test
 
@@ -138,7 +139,11 @@ void FrSliceView::UpdatePipeline(int point){
        //         m_renderer->AddActor(m_tactor);
             }
         }
-    case FRP_SLICE:
+	case FRP_LAYER:
+		{
+			m_LayeredImage->SetParams(liSettings);
+		}
+	case FRP_SLICE:
         {
             // set slice to be rendered
             settings.SliceNumber = ClampValue(settings.SliceNumber, 
@@ -202,4 +207,8 @@ void FrSliceView::UpdatePipeline(int point){
     // redraw scene
 	//m_LayeredImage->Update();
 	GetRenderWindow()->Render();
+}
+
+void FrSliceView::AddLayer(LayerSettings ls){
+	m_LayeredImage->AddLayer(ls);
 }

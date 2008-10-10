@@ -9,7 +9,7 @@
 
 
 // Default constructor
-FrLayer::FrLayer(vtkRenderWindow *renWindow, int layNum)
+FrLayer::FrLayer(LayerSettings ls, vtkRenderWindow *renWindow, int layNum)
 : FrBaseLayer(renWindow){
 	//m_renderWindow = renWindow;
 	
@@ -17,11 +17,22 @@ FrLayer::FrLayer(vtkRenderWindow *renWindow, int layNum)
 	GetRenderer()->SetLayer(layNum);
 
 	// some vars
-	m_Opacity = 1.0;
-	m_CMThreshold = 128;
+	m_Opacity = (float)ls.Opacity/255.0f;	// range is 0..1
+	m_CMThreshold = ls.Threshold;
+	m_Visible = ls.Visible;
+	m_PxMin = 0;
+	m_PxMax = 255;
+	m_CMType = ls.ColormapType;
+	m_Color = ls.color;
+
+	// colormap type is not supported yet
+
 	m_Threshold = 0;
 	m_Brightness = 0;
 	m_Contrast = 0;
+
+	SetOpacity(m_Opacity);
+	SetVisibility(m_Visible);
 }
 
 FrLayer::~FrLayer(){
@@ -36,13 +47,29 @@ void FrLayer::Initialize(){
 	// add actors
 	GetRenderer()->AddActor(m_actor);
 
+	m_cmfilter = FrColormapFilter::New();	// test
+
 //	Update();
 }
 
 void FrLayer::SetInput(vtkImageData* input){
 	m_inputData = input;
-	m_actor->SetInput(input);
 
+	// here should be switch(m_CMType) statement
+	if (m_CMType){
+		m_cmfilter->SetInput(input);				// test
+		m_cmfilter->SetThreshold(m_CMThreshold);
+		m_cmfilter->SetPxMin(m_PxMin);
+		m_cmfilter->SetPxMax(m_PxMax);
+		m_cmfilter->SetCMType(m_CMType);
+		m_cmfilter->SetColor(m_Color);
+		m_cmfilter->Update();						// test
+
+		m_actor->SetInput(m_cmfilter->GetOutput());
+	}
+	else
+		m_actor->SetInput(input);
+	
 //	Update();
 }
 
@@ -71,6 +98,10 @@ void FrLayer::SetVisibility(bool value){
 	m_actor->SetVisibility(value);
 
 	Update();
+}
+
+void FrLayer::SetParams(LayerSettings& lSettings){
+	// TODO: implement
 }
 
 void FrLayer::SetLookupTable(vtkLookupTable* ltable){

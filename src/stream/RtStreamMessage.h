@@ -28,9 +28,10 @@ public:
   // add a peice of data to the message
   //  in 
   //   pointer to the data
+  //   bool for setting data as current data
   //  out
   //   success or failure
-  bool addData(RtData *_data);
+  bool addData(RtData *_data, bool _makeCurrentData = false);
 
   // sets a data portion by index
   //  in
@@ -122,6 +123,11 @@ protected:
 
   // pointer to conductor
   RtConductor *conductor;
+
+private:
+
+  // create mutex for use by addData
+  ACE_Mutex mut;
 
 };
 

@@ -1,18 +1,18 @@
 /******************************************************************************
- * RtActivationSum.cpp computes the sum over all voxels in an roi map
+ * RtRoiMean2Feedback.cpp computes the mean over all voxels in an roi map
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-05
  *
  *****************************************************************************/
 
-#include "RtActivationSum.h"
+#include "RtRoiMean2Feedback.h"
 
-string RtActivationSum::moduleString(ID_ACTIVATIONSUM);
+string RtRoiMean2Feedback::moduleString(ID_ROIMEAN2FEEDBACK);
 
 // default constructor
-RtActivationSum::RtActivationSum() : RtActivationEstimator() {
+RtRoiMean2Feedback::RtRoiMean2Feedback() : RtRoi2Feedback() {
   componentID = moduleString;
-  dataName = NAME_ACTIVATIONSUM;
+  dataName = NAME_ROIMEAN;
 
   activationModuleID = ID_SINGLEIMCOR;
   activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION) + "_0";
@@ -20,33 +20,11 @@ RtActivationSum::RtActivationSum() : RtActivationEstimator() {
 }
 
 // destructor
-RtActivationSum::~RtActivationSum() {}
-
-// process an option
-//  in 
-//   name of the option to process
-//   val  text of the option node
-bool RtActivationSum::processOption(const string &name, const string &text,
-				    const map<string,string> &attrMap) {
-  if(name == "activationDataName") {
-    activationDataName = text;
-    return true;
-  }
-  if(name == "activationModuleID") {
-    activationModuleID = text;
-    return true;
-  }
-  else if(name == "activationRoiID") {
-    activationRoiID = text;
-    return true;
-  }
-
-  return RtActivationEstimator::processOption(name, text, attrMap);
-}  
+RtRoiMean2Feedback::~RtRoiMean2Feedback() {}
 
 // process a single acquisition
-int RtActivationSum::process(ACE_Message_Block *mb) {
-  ACE_TRACE(("RtActivationSum::process"));
+int RtRoiMean2Feedback::process(ACE_Message_Block *mb) {
+  ACE_TRACE(("RtRoiMean2Feedback::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
@@ -62,7 +40,7 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   if(act == NULL) {
     cout << "couldn't find " << activationModuleID << ":" << activationDataName << ":" << activationRoiID << endl;
 
-    ACE_DEBUG((LM_INFO, "RtActivationSum:process: activation passed is NULL\n"));
+    ACE_DEBUG((LM_INFO, "RtRoiMean2Feedback:process: activation passed is NULL\n"));
     return 0;
   }
 
@@ -72,8 +50,12 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
     return 0;
   }
   
-  ACE_DEBUG((LM_DEBUG, "summing activation in image %d\n", 
+  ACE_DEBUG((LM_DEBUG, "mean-ing activation in image %d\n", 
 	     img->getDataID()->getTimepoint()));
+
+  if(needsInit) {
+    initEstimation(*img);
+  }
 	    
   // compute the sum
   double sum = 0;
@@ -85,10 +67,19 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
 
     double pix = act->getPixel(i);
     if(!isnan(pix)) {
+      if(DEBUG_LEVEL & BASIC) {
+	cout << pix << " ";
+      }
+
       sum += pix;
       numPix++;
     }
   }
+
+      if(DEBUG_LEVEL & BASIC) {
+	cout << endl;
+      }
+
 
   // create a one element activation image
   RtActivation *mean = new RtActivation(1);
@@ -102,14 +93,14 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
   mean->setPixel(0, sum/numPix);
   
   // set the image id for handling
-  //mean->addToID("activation-sum");
+  //mean->addToID("activation-mean");
   //mean->setRoiID(roiID);
 
   setResult(msg, mean);
 
-  // log the sum
+  // log the mean
   stringstream logs("");
-  logs << "activation sum: " << acqNum << " " 
+  logs << "activation mean: " << acqNum << " " 
        << activationModuleID << ":" << activationDataName << ":" << roiID  
        << " " << mean->getPixel(0) << endl;
   log(logs);
@@ -119,7 +110,14 @@ int RtActivationSum::process(ACE_Message_Block *mb) {
     ofile.flush();
   }
 
-//  cout << "done processing activation sum at ";
+  if(DEBUG_LEVEL & BASIC) {
+    cout << "activation mean: " << acqNum << " " << mean->getPixel(0) 
+	 << " ( " << numPix << ") pixels"
+	 << endl;
+    cout.flush();
+  }
+
+//  cout << "done processing activation mean at ";
 //  printNow(cout);
 //  cout << endl;
 

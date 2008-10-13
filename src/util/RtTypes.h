@@ -10,5 +10,8 @@
 // numeric sign
 enum Sign {POS, NEG, POSNEG};
 
+// norm
+enum Norm {L1, L2, LINF};
+
 
 #endif

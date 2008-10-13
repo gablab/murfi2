@@ -15,7 +15,6 @@
 // and below that define names of all types of data that the module produces:
 //  #define NAME_<MODULENAME>_<DATANAME>
 
-
 #define ID_STREAM                 		"generic-stream"
 
 #define ID_SCANNERIMG                 		"mri"
@@ -23,6 +22,9 @@
   #define NAME_SCANNERIMG_T1          		"t1"
   #define NAME_SCANNERIMG_T2          		"t2"
   #define NAME_SCANNERIMG_T1EPI       		"t1wepi"
+
+#define ID_MASK                 		"mask"
+ #define NAME_MASK       		        "mask-img"
 
 #define ID_MOSAIC                     		"mosaic"
 // same names as scanner image
@@ -39,8 +41,8 @@
 #define ID_TEMPVAR                    		"temporal-variance"
   #define NAME_TEMPVAR_IMG            		"var-img"
 
-#define ID_SPATIAL_INTENSITYNORM      		"spatial-intensity-norm"
-  #define NAME_SPATIAL_INTENSITYNORM_IMG        "inorm-img"
+#define ID_SPATIALINTENSITYNORM      		"spatial-intensity-norm"
+  #define NAME_SPATIALINTENSITYNORM_IMG        "inorm-img"
 
 #define ID_TEMPORALZSCORE            		"zscore"
   #define NAME_TEMPORALZSCORE_IMG     		"zscore-img"
@@ -64,16 +66,35 @@
 #define ID_SINGLEIMCOR                		"singleimcor"
   #define NAME_SINGLEIMCOR_ACTIVATION          	"activation-img"
   #define NAME_SINGLEIMCOR_BETA            	"beta-img"
+  #define NAME_SINGLEIMCOR_RESIDUAL          	"residual-img"
 
-#define ID_FLUCTUATIONMONITOR         		"fluctuationmonitor"
+#define ID_SLIDEWINCOR                		"slidewincor"
+  #define NAME_SLIDEWINCOR_COR          	"correlation-img"
+  #define NAME_SLIDEWINCOR_STAT            	"stat-img"
+  #define NAME_SLIDEWINCOR_ACTIVATION          	"activation-img"
+  #define NAME_SLIDEWINCOR_BETA_MEAN           	"beta-mean-img"
+  #define NAME_SLIDEWINCOR_BETA_ACT            	"beta-activation-img"
+
+#define ID_FLUCTUATIONMONITOR         		"fluctuation-monitor"
   #define NAME_FLUCTUATIONMONITOR_ACTIVATION  	"activation-img"
   #define NAME_FLUCTUATIONMONITOR_BETA        	"beta-img"
 
-#define ID_ACTIVATIONSUM              		"activation-sum"
-  #define NAME_ACTIVATIONSUM           		"sum"
+#define ID_ROI2FEEDBACK             		"roi2feedback"
 
-#define ID_ACTIVATIONSUMDIFFERENCE    		"activation-sum-difference"
-  #define NAME_ACTIVATIONSUMDIFFERENCE 		"diff"
+#define ID_ROISUM2FEEDBACK             		"roi-sum2feedback"
+  #define NAME_ROISUM            		"roi-sum"
+
+#define ID_ROIMEAN2FEEDBACK             	"roi-mean2feedback"
+  #define NAME_ROIMEAN         	                "roi-mean"
+
+#define ID_ROIWEIGHTEDAVE2FEEDBACK             	"roi-weightedave2feedback"
+  #define NAME_ROIWEIGHTEDAVE            	"roi-weightedave"
+
+#define ID_ROIMEDIAN2FEEDBACK             	"roi-median2feedback"
+  #define NAME_ROIMEDIAN                 	"roi-median"
+
+#define ID_ROIDIFFERENCE             	        "roi-activation-difference"
+  #define NAME_ROIDIFFERENCE                 	"activation-difference"
 
 #define ID_EVENTTRIGGER               		"event-trigger"
 #define ID_EVENTTRIGGER_ACTIVATIONSUMS 		"event-trigger-activation-sums"

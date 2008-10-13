@@ -8,15 +8,17 @@
 
 #include"RtStreamMessage.h"
 
-
-// add a peice of data to the message
+// add a piece of data to the message
 //  in
 //   pointer to the data
+//   bool for setting data as current data
 //  out
 //   success or failure
-bool RtStreamMessage::addData(RtData *_data) {
+bool RtStreamMessage::addData(RtData *_data, bool _makeCurrentData) {
   ACE_TRACE(("RtStreamMessage::addData"));
 
+  mut.acquire();
+  
   if(numData >= MAX_MSGDATAS) {
     return false;
   }
@@ -24,6 +26,13 @@ bool RtStreamMessage::addData(RtData *_data) {
   ACE_DEBUG((LM_DEBUG, "adding data to msg: %d\n", numData));
 
   data[numData++] = _data;
+  
+  if(_makeCurrentData) {
+    this->setLastDataAsCurrent();
+  }
+  
+  mut.release();
+  
   return true;
 }
 
@@ -94,7 +103,7 @@ RtData *RtStreamMessage::getLastData() {
 //  out
 //   pointer to the data or NULL, if index invalid
 RtData *RtStreamMessage::getData(unsigned int index) {
-  if(index > numData) {
+  if(index >= numData) {
     return NULL;
   }
 
@@ -159,11 +168,16 @@ RtData *RtStreamMessage::getData(const string &moduleId,
 //  out
 //   pointer to the data or NULL, if such data doesnt exist
 RtData *RtStreamMessage::getData(const RtDataID &idTemplate) {
+  if(idTemplate.getDataName() == "activation-img_0") {
+    cout << "here" << endl;
+  }
   for(unsigned int i = 0; i < numData; i++) {
     if(idTemplate == data[i]->getDataID()) {
        return data[i];
     }
   }
+
+  return NULL;
 }
 
 // get the number of data objects we currently have

@@ -18,10 +18,10 @@ RtEventTriggerActivationDiff::RtEventTriggerActivationDiff() : RtEventTrigger() 
   componentID = moduleString;
   dataName = "";
 
-  posActivationSumModuleID = ID_ACTIVATIONSUM;
-  negActivationSumModuleID = ID_ACTIVATIONSUM;
-  posActivationSumDataName = NAME_ACTIVATIONSUM;
-  negActivationSumDataName = NAME_ACTIVATIONSUM;
+  posActivationSumModuleID = ID_ROIMEAN2FEEDBACK;
+  negActivationSumModuleID = ID_ROIMEAN2FEEDBACK;
+  posActivationSumDataName = NAME_ROIMEAN;
+  negActivationSumDataName = NAME_ROIMEAN;
   posRoiID = "active";
   negRoiID = "deactive";
 
@@ -126,7 +126,7 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
   // check for good trigger
   if(posact->getPixel(0) - negact->getPixel(0) >= diffThresh) {
     // trigger
-    RtEvent *event = new RtEvent(*posact);
+    RtEvent *event = new RtEvent();
    
     event->getDataID().setFromInputData(*posact,*this);
     event->getDataID().setDataName(NAME_EVENTTRIGGER_GOOD);
@@ -154,11 +154,11 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
   // check for bad trigger
   if(posact->getPixel(0) - negact->getPixel(0) <= -diffThresh) {
     // trigger
-    RtEvent *event = new RtEvent(*posact);
+    RtEvent *event = new RtEvent();
    
     event->getDataID().setFromInputData(*posact,*this);
     event->getDataID().setDataName(NAME_EVENTTRIGGER_BAD);
-    event->getDataID().setTimepoint(tr);
+    event->getDataID().setTimePoint(tr);
 
     //event->addToID("trigger.bad");
     //event->setTR(tr);

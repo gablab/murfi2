@@ -16,7 +16,6 @@ SET(analysis_library_SRCS
     RtImageZScore.cpp
     RtImageAccumCor.cpp
     RtSingleImageCor.cpp
-    RtSlideWinCor.cpp
     RtImageSlideWinCor.cpp
 )
 
@@ -30,7 +29,6 @@ SET(analysis_library_HDRS
     RtAccumCor.h
     RtImageSlideWinCor.h
     RtSingleImageCor.h
-    RtSlideWinCor.h
     RtImageZScore.h
 )
 

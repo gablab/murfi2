@@ -18,6 +18,9 @@
 // for gamma functions
 #include<vnl/vnl_gamma.h>
 
+// for hrf file reading
+//#include<vcl/vcl_istream.h>
+
 #include"debug_levels.h"
 
 string RtActivationEstimator::moduleString("voxel-accumcor");
@@ -34,10 +37,14 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   numTimepoints = 0;
   conditionShift = 0;
 
+  modelMotionParameters = false;
   modelTemporalDerivatives = false;
-
   modelEachBlock = false;
   blockLen = 0;
+
+  // hrf
+  loadHrf = false;
+  hrfFilename = "unset";
 
   roiID = "unset";
 
@@ -48,6 +55,7 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
 
   // default values for mask
   maskSource = NO_MASK;
+  alignMask = false;
   mosaicMask = false;
   flipLRMask = false;
   maskIntensityThreshold = 0.5;
@@ -180,6 +188,16 @@ bool RtActivationEstimator::processOption(const string &name,
   if(name == "conditionshift") {
     return RtConfigVal::convert<unsigned int>(conditionShift,text);
   }
+  if(name == "loadHrf") {
+    return RtConfigVal::convert<bool>(loadHrf,text);
+  }
+  if(name == "hrfFilename") {
+    hrfFilename = text;
+    return true;
+  }
+  if(name == "modelMotionParameters") {
+    return RtConfigVal::convert<bool>(modelMotionParameters,text);
+  }
   if(name == "modelTemporalDerivatives") {
     return RtConfigVal::convert<bool>(modelTemporalDerivatives,text);
   }
@@ -213,6 +231,9 @@ bool RtActivationEstimator::processOption(const string &name,
   if(name == "maskFilename") {
     mask.setFilename(text);
     return true;
+  }
+  if(name == "alignMask") {
+    RtConfigVal::convert<bool>(alignMask,text);
   }
   if(name == "mosaicMask") {
     RtConfigVal::convert<bool>(mosaicMask,text);
@@ -296,15 +317,26 @@ double gammaPDF(double t, double a, double b) {
 }
 
 
+// loads an hrf vector from a file
+bool RtActivationEstimator::loadHrfFile(vnl_vector<double> &hrf,
+					string filename) {
+  vcl_ifstream in(filename.c_str(),ios::in);
+  if(in.fail()) {
+    return false;
+  }
+
+  return hrf.read_ascii(in);
+}
+
 // builds an hrf vector from the difference of two gammas
 //
 // in
 //  tr:           repetition time in seconds
 //  samplePeriod: temporal precision in seconds
-//  length:       length of the HRF in seconds
+//  length:       length of the Hrf in seconds
 // out
-//  vnl_vector HRF
-void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
+//  vnl_vector Hrf
+void RtActivationEstimator::buildHrf(vnl_vector<double> &hrf,
 				     double tr,
 				     double samplePeriod, 
 				     double length) {
@@ -334,47 +366,10 @@ void RtActivationEstimator::buildHRF(vnl_vector<double> &hrf,
   }
 }
 
-// finish initialization and prepare to run
+// finish initialization and prepare to run for a particular series
 bool RtActivationEstimator::finishInit() {
   buildTrends();
   buildConditions();
-
-  // mask from file
-  if(maskSource == LOAD_FROM_FILE) {
-    if(mask.load()) {
-      cout << "loaded mask from " << mask.getFilename() << endl;
-    }
-    else {
-      cout << "failed to load mask from " << mask.getFilename() << endl;
-      putMaskOnMessage = false;
-      maskSource = NO_MASK;
-    }
-
-    // mosaic if we need to
-    if(mosaicMask 
-       || ((int) mask.getNumPix() > mask.getDim(0) * mask.getDim(1))) {
-      cout << "warning: auto mosaic" << endl;
-      mask.mosaic();
-    }
-
-    // flip if we need to
-    if(flipLRMask) {
-      mask.flipLR();
-    }
-  }
-
-  // open the dump file
-  if(dumpAlgoVars) {
-    dumpFile.open(dumpAlgoVarsFilename.c_str());
-    if(dumpFile.fail()) {
-      cout << "couldn't open file to dump vars" << endl;
-      dumpAlgoVars = false;
-    }
-    else {
-      cout << "opened file " << dumpAlgoVarsFilename << " to dump vars" << endl;
-      startDumpAlgoVarsFile();
-    }
-  }
 
   return true;
 }
@@ -389,7 +384,18 @@ bool RtActivationEstimator::finishInit() {
 void RtActivationEstimator::buildConditions() {
   // convolve the conditions with hrf (cannonical from SPM)
   vnl_vector<double> hrf;
-  buildHRF(hrf, tr, 1/16.0, 32);
+
+  if(loadHrf) {
+    if(!loadHrfFile(hrf, hrfFilename)) { // try to load
+      cerr << "error: couldn't load hrf from " 
+	   << hrfFilename << ". using cannonical instead" << endl;
+
+      buildHrf(hrf, tr, 1/16.0, 32);
+    }
+  }
+  else {
+    buildHrf(hrf, tr, 1/16.0, 32);
+  }
   //printVnlVector(hrf);
 
   // debugging
@@ -425,19 +431,31 @@ void RtActivationEstimator::buildConditions() {
       }
     }
     if(DEBUG_LEVEL & ADVANCED) {
-      cerr << "condition matrix before modeling each block" << endl;
+      cout << "condition matrix before modeling each block" << endl;
       printVnlMat(conditions);
-      cerr << endl;
+      cout << endl;
     }
 
     conditions = newConds;
-    numConditions*=numBlocks;
 
     if(DEBUG_LEVEL & ADVANCED) {
-      cerr << "condition matrix after modeling each block" << endl;
+      cout << "condition matrix after modeling each block" << endl;
       printVnlMat(conditions);
-      cerr << endl;
+      cout << endl;
     }
+
+    // update the condition names
+    vector<string> newCondNames;
+    for(unsigned int block=0; block < numBlocks; block++) {
+      for(unsigned int cond=0; cond < numConditions; cond++) {
+	newCondNames.push_back(conditionNames[cond]);
+      }
+    } 
+
+    conditionNames = newCondNames; 
+
+    // update the number of conditions
+    numConditions*=numBlocks;
   }
 
   // convolve each condition with the hrf
@@ -469,20 +487,30 @@ void RtActivationEstimator::buildConditions() {
       }
     }
     if(DEBUG_LEVEL & ADVANCED) {
-      cerr << "condition matrix after modeling temporal derivatives" << endl;
+      cout << "condition matrix after modeling temporal derivatives" << endl;
       printVnlMat(conditions);
-      cerr << endl;
+      cout << endl;
     }
 
     conditions = newConds;
+
+    // update the condition names
+    vector<string> newCondNames;
+    for(unsigned int cond=0; cond < numConditions; cond++) {
+      newCondNames.push_back(conditionNames[cond]);
+      newCondNames.push_back(conditionNames[cond]+"_derivative");
+    } 
+
+    conditionNames = newCondNames; 
+
     numConditions*=2;    
 
   }
 
   if(DEBUG_LEVEL & MODERATE) {
-    cerr << "final condition matrix" << endl;
-    printVnlMat(conditions);
-    cerr << endl;
+    cout << "final condition matrix" << endl;
+    printVnlMat(conditions,numConditions);
+    cout << endl;
   }
 }
 
@@ -494,8 +522,16 @@ bool RtActivationEstimator::conditionIsDerivative(unsigned int index) {
 // build the trend regressors
 void RtActivationEstimator::buildTrends() {
   trends.clear();
-  trends.set_size(numMeas, numTrends);
 
+  if(modelMotionParameters) { // add dummy columns for motion to be filled
+			      // as data arrives from scanner
+    trends.set_size(numMeas, numTrends + 6);
+  }
+  else {
+    trends.set_size(numMeas, numTrends);
+  }
+
+  trends.fill(0.0);
   for(unsigned int i = 0; i < numTrends; i++) {
     for(unsigned int j = 0; j < numMeas; j++) {
       switch(i) {
@@ -511,22 +547,85 @@ void RtActivationEstimator::buildTrends() {
       }
     }
   }
+
 }
 
 // initialize the estimation algorithm for a particular image size
 // in
 //  first acquired image to use as a template for parameter inits
 void RtActivationEstimator::initEstimation(RtMRIImage &image) {
+
   // mask from intensity threshold
   if(maskSource == NO_MASK) {
     mask.setInfo(image);
     numComparisons = image.getNumEl();
     mask.setAll(1);
   }
-  if(maskSource == THRESHOLD_FIRST_IMAGE_INTENSITY) {
+  else if(maskSource == THRESHOLD_FIRST_IMAGE_INTENSITY) {
     numComparisons 
       = mask.initByMeanIntensityThreshold(image, maskIntensityThreshold);
   }
+  else if(maskSource == LOAD_FROM_FILE) { // mask from file
+    unsigned int seriesNum = image.getDataID().getSeriesNum();
+
+    if(alignMask) { // align mask before reading it in?
+      FslJobID status 
+	= RtFSLInterface::applyTransform(
+		RtExperiment::getSeriesRefVolFilename(seriesNum), 
+		RtExperiment::getExperimentRefVolFilename(), 
+		mask.getFilename(), 
+		RtExperiment::getSeriesXfmOutputFilename(seriesNum, 
+							 mask.getFilename()), 
+		RtExperiment::getSeriesXfmFilename(seriesNum), 
+		true);
+      if(status == FSL_JOB_FINISHED) {
+	mask.setFilename(RtExperiment::getSeriesXfmOutputFilename(seriesNum,
+							 mask.getFilename()));
+      }
+      else {
+	cerr << "error aligning mask, just using unaligned version." << endl;
+      }
+    }
+
+    if(mask.load()) {
+      cout << "loaded mask from " << mask.getFilename() << endl;
+    }
+    else {
+      cout << "failed to load mask from " << mask.getFilename() << endl;
+      putMaskOnMessage = false;
+      maskSource = NO_MASK;
+    }
+
+    // mosaic if we need to
+    if(mosaicMask) {
+      //|| ((int) mask.getNumPix() > mask.getDim(0) * mask.getDim(1))) {
+      //cout << "warning: auto mosaic" << endl;
+      mask.mosaic();
+    }
+
+    // flip if we need to
+    if(flipLRMask) {
+      mask.flipLR();
+    }
+  }
+
+  // set the number of nuisance regressors
+  numNuisance = numTrends + (modelMotionParameters ? NUM_MOTION_DIMENSIONS : 0);
+
+  // open the dump file
+  if(dumpAlgoVars) {
+    dumpFile.open(dumpAlgoVarsFilename.c_str());
+    if(dumpFile.fail()) {
+      cout << "couldn't open file to dump vars" << endl;
+      dumpAlgoVars = false;
+    }
+    else {
+      cout << "opened file " << dumpAlgoVarsFilename << " to dump vars" << endl;
+      startDumpAlgoVarsFile();
+    }
+  }
+
+
 
   needsInit = false;
 }

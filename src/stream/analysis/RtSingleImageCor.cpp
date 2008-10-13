@@ -13,6 +13,12 @@
 
 #include"debug_levels.h"
 
+// put this somewhere else
+#ifndef max 
+#define max(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
+
 string RtSingleImageCor::moduleString(ID_SINGLEIMCOR);
 
 // default constructor
@@ -22,30 +28,50 @@ RtSingleImageCor::RtSingleImageCor() : RtActivationEstimator() {
    
   solvers = NULL; 
   numData = 0;
-  absEstErrSum = NULL;
+
+  //  residualSumSqImg = NULL;
+
+  estErrSum = NULL;
   numDataPointsForErrEst = INT_MAX;
+  errorNorm = L2;
+
   onlyEstErrInBaseline = false;
 
   conditionOfInterest = 0;
   feedbackConditionSwitching = false;
+
+  includeConditionMean = true;
 }
 
 // destructor
 RtSingleImageCor::~RtSingleImageCor() {
   // delete all solvers
   if(solvers != NULL) {
-    for(unsigned int i = 0; i < numData; i++) {
-      if(solvers[i] != NULL) {
-	delete solvers[i];
-      }
+    freeSolvers();
+  }
+
+  if(estErrSum != NULL) {
+    freeEstErrSum();
+  }
+
+}
+
+void RtSingleImageCor::freeSolvers() {
+  for(unsigned int i = 0; i < numData; i++) {
+    if(solvers[i] != NULL) {
+      delete solvers[i];
     }
-    delete solvers;
   }
+  delete solvers;
+}
 
-  if(absEstErrSum != NULL) {
-    delete absEstErrSum;
+void RtSingleImageCor::freeEstErrSum() {
+  for(unsigned int i = 0; i < numConditions; i++) {
+    if(estErrSum[i] != NULL) {
+      delete estErrSum[i];
+    }
   }
-
+  delete estErrSum;
 }
 
 // process a configuration option
@@ -58,6 +84,23 @@ bool RtSingleImageCor::processOption(const string &name, const string &text,
   // look for known options
   if(name == "numDataPointsForErrEst") {
     return RtConfigVal::convert<int>(numDataPointsForErrEst,text);    
+  }
+  if(name == "errorNorm") {
+    if(text == "l1" || text == "L1") {
+      errorNorm = L1;
+      return true;
+    } 
+    else if(text == "l2" || text == "L2") {
+      errorNorm = L2;
+      return true;
+    }    
+    else if(text == "linf" || text == "LINF" || text == "LInf") {
+      errorNorm = LINF;
+      return true;
+    }    
+  }
+  if(name == "includeConditionMean") {
+    return RtConfigVal::convert<bool>(includeConditionMean,text);    
   }
   if(name == "onlyEstErrInBaseline") {
     return RtConfigVal::convert<bool>(onlyEstErrInBaseline,text);    
@@ -81,18 +124,26 @@ void RtSingleImageCor::initEstimation(RtMRIImage &image) {
   // get the number of datapoints we must process
   numData = image.getNumEl();
 
+  if(solvers != NULL) {
+    freeSolvers();
+  }
+
   // set up the solvers
   solvers = new RtLeastSquaresSolve*[numData];
   for(unsigned int i = 0; i < numData; i++) {
-    solvers[i] = new RtLeastSquaresSolve(numTrends+numConditions);
+    solvers[i] = new RtLeastSquaresSolve(numNuisance+numConditions);
   }
 
   // setup the estimation error sum of squares
-  if(absEstErrSum != NULL) {
-    delete absEstErrSum;
+  if(estErrSum != NULL) {
+    freeEstErrSum();
   }
-  absEstErrSum = new RtActivation(image);
-  absEstErrSum->initToZeros();
+
+  estErrSum = new RtActivation*[numConditions];
+  for(unsigned int i = 0; i < numConditions; i++) {
+    estErrSum[i] = new RtActivation(image);
+    estErrSum[i]->initToZeros();
+  }
 
   numDataPointsInErrEst = 0;
 
@@ -144,7 +195,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     stats[i]->initToZeros();
 
     // set threshold
-    if(numTimepoints > numTrends+1) {
+    if(numTimepoints > numNuisance+1) {
       stats[i]->setThreshold(getTStatThreshold(1));
       if(DEBUG_LEVEL & BASIC) {
 	cerr << "single image est: using t threshold of " 
@@ -153,36 +204,63 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     }
   }
 
+  // residual sum of squares map
+  RtActivation *res = new RtActivation(*dat);
+  // setup the data id
+  res->getDataID().setFromInputData(*dat,*this);
+  res->getDataID().setDataName(NAME_SINGLEIMCOR_RESIDUAL);
+  res->getDataID().setRoiID(roiID);
+  res->initToZeros();
 
   //// element independent setup
 
-  /// build a design matrix xrow
+  /// build a design matrix row
+  int curCol = 0;
 
   // copy the trends
-  double *Xrow = new double[numConditions+numTrends];
-  for(unsigned int i = 0; i < numTrends; i++) {
-    Xrow[i] = trends.get(numTimepoints-1,i);
+  double *Xrow = new double[numConditions+numNuisance];
+  for(unsigned int i = 0; i < numTrends; i++, curCol++) {
+    Xrow[curCol] = trends.get(numTimepoints-1,i);
   }
+
+  // copy the motion parameters
+  if(modelMotionParameters) {
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_X);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Y);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Z);
+
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_X);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Y);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Z);  
+  }  
 
   // copy the conditions
   // also: search for the maximum magnitude condition regressor 
   // also: check for any regressor over zero
   unsigned int maxMagnitudeCondInd = 0;
   bool anyOverZero = false;
-  for(unsigned int i = 0; i < numConditions; i++) {
-    Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
+  for(unsigned int i = 0; i < numConditions; i++, curCol++) {
+    Xrow[curCol] = conditions.get(numTimepoints-1,i);
 
     // check for max amplitude condition
-    if(fabs(Xrow[numTrends+i]) > fabs(Xrow[numTrends+maxMagnitudeCondInd])
+    if(fabs(Xrow[numNuisance+i]) > fabs(Xrow[numNuisance+maxMagnitudeCondInd])
        && !(modelTemporalDerivatives && conditionIsDerivative(i))
        ) {
-      maxMagnitudeCondInd = numTrends+i;
+      maxMagnitudeCondInd = numNuisance+i;
     }
     // check for on condition for any stimulus
-    if(Xrow[i+numTrends] > 0) {
+    if(Xrow[i+numNuisance] > 0) {
       anyOverZero = true;
     }
   }
+
+  if(DEBUG_LEVEL & TEMP) {
+    cout << " xrow " << numTimepoints << ":";
+    for(int i = 0; i < numNuisance+numConditions; i++) {
+      cout << Xrow[i] << " ";
+    }
+    cout << endl;
+  } 
 
   // switch conditions to max magnitude if condition switching on
   if(feedbackConditionSwitching) {
@@ -216,8 +294,12 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     double y = dat->getElement(i);
     solvers[i]->include(&y,Xrow,1.0);
 
-    // get stats
+    // get stats and residual
     double *beta = solvers[i]->regress(0);
+
+    // note that residual is always the standard L2 version, despite which
+    // norm we are using for the stat scaling
+    res->setPixel(i, sqrt(solvers[i]->getTotalSquaredError(0)/(numTimepoints-1)));
 
     // get activation signal take out everything except regressor of interest
     unsigned int regressorOfInterestIndex = conditionOfInterest;
@@ -231,49 +313,89 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
       regressorOfInterestIndex*=2;
       //regressorOfInterestIndex++;
     }
-    regressorOfInterestIndex+=numTrends;
+    regressorOfInterestIndex += numNuisance;
 
     // compute stats for each condition
     for(int c = 0; c < numConditions; c++) {
-      int condIndex = c + numTrends;
+      double meanCondActivity = 0;
+      int condIndex = c + numNuisance;
       double err = y;
-      for(unsigned int j = 0; j < numTrends+numConditions; j++) {
+      for(unsigned int j = 0; j < numNuisance+numConditions; j++) {
 	if(j == condIndex) {
-	  continue;
-	}
+	  meanCondActivity = beta[j]*Xrow[j];
+	} 
 	err -= beta[j]*Xrow[j];
       }
 
-      // get estimation error
-      double esterr = err;
-      //for(unsigned int j = numTrends; j < numTrends+numConditions; j++) {
-      esterr -= beta[condIndex]*Xrow[condIndex];
-      //}
+      if(DEBUG_LEVEL & ADVANCED) {
+	static double lastErr = 0;
+	cerr << i << ": err is " << err << " ?= " << sqrt(solvers[i]->getTotalSquaredError(0)) - lastErr << endl;
+	lastErr = sqrt(solvers[i]->getTotalSquaredError(0));
+      }
+
     
       // update the error in the estimate for the voxel
-      double stdDev;
-      // check if we should include this timepoint in the error estimate
-      if(includeInErr) {
-	absEstErrSum->setPixel(i, absEstErrSum->getPixel(i) + fabs(esterr));
-      }
-      stdDev = absEstErrSum->getPixel(i)/(numDataPointsInErrEst-1);
 
-      // compute the sds away from the mean
-      stats[c]->setPixel(i, err / stdDev);
+      // get estimation error and compute the standard deviation based on
+      // the error sum and current error norm and include the error in the
+      // estimate if desired
+      double dev;
+      switch(errorNorm) {
+        case L1:
+	  if(includeInErr) {
+	    estErrSum[c]->setPixel(i, estErrSum[c]->getPixel(i) + fabs(err));
+	  }
+
+	  dev = estErrSum[c]->getPixel(i)/(numDataPointsInErrEst-1);
+	  break;
+
+        case L2:
+        default:
+	  if(includeInErr) {
+	    estErrSum[c]->setPixel(i, estErrSum[c]->getPixel(i) + err*err);
+	  }
+
+	  dev = sqrt(estErrSum[c]->getPixel(i)/(numDataPointsInErrEst-1));
+	  break;
+
+        case LINF:
+	  if(includeInErr) {
+	    estErrSum[c]->setPixel(i, max(estErrSum[c]->getPixel(i),fabs(err)));
+	  }
+
+	  dev = estErrSum[c]->getPixel(i);
+
+	  break;
+      }
+
+      if(DEBUG_LEVEL & ADVANCED) {
+	cerr << dev << " ?= " 
+	     << sqrt(solvers[i]->getTotalSquaredError(0)/(numTimepoints-1))
+	     << endl;
+      }
+
+
+      // compute the sds away from the mean (magic kinda happens here)
+      if(includeConditionMean) {
+	stats[c]->setPixel(i, (meanCondActivity + err) / dev);
+      }
+      else {
+	stats[c]->setPixel(i, (meanCondActivity) + (err / dev));
+      }
 
       if(DEBUG_LEVEL & ADVANCED) {
   	cerr 
 	  << numTimepoints << " " 
 	  << i << " " 
 	  << y << " "
-	  << err << " "
+	  << err + meanCondActivity << " "
 	  << conditions.get(numTimepoints-1,0) << " "
-	  << esterr << " "
-	  << stdDev << " "
+	  << err << " "
+	  << dev << " "
 	  << stats[c]->getPixel(i) << " " << endl;
       }
       if(DEBUG_LEVEL & MODERATE) {        
-	cerr << err << "/" << stdDev << "=" <<  stats[c]->getPixel(i) << endl;
+	cerr << err << "/" << dev << "=" <<  stats[c]->getPixel(i) << endl;
       }
 
       if(dumpAlgoVars && numTimepoints > 2) {
@@ -281,12 +403,12 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 	  << numTimepoints << " " 
 	  << i << " " 
 	  << y << " "
-	  << err << " "
+	  << err + meanCondActivity << " "
 	  << conditions.get(numTimepoints-1,0) << " "
-	  << esterr << " "
-	  << stdDev << " "
+	  << err << " "
+	  << dev << " "
 	  << stats[c]->getPixel(i) << " ";
-	for(int b = 0; b < numTrends+numConditions; b++) {
+	for(int b = 0; b < numNuisance+numConditions; b++) {
 	  dumpFile << beta[b] << " ";
 	}
 	dumpFile << endl;
@@ -302,18 +424,14 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     cout << endl;
   }
 
-  // set the image ids for handling
+  // set the results
   for(int c = 0; c < numConditions; c++) {
-    // give the image a name
-    //string name = "voxel-singleimcor-stat_" + conditionNames[c];
-    //stats[c]->addToID(name);
-    //stats[c]->setRoiID(roiID);
-
-    // set the result
     setResult(msg,stats[c]);
   }
-
   delete [] stats;
+
+  setResult(msg,res);
+
 
   return 0;
 }
@@ -331,7 +449,7 @@ void RtSingleImageCor::startDumpAlgoVarsFile() {
 	   << "residual "
 	   << "std_dev "
 	   << "feedback ";
-  for(int b = 0; b < numTrends+numConditions; b++) {
+  for(int b = 0; b < numNuisance+numConditions; b++) {
     dumpFile << "beta[" << b << "] ";
   }
 

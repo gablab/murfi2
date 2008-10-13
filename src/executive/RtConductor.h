@@ -13,7 +13,9 @@
 #include<sstream>
 
 #include"RtConfig.h"
+#include"RtExperiment.h"
 #include"RtDisplayImage.h"
+#include"RtDataStore.h"
 #include"RtInfoServer.h"
 #include"RtInput.h"
 #include"RtInputScannerImages.h"
@@ -127,6 +129,11 @@ public:
   //   vector of pointers to the output objects
   vector<RtOutput*> getAllOutputsWithName(const string &name);
 
+  // get data store map
+  //  out
+  //   pointer to data store map
+  RtDataStore *getDataStore();
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -163,6 +170,9 @@ protected:
 
   // vector of output objects
   vector<RtOutput*> outputs;
+  
+  // data store object
+  RtDataStore dataStore;
 
 };
 

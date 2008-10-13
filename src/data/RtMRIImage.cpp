@@ -8,6 +8,7 @@
 #include"RtMRIImage.h"
 
 #include"RtExperiment.h"
+#include"RtDataIDs.h"
 
 #include"ace/Log_Msg.h"
 #include<fstream>
@@ -21,6 +22,11 @@ RtMRIImage::RtMRIImage() : RtDataImage<short>() {
   dataID.setModuleID("mri");
 
   magicNumber = MAGIC_NUMBER;
+
+  // init motion parms
+  for(int i = 0; i < 6; i++) {
+    motionParameters[i] = 0.0;
+  }
 }
 
 // constructor that accepts a filename to read an image from
@@ -54,10 +60,13 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   setInfo(extinfo);
 
   // fill fields of data id
-  dataID.setModuleID("mri");
+  dataID.setModuleID(ID_SCANNERIMG);
+  dataID.setDataName(NAME_SCANNERIMG_EPI);
+
   dataID.setStudyNum(RtExperiment::getExperimentStudyID());
   dataID.setSeriesNum
     (RtExperiment::getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
+  dataID.setTimePoint(extinfo.iAcquisitionNumber);
 
   // allocate and copy the img data
   if(DEBUG_LEVEL & ALLOC) {
@@ -142,8 +151,13 @@ bool RtMRIImage::writeInfo(ostream &os) {
   boolcon = (char) swapReadPhase;
   os.write((char*) &boolcon, sizeof(char));
   
-  os.write((char*) &seriesNum, sizeof(unsigned int));
-  os.write((char*) &acqNum, sizeof(unsigned int));
+  unsigned int uint_tmp;
+
+  uint_tmp = dataID.getSeriesNum();
+  os.write((char*) uint_tmp, sizeof(unsigned int));
+
+  uint_tmp = dataID.getTimePoint();
+  os.write((char*) uint_tmp, sizeof(unsigned int));
 
   os.write((char*) &timeAfterStart, sizeof(double));
   os.write((char*) &te,             sizeof(double));
@@ -197,8 +211,13 @@ bool RtMRIImage::readInfo(istream &is) {
   is.read((char*) &boolcon, sizeof(char));
   swapReadPhase = (bool) boolcon;
   
-  is.read((char*) &seriesNum, sizeof(unsigned int));
-  is.read((char*) &acqNum, sizeof(unsigned int));
+  unsigned int uint_tmp;
+
+  is.read((char*) uint_tmp, sizeof(unsigned int));
+  dataID.setSeriesNum(uint_tmp);
+
+  is.read((char*) uint_tmp, sizeof(unsigned int));
+  dataID.setTimePoint(uint_tmp);
 
   is.read((char*) &timeAfterStart, sizeof(double));
   is.read((char*) &te,             sizeof(double));
@@ -242,7 +261,7 @@ void RtMRIImage::printInfo(ostream &os) {
      << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "swapReadPhase" << swapReadPhase << endl
-     << setw(wid) << "acqNum" << acqNum << endl
+     << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
      << setw(wid) << "timeAfterStart" << timeAfterStart << endl
      << setw(wid) << "te / tr / ti" << te << " / " 
      << tr << " / " << ti << endl
@@ -282,15 +301,32 @@ RtMRIImage::~RtMRIImage() {
 //}
 
 // get the acquisition number
-unsigned int RtMRIImage::getAcquisitionNum() const {
-  return acqNum;
-}
+//unsigned int RtMRIImage::getAcquisitionNum() const {
+//  return acqNum;
+//}
 
 // get the series number
-unsigned int RtMRIImage::getSeriesNum() const {
-  return seriesNum;
+//unsigned int RtMRIImage::getSeriesNum() {
+//  return getDataID().getSeriesNum();
+//}
+
+// get a motion parameter
+double RtMRIImage::getMotionParameter(MotionDimension d) const {
+  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
+    return 0.0;
+  }
+  
+  return motionParameters[d];
 }
 
+// set a motion parameter
+void RtMRIImage::setMotionParameter(MotionDimension d, double m) {
+  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
+    return;
+  }
+  
+  motionParameters[d] = m;
+}
 
 // DEBUGGGING
 #include"printVnl44Mat.cpp"
@@ -373,12 +409,22 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   seriesInstanceUID = info.cSeriesInstanceUID;
 
   swapReadPhase = info.bSwapReadPhase;       
-  acqNum = info.iAcquisitionNumber;
+  dataID.setTimePoint(info.iAcquisitionNumber);
   timeAfterStart = info.dTimeAfterStart;
   te = info.dTE;
   tr = info.dTR;
   ti = info.dTI;
   triggerTime = info.dTriggerTime;
+
+  // set the motion parameters
+  setMotionParameter(MOTION_TRANSLATION_X, info.dMoCoTransX);
+  setMotionParameter(MOTION_TRANSLATION_Y, info.dMoCoTransY);
+  setMotionParameter(MOTION_TRANSLATION_Z, info.dMoCoTransZ);
+  setMotionParameter(MOTION_ROTATION_X, info.dMoCoRotX);
+  setMotionParameter(MOTION_ROTATION_Y, info.dMoCoRotY);
+  setMotionParameter(MOTION_ROTATION_Z, info.dMoCoRotZ);
+
+
 
   // actual acquision info parms
   time = siemensTime2ACE_Date_Time(info.chAcquisitionTime);
@@ -440,9 +486,9 @@ float RtMRIImage::getAutoBrightness() {
 
 
 // set the series number
-void RtMRIImage::setSeriesNum(unsigned int sn) {
-  seriesNum = sn;
-}
+//void RtMRIImage::setSeriesNum(unsigned int sn) {
+//  seriesNum = sn;
+//}
 
 
 /*****************************************************************************

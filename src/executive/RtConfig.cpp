@@ -22,7 +22,7 @@ static char *VERSION = "$Id$";
 
 // defaults
 #define DEFAULT_SUBJECTSDIR  "/data/subjects"
-#define DEFAULT_CONFFILENAME "conf/example.xml"
+#define NO_CONFFILENAME "undefined"
 
 // limits
 #define MAX_PORT 65535
@@ -31,13 +31,13 @@ static char *VERSION = "$Id$";
 
 // default constructor
 RtConfig::RtConfig()
-    : confFilename(DEFAULT_CONFFILENAME), conductor(NULL) {
+    : confFilename(NO_CONFFILENAME), conductor(NULL) {
   // nothing to do here
 }
 
 // default constructor
 RtConfig::RtConfig(RtConductor &_conductor)
-    : confFilename(DEFAULT_CONFFILENAME), conductor(&_conductor)  {
+    : confFilename(NO_CONFFILENAME), conductor(&_conductor)  {
   // nothing to do here
 }
 
@@ -86,6 +86,7 @@ bool RtConfig::parseArgs(int argc, char **args) {
   if(!parseConfigFile()) {
     ACE_DEBUG((LM_ERROR, ACE_TEXT("failed to parse config file %s\n"),
 	       confFilename));
+    cerr << "failed to parse config file: '" << confFilename << "'" << endl;
     return false;
   }
 
@@ -105,7 +106,13 @@ bool RtConfig::parseArgs(int argc, char **args) {
 bool RtConfig::parseConfigFile() {
   ACE_TRACE(("RtConfig::parseConfigFile"));
 
-  return parms.LoadFile(confFilename);
+  if(!parms.LoadFile(confFilename)) {
+    cout << parms.ErrorDesc() << endl;
+    return false;
+  }
+  else {
+    return true;
+  }
 }
 
 // validate the configuration
@@ -145,6 +152,12 @@ bool RtConfig::validateConfig() {
   }
   fs.close();
 
+
+  // check confile
+  if(confFilename == NO_CONFFILENAME) {
+    cerr << "ERROR: no configuration file name specified" << endl;
+    valid = false;
+  }
 
   // check logfile name
   if(get("info:log:disabled")==false) {

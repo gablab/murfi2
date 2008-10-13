@@ -15,7 +15,7 @@
 class RtActivation;
 
 // class declaration
-class RtMaskImage : public RtDataImage<unsigned short> {
+class RtMaskImage : public RtDataImage<short> {
 
 public:
 
@@ -75,7 +75,7 @@ public:
   // sets all voxels 
   // in:
   //  val: value to set all voxels to
-  void setAll(unsigned short val);
+  void setAll(short val);
 
   // compute the number of "on" voxels
   void computeNumberOfOnVoxels();

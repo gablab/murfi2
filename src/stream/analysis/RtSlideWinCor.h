@@ -10,8 +10,10 @@
 
 #include<vnl/vnl_vector.h>
 #include<vnl/vnl_matrix.h>
+#include<vector>
 
 #include"RtActivationEstimator.h"
+#include"RtDataID.h"
 
 // class declaration
 class RtSlideWinCor : public RtActivationEstimator {
@@ -63,6 +65,9 @@ protected:
   // store x values over timesteps for beta calculations
   vnl_vector<double> *rWindow;
   vnl_matrix<double> *xWindow; 
+  
+//  vector<RtDataID*> xWindowID;
+  RtDataID* xWindowID;
   
   // store value for stat calculation
   vnl_vector<double> *rs;

@@ -38,7 +38,7 @@ int RtDiff::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  if(last == NULL || last->getSeriesNum() != img->getSeriesNum()) {
+  if(last == NULL || last->getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "differencing found first image\n"));
 
     last = img;

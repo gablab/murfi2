@@ -1,20 +1,20 @@
 /******************************************************************************
- * RtActivationSumDifference.h is the header for a class that computes the
- * difference between two activation map sums
+ * RtRoiDifference.h is the header for a class that computes the
+ * difference between two activation map combinations
  *
  * Oliver Hinds <ohinds@mit.edu> 2008-02-25
  *
  *****************************************************************************/
 
-#ifndef RTACTIVATIONSUMDIFFERENCE_H
-#define RTACTIVATIONSUMDIFFERENCE_H
+#ifndef RTROIDIFFERENCE_H
+#define RTROIDIFFERENCE_H
 
 #include"RtStreamComponent.h"
 #include"RtActivation.h"
-#include"RtActivationSum.h"
+#include"RtRoi2Feedback.h"
 
 // class declaration
-class RtActivationSumDifference : public RtStreamComponent {
+class RtRoiDifference : public RtStreamComponent {
 
 public:
 
@@ -23,10 +23,10 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
-  RtActivationSumDifference();
+  RtRoiDifference();
 
   // destructor
-  ~RtActivationSumDifference();
+  ~RtRoiDifference();
 
 protected:
 
@@ -41,12 +41,12 @@ protected:
   int process(ACE_Message_Block *mb);
 
   // dataID for the positive and negative activation sums
-  string posActivationSumModuleID;
-  string negActivationSumModuleID;
-  string posActivationSumDataName;
-  string negActivationSumDataName;
-  string posRoiID;
-  string negRoiID;
+  string posRoiModuleID;
+  string negRoiModuleID;
+  string posRoiDataName;
+  string negRoiDataName;
+  string posRoiRoiID;
+  string negRoiRoiID;
 
 };
 

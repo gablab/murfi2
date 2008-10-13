@@ -12,3 +12,13 @@ void printVnlMat(vnl_matrix<double> &m) {
   }
 }
 
+
+void printVnlMat(vnl_matrix<double> &m, int numCols) {
+  for(int i = 0; i < m.rows(); i++) {
+    for(int j = 0; j < numCols; j++) {
+      cout << m[i][j] << " ";
+    }
+    cout << endl;
+  }
+}
+

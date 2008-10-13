@@ -1,16 +1,15 @@
 /******************************************************************************
- * RtActivationSum.h is the header for a class that computes the sum over
- * voxels in an activation map 
+ * RtRoiMedian2Feedback.h is the header for a class that computes the median
+ * over voxels in an activation map 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-09-05
  *
  *****************************************************************************/
 
-#ifndef RTACTIVATIONSUM_H
-#define RTACTIVATIONSUM_H
+#ifndef RTROIMEDIAN2FEEDBACK_H
+#define RTROIMEDIAN2FEEDBACK_H
 
-#include"RtActivationEstimator.h"
-#include"RtActivation.h"
+#include"RtRoi2Feedback.h"
 
 // scopic alexsid: #define WIN32
 #ifdef WIN32
@@ -22,7 +21,7 @@
 #endif
 
 // class declaration
-class RtActivationSum : public RtActivationEstimator {
+class RtRoiMedian2Feedback : public RtRoi2Feedback {
 
 public:
 
@@ -31,31 +30,15 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
-  RtActivationSum();
+  RtRoiMedian2Feedback();
 
   // destructor
-  ~RtActivationSum();
+  ~RtRoiMedian2Feedback();
 
 protected:
 
-  // process an option
-  //  in 
-  //   name of the option to process
-  //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
-			     const map<string,string> &attr);
-
   // process a single acquisition
   int process(ACE_Message_Block *mb);
-
-  // data ID for the activation we will sum
-  string activationModuleID;
-
-  // data name for the activation we will sum
-  string activationDataName;
-
-  // roi ID for the activation we will sum
-  string activationRoiID;
 
 };
 

@@ -4,9 +4,6 @@
  * Oliver Hinds <ohinds@mit.edu> 2008-08-13
  *
  *****************************************************************************/
-// not ready for prime time
-#if 0
-
 #ifndef RTDATASTORE_H
 #define RTDATASTORE_H
 
@@ -32,7 +29,7 @@ public:
   virtual ~RtDataStore();
 
   // add an output to be notified when new data arrives
-  virtual void addOutputForNotify(const RtOutput *out);
+  virtual void addOutputForNotify(RtOutput *out);
 
   //*** data methods ***//
 
@@ -40,7 +37,7 @@ public:
   virtual void setData(RtData *data);
 
   // get data by id
-  virtual RtData *getData(const RtDataID &id);
+  virtual RtData *getData(RtDataID &id);
 
   // get the version
   //  out: char array that represents the cvs version
@@ -53,9 +50,8 @@ protected:
 
   // hash map to store pointers to acquired data
   map<RtDataID*,RtData*,RtDataIDCompare> store;
-};
 
-#endif
+};
 
 #endif
 

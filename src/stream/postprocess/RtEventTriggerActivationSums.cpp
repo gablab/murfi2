@@ -7,6 +7,7 @@
 
 #include"RtEventTriggerActivationSums.h"
 #include"RtActivation.h"
+#include"RtDataIDs.h"
 
 #include"RtEvent.h"
 
@@ -59,19 +60,20 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
 
   // find the positive activation sum with the right roiID
   RtActivation *posact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
-						  posroiID);
+    = (RtActivation*) msg->getData(posActivationSumModuleID,
+				   posActivationSumDataName,
+				   posRoiID);
+  RtActivation *negact 
+    = (RtActivation*) msg->getData(negActivationSumModuleID,
+				   negActivationSumDataName,
+				   negRoiID);
+
   if(monitorPos && posact == NULL) {
     cout << "couldn't find positive roi " << posroiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtEventTriggerActivationSums:process: no positive ROI found\n"));
     return 0;
   }
-  
-  // find the positive activation sum with the right roiID
-  RtActivation *negact 
-    = (RtActivation*) msg->getDataByIDAndRoiID("data.image.activation.activation-sum",
-						  negroiID);
   if(monitorNeg && negact == NULL) {
     cout << "couldn't find negative roi " << negroiID << endl;
 
@@ -79,7 +81,7 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  int tr = posAct->getDataID().getTimepoint();
+  int tr = posact->getDataID().getTimePoint();
   if(tr < initialSkipTRs) {
     return 0;
   }
@@ -98,11 +100,11 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
 //    event->setTR(tr);
 //    event->addToID("trigger.good");
 
-    RtEvent *event = new RtEvent(*posact);
+    RtEvent *event = new RtEvent();
    
     event->getDataID().setFromInputData(*posact,*this);
     event->getDataID().setDataName(NAME_EVENTTRIGGER_GOOD);
-    event->getDataID().setTimepoint(tr);
+    event->getDataID().setTimePoint(tr);
 
     setResult(msg,event);
 
@@ -122,11 +124,11 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
 //    event->setTR(tr);
 //    event->addToID("trigger.bad");
 
-    RtEvent *event = new RtEvent(*posact);
+    RtEvent *event = new RtEvent();
    
     event->getDataID().setFromInputData(*posact,*this);
     event->getDataID().setDataName(NAME_EVENTTRIGGER_BAD);
-    event->getDataID().setTimepoint(tr);
+    event->getDataID().setTimePoint(tr);
 
     setResult(msg,event);
 

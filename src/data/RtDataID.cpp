@@ -49,7 +49,7 @@ RtDataID::RtDataID(unsigned int _studyNum,
 }
 
 // constructor from a data id from a previous module
-RtDataID::RtDataID(const RtDataID &prevModuleData,
+RtDataID::RtDataID(RtDataID &prevModuleData,
 		   const RtStreamComponent &thisModule) {
   setFromInputDataID(prevModuleData, thisModule);
 }
@@ -155,13 +155,13 @@ string RtDataID::setFromString(const string &id) {
 }
 
 // set from input data
-void RtDataID::setFromInputData(const RtData &prevModuleData,
+void RtDataID::setFromInputData(RtData &prevModuleData,
 				const RtStreamComponent &thisModule) {
   setFromInputDataID(prevModuleData.getDataID(), thisModule);
 }
 
 // set from input data
-void RtDataID::setFromInputDataID(const RtDataID &prevModuleDataID,
+void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
 				  const RtStreamComponent &thisModule) {
   (*this) = prevModuleDataID;
   siteIDNum = SITE_ID_NUMBER;
@@ -171,3 +171,8 @@ void RtDataID::setFromInputDataID(const RtDataID &prevModuleDataID,
   instantiationTime = RtExperiment::getExperimentElapsedTime();
 }
 
+// output to stream
+ostream &operator<<(ostream &out, const RtDataID &id)  {
+  out << id.toString();
+  return out;
+}

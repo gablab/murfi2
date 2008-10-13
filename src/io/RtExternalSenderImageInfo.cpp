@@ -33,6 +33,12 @@ RtExternalImageInfo::RtExternalImageInfo()
   dColSag(0),
   dColCor(0),
   dColTra(0),
+  dMoCoTransX(0.0),
+  dMoCoTransY(0.0),
+  dMoCoTransZ(0.0),
+  dMoCoRotX(0.0),
+  dMoCoRotY(0.0),
+  dMoCoRotZ(0.0),
   bIsMoCo(false),
   iNoOfImagesInMosaic(1),
   iMosaicGridSize(1),
@@ -191,6 +197,28 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(&dColTra, readptr, DOUBLESIZE);
   readptr += DOUBLESIZE;
+
+
+
+  memcpy(&dMoCoTransX, readptr, DOUBLESIZE);
+  readptr += DOUBLESIZE;
+
+  memcpy(&dMoCoTransY, readptr, DOUBLESIZE);
+  readptr += DOUBLESIZE;
+
+  memcpy(&dMoCoTransZ, readptr, DOUBLESIZE);
+  readptr += DOUBLESIZE;
+
+  memcpy(&dMoCoRotX, readptr, DOUBLESIZE);
+  readptr += DOUBLESIZE;
+
+  memcpy(&dMoCoRotY, readptr, DOUBLESIZE);
+  readptr += DOUBLESIZE;
+
+  memcpy(&dMoCoRotZ, readptr, DOUBLESIZE);
+  readptr += DOUBLESIZE;
+
+
 
   memcpy(&bIsMoCo, readptr, sizeof(bool));
   readptr += sizeof(bool);
@@ -391,6 +419,27 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
 
   memcpy(writeptr, &dColTra, DOUBLESIZE);
   writeptr += DOUBLESIZE;
+
+
+  memcpy(writeptr, &dMoCoTransX, DOUBLESIZE);
+  writeptr += DOUBLESIZE;
+
+  memcpy(writeptr, &dMoCoTransY, DOUBLESIZE);
+  writeptr += DOUBLESIZE;
+
+  memcpy(writeptr, &dMoCoTransZ, DOUBLESIZE);
+  writeptr += DOUBLESIZE;
+
+  memcpy(writeptr, &dMoCoRotX, DOUBLESIZE);
+  writeptr += DOUBLESIZE;
+
+  memcpy(writeptr, &dMoCoRotY, DOUBLESIZE);
+  writeptr += DOUBLESIZE;
+
+  memcpy(writeptr, &dMoCoRotZ, DOUBLESIZE);
+  writeptr += DOUBLESIZE;
+
+
 
   memcpy(writeptr, &bIsMoCo, sizeof(bool));
   writeptr += sizeof(bool);

@@ -6,6 +6,8 @@
  *****************************************************************************/
 
 #include"RtLeastSquaresSolve.h"
+#include"debug_levels.h"
+
 #include<cstring>
 #include<iostream>
 using namespace std;
@@ -21,14 +23,13 @@ RtLeastSquaresSolve::RtLeastSquaresSolve() {
 RtLeastSquaresSolve::RtLeastSquaresSolve(unsigned int _numCols) {
   numCols = _numCols;
   numMeas = 1;
-
   init();
 }
 
 // with the number of columns in the design and the number of
 // observations at each time
 RtLeastSquaresSolve::RtLeastSquaresSolve(unsigned int _numCols,
-				     unsigned int _numMeas) {
+					 unsigned int _numMeas) {
   numCols = _numCols;
   numMeas = _numMeas;
   init();
@@ -81,7 +82,6 @@ void RtLeastSquaresSolve::init() {
 //
 // translated from Algorithm AS 75.1 Appl. Statist. (1974) Vol.23, No.3, p448
 bool RtLeastSquaresSolve::include(double *yelems, double *Xrow, double weight) {
-  /* Local variables */
   double y, di, xi, xk, dpi, cbar, sbar, *xrow;
   int nextr;
 
@@ -123,6 +123,11 @@ bool RtLeastSquaresSolve::include(double *yelems, double *Xrow, double weight) {
       y = xk - xi * thetabar[i][j];
       thetabar[i][j] = cbar * thetabar[i][j] + sbar * xk;
     }
+
+//    if(DEBUG_LEVEL & TEMP) {
+//      cerr << "y*y is " << y*y << endl;
+//    }
+
     sserr[i] += weight * y * y;
 
     delete xrow;

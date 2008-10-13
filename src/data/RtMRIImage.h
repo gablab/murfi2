@@ -19,6 +19,17 @@
 
 using namespace std;
 
+// MOTION STUFF
+// TODO: make this its own data class
+#define NUM_MOTION_DIMENSIONS 6
+typedef enum {
+  MOTION_TRANSLATION_X = 0,
+  MOTION_TRANSLATION_Y,
+  MOTION_TRANSLATION_Z,
+  MOTION_ROTATION_X,  
+  MOTION_ROTATION_Y,  
+  MOTION_ROTATION_Z  
+} MotionDimension; 
 
 // class declaration
 class RtMRIImage : public RtDataImage<short> {
@@ -82,8 +93,8 @@ public:
   // get the acquisition number
   string getCreationTime() const;
 
-  // get the acquisition number
-  unsigned int getAcquisitionNum() const;
+//  // get the acquisition number
+//  unsigned int getAcquisitionNum() const;
 
   // set the matrix size
   void setMatrixSize(unsigned int ms);
@@ -91,25 +102,29 @@ public:
   // get the matrix size
   unsigned int getMatrixSize();
 
-  // set the matrix size
+  // set the number of slices
   void setNumSlices(unsigned int ns);
 
-  // get the matrix size
+  // get the number of slices
   unsigned int getNumSlices();
 
-  // get the series number
-  unsigned int getSeriesNum() const;
+//  // set the series number
+//  void setSeriesNum(unsigned int);
+//
+//  // get the series number
+//  unsigned int getSeriesNum();
+
+  // get a motion parameter
+  double getMotionParameter(MotionDimension d) const;
+
+  // set a motion parameter
+  void setMotionParameter(MotionDimension d, double m);
 
   // get a smart contrast level
   float getAutoContrast();
 
   // get a smart brightness level
   float getAutoBrightness();
-
-  //*** sets  ***//
-
-  // set the series number
-  void setSeriesNum(unsigned int);
 
 protected:
 
@@ -122,14 +137,17 @@ protected:
 
   // imaging parms
   bool         swapReadPhase;       
-  unsigned int  seriesNum;           // series number
+  //unsigned int  seriesNum;           // series number
   string        seriesInstanceUID;   // series id
-  unsigned int  acqNum;              // acquisition number
+  //unsigned int  acqNum;              // acquisition number
   double timeAfterStart;      // time after start
   double te;                  // echo time (ms)
   double tr;                  // repetition time (ms)
   double ti;                  // inversion time (ms)
   double triggerTime;         // trigger time (ms)
+
+  // motion parameters
+  double motionParameters[NUM_MOTION_DIMENSIONS];
 
   // actual acquision info parms
   ACE_Date_Time time;                // acquisition time

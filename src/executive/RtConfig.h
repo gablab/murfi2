@@ -6,6 +6,12 @@
  * 
  *****************************************************************************/
 
+// TODO: need these functions:
+// 1) set all possible defaults
+// 2) print out all possible options (have each module print its own options)
+// 3) fold the small amount of duplicated functionality from RtExperiment
+//    into this class
+
 #ifndef RTCONFIG_H
 #define RTCONFIG_H
 

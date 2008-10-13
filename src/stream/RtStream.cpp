@@ -58,14 +58,16 @@ int RtStream::configure(RtConfig &config) {
 #include"RtIntensityNorm.h"
 #include"RtPasser.h"
 #include"RtImageZScore.h"
-#include"RtImageSlideWinCor.h"
-#include"RtAccumCor.h"
 #include"RtSlideWinCor.h"
+#include"RtAccumCor.h"
 #include"RtIncrementalGLM.h"
 #include"RtSingleImageCor.h"
 #include"RtFluctuationMonitor.h"
-#include"RtActivationSum.h"
-#include"RtActivationSumDifference.h"
+#include"RtRoiSum2Feedback.h"
+#include"RtRoiMean2Feedback.h"
+#include"RtRoiWeightedAve2Feedback.h"
+#include"RtRoiMedian2Feedback.h"
+#include"RtRoiDifference.h"
 #include"RtEventTriggerActivationSums.h"
 #include"RtEventTriggerActivationDiff.h"
 
@@ -106,14 +108,11 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   else if(type == RtImageZScore::moduleString) { // voxel z score
     ACE_NEW_NORETURN(sc, RtImageZScore());
   }
-  else if(type == RtImageSlideWinCor::moduleString) { // voxel sliding window correlation
-    ACE_NEW_NORETURN(sc, RtImageSlideWinCor());
+  else if(type == RtSlideWinCor::moduleString) { // voxel sliding window correlation
+    ACE_NEW_NORETURN(sc, RtSlideWinCor());
   }
   else if(type == RtAccumCor::moduleString) { // voxel accumulative correlation
     ACE_NEW_NORETURN(sc, RtAccumCor());
-  }
-  else if(type == RtSlideWinCor::moduleString) { // voxel sliding window correlation
-    ACE_NEW_NORETURN(sc, RtSlideWinCor());
   }
   else if(type == RtIncrementalGLM::moduleString) { // voxel incremental GLM
     ACE_NEW_NORETURN(sc, RtIncrementalGLM());
@@ -124,17 +123,31 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   else if(type == RtFluctuationMonitor::moduleString) { // fluctuation monitor
     ACE_NEW_NORETURN(sc, RtFluctuationMonitor());
   }
-  else if(type == RtActivationSum::moduleString) { // sum image activation
-    ACE_NEW_NORETURN(sc, RtActivationSum());
+  else if(type == RtRoiSum2Feedback::moduleString) { // sum image activation
+    ACE_NEW_NORETURN(sc, RtRoiSum2Feedback());
   }
-  else if(type == RtActivationSumDifference::moduleString) { // activation sum diff
-    ACE_NEW_NORETURN(sc, RtActivationSumDifference());
+  else if(type == RtRoiMean2Feedback::moduleString) { // ave image activation
+    ACE_NEW_NORETURN(sc, RtRoiMean2Feedback());
+  }
+  else if(type == RtRoiMedian2Feedback::moduleString) { // median roi activation
+    ACE_NEW_NORETURN(sc, RtRoiMedian2Feedback());
+  }
+  else if(type == RtRoiWeightedAve2Feedback::moduleString) { // roi weighted ave
+    ACE_NEW_NORETURN(sc, RtRoiWeightedAve2Feedback());
+  }
+  else if(type == RtRoiDifference::moduleString) { // activation roi diff
+    ACE_NEW_NORETURN(sc, RtRoiDifference());
   }
   else if(type == RtEventTriggerActivationSums::moduleString) { // trigger acts
     ACE_NEW_NORETURN(sc, RtEventTriggerActivationSums());
   }
   else if(type == RtEventTriggerActivationDiff::moduleString) { // trigger diff
     ACE_NEW_NORETURN(sc, RtEventTriggerActivationDiff());
+  }
+  else {
+    cerr << "unknown module type: " << type << endl;
+    cerr << "adding data passer instead" << endl;
+    ACE_NEW_NORETURN(sc, RtPasser());
   }
 
   // set the conductor

@@ -221,7 +221,7 @@ bool RtConductor::init() {
   ACE_TRACE(("RtConductor::init"));
 
   outputLog.writeConfig(config);
-
+  RtExperiment::setConfig(&config);
 
   outputLog << "initialization completed at ";
   outputLog.printNow();
@@ -383,6 +383,14 @@ vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
   }
 
   return outs;
+}
+
+// get data store map
+//  out
+//   pointer to data store map
+RtDataStore *RtConductor::getDataStore() {
+  //TODO put in checks?
+  return &dataStore;
 }
 
 // gets the version

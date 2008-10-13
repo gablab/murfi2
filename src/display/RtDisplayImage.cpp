@@ -437,11 +437,13 @@ void RtDisplayImage::setData(RtData *data) {
   static Gnuplot gp = Gnuplot("lines");
   static unsigned int numTimepoints = 0;
 
-  cout << "got data: " << data->getID() << ":" << data->getRoiID() << endl;
+  if(DEBUG_LEVEL & TEMP) {
+    cout << "got data: " << data->getDataID() << endl;
+  }
 
   // handle activation sum
-  if(data->getID() == posActivationSumID 
-     && data->getRoiID() == posActivationSumRoiID) {
+  if(data->getDataID().getDataName() == posActivationSumID 
+     && data->getDataID().getRoiID() == posActivationSumRoiID) {
 //  cout << "display got a pos activation sum: " 
 //       << ((RtActivation*)data)->getPixel(0) 
 //       << " " << numTimepoints << endl;
@@ -453,8 +455,8 @@ void RtDisplayImage::setData(RtData *data) {
     return;
   }
 
-  if(data->getID() == negActivationSumID 
-     && data->getRoiID() == negActivationSumRoiID) {
+  if(data->getDataID().getDataName() == negActivationSumID 
+     && data->getDataID().getRoiID() == negActivationSumRoiID) {
   cout << "display got a neg activation sum: " 
        << ((RtActivation*)data)->getPixel(0) 
        << endl;
@@ -467,7 +469,7 @@ void RtDisplayImage::setData(RtData *data) {
   }
 
   // handle pos overlay
-  if(data->getID() == posOverlayID && data->getRoiID() == posOverlayRoiID) {
+  if(data->getDataID().getDataName() == posOverlayID && data->getDataID().getRoiID() == posOverlayRoiID) {
     posOverlay = (RtActivation*) data;
     newPosOverlay = true;
     //cout << "display got a pos overlay " << img->getID() << endl;
@@ -475,7 +477,7 @@ void RtDisplayImage::setData(RtData *data) {
   }
 
   // handle neg overlay
-  if(data->getID() == negOverlayID && data->getRoiID() == negOverlayRoiID) {
+  if(data->getDataID().getDataName() == negOverlayID && data->getDataID().getRoiID() == negOverlayRoiID) {
     negOverlay = (RtActivation*) data;
     newNegOverlay = true;
   //cout << "display got a neg overlay " << img->getID() << endl;
@@ -483,7 +485,7 @@ void RtDisplayImage::setData(RtData *data) {
   }
 
   // handle pos mask
-  if(data->getID() == posMaskID && data->getRoiID() == posMaskRoiID) {
+  if(data->getDataID().getDataName() == posMaskID && data->getDataID().getRoiID() == posMaskRoiID) {
     // delete existing if we loaded it from a file
     if(loadInitialPosMask && posMask) {
       // memory leak??
@@ -498,7 +500,7 @@ void RtDisplayImage::setData(RtData *data) {
   }
 
   // handle neg mask
-  if(data->getID() == negMaskID && data->getRoiID() == negMaskRoiID) {
+  if(data->getDataID().getDataName() == negMaskID && data->getDataID().getRoiID() == negMaskRoiID) {
     // delete existing if we loaded it from a file
     if(loadInitialNegMask && negMask) {
       // memory leak??
@@ -513,8 +515,15 @@ void RtDisplayImage::setData(RtData *data) {
   }
 
   // handle background image
-  if(data->getID() != imageDisplayType) {
-    ACE_DEBUG((LM_DEBUG, "ignoring image of type %s\n", data->getID()));
+  if(data->getDataID().getModuleID() != imageDisplayType) {
+    if(DEBUG_LEVEL & ADVANCED) {
+      cout << "ignoring image of type " 
+	   << data->getDataID().getModuleID() 
+	   << " because its not " 
+	   << imageDisplayType
+	   << endl;
+    }
+    ACE_DEBUG((LM_DEBUG, "ignoring image of type %s\n", data->getDataID().getModuleID()));
     return;
   }
   
@@ -528,14 +537,14 @@ void RtDisplayImage::setData(RtData *data) {
 
   img = (RtMRIImage*) data;
 
-  ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getAcquisitionNum()));
+  ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getDataID().getTimePoint()));
   //cout << "display got an image " << img->getID() << endl;
 
   // set the info strings
-  bottomStr = img->getID();
+  bottomStr = img->getDataID().getModuleID() + " " + img->getDataID().getDataName();
 
   stringstream s;
-  s << img->getAcquisitionNum();
+  s << img->getDataID().getTimePoint();
   topStr = s.str();
 
   newTex = true;
@@ -728,17 +737,36 @@ void RtDisplayImage::makePosMaskTexture() {
     glDeleteTextures(1, &posMaskTex);
   }
 
+  // mosaic if needed
+  short *imageData;
+  int numImageData;
+  if(!posMask->isMosaic()) {    
+    imageData = posMask->getMosaicedCopy();
+    imageW = posMask->getMosaicedWidth();
+    imageH = posMask->getMosaicedHeight();
+    numImageData = imageW*imageH;
+  }
+  else {
+    imageData = new short[posMask->getNumEl()];
+    numImageData = posMask->getNumEl();
+    imageData = posMask->getDataCopy();
+  }
+
+
   /* get the id for the texture */
   glGenTextures(1, &posMaskTex);
 
   // convert posMask into a displayable image
-  short *posMaskImg = new short[4*posMask->getNumEl()];
-  for(unsigned int i = 0; i < posMask->getNumEl(); i++) {
+  short *posMaskImg = new short[4*numImageData];
+  for(unsigned int i = 0; i < numImageData; i++) {
     posMaskImg[4*i+0] = 0; // r
-    posMaskImg[4*i+1] = posMask->getPixel(i) ? SHRT_MAX : 0; // g
+    posMaskImg[4*i+1] = imageData[i] ? SHRT_MAX : 0; // g
     posMaskImg[4*i+2] = 0; // b
-    posMaskImg[4*i+3] = posMask->getPixel(i) ? SHRT_MAX/3 : 0; // a
+    posMaskImg[4*i+3] = imageData[i] ? SHRT_MAX/3 : 0; // a
   }
+
+  delete [] imageData;
+
 
   /* create the image texture */
   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posMaskTex);
@@ -747,10 +775,8 @@ void RtDisplayImage::makePosMaskTexture() {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, posMask->getDim(0),
-	       posMask->getDim(1), 0, GL_RGBA,
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, imageW, imageH, 0, GL_RGBA,
 	       GL_SHORT, posMaskImg);
-
 
   delete posMaskImg;
 
@@ -761,7 +787,7 @@ void RtDisplayImage::makePosMaskTexture() {
   needsRepaint = true;
 }
 
-// makes a texture from a negative mask and prepares it for display
+// makes a texture from a neg mask and prepares it for display
 void RtDisplayImage::makeNegMaskTexture() {
   ACE_TRACE(("RtDisplayImage::makeNegMaskTexture"));
 
@@ -770,17 +796,36 @@ void RtDisplayImage::makeNegMaskTexture() {
     glDeleteTextures(1, &negMaskTex);
   }
 
+  // mosaic if needed
+  short *imageData;
+  int numImageData;
+  if(!negMask->isMosaic()) {    
+    imageData = negMask->getMosaicedCopy();
+    imageW = negMask->getMosaicedWidth();
+    imageH = negMask->getMosaicedHeight();
+    numImageData = imageW*imageH;
+  }
+  else {
+    imageData = new short[negMask->getNumEl()];
+    numImageData = negMask->getNumEl();
+    imageData = negMask->getDataCopy();
+  }
+
+
   /* get the id for the texture */
   glGenTextures(1, &negMaskTex);
 
-  // convert negMask into a displayable image (cyan background?)
-  short *negMaskImg = new short[4*negMask->getNumEl()];
-  for(unsigned int i = 0; i < negMask->getNumEl(); i++) {
-    negMaskImg[4*i+0] = negMask->getPixel(i) ? SHRT_MAX : 0; // r
+  // convert negMask into a displayable image
+  short *negMaskImg = new short[4*numImageData];
+  for(unsigned int i = 0; i < numImageData; i++) {
+    negMaskImg[4*i+0] = 0; // r
     negMaskImg[4*i+1] = 0; // g
-    negMaskImg[4*i+2] = negMask->getPixel(i) ? SHRT_MAX : 0; // b
-    negMaskImg[4*i+3] = negMask->getPixel(i) ? SHRT_MAX/3 : 0; // a
+    negMaskImg[4*i+2] = imageData[i] ? SHRT_MAX : 0; // b
+    negMaskImg[4*i+3] = imageData[i] ? SHRT_MAX/3 : 0; // a
   }
+
+  delete [] imageData;
+
 
   /* create the image texture */
   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negMaskTex);
@@ -789,14 +834,13 @@ void RtDisplayImage::makeNegMaskTexture() {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, negMask->getDim(0),
-	       negMask->getDim(1), 0, GL_RGBA,
+  glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, imageW, imageH, 0, GL_RGBA,
 	       GL_SHORT, negMaskImg);
 
   delete negMaskImg;
 
   if(!glIsTexture(negMaskTex)) {
-    cerr << "ERROR: could not generate a new negative mask texture" << endl;
+    cerr << "ERROR: could not generate a new negitive mask texture" << endl;
   }
 
   needsRepaint = true;
@@ -1103,10 +1147,10 @@ void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
     imageDisplayType = ID_MOSAIC;
     break;
   case 'd':
-    imageDisplayType = ID_DIFFIMG;
+    imageDisplayType = ID_TEMPDIFF;
     break;
   case 'm':
-    imageDisplayType = ID_MEANIMG;
+    imageDisplayType = ID_TEMPMEAN;
     break;
   case '=':
   case '+':
@@ -1117,10 +1161,10 @@ void RtDisplayImage::CallBackKeyboardFunc(unsigned char key, int x, int y) {
     negMaskOn = !negMaskOn;
     break;
   case 'n':
-    imageDisplayType = ID_INTENSITYNORMIMG;
+    imageDisplayType = ID_SPATIALINTENSITYNORM;
     break;
   case 'v':
-    imageDisplayType = ID_VARIMG;
+    imageDisplayType = ID_TEMPVAR;
     break;
   case 'z':
     posOverlayOn = !posOverlayOn;

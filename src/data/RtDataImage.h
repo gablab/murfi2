@@ -131,6 +131,13 @@ public:
   //   success or failure
   virtual bool load();
 
+  // read an image header from a file
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  virtual bool readHeader(const string &filename);
+
   // read an image from a file
   //  in
   //   filename: string filename
@@ -144,6 +151,15 @@ public:
   //  out
   //   success or failure
   virtual bool readRaw(const string &filename);
+
+  // read the header from a nifti1 image file
+  // WARNING! sets header info but does not read the pixels, can create
+  // a mismatch between data and info
+  //  in
+  //   filename: string filename
+  //  out
+  //   success or failure
+  bool readNiftiHeader(const string &_filename);
 
   // read an image from a nifti file
   //  in

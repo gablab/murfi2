@@ -15,6 +15,7 @@
 
 #include"RtActivationEstimator.h"
 #include"RtLeastSquaresSolve.h"
+#include"RtTypes.h"
 
 #include<vector>
 using namespace std;
@@ -35,6 +36,10 @@ public:
   ~RtSingleImageCor();
 
 protected:
+
+  // deallocate internal data
+  void freeSolvers();
+  void freeEstErrSum();
 
   // process a single acquisition
   virtual int process(ACE_Message_Block *mb);
@@ -68,10 +73,16 @@ protected:
   // one solver for each voxel 
   RtLeastSquaresSolve **solvers;
 
+  // whether to include the condition mean in the stat computation
+  bool includeConditionMean;
+
   //// error estimation params
 
+  // error norm method
+  Norm errorNorm;
+
   // store the per pixel sum of absolute error for the single image model fit
-  RtActivation *absEstErrSum;
+  RtActivation **estErrSum;
 
   // number of data actually in the error estimate so far
   int numDataPointsInErrEst;

@@ -8,22 +8,26 @@
  *****************************************************************************/
 
 #include"RtIntensityNorm.h"
+#include"RtExperiment.h"
 #include"ace/Mutex.h"
 #include"RtDataIDs.h"
 
-string RtIntensityNorm::moduleString(ID_SPATIAL_INTENSITYNORM);
+string RtIntensityNorm::moduleString(ID_SPATIALINTENSITYNORM);
+
+#define DEFAULT_BET_PARMS "-f 0.5 -g 0 -n -m"
+#define DEFAULT_MASK_FILENAME "mask/brain_mask.nii"
 
 // default constructor
 RtIntensityNorm::RtIntensityNorm() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = NAME_SPATIAL_INTENSITYNORM_IMG;
+  dataName = NAME_SPATIALINTENSITYNORM_IMG;
 
   meanIntensity = fmod(1.0,0.0); // assign nan
 
   makeBETMask = false;
   computingMask = false;
-  maskScript = "scripts/make_bet_mask.sh";
-  betParms = "-f 0.5 -g 0 -n -m";
+  betParms = DEFAULT_BET_PARMS;
+  maskFilename = DEFAULT_MASK_FILENAME;
 
   maskIntensityThreshold = 0.7;
 
@@ -42,12 +46,12 @@ bool RtIntensityNorm::processOption(const string &name, const string &text,
 				      const map<string,string> &attrMap) {
 
   // look for known options
+  if(name == "maskFilename") {
+    maskFilename = text;
+    return true; 
+  }
   if(name == "betMask") {
     return RtConfigVal::convert<bool>(makeBETMask,text);
-  }
-  if(name == "maskScript") {
-    maskScript = text;
-    return true;
   }
   if(name == "betParms") {
     betParms = text;
@@ -59,6 +63,7 @@ bool RtIntensityNorm::processOption(const string &name, const string &text,
 
 // process a single acquisition
 int RtIntensityNorm::process(ACE_Message_Block *mb) {
+  static bool needsInit = true; 
   double sum = 0;
   
   ACE_TRACE(("RtIntensityNorm::process"));
@@ -66,7 +71,7 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   // get the current image to operate on
-  RtMRIImage *img = (RtMRIImage*)msg->getCurrentData();
+  RtMRIImage *img = (RtMRIImage*) msg->getCurrentData();
 
   if(img == NULL) {
     cout << "RtIntensityNorm::process: image passed is NULL" << endl;
@@ -76,54 +81,44 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   }
 
   // look for first image, compute ROI and mean intensity
-  if(isnan(meanIntensity)) {
+  if(needsInit) {
     ACE_DEBUG((LM_DEBUG, "intensity normalization found first image\n"));
+
+    mask.setFilename(maskFilename);
 
     // if we are getting a brain mask from bet write the first image and
     // wait for bet to finish before we read it back in and continue
     if(makeBETMask) {
       if(!computingMask) {
-	// execute commands to make the mask PLATFORM SPECIFIC!!!!!
-	system("mkdir -p mask");
-
-	// lock, unmosaic, write, mosaic
-	ACE_Mutex mutx;
-	mutx.acquire(); {	
-	  img->unmosaic();	
-	  img->write("mask/first_img.nii");
-	  img->mosaic();	
-	}  mutx.release();
-
-	string cmd = maskScript + " " 
-	  + img->getFilename() + " "
-	  + "mask/brain" + " " 
-	  + betParms;
-	cout << "executing: " << cmd << endl;
-	system(cmd.c_str());
-
+	// execute commands to make the mask
+	maskJobID = RtFSLInterface::makeBrainMask(
+		RtExperiment::getSeriesRefVolFilename(img->getDataID().getSeriesNum()), 
+		mask.getFilename(),
+		betParms);
+	
 	computingMask = true;
 
 	return 0;
       }
+      else if(computingMask 
+	      && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_FINISHED) {
+
+	computingMask = false;
+	mask.load();
+	mask.computeNumberOfOnVoxels();
+	//mask.mosaic();
+	//	  mask.setFilename("/tmp/mosaic_mask.nii");
+	//	  mask.write("/tmp/mosaic_mask.nii");
+      }
+      else if(computingMask 
+	      && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_ERROR) {	
+	computingMask = false;
+	cerr << "RtIntensityNorm: error computing brain mask. guessing by threshold" << endl;
+	mask.initByMeanIntensityThreshold(*img, maskIntensityThreshold);
+      }
       else {
-	// execute commands to read the mask PLATFORM SPECIFIC!!!!!
-	string cmd = "if [ -f mask/brain_mask.nii -o -f mask/brain_mask.nii.gz ]; then exit 0; else exit 1; fi";
-
-	cerr << "looking for mask" << endl;
-	if(!system(cmd.c_str())) {
-	  cerr << "found it" << endl;
-
-	  computingMask = false;
-	  mask.read("mask/brain_mask.nii");
-	  mask.computeNumberOfOnVoxels();
-	  mask.mosaic();
-//	  mask.setFilename("/tmp/mosaic_mask.nii");
-//	  mask.write("/tmp/mosaic_mask.nii");
-	}
-	else {
-	  cerr << "didnt found it" << endl;
-	  return 0;
-	}
+	cerr << "not done computing mask..." << endl;
+	return 0;
       }
     }
     else {
@@ -143,6 +138,8 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
 
     cout << "found mean intensity of " << meanIntensity << "=" 
 	 << sum << "/" << mask.getNumberOfOnVoxels() << endl;
+
+    needsInit = false;
   }
   
   ACE_DEBUG((LM_DEBUG, "intensity normalizing image %d\n", 

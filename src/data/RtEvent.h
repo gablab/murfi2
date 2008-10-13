@@ -24,6 +24,9 @@ public:
   // default constructor
   RtEvent();
 
+  // construct from data
+  RtEvent(const RtData &dat);
+
   // destructor
   virtual ~RtEvent();
 

@@ -8,16 +8,20 @@
 static char *VERSION = "$Id$";
 
 #include"RtInputScannerImages.h"
+#include"site_config.h"
+#include"RtDataIDs.h"
+#include"RtExperiment.h"
+
 #include<vnl/vnl_matrix_fixed.h>
 #include<vnl/vnl_vector.h>
 #include<fstream>
+
 using namespace std;
 
 // defaults
 static const int    DEFAULT_PORT = 15000;
-static const char*  DEFAULT_SAVEDIR  = "img";
-static const char*  DEFAULT_SAVESTEM = "img";
-static const char*  DEFAULT_SAVEEXT  = "nii";
+//static const char*  DEFAULT_SAVESTEM = "img";
+//static const char*  DEFAULT_SAVEEXT  = "nii";
 
 // increase this size for highres acquisitions
 #define MAX_BUFSIZ 256*256*256*2
@@ -27,10 +31,9 @@ static char buffer[MAX_BUFSIZ];
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
   :  port(DEFAULT_PORT),
-     savePath(""),
-     saveDir(DEFAULT_SAVEDIR),
-     saveFilestem(DEFAULT_SAVESTEM),
-     saveFileext(DEFAULT_SAVEEXT),
+     //     savePath(""),
+//     saveFilestem(DEFAULT_SAVESTEM),
+//     saveFileext(DEFAULT_SAVEEXT),
      seriesNum(1),
      toBeDeleted(received.begin())
 {
@@ -42,6 +45,8 @@ RtInputScannerImages::RtInputScannerImages()
   numSlices = 32;
   sliceGap = 0.1;
   voxDim[0] = voxDim[1] = voxDim[2] = 1.0;
+
+  alignSeries = false;
 }
 
 // destructor
@@ -102,7 +107,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
     onlyReadMoCo = false;
   }
 
- // see if we should unmosaic the images
+  // see if we should unmosaic the images
   if(config.isSet("scanner:unmosaic")) {
       unmosaicInputImages = (bool) config.get("scanner:unmosaic");
   }
@@ -111,25 +116,34 @@ bool RtInputScannerImages::open(RtConfig &config) {
   if(config.get("scanner:saveImages")==true) {
     saveImagesToFile = true;
 
-    // set up the directory to save to
-    if(config.isSet("scanner:imageDir")) {
-      saveDir = config.get("scanner:imageDir").str();
-    }
+//    // set up the directory to save to
+//    if(config.isSet("scanner:imageDir")) {
+//      saveDir = config.get("scanner:imageDir").str();
+//    }
+//
+//    if(config.isSet("scanner:imageStem")) {
+//      saveFilestem = config.get("scanner:imageStem").str();
+//    }
+//
+//    if(config.isSet("scanner:imageExt")) {
+//      saveFileext = config.get("scanner:imageExt").str();
+//    }
+//
+//    // set the save path
+//    //string sp(config.get("studyDir").str());
+//    stringstream sp;
+//    //sp << "/home/mri/subjects/foobar/" << saveDir << "/" << saveFilestem;
+//    sp <<  << "/" << saveFilestem;
+//    savePath = sp.str();
+  }
 
-    if(config.isSet("scanner:imageStem")) {
-      saveFilestem = config.get("scanner:imageStem").str();
-    }
-
-    if(config.isSet("scanner:imageExt")) {
-      saveFileext = config.get("scanner:imageExt").str();
-    }
-
-    // set the save path
-    //string sp(config.get("studyDir").str());
-    stringstream sp;
-    //sp << "/home/mri/subjects/foobar/" << saveDir << "/" << saveFilestem;
-    sp << config.get("study:dir").str() << saveDir << "/" << saveFilestem;
-    savePath = sp.str();
+  // see if we should align the series to a reference
+  if(config.isSet("scanner:alignSeries") 
+     && config.get("scanner:alignSeries")==true) {
+    alignSeries = true;
+  }
+  else {
+    alignSeries = false;
   }
 
   return true;
@@ -154,6 +168,7 @@ int RtInputScannerImages::svc() {
   RtExternalImageInfo *ei;
   short *img;
   RtMRIImage *rti;
+  static bool haveRefVol = false;
   stringstream infos;
 
   int imageNum = 0;
@@ -177,15 +192,17 @@ int RtInputScannerImages::svc() {
     img = receiveImage(stream, *ei);
 
     if(onlyReadMoCo && !ei->bIsMoCo) {
-      //cout << "ignoring non-MoCo image." << endl;
+      cout << "ignoring non-MoCo image." << endl;
       continue;
     }
 
     // build data class
     rti = new RtMRIImage(*ei,img);
+
     //rti->setSeriesNum(seriesNum);
     rti->setMatrixSize(matrixSize);
     rti->setNumSlices(numSlices);
+
 
 
 //    rti->setPixDim(0,voxDim[0]);
@@ -205,9 +222,42 @@ int RtInputScannerImages::svc() {
     // signal that we got an image
     //cout << "sending event with code number " << codeNum << endl;
 
+    //rti->printInfo(cout);
+
+    // if its the first epi image in an experiment save it no matter what
+    if(!haveRefVol 
+       && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI
+       ) {
+      
+      if(!(haveRefVol = RtExperiment::getExperimentRefVolExist())) {
+	if(rti->write(RtExperiment::getExperimentRefVolFilename())) {
+	  haveRefVol = true;
+	}
+      }
+      else {
+	haveRefVol = true;
+      }
+    }
+
+    // if its the first image in a series save it no matter what
+    if(isFirstInSeries(*ei)
+       && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
+
+      rti->write(RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
+
+      // register with reference
+      if(alignSeries) {
+        RtFSLInterface::registerSameSubjEPI(
+            RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()),
+            RtExperiment::getExperimentRefVolFilename(),
+            RtExperiment::getSeriesXfmFilename(rti->getDataID().getSeriesNum()), true
+  					  );
+      }
+
+    }
+
     sendCode(rti);
 
-    //rti->printInfo(cout);
 
     if(saveImagesToFile) {
       saveImage(*rti);
@@ -289,11 +339,11 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   //info->iAcquisitionNumber = acnum++;
 
   // if this is the first acquisition, get the series number
-  if(isFirstInSeries(*info)) {
-    seriesNum = getNextSeriesNum();
-  }
+  //if(isFirstInSeries(*info)) {
+  //  seriesNum = getNextSeriesNum();
+  //}
 
-  ACE_DEBUG((LM_DEBUG, "received info for %d:%d\n", seriesNum, info->iAcquisitionNumber));
+  //ACE_DEBUG((LM_DEBUG, "received info for %d:%d\n", seriesNum, info->iAcquisitionNumber));
 
   return info;
 }
@@ -327,31 +377,33 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 //   img: image to save
 bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 
-  cout << "writing image number " << seriesNum << ":" << img.getAcquisitionNum() << endl;
+  cout << "writing image number " << img.getDataID().getSeriesNum() << ":" << img.getDataID().getTimePoint() << endl;
 
-  return img.write(getImageFilename(seriesNum, img.getAcquisitionNum()));
+  return img.write(RtExperiment::getExperimentVolFilename(
+			    img.getDataID().getSeriesNum(),
+			    img.getDataID().getTimePoint()));
 }
 
-// build a filename for a given acquisition number for the current series
-// number
-//  in
-//   acquisition number
-//  out
-//   absolute file string
-string RtInputScannerImages::getImageFilename(int _seriesNum,
-					      int _acquisitionNum) {
-  // five digit filename assumption here!
-  char srnum[6];
-  char acnum[6];
-  sprintf(srnum,"%05d",_seriesNum);
-  sprintf(acnum,"%05d",_acquisitionNum);
-
-  stringstream s;
-  s << savePath << "-" << srnum << "-" << acnum << "." << saveFileext;
-  string ret = s.str();
-
-  return s.str();
-}
+//// build a filename for a transform file operating on a given image
+//// number
+////  in
+////   acquisition number
+////  out
+////   absolute file string
+//string RtInputScannerImages::getXfmFilename(int _seriesNum,
+//					    int _acquisitionNum) {
+//  // five digit filename assumption here!
+//  char srnum[6];
+//  char acnum[6];
+//  sprintf(srnum,"%05d",_seriesNum);
+//  sprintf(acnum,"%05d",_acquisitionNum);
+//
+//  stringstream s;
+//  s << xfmSavePath << "-" << srnum << "-" << acnum << "." << xfmFileext;
+//  string ret = s.str();
+//
+//  return s.str();
+//}
 
 // determines if the received image is the first image in a series or not
 // examines the acquisition number for 1
@@ -360,28 +412,28 @@ string RtInputScannerImages::getImageFilename(int _seriesNum,
 //  out
 //   true if this image is the first in a series
 bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
-  return info.iAcquisitionNumber == 1;
+  return info.iAcquisitionNumber == SERIES_FIRST_ACQ_NUM;
 }
 
 // gets the next series number to be saved in the current image directory
 // inspects the series currently in the directory and makes a new one
-unsigned int RtInputScannerImages::getNextSeriesNum() {
-  fstream fin;
-  string fname;
-
-  for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
-    fname = getImageFilename(sn, 1);
-    fin.open(fname.c_str());
-
-    if(fin.fail() ) {
-      fin.close();
-      return sn;
-    }
-    fin.close();
-  }
-
-  return MAX_SERIESNUM;
-}
+//unsigned int RtInputScannerImages::getNextSeriesNum() {
+//  fstream fin;
+//  string fname;
+//
+//  for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
+//    fname = getImageFilename(sn, 1);
+//    fin.open(fname.c_str());
+//
+//    if(fin.fail() ) {
+//      fin.close();
+//      return sn;
+//    }
+//    fin.close();
+//  }
+//
+//  return MAX_SERIESNUM;
+//}
 
 // gets the version
 //  out:

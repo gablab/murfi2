@@ -37,7 +37,7 @@ public:
 	   const string &_roiID = "");
 
   // constructor from a data id from a previous module
-  RtDataID(const RtDataID &prevModuleData,
+  RtDataID(RtDataID &prevModuleData,
 	   const RtStreamComponent &thisModule);
 
 
@@ -56,11 +56,11 @@ public:
   string toString() const;
 
   // set info from a data id of the input data
-  void setFromInputDataID(const RtDataID &prevModuleDataID,
+  void setFromInputDataID(RtDataID &prevModuleDataID,
 			  const RtStreamComponent &thisModule);
 
   // set info from input data
-  void setFromInputData(const RtData &prevModuleData,
+  void setFromInputData(RtData &prevModuleData,
 			const RtStreamComponent &thisModule);
 
   // set the ID from a string
@@ -111,10 +111,7 @@ public:
 
 
 // output to stream
-ostream &operator<<(ostream &out, const RtDataID &id) {
-  out << id.toString();
-  return out;
-}
+ostream &operator<<(ostream &out, const RtDataID &id);
 
 
 #endif

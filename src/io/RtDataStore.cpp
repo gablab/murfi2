@@ -4,14 +4,12 @@
  * Oliver Hinds <ohinds@mit.edu> 2008-08-13
  *
  *****************************************************************************/
-// not ready for prime time
-#if 0
 
 static char *VERSION = "$Id$";
 
 #include"RtDataStore.h"
 
-#define INITIAL_NOTIFY_LIST_LEN 128;
+#define INITIAL_NOTIFY_LIST_LEN 128
 
 RtDataStore::RtDataStore() {
   outputNotifyList.reserve(INITIAL_NOTIFY_LIST_LEN);
@@ -23,7 +21,7 @@ RtDataStore::~RtDataStore() {
 }
 
 // add an output to be notified when new data arrives
-void RtDataStore::addOutputForNotify(const RtOutput *out) {
+void RtDataStore::addOutputForNotify(RtOutput *out) {
   outputNotifyList.push_back(out);
 }
 
@@ -32,34 +30,37 @@ void RtDataStore::addOutputForNotify(const RtOutput *out) {
 // hand off some data to be output
 void RtDataStore::setData(RtData *data) {
   // save the pointer to the data
-  store[data.getDataID()] = data;
-
+  store[&data->getDataID()] = data;
+  
   // notify listeners
-  for(vector<RtOutput*>::iterator i = outputNotifyList.begin(); 
+  for(vector<RtOutput*>::iterator i = outputNotifyList.begin();
       i != outputNotifyList.end(); i++) {
     (*i)->setData(data);
   }
 }
 
 // get data by id
-RtData *RtDataStore::getData(const RtDataID &id) {
-  vector<RtOutput*>::iterator_const i = store.find(id);
+RtData *RtDataStore::getData(RtDataID &dataID) {
+  
+  // iterator for map
+  map<RtDataID*,RtData*,RtDataIDCompare>::iterator it;
+  
+  // find iterator to mapped value
+  it = store.find(&dataID);
 
   // if not found
-  if(i == store.end()) {
+  if(it == store.end()) {
     return NULL;
   }
 
-  return (*i).second
+  return (*it).second;
 }
 
 // get the version
 //  out: char array that represents the cvs version
-char RtDataStore::*getVersionString() {
+char *RtDataStore::getVersionString() {
   return VERSION;
 }
-
-#endif
 
 /*****************************************************************************
  * $Source$

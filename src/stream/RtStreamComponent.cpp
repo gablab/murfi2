@@ -187,19 +187,12 @@ void RtStreamComponent::passData(RtData* data) {
 //  in
 //   data result
 void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
-  ACE_Mutex mut;
-  mut.acquire();
 
   if(putResultOnMessage) {
-    msg->addData(data);
-
-    if(makeCurrentData) {
-      msg->setLastDataAsCurrent();
-    }
+    msg->addData(data, makeCurrentData);
   }
 
   passData(data);
-  mut.release();
 }
   
 // close a stream component

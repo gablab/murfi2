@@ -14,6 +14,7 @@
 #include<vnl/algo/vnl_convolve.h>
 
 #include"RtStreamComponent.h"
+#include"RtExperiment.h"
 #include"RtDataImage.h"
 #include"RtDataIDs.h"
 #include"RtMaskImage.h"
@@ -43,7 +44,7 @@ public:
   void setProbThreshold(double p);
 
   // get the desired probability threshold
-  double  getProbThreshold();
+  double getProbThreshold();
 
   // set whether stat thresholds should reflect multiple comparisons corrections
   void setCorrectMultipleComparisons(bool correct);
@@ -61,6 +62,9 @@ public:
 
 protected:
 
+  // loads an hrf vector from a file
+  bool loadHrfFile(vnl_vector<double> &hrf, string filename);
+
   // builds an hrf vector
   //
   // in
@@ -68,7 +72,7 @@ protected:
   //  length:     length of the HRF in milliseconds
   // out
   //  vnl_vector HRF
-  void buildHRF(vnl_vector<double> &hrf, double tr,
+  void buildHrf(vnl_vector<double> &hrf, double tr,
 		double sampleRate, double length);
 
   // process a single acquisition
@@ -120,20 +124,25 @@ protected:
   unsigned int numMeas;        // total expected
   unsigned int numTimepoints;  // so far
 
+  // hrf spec 
+  bool loadHrf;
+  string hrfFilename;
+
   // condition regressors
   unsigned int numConditions;
   vnl_matrix<double> conditions;
   vector<string> conditionNames;
   unsigned int conditionShift;  // shift all condition regressors
 
+  bool modelMotionParameters;
   bool modelTemporalDerivatives;
-
   bool modelEachBlock;
   unsigned int blockLen;
 
   // trend regressors
   unsigned int numTrends;
   vnl_matrix<double> trends;
+  unsigned int numNuisance;  // with motion and outliers
 
   // probability of false positive at which to threshold activations
   double probThreshold;
@@ -160,6 +169,7 @@ protected:
   // parameters for different mask sources
   double maskIntensityThreshold;
   string maskFilename;
+  bool alignMask;
   bool mosaicMask;
   bool flipLRMask;
   bool putMaskOnMessage;

@@ -42,7 +42,7 @@ int RtMean::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  if(numTimePoints == 0 || storemean.getSeriesNum() != img->getSeriesNum()) {
+  if(numTimePoints == 0 || storemean.getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "mean found first image\n"));
     storemean = (*img);
   }

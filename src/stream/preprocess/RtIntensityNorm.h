@@ -14,6 +14,8 @@
 #include"RtMaskImage.h"
 #include"RtDataImage.h"
 
+#include"RtFSLInterface.h"
+
 #include <float.h>
 #include "add_functions.h"
 
@@ -55,14 +57,15 @@ protected:
 
   // which voxels to normalize
   RtMaskImage mask;
+  string maskFilename;
   double maskIntensityThreshold;
 
   // methods for making the mask
 
-  // use bet
+  // use fsl BET for brain mask
   bool makeBETMask;  // default
   bool computingMask;
-  string maskScript;
+  FslJobID maskJobID;
   string betParms;
   
   // dont use bet

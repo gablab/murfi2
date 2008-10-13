@@ -14,6 +14,7 @@
 #include"RtExternalSenderImageInfo.h"
 #include"RtMRIImage.h"
 #include"RtServerSocket.h"
+#include"RtFSLInterface.h"
 
 // controls input operations to receive scanner images
 class RtInputScannerImages : public RtInput {
@@ -75,11 +76,19 @@ protected:
   //   acquisition number
   //  out
   //   absolute file string
-  string getImageFilename(int seriesNum, int acquisitionNum);
+  //string getImageFilename(int seriesNum, int acquisitionNum);
+
+  // build a filename for a transform file operating on a given image
+  // number
+  //  in
+  //   acquisition number
+  //  out
+  //   absolute file string
+  string getXfmFilename(int _seriesNum, int _acquisitionNum);
 
   // gets the next series number to be saved in the current image directory
   // inspects the series currently in the directory and makes a new one
-  unsigned int getNextSeriesNum();
+  //unsigned int getNextSeriesNum();
 
   // sends an image to a event handler
   //  in
@@ -114,10 +123,10 @@ protected:
   // parms for image saving to disk
   bool   saveImagesToFile;
   bool unmosaicInputImages;
-  string savePath;
-  string saveDir;
-  string saveFilestem;
-  string saveFileext;
+//  string savePath;
+//  string saveDir;
+//  string saveFilestem;
+//  string saveFileext;
 
   // scanner parms
   unsigned int matrixSize;
@@ -127,6 +136,10 @@ protected:
   
   // current series number
   unsigned int seriesNum;
+
+  // whether alignment to previous series should be performed
+  bool alignSeries;
+  string alignTarget;
 
   // vector to store received images 
   vector<RtMRIImage*> received;

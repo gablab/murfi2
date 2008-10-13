@@ -38,9 +38,13 @@ protected:
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
-  // roiIDs for the activation sums
-  string posroiID;
-  string negroiID;
+  // idss for the activation sums
+  string posActivationSumModuleID;
+  string negActivationSumModuleID;
+  string posActivationSumDataName;
+  string negActivationSumDataName;
+  string posRoiID;
+  string negRoiID;
 
   // flags or whether to monitor rois
   bool monitorPos;

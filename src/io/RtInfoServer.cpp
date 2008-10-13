@@ -37,22 +37,27 @@ RtInfoServer::~RtInfoServer() {
 // set some data
 // NOTE: at the moment this only takes activation sums and stores them for 
 // each tr in an xml document 
-void RtInfoServer::setData(RtData *data) {
-  //cout << data->getID() << endl;
-  if(data->getDataID().getModuleID() == ID_ACTIVATIONSUMDIFFERENCE) {
+void RtInfoServer::setData(RtData *data) {  
+
+  //cout << "EVENT TRIGGER SETDATA " << data->getDataID() << endl;
+  if(data->getDataID().getDataName() == NAME_ROIWEIGHTEDAVE) {
     database.push_back(data);
   }
-  else if(data->getDataID().getModuleID() == ID_EVENTTRIGGER) {
+  //else if(data->getDataID().getModuleID() == ID_EVENTTRIGGER) {
+
     // note about "good" and "bad" triggers: these are just to denote two
     // types of triggers, one based on activation in the direction you
     // expect, and the other opposite. neither is an error
     
-    if(data->getDataID().getDataName() == NAME_EVENTTRIGGER_BAD) { // bad trigger
-      lastBadTriggerTR = data->getDataID().getTimePoint();
-    }
-    else { // otherwise its good
-      lastGoodTriggerTR = data->getDataID().getTimePoint();
-    }
+  else if(data->getDataID().getDataName() == NAME_EVENTTRIGGER_BAD) { // bad trigger
+    lastBadTriggerTR = data->getDataID().getTimePoint();
+    
+    //cout << "!! FOUND BAD TRUGGER !!!!!!!!!!!!!!!!!" << endl;
+    
+  }
+  else if(data->getDataID().getDataName() == NAME_EVENTTRIGGER_GOOD) { // otherwise its good
+    lastGoodTriggerTR = data->getDataID().getTimePoint();
+    //cout << "!! FOUND BAD TRUGGER !!!!!!!!!!!!!!!!!" << endl;
   }
   else {
     cout << "infoserver: ignoring a " << data->getDataID() << endl;

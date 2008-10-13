@@ -6,6 +6,8 @@
  *****************************************************************************/
 
 #include"RtMaskImage.h"
+
+#include"RtDataIDs.h"
 #include"ace/Log_Msg.h"
 #include"constants.h"
 #include<fstream>
@@ -13,13 +15,14 @@
 using namespace std;
   
 // default constructor
-RtMaskImage::RtMaskImage() : RtDataImage<unsigned short>() {
+RtMaskImage::RtMaskImage() : RtDataImage<short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage()")); 
    
-  dataID.setModuleID("mask");
+  dataID.setModuleID(ID_MASK);
+  dataID.setDataName(NAME_MASK);
 
   magicNumber = MAGIC_NUMBER;
-  bytesPerPix = sizeof(unsigned short);
+  bytesPerPix = sizeof(short);
   numOnVoxels = 0;
 }
 
@@ -38,10 +41,10 @@ RtMaskImage::RtMaskImage(RtMaskImage &img) {
   magicNumber = MAGIC_NUMBER;
 
   // copy the data 
-  data = new unsigned short[numPix];
-  imgDataLen = numPix*sizeof(unsigned short);
+  data = new short[numPix];
+  imgDataLen = numPix*sizeof(short);
   memcpy(data, img.data, imgDataLen);
-  bytesPerPix = sizeof(unsigned short);
+  bytesPerPix = sizeof(short);
 
   numOnVoxels = 0;
 }
@@ -49,15 +52,16 @@ RtMaskImage::RtMaskImage(RtMaskImage &img) {
 
 // construct from an mri image
 RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold) 
-    : RtDataImage<unsigned short>() {
+    : RtDataImage<short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
 
   dataID.setHistory
     (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
-  dataID.setModuleID("mask");
+  dataID.setModuleID(ID_MASK);
+  dataID.setDataName(NAME_MASK);
 
   magicNumber = MAGIC_NUMBER;
-  bytesPerPix = sizeof(unsigned short);
+  bytesPerPix = sizeof(short);
 
   numOnVoxels = 0;
 
@@ -72,15 +76,16 @@ RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold)
 
 // construct from an activation image
 RtMaskImage::RtMaskImage(RtActivation &img, double threshold) 
-    : RtDataImage<unsigned short>() {
+    : RtDataImage<short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
 
   dataID.setHistory
     (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
-  dataID.setModuleID("mask");
+  dataID.setModuleID(ID_MASK);
+  dataID.setDataName(NAME_MASK);
 
   magicNumber = MAGIC_NUMBER;
-  bytesPerPix = sizeof(unsigned short);
+  bytesPerPix = sizeof(short);
 
   setInfo(img);
 
@@ -192,7 +197,7 @@ void RtMaskImage::computeNumberOfOnVoxels() {
 //  out
 //   success or failure
 bool RtMaskImage::read(const string &_filename) {
-  bool ret = RtDataImage<unsigned short>::read(_filename);
+  bool ret = RtDataImage<short>::read(_filename);
   computeNumberOfOnVoxels();
   return ret;
 }
@@ -201,7 +206,7 @@ bool RtMaskImage::read(const string &_filename) {
 // sets all voxels 
 // in:
 //  val: value to set all voxels to
-void RtMaskImage::setAll(unsigned short val) {
+void RtMaskImage::setAll(short val) {
   for(unsigned int i = 0; i < getNumEl(); i++) {
     setPixel(i,val);
   }
@@ -216,7 +221,7 @@ void RtMaskImage::setInfo(RtMRIImage &img) {
 
   imgDataLen = img.getImgDataLen();
   numPix = img.getNumPix();
-  bytesPerPix = sizeof(unsigned short);
+  bytesPerPix = sizeof(short);
 
   vxl2ras = img.getVxl2Ras();
   ras2ref = img.getRas2Ref();
@@ -225,7 +230,7 @@ void RtMaskImage::setInfo(RtMRIImage &img) {
     delete [] data;
   }
 
-  data = new unsigned short[numPix];
+  data = new short[numPix];
 }
 
 // set the info based on a generic data image info
@@ -237,7 +242,7 @@ void RtMaskImage::setInfo(RtActivation &img) {
 
   imgDataLen = img.getImgDataLen();
   numPix = img.getNumPix();
-  bytesPerPix = sizeof(unsigned short);
+  bytesPerPix = sizeof(short);
 
   vxl2ras = img.getVxl2Ras();
   ras2ref = img.getRas2Ref();
@@ -246,7 +251,7 @@ void RtMaskImage::setInfo(RtActivation &img) {
     delete [] data;
   }
 
-  data = new unsigned short[numPix];
+  data = new short[numPix];
 }
 
 /*****************************************************************************

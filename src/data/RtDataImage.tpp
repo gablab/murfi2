@@ -444,6 +444,19 @@ bool RtDataImage<T>::read(const string &_filename) {
   return suc;
 }
 
+// read the image header from a file
+//  in
+//   filename: string filename
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::readHeader(const string &_filename) {
+  ACE_TRACE(("RtDataImage<T>::read"));
+  bool suc = readNiftiHeader(_filename);
+
+  return suc;
+}
+
 // read the image from a raw file
 //  in
 //   filename: string filename
@@ -504,6 +517,48 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
 
   return true;
 }
+
+// read the header from a nifti1 image file
+// WARNING! sets header info but does not read the pixels, can create
+// a mismatch between data and info
+//  in
+//   filename: string filename
+//  out
+//   success or failure
+template<class T>
+bool RtDataImage<T>::readNiftiHeader(const string &_filename) {
+  ACE_TRACE(("RtDataImage<T>::readNiftiHeader"));
+
+  nifti_image *img = nifti_image_read(_filename.c_str(), 0);
+  if(img == NULL) {
+    cerr << "could not open " << _filename << " for reading a nifti image"
+	 << endl; 
+    return false;
+  }
+
+  // validate the datatype
+  if(img->nbyper != sizeof(T)) {
+    cerr << _filename << " has " << img->nbyper
+	 << " bytes/voxel but i was expecting " << sizeof(T)
+	 << endl;
+    return false;
+  }
+
+  // store filename if its not set
+  if(filename.empty()) {
+    filename = _filename;
+  }
+
+  lock(); {
+    // transform nifti header into our image info struct
+    setInfo(img);
+  } unlock(); 
+
+  nifti_image_free(img);
+
+  return true;
+}
+
 
 // read the image from a nifti1 file
 //  in
@@ -664,22 +719,22 @@ bool RtDataImage<T>::setInfo(nifti_image *hdr) {
   imgDataLen = numPix*hdr->nbyper;
 
   // vxl2ras
-  vxl2ras.put(0,0,hdr->qto_xyz.m[0][0]);
-  vxl2ras.put(0,1,hdr->qto_xyz.m[0][1]);
-  vxl2ras.put(0,2,hdr->qto_xyz.m[0][2]);
-  vxl2ras.put(0,3,hdr->qto_xyz.m[0][3]);
-  vxl2ras.put(1,0,hdr->qto_xyz.m[1][0]);
-  vxl2ras.put(1,1,hdr->qto_xyz.m[1][1]);
-  vxl2ras.put(1,2,hdr->qto_xyz.m[1][2]);
-  vxl2ras.put(1,3,hdr->qto_xyz.m[1][3]);
-  vxl2ras.put(2,0,hdr->qto_xyz.m[2][0]);
-  vxl2ras.put(2,1,hdr->qto_xyz.m[2][1]);
-  vxl2ras.put(2,2,hdr->qto_xyz.m[2][2]);
-  vxl2ras.put(2,3,hdr->qto_xyz.m[2][3]);
-  vxl2ras.put(3,0,hdr->qto_xyz.m[3][0]);
-  vxl2ras.put(3,1,hdr->qto_xyz.m[3][1]);
-  vxl2ras.put(3,2,hdr->qto_xyz.m[3][2]);
-  vxl2ras.put(3,3,hdr->qto_xyz.m[3][3]);
+  vxl2ras.put(0,0,hdr->sto_xyz.m[0][0]);
+  vxl2ras.put(0,1,hdr->sto_xyz.m[0][1]);
+  vxl2ras.put(0,2,hdr->sto_xyz.m[0][2]);
+  vxl2ras.put(0,3,hdr->sto_xyz.m[0][3]);
+  vxl2ras.put(1,0,hdr->sto_xyz.m[1][0]);
+  vxl2ras.put(1,1,hdr->sto_xyz.m[1][1]);
+  vxl2ras.put(1,2,hdr->sto_xyz.m[1][2]);
+  vxl2ras.put(1,3,hdr->sto_xyz.m[1][3]);
+  vxl2ras.put(2,0,hdr->sto_xyz.m[2][0]);
+  vxl2ras.put(2,1,hdr->sto_xyz.m[2][1]);
+  vxl2ras.put(2,2,hdr->sto_xyz.m[2][2]);
+  vxl2ras.put(2,3,hdr->sto_xyz.m[2][3]);
+  vxl2ras.put(3,0,hdr->sto_xyz.m[3][0]);
+  vxl2ras.put(3,1,hdr->sto_xyz.m[3][1]);
+  vxl2ras.put(3,2,hdr->sto_xyz.m[3][2]);
+  vxl2ras.put(3,3,hdr->sto_xyz.m[3][3]);
 
   minMaxSet = false;
   minVal = 0;

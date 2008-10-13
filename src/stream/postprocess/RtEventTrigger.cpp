@@ -6,6 +6,7 @@
  *****************************************************************************/
 
 #include"RtEventTrigger.h"
+#include"RtDataIDs.h"
 #include"RtActivation.h"
 
 #include"RtEvent.h"

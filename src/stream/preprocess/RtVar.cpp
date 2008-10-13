@@ -76,7 +76,7 @@ int RtVar::process(ACE_Message_Block *mb) {
   }
 
 
-  if(numTimePoints == 0 || mean->getSeriesNum() != img->getSeriesNum()) {
+  if(numTimePoints == 0 || mean->getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "var found first image\n"));
 
     varnum.setInfo(*img);

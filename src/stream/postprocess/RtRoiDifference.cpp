@@ -1,63 +1,63 @@
 /******************************************************************************
- * RtActivationSumDifference.cpp computes the difference between two
+ * RtRoiDifference.cpp computes the difference between two
  * activaton sums
  *
  * Oliver Hinds <ohinds@mit.edu> 2008-02-25
  *
  *****************************************************************************/
 
-#include"RtActivationSumDifference.h"
-#include"RtActivationSum.h"
+#include"RtRoiDifference.h"
+#include"RtRoi2Feedback.h"
 
-string RtActivationSumDifference::moduleString(ID_ACTIVATIONSUMDIFFERENCE);
+string RtRoiDifference::moduleString(ID_ROIDIFFERENCE);
 
 // default constructor
-RtActivationSumDifference::RtActivationSumDifference() : RtStreamComponent() {
+RtRoiDifference::RtRoiDifference() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = NAME_ACTIVATIONSUMDIFFERENCE;
+  dataName = NAME_ROIDIFFERENCE;
 
-  posActivationSumModuleID = ID_ACTIVATIONSUM;
-  negActivationSumModuleID = ID_ACTIVATIONSUM;
-  posActivationSumDataName = NAME_ACTIVATIONSUM;
-  negActivationSumDataName = NAME_ACTIVATIONSUM;
-  posRoiID = "active";
-  negRoiID = "deactive";
+  posRoiModuleID = ID_ROIMEAN2FEEDBACK;
+  negRoiModuleID = ID_ROIMEAN2FEEDBACK;
+  posRoiDataName = NAME_ROIMEAN;
+  negRoiDataName = NAME_ROIMEAN;
+  posRoiRoiID = "active";
+  negRoiRoiID = "deactive";
 }
 
 // destructor
-RtActivationSumDifference::~RtActivationSumDifference() {}
+RtRoiDifference::~RtRoiDifference() {}
 
 // process an option
 //  in 
 //   name of the option to process
 //   val  text of the option node
-bool RtActivationSumDifference::processOption(const string &name, 
+bool RtRoiDifference::processOption(const string &name, 
 					  const string &text,
 					  const map<string,string> &attrMap) {
 
   // look for options
-  if(name == "posActivationModuleID") {
-    posActivationSumModuleID = text;
+  if(name == "posRoiModuleID") {
+    posRoiModuleID = text;
     return true;
   }
-  else if(name == "negActivationModuleID") {
-    negActivationSumModuleID = text;
+  else if(name == "negRoiModuleID") {
+    negRoiModuleID = text;
     return true;
   }
-  else if(name == "posActivationDataName") {
-    posActivationSumDataName = text;
+  else if(name == "posRoiDataName") {
+    posRoiDataName = text;
     return true;
   }
-  else if(name == "negActivationDataName") {
-    negActivationSumDataName = text;
+  else if(name == "negRoiDataName") {
+    negRoiDataName = text;
     return true;
   }
-  else if(name == "posRoiID") {
-    posRoiID = text;
+  else if(name == "posRoiRoiID") {
+    posRoiRoiID = text;
     return true;
   }
-  else if(name == "negRoiID") {
-    negRoiID = text;
+  else if(name == "negRoiRoiID") {
+    negRoiRoiID = text;
     return true;
   }
 
@@ -65,8 +65,8 @@ bool RtActivationSumDifference::processOption(const string &name,
 }  
 
 // process a single acquisition
-int RtActivationSumDifference::process(ACE_Message_Block *mb) {
-  ACE_TRACE(("RtActivationSumDifference::process"));
+int RtRoiDifference::process(ACE_Message_Block *mb) {
+  ACE_TRACE(("RtRoiDifference::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
@@ -74,13 +74,13 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
 
   // find the data with the right data IDs
   RtActivation *posact 
-    = (RtActivation*) msg->getData(posActivationSumModuleID,
-				   posActivationSumDataName,
-				   posRoiID);
+    = (RtActivation*) msg->getData(posRoiModuleID,
+				   posRoiDataName,
+				   posRoiRoiID);
   RtActivation *negact 
-    = (RtActivation*) msg->getData(negActivationSumModuleID,
-				   negActivationSumDataName,
-				   negRoiID);
+    = (RtActivation*) msg->getData(negRoiModuleID,
+				   negRoiDataName,
+				   negRoiRoiID);
 
   double p = 0;
   if(posact != NULL) {
@@ -94,7 +94,7 @@ int RtActivationSumDifference::process(ACE_Message_Block *mb) {
 
  //  if(posact == NULL || negact == NULL) {
 //     cout << "activation-sum-difference: couldn't find required rois" << endl;
-//     ACE_DEBUG((LM_INFO, "RtActivationSumDifference::process: pos or neg activation passed is NULL\n"));
+//     ACE_DEBUG((LM_INFO, "RtRoiDifference::process: pos or neg activation passed is NULL\n"));
 //     return 0;
 //   }
   

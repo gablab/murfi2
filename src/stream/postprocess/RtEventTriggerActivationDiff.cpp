@@ -123,7 +123,7 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
        << diffThresh 
        << endl;
 
-  // check for good trigger
+  // check for goodrigger
   if(posact->getPixel(0) - negact->getPixel(0) >= diffThresh) {
     // trigger
     RtEvent *event = new RtEvent();
@@ -166,7 +166,7 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
 
     // log the trigger
     stringstream logs("");
-    logs << "trigger event bad: " 
+    logs << "trigger event bad at tr " << tr << ": " 
 	 << posact->getPixel(0) - negact->getPixel(0) << " <= " 
 	 << -diffThresh << endl;
     log(logs);

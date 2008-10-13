@@ -207,7 +207,7 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 
 	}
 	  
-	cout << trStart << " trend=" << trEnd << " database size=" << database.size() << endl; 
+	//cout << trStart << " trend=" << trEnd << " database size=" << database.size() << endl; 
 
 	// check range (fix this when database is better)
 	if(trStart < 1 || trEnd > database.size()) {

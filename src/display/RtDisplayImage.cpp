@@ -178,7 +178,7 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   posMaskOn = false;
   negMaskOn = false;
 
-  imageDisplayType = ID_SCANNERIMG;
+  imageDisplayType = ID_MOSAIC;
 
   posOverlayID = DEFAULT_POSOVERLAYID;
   posOverlayRoiID = DEFAULT_POSOVERLAYROIID;
@@ -240,6 +240,7 @@ bool RtDisplayImage::open(RtConfig &config) {
 
   if(config.isSet("display:displayType")) {
     imageDisplayType = config.get("display:displayType").str();
+    cout << "set image display type to " << imageDisplayType << endl;
   }
 
   if(config.isSet("display:initialPosMask")) {
@@ -437,7 +438,7 @@ void RtDisplayImage::setData(RtData *data) {
   static Gnuplot gp = Gnuplot("lines");
   static unsigned int numTimepoints = 0;
 
-  if(DEBUG_LEVEL & TEMP) {
+  if(DEBUG_LEVEL & BASIC) {
     cout << "got data: " << data->getDataID() << endl;
   }
 
@@ -449,9 +450,11 @@ void RtDisplayImage::setData(RtData *data) {
 //       << " " << numTimepoints << endl;
     // plot the sum
     postc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
+
     gp.reset_plot();
     gp.plot_x(postc,posActivationSumRoiID.c_str());
     numTimepoints++;
+
     return;
   }
 
@@ -462,7 +465,7 @@ void RtDisplayImage::setData(RtData *data) {
        << endl;
     // plot the sum
     negtc.put(numTimepoints,((RtActivation*)data)->getPixel(0));
-    gp.reset_plot();
+    //gp.reset_plot();
     gp.plot_x(negtc,negActivationSumRoiID.c_str());
     //numTimepoints++;
     return;
@@ -586,6 +589,8 @@ void RtDisplayImage::makeTexture() {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  cout << "making image texture" << endl;
 
   // unmosaic if needed
   short *imageData;

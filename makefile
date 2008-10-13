@@ -91,6 +91,8 @@ SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)
 
 # library flags
 
+PKG_DIR = /sw/packages
+
 # math
 
 MATH_LIB = -lm 
@@ -113,17 +115,18 @@ TINYXML_FLAGS=-DTIXML_USE_STL
 
 GLUT_LIB=-lglut
 
-VXL_INCS=-I/usr/local/include/vxl/core -I/usr/local/include/vxl/vcl
-VXL_LIBS=-lvnl -lvcl -lvnl_algo
+VXL_INCS=-I$(PKG_DIR)/vxl/include/vxl/core -I$(PKG_DIR)/vxl/include/vxl/vcl
+VXL_LIBS=-lvnl -lvcl -lvnl_algo -lv3p_netlib -L$(PKG_DIR)/vxl/lib
 
-GNUPLOT_LIBS=-lgnuplot_i_vxl -L/usr/local/lib
+GNUPLOT_INCS=-I$(PKG_DIR)/gnuplot_i_vxl/include
+GNUPLOT_LIBS=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
 
 NIFTI_INCS=-I/usr/include/nifti
 NIFTI_LIBS=-lniftiio -lznz -lz
 
 # build compiler flags
 
-export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(TINYXML_FLAGS) $(VXL_INCS) $(NIFTI_INCS)
+export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(TINYXML_FLAGS) $(VXL_INCS) $(GNUPLOT_INCS) $(NIFTI_INCS)
 
 export C_FLAGS = -Wall \
 	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \

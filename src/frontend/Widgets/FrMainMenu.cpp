@@ -68,6 +68,7 @@ void FrMainMenu::SetupActions(){
     // Edit
     m_menuEdit->addAction(m_actManager->GetSaveToTabAction());
 	m_menuEdit->addAction(m_actManager->GetAddLayerAction());
+	m_menuEdit->addAction(m_actManager->GetRemoveLayerAction());
 	m_menuEdit->addSeparator();
     m_menuEdit->addAction(m_actManager->GetChangeThresholdAction());
     m_menuEdit->addAction(m_actManager->GetChangeColormapAction());

@@ -160,3 +160,21 @@ void FrTabSettingsDocObj::AddLayer(LayerSettings ls){
 	LayeredImageSettings* lis = &m_LayeredImageSettings;
 	lis->push_back(ls);
 }
+
+void FrTabSettingsDocObj::RemoveLayer(LayerSettings ls){
+	// TODO: not finished
+	LayeredImageSettings* lis = &m_LayeredImageSettings;
+
+	std::vector<LayerSettings>::iterator Iter;
+   
+	for (Iter = m_LayeredImageSettings.begin(); Iter != m_LayeredImageSettings.end(); Iter++){
+		LayerSettings layer = (LayerSettings)(*Iter);
+		if (layer.id == ls.id){		// should be implemented support for multiple deletion? not only active layer deletion?
+			lis->erase(Iter);
+			//delete layer;
+			return;					// because we can't store two layers with the same ids 	
+		}
+	}
+	
+	// update layers ids
+}

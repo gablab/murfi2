@@ -35,6 +35,7 @@ void FrActionSignalManager::Initialize(){
     //Edit 
     CONNECT_ACTION_TRIGGERED(am->GetSaveToTabAction(), OnSaveToTabAction());
 	CONNECT_ACTION_TRIGGERED(am->GetAddLayerAction(), OnAddLayerAction());
+	CONNECT_ACTION_TRIGGERED(am->GetRemoveLayerAction(), OnRemoveLayerAction());
     CONNECT_ACTION_TRIGGERED(am->GetChangeThresholdAction(), OnChangeThresholdAction());
     CONNECT_ACTION_TRIGGERED(am->GetChangeColormapAction(), OnChangeColormapAction());
     
@@ -104,9 +105,10 @@ void FrActionSignalManager::OnSaveToTabAction(){
 
 void FrActionSignalManager::OnAddLayerAction(){
 	m_mainWindow->GetMainController()->AddLayer();
-	// test
-//	FrAddLayerDialog dlg(m_mainWindow, true);
-//	dlg.SimpleExec();
+}
+
+void FrActionSignalManager::OnRemoveLayerAction(){
+	m_mainWindow->GetMainController()->RemoveLayer();
 }
 
 void FrActionSignalManager::OnChangeThresholdAction(){

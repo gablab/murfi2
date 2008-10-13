@@ -72,7 +72,23 @@ void FrLayeredImage::AddLayer(LayerSettings ls){
 }
 
 void FrLayeredImage::RemoveLayer(){
-	// TODO: implement..
+	// TODO: not finished
+	if (m_Layers.size() == 1)		// only default layer
+		return;
+
+	std::vector<FrLayer*>::iterator Iter;
+   
+	for (Iter = m_Layers.begin(); Iter != m_Layers.end(); Iter++){
+		FrLayer* layer = (FrLayer*)(*Iter);
+		if (layer->GetId() == m_ActiveLayer){		// should be implemented support for multiple deletion? not only active layer deletion?
+			m_Layers.erase(Iter);
+			delete layer;
+			m_ActiveLayer--;		// TODO: get new active layer position
+			return;					// because we can't store two layers with the same ids 	
+		}
+	}
+
+	// Update layers position after deletion
 }
 
 void FrLayeredImage::SetInput(vtkImageData *input){

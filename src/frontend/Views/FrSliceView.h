@@ -44,6 +44,7 @@ public:
     
 	// test
 	void AddLayer(LayerSettings ls);
+	void RemoveLayer();					// RemoveActiveLayer?
 
 private:
     // Pipeline

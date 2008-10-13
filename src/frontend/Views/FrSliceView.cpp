@@ -212,3 +212,7 @@ void FrSliceView::UpdatePipeline(int point){
 void FrSliceView::AddLayer(LayerSettings ls){
 	m_LayeredImage->AddLayer(ls);
 }
+
+void FrSliceView::RemoveLayer(){
+	m_LayeredImage->RemoveLayer();
+}

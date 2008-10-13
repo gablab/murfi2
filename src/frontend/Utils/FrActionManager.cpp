@@ -29,7 +29,9 @@ void FrActionManager::Initialize(QObject* parent){
     m_SaveToTabAction->setObjectName(QString::fromUtf8("m_SaveToTabAction"));
     m_AddLayerAction = new QAction(parent);
     m_AddLayerAction->setObjectName(QString::fromUtf8("m_AddLayerAction"));
-    m_ChangeThresholdAction = new QAction(parent);
+    m_RemoveLayerAction = new QAction(parent);
+    m_RemoveLayerAction->setObjectName(QString::fromUtf8("m_RemoveLayerAction"));
+	m_ChangeThresholdAction = new QAction(parent);
     m_ChangeThresholdAction->setObjectName(QString::fromUtf8("m_ChangeThresholdAction"));
     m_ChangeColormapAction = new QAction(parent);
     m_ChangeColormapAction->setObjectName(QString::fromUtf8("m_ChangeColormapAction"));
@@ -78,6 +80,8 @@ void FrActionManager::Retranslate(){
     m_SaveToTabAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save To Tab"));
     m_AddLayerAction->setText(DO_TRANSLATE(TR_CONTEXT, "Add Layer"));
     m_AddLayerAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Add Layer"));
+    m_RemoveLayerAction->setText(DO_TRANSLATE(TR_CONTEXT, "Remove Layer"));
+    m_RemoveLayerAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Remove Layer"));
     m_ChangeThresholdAction->setText(DO_TRANSLATE(TR_CONTEXT, "Change Threshold"));
     m_ChangeThresholdAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Change Threshold"));
     m_ChangeColormapAction->setText(DO_TRANSLATE(TR_CONTEXT, "Change Colormap/Opacity"));

@@ -13,7 +13,10 @@ FrBaseLayer::FrBaseLayer(vtkRenderWindow *renWindow){
 }
 
 FrBaseLayer::~FrBaseLayer(){
-    if(m_Renderer) m_Renderer->Delete();
+	if(m_Renderer){
+		m_RenderWindow->RemoveRenderer(m_Renderer);	
+		m_Renderer->Delete();
+	}
 }
 
 void FrBaseLayer::Initialize(){
@@ -21,3 +24,4 @@ void FrBaseLayer::Initialize(){
 
 void FrBaseLayer::Update(){
 }
+

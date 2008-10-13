@@ -24,6 +24,7 @@ public slots:
     //Edit 
     void OnSaveToTabAction();
 	void OnAddLayerAction();
+	void OnRemoveLayerAction();
     void OnChangeThresholdAction();
     void OnChangeColormapAction();
     //View

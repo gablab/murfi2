@@ -26,7 +26,8 @@ public:
 	~FrLayer();
 	
 	void Initialize();
-	
+	void Delete();
+
 	void SetInput(vtkImageData* input);
 	void SetCamera(CameraSettings& camSettings);
 
@@ -42,6 +43,7 @@ public:
 	FrPropMacro(int, Threshold);
 	FrPropMacro(int, Brightness);
 	FrPropMacro(int, Contrast);
+	FrPropMacro(int, Id);			// unique id of layer
 
 private:
 

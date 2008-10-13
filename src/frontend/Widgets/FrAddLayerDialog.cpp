@@ -223,6 +223,7 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 	groupBox->setVisible(true);
 	groupBox2->setVisible(false);
 	cmType = 1;		// multi colormap
+	color = QColor(0, 0, 255, 255);
 }
 
 //void FrAddLayerDialog::SetCaption(QString& caption){

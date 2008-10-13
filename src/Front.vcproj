@@ -991,6 +991,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrRemoveLayerCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrRemoveLayerCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrResetImageCmd.cpp"
 				>
 			</File>

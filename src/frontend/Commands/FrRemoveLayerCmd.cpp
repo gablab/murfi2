@@ -1,7 +1,7 @@
 #include "FrAddLayerCmd.h"
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
-#include "FrAddLayerDialog.h"
+#include "FrRemoveLayerCmd.h"
 #include "FrTabSettingsDocObj.h"
 
 #include "FrBaseView.h"
@@ -12,30 +12,28 @@
 #include "FrSliceExtractor.h"
 
 
-FrAddLayerCmd::FrAddLayerCmd(){
+FrRemoveLayerCmd::FrRemoveLayerCmd(){
 }
 
-bool FrAddLayerCmd::Execute(){
-    // Check for safety
+bool FrRemoveLayerCmd::Execute(){
+	// TODO: not finished
+	// Check for safety
     if(!this->GetMainController()) return false;
 
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrMainWindow* mv = this->GetMainController()->GetMainView();
 
-	FrAddLayerDialog dlg(mv, true);
-	if(!dlg.SimpleExec())
-		return false;
-	
     FrTabSettingsDocObj* sets = doc->GetCurrentTabSettings();
-	LayerSettings layerParams = dlg.GetLayerParams();
+	//LayerSettings layerParams = dlg.GetLayerParams();
+	// getactivelayer();
 
 	// we should update layer settings in all tabs
-	sets->AddLayer(layerParams);	// test
-	doc->SyncronyzeLayers(layerParams, 1);
+//	sets->RemoveLayer(layerParams);	// test
+//	doc->SyncronyzeLayers(layerParams, 2);
 
-	mv->GetSliceView()->AddLayer(layerParams);	// check in each view variable to update pipeline? test
-	//mv->GetMosaicView()->AddLayer(layerParams);
-	//mv->GetOrthoView()->AddLayer(layerParams);
+	mv->GetSliceView()->RemoveLayer();				// test
+	////mv->GetMosaicView()->AddLayer(layerParams);
+	////mv->GetOrthoView()->AddLayer(layerParams);
 		
 	mv->GetCurrentView()->UpdatePipeline(FRP_LAYER);	// FRP_LAYER?
 
@@ -45,14 +43,14 @@ bool FrAddLayerCmd::Execute(){
 
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now
-bool FrAddLayerCmd::CanUndo(){
+bool FrRemoveLayerCmd::CanUndo(){
     return false;
 }
 
-bool FrAddLayerCmd::Undo(){
+bool FrRemoveLayerCmd::Undo(){
     return false;
 }
 
-bool FrAddLayerCmd::Redo(){
+bool FrRemoveLayerCmd::Redo(){
     return false;
 }

@@ -141,8 +141,14 @@ void FrMainController::ChangeView(int view){
 }
 
 void FrMainController::AddLayer(){
-	// TODO: implement
     FrAddLayerCmd* cmd = FrCommandController::CreateCmd<FrAddLayerCmd>();
+    cmd->Execute();
+    delete cmd;
+}
+
+void FrMainController::RemoveLayer(){
+	// remove active layer? 
+	FrRemoveLayerCmd* cmd = FrCommandController::CreateCmd<FrRemoveLayerCmd>();
     cmd->Execute();
     delete cmd;
 }

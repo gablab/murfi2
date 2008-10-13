@@ -14,7 +14,7 @@ public:
 
     void GetAllImages(std::vector<FrDocumentObj*>& images);
     FrTabSettingsDocObj* GetCurrentTabSettings();
-	void SyncronyzeLayers(LayerSettings& ls);
+	void SyncronyzeLayers(LayerSettings& ls, int mode);
 
 public:
     // Properties

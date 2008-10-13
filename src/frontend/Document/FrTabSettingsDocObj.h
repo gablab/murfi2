@@ -31,6 +31,7 @@ typedef struct _layerSettings{
 	unsigned char ColormapType;		// 0, 1, 2
 	unsigned char Threshold;		// 0..255
 	QColor color;
+	int id;			// new
 } LayerSettings;
 
 typedef std::vector<LayerSettings> LayeredImageSettings;
@@ -86,6 +87,7 @@ public:
 
 	LayeredImageSettings GetLayeredImageSettings(){return m_LayeredImageSettings;};
 	void AddLayer(LayerSettings ls);
+	void RemoveLayer(LayerSettings ls);		
 
 private:
 	LayeredImageSettings m_LayeredImageSettings;	// list of settings for all layers in tab

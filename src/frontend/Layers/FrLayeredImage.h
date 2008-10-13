@@ -23,7 +23,7 @@ public:
 	void Initialize();
 
 	void AddLayer(LayerSettings ls);
-	void RemoveLayer();
+	void RemoveLayer();					// RemoveActiveLayer?
 
 	void SetInput(vtkImageData* input);
 	void SetCamera(CameraSettings& camSettings);

@@ -14,6 +14,7 @@ class FrMainController;
 class FrToolBar;
 class FrMainMenu;
 class FrBookmarkWidget;
+class FrLayerListWidget;
 class QVTKWidget;
 class FrActionManager;
 class FrMainWindowSignalManager;
@@ -43,6 +44,7 @@ public:
     // GUI elements
     FrGetPropMacro(QVTKWidget*, QVTKWidget);
     FrGetPropMacro(FrBookmarkWidget*, BookmarkWidget);
+	FrGetPropMacro(FrLayerListWidget*, LayerListWidget);
 
     // Some others
 private: friend class FrActionSignalManager;
@@ -63,6 +65,7 @@ private:
     FrMainMenu* m_mainMenu;
     FrToolBar*  m_toolBar;
     QStatusBar* m_statusBar;
+
 };
 
 #endif

@@ -265,6 +265,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrLayerListWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrMainMenu_moc.cpp"
 				>
 			</File>
@@ -739,12 +743,30 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrLayerListWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrLayerListWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1056,14 +1078,6 @@
 		<Filter
 			Name="Layers"
 			>
-			<File
-				RelativePath=".\frontend\Layers\FrBaseLayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Layers\FrBaseLayer.h"
-				>
-			</File>
 			<File
 				RelativePath=".\frontend\Layers\FrMyLayer.cpp"
 				>

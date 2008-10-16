@@ -19,7 +19,8 @@ public:
 
     // Methods
     void Retranslate();
-    
+	QMenu* GetMenuView(){return m_menuView;};
+
 private:
     void Initialize();
     void SetupActions();

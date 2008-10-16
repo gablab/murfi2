@@ -5,6 +5,7 @@
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
 #include "FrBookmarkWidget.h"
+#include "FrLayerListWidget.h"
 #include "QVTKWidget.h"
 #include "FrToolBar.h"
 #include "FrMainMenu.h"
@@ -18,6 +19,7 @@
 #include "Qt/QTabWidget.h"
 #include "Qt/QTextEdit.h"
 #include "QtGui/QStatusBar.h"
+#include "Qt/QDockWidget.h"
 
 
 FrMainWindow::FrMainWindow()
@@ -45,9 +47,9 @@ void FrMainWindow::SetupUi(QMainWindow* mainWindow){
         mainWindow->setObjectName(QString::fromUtf8("MainWindow"));
 
     // Central widget
-    m_centralWidget = new QWidget(mainWindow);
-    m_centralWidget->setObjectName(QString::fromUtf8("m_centralWidget"));
-    mainWindow->setCentralWidget(m_centralWidget);
+//    m_centralWidget = new QWidget(mainWindow);
+//    m_centralWidget->setObjectName(QString::fromUtf8("m_centralWidget"));
+//    mainWindow->setCentralWidget(m_centralWidget);
 
     // Action manager
     m_ActionManager = new FrActionManager(mainWindow);
@@ -86,16 +88,17 @@ void FrMainWindow::RetranslateUi(QMainWindow* mainWindow){
 
 void FrMainWindow::InitializeWidgets(){
     
-    QWidget* centralWidget = this->centralWidget();
+//    QWidget* centralWidget = this->centralWidget();
     
-    QWidget* topPane = new QWidget(centralWidget);
+//	QDockWidget *dock = new QDockWidget(tr("3D View"), this);
+//	dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    QWidget* topPane = new QWidget(this);
     topPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    QWidget* btmPane = new QWidget(centralWidget);
-    btmPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     
     // Create 3D view and logical views 
     m_QVTKWidget = new QVTKWidget(topPane);
-    m_QVTKWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);    
+	m_QVTKWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);    
     m_SliceView  = new FrSliceView(this);
     m_MosaicView = new FrMosaicView(this);
     m_OrthoView  = new FrOrthoView(this);
@@ -109,27 +112,60 @@ void FrMainWindow::InitializeWidgets(){
 	viewLayout->setSpacing(0);
     viewLayout->addWidget(m_QVTKWidget);
     viewLayout->addWidget(m_BookmarkWidget);
-    
-    QTabWidget* viewInfoControl = new QTabWidget(topPane);
-    viewInfoControl->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+
+    topPane->setLayout(viewLayout);
+	this->setCentralWidget(topPane);		// test
+
+//	dock->setWidget(topPane);
+//	addDockWidget(Qt::LeftDockWidgetArea, dock);
+	m_mainMenu->GetMenuView()->addSeparator();
+//	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+
+	QDockWidget* dock = new QDockWidget(tr("Info Tab"), this);
+	dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea | Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+	QTabWidget* viewInfoControl = new QTabWidget(dock);
+    viewInfoControl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     viewInfoControl->addTab(new QWidget(viewInfoControl), QString("Info1"));
     viewInfoControl->addTab(new QWidget(viewInfoControl), QString("Info2"));
 
-    QHBoxLayout* vcLayout = new QHBoxLayout();
-    vcLayout->addLayout(viewLayout);
-    vcLayout->addWidget(viewInfoControl);
-    topPane->setLayout(vcLayout);
+	dock->setWidget(viewInfoControl);
+	addDockWidget(Qt::RightDockWidgetArea, dock);
+	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+		
+//    QHBoxLayout* vcLayout = new QHBoxLayout();
+//    vcLayout->addLayout(viewLayout);
+//    vcLayout->addWidget(viewInfoControl);
+
+
+	dock = new QDockWidget(tr("Graph View"), this);
+//	dock->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+	
+    QWidget* btmPane = new QWidget(dock);
+    btmPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QHBoxLayout* graphLayout = new QHBoxLayout();
     graphLayout->addWidget(new QGroupBox(QString("Graph View"), btmPane));
     btmPane->setLayout(graphLayout);
 
-    // Setup layout to  central widget
-    QVBoxLayout* vLayout = new  QVBoxLayout();
-    vLayout->addWidget(topPane);
-    vLayout->addWidget(btmPane);
+	dock->setWidget(btmPane);
+	addDockWidget(Qt::BottomDockWidgetArea, dock);
+	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
 
-    centralWidget->setLayout(vLayout);
+	dock = new QDockWidget(tr("Layer List"), this);
+
+	m_LayerListWidget = new FrLayerListWidget(dock);
+
+	dock->setWidget(m_LayerListWidget);
+	addDockWidget(Qt::BottomDockWidgetArea, dock);
+	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+
+    // Setup layout to  central widget
+    //QVBoxLayout* vLayout = new  QVBoxLayout();
+    //vLayout->addWidget(topPane);
+    //vLayout->addWidget(btmPane);
+
+    //centralWidget->setLayout(vLayout);
 }
 
 void FrMainWindow::Initialize(){

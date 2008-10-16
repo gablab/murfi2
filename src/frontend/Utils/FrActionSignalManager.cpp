@@ -3,7 +3,7 @@
 #include "FrMainWindow.h"
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
-#include "FrAddlayerDialog.h"	// test
+//#include "FrAddlayerDialog.h"	// test
 
 // Qt
 #include "Qt/QString.h"

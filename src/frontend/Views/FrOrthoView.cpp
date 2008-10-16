@@ -4,11 +4,11 @@
 #include "FrDocumentReader.h"
 #include "FrDocument.h"
 #include "FrMainDocument.h"
-#include "FrTBCFilter.h"
 #include "FrNotify.h"
-#include "Fr2DSliceActor.h"
+#include "FrUtils.h"
 #include "FrSliceExtractor.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrMyLayeredImage.h"
 
 // VTK stuff
 #include "vtkCamera.h"
@@ -22,7 +22,7 @@
 #include "vtkTextProperty.h"
 
 
-FrSliceExtractor::Orientation g_Orientation[RENDERER_COUNT-1];
+FrSliceExtractor::Orientation g_Orientation[ORTHO_IMAGE_COUNT];
 
 // Default constructor
 FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
@@ -31,299 +31,252 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
     m_docReader = FrDocumentReader::New();
 
     // Init orientations
-    g_Orientation[CORONAL_RENDERER] = FrSliceExtractor::YZ;
-    g_Orientation[SAGITAL_RENDERER] = FrSliceExtractor::XZ;
-    g_Orientation[AXIAL_RENDERER]   = FrSliceExtractor::XY;
+    g_Orientation[CORONAL_IMAGE] = FrSliceExtractor::XZ;
+    g_Orientation[SAGITAL_IMAGE] = FrSliceExtractor::YZ;
+    g_Orientation[AXIAL_IMAGE]   = FrSliceExtractor::XY;
 
     // create renderers
-	for(int i = 0; i < RENDERER_COUNT; i++){
-        m_renderer[i] = vtkRenderer::New();
-//		m_actor[i] = Fr2DSliceActor::New();
-		m_actor[i] = vtkImageActor::New();
-		m_tactor[i] = vtkTextActor::New();
+	for(int i = 0; i < ORTHO_IMAGE_COUNT; i++){
 		m_SliceExtractor[i] = FrSliceExtractor::New();
-		m_tbcFilter[i] = FrTBCFilter::New();	
+        m_LayeredImage[i] = FrMyLayeredImage::New();
     }
+    m_dummyRenderer = vtkRenderer::New();
+    m_dummyRenderer->SetBackground(0.0, 0.0, 0.0);
+    m_dummyRenderer->GetActiveCamera()->ParallelProjectionOn();
 }
 
 FrOrthoView::~FrOrthoView(){
     if(m_docReader) m_docReader->Delete();
 
-    for(int i = 0; i < RENDERER_COUNT; i++){
-        if(m_renderer[i]) m_renderer[i]->Delete();
-		if(m_actor[i]) m_actor[i]->Delete();
-		if(m_tactor[i]) m_tactor[i]->Delete();
-		if(m_SliceExtractor[i]) m_SliceExtractor[i]->Delete();
-		if(m_tbcFilter[i]) m_tbcFilter[i]->Delete();	
-    }    
+    for(int i = 0; i < ORTHO_IMAGE_COUNT; i++){
+        if(m_SliceExtractor[i]) m_SliceExtractor[i]->Delete();
+        if(m_LayeredImage[i]) m_LayeredImage[i]->Delete();
+    } 
+
+    if(m_dummyRenderer) m_dummyRenderer->Delete();
 }
 
-void FrOrthoView::Initialize()
-{
-    // create renderers
-	for(int i = 0; i < RENDERER_COUNT; i++){        
-        m_renderer[i]->GetActiveCamera()->ParallelProjectionOn();
-        m_renderer[i]->SetBackground( 0.0, 0.0, 0.0 );
-    }
-
+void FrOrthoView::Initialize(){
+    // Some initialization
     SetupRenderers();
 }
 
 void FrOrthoView::SetupRenderers(){
     
     RemoveRenderers();
-	GetRenderWindow()->Render();
-    
-    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[CORONAL_RENDERER]);
-    m_renderer[CORONAL_RENDERER]->SetViewport(0.0, 0.5, 0.5, 1.0);
-    
-    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[SAGITAL_RENDERER]);
-	m_renderer[SAGITAL_RENDERER]->SetViewport(0.5, 0.5, 1.0, 1.0);
-    
-    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[AXIAL_RENDERER]);
-	m_renderer[AXIAL_RENDERER]->SetViewport(0.0, 0.0, 0.5, 0.5);
 
-    QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer[DUMMY_RENDERER]);
-	m_renderer[DUMMY_RENDERER]->SetViewport(0.5, 0.0, 1.0, 0.5);
+    int layersNum = 0;
+    std::vector<vtkRenderer*> renderers;
+	vtkRenderWindow* renWin = QTVIEW3D->GetRenderWindow();
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        renderers.clear();
+        m_LayeredImage[i]->GetRenderers(renderers);
+        layersNum = std::max(layersNum, int(renderers.size()));
+
+        // Add renderers and adjust viewport
+        std::vector<vtkRenderer*>::iterator it, itEnd(renderers.end());
+        for(it = renderers.begin(); it != itEnd; ++it){
+            renWin->AddRenderer( (*it) );
+            if(i == CORONAL_IMAGE){
+                (*it)->SetViewport(0.0, 0.5, 0.5, 1.0);
+            }
+            else if(i == SAGITAL_IMAGE){
+                (*it)->SetViewport(0.5, 0.5, 1.0, 1.0);
+            }
+            else if(i == AXIAL_IMAGE){
+                (*it)->SetViewport(0.0, 0.0, 0.5, 0.5);
+            }
+        }
+    }
+    // add dummy renderer
+    renWin->AddRenderer(m_dummyRenderer);
+    m_dummyRenderer->SetViewport(0.5, 0.0, 1.0, 0.5);
+
+    renWin->GetRenderers()->InitTraversal();
+    renWin->SetNumberOfLayers(layersNum);
 }
 
 void FrOrthoView::RemoveRenderers(){
-
     // Remove all renderers
-    for (int i = 0; i < RENDERER_COUNT; i++) {      
-        QTVIEW3D->GetRenderWindow()->GetRenderers()->RemoveItem(m_renderer[i]);
+    std::vector<vtkRenderer*> renderers;
+	vtkRenderWindow* renWin = QTVIEW3D->GetRenderWindow();
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        renderers.clear();
+        m_LayeredImage[i]->GetRenderers(renderers);
+
+        std::vector<vtkRenderer*>::iterator it, itEnd(renderers.end());
+        for(it = renderers.begin(); it != itEnd; ++it){
+            renWin->RemoveRenderer( (*it) );
+            (*it)->SetRenderWindow(0);
+        }
+        
     }
-    QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
+    // remove dummy renderer
+    renWin->RemoveRenderer(m_dummyRenderer);
+
+    renWin->GetRenderers()->InitTraversal();
+    renWin->SetNumberOfLayers(0);
 }
 
 void FrOrthoView::UpdatePipeline(int point){
+    // Setup some vars
+    int maxSliceNumber = 0;
 
-    // TODO: implement!!!
-    bool isCleared = false;
-    vtkCamera* cam = 0L;
+    // Get common settings
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
-    OViewSettings& viewSettings = document->GetCurrentTabSettings()->GetOrthoViewSettings();
-    	
-	int clickedRenderer = -1;
-	double* local;
-	double localx, localy, localz;
-	double* bounds;
-	double maxX, maxY;
-	int coor[3];
+    FrTabSettingsDocObj* tabSets = document->GetCurrentTabSettings();
+    FrOrthoViewSettings* viewSets = tabSets->GetOrthoViewSettings();
 
-	char text[50] = "";
-	char tmp[10];
+    // Get settings of layers
+    LayerCollection  cLayers, sLayers, aLayers;
+    LayerCollection* layers[3];
+    layers[CORONAL_IMAGE] = &cLayers;
+    layers[SAGITAL_IMAGE] = &sLayers;
+    layers[AXIAL_IMAGE] = &aLayers;
+    
+    FrLayerSettings* layer[3];
+    layer[CORONAL_IMAGE] = GetLayerAndInitLayers(cLayers, viewSets, CORONAL_IMAGE);
+    layer[SAGITAL_IMAGE] = GetLayerAndInitLayers(sLayers, viewSets, SAGITAL_IMAGE);
+    layer[AXIAL_IMAGE] = GetLayerAndInitLayers(aLayers, viewSets, AXIAL_IMAGE);
 
-    switch(point){
+    LayerCollection::iterator it, itEnd;
+                        	
+    // Update pipeline
+    switch(point)
+    {
     case FRP_FULL:
         {
-            // Clear scene
-            for(int i = 0; i < RENDERER_COUNT; i++){
-                m_renderer[i]->RemoveAllViewProps();
-                m_renderer[i]->ResetCamera();
-            }
-			GetRenderWindow()->Render();
-			
-            isCleared = true;
+            // NOTE: Do nothing here !!!
         }
     case FRP_READIMAGE:
         {
+            // read document and connect filters
             m_docReader->SetDocument(document);
             m_docReader->SetUnMosaicOn(true);
             m_docReader->Update();
-
-            const char* tactorText[RENDERER_COUNT-1];
-            tactorText[CORONAL_RENDERER] = "Coronal";
-            tactorText[SAGITAL_RENDERER] = "Sagital";
-            tactorText[AXIAL_RENDERER]   = "Axial";
-			for(int i = 0; i < RENDERER_COUNT-1; i++){
-				m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
-				m_SliceExtractor[i]->SetOrientation(g_Orientation[i]);
-
-				// set text actors                
-				m_tactor[i]->GetTextProperty()->SetColor(100, 100, 0);
-				m_tactor[i]->GetTextProperty()->SetBold(5);
-				m_tactor[i]->GetTextProperty()->SetFontSize(20);
-				m_tactor[i]->SetPosition(20, 20);
-                m_tactor[i]->SetInput(tactorText[i]);
-				m_renderer[i]->AddActor(m_tactor[i]);	
-			}
+			
+            // Setup slice extractor filter
+            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
+            }
         }
-    case FRP_SLICE:
+	case FRP_SLICE:
         {
-            int* sliceNumber[RENDERER_COUNT-1];
-            sliceNumber[CORONAL_RENDERER] = &viewSettings.CoronalSlice;
-            sliceNumber[SAGITAL_RENDERER] = &viewSettings.SagitalSlice;
-            sliceNumber[AXIAL_RENDERER]   = &viewSettings.AxialSlice;
+            // set slice to be rendered
+            m_SliceExtractor[CORONAL_IMAGE]->SetOrientation(g_Orientation[CORONAL_IMAGE]);
+            maxSliceNumber = m_SliceExtractor[CORONAL_IMAGE]->GetMaxSliceNumber();
+            viewSets->CoronalSlice = ClampValue(viewSets->CoronalSlice, 0, maxSliceNumber);
+            m_SliceExtractor[CORONAL_IMAGE]->SetSlice(viewSets->CoronalSlice);
+            
+            m_SliceExtractor[SAGITAL_IMAGE]->SetOrientation(g_Orientation[SAGITAL_IMAGE]);
+            maxSliceNumber = m_SliceExtractor[SAGITAL_IMAGE]->GetMaxSliceNumber();
+            viewSets->SagitalSlice = ClampValue(viewSets->SagitalSlice, 0, maxSliceNumber);
+            m_SliceExtractor[SAGITAL_IMAGE]->SetSlice(viewSets->SagitalSlice);
 
-            // Need this to allow working process
-            for(int i=0; i < RENDERER_COUNT-1; ++i){
-                // Setup slice                 
-                if(m_SliceExtractor[i]->GetInput() != 0L){
-                    m_SliceExtractor[i]->SetSlice( (*sliceNumber[i]) );
-                    m_SliceExtractor[i]->Update();
-				    m_tbcFilter[i]->SetInput(m_SliceExtractor[i]->GetOutput());
+            m_SliceExtractor[AXIAL_IMAGE]->SetOrientation(g_Orientation[AXIAL_IMAGE]);
+            maxSliceNumber = m_SliceExtractor[AXIAL_IMAGE]->GetMaxSliceNumber();
+            viewSets->AxialSlice = ClampValue(viewSets->AxialSlice, 0, maxSliceNumber);
+            m_SliceExtractor[AXIAL_IMAGE]->SetSlice(viewSets->AxialSlice);
+                    
+            // Connect output to layered image
+            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                if(m_SliceExtractor[i]->GetInput()){
+		            m_SliceExtractor[i]->Update();
+                    m_LayeredImage[i]->SetInput(m_SliceExtractor[i]->GetOutput());
                 }
             }
-		}   
-	case FRP_TBC:
+        }
+    case FRP_COLORMAP:
         {
-            for(int i = 0; i < RENDERER_COUNT-1; i++){
-				// Setup brightness contrast
-                m_tbcFilter[i]->SetThreshold(viewSettings.TbcSettings[i].Threshold);
-                m_tbcFilter[i]->SetBrightness(viewSettings.TbcSettings[i].Brightness);
-                m_tbcFilter[i]->SetContrast(viewSettings.TbcSettings[i].Contrast);
-                viewSettings.TbcSettings[i].Threshold = m_tbcFilter[i]->GetThreshold();
-                viewSettings.TbcSettings[i].Brightness = m_tbcFilter[i]->GetBrightness();
-                viewSettings.TbcSettings[i].Contrast = m_tbcFilter[i]->GetContrast();
-
-				if(m_tbcFilter[i]->GetInput()){                
-					m_tbcFilter[i]->Update();
-					//m_actor[i]->SetInput(m_docReader->GetOutput());
-					m_actor[i]->SetInput(m_tbcFilter[i]->GetOutput());
-
-                    // Add actors if they were removed
-                    if(isCleared){
-                        m_renderer[i]->AddActor(m_actor[i]);
-					}
-				}
+            // Update here colormap values
+            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                    it = layers[i]->begin();
+                    itEnd = layers[i]->end();
+                    for(; it != itEnd; ++it){
+                        m_LayeredImage[i]->SetColormapSettings(
+                            (*it)->ColormapSettings, (*it)->ID);
+                    }
+                }
+                else {
+                    m_LayeredImage[i]->SetColormapSettings(
+                        layer[i]->ColormapSettings, layer[i]->ID);
+                }
+                m_LayeredImage[i]->UpdateColormap();
             }
         }
-    case  FRP_SETCAM:
-        {   
-            for(int i=0; i < RENDERER_COUNT; ++i){
-                cam = m_renderer[i]->GetActiveCamera();
-                cam->ParallelProjectionOn();
-                cam->SetParallelScale(viewSettings.CamSettings[i].Scale);
-                cam->SetFocalPoint(viewSettings.CamSettings[i].FocalPoint);
-                cam->SetViewUp(viewSettings.CamSettings[i].ViewUp);
-                cam->SetPosition(viewSettings.CamSettings[i].Position);
+    case FRP_TBC:
+        {
+            // set TBC values
+            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                    it = layers[i]->begin();
+                    itEnd = layers[i]->end();
+                    for(; it != itEnd; ++it){
+                        m_LayeredImage[i]->SetTBCSettings(
+                            (*it)->TbcSettings, (*it)->ID);
+                    }
+                }
+                else {
+                    m_LayeredImage[i]->SetTBCSettings(
+                        layer[i]->TbcSettings, layer[i]->ID);
+                }
+                m_LayeredImage[i]->UpdateTBC();
+            }
+        }
+    case FRP_OPACITY_VISIBILITY:
+        {
+            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                    it = layers[i]->begin();
+                    itEnd = layers[i]->end();
+                    for(; it != itEnd; ++it){
+                        m_LayeredImage[i]->SetOpacity((*it)->Opacity, (*it)->ID);
+                        m_LayeredImage[i]->SetVisibility((*it)->Visibility, (*it)->ID);
+                    }
+                }
+                else {
+                    m_LayeredImage[i]->SetOpacity(layer[i]->Opacity, layer[i]->ID);
+                    m_LayeredImage[i]->SetVisibility(layer[i]->Visibility, layer[i]->ID);
+                }
+            }
+        }
+    case FRP_SETCAM:
+        {
+            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                m_LayeredImage[i]->SetCameraSettings(
+                    viewSets->CamSettings[i], ALL_LAYERS_ID);	
+                m_LayeredImage[i]->UpdateCamera();
             }
         }
     default:
         // do nothing
         break;
     }
-    GetRenderWindow()->Render();
+
+    // redraw scene
+	GetRenderWindow()->Render();
 }
 
-// Commented
-//// get absolute mouse position
-//x = document->GetXCoord();
-//y = document->GetYCoord();
-//
-//// search for renderer that was activated
-//for (int i = 0; i < RENDERER_COUNT-1; i++){
-//	if (m_renderer[i]->IsInViewport(x, y))
-//		clickedRenderer = i;
-//}
-//
-//// get local coordinates for found renderer
-//if (clickedRenderer != -1){
-//	local = GetLocalRendererPoint(m_renderer[clickedRenderer], x, y);
-//	localx = local[0];
-//	localy = local[1];
-//
-//	// output some slice info in 4th renderer
-//	//strcat(text, "X = ");
-//	//itoa(localx, tmp, 10);
-//	//strcat(text, tmp);
-//	//strcat(text, " , Y = ");
-//	//itoa(localy, tmp, 10);
-//	//strcat(text, tmp);
-//	//strcat(text, " , Z = ");
-//	//itoa(coor[2], tmp, 10);
-//	//strcat(text, tmp);
-//	//
-//	//m_tactor[3]->SetInput(text);
-//
-//	for(int i = 0; i < RENDERER_COUNT-1; ++i){
-//		if(i != clickedRenderer){
-//			switch(i){
-//				case CORONAL_RENDERER: 
-//					m_SliceExtractor[i]->SetSlice(GetCoronalSlice(clickedRenderer, localx, localy));
-//					break;
-//				case SAGITAL_RENDERER:
-//					m_SliceExtractor[i]->SetSlice(GetSagitalSlice(clickedRenderer, localx, localy));
-//					break;
-//				case AXIAL_RENDERER:
-//					m_SliceExtractor[i]->SetSlice(GetAxialSlice(clickedRenderer, localx, localy));
-//					break;
-//			}
-//		}
-//	}
-//}
 
-double* FrOrthoView::GetLocalRendererPoint(vtkRenderer *ren, int x, int y){
-	vtkCoordinate* coord = vtkCoordinate::New();
-	coord->SetCoordinateSystemToDisplay();
-	coord->SetValue(x, y, 0.0);
-	double* out = coord->GetComputedWorldValue(ren);
+FrLayerSettings* FrOrthoView::GetLayerAndInitLayers(
+                                           std::vector<FrLayerSettings*>& layers, 
+                                           FrOrthoViewSettings* viewSets, 
+                                           int rendererID){
+    
+    int layerID = viewSets->ActiveLayerID;
+    GetLayerSettings(viewSets, layers, rendererID);
+    LayerCollection::iterator it, itEnd(layers.end());    
 
-	coord->Delete();
-
-	return out;
-}
-
-//int FrOrthoView::GetCoronalSlice(int ren, int dx, int dy){
-//	double* bounds = m_actor[ren]->GetBounds();	
-//	int max, slice;			
-//
-//	switch(ren)
-//	{
-//		case AXIAL_RENDERER:
-//			max = bounds[3];
-//			slice = dy;
-//			break;
-//		case SAGITAL_RENDERER:
-//			max = bounds[1];
-//			slice = dx;
-//			break;
-//	}
-//
-//	if (slice > max)
-//		slice = max;
-//	if (slice < 0)
-//		slice = 0;
-//
-//	return slice;
-//}
-
-int FrOrthoView::GetSagitalSlice(int ren, int dx, int dy){
-	double* bounds = m_actor[ren]->GetBounds();	
-	int max, slice;			
-
-	switch(ren)
-	{
-		case AXIAL_RENDERER:
-			max = bounds[1];
-			slice = dx;
-			break;
-		case CORONAL_RENDERER:
-			max = bounds[1];
-			slice = dx;
-			break;
-	}
-
-	if (slice > max)
-		slice = max;
-	if (slice < 0)
-		slice = 0;
-
-	return slice;
-}
-
-int FrOrthoView::GetAxialSlice(int ren, int dx, int dy){
-	double* bounds = m_actor[ren]->GetBounds();	
-	int max, slice;			
-
-	max = bounds[3];
-	slice = dy;		
-
-	if (slice > max)
-		slice = max;
-	if (slice < 0)
-		slice = 0;
-
-	return slice;
+    // If not 'broadcast update' then get layer settings 
+    FrLayerSettings* layer = 0L;
+    if(layerID != ALL_LAYERS_ID){
+        for(it = layers.begin(); it != itEnd; ++it){
+            if((*it)->ID == layerID){
+                layer = (*it);
+                break;
+            }
+        }
+    }
+    return layer;
 }

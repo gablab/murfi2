@@ -7,15 +7,12 @@ class vtkImageActor;
 class QVTKWidget;
 class FrMainWindow;
 class FrDocumentReader;
-class FrTBCFilter;
-class Fr2DSliceActor;
-class FrLayeredImage;	// test
+class FrMyLayeredImage;
 
 #include "FrBaseView.h"
 
 // Mosaic view
-class FrMosaicView : public FrBaseView
-{ 
+class FrMosaicView : public FrBaseView { 
 public:
     FrMosaicView(FrMainWindow* mainWindow);
     virtual ~FrMosaicView();
@@ -26,24 +23,12 @@ public:
     virtual void RemoveRenderers();
 
     // Accessors
-    FrTBCFilter* GetTBCFilter() { return m_tbcFilter; }
-    vtkRenderer* GetRenderer(){ return m_renderer; }
-    //Fr2DSliceActor* GetActor(){ return m_actor; }
-	vtkImageActor* GetActor(){ return m_actor; }
+    FrMyLayeredImage* GetImage(){ return m_LayeredImage; }
 
 private:
     // Pipline 
     FrDocumentReader* m_docReader;
-    FrTBCFilter* m_tbcFilter;
-    vtkRenderer* m_renderer;
-
-    // Actors
-    //Fr2DSliceActor* m_actor;
-	vtkImageActor* m_actor;
-	
-	// test
-	FrLayeredImage* m_LayeredImage;
-
+	FrMyLayeredImage* m_LayeredImage;
 };
 
 #endif

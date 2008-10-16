@@ -80,13 +80,13 @@ void FrSliceExtractor::Update(){
 			break;
 
     case FrSliceExtractor::XZ:		// XZ
-			m_Reslicer->SetResliceAxesOrigin(m_Slice, 0, 0);
-			m_Reslicer->SetResliceAxesDirectionCosines(0,1,0, 0,0,1, 1,0,0);
+            m_Reslicer->SetResliceAxesOrigin(0, m_Slice, 0);
+            m_Reslicer->SetResliceAxesDirectionCosines(1,0,0, 0,0,1, 0,1,0);
 			break;
 
     case FrSliceExtractor::YZ:		// YZ
-			m_Reslicer->SetResliceAxesOrigin(0, m_Slice, 0);
-			m_Reslicer->SetResliceAxesDirectionCosines(1,0,0, 0,0,1, 0,-1,0);
+            m_Reslicer->SetResliceAxesOrigin(m_Slice, 0, 0);
+            m_Reslicer->SetResliceAxesDirectionCosines(0,1,0, 0,0,1, 1,0,0);
 			break;
 
 		default:

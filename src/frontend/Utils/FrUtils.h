@@ -1,6 +1,8 @@
 #ifndef FR_UTILS
 #define FR_UTILS
 
+#include "FrSettings.h"
+
 #define M_PI 3.1415926854
 
 // This function is used to ensure that
@@ -15,5 +17,9 @@ T ClampValue(T value, T min, T max){
 float Frange(float a, float minv, float maxv);
 int  Irange(int a, int minv, int maxv);
 
+// This functions helps to get layer settings
+void GetLayerSettings(FrSliceViewSettings*  sets, LayerCollection& layers);
+void GetLayerSettings(FrMosaicViewSettings* sets, LayerCollection& layers);
+void GetLayerSettings(FrOrthoViewSettings*  sets, LayerCollection& layers, int viewID);
 
 #endif

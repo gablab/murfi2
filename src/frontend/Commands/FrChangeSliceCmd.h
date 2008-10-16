@@ -26,9 +26,9 @@ public:
 
 private:
     bool ChangeOrthoViewSliceNums();
-    int GetCoronalSlice(int x, int y, int renNum);
-	int GetSagitalSlice(int x, int y, int renNum);
-	int GetAxialSlice(int x, int y, int renNum);
+    int GetCoronalSlice(int x, int y, int imgNum);
+	int GetSagitalSlice(int x, int y, int imgNum);
+	int GetAxialSlice(int x, int y, int imgNum);
 
 private:
     // Params for simple views 

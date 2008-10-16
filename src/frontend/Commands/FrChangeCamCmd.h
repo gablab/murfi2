@@ -1,7 +1,9 @@
 #ifndef FR_CHANGECAM_CMD
 #define FR_CHANGECAM_CMD
 
+// Fprward declarations
 class vtkRenderer;
+class FrCameraSettings;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
@@ -27,7 +29,7 @@ public:
     void SetScale(double value);
 
     // Property
-    FrSetPropMacro(vtkRenderer*, Renderer);
+    void SetMouseXY(int x, int y);
 
     //
     // Overrides
@@ -40,7 +42,7 @@ public:
 	virtual bool Redo();
 
 private:
-    void SetupCameraSettings(void* settings);
+    void SetupCameraSettings(FrCameraSettings& settings);
     bool SetupOrthoViewCamSettings();
 
 private:
@@ -55,6 +57,9 @@ private:
 
     bool m_isScale;
     double m_Scale;
+
+    int m_X, m_Y;
+    bool m_isXY;
 };
 
 #endif // FR_CHANGECAM_CMD

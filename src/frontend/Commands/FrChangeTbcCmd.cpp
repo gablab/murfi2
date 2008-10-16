@@ -2,8 +2,8 @@
 #include "FrMainDocument.h"
 #include "FrMainWindow.h"
 #include "FrBaseView.h"
-
 #include "FrTabSettingsDocObj.h"
+#include "FrUtils.h"
 
 FrChangeTbcCmd::FrChangeTbcCmd()
 : m_isThreshold(false), m_isBrightness(false), 
@@ -31,43 +31,74 @@ bool FrChangeTbcCmd::Execute(){
     
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrMainWindow* mv = this->GetMainController()->GetMainView(); 
-
+    
+    int layerID = BAD_LAYER_ID;
+    std::vector<FrLayerSettings*> layers;
     FrTabSettingsDocObj* sets = doc->GetCurrentTabSettings();
+    
     switch(sets->GetActiveView()){
-    case ActiveView::Slice:
-        SetupTbcSettings(&sets->GetSliceViewSettings().TbcSetting);
+    case FrTabSettingsDocObj::SliceView:
+    {
+        layerID = sets->GetSliceViewSettings()->ActiveLayerID;
+        GetLayerSettings(sets->GetSliceViewSettings(), layers);
+        ChangeTbcByLayerID(layers, layerID);
         break;
-    case ActiveView::Mosaic:
-        SetupTbcSettings(&sets->GetMosaicViewSettings().TbcSetting);
+    }
+    case FrTabSettingsDocObj::MosaicView:
+    {
+        layerID = sets->GetSliceViewSettings()->ActiveLayerID;
+        GetLayerSettings(sets->GetMosaicViewSettings(), layers);
+        ChangeTbcByLayerID(layers, layerID);
         break;
-    case ActiveView::Ortho:
-        // change for all views
-        SetupTbcSettings(&sets->GetOrthoViewSettings().TbcSettings[0]);
-        SetupTbcSettings(&sets->GetOrthoViewSettings().TbcSettings[1]);
-        SetupTbcSettings(&sets->GetOrthoViewSettings().TbcSettings[2]);
+    }
+    case FrTabSettingsDocObj::OrthoView:
+        // change for all 3 views
+        layerID = sets->GetSliceViewSettings()->ActiveLayerID;
+        for(int viewID=0; viewID < ORTHO_VIEW_NUM; ++viewID){
+            GetLayerSettings(sets->GetOrthoViewSettings(), layers, viewID);
+            ChangeTbcByLayerID(layers, layerID);
+        }
         break;
     default:
         return false;
     }
-    mv->GetCurrentView()->UpdatePipeline(FRP_TBC);
+    m_isThreshold = m_isBrightness = m_isContrast = false;
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_TBC);
     
     return true;
 }
 
-void FrChangeTbcCmd::SetupTbcSettings(void* settings){
-    // Assume that settings can only be camera settings
-    TBCSettings* tbcSettings = (TBCSettings*)settings;
+void FrChangeTbcCmd::ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, int ID){
+    // find layer by ID and change its settings
+    if(ID == ALL_LAYERS_ID){
+        // change settings for all layers
+        std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
+        for(it = layers.begin(); it != itEnd; ++it){
+            SetupTbcSettings((*it)->TbcSettings);
+        }
+    }
+    else if(ID != BAD_LAYER_ID){
+        // find laye by ID and change settings
+        std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
+        for(it = layers.begin(); it != itEnd; ++it){
+            if((*it)->ID == ID){
+                SetupTbcSettings((*it)->TbcSettings);
+                break;
+            }
+        }
+    }
+}
+
+void FrChangeTbcCmd::SetupTbcSettings(FrTBCSettings& settings){ 
+
     if(m_isThreshold)  {
-        tbcSettings->Threshold  += m_Threshold;
-        m_isThreshold = false;
+        settings.Threshold  += m_Threshold;
     }
     if(m_isBrightness) {
-        tbcSettings->Brightness += m_Brightness;
-        m_isBrightness = false;;
+        settings.Brightness += m_Brightness;
     }
     if(m_isContrast) {
-        tbcSettings->Contrast   += m_Contrast;
-        m_isContrast = false;
+        settings.Contrast += m_Contrast;
     }
 }
 

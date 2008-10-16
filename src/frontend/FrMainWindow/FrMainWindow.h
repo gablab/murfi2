@@ -32,7 +32,6 @@ public:
     FrPropMacro(FrMainDocument*,MainDocument);
     FrPropMacro(FrMainController*,MainController);
     
-
     void Initialize();
 
     // Properties

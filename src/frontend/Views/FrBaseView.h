@@ -10,8 +10,7 @@ class vtkRenderWindow;
 #define QTVIEW3D (this->GetQtView())
 
 // Base view for all other views
-class FrBaseView
-{ 
+class FrBaseView { 
 public:
     FrBaseView(FrMainWindow* mainWindow);
     virtual ~FrBaseView();

@@ -3,63 +3,22 @@
 
 // includes
 #include "FrDocumentObj.h"
+#include "FrSettings.h"
 #include "FrMacro.h"
 
 #include "Qt/QString.h"
 #include "Qt/QColor.h"
 #include <vector>
 
-// Type for threshold / brightness / contrast
-typedef struct _tbcSettings {
-    double Threshold;
-    double Brightness;
-    double Contrast;
-} TBCSettings;
-
-// Type for camera settings
-typedef struct _camSettings {
-    double Scale;
-    double ViewUp[3];
-    double Position[3];
-    double FocalPoint[3];
-} CameraSettings;
-
-// Type for layer settings
-typedef struct _layerSettings{
-	bool Visible;
-	unsigned char Opacity;			// 0..255
-	unsigned char ColormapType;		// 0, 1, 2
-	unsigned char Threshold;		// 0..255
-	QColor color;
-	int id;			// new
-} LayerSettings;
-
-typedef std::vector<LayerSettings> LayeredImageSettings;
-
-// Type for view settings.
-// Contains almost everything...
-typedef struct _viewSettings {
-    int SliceNumber;
-    TBCSettings TbcSetting;
-    CameraSettings CamSettings;
-} ViewSettings;
-
-#define ORTHO_VIEW_NUM 3
-typedef struct _orthoViewSettings {
-    int CoronalSlice;
-    int SagitalSlice;
-    int AxialSlice;
-    TBCSettings TbcSettings[ORTHO_VIEW_NUM];
-    CameraSettings CamSettings[ORTHO_VIEW_NUM];
-}OViewSettings;
-
-typedef struct _activeView {
-    enum View { Unknown = 0, Slice, Mosaic, Ortho };
-}ActiveView;
-
-// One have to provide valid type system
-// All object types have to be registered here.
+// This class represets settings of Tab
+// Every tab may have its own:
+// 1. ID, Name, Description
+// 2. Settigns for each view
+// 3. Set of layers (with own settings)
 class FrTabSettingsDocObj : public FrDocumentObj {
+public:
+    enum View { Undefined, SliceView, MosaicView, OrthoView };
+
 public:
     FrTabSettingsDocObj(bool isDefault = false);
     virtual ~FrTabSettingsDocObj();
@@ -79,19 +38,14 @@ public:
 
     FrPropMacro(bool,IsCurrent);
     FrGetPropMacro(bool,IsDefault)
-    FrPropMacro(ActiveView::View,ActiveView);
+    FrPropMacro(View, ActiveView);
 
-    FrGetRefPropMacro(ViewSettings,SliceViewSettings);
-    FrGetRefPropMacro(ViewSettings,MosaicViewSettings);
-    FrGetRefPropMacro(OViewSettings,OrthoViewSettings);
-
-	LayeredImageSettings GetLayeredImageSettings(){return m_LayeredImageSettings;};
-	void AddLayer(LayerSettings ls);
-	void RemoveLayer(LayerSettings ls);		
+    FrGetPropMacro(FrSliceViewSettings*,  SliceViewSettings);
+    FrGetPropMacro(FrMosaicViewSettings*, MosaicViewSettings);
+    FrGetPropMacro(FrOrthoViewSettings*,  OrthoViewSettings);
 
 private:
-	LayeredImageSettings m_LayeredImageSettings;	// list of settings for all layers in tab
-
+    void CopyLayersInfo(LayerCollection& dst, LayerCollection& src);
 };
 
 #endif

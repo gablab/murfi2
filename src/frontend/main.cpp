@@ -3,15 +3,17 @@
 #include "FrMainDocument.h"
 #include "FrMainController.h"
 
+#include "vtkMath.h"
+
 int main(int argc, char **argv){
 	FrApplication application(argc, argv);
-    
+
     // Create main view and document of app
 	FrMainWindow* mainWindow = new FrMainWindow();
     FrMainDocument* document = new FrMainDocument();
 
     // Create main controller.
-    // It take care about all the stuff.
+    // It takes care about all the stuff (i.e. init, manage and delete).
     FrMainController controller(mainWindow, document);
     controller.Initialize();
 

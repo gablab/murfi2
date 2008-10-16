@@ -1,6 +1,7 @@
 #include "FrMainDocument.h"
 #include "FrTBCFilter.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrTabSettingsDocObj.h"
 
 FrMainDocument::FrMainDocument() 
 : FrDocument(){
@@ -33,26 +34,4 @@ FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
         }
     }
     return result;
-}
-
-// add/remove layer to/from all tabs
-void FrMainDocument::SyncronyzeLayers(LayerSettings &ls, int mode){
-	// TODO: not finished, need to implement removal
-	std::vector<FrDocumentObj*>& objects = this->GetObjects();
-	std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
-
-	ls.Visible = true;		// test
-
-	for(it = objects.begin(); it != itEnd; ++it){
-		// Check for type 
-		if((*it)->GetType() != FrDocumentObj::TabSettings) continue;
-        
-		// returns first current
-		FrTabSettingsDocObj* ts = (FrTabSettingsDocObj*)(*it);
-		if(!ts->GetIsCurrent())
-			if (mode == 1)
-				ts->AddLayer(ls);
-			else if (mode == 2)
-				ts->RemoveLayer(ls);
-	}
 }

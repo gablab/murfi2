@@ -5,12 +5,19 @@
 class QDomDocument; 
 class QDomElement;
 class FrTabSettingsDocObj;
+class FrCameraSettings;
+class FrLayerSettings;
+class FrOrthoViewSettings;
+class FrMosaicViewSettings;
+class FrSliceViewSettings;
+class FrTBCSettings;
 
 // Some includes
 #include "FrMacro.h"
 #include "FrBaseCmd.h"
 
 #include "Qt/QString.h"
+#include <vector>
 
 // This command can save all tabs into file.
 class FrSaveTabsCmd : public FrBaseCmd {
@@ -31,11 +38,22 @@ public:
 
 private:
     bool SaveTabSettings(QDomElement& root, FrTabSettingsDocObj* tabs);
-    void SaveSliceViewSettings(QDomElement& parent,  void* svSets);
-    void SaveMosaicViewSettings(QDomElement& parent, void* mvSets);
-    void SaveOrthoViewSettings(QDomElement& parent,  void* ovSets);
-    void SaveCameraSettings(QDomElement& parent, void* camSets);
-    void SaveLayeredImgSettings(QDomElement& parent, void* liSets);
+    
+    void SaveSliceViewSettings(QDomElement& parent,  FrSliceViewSettings* svSets);
+    
+    void SaveMosaicViewSettings(QDomElement& parent, FrMosaicViewSettings* mvSets);
+    
+    void SaveOrthoViewSettings(QDomElement& parent,  FrOrthoViewSettings* ovSets);
+    
+    void SaveCameraSettings(QDomElement& parent, int id, FrCameraSettings* camSets);
+
+    void SaveLayeredImageSettings(QDomElement& parent, int id,
+                                  FrLayerSettings* mlSets, 
+                                  std::vector<FrLayerSettings*>& olSets);
+    
+    void SaveLayerSettings(QDomElement& parent, FrLayerSettings* liSets);
+    
+    void SaveTbcSettings(QDomElement& parent, FrTBCSettings* tbcSets);
 
 private:
     QDomDocument* m_Document;

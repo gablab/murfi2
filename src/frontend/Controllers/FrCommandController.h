@@ -24,8 +24,7 @@ class FrMainController;
 #include "FrResetImageCmd.h"
 #include "FrLoadTabsCmd.h"
 #include "FrSaveTabsCmd.h"
-#include "FrAddLayerCmd.h"
-#include "FrRemoveLayerCmd.h"
+#include "FrLayerCmd.h"
 
 // This class allow user to create 
 // and manage commands. Organised like singletone;

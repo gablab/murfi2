@@ -26,4 +26,12 @@
     public: \
         Type& Get##Name () { return m_##Name; }
 
+// This copies values from source array to destiny array
+#define COPY_ARR3(dst,src) dst[0]=src[0]; dst[1]=src[1]; dst[2]=src[2]
+//This inits values of array
+template<class T>
+void INIT_ARR3(T dst[], T a, T b, T c){
+    dst[0]=a; dst[1]=b; dst[2]=c;
+}
+
 #endif

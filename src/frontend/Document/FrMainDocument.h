@@ -1,30 +1,22 @@
 #ifndef FR_MAIN_DOCUMENT
 #define FR_MAIN_DOCUMENT
 
+// Forward declarations
+class FrDocumentObj;
 class FrTabSettingsDocObj;
 
-#include <vector>
+// Some includes
 #include "FrDocument.h"
-#include "FrTabSettingsDocObj.h"
+#include <vector>
 
 class FrMainDocument: public FrDocument {
 public:
     FrMainDocument();
     virtual ~FrMainDocument();
 
+    // Some helper methods
     void GetAllImages(std::vector<FrDocumentObj*>& images);
     FrTabSettingsDocObj* GetCurrentTabSettings();
-	void SyncronyzeLayers(LayerSettings& ls, int mode);
-
-public:
-    // Properties
-    FrPropMacro(double,Threshold);
-    FrPropMacro(double,Brightness);
-    FrPropMacro(double,Contrast);
-	FrPropMacro(int, Slice);
-	FrPropMacro(int, XCoord);
-	FrPropMacro(int, YCoord);
-
 };
 
 #endif

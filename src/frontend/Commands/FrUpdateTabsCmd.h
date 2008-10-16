@@ -32,6 +32,8 @@ public:
 private:
     bool SetupTab();
     bool UpdateView();
+
+    void SetupImageLayers();
 };
 
 #endif // FR_UPDTABS_CMD

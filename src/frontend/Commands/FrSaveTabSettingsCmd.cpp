@@ -38,7 +38,6 @@ bool FrSaveTabSettingsCmd::Execute(){
         docObj->SetName(dlg.GetName());
         docObj->SetDescription(dlg.GetDescription());
         // Use new instead
-        // InitDocObjFromView(docObj, mv);
         InitDocObjFromActive(docObj);
 
         // add to main document
@@ -61,82 +60,6 @@ void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* source = doc->GetCurrentTabSettings();
     docObj->InitFrom(source);
-}
-
-void FrSaveTabSettingsCmd::InitDocObjFromView(FrTabSettingsDocObj* docObj, 
-                                              FrMainWindow* mv){
-    // Setup common settings
-    SetActiveViewSettings(docObj, mv);
-
-    // Init slice view settings
-    FrSliceView* sliceView = mv->GetSliceView();
-    ViewSettings& svSettings = docObj->GetSliceViewSettings();
-    svSettings.SliceNumber = sliceView->GetSliceExtractor()->GetSlice();
-    InitCamSettings(&svSettings.CamSettings, 
-                    sliceView->GetRenderer()->GetActiveCamera());
-    InitTBCSettings(&svSettings.TbcSetting, 
-                    sliceView->GetTBCFilter());
-
-    // Init mosaic view settings
-    FrMosaicView* mosaicView = mv->GetMosaicView();
-    ViewSettings& mvSettings = docObj->GetMosaicViewSettings();
-    InitCamSettings(&mvSettings.CamSettings, 
-                    mosaicView->GetRenderer()->GetActiveCamera());
-    InitTBCSettings(&mvSettings.TbcSetting, 
-                    mosaicView->GetTBCFilter());
-
-    // Init ortho view settings
-    FrOrthoView* orthoView = mv->GetOrthoView();
-    OViewSettings& ovSettings = docObj->GetOrthoViewSettings();
-
-    ovSettings.CoronalSlice = orthoView->GetSliceExtractor(CORONAL_RENDERER)->GetSlice();
-    ovSettings.SagitalSlice = orthoView->GetSliceExtractor(SAGITAL_RENDERER)->GetSlice();
-    ovSettings.AxialSlice   = orthoView->GetSliceExtractor(AXIAL_RENDERER)->GetSlice();
-
-    for(int i=0; i < RENDERER_COUNT-1; ++i){
-        InitCamSettings(&ovSettings.CamSettings[i], 
-                        orthoView->GetRenderer(i)->GetActiveCamera());
-        InitTBCSettings(&ovSettings.TbcSettings[i], 
-                        orthoView->GetTBCFilter(i));
-    }
-}
-
-void FrSaveTabSettingsCmd::SetActiveViewSettings(FrTabSettingsDocObj* docObj, 
-                                                 FrMainWindow* mv){
-    ActiveView::View activeView = ActiveView::Unknown;
-    
-    FrBaseView* currentView = mv->GetCurrentView();
-    if(currentView == mv->GetSliceView()){
-        activeView = ActiveView::Slice; 
-    }
-    else if(currentView == mv->GetMosaicView()){
-        activeView = ActiveView::Mosaic;
-    }
-    else if(currentView == mv->GetOrthoView()){
-        activeView = ActiveView::Ortho;
-    }
-
-    docObj->SetActiveView(activeView);
-}
-
-void FrSaveTabSettingsCmd::InitCamSettings(void* settings, vtkCamera* cam){
-    //Assume that settings is of type CameraSettings
-    CameraSettings* camSettings = (CameraSettings*)settings;
-
-    cam->GetFocalPoint(camSettings->FocalPoint);
-    cam->GetPosition(camSettings->Position);
-    cam->GetViewUp(camSettings->ViewUp);
-
-    camSettings->Scale = cam->GetParallelScale();
-}
-
-void FrSaveTabSettingsCmd::InitTBCSettings(void* settings, FrTBCFilter* tbcFilter){
-    //Assume that settings is of type TBCSettings
-    TBCSettings* tbcSettings = (TBCSettings*)settings;
-
-    tbcSettings->Threshold  = tbcFilter->GetThreshold();
-    tbcSettings->Brightness = tbcFilter->GetBrightness();
-    tbcSettings->Contrast   = tbcFilter->GetContrast();
 }
 
 ///////////////////////////////////////////////////////////////

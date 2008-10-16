@@ -1,7 +1,5 @@
-// class to get bookmark info
-
-#ifndef FR_ADD_LAYER_DLG
-#define FR_ADD_LAYER_DLG
+#ifndef FR_LAYER_DLG
+#define FR_LAYER_DLG
 
 class QLabel;
 class QLineEdit;
@@ -20,20 +18,15 @@ class QSlider;
 #include "QtGui/QDialog.h"
 
 
-class FrAddLayerDialog: public QDialog
+class FrLayerDialog: public QDialog
 {
 	Q_OBJECT
 public:
-    FrAddLayerDialog(QWidget* parent = 0L, bool isModal = true);
+    FrLayerDialog(QWidget* parent = 0L, bool isModal = true);
 
     void SetCaption(QString& caption);
-
-//    QString GetName();
-//    void SetName(QString& value);
-
-//    QString GetDescription();
-//    void SetDescription(QString& value);
-	LayerSettings GetLayerParams();
+	void GetLayerParams(FrLayerSettings& layerSets);
+    void SetLayerParams(FrLayerSettings& layerSets);
 
     bool SimpleExec();
  
@@ -62,8 +55,8 @@ private:
     QPushButton* m_btnCancel;
 
 	// new
+    QColor color;
 	QWidget* colorWidget;
-	QColor color;
 	QComboBox* comboBox;
 
 	// spin boxes
@@ -72,7 +65,7 @@ private:
 	QSpinBox *PxMaxSpinBox;
 	QSpinBox *ThresholdSpinBox;
 
-	QCheckBox *checkBox;
+	QCheckBox *visibleCheckBox;
 
 	// sliders
     QSlider *OpacitySlider;
@@ -80,11 +73,10 @@ private:
     QSlider *PxMaxSlider;
     QSlider *ThresholdSlider;
 
-	int cmType;
-
 	QGroupBox* groupBox;
 	QGroupBox* groupBox2;
-    
+
+    enum FrColormapSettings::Type cmType;
 };
 
 #endif

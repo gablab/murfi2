@@ -138,9 +138,8 @@ void FrMainWindow::Initialize(){
 
     m_MosaicView->Initialize();
     m_MosaicView->RemoveRenderers();
-    
+
     m_SliceView->Initialize();
-    //m_SliceView->UpdatePipeline(0);
 
     // make it as current
     m_CurrentView = m_SliceView;

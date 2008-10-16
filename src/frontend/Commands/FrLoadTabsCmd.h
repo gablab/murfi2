@@ -11,6 +11,7 @@ class FrTabSettingsDocObj;
 #include "FrBaseCmd.h"
 
 #include "Qt/QString.h"
+#include <vector>
 
 // This command can save all tabs into file.
 class FrLoadTabsCmd : public FrBaseCmd {
@@ -30,15 +31,20 @@ public:
     FrSetPropMacro(QString, FileName);
 
 private:
-    bool LoadTabSettings(QDomElement& root, FrTabSettingsDocObj* tabs);
-    void LoadSliceViewSettings(QDomElement& parent,  void* svSets);
-    void LoadMosaicViewSettings(QDomElement& parent, void* mvSets);
-    void LoadOrthoViewSettings(QDomElement& parent,  void* ovSets);
-    void LoadCameraSettings(QDomElement& parent, void* camSets);
-    void LoadLayeredImgSettings(QDomElement& parent, void* liSets);
+    bool LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs);
+    bool LoadSliceViewSettings(QDomElement& elem,  void* svSets);
+    bool LoadMosaicViewSettings(QDomElement& elem, void* mvSets);
+    bool LoadOrthoViewSettings(QDomElement& elem,  void* ovSets);
+    bool LoadCameraSettings(QDomElement& elem,     void* camSets);
+    bool LoadLayeredImgSettings(QDomElement& elem, void* liSets);
+
+    // vec should point to double[3]
+    bool LoadAttrValuesXYZ(QDomElement& elem, double* vec);
 
 private:
     QDomDocument* m_Document;
+    typedef std::vector<FrTabSettingsDocObj*> TabSettingsVec;
+    TabSettingsVec m_tabSets;
 };
 
 #endif // FR_LOADTABS_CMD

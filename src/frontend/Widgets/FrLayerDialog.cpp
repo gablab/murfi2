@@ -1,4 +1,4 @@
-#include "FrAddLayerDialog.h"
+#include "FrLayerDialog.h"
 
 #include "Qt/QLayout.h"
 #include "Qt/QLabel.h"
@@ -16,8 +16,10 @@
 #include "Qt/QColorDialog.h"
 #include "Qt/QMessageBox.h"
 
+#define MULTICOLOR_ITEM_IDX 0 
+#define SINGLECOLOR_ITEM_IDX 1 
 
-FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
+FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 : QDialog(parent){    
     this->setModal(isModal);
     this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -78,8 +80,8 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 	hl2->addLayout(vl);
 	hl2->addLayout(vl2);
 
-	checkBox = new QCheckBox("Visible", this);
-    checkBox->setChecked(true);
+	visibleCheckBox = new QCheckBox("Visible", this);
+    visibleCheckBox->setChecked(true);
 	
 	// colormap group
 	QLabel *colormap;
@@ -186,7 +188,7 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 //	colorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	
 	QPalette palette;
-    QBrush brush(QColor(0, 0, 255, 255));
+    QBrush brush(QColor(DEF_CM_COLOR));
     brush.setStyle(Qt::SolidPattern);	
 	palette.setBrush(QPalette::Active, QPalette::Window, brush);
 	palette.setBrush(QPalette::Inactive, QPalette::Window, brush);
@@ -213,7 +215,7 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 	// main vertical layout
 	m_vLayout->addLayout(hl);
 	m_vLayout->addLayout(hl2);
-	m_vLayout->addWidget(checkBox);
+	m_vLayout->addWidget(visibleCheckBox);
 	m_vLayout->addLayout(hl3);
 	m_vLayout->addLayout(hmainc);
 	m_vLayout->addWidget(groupBox);
@@ -222,50 +224,76 @@ FrAddLayerDialog::FrAddLayerDialog(QWidget* parent, bool isModal)
 
 	groupBox->setVisible(true);
 	groupBox2->setVisible(false);
-	cmType = 1;		// multi colormap
-	color = QColor(0, 0, 255, 255);
+    cmType = FrColormapSettings::MultiColor;
+    color = QColor(DEF_CM_COLOR);
 }
 
-//void FrAddLayerDialog::SetCaption(QString& caption){
-//    this->setWindowTitle(caption);
-//}
-//
-//QString FrAddLayerDialog::GetName(){
-//    return m_txtName->text();
-//}
-//
-//void FrAddLayerDialog::SetName(QString& value){
-//    m_txtName->setText(value);
-//}
-//
-//QString FrAddLayerDialog::GetDescription(){
-//    return m_txtDescription->text();
-//}
-//
-//void FrAddLayerDialog::SetDescription(QString& value){
-//    m_txtDescription->setText(value);
-//}
-
-LayerSettings FrAddLayerDialog::GetLayerParams(){
-	// TODO: add pxmin pxmax 
-	LayerSettings ls;
-	ls.color = color;
-	ls.ColormapType = cmType;
-	ls.Opacity = OpacitySpinBox->value();
-	ls.Threshold = ThresholdSpinBox->value();
-	ls.Visible = checkBox->isChecked();
-	
-	return ls;
+void FrLayerDialog::SetCaption(QString& caption){
+    this->setWindowTitle(caption);
 }
 
-bool FrAddLayerDialog::SimpleExec(){
+void FrLayerDialog::GetLayerParams(FrLayerSettings& layerSets){
+    // Common props
+    layerSets.ID = BAD_LAYER_ID;
+    layerSets.Opacity = double(OpacitySpinBox->value()) / double(OpacitySpinBox->maximum());
+    layerSets.Visibility = visibleCheckBox->isChecked();
+
+    // TBC props
+    InitTbcDefault(&layerSets.TbcSettings);
+
+    // Colormap props
+    layerSets.ColormapSettings.MinValue = PxMinSpinBox->value();
+    layerSets.ColormapSettings.MaxValue = PxMaxSpinBox->value();
+    layerSets.ColormapSettings.Type = cmType;
+    layerSets.ColormapSettings.Threshold = ThresholdSpinBox->value();
+    layerSets.ColormapSettings.Color = color;
+}
+
+void FrLayerDialog::SetLayerParams(FrLayerSettings& layerSets){
+    // Common props
+    visibleCheckBox->setChecked(layerSets.Visibility);
+    int opacity = int(layerSets.Opacity * OpacitySpinBox->maximum());
+    OpacitySpinBox->setValue(opacity);
+        
+    // Colormap props
+    PxMinSpinBox->setValue(layerSets.ColormapSettings.MinValue);
+    PxMaxSpinBox->setValue(layerSets.ColormapSettings.MaxValue);
+    ThresholdSpinBox->setValue(layerSets.ColormapSettings.Threshold);
+
+    // Set color
+    color = layerSets.ColormapSettings.Color;
+    QPalette palette;
+    QBrush brush(color);
+    brush.setStyle(Qt::SolidPattern);	
+	palette.setBrush(QPalette::Active, QPalette::Window, brush);
+	palette.setBrush(QPalette::Inactive, QPalette::Window, brush);
+    palette.setBrush(QPalette::Disabled, QPalette::Window, brush);
+	colorWidget->setPalette(palette);
+    
+    // Set colormap settings
+    switch(layerSets.ColormapSettings.Type){
+        case FrColormapSettings::MultiColor:
+            comboBox->setCurrentIndex(MULTICOLOR_ITEM_IDX);
+            break;
+        case FrColormapSettings::SingleColor:
+            comboBox->setCurrentIndex(SINGLECOLOR_ITEM_IDX);
+            break;
+        default:
+            // Do nothing here
+            break;
+    }
+}
+
+bool FrLayerDialog::SimpleExec(){
     bool result = (this->exec() == QDialog::Accepted);
     return result;
 }
 
-void FrAddLayerDialog::onColorBtnClicked(){
-	//QMessageBox(QMessageBox::Icon::Information, "Test", "test");
-	color = QColorDialog::getColor(Qt::white, this);
+void FrLayerDialog::onColorBtnClicked(){
+	QColor newColor = QColorDialog::getColor(color, this);
+    if(newColor.isValid()){
+        color = newColor;
+    }
 
 	QPalette palette;
     QBrush brush(color);
@@ -277,49 +305,49 @@ void FrAddLayerDialog::onColorBtnClicked(){
 	colorWidget->setPalette(palette);
 }
 
-void FrAddLayerDialog::onComboBoxChange(int index){
+void FrLayerDialog::onComboBoxChange(int index){
 	switch(index){
-		case 0:		// multi colormap
-			cmType = 1;
-			groupBox->setVisible(true);
+		case MULTICOLOR_ITEM_IDX:
+            cmType = FrColormapSettings::MultiColor;
 			groupBox2->setVisible(false);
+            groupBox->setVisible(true);
 			break;
-		case 1:		// single colormap
-			cmType = 2;
+		case SINGLECOLOR_ITEM_IDX:
+            cmType = FrColormapSettings::SingleColor;
 			groupBox->setVisible(false);
 			groupBox2->setVisible(true);
 			break;
 	}
 }
 
-void FrAddLayerDialog::SetOpacitySliderPosition(int value){
+void FrLayerDialog::SetOpacitySliderPosition(int value){
 	OpacitySlider->setValue(value);
 }
 
-void FrAddLayerDialog::SetPxMinSliderPosition(int value){
+void FrLayerDialog::SetPxMinSliderPosition(int value){
 	PxMinSlider->setValue(value);
 }
 
-void FrAddLayerDialog::SetPxMaxSliderPosition(int value){
+void FrLayerDialog::SetPxMaxSliderPosition(int value){
 	PxMaxSlider->setValue(value);
 }
 
-void FrAddLayerDialog::SetThresholdSliderPosition(int value){
+void FrLayerDialog::SetThresholdSliderPosition(int value){
 	ThresholdSlider->setValue(value);
 }
 
-void FrAddLayerDialog::SetOpacitySpinBoxPosition(int value){
+void FrLayerDialog::SetOpacitySpinBoxPosition(int value){
 	OpacitySpinBox->setValue(value);
 }
 
-void FrAddLayerDialog::SetPxMinSpinBoxPosition(int value){
+void FrLayerDialog::SetPxMinSpinBoxPosition(int value){
 	PxMinSpinBox->setValue(value);
 }
 
-void FrAddLayerDialog::SetPxMaxSpinBoxPosition(int value){
+void FrLayerDialog::SetPxMaxSpinBoxPosition(int value){
 	PxMaxSpinBox->setValue(value);
 }
 
-void FrAddLayerDialog::SetThresholdSpinBoxPosition(int value){
+void FrLayerDialog::SetThresholdSpinBoxPosition(int value){
 	ThresholdSpinBox->setValue(value);
 }

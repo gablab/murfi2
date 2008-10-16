@@ -4,141 +4,163 @@
 #include "FrDocumentReader.h"
 #include "FrDocument.h"
 #include "FrMainDocument.h"
-#include "FrTBCFilter.h"
 #include "FrNotify.h"
-#include "Fr2DSliceActor.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrLayeredImage.h"
-#include "FrColormapFilter.h"
+#include "FrMyLayeredImage.h"
+#include "FrUtils.h"
 
-#include "vtkPNGReader.h"
-#include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
-#include "vtkImageActor.h"
 
 
 // Default constructor
 FrMosaicView::FrMosaicView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
-    m_docReader = FrDocumentReader::New();
-    //m_renderer = vtkRenderer::New();
-    //m_actor = Fr2DSliceActor::New();
-	//m_actor = vtkImageActor::New();
-    m_tbcFilter = FrTBCFilter::New();
-	
-	m_LayeredImage = new FrLayeredImage(GetRenderWindow());
+    m_docReader = FrDocumentReader::New();	
+    m_LayeredImage = FrMyLayeredImage::New();
 }
 
 FrMosaicView::~FrMosaicView(){
     if(m_docReader) m_docReader->Delete();
-//    if(m_renderer) m_renderer->Delete();
-//    if(m_actor) m_actor->Delete();
-    if(m_tbcFilter) m_tbcFilter->Delete();
+    if(m_LayeredImage) m_LayeredImage->Delete();
 }
 
-void FrMosaicView::Initialize()
-{
-    // create renderer
-//    m_renderer->GetActiveCamera()->ParallelProjectionOn();
-//    m_renderer->SetBackground( 0.0, 0.0, 0.0 );
-
-	m_LayeredImage->Initialize();		// test
-
+void FrMosaicView::Initialize(){
     SetupRenderers();    
 }
 
 void FrMosaicView::SetupRenderers(){
-    
-    RemoveRenderers();
-    
- //   QTVIEW3D->GetRenderWindow()->AddRenderer(m_renderer);
-	m_LayeredImage->SetupRenderers();
+    this->RemoveRenderers();
+
+    // Get all renderers
+    std::vector<vtkRenderer*> renderers;
+	m_LayeredImage->GetRenderers(renderers);
+
+    // Add them 
+    vtkRenderWindow* renWin = QTVIEW3D->GetRenderWindow();
+    std::vector<vtkRenderer*>::iterator it, itEnd(renderers.end());
+    for(it = renderers.begin(); it != itEnd; ++it){
+        renWin->AddRenderer( (*it) );
+    }
+
+    renWin->GetRenderers()->InitTraversal();
+    renWin->SetNumberOfLayers(renderers.size());
 }
 
 void FrMosaicView::RemoveRenderers(){
+    // Get all renderers
+    std::vector<vtkRenderer*> renderers;
+	m_LayeredImage->GetRenderers(renderers);
 
-    // Remove all renderers
-//    QTVIEW3D->GetRenderWindow()->GetRenderers()->RemoveItem(m_renderer);
-//    QTVIEW3D->GetRenderWindow()->GetRenderers()->InitTraversal();
-	m_LayeredImage->RemoveRenderers();
+    // Remove them
+    vtkRenderWindow* renWin = QTVIEW3D->GetRenderWindow();
+    std::vector<vtkRenderer*>::iterator it, itEnd(renderers.end());
+    for(it = renderers.begin(); it != itEnd; ++it){
+        renWin->RemoveRenderer( (*it) );
+        (*it)->SetRenderWindow(0);
+    }
+
+    renWin->GetRenderers()->InitTraversal();
+    renWin->SetNumberOfLayers(0);
 }
 
 void FrMosaicView::UpdatePipeline(int point){
-
-    bool isCleared = false;
-
-    vtkCamera* cam = 0L; 
+    // Get common settings
     FrMainDocument* document = GetMainWindow()->GetMainDocument();
-    ViewSettings& settings = document->GetCurrentTabSettings()->GetMosaicViewSettings();
-    TBCSettings& tbcSettings = settings.TbcSetting;
-    CameraSettings& camSettings = settings.CamSettings;
+    FrTabSettingsDocObj* tabSets = document->GetCurrentTabSettings();
+    FrMosaicViewSettings* viewSets = tabSets->GetMosaicViewSettings();
 
-    switch(point){
+    // Get settings of layers
+    int layerID = viewSets->ActiveLayerID;
+    FrLayerSettings* layer = 0L;
+    LayerCollection  layers;
+    GetLayerSettings(viewSets, layers);
+    LayerCollection::iterator it, itEnd(layers.end());    
+
+    // If not 'broadcast update' then get layer settings 
+    if(layerID != ALL_LAYERS_ID){
+        for(it = layers.begin(); it != itEnd; ++it){
+            if((*it)->ID == viewSets->ActiveLayerID){
+                layer = (*it);
+                break;
+            }
+        }
+    }
+                    	
+    // Update pipeline
+    switch(point)
+    {
     case FRP_FULL:
         {
-            // Clear scene
-            //m_renderer->RemoveAllViewProps();
-            //m_renderer->ResetCamera();
-            GetRenderWindow()->Render();
-
-            isCleared = true;
+            // NOTE: Do nothing here !!!
         }
     case FRP_READIMAGE:
         {
-            // read data from document
+            // read document and connect filters
             m_docReader->SetDocument(document);
             m_docReader->SetMosaicOn(true);
             m_docReader->Update();
-
-            m_tbcFilter->SetInput(m_docReader->GetOutput());
+			
+            m_LayeredImage->SetInput(m_docReader->GetOutput());
         }
-    case FRP_SLICE:
+	case FRP_SLICE:
         {
-            // NOTE: Do nothing here for a while
+            // NOTE: DO NOTHING HERE SINCE IT's MOSAIC VIEW
+        }
+    case FRP_COLORMAP:
+        {
+            // Update here colormap values
+            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                for(it=layers.begin(); it != itEnd; ++it){
+                    m_LayeredImage->SetColormapSettings(
+                        (*it)->ColormapSettings, (*it)->ID);
+                }
+            }
+            else {
+                m_LayeredImage->SetColormapSettings(
+                    layer->ColormapSettings, layer->ID);
+            }
+            m_LayeredImage->UpdateColormap();
         }
     case FRP_TBC:
         {
-            // Setup brightness contrast
-            m_tbcFilter->SetThreshold(tbcSettings.Threshold);
-            m_tbcFilter->SetBrightness(tbcSettings.Brightness);
-            m_tbcFilter->SetContrast(tbcSettings.Contrast);
-
-            // Keep data up-to-date
-            tbcSettings.Threshold  = m_tbcFilter->GetThreshold();
-            tbcSettings.Brightness = m_tbcFilter->GetBrightness();
-            tbcSettings.Contrast   = m_tbcFilter->GetContrast();
-
-            if(m_tbcFilter->GetInput()){                
-                m_tbcFilter->Update();
-                //m_actor->SetInput(m_tbcFilter->GetOutput());
-
-				m_LayeredImage->SetInput(m_tbcFilter->GetOutput());
-
-                // Add actor
-                if(isCleared) {
-                    //m_renderer->AddActor(m_actor);
+            // set TBC values
+            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                for(it=layers.begin(); it != itEnd; ++it){
+                    m_LayeredImage->SetTBCSettings(
+                        (*it)->TbcSettings, (*it)->ID);
                 }
+            }
+            else {
+                m_LayeredImage->SetTBCSettings(
+                    layer->TbcSettings, layer->ID);
+            }
+            m_LayeredImage->UpdateTBC();
+        }
+    case FRP_OPACITY_VISIBILITY:
+        {
+            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                for(it=layers.begin(); it != itEnd; ++it){
+                    m_LayeredImage->SetOpacity((*it)->Opacity, (*it)->ID);
+                    m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
+                }
+            }
+            else {
+                m_LayeredImage->SetOpacity(layer->Opacity, layer->ID);
+                m_LayeredImage->SetVisibility(layer->Visibility, layer->ID);
             }
         }
     case FRP_SETCAM:
         {
-            // Setup camera here 
-            //cam = m_renderer->GetActiveCamera();
-            //cam->ParallelProjectionOn();
-            //cam->SetParallelScale(camSettings.Scale);
-            //cam->SetFocalPoint(camSettings.FocalPoint);
-            //cam->SetViewUp(camSettings.ViewUp);
-
-            //cam->SetPosition(camSettings.Position);
-			m_LayeredImage->SetCamera(camSettings);	
+            m_LayeredImage->SetCameraSettings(viewSets->CamSettings, ALL_LAYERS_ID);	
+            m_LayeredImage->UpdateCamera();
         }
     default:
         // do nothing
         break;
-    }  
+    }
 
-    // render scene
-    GetRenderWindow()->Render();
+    // redraw scene
+	GetRenderWindow()->Render();
 }

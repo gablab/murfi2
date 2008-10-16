@@ -23,6 +23,9 @@ public:
 
     // Properties
     FrPropMacro(FrMainController*, MainController);
+
+protected:
+    void UpdatePipelineForID(int id, int point);
 };
 
 #endif // FR_BASE_CMD

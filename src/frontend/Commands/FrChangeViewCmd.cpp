@@ -19,8 +19,10 @@ bool FrChangeViewCmd::Execute(){
         m_TargetView == FrChangeViewCmd::Unknown) return false;
     
     bool result = false;
-    ActiveView::View viewType = (ActiveView::View)GetActiveViewType();
-    if(viewType != ActiveView::Unknown){
+    FrTabSettingsDocObj::View viewType = 
+        (FrTabSettingsDocObj::View)GetActiveViewType();
+
+    if(viewType != FrTabSettingsDocObj::Undefined){
         
         FrMainWindow* mv = this->GetMainController()->GetMainView();
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
@@ -32,7 +34,7 @@ bool FrChangeViewCmd::Execute(){
         mv->GetCurrentView()->RemoveRenderers();
         mv->SetCurrentView( GetTargetView(viewType) );
         mv->GetCurrentView()->SetupRenderers();
-        mv->GetCurrentView()->UpdatePipeline(FRP_FULL);
+        FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_FULL);
 
         // Update UI
         UpdateViewUI();
@@ -42,18 +44,18 @@ bool FrChangeViewCmd::Execute(){
 }
 
 int FrChangeViewCmd::GetActiveViewType(){
-    
-    ActiveView::View viewType = ActiveView::Unknown;
+    // preset
+    FrTabSettingsDocObj::View viewType = FrTabSettingsDocObj::Undefined;
         
     switch(m_TargetView){
         case FrChangeViewCmd::Slice:  
-            viewType = ActiveView::Slice;
+            viewType = FrTabSettingsDocObj::SliceView;
             break;
         case FrChangeViewCmd::Mosaic: 
-            viewType = ActiveView::Mosaic;
+            viewType = FrTabSettingsDocObj::MosaicView;
             break;
         case FrChangeViewCmd::Ortho:  
-            viewType = ActiveView::Ortho;
+            viewType = FrTabSettingsDocObj::OrthoView;
             break;
         case FrChangeViewCmd::Synchronize:
             {
@@ -72,19 +74,19 @@ int FrChangeViewCmd::GetActiveViewType(){
 
 FrBaseView* FrChangeViewCmd::GetTargetView(int view){
     // Presets
-    ActiveView::View viewType = (ActiveView::View)view;
+    FrTabSettingsDocObj::View viewType = (FrTabSettingsDocObj::View)view;
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrBaseView* targetView = 0L;
 
     // Determine wich view to return
     switch(viewType){
-        case ActiveView::Slice: 
+        case FrTabSettingsDocObj::SliceView: 
             targetView = (FrBaseView*)mv->GetSliceView();
             break;
-        case ActiveView::Mosaic: 
+        case FrTabSettingsDocObj::MosaicView: 
             targetView = (FrBaseView*)mv->GetMosaicView();
             break;
-        case ActiveView::Ortho:
+        case FrTabSettingsDocObj::OrthoView:
             targetView = (FrBaseView*)mv->GetOrthoView();
             break;
         default:
@@ -103,18 +105,19 @@ void FrChangeViewCmd::UpdateViewUI(){
     actions[2] = am->GetViewOrthoAction();
     
     QAction* action = 0L;
-    ActiveView::View viewType = (ActiveView::View)GetActiveViewType();
+    FrTabSettingsDocObj::View viewType = (FrTabSettingsDocObj::View)GetActiveViewType();
     switch(viewType){
-        case ActiveView::Slice: action = actions[0];
+        case FrTabSettingsDocObj::SliceView: action = actions[0];
             break;
-        case ActiveView::Mosaic: action = actions[1];
+        case FrTabSettingsDocObj::MosaicView: action = actions[1];
             break;
-        case ActiveView::Ortho:  action = actions[2];
+        case FrTabSettingsDocObj::OrthoView:  action = actions[2];
             break;
         default:
             break;
     }
 
+    // Do update UI
     if(action != 0L){
         for(int i=0; i < 3; ++i){
             actions[i]->blockSignals(true);
@@ -122,7 +125,6 @@ void FrChangeViewCmd::UpdateViewUI(){
             actions[i]->blockSignals(false);
         }
     }
-
 }
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now

@@ -6,7 +6,7 @@
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
-#include "Fr2DSliceActor.h"
+#include "FrMyLayeredImage.h"
 
 // VTK stuff
 #include "vtkCamera.h"
@@ -31,33 +31,31 @@ bool FrResetImageCmd::Execute(){
     FrResetImageCmd::View targetView = m_TargetView;
     if(targetView == FrResetImageCmd::Current){
         switch(tsDO->GetActiveView()){
-            case ActiveView::Slice: targetView = FrResetImageCmd::Slice;
+            case FrTabSettingsDocObj::SliceView: targetView = FrResetImageCmd::Slice;
                 break;
-            case ActiveView::Mosaic: targetView = FrResetImageCmd::Mosaic;
+            case FrTabSettingsDocObj::MosaicView: targetView = FrResetImageCmd::Mosaic;
                 break;
-            case ActiveView::Ortho: targetView = FrResetImageCmd::Ortho;
+            case FrTabSettingsDocObj::OrthoView: targetView = FrResetImageCmd::Ortho;
                 break;
         }
     }
 
     // Get actors and renderers
-//    std::vector<Fr2DSliceActor*> actors;
     std::vector<vtkImageActor*> actors;
-    
 	std::vector<vtkRenderer*> renderers;
     switch(targetView){
          case FrResetImageCmd::Slice:
-             actors.push_back(mv->GetSliceView()->GetActor());
-             renderers.push_back(mv->GetSliceView()->GetRenderer());
+             actors.push_back(mv->GetSliceView()->GetImage()->GetActor());
+             renderers.push_back(mv->GetSliceView()->GetImage()->GetRenderer());
              break;
          case FrResetImageCmd::Mosaic:
-             actors.push_back(mv->GetSliceView()->GetActor());
-             renderers.push_back(mv->GetSliceView()->GetRenderer());
+             actors.push_back(mv->GetMosaicView()->GetImage()->GetActor());
+             renderers.push_back(mv->GetMosaicView()->GetImage()->GetRenderer());
              break;
          case FrResetImageCmd::Ortho:
-             for(int i=0; i < RENDERER_COUNT-1; ++i){
-                actors.push_back(mv->GetOrthoView()->GetActor(i));
-                renderers.push_back(mv->GetOrthoView()->GetRenderer(i));
+             for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                actors.push_back(mv->GetOrthoView()->GetImage(i)->GetActor());
+                renderers.push_back(mv->GetOrthoView()->GetImage(i)->GetRenderer());
              }
              break;         
          default:
@@ -88,21 +86,14 @@ void FrResetImageCmd::ResetCamera(vtkImageActor* actor, vtkRenderer* renderer){	
     renderer->GetActiveCamera()->SetPosition(newPosition);
     renderer->Render();
 
-    //// Calc scale now
-    //double origin[3];
-    //actor->GetOrigin(origin);
-    //double actorWidth  = (imgCenter[0] - origin[0]) * 2;
-    //double actorHeight = (imgCenter[1] - origin[1]) * 2;
-    //double winWidth  = renderer->GetSize()[0];
-    //double winHeight = renderer->GetSize()[1];
+    // Calculate scale 
+    double bounds[6];
+    actor->GetBounds(bounds);    
+    double width = bounds[1] - bounds[0];
+    double height = bounds[3] - bounds[2];
     
-    double aspect[2];
-    renderer->ComputeAspect();
-    renderer->GetAspect(aspect);
-    
-    double sc = renderer->GetSize()[0] / aspect[0];
-    double scale = renderer->GetActiveCamera()->GetParallelScale();
-    renderer->GetActiveCamera()->SetParallelScale(scale);
+    int scale = std::max(int(bounds[1]), int(bounds[3])) / 2;
+    renderer->GetActiveCamera()->SetParallelScale(scale + 1);
 }
 
 ///////////////////////////////////////////////////////////////

@@ -61,7 +61,7 @@ void FrMainController::Initialize(){
         cmd->Execute();
         delete cmd;
     }
-
+    
     // Initialize Controller itself
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
     cmd->SetToolType(FrManageToolCmd::ManipulationTool);
@@ -141,16 +141,17 @@ void FrMainController::ChangeView(int view){
 }
 
 void FrMainController::AddLayer(){
-    FrAddLayerCmd* cmd = FrCommandController::CreateCmd<FrAddLayerCmd>();
+    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd->SetAction(FrLayerCmd::Add);
     cmd->Execute();
     delete cmd;
 }
 
 void FrMainController::RemoveLayer(){
-	// remove active layer? 
-	FrRemoveLayerCmd* cmd = FrCommandController::CreateCmd<FrRemoveLayerCmd>();
-    cmd->Execute();
-    delete cmd;
+	//// remove active layer? 
+	//FrRemoveLayerCmd* cmd = FrCommandController::CreateCmd<FrRemoveLayerCmd>();
+    //cmd->Execute();
+    //delete cmd;
 }
 
 void FrMainController::ChangeBookmark(int id){
@@ -204,13 +205,13 @@ void FrMainController::SetCurrentTool(int tool){
 }
 
 void FrMainController::Test(){    
-    /*FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
+    FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
     cmd->SetTargetView(FrResetImageCmd::Current);
     cmd->Execute();
-    delete cmd;*/
+    delete cmd;
 
-    FrSaveTabsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabsCmd>();
+    /*FrSaveTabsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabsCmd>();
     cmd->SetFileName(QString("test"));
     cmd->Execute();
-    delete cmd;
+    delete cmd;*/
 }

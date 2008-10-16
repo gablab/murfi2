@@ -1,7 +1,13 @@
 #ifndef FR_CHANGETBC_CMD
 #define FR_CHANGETBC_CMD
 
+// Forwward declarations
+class FrTBCSettings;
+class FrLayerSettings;
+
+// includes
 #include "FrBaseCmd.h"
+#include <vector>
 
 // This command changes settings of camera
 // of current view and then update view.
@@ -27,7 +33,8 @@ public:
 	virtual bool Redo();
 
 private:
-    void SetupTbcSettings(void* settings);
+    void ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, int ID);
+    void SetupTbcSettings(FrTBCSettings& settings);
 
 private:
     bool m_isThreshold;

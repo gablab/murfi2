@@ -4,16 +4,17 @@
 #include "FrBaseView.h"
 #include "FrOrthoView.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrMyLayeredImage.h"
 
 #include "vtkRenderer.h"
 
 // Defines
-#define UNDEF_RENDERER_INDEX -1
+#define INVALIDE_IMAGE_NUM -1
 
 
 FrChangeCamCmd::FrChangeCamCmd()
 : m_isPosition(false), m_isFocalPoint(false), 
-  m_isViewUp(false), m_isScale(false), m_Renderer(0) {
+  m_isViewUp(false), m_isScale(false), m_isXY(false) {
     
 }
 
@@ -64,93 +65,86 @@ void FrChangeCamCmd::SetScale(double value){
     m_isScale = true;
 }
 
+void FrChangeCamCmd::SetMouseXY(int x, int y){
+    m_X = x; m_Y = y;
+    m_isXY = true;
+}
+
 bool FrChangeCamCmd::Execute(){
     if(!this->GetMainController()) return false;
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-    // Suppose command is working well in comman case
+    // Suppose command is working well in common case
     // bad in case of unknown active view or if ortho view has some problems
     bool result = true;
     FrTabSettingsDocObj* sets = doc->GetCurrentTabSettings();
     switch(sets->GetActiveView()){
-    case ActiveView::Slice:
-        SetupCameraSettings(&sets->GetSliceViewSettings().CamSettings);
+    case FrTabSettingsDocObj::SliceView:
+        SetupCameraSettings(sets->GetSliceViewSettings()->CamSettings);
         break;
-    case ActiveView::Mosaic:
-        SetupCameraSettings(&sets->GetMosaicViewSettings().CamSettings);
+    case FrTabSettingsDocObj::MosaicView:
+        SetupCameraSettings(sets->GetMosaicViewSettings()->CamSettings);
         break;
-    case ActiveView::Ortho:
+    case FrTabSettingsDocObj::OrthoView:
         result = SetupOrthoViewCamSettings();
         break;
     default:
         result = false;
     }
+    m_isFocalPoint = m_isPosition = m_isViewUp = m_isScale = m_isXY = false;
     mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
     
     return result;
 }
 
-void FrChangeCamCmd::SetupCameraSettings(void* settings){
-    // Assume that settings can only be camera settings
-    CameraSettings* camSettings = (CameraSettings*)settings;
-    if(m_isFocalPoint){
-        camSettings->FocalPoint[0] = m_FocalPoint[0];
-        camSettings->FocalPoint[1] = m_FocalPoint[1];
-        camSettings->FocalPoint[2] = m_FocalPoint[2];
-        m_isFocalPoint = false;
-    }
-    
-    if(m_isPosition) {
-        camSettings->Position[0] = m_Position[0];
-        camSettings->Position[1] = m_Position[1];
-        camSettings->Position[2] = m_Position[2];
-        m_isPosition = false;
-    }
-
-    if(m_isViewUp){
-        camSettings->ViewUp[0] = m_ViewUp[0];
-        camSettings->ViewUp[1] = m_ViewUp[1];
-        camSettings->ViewUp[2] = m_ViewUp[2];
-        m_isViewUp = false;
-    }
-
-    if(m_isScale) {
-        camSettings->Scale = m_Scale;
-        m_isScale = false;
-    }
-}
-
 bool FrChangeCamCmd::SetupOrthoViewCamSettings(){
     
-    if(m_Renderer == 0L) return false;
+    if( !m_isXY ) return false;
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrOrthoView* orthoView = mv->GetOrthoView();
     
-    // Find working renderer, default is CORONAL
-    int rendererIndex = UNDEF_RENDERER_INDEX;
-    if(m_Renderer == orthoView->GetRenderer(CORONAL_RENDERER)){
-        rendererIndex = CORONAL_RENDERER;
-    }
-    else if(m_Renderer == orthoView->GetRenderer(SAGITAL_RENDERER)){
-        rendererIndex = SAGITAL_RENDERER;
-    }
-    else if(m_Renderer == orthoView->GetRenderer(AXIAL_RENDERER)){
-        rendererIndex = AXIAL_RENDERER;
+    // Find working renderer
+    // Find Image where click's occured
+    int imgIndex = INVALIDE_IMAGE_NUM;
+    for(int idx=0; idx < ORTHO_IMAGE_COUNT; ++idx){
+        if (orthoView->GetImage(idx)->GetRenderer()->IsInViewport(m_X, m_Y)){
+            imgIndex = idx; break;
+        }
     }
     
     bool result = false;
-    if(rendererIndex != UNDEF_RENDERER_INDEX){
+    if(imgIndex != INVALIDE_IMAGE_NUM){
         // Change info in document
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-        OViewSettings& settings = doc->GetCurrentTabSettings()->GetOrthoViewSettings();
-        SetupCameraSettings(&settings.CamSettings[rendererIndex]);
+        FrOrthoViewSettings* settings = doc->GetCurrentTabSettings()->GetOrthoViewSettings();
+        SetupCameraSettings(settings->CamSettings[imgIndex]);
         result = true;
     }
     return result;
 }
+
+void FrChangeCamCmd::SetupCameraSettings(FrCameraSettings& settings){
+    
+    if(m_isFocalPoint){
+        COPY_ARR3(settings.FocalPoint, m_FocalPoint);
+    }
+    
+    if(m_isPosition) {
+        COPY_ARR3(settings.Position, m_Position);
+    }
+
+    if(m_isViewUp){
+        COPY_ARR3(settings.ViewUp, m_ViewUp);
+    }
+
+    if(m_isScale) {
+        settings.Scale = m_Scale;
+    }
+}
+
 
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now

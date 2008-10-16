@@ -8,6 +8,8 @@
 
 class FrColormapFilter : public FrBaseFilter{
 public:
+    enum Type { SingleColor, MultiColor };
+public:
 	static FrColormapFilter* New();
 
 	virtual void SetInput(vtkImageData* data);
@@ -15,11 +17,19 @@ public:
     virtual void ExecuteInformation();
     virtual void SimpleExecute(vtkImageData* input, vtkImageData* output);
 
-	FrPropMacro(int, Threshold);
-	FrPropMacro(int, PxMin);
-	FrPropMacro(int, PxMax);
-	FrPropMacro(int, CMType);
-	FrPropMacro(QColor, Color);
+    // Properties
+	FrGetPropMacro(int, Threshold);
+    void SetThreshold(int value);
+	FrGetPropMacro(int, PxMin);
+    void SetPxMin(int value);
+	FrGetPropMacro(int, PxMax);
+    void SetPxMax(int value);
+	FrGetPropMacro(int, Type);
+    void SetType(int value);
+	FrGetPropMacro(QColor, Color);
+    void SetColor(QColor value);
+
+    FrGetPropMacro(bool, IsModified);
 
 private:
     // VTK style

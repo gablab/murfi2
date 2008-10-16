@@ -5,18 +5,26 @@
 // and attribute names for both reading and saving operation
 // this prevent from typos and makes writting of code easier
 
+// supported version
+#define FR_TAB_SET_VERSION 1.0
+
 // Names of elements
 #define FR_XML_DECLARATION "version=\"1.0\" encoding=\"UTF-8\""
-#define FR_XML_TABSETS_ELEM "tabSet"
+#define FR_XML_ROOT_ELEM "tabSet"
 #define FR_XML_TABSETTINGS_ELEM "tabSettings"
+#define FR_XML_SLICEVIEW_ELEM "sliceView"
+#define FR_XML_MOSAICVIEW_ELEM "mosaicView"
+#define FR_XML_ORTHOVIEW_ELEM "orthoView"
 #define FR_XML_SLICENUM_ELEM "sliceNumber"
+#define FR_XML_LAYERNUM_ELEM "activeLayer"
 #define FR_XML_CAMS_ELEM "cameras"
 #define FR_XML_CAM_ELEM "camera"
+#define FR_XML_LIS_ELEM "layeredImages"
+#define FR_XML_IMG_ELEM "image"
 #define FR_XML_SCALE_ELEM "scale"
 #define FR_XML_POS_ELEM "position"
 #define FR_XML_FOCUS_ELEM "focalPoint"
 #define FR_XML_VIEWUP_ELEM "viewUp"
-#define FR_XML_LIMAGE_ELEM "layeredImage"
 #define FR_XML_LAYER_ELEM "layer"
 #define FR_XML_PXRANGE_ELEM "pxRange"
 #define FR_XML_CMAP_ELEM "colorMap"
@@ -30,6 +38,7 @@
 #define FR_XML_NAME_ATTR "name"
 #define FR_XML_DESCRIPTION_ATTR "description"
 #define FR_XML_ACTIVEVIEW_ATTR "activeView"
+#define FR_XML_ID_ATTR "id"
 #define FR_XML_VALUE_ATTR "value"
 #define FR_XML_COUNT_ATTR "count"
 #define FR_XML_CORONAL_ATTR "coronalValue"

@@ -4,6 +4,10 @@
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrMyLayeredImage.h"
+#include "FrSliceView.h"
+#include "FrMosaicView.h"
+#include "FrOrthoView.h"
 
 #define BAD_TAB_ID -1
 
@@ -43,6 +47,9 @@ bool FrUpdateTabsCmd::SetupTab(){
         tsDO->SetIsCurrent( (tsDO->GetID() == m_TabID) );
     }
 
+    // Setup layers to images
+    SetupImageLayers();
+
     return true;
 }
 
@@ -67,6 +74,21 @@ bool FrUpdateTabsCmd::UpdateView(){
             break;
     }
     return result;
+}
+
+
+void FrUpdateTabsCmd::SetupImageLayers(){
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
+    
+    FrMyLayeredImage* img = mv->GetSliceView()->GetImage();
+    LayerCollection& layers = tabSets->GetSliceViewSettings()->OtherLayers;
+    
+    
+
+    //FrSliceView* sv = ;
+    //FrMosaicView* 
 }
 
 ///////////////////////////////////////////////////////////////

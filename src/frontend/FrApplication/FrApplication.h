@@ -1,9 +1,6 @@
 #ifndef FR_APPLICATION
 #define FR_APPLICATION
 
-// Froward declarations
-class FrDocument;
-
 // includes
 #include <Qt/qapplication.h>
 
@@ -14,11 +11,6 @@ public:
 	~FrApplication();
 
 protected:
-
-
-private:
-    FrDocument* m_doc;
-
 };
 
 #endif

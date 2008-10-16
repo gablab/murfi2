@@ -23,9 +23,10 @@
 // points in that pipeline. So define that points.
 #define FRP_FULL        0
 #define FRP_READIMAGE   1
-#define FRP_LAYER		2
-#define FRP_SLICE       3
+#define FRP_SLICE       2
+#define FRP_COLORMAP	3
 #define FRP_TBC         4
-#define FRP_SETCAM      5
+#define FRP_OPACITY_VISIBILITY  5
+#define FRP_SETCAM      6
 
 #endif

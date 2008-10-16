@@ -249,10 +249,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\moc\FrAddLayerDialog_moc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\frontend\moc\FrApplication_moc.cpp"
 				>
 			</File>
@@ -262,6 +258,10 @@
 			</File>
 			<File
 				RelativePath=".\frontend\moc\FrBookmarkWidget_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrLayerDialog_moc.cpp"
 				>
 			</File>
 			<File
@@ -615,6 +615,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Utils\FrSettings.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Utils\FrUtils.cpp"
 				>
 			</File>
@@ -630,24 +634,6 @@
 		<Filter
 			Name="Widgets"
 			>
-			<File
-				RelativePath=".\frontend\Widgets\FrAddLayerDialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Widgets\FrAddLayerDialog.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
 			<File
 				RelativePath=".\frontend\Widgets\FrBookmark.cpp"
 				>
@@ -736,6 +722,34 @@
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
 						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrLayerDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrLayerDialog.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -911,14 +925,6 @@
 			Name="Commands"
 			>
 			<File
-				RelativePath=".\frontend\Commands\FrAddLayerCmd.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Commands\FrAddLayerCmd.h"
-				>
-			</File>
-			<File
 				RelativePath=".\frontend\Commands\FrBaseCmd.cpp"
 				>
 			</File>
@@ -967,6 +973,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrLayerCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrLayerCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrLoadTabsCmd.cpp"
 				>
 			</File>
@@ -988,14 +1002,6 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrMultiCmd.h"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Commands\FrRemoveLayerCmd.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Commands\FrRemoveLayerCmd.h"
 				>
 			</File>
 			<File
@@ -1059,35 +1065,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Layers\FrLayer.cpp"
+				RelativePath=".\frontend\Layers\FrMyLayer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Layers\FrLayer.h"
+				RelativePath=".\frontend\Layers\FrMyLayer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Layers\FrLayeredImage.cpp"
+				RelativePath=".\frontend\Layers\FrMyLayeredImage.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Layers\FrLayeredImage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Layers\FrSpecialLayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Layers\FrSpecialLayer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Layers\FrTextLayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Layers\FrTextLayer.h"
+				RelativePath=".\frontend\Layers\FrMyLayeredImage.h"
 				>
 			</File>
 		</Filter>

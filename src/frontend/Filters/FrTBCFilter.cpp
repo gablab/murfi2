@@ -58,16 +58,17 @@ void FrTBCFilter::SimpleExecute(vtkImageData *inData,
         vtkErrorMacro(<<"FrTBCFilter: vtkImageData has to have only unsigned char data type.");
         return;
     }
-
-    // Init some data for algorithm
-    int dims[3]; 
-    inData->GetDimensions(dims);
-    int numVoxs = dims[0] * dims[1] * dims[2];
-    int numComps = inData->GetNumberOfScalarComponents();
-    
+            
     vtkDataArray* inArray = inData->GetPointData()->GetScalars();
     vtkDataArray* outArray = outData->GetPointData()->GetScalars();
 
+    // If all values are 0.0 then just copy data to output
+    if(m_Threshold == 0.0 && m_Brightness==0.0 && m_Contrast == 0.0){
+        outArray->DeepCopy(inArray);
+        return;
+    }
+
+    // Process all values
     double maxValue   = inData->GetScalarTypeMax();
     double brightness = maxValue * m_Brightness;
     double contrast   = maxValue * m_Contrast;
@@ -77,18 +78,15 @@ void FrTBCFilter::SimpleExecute(vtkImageData *inData,
     InitLookupTable(luTable, brightness, contrast);
 
     // Process image data
-    double threshold  = maxValue * m_Threshold;
-    for (int component = 0; component < numComps; ++component){
-        for (int voxel = 0; voxel < numVoxs; ++voxel){
-            // Check threshold 
-            double out = 0.0;
-            double value = inArray->GetComponent(voxel, component);
-            out = (value >= threshold) ? value : 0.0;
+    unsigned char value;
+    unsigned char* srcPtr = (unsigned char*)inArray->GetVoidPointer(0);
+    unsigned char* dstPtr = (unsigned char*)outArray->GetVoidPointer(0);
 
-            // set brightness/contrast value
-            out = luTable[int(out)];
-            outArray->SetComponent(voxel, component, out);
-        }
+    double threshold  = maxValue * m_Threshold;
+    for(int i=0; i < inArray->GetSize(); ++i){
+        value = ((*srcPtr) >= threshold) ? (*srcPtr) : 0;
+        (*dstPtr) = luTable[value];
+        ++srcPtr; ++dstPtr;
     }
 }
 

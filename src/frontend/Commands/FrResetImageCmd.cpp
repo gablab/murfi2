@@ -14,6 +14,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkImageActor.h"
 
+#define DEF_DELTA 10
 
 FrResetImageCmd::FrResetImageCmd()
 : m_TargetView(FrResetImageCmd::Unknown){
@@ -43,19 +44,23 @@ bool FrResetImageCmd::Execute(){
     // Get actors and renderers
     std::vector<vtkImageActor*> actors;
 	std::vector<vtkRenderer*> renderers;
+    std::vector<FrCameraSettings*> camSettings;
     switch(targetView){
          case FrResetImageCmd::Slice:
              actors.push_back(mv->GetSliceView()->GetImage()->GetActor());
              renderers.push_back(mv->GetSliceView()->GetImage()->GetRenderer());
+             camSettings.push_back(&tsDO->GetSliceViewSettings()->CamSettings);
              break;
          case FrResetImageCmd::Mosaic:
              actors.push_back(mv->GetMosaicView()->GetImage()->GetActor());
              renderers.push_back(mv->GetMosaicView()->GetImage()->GetRenderer());
+             camSettings.push_back(&tsDO->GetMosaicViewSettings()->CamSettings);
              break;
          case FrResetImageCmd::Ortho:
              for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
                 actors.push_back(mv->GetOrthoView()->GetImage(i)->GetActor());
                 renderers.push_back(mv->GetOrthoView()->GetImage(i)->GetRenderer());
+                camSettings.push_back(&tsDO->GetOrthoViewSettings()->CamSettings[i]);
              }
              break;         
          default:
@@ -66,13 +71,25 @@ bool FrResetImageCmd::Execute(){
     // Performe reset action
     bool result = false;
     for(int i=0; i < actors.size(); ++i){
-        ResetCamera(actors[i], renderers[i]);
+        ResetCamera(camSettings[i], actors[i], renderers[i]);
         result = true;
+    }
+
+    if(result){
+        mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
     }
     return result;
 }
 
-void FrResetImageCmd::ResetCamera(vtkImageActor* actor, vtkRenderer* renderer){		// test
+void FrResetImageCmd::ResetCamera(FrCameraSettings* camSets,
+                                  vtkImageActor* actor, 
+                                  vtkRenderer* renderer){
+    // Up vector directed along Y axis
+    double newViewUp[3];
+    newViewUp[0] = 0.0;
+    newViewUp[1] = 1.0;
+    newViewUp[2] = 0.0;
+
     // Move camera at center of image
     double newFocalPt[3];
     double newPosition[3];
@@ -81,19 +98,20 @@ void FrResetImageCmd::ResetCamera(vtkImageActor* actor, vtkRenderer* renderer){	
     newFocalPt[1] = newPosition[1] = imgCenter[1];
     newFocalPt[2] = imgCenter[2];
     newPosition[2] = imgCenter[2] + 1.0;
-
-    renderer->GetActiveCamera()->SetFocalPoint(newFocalPt);
-    renderer->GetActiveCamera()->SetPosition(newPosition);
-    renderer->Render();
-
+    
     // Calculate scale 
     double bounds[6];
     actor->GetBounds(bounds);    
     double width = bounds[1] - bounds[0];
     double height = bounds[3] - bounds[2];
-    
-    int scale = std::max(int(bounds[1]), int(bounds[3])) / 2;
-    renderer->GetActiveCamera()->SetParallelScale(scale + 1);
+        
+    double newScale = std::max(width, height) / 2;
+    newScale = newScale + DEF_DELTA;
+
+    COPY_ARR3(camSets->FocalPoint, newFocalPt);
+    COPY_ARR3(camSets->Position, newPosition);
+    COPY_ARR3(camSets->ViewUp, newViewUp);
+    camSets->Scale = newScale;
 }
 
 ///////////////////////////////////////////////////////////////

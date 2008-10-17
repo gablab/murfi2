@@ -37,9 +37,8 @@ private:
     FrColormapFilter(const FrColormapFilter&);  // Not implemented.
     void operator=(const FrColormapFilter&);  // Not implemented.  	
 
-	int GetId(int x, int y);
-	void ProcessSingleColormap(vtkImageData* input, vtkImageData* output);
-	void ProcessMultiColormap(vtkImageData* input, vtkImageData* output);
+    void InitSingleLookupTable(unsigned char luTable[][3]);
+    void InitMultiLookupTable(unsigned char luTable[][3]);
 
 private:
 	int m_Dims[3];

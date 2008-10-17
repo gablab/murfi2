@@ -36,7 +36,8 @@ public:
     void ChangeView(int view);
 
 	void AddLayer();
-	void RemoveLayer();
+    void EditLayer(int id);
+	void RemoveLayer(int id);
 
     void ChangeBookmark(int id);
     void DeleteBookmark(int id);

@@ -4,6 +4,7 @@
 #include "FrLayerDialog.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrMyLayeredImage.h"
+#include "FrUtils.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -15,7 +16,12 @@
 #define ALL_ITEMS_COUNT 5
 
 FrLayerCmd::FrLayerCmd() 
-: m_Action(FrLayerCmd::Undefined){
+: m_Action(FrLayerCmd::Undefined), m_isID(false){
+}
+
+void FrLayerCmd::SetID(int id){
+    m_ID = id;
+    m_isID = true;
 }
 
 bool FrLayerCmd::Execute(){
@@ -79,11 +85,70 @@ bool FrLayerCmd::AddLayer(){
 }
 
 bool FrLayerCmd::DeleteLayer(){
+    if(!m_isID) return false;
     return false;
 }
 
 bool FrLayerCmd::ChangeLayer(){
-    return false;
+    if(!m_isID) return false;
+        
+    // get layers of active view
+    int* ptrToActiveID = 0L;
+    LayerCollection layers;
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
+    switch(tabSets->GetActiveView()){
+        case FrTabSettingsDocObj::SliceView:
+            GetLayerSettings(tabSets->GetSliceViewSettings(), layers);
+            ptrToActiveID = &tabSets->GetSliceViewSettings()->ActiveLayerID;
+            break;
+        case FrTabSettingsDocObj::MosaicView:
+            GetLayerSettings(tabSets->GetMosaicViewSettings(), layers);
+            ptrToActiveID = &tabSets->GetMosaicViewSettings()->ActiveLayerID;
+            break;
+        case FrTabSettingsDocObj::OrthoView:
+            GetLayerSettings(tabSets->GetOrthoViewSettings(), layers, CORONAL_SLICE);
+            ptrToActiveID = &tabSets->GetOrthoViewSettings()->ActiveLayerID;
+            break;
+    }
+    if(layers.size() <= 0 ) return false;
+
+    // Find layer by id
+    FrLayerSettings* layerSets = 0L;
+    LayerCollection::iterator it, itEnd(layers.end());
+
+    if(m_ID == CUR_LAYER_ID) m_ID = *ptrToActiveID;
+    for(it = layers.begin(); it != itEnd; ++it){
+        if((*it)->ID == m_ID){
+            layerSets = (*it);
+            break;
+        }
+    }
+
+    // Get new values and set them
+    bool result = false;
+    if(layerSets){
+        FrMainWindow* mv = this->GetMainController()->GetMainView();
+        FrLayerDialog dlg(mv, true);
+        dlg.SetLayerParams(*layerSets);
+
+        if(dlg.SimpleExec()) {
+            // Need to save ID since it may be broken
+            int oldID = layerSets->ID;
+            dlg.GetLayerParams(*layerSets);
+            layerSets->ID = oldID;
+
+            if(tabSets->GetActiveView() == FrTabSettingsDocObj::OrthoView){
+                // TODO: implement update
+            }
+            
+            *ptrToActiveID = layerSets->ID;
+            mv->GetCurrentView()->UpdatePipeline(FRP_COLORMAP);
+            result = true;
+        }
+    }
+
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////

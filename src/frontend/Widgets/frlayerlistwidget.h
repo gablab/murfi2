@@ -3,40 +3,43 @@
 #ifndef FR_LAYERLISTWIDGET
 #define FR_LAYERLISTWIDGET
 
-//class QVBoxLayout;
-//class QTableWidget;
+// Forward declarations 
+class FrLayerSettings;
+class QTableWidget;
+class QVBoxLayout;
 
-//class FrTabSettingsDocObj;
-#include "FrTabSettingsDocObj.h"
-
-
+// includes
 #include "Qt/QWidget.h"
-#include "Qt/QTableWidget.h"
-#include "Qt/QBoxLayout.h"
-#include <vector>
-using namespace std;
 
 
+// This class used to display layers
+// available on image and also manage them
 class FrLayerListWidget: public QWidget
 {
 	Q_OBJECT
 public:
 	FrLayerListWidget(QWidget *parent = 0);
 
-//    void AddLayer(LayerSettings ls);
-    void RemoveLayer();
-//	void WriteLayerSettings(int rownumber, LayerSettings ls);
-
-public slots:
-    // Add slots here
-	void onLayerEdit(int row, int column);
+    void RemoveLayers();
+    void AddLayer(FrLayerSettings* layerSets);
+    
+    void SetSelectedLayer(int layerID);
 
 signals:
+    void LayerEdit(int id);
+    void LayerSelected(int id); 
+    
+
+private Q_SLOTS:
+    // Add slots here
+	void OnLayerEdit(int row, int column);
+    void OnLayerSelect(int row, int column);
+
+    int GetLayerID(int row, int column);
 	
 private:
 	QTableWidget*		m_layerTable;
 	QVBoxLayout*        m_layout;
-	
 };
 
 #endif

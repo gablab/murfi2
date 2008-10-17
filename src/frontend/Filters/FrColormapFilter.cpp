@@ -6,6 +6,16 @@
 #include "vtkPointData.h"
 #include "vtkObjectFactory.h"
 
+#define R_INDEX 0
+#define G_INDEX 1
+#define B_INDEX 2
+#define A_INDEX 3
+#define COMPONENT_NUM 4
+
+#define H_INDEX 0
+#define S_INDEX 1
+#define V_INDEX 2
+
 #define DEF_MIN_VALUE 0
 #define DEF_MAX_VALUE 255
 #define DEF_THRESHOLD 128
@@ -109,97 +119,113 @@ void FrColormapFilter::ExecuteInformation() {
 }
 
 void FrColormapFilter::SimpleExecute(vtkImageData* input, vtkImageData* output){
-    // TODO: OPTIMIZE THIS!!!
+    vtkDataArray* inArray = input->GetPointData()->GetScalars();
+    vtkDataArray* outArray = output->GetPointData()->GetScalars();
+
+    unsigned char luTable[256][3];
+    bool isValideType = true;
+    
 	switch(m_Type){
-        case FrColormapFilter::MultiColor:
-			ProcessMultiColormap(input, output);
-			break;
         case FrColormapFilter::SingleColor:
-			ProcessSingleColormap(input, output);
+			InitSingleLookupTable(luTable);
 			break;
+        case FrColormapFilter::MultiColor:
+			InitMultiLookupTable(luTable);
+			break;
+        default:
+            vtkErrorMacro(<<"FrColormapFilter: Filter type is undefined...");
+            isValideType = false;
+            break;
 	}
+
+    // Apply transformation
+    if(isValideType){
+        // NOTE: assume that input is a single component grayscale data
+        unsigned char value;
+        unsigned char* srcPtr = (unsigned char*)inArray->GetVoidPointer(0);
+        unsigned char* dstPtr = (unsigned char*)outArray->GetVoidPointer(0);
+        for(int i=0; i < inArray->GetSize(); ++i){
+            value = (*srcPtr);
+            if(m_PxMin <= value && value <= m_PxMax){
+                dstPtr[R_INDEX] = luTable[value][R_INDEX];
+                dstPtr[G_INDEX] = luTable[value][G_INDEX];
+                dstPtr[B_INDEX] = luTable[value][B_INDEX];
+                dstPtr[A_INDEX] = DEF_MAX_VALUE;
+                dstPtr += COMPONENT_NUM;
+            }
+            else {
+                // otherwise clear color
+                dstPtr[R_INDEX] = DEF_MIN_VALUE;
+                dstPtr[G_INDEX] = DEF_MIN_VALUE;
+                dstPtr[B_INDEX] = DEF_MIN_VALUE;
+                dstPtr[A_INDEX] = DEF_MIN_VALUE;
+                dstPtr += COMPONENT_NUM;
+            }
+            ++srcPtr;
+        }
+    }
     m_IsModified = false;
 }
 
-int FrColormapFilter::GetId(int x, int y){
-	return x*m_Dims[1]+y;	
+void FrColormapFilter::InitSingleLookupTable(unsigned char luTable[][3]){
+    double rgb[3];
+    rgb[R_INDEX] = m_Color.red();
+    rgb[G_INDEX] = m_Color.green();
+    rgb[B_INDEX] = m_Color.blue();
+
+    double hsv[3];
+    vtkMath::RGBToHSV(rgb, hsv);
+
+    for(int i=0; i < 256; ++i){
+        if(m_PxMin <= i && i <= m_PxMax){
+            hsv[V_INDEX] = double(i);
+            vtkMath::HSVToRGB(hsv, rgb);
+
+            luTable[i][R_INDEX] = rgb[R_INDEX];
+            luTable[i][G_INDEX] = rgb[G_INDEX];
+            luTable[i][B_INDEX] = rgb[B_INDEX];
+        }
+    }
 }
 
-void FrColormapFilter::ProcessSingleColormap(vtkImageData* input, vtkImageData* output){
-    unsigned char* srcPtr = (unsigned char*)input->GetPointData()->GetScalars()->GetVoidPointer(0);
-    unsigned char* dstPtr = (unsigned char*)output->GetPointData()->GetScalars()->GetVoidPointer(0);
+void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
+    // params for initialization
+    double min, max;
+    double iPos, delta, hue;
+    double rgb[3];
+    double hsv[3];
+    
+    // set defaults
+    hsv[S_INDEX] = 1.0;
+    hsv[V_INDEX] = 255.0;
 
-    // For now just mark with single color
-	int r1, g1, b1;
-	m_Color.getRgb(&r1, &g1, &b1);
-
-	//// HSV
-	//double h, s, v; 
-	//vtkMath::RGBToHSV(r1, b1, g1, &h, &s, &v);
-	for (int x = 0; x < m_Dims[0]; x++){
-		for (int y = 0; y < m_Dims[1]; y++){
-			int id = GetId(x, y);
-			
-			// old grayscale value
-			unsigned char k = *srcPtr; //[id];
-            if(m_PxMin <= k && k <= m_PxMax){
-                *dstPtr = r1;  ++dstPtr;
-                *dstPtr = g1;  ++dstPtr;
-                *dstPtr = b1;  ++dstPtr;
-                *dstPtr = DEF_MAX_VALUE; 
-                ++dstPtr;
+    for(int i=0; i < 256; ++i){
+        // NOTE: range consists from two parts: left and right
+        // [m_PxMin, m_Threshold] && [m_Threshold, m_PxMax]
+        if(m_PxMin <= i && i <= m_PxMax){
+            // get relative pos of i from threshold
+            if(i < m_Threshold){
+                // ...in left part
+                min = HUE_LBLUE; max = HUE_BLUE;
+                iPos = double(i - m_Threshold) / double(m_PxMin - m_Threshold);
             }
             else {
-                // otherwise clear color
-                *dstPtr = DEF_MIN_VALUE;  ++dstPtr;
-                *dstPtr = DEF_MIN_VALUE;  ++dstPtr;
-                *dstPtr = DEF_MIN_VALUE;  ++dstPtr;
-                *dstPtr = DEF_MIN_VALUE; ++dstPtr;
+                // ...in right part
+                min = HUE_YELLOW; max = HUE_RED;
+                iPos = double(i - m_Threshold) / double(m_PxMax - m_Threshold);
             }
-            ++srcPtr;
-		}
-	}
-}
+                
+            // calc delta for hue 
+            // (NOTE: in left part delta is positive in right is negative)
+            delta = (max - min) * iPos;
+            hsv[H_INDEX] = (min + delta) / HUE_NORM;
 
-void FrColormapFilter::ProcessMultiColormap(vtkImageData* input, vtkImageData* output){
-    unsigned char* srcPtr = (unsigned char*)input->GetPointData()->GetScalars()->GetVoidPointer(0);
-    unsigned char* dstPtr = (unsigned char*)output->GetPointData()->GetScalars()->GetVoidPointer(0);
-		
-	for (int x = 0; x < m_Dims[0]; x++){
-		for (int y = 0; y < m_Dims[1]; y++){
-			int id = GetId(x, y);
-						
-			// old grayscale value
-			unsigned char value = srcPtr[id];
-            if(m_PxMin <= value && value <= m_PxMax){
-                double min  = (value < m_Threshold) ? HUE_LBLUE : HUE_RED;
-                double max  = (value < m_Threshold) ? HUE_BLUE  : HUE_YELLOW;
-                double norm = (value < m_Threshold) ? 
-                    (m_Threshold - m_PxMin) : (m_Threshold - m_PxMax);
-                 
-                double mult = abs((value - m_Threshold) / norm);
-                double delta = (max - min) * mult;
-                double hue = (value < m_Threshold) ? 
-                    (min + delta) / HUE_NORM : 
-                    (max - delta) / HUE_NORM;
-                                                
-                // calculate final color
-                double r, g, b;
-		        vtkMath::HSVToRGB(hue, 1.0, 255.0, &r, &g, &b);	
+            // calculate final color
+	        vtkMath::HSVToRGB(hsv, rgb);	
 
-		        *dstPtr = r;   ++dstPtr;
-		        *dstPtr = g;   ++dstPtr;
-		        *dstPtr = b;   ++dstPtr;
-                *dstPtr = DEF_MAX_VALUE; 
-                ++dstPtr;
-            }
-            else {
-                // otherwise clear color
-                *dstPtr = DEF_MIN_VALUE; ++dstPtr;
-                *dstPtr = DEF_MIN_VALUE; ++dstPtr;
-                *dstPtr = DEF_MIN_VALUE; ++dstPtr;
-                *dstPtr = DEF_MIN_VALUE; ++dstPtr;
-            }
-		}
-	}
+	        luTable[i][R_INDEX] = rgb[R_INDEX];
+            luTable[i][G_INDEX] = rgb[G_INDEX];
+            luTable[i][B_INDEX] = rgb[B_INDEX];
+        }
+    }
 }

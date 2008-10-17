@@ -41,6 +41,7 @@ public:
     // Layer management
     int  AddLayer();
     bool RemoveLayer(int id);
+    void RemoveLayers();
 
     // Returns layer by ID
     FrMyLayer* GetLayerByID(int id);

@@ -2,7 +2,7 @@
 #define FR_RESET_IMAGE_CMD
 
 // Forward declarations
-class Fr2DSliceActor;
+class FrCameraSettings;
 class vtkRenderer;
 class vtkImageActor;
 
@@ -32,7 +32,9 @@ public:
 
 private:
     // Reset camera
-    void ResetCamera(vtkImageActor* actor, vtkRenderer* renderer);
+    void ResetCamera(FrCameraSettings* camSets, 
+                     vtkImageActor* actor, 
+                     vtkRenderer* renderer);
 };
 
 #endif // FR_RESET_IMAGE_CMD

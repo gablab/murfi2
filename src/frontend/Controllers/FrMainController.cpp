@@ -134,24 +134,58 @@ void FrMainController::ChangeView(int view){
         break;
     }
 
-    FrChangeViewCmd* cmd = FrCommandController::CreateCmd<FrChangeViewCmd>();
-    cmd->SetTargetView(targetView);
+    FrChangeViewCmd* cmd1 = FrCommandController::CreateCmd<FrChangeViewCmd>();
+    cmd1->SetTargetView(targetView);
+
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+        
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;    
 }
 
 void FrMainController::AddLayer(){
-    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd->SetAction(FrLayerCmd::Add);
+    
+    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd1->SetAction(FrLayerCmd::Add);
+
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;
 }
 
-void FrMainController::RemoveLayer(){
-	//// remove active layer? 
-	//FrRemoveLayerCmd* cmd = FrCommandController::CreateCmd<FrRemoveLayerCmd>();
-    //cmd->Execute();
-    //delete cmd;
+void FrMainController::EditLayer(int id){
+    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd1->SetAction(FrLayerCmd::Change);
+    cmd1->SetID(id);
+
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
+    cmd->Execute();
+    delete cmd;
+}
+
+void FrMainController::RemoveLayer(int id){
+	FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd1->SetAction(FrLayerCmd::Delete);
+    cmd1->SetID(id);
+
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
+    cmd->Execute();
+    delete cmd;
 }
 
 void FrMainController::ChangeBookmark(int id){
@@ -163,10 +197,13 @@ void FrMainController::ChangeBookmark(int id){
 
     FrChangeViewCmd* cmd2 = FrCommandController::CreateCmd<FrChangeViewCmd>();
     cmd2->SetTargetView(FrChangeViewCmd::Synchronize);
+
+    FrRefreshLayerInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
         
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
+    cmd->AddCommand(cmd3);
     cmd->Execute();
 
     delete cmd;

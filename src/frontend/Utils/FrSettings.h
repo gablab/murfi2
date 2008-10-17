@@ -61,11 +61,14 @@ public:
 #define DEF_LAYER_VISIBILITY true
 #define DEFAULT_LAYER_ID  0
 #define ALL_LAYERS_ID    -1
-#define BAD_LAYER_ID     -2
+#define CUR_LAYER_ID     -2
+#define BAD_LAYER_ID     -3
 
 class FrLayerSettings{
 public:
-    int ID;
+    // IDs params 
+    int     ID;
+    // Values params
     FrColormapSettings ColormapSettings;
     FrTBCSettings      TbcSettings;
     double             Opacity;

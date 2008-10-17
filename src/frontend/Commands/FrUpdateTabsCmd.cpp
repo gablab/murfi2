@@ -10,6 +10,7 @@
 #include "FrOrthoView.h"
 
 #define BAD_TAB_ID -1
+#define ITEMS_NUM  5
 
 
 FrUpdateTabsCmd::FrUpdateTabsCmd()
@@ -82,13 +83,29 @@ void FrUpdateTabsCmd::SetupImageLayers(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
     
-    FrMyLayeredImage* img = mv->GetSliceView()->GetImage();
-    LayerCollection& layers = tabSets->GetSliceViewSettings()->OtherLayers;
+    FrMyLayeredImage* image[ITEMS_NUM];
+    image[0] = mv->GetSliceView()->GetImage();
+    image[1] = mv->GetMosaicView()->GetImage();
+    image[2] = mv->GetOrthoView()->GetImage(CORONAL_IMAGE);
+    image[3] = mv->GetOrthoView()->GetImage(SAGITAL_IMAGE);
+    image[4] = mv->GetOrthoView()->GetImage(AXIAL_IMAGE);
     
+    LayerCollection* layers[ITEMS_NUM];
+    layers[0] = &tabSets->GetSliceViewSettings()->OtherLayers;
+    layers[1] = &tabSets->GetMosaicViewSettings()->OtherLayers;
+    layers[2] = &tabSets->GetOrthoViewSettings()->OtherLayers[CORONAL_IMAGE];
+    layers[3] = &tabSets->GetOrthoViewSettings()->OtherLayers[SAGITAL_IMAGE];
+    layers[4] = &tabSets->GetOrthoViewSettings()->OtherLayers[AXIAL_IMAGE];
     
+    for(int i=0; i < ITEMS_NUM; ++i){
+        image[i]->RemoveLayers();
 
-    //FrSliceView* sv = ;
-    //FrMosaicView* 
+        LayerCollection::iterator it, itEnd(layers[i]->end());
+        for(it = layers[i]->begin(); it != itEnd; ++it){
+            int layerID = image[i]->AddLayer();
+            (*it)->ID = layerID;
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////

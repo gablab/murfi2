@@ -220,7 +220,7 @@ bool FrMyLayeredImage::RemoveLayer(int layerId){
     bool result = false;
     LayerCollection::iterator it, itEnd(m_layers.end());
     for(it = m_layers.begin(); it != itEnd; ++it){
-        if((*it)->GetID() == layerId)break;
+        if((*it)->GetID() == layerId) break;
     }
     
     // delete layer if it were found
@@ -234,19 +234,36 @@ bool FrMyLayeredImage::RemoveLayer(int layerId){
             rw->RemoveRenderer(layer->GetRenderer());
             rw->GetRenderers()->InitTraversal();
 
-            // Update layer numbers
-            int layerID = START_LAYER_ID;
+            // Update layer IDs and number of layers
+            m_nextLayerId = START_LAYER_ID;
             LayerCollection::iterator it, itEnd(m_layers.end());
             for(it = m_layers.begin(); it != itEnd; ++it){
-                (*it)->GetRenderer()->SetLayer(layerID);
-                ++layerID;
+                (*it)->GetRenderer()->SetLayer(m_nextLayerId);
+                ++m_nextLayerId;
             }
+            rw->SetNumberOfLayers(m_layers.size()+1);
         }
 
         layer->Delete();
         result = true;
     }
     return result;
+}
+
+void FrMyLayeredImage::RemoveLayers(){
+    vtkRenderWindow* rw = m_renderer->GetRenderWindow();
+
+    // Delete all layers
+    LayerCollection::iterator it, itEnd(m_layers.end());
+    for(it = m_layers.begin(); it != itEnd; ++it){
+        FrMyLayer* layer = (*it);
+        if(rw) rw->RemoveRenderer(layer->GetRenderer());
+        layer->Delete();
+    }
+    if(rw) rw->SetNumberOfLayers(1);
+
+    m_layers.clear();
+    m_nextLayerId = START_LAYER_ID;
 }
 
 FrMyLayer* FrMyLayeredImage::GetLayerByID(int id){

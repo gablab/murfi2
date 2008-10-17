@@ -24,13 +24,19 @@ public:
 	virtual bool Undo();
 	virtual bool Redo();
 	
+    // Properties
     FrSetPropMacro(Action, Action);
+    void SetID(int id);
 
 private:
     // Helper methods here
     bool AddLayer();
     bool DeleteLayer();
     bool ChangeLayer();
+
+private:
+    bool m_isID;
+    int m_ID;
 };
 
 #endif

@@ -3,7 +3,8 @@
 #include "FrMainWindow.h"
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
-//#include "FrAddlayerDialog.h"	// test
+#include "FrLayerListWidget.h"
+#include "FrSettings.h"
 
 // Qt
 #include "Qt/QString.h"
@@ -60,6 +61,9 @@ void FrActionSignalManager::Initialize(){
     connect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(int)),
              m_mainWindow, SLOT(OnBookmarkDelete(int)) );
 
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerEdit(int)),
+             m_mainWindow, SLOT(OnLayerEdit(int)) );
+
     // Connect test action
     CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
 }
@@ -108,7 +112,7 @@ void FrActionSignalManager::OnAddLayerAction(){
 }
 
 void FrActionSignalManager::OnRemoveLayerAction(){
-	m_mainWindow->GetMainController()->RemoveLayer();
+	m_mainWindow->GetMainController()->RemoveLayer(CUR_LAYER_ID);
 }
 
 void FrActionSignalManager::OnChangeThresholdAction(){

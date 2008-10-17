@@ -35,9 +35,10 @@ public:
     void SaveCurrentViewToTab();
     void ChangeView(int view);
 
+    void SelectLayer(int id);
 	void AddLayer();
-    void EditLayer(int id);
-	void RemoveLayer(int id);
+    void DeleteLayer();
+    void ChangeLayer();
 
     void ChangeBookmark(int id);
     void DeleteBookmark(int id);

@@ -208,6 +208,6 @@ void FrMainWindow::OnBookmarkDelete(int id){
     this->GetMainController()->DeleteBookmark(id);
 }
 
-void FrMainWindow::OnLayerEdit(int id){
-    this->GetMainController()->EditLayer(id);
+void FrMainWindow::OnLayerSelected(int id){
+    this->GetMainController()->SelectLayer(id);
 }

@@ -41,6 +41,7 @@ public slots:
 	void SetPxMaxSpinBoxPosition(int value);
 	void SetThresholdSliderPosition(int value);
 	void SetThresholdSpinBoxPosition(int value);
+    void OnOKClicked();
 
 private:
     QVBoxLayout* m_vLayout;

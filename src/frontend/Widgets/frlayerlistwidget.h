@@ -5,6 +5,7 @@
 class FrLayerSettings;
 class QTableWidget;
 class QVBoxLayout;
+class QToolButton;
 
 // includes
 #include "Qt/QWidget.h"
@@ -22,22 +23,30 @@ public:
     void AddLayer(FrLayerSettings* layerSets);
     
     void SetSelectedLayer(int layerID);
+    void BlockSignals(bool value){ 
+        m_signalsBlocked = value;
+    }
 
 signals:
-    void LayerEdit(int id);
-    void LayerSelected(int id); 
-    
+    void NewLayer();
+    void DeleteLayer();
+    void ChangeLayer();
+    void LayerSelected(int id);
 
 private Q_SLOTS:
     // Add slots here
-	void OnLayerEdit(int row, int column);
-    void OnLayerSelect(int row, int column);
-
-    int GetLayerID(int row, int column);
+    void OnSelectionChanged();
+    void OnAddClicked();
+    void OnDeleteClicked();
+    void OnChangeClicked();    
 	
 private:
-	QTableWidget*		m_layerTable;
-	QVBoxLayout*        m_layout;
+	QTableWidget*   m_layerTable;
+	QVBoxLayout*    m_layout;
+    QToolButton*    m_btnAdd;
+    QToolButton*    m_btnDelete;
+    QToolButton*    m_btnChange;
+    bool m_signalsBlocked;
 };
 
 #endif

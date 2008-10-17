@@ -35,10 +35,9 @@ void FrActionSignalManager::Initialize(){
      
     //Edit 
     CONNECT_ACTION_TRIGGERED(am->GetSaveToTabAction(), OnSaveToTabAction());
-	CONNECT_ACTION_TRIGGERED(am->GetAddLayerAction(), OnAddLayerAction());
-	CONNECT_ACTION_TRIGGERED(am->GetRemoveLayerAction(), OnRemoveLayerAction());
-    CONNECT_ACTION_TRIGGERED(am->GetChangeThresholdAction(), OnChangeThresholdAction());
-    CONNECT_ACTION_TRIGGERED(am->GetChangeColormapAction(), OnChangeColormapAction());
+	CONNECT_ACTION_TRIGGERED(am->GetNewLayerAction(),  OnNewLayerAction());
+	CONNECT_ACTION_TRIGGERED(am->GetDeleteLayerAction(), OnDeleteLayerAction());
+    CONNECT_ACTION_TRIGGERED(am->GetChangeLayerAction(), OnChangeLayerAction());
     
     //View
     CONNECT_ACTION_TRIGGERED(am->GetViewSliceAction(), OnViewSliceAction());
@@ -61,8 +60,16 @@ void FrActionSignalManager::Initialize(){
     connect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(int)),
              m_mainWindow, SLOT(OnBookmarkDelete(int)) );
 
-    connect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerEdit(int)),
-             m_mainWindow, SLOT(OnLayerEdit(int)) );
+    // Connect signals to layer list widget
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerSelected(int)),
+             m_mainWindow, SLOT(OnLayerSelected(int)) );
+
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(NewLayer()),
+             this, SLOT(OnNewLayerAction()) );
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(DeleteLayer()),
+             this, SLOT(OnDeleteLayerAction()) );
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayer()),
+             this, SLOT(OnChangeLayerAction()) );
 
     // Connect test action
     CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
@@ -107,24 +114,16 @@ void FrActionSignalManager::OnSaveToTabAction(){
     m_mainWindow->GetMainController()->SaveCurrentViewToTab();
 }
 
-void FrActionSignalManager::OnAddLayerAction(){
+void FrActionSignalManager::OnNewLayerAction(){
 	m_mainWindow->GetMainController()->AddLayer();
 }
 
-void FrActionSignalManager::OnRemoveLayerAction(){
-	m_mainWindow->GetMainController()->RemoveLayer(CUR_LAYER_ID);
+void FrActionSignalManager::OnDeleteLayerAction(){
+	m_mainWindow->GetMainController()->DeleteLayer();
 }
 
-void FrActionSignalManager::OnChangeThresholdAction(){
-    QMessageBox::information(m_mainWindow, 
-        tr("To be implemented"),
-        tr("This shows Change threshold dialog..."));
-}
-
-void FrActionSignalManager::OnChangeColormapAction(){
-    QMessageBox::information(m_mainWindow, 
-        tr("To be implemented"),
-        tr("This shows Change Colormap dialog..."));
+void FrActionSignalManager::OnChangeLayerAction(){
+    m_mainWindow->GetMainController()->ChangeLayer();
 }
 
 //View

@@ -23,10 +23,9 @@ public slots:
     void OnExitAction();
     //Edit 
     void OnSaveToTabAction();
-	void OnAddLayerAction();
-	void OnRemoveLayerAction();
-    void OnChangeThresholdAction();
-    void OnChangeColormapAction();
+	void OnNewLayerAction();
+	void OnDeleteLayerAction();
+    void OnChangeLayerAction();
     //View
     void OnViewSliceAction();
     void OnViewMosaicAction();

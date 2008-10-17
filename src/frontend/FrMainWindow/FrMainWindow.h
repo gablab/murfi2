@@ -59,7 +59,7 @@ public slots:
     void OnBookmarkChanged(int id);
     void OnBookmarkDelete(int id);
 
-    void OnLayerEdit(int id);
+    void OnLayerSelected(int id);
     
 private:
     void SetupUi(QMainWindow* mainWindow);

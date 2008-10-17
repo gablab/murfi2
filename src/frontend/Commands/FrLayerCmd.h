@@ -2,6 +2,7 @@
 #define FR_LAYER_CMD
 
 class FrTabSettingsDocObj;
+class FrLayerSettings;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
@@ -11,7 +12,7 @@ class FrTabSettingsDocObj;
 class FrLayerCmd : public FrBaseCmd
 {
 public:
-    enum Action { Undefined, Add, Delete, Change };
+    enum Action { Undefined, Add, Delete, Change, UpdateSelectedID };
 
 public:
     // Constructor/destructor
@@ -33,6 +34,9 @@ private:
     bool AddLayer();
     bool DeleteLayer();
     bool ChangeLayer();
+    bool UpdateSelectedLayerID();
+
+    int GetActiveLayerID();
 
 private:
     bool m_isID;

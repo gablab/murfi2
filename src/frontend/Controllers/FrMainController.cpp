@@ -146,8 +146,15 @@ void FrMainController::ChangeView(int view){
     delete cmd;    
 }
 
+void FrMainController::SelectLayer(int id){
+    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd->SetAction(FrLayerCmd::UpdateSelectedID);
+    cmd->SetID(id);
+    cmd->Execute();
+    delete cmd;
+}
+
 void FrMainController::AddLayer(){
-    
     FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
     cmd1->SetAction(FrLayerCmd::Add);
 
@@ -160,10 +167,12 @@ void FrMainController::AddLayer(){
     delete cmd;
 }
 
-void FrMainController::EditLayer(int id){
-    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Change);
-    cmd1->SetID(id);
+void FrMainController::DeleteLayer(){
+    // Deletes currently selected layer
+	FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd1->SetAction(FrLayerCmd::Delete);
+    // If not set ID is the same as current ID
+    // cmd1->SetID(CUR_LAYER_ID);
 
     FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
     
@@ -174,10 +183,11 @@ void FrMainController::EditLayer(int id){
     delete cmd;
 }
 
-void FrMainController::RemoveLayer(int id){
-	FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Delete);
-    cmd1->SetID(id);
+void FrMainController::ChangeLayer(){
+    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd1->SetAction(FrLayerCmd::Change);
+    // If not set ID is the same as current ID
+    // cmd1->SetID(CUR_LAYER_ID);
 
     FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
     

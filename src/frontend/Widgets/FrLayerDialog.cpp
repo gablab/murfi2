@@ -27,7 +27,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
     // create buttons
     m_btnOk = new QPushButton(tr("OK"), this);
     m_btnCancel = new QPushButton(tr("Cancel"), this);
-    connect( m_btnOk, SIGNAL( clicked() ), this, SLOT( accept() ) );
+    connect( m_btnOk, SIGNAL( clicked() ), this, SLOT( OnOKClicked() ) );
     connect( m_btnCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
 	m_vLayout = new QVBoxLayout(this);
@@ -185,8 +185,8 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 
 	colorWidget = new QWidget(groupBox2);
 	colorWidget->setSizeIncrement(100, 20);
-//	colorWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	
+    colorWidget->setMinimumSize(24, 24);
+		
 	QPalette palette;
     QBrush brush(QColor(DEF_CM_COLOR));
     brush.setStyle(Qt::SolidPattern);	
@@ -259,17 +259,7 @@ void FrLayerDialog::SetLayerParams(FrLayerSettings& layerSets){
     PxMinSpinBox->setValue(layerSets.ColormapSettings.MinValue);
     PxMaxSpinBox->setValue(layerSets.ColormapSettings.MaxValue);
     ThresholdSpinBox->setValue(layerSets.ColormapSettings.Threshold);
-
-    // Set color
-    color = layerSets.ColormapSettings.Color;
-    QPalette palette;
-    QBrush brush(color);
-    brush.setStyle(Qt::SolidPattern);	
-	palette.setBrush(QPalette::Active, QPalette::Window, brush);
-	palette.setBrush(QPalette::Inactive, QPalette::Window, brush);
-    palette.setBrush(QPalette::Disabled, QPalette::Window, brush);
-	colorWidget->setPalette(palette);
-    
+            
     // Set colormap settings
     switch(layerSets.ColormapSettings.Type){
         case FrColormapSettings::MultiColor:
@@ -281,6 +271,19 @@ void FrLayerDialog::SetLayerParams(FrLayerSettings& layerSets){
         default:
             // Do nothing here
             break;
+    }
+
+    // Set color
+    color = layerSets.ColormapSettings.Color;
+
+    if(layerSets.ColormapSettings.Type == FrColormapSettings::SingleColor){
+        QPalette palette;
+        QBrush brush(color);
+        brush.setStyle(Qt::SolidPattern);	
+	    palette.setBrush(QPalette::Active, QPalette::Window, brush);
+	    palette.setBrush(QPalette::Inactive, QPalette::Window, brush);
+        palette.setBrush(QPalette::Disabled, QPalette::Window, brush);
+	    colorWidget->setPalette(palette);
     }
 }
 
@@ -325,7 +328,7 @@ void FrLayerDialog::SetOpacitySliderPosition(int value){
 }
 
 void FrLayerDialog::SetPxMinSliderPosition(int value){
-	PxMinSlider->setValue(value);
+	PxMinSlider->setValue(value);    
 }
 
 void FrLayerDialog::SetPxMaxSliderPosition(int value){
@@ -350,4 +353,36 @@ void FrLayerDialog::SetPxMaxSpinBoxPosition(int value){
 
 void FrLayerDialog::SetThresholdSpinBoxPosition(int value){
 	ThresholdSpinBox->setValue(value);
+}
+
+#define VALIDATING_PIPELINE for(int i=0; i < 1; ++i)
+void FrLayerDialog::OnOKClicked(){
+    bool isValid = false;
+    QString message = "Validation OK";
+    VALIDATING_PIPELINE {
+        // Check all params
+        int min = PxMinSpinBox->value();
+        int max = PxMaxSpinBox->value();
+        if(min >= max){
+            message = "MIN value has to be less then MAX value...";
+            break;
+        }
+
+        int thresh = ThresholdSpinBox->value();
+        if((cmType == FrColormapSettings::MultiColor) && 
+           (thresh <= min || max <= thresh)){
+            message = "THRESHOLD value has to be between MIN and MAX values...";
+            break;
+        }
+
+        isValid = true;
+    }
+    
+    // Process validation results 
+    if(isValid){
+        this->accept();
+    }
+    else {        
+        QMessageBox::critical(this, "Validating Error", message);
+    }
 }

@@ -23,11 +23,10 @@ public:
     FrGetPropMacro(QAction*, LoadTabsAction);
     FrGetPropMacro(QAction*, ExitAction);    
     // Edit
-    FrGetPropMacro(QAction*, AddLayerAction);
-    FrGetPropMacro(QAction*, RemoveLayerAction);
-	FrGetPropMacro(QAction*, SaveToTabAction);
-    FrGetPropMacro(QAction*, ChangeThresholdAction);
-    FrGetPropMacro(QAction*, ChangeColormapAction);
+    FrGetPropMacro(QAction*, SaveToTabAction);
+    FrGetPropMacro(QAction*, NewLayerAction);
+    FrGetPropMacro(QAction*, DeleteLayerAction);
+    FrGetPropMacro(QAction*, ChangeLayerAction);
     //View
     FrGetPropMacro(QAction*, ViewSliceAction);
     FrGetPropMacro(QAction*, ViewMosaicAction);

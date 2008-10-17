@@ -38,6 +38,8 @@ bool FrRefreshLayerInfoCmd::Execute(){
     bool result = false;
     if(layers.size() > 0){
         FrLayerListWidget* widget = mv->GetLayerListWidget();
+        widget->BlockSignals(true);
+
         widget->RemoveLayers();
         
         LayerCollection::iterator it, itEnd(layers.end());
@@ -46,6 +48,7 @@ bool FrRefreshLayerInfoCmd::Execute(){
         }
 
         widget->SetSelectedLayer(layerID);
+        widget->BlockSignals(false);
     }
     return result;
 }

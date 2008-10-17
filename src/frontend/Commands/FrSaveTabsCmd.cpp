@@ -207,7 +207,7 @@ void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, int id,
     SaveTbcSettings(imageElem, &mlSets->TbcSettings);
 
     // Layers
-    QDomElement layersElem = m_Document->createElement(FR_XML_LAYER_ELEM);
+    QDomElement layersElem = m_Document->createElement(FR_XML_LAYERS_ELEM);
     layersElem.setAttribute(FR_XML_COUNT_ATTR, olSets.size());
     LayerCollection::iterator it, itEnd(olSets.end());
     for(it = olSets.begin(); it != itEnd; ++it){

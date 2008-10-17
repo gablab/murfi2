@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrMainWindow.h'
 **
-** Created: Fri 17. Oct 01:48:57 2008
+** Created: Fri 17. Oct 21:34:02 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -37,7 +37,7 @@ static const uint qt_meta_data_FrMainWindow[] = {
 
 static const char qt_meta_stringdata_FrMainWindow[] = {
     "FrMainWindow\0\0id\0OnBookmarkChanged(int)\0"
-    "OnBookmarkDelete(int)\0OnLayerEdit(int)\0"
+    "OnBookmarkDelete(int)\0OnLayerSelected(int)\0"
 };
 
 const QMetaObject FrMainWindow::staticMetaObject = {
@@ -67,7 +67,7 @@ int FrMainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: OnBookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 1: OnBookmarkDelete((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 2: OnLayerEdit((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 2: OnLayerSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
         }
         _id -= 3;
     }

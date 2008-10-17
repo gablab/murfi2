@@ -25,6 +25,7 @@
 #define FR_XML_POS_ELEM "position"
 #define FR_XML_FOCUS_ELEM "focalPoint"
 #define FR_XML_VIEWUP_ELEM "viewUp"
+#define FR_XML_LAYERS_ELEM "layers"
 #define FR_XML_LAYER_ELEM "layer"
 #define FR_XML_PXRANGE_ELEM "pxRange"
 #define FR_XML_CMAP_ELEM "colorMap"

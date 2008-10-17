@@ -1,5 +1,3 @@
-// class for displaying bookmarks
-
 #ifndef FR_LAYERLISTWIDGET
 #define FR_LAYERLISTWIDGET
 

@@ -15,6 +15,8 @@ class FrToolBar;
 class FrMainMenu;
 class FrBookmarkWidget;
 class FrLayerListWidget;
+class FrVoxelInfoWidget;
+class FrROIInfoWidget;
 class QVTKWidget;
 class FrActionManager;
 class FrMainWindowSignalManager;
@@ -45,6 +47,8 @@ public:
     FrGetPropMacro(QVTKWidget*, QVTKWidget);
     FrGetPropMacro(FrBookmarkWidget*, BookmarkWidget);
 	FrGetPropMacro(FrLayerListWidget*, LayerListWidget);
+	FrGetPropMacro(FrVoxelInfoWidget*, VoxelInfoWidget);
+	FrGetPropMacro(FrROIInfoWidget*, ROIInfoWidget);
 
     // Some others
 private: friend class FrActionSignalManager;

@@ -6,6 +6,8 @@
 #include "FrOrthoView.h"
 #include "FrBookmarkWidget.h"
 #include "FrLayerListWidget.h"
+#include "FrVoxelInfoWidget.h"
+#include "FrROIInfoWidget.h"
 #include "QVTKWidget.h"
 #include "FrToolBar.h"
 #include "FrMainMenu.h"
@@ -42,8 +44,10 @@ FrMainWindow::~FrMainWindow(){
 
 void FrMainWindow::SetupUi(QMainWindow* mainWindow){
     // Main window
-    mainWindow->resize(600, 800);
-    if (mainWindow->objectName().isEmpty())
+    //mainWindow->resize(600, 800);
+	//mainWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	mainWindow->setWindowState(Qt::WindowMaximized);
+	if (mainWindow->objectName().isEmpty())
         mainWindow->setObjectName(QString::fromUtf8("MainWindow"));
 
     // Central widget
@@ -57,8 +61,8 @@ void FrMainWindow::SetupUi(QMainWindow* mainWindow){
     // Main menu
     m_mainMenu = new FrMainMenu(mainWindow, m_ActionManager);
     m_mainMenu->setObjectName(QString::fromUtf8("m_mainMenu"));
-    m_mainMenu->setGeometry(QRect(0, 0, 800, 21));
-    mainWindow->setMenuBar(m_mainMenu);
+    //m_mainMenu->setGeometry(QRect(0, 0, 800, 21));
+	mainWindow->setMenuBar(m_mainMenu);
 
     // Tool bar
     m_toolBar = new FrToolBar(mainWindow, m_ActionManager);
@@ -119,7 +123,7 @@ void FrMainWindow::InitializeWidgets(){
 //	dock->setWidget(topPane);
 //	addDockWidget(Qt::LeftDockWidgetArea, dock);
 	m_mainMenu->GetMenuView()->addSeparator();
-//	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+//	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
 	QDockWidget* dock = new QDockWidget(tr("Info Tab"), this);
 	dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea | Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -131,7 +135,7 @@ void FrMainWindow::InitializeWidgets(){
 
 	dock->setWidget(viewInfoControl);
 	addDockWidget(Qt::RightDockWidgetArea, dock);
-	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 		
 //    QHBoxLayout* vcLayout = new QHBoxLayout();
 //    vcLayout->addLayout(viewLayout);
@@ -150,7 +154,7 @@ void FrMainWindow::InitializeWidgets(){
 
 	dock->setWidget(btmPane);
 	addDockWidget(Qt::BottomDockWidgetArea, dock);
-	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
 	dock = new QDockWidget(tr("Layer List"), this);
 
@@ -158,7 +162,22 @@ void FrMainWindow::InitializeWidgets(){
 
 	dock->setWidget(m_LayerListWidget);
 	addDockWidget(Qt::BottomDockWidgetArea, dock);
-	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
+
+	dock = new QDockWidget(tr("Voxel Info"), this);
+
+	m_VoxelInfoWidget = new FrVoxelInfoWidget(dock);
+
+	dock->setWidget(m_VoxelInfoWidget);
+	addDockWidget(Qt::LeftDockWidgetArea, dock);
+//	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
+
+	dock = new QDockWidget(tr("ROI Info"), this);
+
+	m_ROIInfoWidget = new FrROIInfoWidget(dock);
+
+	dock->setWidget(m_ROIInfoWidget);
+	addDockWidget(Qt::LeftDockWidgetArea, dock);
 
     // Setup layout to  central widget
     //QVBoxLayout* vLayout = new  QVBoxLayout();

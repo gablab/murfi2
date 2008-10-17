@@ -277,11 +277,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrROIInfoWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrTabInfoDialog_moc.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\frontend\moc\FrToolBar_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrVoxelInfoWidget_moc.cpp"
 				>
 			</File>
 			<File
@@ -771,7 +779,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -800,6 +808,24 @@
 						Name="VCCustomBuildTool"
 						Description="Mocing &quot;$(InputPath)&quot;"
 						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrROIInfoWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrROIInfoWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -851,6 +877,24 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing &quot;$(InputPath)&quot;"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrVoxelInfoWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrVoxelInfoWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"

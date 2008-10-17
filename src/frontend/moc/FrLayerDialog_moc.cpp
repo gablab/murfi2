@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrLayerDialog.h'
 **
-** Created: Thu 16. Oct 22:22:29 2008
+** Created: Thu 16. Oct 23:39:36 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

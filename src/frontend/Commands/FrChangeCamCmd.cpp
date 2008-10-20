@@ -4,7 +4,7 @@
 #include "FrBaseView.h"
 #include "FrOrthoView.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 
 #include "vtkRenderer.h"
 

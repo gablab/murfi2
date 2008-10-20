@@ -1,6 +1,6 @@
 // class combining renderer and actors for single layer display
-#ifndef FR_MYLAYER
-#define FR_MYLAYER
+#ifndef FR_LAYER
+#define FR_LAYER
 
 //Forward declarations
 class FrColormapSettings;
@@ -17,9 +17,9 @@ class vtkRenderer;
 #include "FrMacro.h"
 
 // Represents layer object
-class FrMyLayer : public vtkObject {
+class FrLayer : public vtkObject {
 public:
-    static FrMyLayer* New();
+    static FrLayer* New();
 
     // Properties
     FrPropMacro(int, ID);
@@ -53,8 +53,8 @@ public:
 
 protected:
     // Constructor and destructor
-    FrMyLayer();
-    virtual ~FrMyLayer();
+    FrLayer();
+    virtual ~FrLayer();
 
 protected:
     // Pipline stuff
@@ -64,8 +64,8 @@ protected:
     vtkRenderer* m_renderer;
 
 private:
-    FrMyLayer(const FrMyLayer&);  // Not implemented.
-    void operator=(const FrMyLayer&);  // Not implemented.
+    FrLayer(const FrLayer&);  // Not implemented.
+    void operator=(const FrLayer&);  // Not implemented.
 };
 
 #endif

@@ -11,7 +11,7 @@ class FrMainWindow;
 class Fr2DSliceActor;
 class FrDocumentReader;
 class FrSliceExtractor;
-class FrMyLayeredImage;
+class FrLayeredImage;
 
 #include "FrBaseView.h"
 #include "FrTabSettingsDocObj.h"
@@ -28,13 +28,13 @@ public:
     virtual void RemoveRenderers();
     
     // Accessors
-    FrMyLayeredImage* GetImage(){ return m_LayeredImage; }
+    FrLayeredImage* GetImage(){ return m_LayeredImage; }
     
 private:
     // Pipeline
     FrDocumentReader* m_docReader;
     FrSliceExtractor* m_SliceExtractor;
-	FrMyLayeredImage* m_LayeredImage;
+	FrLayeredImage* m_LayeredImage;
 
 };
 

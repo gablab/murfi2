@@ -4,7 +4,7 @@
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
@@ -83,7 +83,7 @@ void FrUpdateTabsCmd::SetupImageLayers(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
     
-    FrMyLayeredImage* image[ITEMS_NUM];
+    FrLayeredImage* image[ITEMS_NUM];
     image[0] = mv->GetSliceView()->GetImage();
     image[1] = mv->GetMosaicView()->GetImage();
     image[2] = mv->GetOrthoView()->GetImage(CORONAL_IMAGE);

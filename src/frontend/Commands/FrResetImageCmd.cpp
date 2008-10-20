@@ -6,7 +6,7 @@
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 
 // VTK stuff
 #include "vtkCamera.h"

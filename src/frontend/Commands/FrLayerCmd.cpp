@@ -3,7 +3,7 @@
 #include "FrMainDocument.h"
 #include "FrLayerDialog.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 #include "FrUtils.h"
 
 #include "FrBaseView.h"
@@ -57,7 +57,7 @@ bool FrLayerCmd::AddLayer(){
     FrLayerDialog dlg(mv, true);
 	if(!dlg.SimpleExec()) return false;
 	
-    FrMyLayeredImage* layeredImage[ALL_ITEMS_COUNT];
+    FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
     layeredImage[0] = mv->GetSliceView()->GetImage();
     layeredImage[1] = mv->GetMosaicView()->GetImage();
     layeredImage[2] = mv->GetOrthoView()->GetImage(CORONAL_IMAGE);
@@ -105,7 +105,7 @@ bool FrLayerCmd::DeleteLayer(){
         
     // Init data
     FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrMyLayeredImage* layeredImage[ALL_ITEMS_COUNT];
+    FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
     layeredImage[0] = mv->GetSliceView()->GetImage();
     layeredImage[1] = mv->GetMosaicView()->GetImage();
     layeredImage[2] = mv->GetOrthoView()->GetImage(CORONAL_IMAGE);

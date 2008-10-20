@@ -8,7 +8,7 @@
 #include "Fr2DSliceActor.h"
 #include "FrUtils.h"
 #include "FrVoxelInfoWidget.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 
 #include "vtkPointPicker.h"
 

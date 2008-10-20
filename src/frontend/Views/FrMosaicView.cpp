@@ -6,7 +6,7 @@
 #include "FrMainDocument.h"
 #include "FrNotify.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 #include "FrUtils.h"
 
 #include "vtkRenderer.h"
@@ -18,7 +18,7 @@
 FrMosaicView::FrMosaicView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
     m_docReader = FrDocumentReader::New();	
-    m_LayeredImage = FrMyLayeredImage::New();
+    m_LayeredImage = FrLayeredImage::New();
 }
 
 FrMosaicView::~FrMosaicView(){

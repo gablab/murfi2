@@ -8,7 +8,7 @@
 #include "FrUtils.h"
 #include "FrSliceExtractor.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 
 // VTK stuff
 #include "vtkCamera.h"
@@ -38,7 +38,7 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
     // create renderers
 	for(int i = 0; i < ORTHO_IMAGE_COUNT; i++){
 		m_SliceExtractor[i] = FrSliceExtractor::New();
-        m_LayeredImage[i] = FrMyLayeredImage::New();
+        m_LayeredImage[i] = FrLayeredImage::New();
     }
     m_dummyRenderer = vtkRenderer::New();
     m_dummyRenderer->SetBackground(0.0, 0.0, 0.0);

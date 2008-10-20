@@ -7,7 +7,7 @@
 #include "FrDocumentReader.h"
 #include "FrSliceExtractor.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 #include "FrNotify.h"
 #include "FrUtils.h"
 
@@ -29,7 +29,7 @@ FrSliceView::FrSliceView(FrMainWindow* mainWindow)
     // Create pipeline stuff
     m_docReader = FrDocumentReader::New();
 	m_SliceExtractor = FrSliceExtractor::New();
-    m_LayeredImage = FrMyLayeredImage::New();
+    m_LayeredImage = FrLayeredImage::New();
 }
 
 FrSliceView::~FrSliceView(){

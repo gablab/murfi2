@@ -7,7 +7,7 @@ class vtkRenderer;
 class FrMainWindow;
 class FrDocumentReader;
 class FrSliceExtractor;
-class FrMyLayeredImage;
+class FrLayeredImage;
 class FrLayerSettings;
 class FrOrthoViewSettings;
 
@@ -32,7 +32,7 @@ public:
     virtual void RemoveRenderers();
 
     // Accessors
-    FrMyLayeredImage* GetImage(int idx){ return m_LayeredImage[idx]; }
+    FrLayeredImage* GetImage(int idx){ return m_LayeredImage[idx]; }
 
 private:
     FrLayerSettings* GetLayerAndInitLayers(std::vector<FrLayerSettings*>& layers, 
@@ -43,7 +43,7 @@ private:
     // Render pipline
     FrDocumentReader* m_docReader;
     FrSliceExtractor* m_SliceExtractor[ORTHO_IMAGE_COUNT];
-    FrMyLayeredImage* m_LayeredImage[ORTHO_IMAGE_COUNT];
+    FrLayeredImage* m_LayeredImage[ORTHO_IMAGE_COUNT];
 
     vtkRenderer* m_dummyRenderer;
 };

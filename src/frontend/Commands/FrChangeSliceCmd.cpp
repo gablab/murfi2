@@ -3,7 +3,7 @@
 #include "FrMainWindow.h"
 #include "FrBaseView.h"
 #include "FrOrthoView.h"
-#include "FrMyLayeredImage.h"
+#include "FrLayeredImage.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrUtils.h"
 

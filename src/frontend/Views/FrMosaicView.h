@@ -7,7 +7,7 @@ class vtkImageActor;
 class QVTKWidget;
 class FrMainWindow;
 class FrDocumentReader;
-class FrMyLayeredImage;
+class FrLayeredImage;
 
 #include "FrBaseView.h"
 
@@ -23,12 +23,12 @@ public:
     virtual void RemoveRenderers();
 
     // Accessors
-    FrMyLayeredImage* GetImage(){ return m_LayeredImage; }
+    FrLayeredImage* GetImage(){ return m_LayeredImage; }
 
 private:
     // Pipline 
     FrDocumentReader* m_docReader;
-	FrMyLayeredImage* m_LayeredImage;
+	FrLayeredImage* m_LayeredImage;
 };
 
 #endif

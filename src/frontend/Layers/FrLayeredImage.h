@@ -1,20 +1,20 @@
 // class combining renderer and actors for single layer display
-#ifndef FR_MYLAYERED_IMG
-#define FR_MYLAYERED_IMG
+#ifndef FR_LAYERED_IMG
+#define FR_LAYERED_IMG
 
 // Forward declarations
 class vtkRenderer;
 
 // Some includes
-#include "FrMyLayer.h"
+#include "FrLayer.h"
 #include "FrSettings.h"
 #include <vector>
 
 
 // Represents layer object
-class FrMyLayeredImage : public FrMyLayer {
+class FrLayeredImage : public FrLayer {
 public:
-    static FrMyLayeredImage* New();
+    static FrLayeredImage* New();
     
     // Accessors/Modifiers
     virtual void SetInput(vtkImageData* data);
@@ -36,7 +36,7 @@ public:
     virtual void UpdateCamera();
 
     // Initialization
-    void InitDefault(FrMyLayer* layer);
+    void InitDefault(FrLayer* layer);
 
     // Layer management
     int  AddLayer();
@@ -44,21 +44,21 @@ public:
     void RemoveLayers();
 
     // Returns layer by ID
-    FrMyLayer* GetLayerByID(int id);
+    FrLayer* GetLayerByID(int id);
 
 protected:
     // Constructor and destructor
-    FrMyLayeredImage();
-    virtual ~FrMyLayeredImage();
+    FrLayeredImage();
+    virtual ~FrLayeredImage();
 
 private:
-   typedef std::vector<FrMyLayer*> LayerCollection;
+   typedef std::vector<FrLayer*> LayerCollection;
    LayerCollection m_layers;
    int m_nextLayerId;
 
 private:
-    FrMyLayeredImage(const FrMyLayeredImage&);  // Not implemented.
-    void operator=(const FrMyLayeredImage&);  // Not implemented.
+    FrLayeredImage(const FrLayeredImage&);  // Not implemented.
+    void operator=(const FrLayeredImage&);  // Not implemented.
 };
 
 #endif

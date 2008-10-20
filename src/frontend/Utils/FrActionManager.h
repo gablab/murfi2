@@ -31,6 +31,7 @@ public:
     FrGetPropMacro(QAction*, ViewSliceAction);
     FrGetPropMacro(QAction*, ViewMosaicAction);
     FrGetPropMacro(QAction*, ViewOrthoAction);
+    FrGetPropMacro(QAction*, ResetImageAction);
     // Tools 
     FrGetPropMacro(QAction*, ManipulatorToolAction);
     FrGetPropMacro(QAction*, VoxelToolAction);

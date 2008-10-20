@@ -45,6 +45,8 @@ public:
 
     void SetCurrentTool(int tool);
 
+    void ResetImage();
+
 	// Override from base class
     virtual void Notify(int notifyCode);
    

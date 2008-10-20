@@ -20,18 +20,21 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
     m_SliceViewSettings->MainLayer.ID = DEFAULT_LAYER_ID;
     m_SliceViewSettings->ActiveLayerID = DEFAULT_LAYER_ID;
     m_SliceViewSettings->SliceNumber = DEF_SLICE_NUMBER;
+    m_SliceViewSettings->ResetNeeded = true;
 
     // Init mosaic view settings
     InitCameraDefault(&m_MosaicViewSettings->CamSettings);
     InitLayerDefault(&m_MosaicViewSettings->MainLayer);
     m_MosaicViewSettings->MainLayer.ID = DEFAULT_LAYER_ID;
     m_MosaicViewSettings->ActiveLayerID = DEFAULT_LAYER_ID;
+    m_MosaicViewSettings->ResetNeeded = true;
     
     // Setup ortho view
     m_OrthoViewSettings->CoronalSlice = DEF_SLICE_NUMBER;
     m_OrthoViewSettings->SagitalSlice = DEF_SLICE_NUMBER;
     m_OrthoViewSettings->AxialSlice   = DEF_SLICE_NUMBER;
     m_OrthoViewSettings->ActiveLayerID = DEFAULT_LAYER_ID;
+    m_OrthoViewSettings->ResetNeeded = true;
 
     for(int i=0; i < ORTHO_VIEW_NUM; ++i){
         InitCameraDefault(&m_OrthoViewSettings->CamSettings[i]);
@@ -80,6 +83,7 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
     dstSlice->ActiveLayerID = srcSlice->ActiveLayerID;
     dstSlice->SliceNumber   = srcSlice->SliceNumber;
     CopyLayersInfo(dstSlice->OtherLayers, srcSlice->OtherLayers);
+    dstSlice->ResetNeeded = srcSlice->ResetNeeded;
     
     // Init mosaic view settings
     FrMosaicViewSettings* srcMosaic = docObj->GetMosaicViewSettings();
@@ -88,6 +92,7 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
     dstMosaic->MainLayer    = srcMosaic->MainLayer;
     dstMosaic->ActiveLayerID = srcMosaic->ActiveLayerID;
     CopyLayersInfo(dstMosaic->OtherLayers, srcMosaic->OtherLayers);
+    dstMosaic->ResetNeeded = srcMosaic->ResetNeeded;
     
     // Setup ortho view
     FrOrthoViewSettings* srcOrtho = docObj->GetOrthoViewSettings();
@@ -96,6 +101,7 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
     dstOrtho->CoronalSlice = srcOrtho->CoronalSlice;
     dstOrtho->SagitalSlice = srcOrtho->SagitalSlice;
     dstOrtho->AxialSlice   = srcOrtho->AxialSlice;
+    dstOrtho->ResetNeeded  = srcOrtho->ResetNeeded;
 
     for(int i=0; i < ORTHO_VIEW_NUM; ++i){
         dstOrtho->CamSettings[i] = srcOrtho->CamSettings[i];

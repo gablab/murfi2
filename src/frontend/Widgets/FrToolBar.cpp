@@ -37,6 +37,10 @@ void FrToolBar::SetupActions(){
     this->addAction(m_actManager->GetShowAboutAction());
     this->addSeparator();
 
+    // Some other
+    this->addAction(m_actManager->GetResetImageAction());
+    this->addSeparator();
+
     // Test
     this->addAction(m_actManager->GetTestAction());
 }

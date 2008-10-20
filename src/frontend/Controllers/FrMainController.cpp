@@ -91,11 +91,16 @@ void FrMainController::LoadImage(QString& fileName){
 
     if(imgObj->LoadFromFile(fileName)){
         m_MainDocument->Add(imgObj);
+        m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
+        
+        FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
+        cmd->SetTargetView(FrResetImageCmd::Current);
+        cmd->Execute();
+        delete cmd;
     }
     else{
         // TODO: process error
-    }    
-    m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
+    }
 }
 
 void FrMainController::IoTabSettings(QString& fileName, bool isInput){
@@ -251,14 +256,13 @@ void FrMainController::SetCurrentTool(int tool){
     delete cmd;
 }
 
-void FrMainController::Test(){    
+void FrMainController::ResetImage(){
     FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
     cmd->SetTargetView(FrResetImageCmd::Current);
     cmd->Execute();
     delete cmd;
+}
 
-    /*FrSaveTabsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabsCmd>();
-    cmd->SetFileName(QString("test"));
-    cmd->Execute();
-    delete cmd;*/
+void FrMainController::Test(){    
+    
 }

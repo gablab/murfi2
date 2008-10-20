@@ -106,6 +106,8 @@ public:
     FrCameraSettings CamSettings;
     FrLayerSettings  MainLayer;
     LayerCollection  OtherLayers;
+    // Some other params
+    bool ResetNeeded;
 };
 
 // Mosaic view definitions
@@ -121,6 +123,8 @@ public:
     FrCameraSettings CamSettings;
     FrLayerSettings  MainLayer;
     LayerCollection  OtherLayers;
+    // Some other params
+    bool ResetNeeded;
 };
 
 // Ortho view definitions
@@ -150,6 +154,8 @@ public:
     FrCameraSettings CamSettings[ORTHO_VIEW_NUM];
     FrLayerSettings  MainLayer[ORTHO_VIEW_NUM];
     LayerCollection  OtherLayers[ORTHO_VIEW_NUM];
+    // Some other params
+    bool ResetNeeded;
 };
 
 // Initialization stuff

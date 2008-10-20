@@ -122,6 +122,7 @@ bool FrLayerCmd::DeleteLayer(){
     otherLayers[4] = &tabSets->GetOrthoViewSettings()->OtherLayers[AXIAL_IMAGE];
 
     // Delete layer from all views
+    bool isFound = false;
     for(int i=0; i < ALL_ITEMS_COUNT; ++i){
         if(layeredImage[i]->RemoveLayer(m_ID)){
             // Find layer
@@ -129,7 +130,7 @@ bool FrLayerCmd::DeleteLayer(){
             for(it = otherLayers[i]->begin(); it != itEnd; ++it){
                 if((*it)->ID == m_ID) break;
             }
-            // remove and update layer IDs
+            // remove and update layer IDs            
             if(it != itEnd){
                 delete (*it);
                 otherLayers[i]->erase(it);
@@ -139,8 +140,18 @@ bool FrLayerCmd::DeleteLayer(){
                 for(it = otherLayers[i]->begin(); it != itEnd; ++it){
                     (*it)->ID = newID++;
                 }
+                isFound = true;
             }
         }
+    }
+
+    if(isFound){
+        // Assume that there is good sync between layers 
+        tabSets->GetSliceViewSettings()->ActiveLayerID--;
+        tabSets->GetMosaicViewSettings()->ActiveLayerID--;
+        tabSets->GetOrthoViewSettings()->ActiveLayerID--;
+
+        FrBaseCmd::UpdatePipelineForID(0, FRP_COLORMAP);
     }
     return true;
 }

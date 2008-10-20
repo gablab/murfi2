@@ -43,6 +43,7 @@ void FrActionSignalManager::Initialize(){
     CONNECT_ACTION_TRIGGERED(am->GetViewSliceAction(), OnViewSliceAction());
     CONNECT_ACTION_TRIGGERED(am->GetViewMosaicAction(), OnViewMosaicAction());
     CONNECT_ACTION_TRIGGERED(am->GetViewOrthoAction(), OnViewOrthoAction());
+    CONNECT_ACTION_TRIGGERED(am->GetResetImageAction(), OnResetImageAction());
 
     // Tools 
     CONNECT_ACTION_TRIGGERED(am->GetManipulatorToolAction(), OnManipulatorToolAction());
@@ -137,6 +138,10 @@ void FrActionSignalManager::OnViewMosaicAction(){
 
 void FrActionSignalManager::OnViewOrthoAction(){
     m_mainWindow->GetMainController()->ChangeView(2);
+}
+
+void FrActionSignalManager::OnResetImageAction(){
+    m_mainWindow->GetMainController()->ResetImage();
 }
 
 // Tools 

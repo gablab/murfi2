@@ -76,6 +76,8 @@ void FrMainMenu::SetupActions(){
     m_menuView->addAction(m_actManager->GetViewSliceAction());
     m_menuView->addAction(m_actManager->GetViewMosaicAction());
     m_menuView->addAction(m_actManager->GetViewOrthoAction());
+    m_menuView->addSeparator();
+    m_menuView->addAction(m_actManager->GetResetImageAction());
 
     // Tool
     m_menuTools->addAction(m_actManager->GetManipulatorToolAction());

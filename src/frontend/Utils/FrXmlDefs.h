@@ -5,8 +5,11 @@
 // and attribute names for both reading and saving operation
 // this prevent from typos and makes writting of code easier
 
-// supported version
+// Some values
 #define FR_TAB_SET_VERSION 1.0
+#define FR_CMTYPE_SINGLE "singleColor"
+#define FR_CMTYPE_MULTI  "multiColor"
+#define FR_ZEROCOLOR_VALUE "00"
 
 // Names of elements
 #define FR_XML_DECLARATION "version=\"1.0\" encoding=\"UTF-8\""
@@ -55,5 +58,6 @@
 #define FR_XML_MAXVAL_ATTR "maxValue"
 #define FR_XML_TYPE_ATTR "type"
 #define FR_XML_THRESH_ATTR "threshold"
+#define FR_XML_COLOR_ATTR "color"
 
 #endif

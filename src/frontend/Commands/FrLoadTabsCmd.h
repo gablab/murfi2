@@ -5,6 +5,12 @@
 class QDomDocument; 
 class QDomElement;
 class FrTabSettingsDocObj;
+class FrCameraSettings;
+class FrSliceViewSettings;
+class FrMosaicViewSettings;
+class FrOrthoViewSettings;
+class FrTBCSettings;
+class FrLayerSettings;
 
 // Some includes
 #include "FrMacro.h"
@@ -32,12 +38,18 @@ public:
 
 private:
     bool LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs);
-    bool LoadSliceViewSettings(QDomElement& elem,  void* svSets);
-    bool LoadMosaicViewSettings(QDomElement& elem, void* mvSets);
-    bool LoadOrthoViewSettings(QDomElement& elem,  void* ovSets);
-    bool LoadCameraSettings(QDomElement& elem,     void* camSets);
-    bool LoadLayeredImgSettings(QDomElement& elem, void* liSets);
+    bool ValidateTabSettings(FrTabSettingsDocObj* tabs);
+    bool LoadSliceViewSettings(QDomElement& elem,  FrSliceViewSettings* svSets);
+    bool LoadMosaicViewSettings(QDomElement& elem, FrMosaicViewSettings* mvSets);
+    bool LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSettings* ovSets);
+    bool LoadCameraSettings(QDomElement& elem,     FrCameraSettings* camSets);
+    bool LoadLayeredImageSettings(QDomElement& elem, 
+                                  FrLayerSettings* mlSets, 
+                                  std::vector<FrLayerSettings*>& olSets);
 
+    bool LoadLayersSettings(QDomElement& elem, std::vector<FrLayerSettings*>& olSets);
+    bool LoadLayerSettings(QDomElement& elem, FrLayerSettings* liSets);
+    bool LoadTbcSettings(QDomElement& elem, FrTBCSettings* tbsSets);
     // vec should point to double[3]
     bool LoadAttrValuesXYZ(QDomElement& elem, double* vec);
 

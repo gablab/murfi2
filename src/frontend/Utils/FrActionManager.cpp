@@ -43,6 +43,8 @@ void FrActionManager::Initialize(QObject* parent){
     m_ViewOrthoAction = new QAction(parent);
     m_ViewOrthoAction->setObjectName(QString::fromUtf8("m_ViewOrthoAction"));
     m_ViewOrthoAction->setCheckable(true);
+    m_ResetImageAction = new QAction(parent);
+    m_ResetImageAction->setObjectName(QString::fromUtf8("m_ResetImageAction"));
     // Tool
     m_ManipulatorToolAction = new QAction(parent);
     m_ManipulatorToolAction->setObjectName(QString::fromUtf8("m_ManipulatorToolAction"));
@@ -89,6 +91,8 @@ void FrActionManager::Retranslate(){
     m_ViewMosaicAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Mosaic View"));
     m_ViewOrthoAction->setText(DO_TRANSLATE(TR_CONTEXT, "Ortho View"));
     m_ViewOrthoAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Ortho View"));
+    m_ResetImageAction->setText(DO_TRANSLATE(TR_CONTEXT, "Reset Image"));
+    m_ResetImageAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Reset Image"));
     // Tool
     m_ManipulatorToolAction->setText(DO_TRANSLATE(TR_CONTEXT, "Manipulation Tool"));
     m_ManipulatorToolAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Manipulation Tool"));

@@ -30,6 +30,7 @@ public slots:
     void OnViewSliceAction();
     void OnViewMosaicAction();
     void OnViewOrthoAction();
+    void OnResetImageAction();
     // Tools 
     void OnManipulatorToolAction();
     void OnVoxelToolAction();

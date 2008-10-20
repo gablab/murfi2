@@ -50,7 +50,13 @@ FrColormapFilter::FrColormapFilter()
 void FrColormapFilter::SetInput(vtkImageData *data){
     if(data != FrBaseFilter::GetInput()){
         FrBaseFilter::SetInput(data);
-	    this->GetInput()->GetDimensions(m_Dims);
+
+        if(this->GetInput()){
+	        this->GetInput()->GetDimensions(m_Dims);
+        }
+        else {
+            m_Dims[0] = m_Dims[1] = m_Dims[2] = 0;
+        }
         this->Modified();
         m_IsModified = true;
     }
@@ -106,11 +112,10 @@ void FrColormapFilter::SetColor(QColor value){
 // Use this to update output params
 void FrColormapFilter::ExecuteInformation() {
     FrBaseFilter::ExecuteInformation();
+    if(!this->GetInput()) return;
 
     vtkImageData *input=this->GetInput();
     vtkImageData *output=this->GetOutput();
-
-    if (input==NULL) return;
     
 	output->SetScalarTypeToUnsignedChar();
 	output->SetNumberOfScalarComponents(4);				// ARGB
@@ -119,6 +124,7 @@ void FrColormapFilter::ExecuteInformation() {
 }
 
 void FrColormapFilter::SimpleExecute(vtkImageData* input, vtkImageData* output){
+    if(!input) return;
     vtkDataArray* inArray = input->GetPointData()->GetScalars();
     vtkDataArray* outArray = output->GetPointData()->GetScalars();
 

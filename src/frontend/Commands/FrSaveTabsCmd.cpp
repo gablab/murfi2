@@ -10,6 +10,7 @@
 
 // Some defines
 #define DEF_NODE_INDENT 4
+#define GET_HEX_COLOR_STRING(cl) ((cl == 0) ? QString("00") : QString().setNum(cl, 16))
 
 FrSaveTabsCmd::FrSaveTabsCmd()
 : m_FileName(""), m_Document(0) {
@@ -105,7 +106,7 @@ void FrSaveTabsCmd::SaveSliceViewSettings(QDomElement& parent, FrSliceViewSettin
 
     // images
     QDomElement imagesElem = m_Document->createElement(FR_XML_LIS_ELEM);
-    camerasElem.setAttribute(FR_XML_COUNT_ATTR, 1);
+    imagesElem.setAttribute(FR_XML_COUNT_ATTR, 1);
     SaveLayeredImageSettings(imagesElem, 0, &vs->MainLayer, vs->OtherLayers);
     parent.appendChild(imagesElem);
 }
@@ -124,7 +125,7 @@ void FrSaveTabsCmd::SaveMosaicViewSettings(QDomElement& parent, FrMosaicViewSett
 
     // images
     QDomElement imagesElem = m_Document->createElement(FR_XML_LIS_ELEM);
-    camerasElem.setAttribute(FR_XML_COUNT_ATTR, 1);
+    imagesElem.setAttribute(FR_XML_COUNT_ATTR, 1);
     SaveLayeredImageSettings(imagesElem, 0, &vs->MainLayer, vs->OtherLayers);
     parent.appendChild(imagesElem);
 }
@@ -225,16 +226,37 @@ void FrSaveTabsCmd::SaveLayerSettings(QDomElement& parent, FrLayerSettings* liSe
 
     // pxRange
     QDomElement prElem = m_Document->createElement(FR_XML_PXRANGE_ELEM);
-    prElem.setAttribute(FR_XML_MINVAL_ATTR, 0);
-    prElem.setAttribute(FR_XML_MAXVAL_ATTR, 255);
+    prElem.setAttribute(FR_XML_MINVAL_ATTR, liSets->ColormapSettings.MinValue);
+    prElem.setAttribute(FR_XML_MAXVAL_ATTR, liSets->ColormapSettings.MaxValue);
     layerElem.appendChild(prElem);
 
     // colorMap
     QDomElement cmElem = m_Document->createElement(FR_XML_CMAP_ELEM);
-    cmElem.setAttribute(FR_XML_TYPE_ATTR, "multiColor");
-    cmElem.setAttribute(FR_XML_THRESH_ATTR, 0.5);
+    switch(liSets->ColormapSettings.Type){
+        case FrColormapSettings::MultiColor:
+            cmElem.setAttribute(FR_XML_TYPE_ATTR, FR_CMTYPE_MULTI);
+            break;
+        case FrColormapSettings::SingleColor:
+            cmElem.setAttribute(FR_XML_TYPE_ATTR, FR_CMTYPE_SINGLE);
+            break;
+        default:
+            // Do nothing here
+            break;
+    }
+    cmElem.setAttribute(FR_XML_THRESH_ATTR, liSets->ColormapSettings.Threshold);
+
+    // Save color value
+    QColor color = liSets->ColormapSettings.Color;
+    QString colorValue = "#";
+    colorValue += GET_HEX_COLOR_STRING(color.red());
+    colorValue += GET_HEX_COLOR_STRING(color.green());
+    colorValue += GET_HEX_COLOR_STRING(color.blue());
+    cmElem.setAttribute(FR_XML_COLOR_ATTR, colorValue);
+
     layerElem.appendChild(cmElem);
 
+    // TBC
+    SaveTbcSettings(layerElem, &liSets->TbcSettings);
     parent.appendChild(layerElem);
 }
 

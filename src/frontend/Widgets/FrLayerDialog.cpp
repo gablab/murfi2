@@ -54,7 +54,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 	vl->addWidget(label);
 	vl->addWidget(label_2);
 
-	QLineEdit *lineEdit;
+	lineEdit;
 	lineEdit = new QLineEdit("New layer", this);
 
 	OpacitySpinBox = new QSpinBox(this);
@@ -234,7 +234,8 @@ void FrLayerDialog::SetCaption(QString& caption){
 
 void FrLayerDialog::GetLayerParams(FrLayerSettings& layerSets){
     // Common props
-    layerSets.ID = BAD_LAYER_ID;
+    layerSets.Name = lineEdit->text();
+	layerSets.ID = BAD_LAYER_ID;
     layerSets.Opacity = double(OpacitySpinBox->value()) / double(OpacitySpinBox->maximum());
     layerSets.Visibility = visibleCheckBox->isChecked();
 
@@ -251,7 +252,8 @@ void FrLayerDialog::GetLayerParams(FrLayerSettings& layerSets){
 
 void FrLayerDialog::SetLayerParams(FrLayerSettings& layerSets){
     // Common props
-    visibleCheckBox->setChecked(layerSets.Visibility);
+	lineEdit->setText(layerSets.Name);
+	visibleCheckBox->setChecked(layerSets.Visibility);
     int opacity = int(layerSets.Opacity * OpacitySpinBox->maximum());
     OpacitySpinBox->setValue(opacity);
         

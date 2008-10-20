@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrVoxelInfoWidget.h'
 **
-** Created: Fri 17. Oct 14:04:51 2008
+** Created: Mon 20. Oct 19:43:46 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

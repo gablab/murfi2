@@ -51,8 +51,16 @@ bool FrVoxelTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrVoxelTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    QMessageBox::information(0, QString("Tool info"), QString("Voxel tool is working"));
-    return false;
+//    QMessageBox::information(0, QString("Tool info"), QString("Voxel tool is working"));
+    if(params.Button == FrMouseParams::LeftButton){
+        FrVoxelInfoCmd* cmd = FrCommandController::CreateCmd<FrVoxelInfoCmd>();
+        cmd->SetAction(FrVoxelInfoCmd::Update);
+        cmd->SetPointPicker(m_pointPicker);
+        cmd->SetMouseXY(params.X, params.Y);
+        cmd->Execute();
+        delete cmd;
+    }
+	return false;
 }
 
 bool FrVoxelTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
@@ -78,57 +86,47 @@ int FrVoxelTool::GetPickedPointIndex(int x, int y, vtkRenderer* renderer){
     
     int id = m_pointPicker->GetPointId();
     return id;
-    //// Get the mapped position of the mouse using the picker.
-    //double ptMapped[3];
-    //m_pPicker->GetMapperPosition(ptMapped);
+  
+	//// Get the mapped position of the mouse using the picker.
+ //   double ptMapped[3];
+ //   m_pointPicker->GetMapperPosition(ptMapped);
 
-    //// We have to manually set the physical z-coordinate which requires
-    //// us to get the volume spacing.
-    //double dSpacing[3];
-    //m_pImageViewer->GetInput()->GetSpacing(dSpacing);
-    //ptMapped[2] = m_pImageViewer->GetSlice() * dSpacing[2];
+ //   // We have to manually set the physical z-coordinate which requires
+ //   // us to get the volume spacing.
+ //   double dSpacing[3];
+ //   m_pImageViewer->GetInput()->GetSpacing(dSpacing);			// get image data
+ //   ptMapped[2] = m_pImageViewer->GetSlice() * dSpacing[2];		// get slice number
 
-    //// Get a shortcut to the pixel data.
-    //vtkImageData* pImageData = m_pImageViewer->GetInput();
+ //   // Get a shortcut to the pixel data.
+ //   vtkImageData* pImageData = m_pImageViewer->GetInput();		// get image data
 
-    //// Get the volume index within the entire volume now.
-    //int nVolIdx = pImageData->FindPoint(ptMapped);
+ //   // Get the volume index within the entire volume now.
+ //   int nVolIdx = pImageData->FindPoint(ptMapped);
 
-    //// We have to handle different number of scalar components.
-    //switch (pImageData->GetNumberOfScalarComponents()) {
-    //    case 1:
-    //        {
-    //            // Get a shortcut to the raw pixel data. This should be further
-    //            // updated to check if your data is signed or not, but for this
-    //            // example we'll just assume it's unsigned. You should also check
-    //            // the type of your data too (unsigned char, unsigned short, etc).
-    //            unsigned short* pPix = (unsigned short*)pImageData->GetScalarPointer();
-    //            unsigned short usPix = pPix[nVolIdx];
-    //            FmtStr(m_strDetails, "Pixel val = [" << usPix << "]   at index [" << nVolIdx << "],  coordinates(" << ptMapped[0] << "," << ptMapped[1] << ")");
-    //        }
-    //        break;
-    //    
-    //    case 3:
-    //        {
-    //            // For vtkImageData with multiple components, you have to get each
-    //            // component separately. Here's one case where we assume the data
-    //            // type is unsigned char. Add additional specific cases.
-    //            unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
-    //            unsigned char usPixR = pPix[nVolIdx * 3 + 0];
-    //            unsigned char usPixG = pPix[nVolIdx * 3 + 1];
-    //            unsigned char usPixB = pPix[nVolIdx * 3 + 2];
-    //            FmtStr(m_strDetails, "Pixel val = [" << (int)usPixR << "," << (int)usPixG << "," << (int)usPixB << "]   at index [" << nVolIdx << "],  coordinates(" << ptMapped[0] << "," << ptMapped[1] << ")");
-    //        }
-    //        break;
+ //   // We have to handle different number of scalar components.
+ //   switch (pImageData->GetNumberOfScalarComponents()) {
+ //       case 1:
+ //           {
+ //               unsigned short* pPix = (unsigned short*)pImageData->GetScalarPointer();
+ //               unsigned short usPix = pPix[nVolIdx];
+	//	       // FmtStr(m_strDetails, "Pixel val = [" << usPix << "]   at index [" << nVolIdx << "],  coordinates(" << ptMapped[0] << "," << ptMapped[1] << ")");
+ //           }
+ //           break;
+ //       
+ //       case 3:
+ //           {
+ //               unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
+ //               unsigned char usPixR = pPix[nVolIdx * 3 + 0];
+ //               unsigned char usPixG = pPix[nVolIdx * 3 + 1];
+ //               unsigned char usPixB = pPix[nVolIdx * 3 + 2];
+ //               //FmtStr(m_strDetails, "Pixel val = [" << (int)usPixR << "," << (int)usPixG << "," << (int)usPixB << "]   at index [" << nVolIdx << "],  coordinates(" << ptMapped[0] << "," << ptMapped[1] << ")");
+ //           }
+ //           break;
 
-    //    default:
-    //        FmtStr(m_strDetails, "Unsupported number of scalar components [" << pImageData->GetNumberOfScalarComponents() << "] for pixel picker.");
-    //        break;
-    //}
+ //       default:
+ //           //FmtStr(m_strDetails, "Unsupported number of scalar components [" << pImageData->GetNumberOfScalarComponents() << "] for pixel picker.");
+ //           break;
+ //   }
 
-    //// Update the info text with pixel coordinates/value if requested.
-    //if (m_pTextMapper) {
-    //    m_pTextMapper->SetInput(m_strDetails.c_str());
-    //    m_pIren->Render();
-    //}
+ //   return nVolIdx;
 }

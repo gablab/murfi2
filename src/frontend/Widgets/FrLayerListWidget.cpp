@@ -100,8 +100,9 @@ void FrLayerListWidget::AddLayer(FrLayerSettings* layerSets){
         value = "Default";
     }
     else{
-        value = "Layer";
-        value += QString().setNum(layerSets->ID);
+        //value = "Layer";
+        //value += QString().setNum(layerSets->ID);
+		value = layerSets->Name;
     }
     m_layerTable->setItem(INSERT_ROW_NUM, TAB_NAME_IDX, new QTableWidgetItem(value));
 

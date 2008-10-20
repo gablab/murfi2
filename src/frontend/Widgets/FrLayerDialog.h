@@ -51,6 +51,7 @@ private:
     QLineEdit* m_txtName;
     QLabel* m_lblDescription;
     QLineEdit* m_txtDescription;
+	QLineEdit *lineEdit;	// name
 
     QPushButton* m_btnOk;
     QPushButton* m_btnCancel;

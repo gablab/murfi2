@@ -66,7 +66,8 @@ public:
 
 class FrLayerSettings{
 public:
-    // IDs params 
+    QString Name;
+	// IDs params 
     int     ID;
     // Values params
     FrColormapSettings ColormapSettings;

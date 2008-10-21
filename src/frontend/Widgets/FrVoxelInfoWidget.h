@@ -37,6 +37,7 @@ public:
 
 	void SetVoxelData(VoxelData vd);
 	VoxelData GetVoxelData();
+	void Clear();
 
 public slots:
     // Add slots here

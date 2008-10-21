@@ -2,6 +2,7 @@
 #include "FrMainDocument.h"
 #include "FrMainWindow.h"
 #include "FrBaseView.h"
+#include "FrMosaicView.h"
 #include "FrSliceView.h"
 #include "FrOrthoView.h"
 #include "FrTabSettingsDocObj.h"
@@ -11,6 +12,9 @@
 #include "FrLayeredImage.h"
 
 #include "vtkPointPicker.h"
+#include "vtkCoordinate.h"
+#include "vtkRenderer.h"
+
 
 //Some defines
 #define INVALIDE_RENDERER_NUM -1
@@ -50,14 +54,45 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	// get renderer    
 	FrMainWindow* mv = this->GetMainController()->GetMainView();
 	FrMainDocument* md = this->GetMainController()->GetMainDocument();
-
+	FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+	
 	std::vector<vtkRenderer*> renCollection;
-	mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
+	
+	FrTabSettingsDocObj::View view = ts->GetActiveView();
+	switch(view){
+		case FrTabSettingsDocObj::View::SliceView:
+			mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
+			break;
+		case FrTabSettingsDocObj::View::MosaicView:
+			mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
+			break;
+		case FrTabSettingsDocObj::View::OrthoView:
+			{
+				FrOrthoView* ov =  mv->GetOrthoView();
+
+				// Find Image where click's occured
+				int imgNumber = -1;
+				for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+					if (ov->GetImage(i)->GetRenderer()->IsInViewport(m_mouseX, m_mouseY)){
+						imgNumber = i; break;
+					}
+				}
+				if (imgNumber != -1){
+					ov->GetImage(imgNumber)->GetRenderers(renCollection);
+				}
+				else{
+					ResetVoxelInfo();
+					return false;
+				}
+			}
+			break;	
+	}
 
 	vtkRenderer* renderer = renCollection[0];	// get renderer from current layer (from main layer atm)
 	
 	if (!m_PointPicker->Pick(m_mouseX, m_mouseY, 0, renderer)) {
-        return false;
+        ResetVoxelInfo();
+		return false;
     }	
 
     // Get the mapped position of the mouse using the picker.
@@ -100,7 +135,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	// this should be done for all layers 
 	int nol = md->GetCurrentTabSettings()->GetSliceViewSettings()->OtherLayers.size();	// number of layers
 
-	for (int i = 0; i<nol+1; i++)
+	for (int i = 0; i<nol+1; i++)	// plus default layer
 	{
 		pImageData = mv->GetSliceView()->GetImage()->GetLayerByID(i)->GetInput();		// get image data
 
@@ -130,7 +165,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 				break;
 		}
 		
-		// only for main layer now
+		// Set table values
 		Voxel v;
 		if (i == 0)
 			v.name = "Default";
@@ -146,6 +181,10 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 }
 
 bool FrVoxelInfoCmd::ResetVoxelInfo(){
+	// reset main properties
+	FrMainWindow* mv = this->GetMainController()->GetMainView();
+	mv->GetVoxelInfoWidget()->Clear();	// clear table of voxel values
+
     return false;
 }
 

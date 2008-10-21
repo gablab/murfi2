@@ -165,5 +165,22 @@ VoxelData FrVoxelInfoWidget::GetVoxelData(){
 	return vd;
 }
 
+void FrVoxelInfoWidget::Clear(){
+	// General
+//	labelName->setText(vd.name);
+//	labelTimepoint->setText(QString::number(vd.timepoint));
+
+	// Position
+	labelx->setText("");
+	labely->setText("");
+	labelz->setText("");
+	
+	// Index
+	labeli->setText("");
+	labelj->setText("");
+	labelk->setText("");
+
+	voxelInfo->clear();
+}
 
 

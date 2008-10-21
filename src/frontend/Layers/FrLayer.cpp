@@ -38,11 +38,14 @@ FrLayer::FrLayer()
     m_renderer->AddActor(m_actor);
 }
 
-FrLayer::~FrLayer(){
+FrLayer::~FrLayer(){    
     if(m_cmFilter) m_cmFilter->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
+    if(m_renderer){
+        m_renderer->RemoveActor(m_actor);
+        m_renderer->Delete();
+    }
     if(m_actor) m_actor->Delete();
-    if(m_renderer) m_renderer->Delete();
 }
 
 // Accessors / Modifiers

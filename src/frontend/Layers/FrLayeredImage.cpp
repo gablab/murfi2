@@ -233,17 +233,20 @@ bool FrLayeredImage::RemoveLayer(int layerId){
         if(rw != 0){
             rw->RemoveRenderer(layer->GetRenderer());
             rw->GetRenderers()->InitTraversal();
-
-            // Update layer IDs and number of layers
-            m_nextLayerId = START_LAYER_ID;
-            LayerCollection::iterator it, itEnd(m_layers.end());
-            for(it = m_layers.begin(); it != itEnd; ++it){
-                (*it)->GetRenderer()->SetLayer(m_nextLayerId);
-                ++m_nextLayerId;
-            }
+            
             rw->SetNumberOfLayers(m_layers.size()+1);
         }
+        
+        // Update layer IDs and number of layers
+        m_nextLayerId = START_LAYER_ID;
+        LayerCollection::iterator it, itEnd(m_layers.end());
+        for(it = m_layers.begin(); it != itEnd; ++it){
+            (*it)->SetID(m_nextLayerId);
+            (*it)->GetRenderer()->SetLayer(m_nextLayerId);
+            m_nextLayerId++;
+        }
 
+        // Delete layer object
         layer->Delete();
         result = true;
     }

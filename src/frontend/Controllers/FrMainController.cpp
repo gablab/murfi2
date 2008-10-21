@@ -105,8 +105,19 @@ void FrMainController::LoadImage(QString& fileName){
 
 void FrMainController::IoTabSettings(QString& fileName, bool isInput){
     if(isInput){
-        FrLoadTabsCmd* cmd = FrCommandController::CreateCmd<FrLoadTabsCmd>();
-        cmd->SetFileName(fileName);
+        FrLoadTabsCmd* cmd1 = FrCommandController::CreateCmd<FrLoadTabsCmd>();
+        cmd1->SetFileName(fileName);
+
+        FrUpdateTabsCmd* cmd2 = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
+        cmd2->SetAction(FrUpdateTabsCmd::SetCurrentTab);
+        cmd2->SetTabID(CURRENT_TAB_ID);
+
+        FrRefreshLayerInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        cmd->AddCommand(cmd1);
+        cmd->AddCommand(cmd2);
+        cmd->AddCommand(cmd3);
         cmd->Execute();
         delete cmd;
     }

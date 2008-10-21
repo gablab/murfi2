@@ -9,10 +9,10 @@
 FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 : QWidget(parent){
 	mainVLayout = new QVBoxLayout(this);
+    mainVLayout->setObjectName("mainVLayout");
 
 	// general info
 	QGroupBox* groupBox = new QGroupBox("General", this);
-//	groupBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	
 	QLabel* label1 = new QLabel("Name: ", groupBox);
 	label1->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -20,6 +20,7 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 	label2->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	QVBoxLayout* vl1 = new QVBoxLayout(this);
+    vl1->setObjectName("vl1");
 	vl1->addWidget(label1);
 	vl1->addWidget(label2);
 
@@ -32,10 +33,12 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 	labelTimepoint->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	QVBoxLayout* vl2 = new QVBoxLayout(this);
+    vl2->setObjectName("vl2");
 	vl2->addWidget(labelName);
 	vl2->addWidget(labelTimepoint);
 
 	QHBoxLayout* groupBoxLayout = new QHBoxLayout(groupBox);
+    groupBoxLayout->setObjectName("groupBoxLayout");
 	groupBoxLayout->addLayout(vl1);
 	groupBoxLayout->addLayout(vl2);
 
@@ -45,6 +48,7 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 
 	QGroupBox* gB = new QGroupBox("Position (x, y, z)", groupBox2);
 	QHBoxLayout* gBLayout = new QHBoxLayout(gB);
+    gBLayout->setObjectName("gBLayout");
 
 	labelx = new QLabel("100", gB);
 	labely = new QLabel("102", gB);
@@ -56,6 +60,7 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 
 	QGroupBox* gB2 = new QGroupBox("Index (i, j, k)", groupBox2);
 	QHBoxLayout* gB2Layout = new QHBoxLayout(gB2);
+    gB2Layout->setObjectName("gB2Layout");
 
 	labeli = new QLabel("234", gB2);
 	labelj = new QLabel("111", gB2);
@@ -66,7 +71,6 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 	gB2Layout->addWidget(labelk);
 	
 	voxelInfo = new QTableWidget(groupBox2);
-//	voxelInfo->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	voxelInfo->setColumnCount(2);
 	voxelInfo->setRowCount(0);					// number of layers
 
@@ -77,6 +81,7 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 //	voxelInfo->setFixedWidth(120);
 
 	QVBoxLayout* groupBox2Layout = new QVBoxLayout(groupBox2);
+    groupBox2Layout->setObjectName("groupBox2Layout");
 	groupBox2Layout->addWidget(gB);
 	groupBox2Layout->addWidget(gB2);
 	groupBox2Layout->addWidget(voxelInfo);

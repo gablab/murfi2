@@ -9,7 +9,6 @@
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
 
-#define BAD_TAB_ID -1
 #define ITEMS_NUM  5
 
 
@@ -39,17 +38,20 @@ bool FrUpdateTabsCmd::SetupTab(){
     // Update current tab in document!
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-    std::vector<FrDocumentObj*> docTabs;
-    doc->GetObjectsByType(docTabs, FrDocumentObj::TabSettings);
-    
-    std::vector<FrDocumentObj*>::iterator it, itEnd(docTabs.end());
-    for(it = docTabs.begin(); it != itEnd; ++it){
-        FrTabSettingsDocObj* tsDO = (FrTabSettingsDocObj*)(*it);
-        tsDO->SetIsCurrent( (tsDO->GetID() == m_TabID) );
+    if(m_TabID != CURRENT_TAB_ID){
+        std::vector<FrDocumentObj*> docTabs;
+        doc->GetObjectsByType(docTabs, FrDocumentObj::TabSettings);
+        
+        std::vector<FrDocumentObj*>::iterator it, itEnd(docTabs.end());
+        for(it = docTabs.begin(); it != itEnd; ++it){
+            FrTabSettingsDocObj* tsDO = (FrTabSettingsDocObj*)(*it);
+            tsDO->SetIsCurrent( (tsDO->GetID() == m_TabID) );
+        }
     }
 
     // Setup layers to images
     SetupImageLayers();
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_FULL);
 
     return true;
 }

@@ -349,9 +349,12 @@ bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem,
     //Load main settings
     bool isValid = false;
     // ID
-    if(!elem.hasAttribute(FR_XML_ID_ATTR)) return false;
-    mlSets->ID = elem.attribute(FR_XML_ID_ATTR).toInt(&isValid);
-    if(!isValid) return false;
+    //if(!elem.hasAttribute(FR_XML_ID_ATTR)) return false;
+    //mlSets->ID = elem.attribute(FR_XML_ID_ATTR).toInt(&isValid);
+    //if(!isValid) return false;
+    // NOTE: ID is always 0 for main layer of the image
+    mlSets->ID = DEFAULT_LAYER_ID;
+
     // Opacity    
     if(!elem.hasAttribute(FR_XML_OPACITY_ATTR)) return false;
     mlSets->Opacity = elem.attribute(FR_XML_OPACITY_ATTR).toDouble(&isValid);

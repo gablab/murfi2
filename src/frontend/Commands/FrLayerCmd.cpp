@@ -224,10 +224,15 @@ bool FrLayerCmd::ChangeLayer(){
                 for(itr = otherLayers[i]->begin(); itr != itrEnd; ++itr){
                     if((*itr)->ID == layerSets->ID){
                         FrLayerSettings& ls = *(*itr);
-                        // Just keep TBC
-                        saveTbc = ls.TbcSettings;
-                        ls = *layerSets;
-                        ls.TbcSettings = saveTbc;
+                        // Update params
+                        ls.Name = layerSets->Name;
+                        ls.Opacity = layerSets->Opacity;
+                        ls.Visibility = layerSets->Visibility;
+                        ls.ColormapSettings.Type = layerSets->ColormapSettings.Type;
+                        ls.ColormapSettings.MinValue = layerSets->ColormapSettings.MinValue;
+                        ls.ColormapSettings.MaxValue = layerSets->ColormapSettings.MaxValue;
+                        ls.ColormapSettings.Threshold = layerSets->ColormapSettings.Threshold;
+                        ls.ColormapSettings.Color = layerSets->ColormapSettings.Color;
                         break;
                     }
                 }

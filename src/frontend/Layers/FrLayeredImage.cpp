@@ -10,6 +10,9 @@
 #include "vtkImageData.h"
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
+#include "vtkTextMapper.h"
+#include "vtkActor2D.h"
+#include "vtkTextProperty.h"
 
 #define START_LAYER_ID 1
 
@@ -26,12 +29,31 @@ FrLayeredImage* FrLayeredImage::New(){
 FrLayeredImage::FrLayeredImage() {
     m_nextLayerId = DEFAULT_LAYER_ID;
     this->InitDefault(this);
-
+       
     // NOTE: remove colormap filter from pipline
     if(m_cmFilter) {
         m_cmFilter->Delete();
         m_cmFilter = 0L;
     }
+
+    // Init text stuff
+    m_TextMapper = vtkTextMapper::New();
+    m_TextMapper->SetInput("");
+
+    vtkTextProperty* pProperty = m_TextMapper->GetTextProperty();
+	pProperty->SetBold(1);
+    pProperty->SetItalic(0);
+    pProperty->SetFontSize(20);
+    pProperty->SetFontFamily(VTK_ARIAL);
+    pProperty->SetColor(100.0, 100.0, 0.0);
+    pProperty->SetJustification(VTK_TEXT_LEFT);
+    pProperty->SetVerticalJustification(VTK_TEXT_CENTERED);
+    
+    m_TextActor = vtkActor2D::New();
+    m_TextActor->SetMapper(m_TextMapper);
+    m_TextActor->SetPosition(20, 20);
+    m_TextActor->PickableOff();
+    m_renderer->AddActor2D(m_TextActor);
 }
 
 FrLayeredImage::~FrLayeredImage(){
@@ -39,6 +61,10 @@ FrLayeredImage::~FrLayeredImage(){
     for(int id = 0; id < m_nextLayerId; ++id){
         this->RemoveLayer(id);
     }
+
+    // Delete text stuff
+    if(m_TextMapper) m_TextMapper->Delete();
+    if(m_TextActor) m_TextActor->Delete();
 }
 
 // Modifiers
@@ -296,4 +322,9 @@ void FrLayeredImage::GetRenderers(std::vector<vtkRenderer*>& renderers){
         (*it)->GetRenderer()->SetLayer(layer);
         layer++;
     }
+}
+
+// Text management
+void FrLayeredImage::SetText(const char* text){
+    m_TextMapper->SetInput(text);
 }

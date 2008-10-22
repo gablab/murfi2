@@ -106,7 +106,14 @@ void FrMosaicView::UpdatePipeline(int point){
         }
 	case FRP_SLICE:
         {
-            // NOTE: DO NOTHING HERE SINCE IT's MOSAIC VIEW
+            // NOTE: Do nothing here but setup text
+            // Set text
+            if(m_LayeredImage->GetInput()){
+                m_LayeredImage->SetText("Mosaic View:");
+            }
+            else {            
+                m_LayeredImage->SetText("");
+            }
         }
     case FRP_COLORMAP:
         {

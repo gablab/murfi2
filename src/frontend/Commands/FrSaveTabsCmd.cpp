@@ -200,6 +200,7 @@ void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, int id,
     // image
     QDomElement imageElem = m_Document->createElement(FR_XML_IMG_ELEM);
     imageElem.setAttribute(FR_XML_ID_ATTR, id);
+    imageElem.setAttribute(FR_XML_NAME_ATTR, mlSets->Name);
     imageElem.setAttribute(FR_XML_OPACITY_ATTR, mlSets->Opacity);
     imageElem.setAttribute(FR_XML_VISIBLE_ATTR, (mlSets->Visibility ? 1 : 0) );
     parent.appendChild(imageElem);
@@ -221,6 +222,7 @@ void FrSaveTabsCmd::SaveLayerSettings(QDomElement& parent, FrLayerSettings* liSe
     
     QDomElement layerElem = m_Document->createElement(FR_XML_LAYER_ELEM);
     layerElem.setAttribute(FR_XML_ID_ATTR, liSets->ID);
+    layerElem.setAttribute(FR_XML_NAME_ATTR, liSets->Name);
     layerElem.setAttribute(FR_XML_OPACITY_ATTR, liSets->Opacity);
     layerElem.setAttribute(FR_XML_VISIBLE_ATTR, (liSets->Visibility ? 1 : 0) );
 

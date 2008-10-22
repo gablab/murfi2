@@ -956,6 +956,8 @@ bool RtDataImage<T>::unmosaicUnlocked() {
   }
 
   // build a new pixdim
+  // scopic: mosaic image have might not to have 3rd dim
+  if(pixdims.size() == 2) pixdims.push_back(0);
   pixdims[2] = sliceThick*(1+sliceGap);
 
   // reshape the data
@@ -1164,7 +1166,8 @@ bool RtDataImage<T>::seemsMosaic() {
 
   // see if the two dimensions look like mosaiced dimensions
   // assumptions: if the matrix size is 32, 64, or 128 assume its a single slice
-  return (dims[1] != dims[2]) 
+  // scopic: dims from 0 to 2
+  return (dims[1] != dims[0]) 
     || !(dims[1] == 32 || dims[1] == 64 || dims[1] == 128);
 }
 

@@ -4,6 +4,8 @@
 
 // Forward declarations
 class vtkRenderer;
+class vtkTextMapper;
+class vtkActor2D;
 
 // Some includes
 #include "FrLayer.h"
@@ -38,13 +40,19 @@ public:
     // Initialization
     void InitDefault(FrLayer* layer);
 
+    //
     // Layer management
+    //
     int  AddLayer();
     bool RemoveLayer(int id);
     void RemoveLayers();
-
     // Returns layer by ID
     FrLayer* GetLayerByID(int id);
+
+    //
+    // Text management
+    //
+    void SetText(const char* text);
 
 protected:
     // Constructor and destructor
@@ -52,9 +60,14 @@ protected:
     virtual ~FrLayeredImage();
 
 private:
-   typedef std::vector<FrLayer*> LayerCollection;
-   LayerCollection m_layers;
-   int m_nextLayerId;
+    typedef std::vector<FrLayer*> LayerCollection;
+    LayerCollection m_layers;
+    int m_nextLayerId;
+
+    // Add text support
+    // Combine a text mapper with an actor.
+    vtkTextMapper* m_TextMapper;
+    vtkActor2D*    m_TextActor;
 
 private:
     FrLayeredImage(const FrLayeredImage&);  // Not implemented.

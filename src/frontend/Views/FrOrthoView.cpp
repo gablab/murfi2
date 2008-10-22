@@ -179,10 +179,20 @@ void FrOrthoView::UpdatePipeline(int point){
             m_SliceExtractor[AXIAL_IMAGE]->SetSlice(viewSets->AxialSlice);
                     
             // Connect output to layered image
+            char* text[3];
+            text[CORONAL_IMAGE] = "Ortho View: Coronal";
+            text[SAGITAL_IMAGE] = "Ortho View: Sagital";
+            text[AXIAL_IMAGE]   = "Ortho View: Axial";
             for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
                 if(m_SliceExtractor[i]->GetInput()){
 		            m_SliceExtractor[i]->Update();
                     m_LayeredImage[i]->SetInput(m_SliceExtractor[i]->GetOutput());
+
+                    // Set text
+                    m_LayeredImage[i]->SetText(text[i]);
+                }
+                else {
+                    m_LayeredImage[i]->SetText("");
                 }
             }
         }

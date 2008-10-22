@@ -57,6 +57,7 @@ public:
 };
 
 // Settings of layers
+#define DEF_DEFLAYER_NAME "Default"
 #define DEF_LAYER_OPACITY    1.0
 #define DEF_LAYER_VISIBILITY true
 #define DEFAULT_LAYER_ID  0

@@ -183,6 +183,7 @@ FslJobID RtFSLInterface::runAnalysis(string filePrefix, unsigned int runNum,
 				     float blockLength, 
 				     unsigned int numConditions) {
   cout << "RtFSLInterface::runAnalysis() is not yet implemented" << endl;
+  return cmdMap.size();
 }
 
 // get the next job id

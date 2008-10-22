@@ -64,6 +64,7 @@ RtConductor::RtConductor(int argc, char **argv) {
 
   // prepare outputs
 
+#ifndef USE_FRONTEND
   // display always first, if here
   if(config.get("display:image")==true) {
     RtDisplayImage *dispimg;
@@ -73,6 +74,7 @@ RtConductor::RtConductor(int argc, char **argv) {
       cerr << "ERROR: could not initialize image display" << endl;
     }
   }
+#endif
 
   // open output socket
   if(config.get("infoserver:port")==true) {
@@ -400,6 +402,10 @@ char *RtConductor::getVersionString() {
   return VERSION;
 }
 
+// NOTE: when we build app using front end 
+// then main hasn't be defined several times
+#ifndef USE_FRONTEND
+
 // main function for the realtime system
 // very simple
 int ACE_TMAIN(int argc, char **args) {
@@ -414,6 +420,8 @@ int ACE_TMAIN(int argc, char **args) {
 
   return 0;
 }
+
+#endif
 
 /*****************************************************************************
  * $Source$

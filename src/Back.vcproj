@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;TIXML_USE_STL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;TIXML_USE_STL;USE_FRONTEND"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -105,7 +105,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;TIXML_USE_STL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;TIXML_USE_STL;USE_FRONTEND"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -216,14 +216,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\stream\analysis\RtImageSlideWinCor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\analysis\RtImageSlideWinCor.h"
-					>
-				</File>
-				<File
 					RelativePath=".\stream\analysis\RtImageZScore.cpp"
 					>
 				</File>
@@ -255,9 +247,93 @@
 					RelativePath=".\stream\analysis\RtSingleImageCor.h"
 					>
 				</File>
+				<File
+					RelativePath=".\stream\analysis\RtSlideWinCor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\analysis\RtSlideWinCor.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="postprocess"
+				>
+				<File
+					RelativePath=".\stream\postprocess\RtEventTrigger.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtEventTrigger.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtEventTriggerActivationDiff.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtEventTriggerActivationDiff.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtEventTriggerActivationSums.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtEventTriggerActivationSums.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoi2Feedback.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoi2Feedback.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiDifference.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiDifference.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiMean2Feedback.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiMean2Feedback.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiMedian2Feedback.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiMedian2Feedback.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiSum2Feedback.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiSum2Feedback.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiWeightedAve2Feedback.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiWeightedAve2Feedback.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="preprocess"
 				>
 				<File
 					RelativePath=".\stream\preprocess\RtDiff.cpp"
@@ -308,50 +384,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="preprocess"
-				>
-				<File
-					RelativePath=".\stream\postprocess\RtActivationSum.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtActivationSum.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtActivationSumDifference.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtActivationSumDifference.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtEventTrigger.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtEventTrigger.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtEventTriggerActivationDiff.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtEventTriggerActivationDiff.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtEventTriggerActivationSums.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtEventTriggerActivationSums.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="data"
@@ -370,6 +402,10 @@
 			</File>
 			<File
 				RelativePath=".\data\RtData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\data\RtDataID.cpp"
 				>
 			</File>
 			<File
@@ -426,6 +462,10 @@
 			>
 			<File
 				RelativePath=".\io\ExternalSenderImageInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\io\RtDataStore.cpp"
 				>
 			</File>
 			<File
@@ -548,6 +588,10 @@
 				RelativePath=".\util\RtTypes.h"
 				>
 			</File>
+			<File
+				RelativePath=".\util\site_config.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="executive"
@@ -582,6 +626,22 @@
 			</File>
 			<File
 				RelativePath=".\executive\RtConfigVal.h"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtExperiment.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtExperiment.h"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtFSLInterface.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtFSLInterface.h"
 				>
 			</File>
 			<Filter

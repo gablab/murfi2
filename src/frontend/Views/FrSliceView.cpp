@@ -58,7 +58,7 @@ void FrSliceView::SetupRenderers(){
     }
 
     renWin->GetRenderers()->InitTraversal();
-    renWin->SetNumberOfLayers(renderers.size());
+    renWin->SetNumberOfLayers((int)renderers.size());
 }
 
 void FrSliceView::RemoveRenderers(){
@@ -130,6 +130,15 @@ void FrSliceView::UpdatePipeline(int point){
             if(m_SliceExtractor->GetInput()){
 			    m_SliceExtractor->Update();
                 m_LayeredImage->SetInput(m_SliceExtractor->GetOutput());
+
+                // Set text
+                char text[255];
+                sprintf(text, "Slice View: %d of %d", 
+                    viewSets->SliceNumber, maxSliceNumber);
+                m_LayeredImage->SetText(text);
+            }
+            else {
+                m_LayeredImage->SetText("");
             }
         }
     case FRP_COLORMAP:

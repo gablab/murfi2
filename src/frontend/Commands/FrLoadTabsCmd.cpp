@@ -355,6 +355,10 @@ bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem,
     // NOTE: ID is always 0 for main layer of the image
     mlSets->ID = DEFAULT_LAYER_ID;
 
+    if(!elem.hasAttribute(FR_XML_NAME_ATTR)) return false;
+    mlSets->Name = elem.attribute(FR_XML_NAME_ATTR);
+    if(mlSets->Name != QString(DEF_DEFLAYER_NAME)) return false;
+
     // Opacity    
     if(!elem.hasAttribute(FR_XML_OPACITY_ATTR)) return false;
     mlSets->Opacity = elem.attribute(FR_XML_OPACITY_ATTR).toDouble(&isValid);
@@ -454,6 +458,11 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
     bool isValid = false;
     // NOTE for now ignore id attribute
     ls->ID = BAD_LAYER_ID;    
+
+    // Name
+    if(!elem.hasAttribute(FR_XML_NAME_ATTR)) return false;
+    ls->Name = elem.attribute(FR_XML_NAME_ATTR);
+
     // Opacity    
     if(!elem.hasAttribute(FR_XML_OPACITY_ATTR)) return false;
     ls->Opacity = elem.attribute(FR_XML_OPACITY_ATTR).toDouble(&isValid);
@@ -548,7 +557,7 @@ bool FrLoadTabsCmd::LoadAttrValuesXYZ(QDomElement& elem, double* vec){
 
 bool FrLoadTabsCmd::ValidateTabSettings(FrTabSettingsDocObj* tabs){
     // All views have to have the same layers
-    LayerCollection* layers[4];    
+    LayerCollection* layers[4];
     layers[0]= &tabs->GetMosaicViewSettings()->OtherLayers;
     layers[1]= &tabs->GetOrthoViewSettings()->OtherLayers[0];
     layers[2]= &tabs->GetOrthoViewSettings()->OtherLayers[1];

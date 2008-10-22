@@ -142,8 +142,8 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
     needsInit = false;
   }
   
-  ACE_DEBUG((LM_DEBUG, "intensity normalizing image %d\n", 
-	     img->getAcquisitionNum()));
+//  ACE_DEBUG((LM_DEBUG, "intensity normalizing image %d\n", 
+//	     img->getAcquisitionNum()));
   
   // compute the mean intensity in the mask for this image
 

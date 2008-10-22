@@ -87,8 +87,8 @@ int RtRoiWeightedAve2Feedback::process(ACE_Message_Block *mb) {
     return 0;
   }
   
-  ACE_DEBUG((LM_DEBUG, "weightedAve-ing activation in image %d\n", 
-	     img->getDataID()->getTimepoint()));
+//  ACE_DEBUG((LM_DEBUG, "weightedAve-ing activation in image %d\n", 
+//	     img->getDataID()->getTimepoint()));
 	    
   if(needsInit) {
     initEstimation(*img);

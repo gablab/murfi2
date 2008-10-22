@@ -83,8 +83,8 @@ int RtImageZScore::process(ACE_Message_Block *mb) {
     return 0;
   }
   
-  ACE_DEBUG((LM_DEBUG, "including image %d in the z-score estimate\n", 
-	     img->getAcquisitionNum()));
+//  ACE_DEBUG((LM_DEBUG, "including image %d in the z-score estimate\n", 
+//	     img->getAcquisitionNum()));
   
   // validate sizes
   if(img->getNumPix() != mean->getNumPix() 

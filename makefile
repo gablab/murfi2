@@ -91,7 +91,8 @@ SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)
 
 # library flags
 
-PKG_DIR = /sw/packages
+#PKG_DIR = /sw/packages
+PKG_DIR = /usr/local/packages
 
 # math
 

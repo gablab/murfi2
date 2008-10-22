@@ -45,8 +45,8 @@ int RtDiff::process(ACE_Message_Block *mb) {
     return 0;
   }
   
-  ACE_DEBUG((LM_DEBUG, "differencing images %d and %d\n", 
-	     img->getAcquisitionNum(), last->getAcquisitionNum()));
+//  ACE_DEBUG((LM_DEBUG, "differencing images %d and %d\n", 
+//	     img->getAcquisitionNum(), last->getAcquisitionNum()));
   
   // validate sizes
   if(img->getNumPix() != last->getNumPix()) {

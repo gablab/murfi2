@@ -130,7 +130,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
     needsInit = false;
   }
   
-  ACE_DEBUG((LM_DEBUG, "including image %d in the sliding window correlation estimate\n", dat->getAcquisitionNum()));
+  //ACE_DEBUG((LM_DEBUG, "including image %d in the sliding window correlation estimate\n", dat->getAcquisitionNum()));
   
   // validate sizes
   if(dat->getNumEl() != numData) {

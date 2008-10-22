@@ -19,7 +19,7 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 	QLabel* label2 = new QLabel("Timepoint: ", groupBox);
 	label2->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	QVBoxLayout* vl1 = new QVBoxLayout(this);
+	QVBoxLayout* vl1 = new QVBoxLayout();
     vl1->setObjectName("vl1");
 	vl1->addWidget(label1);
 	vl1->addWidget(label2);
@@ -32,7 +32,7 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 	labelTimepoint->setFrameShape(QFrame::Box);
 	labelTimepoint->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	QVBoxLayout* vl2 = new QVBoxLayout(this);
+	QVBoxLayout* vl2 = new QVBoxLayout();
     vl2->setObjectName("vl2");
 	vl2->addWidget(labelName);
 	vl2->addWidget(labelTimepoint);

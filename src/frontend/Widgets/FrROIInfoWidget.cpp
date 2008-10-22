@@ -19,7 +19,7 @@ FrROIInfoWidget::FrROIInfoWidget(QWidget *parent)
 	QLabel* label2 = new QLabel("Number of voxels: ", groupBox);
 	label2->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	QVBoxLayout* vl1 = new QVBoxLayout(this);
+	QVBoxLayout* vl1 = new QVBoxLayout();
 	vl1->addWidget(label1);
 	vl1->addWidget(label2);
 
@@ -31,7 +31,7 @@ FrROIInfoWidget::FrROIInfoWidget(QWidget *parent)
 	labelVoxelNumber->setFrameShape(QFrame::Box);
 	labelVoxelNumber->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	QVBoxLayout* vl2 = new QVBoxLayout(this);
+	QVBoxLayout* vl2 = new QVBoxLayout();
 	vl2->addWidget(labelName);
 	vl2->addWidget(labelVoxelNumber);
 

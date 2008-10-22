@@ -269,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrLayerWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrMainMenu_moc.cpp"
 				>
 			</File>
@@ -785,6 +789,24 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrlayerWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrLayerWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrMainMenu.cpp"
 				>
 			</File>
@@ -825,7 +847,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1071,6 +1093,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrRefreshLayerInfoCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrRefreshLayerInfoCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrResetImageCmd.cpp"
 				>
 			</File>
@@ -1123,19 +1153,19 @@
 			Name="Layers"
 			>
 			<File
-				RelativePath=".\frontend\Layers\FrMyLayer.cpp"
+				RelativePath=".\frontend\Layers\FrLayer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Layers\FrMyLayer.h"
+				RelativePath=".\frontend\Layers\FrLayer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Layers\FrMyLayeredImage.cpp"
+				RelativePath=".\frontend\Layers\FrLayeredImage.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Layers\FrMyLayeredImage.h"
+				RelativePath=".\frontend\Layers\FrLayeredImage.h"
 				>
 			</File>
 		</Filter>

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrApplication.h'
 **
-** Created: Tue 21. Oct 12:12:27 2008
+** Created: Tue 21. Oct 22:25:57 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

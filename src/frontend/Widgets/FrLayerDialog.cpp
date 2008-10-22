@@ -25,13 +25,13 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
     this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
         
     // create buttons
+	//QWidget* mainWidget = new QWidget(this);
+
     m_btnOk = new QPushButton(tr("OK"), this);
     m_btnCancel = new QPushButton(tr("Cancel"), this);
     connect( m_btnOk, SIGNAL( clicked() ), this, SLOT( OnOKClicked() ) );
     connect( m_btnCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
-	m_vLayout = new QVBoxLayout(this);
-	
 	// general group
 	QLabel *general;
 	general = new QLabel("General", this);
@@ -41,7 +41,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
 
-	QHBoxLayout* hl = new QHBoxLayout(this);
+	QHBoxLayout* hl = new QHBoxLayout();
 	hl->addWidget(general);
 	hl->addWidget(line);
 
@@ -50,7 +50,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 	QLabel *label_2;
 	label_2 = new QLabel("Opacity: ", this);
 
-	QVBoxLayout* vl = new QVBoxLayout(this);
+	QVBoxLayout* vl = new QVBoxLayout();
 	vl->addWidget(label);
 	vl->addWidget(label_2);
 
@@ -68,15 +68,15 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
     OpacitySlider->setOrientation(Qt::Horizontal);
 	connect(OpacitySlider, SIGNAL(valueChanged(int)), this, SLOT(SetOpacitySpinBoxPosition(int)));
 
-	QHBoxLayout* hl1 = new QHBoxLayout(this);
+	QHBoxLayout* hl1 = new QHBoxLayout();
 	hl1->addWidget(OpacitySpinBox);
 	hl1->addWidget(OpacitySlider);
 
-	QVBoxLayout* vl2 = new QVBoxLayout(this);
+	QVBoxLayout* vl2 = new QVBoxLayout();
 	vl2->addWidget(lineEdit);
 	vl2->addLayout(hl1);
 
-	QHBoxLayout* hl2 = new QHBoxLayout(this);
+	QHBoxLayout* hl2 = new QHBoxLayout();
 	hl2->addLayout(vl);
 	hl2->addLayout(vl2);
 
@@ -92,7 +92,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
     line2->setFrameShape(QFrame::HLine);
     line2->setFrameShadow(QFrame::Sunken);
 
-	QHBoxLayout* hl3 = new QHBoxLayout(this);
+	QHBoxLayout* hl3 = new QHBoxLayout();
 	hl3->addWidget(colormap);
 	hl3->addWidget(line2);
 
@@ -103,7 +103,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 	QLabel *label_5;
 	label_5 = new QLabel("PxMax: ", this);
 
-	QVBoxLayout* vl3 = new QVBoxLayout(this);
+	QVBoxLayout* vl3 = new QVBoxLayout();
 	vl3->addWidget(label_3);
 	vl3->addWidget(label_4);
 	vl3->addWidget(label_5);
@@ -119,7 +119,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
     PxMinSlider->setOrientation(Qt::Horizontal);
 	connect(PxMinSlider, SIGNAL(valueChanged(int)), this, SLOT(SetPxMinSpinBoxPosition(int)));
 
-	QHBoxLayout* hl4 = new QHBoxLayout(this);
+	QHBoxLayout* hl4 = new QHBoxLayout();
 	hl4->addWidget(PxMinSpinBox);
 	hl4->addWidget(PxMinSlider);
 
@@ -134,7 +134,7 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
     PxMaxSlider->setOrientation(Qt::Horizontal);
 	connect(PxMaxSlider, SIGNAL(valueChanged(int)), this, SLOT(SetPxMaxSpinBoxPosition(int)));
 
-	QHBoxLayout* hl5 = new QHBoxLayout(this);
+	QHBoxLayout* hl5 = new QHBoxLayout();
 	hl5->addWidget(PxMaxSpinBox);
 	hl5->addWidget(PxMaxSlider);
 
@@ -146,12 +146,12 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 	comboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboBoxChange(int)));
 
-	QVBoxLayout* vl4 = new QVBoxLayout(this);
+	QVBoxLayout* vl4 = new QVBoxLayout();
 	vl4->addWidget(comboBox);
 	vl4->addLayout(hl4);
 	vl4->addLayout(hl5);
 
-	QHBoxLayout* hmainc = new QHBoxLayout(this);
+	QHBoxLayout* hmainc = new QHBoxLayout();
 	hmainc->addLayout(vl3);
 	hmainc->addLayout(vl4);
 
@@ -207,12 +207,13 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 	groupBoxLayout2->addWidget(colorBtn);
 
 	// button layout
-    m_btnLayout = new QHBoxLayout(this);
+    m_btnLayout = new QHBoxLayout();
     m_btnLayout->addStretch();    
     m_btnLayout->addWidget(m_btnOk);
     m_btnLayout->addWidget(m_btnCancel);
 
 	// main vertical layout
+	m_vLayout = new QVBoxLayout(this);
 	m_vLayout->addLayout(hl);
 	m_vLayout->addLayout(hl2);
 	m_vLayout->addWidget(visibleCheckBox);

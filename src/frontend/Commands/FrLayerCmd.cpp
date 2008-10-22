@@ -2,6 +2,7 @@
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 #include "FrLayerDialog.h"
+#include "FrLayerListWidget.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
@@ -161,6 +162,8 @@ bool FrLayerCmd::UpdateSelectedLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
 
+	// TODO: update selected layer settings on LayerListWidget's right panel
+	
     tabSets->GetSliceViewSettings()->ActiveLayerID = m_ID;
     tabSets->GetMosaicViewSettings()->ActiveLayerID = m_ID;
     tabSets->GetOrthoViewSettings()->ActiveLayerID = m_ID;

@@ -38,7 +38,7 @@ public:
     void SelectLayer(int id);
 	void AddLayer();
     void DeleteLayer();
-    void ChangeLayer();
+    void ChangeLayer(int action);
 
     void ChangeBookmark(int id);
     void DeleteBookmark(int id);

@@ -58,7 +58,7 @@ void FrSliceView::SetupRenderers(){
     }
 
     renWin->GetRenderers()->InitTraversal();
-    renWin->SetNumberOfLayers((int)renderers.size());
+    renWin->SetNumberOfLayers( int(renderers.size()) );
 }
 
 void FrSliceView::RemoveRenderers(){
@@ -193,6 +193,9 @@ void FrSliceView::UpdatePipeline(int point){
         // do nothing
         break;
     }
+
+    // Draw border
+    m_LayeredImage->UpdateBorder();
 
     // redraw scene
 	GetRenderWindow()->Render();

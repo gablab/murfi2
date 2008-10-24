@@ -168,6 +168,9 @@ void FrMosaicView::UpdatePipeline(int point){
         break;
     }
 
+    // Draw border
+    m_LayeredImage->UpdateBorder();
+
     // redraw scene
 	GetRenderWindow()->Render();
 }

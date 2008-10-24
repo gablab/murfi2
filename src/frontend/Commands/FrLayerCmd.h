@@ -12,7 +12,9 @@ class FrLayerSettings;
 class FrLayerCmd : public FrBaseCmd
 {
 public:
-    enum Action { Undefined, Add, Delete, Change, UpdateSelectedID };
+    enum Action { Undefined, Add, Delete, 
+        ChangeOld, ChangeParams, ChangeColormap, 
+        UpdateSelectedID };
 
 public:
     // Constructor/destructor
@@ -32,9 +34,12 @@ public:
 private:
     // Helper methods here
     bool AddLayer();
-    bool DeleteLayer();
-    bool ChangeLayer();
+    bool DeleteLayer();    
     bool UpdateSelectedLayerID();
+
+    bool ChangeLayerOld();
+    bool ChangeLayerParams();
+    bool ChangeLayerColormap();
 
     int GetActiveLayerID();
 

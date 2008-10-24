@@ -183,6 +183,7 @@ inline void InitTbcDefault(FrTBCSettings* sets){
 
 inline void InitLayerDefault(FrLayerSettings* sets){
     sets->ID = BAD_LAYER_ID;
+    sets->Name = DEF_DEFLAYER_NAME;
     sets->Opacity = DEF_LAYER_OPACITY;
     sets->Visibility = DEF_LAYER_VISIBILITY;
 

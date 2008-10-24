@@ -100,7 +100,7 @@ void FrUpdateTabsCmd::SetupImageLayers(){
     layers[4] = &tabSets->GetOrthoViewSettings()->OtherLayers[AXIAL_IMAGE];
     
     for(int i=0; i < ITEMS_NUM; ++i){
-        image[i]->RemoveLayers();
+        image[i]->RemoveImageLayers();
 
         LayerCollection::iterator it, itEnd(layers[i]->end());
         for(it = layers[i]->begin(); it != itEnd; ++it){

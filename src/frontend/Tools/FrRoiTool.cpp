@@ -37,7 +37,7 @@ bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    QMessageBox::information(0, QString("Tool info"), QString("ROI tool is working"));
+    //QMessageBox::information(0, QString("Tool info"), QString("ROI tool is working"));
     return false;
 }
 

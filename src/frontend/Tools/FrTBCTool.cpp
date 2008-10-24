@@ -44,20 +44,32 @@ bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     int deltaX = params.X - m_oldX;
     FrChangeTbcCmd* cmd = FrCommandController::CreateCmd<FrChangeTbcCmd>();
 
-    if ((abs(deltaX / 20)) > MOUSE_MOVE_THRESHOLD){
-        // set brightness
-		m_oldX = params.X;		
-		inc = (deltaX < 0) ? -1 : 1;
-        cmd->SetBrightnessDelta( inc / 100.0 );
-	}
+    if(!params.IsControl){
+        if ((abs(deltaX / 20)) > MOUSE_MOVE_THRESHOLD){
+            // set brightness
+		    m_oldX = params.X;		
+		    inc = (deltaX < 0) ? -1 : 1;
+            cmd->SetBrightnessDelta( inc / 100.0 );
+	    }
 
-    int deltaY = params.Y - m_oldY;
-	if ((abs(deltaY / 20)) > MOUSE_MOVE_THRESHOLD){
-        // set contrast
-		m_oldY = params.Y;
-        inc = (deltaY < 0) ? -1 : 1;
-        cmd->SetContrastDelta( inc / 100.0 );
-	}
+        int deltaY = params.Y - m_oldY;
+	    if ((abs(deltaY / 20)) > MOUSE_MOVE_THRESHOLD){
+            // set contrast
+		    m_oldY = params.Y;
+            inc = (deltaY < 0) ? -1 : 1;
+            cmd->SetContrastDelta( inc / 100.0 );
+	    }
+    }
+    else {
+        // Threshold changing
+        int deltaY = params.Y - m_oldY;
+	    if ((abs(deltaY / 20)) > MOUSE_MOVE_THRESHOLD){
+            // set threshold
+		    m_oldY = params.Y;
+            inc = (deltaY < 0) ? -1 : 1;
+            cmd->SetThresholdDelta( inc / 100.0 );
+	    }
+    }
 	
     // Execute command
     bool result = cmd->Execute();

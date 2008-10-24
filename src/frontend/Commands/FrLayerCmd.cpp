@@ -34,17 +34,17 @@ bool FrLayerCmd::Execute(){
 
     bool result = false;
     switch(m_Action){
-        case FrLayerCmd::Add: 
-            result = AddLayer();
+        case FrLayerCmd::Add: result = AddLayer();
             break;
-        case FrLayerCmd::Delete: 
-            result = DeleteLayer();
+        case FrLayerCmd::Delete: result = DeleteLayer();
             break;
-        case FrLayerCmd::Change: 
-            result = ChangeLayer();
+        case FrLayerCmd::ChangeOld: result = ChangeLayerOld();
             break;
-        case FrLayerCmd::UpdateSelectedID: 
-            result = UpdateSelectedLayerID();
+        case ChangeParams: result = ChangeLayerParams();
+            break;
+        case ChangeColormap: result = ChangeLayerColormap();
+            break;
+        case FrLayerCmd::UpdateSelectedID: result = UpdateSelectedLayerID();
             break;
         default:
             // Do nothing here
@@ -169,10 +169,10 @@ bool FrLayerCmd::UpdateSelectedLayerID(){
     tabSets->GetOrthoViewSettings()->ActiveLayerID = m_ID;
 }
 
-bool FrLayerCmd::ChangeLayer(){
+bool FrLayerCmd::ChangeLayerOld(){
     // Get proper ID
     if(!m_isID || m_ID == CUR_LAYER_ID){
-        m_ID = GetActiveLayerID();
+        m_ID = this->GetActiveLayerID();
     }
     // if wrong ID is specified return
     if(m_ID < DEFAULT_LAYER_ID) return false;
@@ -246,6 +246,94 @@ bool FrLayerCmd::ChangeLayer(){
         mv->GetCurrentView()->UpdatePipeline(FRP_COLORMAP);
     }
     return result;
+}
+
+
+
+bool FrLayerCmd::ChangeLayerParams(){
+    // Get proper ID
+    if(!m_isID || m_ID == CUR_LAYER_ID){
+        m_ID = this->GetActiveLayerID();
+    }
+
+    // Init data
+    FrMainWindow* mw = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
+    LayerCollection sliceLayers, mosaicLayers, 
+                    orthoLayers0, orthoLayers1, orthoLayers2;
+    GetLayerSettings(tabSets->GetSliceViewSettings(), sliceLayers);
+    GetLayerSettings(tabSets->GetMosaicViewSettings(), mosaicLayers);
+    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers0, 0);
+    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers1, 1);
+    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers2, 2);
+
+    LayerCollection* otherLayers[ALL_ITEMS_COUNT];    
+    otherLayers[0] = &sliceLayers;
+    otherLayers[1] = &mosaicLayers;
+    otherLayers[2] = &orthoLayers0;
+    otherLayers[3] = &orthoLayers1;
+    otherLayers[4] = &orthoLayers2;
+
+    FrLayerSettings ls;
+    if(!mw->GetLayerListWidget()->GetLayerParams(m_ID, ls)) return false;
+
+    // Update simple params
+    for(int i=0; i < ALL_ITEMS_COUNT; ++i){
+        LayerCollection::iterator it, itEnd(otherLayers[i]->end());
+        for(it = otherLayers[i]->begin(); it != itEnd; ++it){
+            if((*it)->ID == m_ID){
+                (*it)->Visibility = ls.Visibility;
+                (*it)->Opacity = ls.Opacity;
+                (*it)->Name = ls.Name;
+                break;
+            }
+        }    
+    }
+    FrBaseCmd::UpdatePipelineForID(m_ID, FRP_OPACITY_VISIBILITY);    
+    return true;
+}
+
+bool FrLayerCmd::ChangeLayerColormap(){
+    // Get proper ID
+    if(!m_isID || m_ID == CUR_LAYER_ID){
+        m_ID = this->GetActiveLayerID();
+    }
+
+    // Init data
+    FrMainWindow* mw = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
+    LayerCollection sliceLayers, mosaicLayers, 
+                    orthoLayers0, orthoLayers1, orthoLayers2;
+    GetLayerSettings(tabSets->GetSliceViewSettings(), sliceLayers);
+    GetLayerSettings(tabSets->GetMosaicViewSettings(), mosaicLayers);
+    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers0, 0);
+    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers1, 1);
+    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers2, 2);
+
+    LayerCollection* otherLayers[ALL_ITEMS_COUNT];    
+    otherLayers[0] = &sliceLayers;
+    otherLayers[1] = &mosaicLayers;
+    otherLayers[2] = &orthoLayers0;
+    otherLayers[3] = &orthoLayers1;
+    otherLayers[4] = &orthoLayers2;
+
+    FrLayerSettings ls;
+    if(!mw->GetLayerListWidget()->GetLayerParams(m_ID, ls)) return false;
+
+    // Update simple params
+    for(int i=0; i < ALL_ITEMS_COUNT; ++i){
+        LayerCollection::iterator it, itEnd(otherLayers[i]->end());
+        for(it = otherLayers[i]->begin(); it != itEnd; ++it){
+            if((*it)->ID == m_ID){
+                (*it)->ColormapSettings = ls.ColormapSettings;
+                break;
+            }
+        }    
+    }
+    FrBaseCmd::UpdatePipelineForID(m_ID, FRP_COLORMAP);
+    return true;
 }
 
 // delete active layer

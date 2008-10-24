@@ -3,36 +3,31 @@
 
 // Forward declarations 
 class FrLayerSettings;
+class FrSpinSliderWidget; 
+class FrColormapWidget;
 class QTableWidget;
 class QHBoxLayout;
 class QToolButton;
-class QComboBox;
-class QWidget;
-class QSpinBox;
-class QColor;
-class QSlider;
-class QGroupBox;
 
 // includes
 #include "Qt/QWidget.h"
 
-
 // This class used to display layers
 // available on image and also manage them
-class FrLayerListWidget: public QWidget
-{
+class FrLayerListWidget: public QWidget {
 	Q_OBJECT
 public:
 	FrLayerListWidget(QWidget *parent = 0);
 
-    void RemoveLayers();
+    // Common actions
     void AddLayer(FrLayerSettings* layerSets);
-    void SetLayerParams(FrLayerSettings* layerSets);
-
+    void RemoveLayers();
     void SetSelectedLayer(int layerID);
     void BlockSignals(bool value){ 
         m_signalsBlocked = value;
     }
+
+    bool GetLayerParams(int id, FrLayerSettings& params);
 
 signals:
     void NewLayer();
@@ -40,26 +35,27 @@ signals:
     void ChangeLayer();
     void LayerSelected(int id);
 
+    // Emmited when Name, Visibility 
+    // or Opacity are changed
+    void ChangeLayerParams();
+    // Emmited when colormap params are changed
+    void ChangeLayerColormap();
+    
 private Q_SLOTS:
     // Add slots here
     void OnSelectionChanged();
+    // Manage whole layer
     void OnAddClicked();
     void OnDeleteClicked();
     void OnChangeClicked();
-	void OnVisibilityChanged(int state);
-	void OnNameChanged(int row, int column);
+    // Manage some params
+	void OnVisibilityChanged(int id);
+    void OnOpacityChanged(int value);
+    void OnColormapParamsChanged();
 
-	void onComboBoxChange(int index);
-	void onColorBtnClicked();
-	void SetOpacitySliderPosition(int value);
-	void SetOpacitySpinBoxPosition(int value);
-	void SetPxMinSliderPosition(int value);
-	void SetPxMinSpinBoxPosition(int value);
-	void SetPxMaxSliderPosition(int value);
-	void SetPxMaxSpinBoxPosition(int value);
-	void SetThresholdSliderPosition(int value);
-	void SetThresholdSpinBoxPosition(int value);
-	
+    // Utility methods
+    void UpdateCurrentLayerParams();
+		
 private:
 	QTableWidget*   m_layerTable;
 	QHBoxLayout*    m_layout;
@@ -67,26 +63,9 @@ private:
     QToolButton*    m_btnDelete;
     QToolButton*    m_btnChange;
 
-	// new
-    QColor color;
-	QWidget* colorWidget;
-	QComboBox* comboBox;
-
-	// spin boxes
-	QSpinBox *OpacitySpinBox;
-	QSpinBox *PxMinSpinBox;
-	QSpinBox *PxMaxSpinBox;
-	QSpinBox *ThresholdSpinBox;
-
-	// sliders
-    QSlider *OpacitySlider;
-    QSlider *PxMinSlider;
-    QSlider *PxMaxSlider;
-    QSlider *ThresholdSlider;
-
-	QGroupBox* groupBox;
-	QGroupBox* groupBox2;
-
+    FrColormapWidget*   m_colormapWidget;
+    FrSpinSliderWidget* m_opacityWidget;
+    
     bool m_signalsBlocked;
 };
 

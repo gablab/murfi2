@@ -1,25 +1,23 @@
 #ifndef FR_LAYER_DLG
 #define FR_LAYER_DLG
 
+class FrLayerSettings;
+class FrSpinSliderWidget;
+class FrColormapWidget;
+
 class QLabel;
 class QLineEdit;
 class QPushButton;
-class QGroupBox;
 class QVBoxLayout;
 class QHBoxLayout;
-class QSpinBox;
-class QComboBox;
 class QCheckBox;
-class QSlider;
 
-#include "FrTabSettingsDocObj.h"
 
 #include "Qt/QString.h"
 #include "QtGui/QDialog.h"
 
 
-class FrLayerDialog: public QDialog
-{
+class FrLayerDialog: public QDialog {
 	Q_OBJECT
 public:
     FrLayerDialog(QWidget* parent = 0L, bool isModal = true);
@@ -31,54 +29,21 @@ public:
     bool SimpleExec();
  
 public slots:
-	void onComboBoxChange(int index);
-	void onColorBtnClicked();
-	void SetOpacitySliderPosition(int value);
-	void SetOpacitySpinBoxPosition(int value);
-	void SetPxMinSliderPosition(int value);
-	void SetPxMinSpinBoxPosition(int value);
-	void SetPxMaxSliderPosition(int value);
-	void SetPxMaxSpinBoxPosition(int value);
-	void SetThresholdSliderPosition(int value);
-	void SetThresholdSpinBoxPosition(int value);
-    void OnOKClicked();
+	void OnBtnOKClicked();
 
 private:
-    QVBoxLayout* m_vLayout;
-    QHBoxLayout* m_btnLayout;
+    QHBoxLayout* CreateTitleLayout();
+    QHBoxLayout* CreateButtonLayout();
+    QHBoxLayout* CreateGeneralLayout();
 
-    QLabel* m_lblName;
+private:
     QLineEdit* m_txtName;
-    QLabel* m_lblDescription;
-    QLineEdit* m_txtDescription;
-	QLineEdit *lineEdit;	// name
+    FrSpinSliderWidget* m_opacityWidget; 
+    QCheckBox *m_chkVisibility;
+    FrColormapWidget* m_colormapWidget;
 
     QPushButton* m_btnOk;
     QPushButton* m_btnCancel;
-
-	// new
-    QColor color;
-	QWidget* colorWidget;
-	QComboBox* comboBox;
-
-	// spin boxes
-	QSpinBox *OpacitySpinBox;
-	QSpinBox *PxMinSpinBox;
-	QSpinBox *PxMaxSpinBox;
-	QSpinBox *ThresholdSpinBox;
-
-	QCheckBox *visibleCheckBox;
-
-	// sliders
-    QSlider *OpacitySlider;
-    QSlider *PxMinSlider;
-    QSlider *PxMaxSlider;
-    QSlider *ThresholdSlider;
-
-	QGroupBox* groupBox;
-	QGroupBox* groupBox2;
-
-    enum FrColormapSettings::Type cmType;
 };
 
 #endif

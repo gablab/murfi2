@@ -71,6 +71,10 @@ void FrActionSignalManager::Initialize(){
              this, SLOT(OnDeleteLayerAction()) );
     connect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayer()),
              this, SLOT(OnChangeLayerAction()) );
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerParams()),
+             this, SLOT(OnLayerParamsChanged()) );
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerColormap()),
+             this, SLOT(OnLayerColormapChanged()) );
 
     // Connect test action
     CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
@@ -124,7 +128,7 @@ void FrActionSignalManager::OnDeleteLayerAction(){
 }
 
 void FrActionSignalManager::OnChangeLayerAction(){
-    m_mainWindow->GetMainController()->ChangeLayer();
+    m_mainWindow->GetMainController()->ChangeLayer(0);
 }
 
 //View
@@ -171,4 +175,12 @@ void FrActionSignalManager::OnShowAboutAction(){
 //Test
 void FrActionSignalManager::OnTestAction(){
     m_mainWindow->GetMainController()->Test();
+}
+
+void FrActionSignalManager::OnLayerParamsChanged(){
+    m_mainWindow->GetMainController()->ChangeLayer(1);
+}
+
+void FrActionSignalManager::OnLayerColormapChanged(){
+    m_mainWindow->GetMainController()->ChangeLayer(2);
 }

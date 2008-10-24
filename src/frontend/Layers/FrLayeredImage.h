@@ -8,13 +8,14 @@ class vtkTextMapper;
 class vtkActor2D;
 
 // Some includes
-#include "FrLayer.h"
+#include "FrImageLayer.h"
+#include "FrSpecialLayer.h"
 #include "FrSettings.h"
 #include <vector>
 
 
 // Represents layer object
-class FrLayeredImage : public FrLayer {
+class FrLayeredImage : public FrImageLayer {
 public:
     static FrLayeredImage* New();
     
@@ -27,9 +28,7 @@ public:
     void SetOpacity(double value, int layerId);
     void SetVisibility(bool value, int layerId);
 
-    // Setiurns set of renderers
-    // NOTE: index of every renderer in collection equal to
-    // render layer number!!!
+    // Returns set of renderers
     void GetRenderers(std::vector<vtkRenderer*>& renderers);
 
     // Update methods
@@ -38,21 +37,22 @@ public:
     virtual void UpdateCamera();
 
     // Initialization
-    void InitDefault(FrLayer* layer);
+    void InitDefault(FrImageLayer* layer);
 
     //
     // Layer management
     //
     int  AddLayer();
     bool RemoveLayer(int id);
-    void RemoveLayers();
+    void RemoveImageLayers();
     // Returns layer by ID
-    FrLayer* GetLayerByID(int id);
+    FrImageLayer* GetLayerByID(int id);
 
     //
     // Text management
     //
     void SetText(const char* text);
+    void UpdateBorder();
 
 protected:
     // Constructor and destructor
@@ -60,14 +60,11 @@ protected:
     virtual ~FrLayeredImage();
 
 private:
-    typedef std::vector<FrLayer*> LayerCollection;
-    LayerCollection m_layers;
-    int m_nextLayerId;
+    int m_nextImageLayerID;
+    typedef std::vector<FrImageLayer*> LayerCollection;
+    LayerCollection m_ImageLayers;
 
-    // Add text support
-    // Combine a text mapper with an actor.
-    vtkTextMapper* m_TextMapper;
-    vtkActor2D*    m_TextActor;
+    FrSpecialLayer* m_SpecialLayer;
 
 private:
     FrLayeredImage(const FrLayeredImage&);  // Not implemented.

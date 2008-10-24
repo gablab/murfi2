@@ -52,12 +52,20 @@ void FrDocumentReader::Update(){
         RtMRIImage* img = ido->GetImage();
         if(m_UnMosaicOn && img->seemsMosaic()){
             img = new RtMRIImage(*img);
-            if(!img->unmosaic()) vtkErrorMacro(<<"Can't unmosaic image.");
+            if(!img->unmosaic()) {
+                vtkErrorMacro(<<"Can't unmosaic image.");
+                delete img;
+                return;
+            }
             deleteImage = true;
         }
         else if(m_MosaicOn && !img->seemsMosaic()) {
             img = new RtMRIImage(*img);
-            if(img->mosaic()) vtkErrorMacro(<<"Can't mosaic image.");
+            if(!img->mosaic()){
+                vtkErrorMacro(<<"Can't mosaic image.");
+                delete img;
+                return;
+            }
             deleteImage = true;
         }
         

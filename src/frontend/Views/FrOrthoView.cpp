@@ -264,6 +264,11 @@ void FrOrthoView::UpdatePipeline(int point){
         break;
     }
 
+    // Draw border
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        m_LayeredImage[i]->UpdateBorder();
+    }
+
     // redraw scene
 	GetRenderWindow()->Render();
 }

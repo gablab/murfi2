@@ -1,4 +1,4 @@
-#include "FrLayer.h"
+#include "FrImageLayer.h"
 #include "FrColormapFilter.h"
 #include "FrTBCFilter.h"
 #include "FrSettings.h"
@@ -14,48 +14,33 @@
 // Some defines
 #define DEF_REN_BACKGROUND 0.0, 0.0, 0.0
 
-FrLayer* FrLayer::New(){  
-  vtkObject* result = vtkObjectFactory::CreateInstance("FrLayer");
-  if(result){
-      return (FrLayer*)result;
-  }
-  return new FrLayer();
-}
 
+vtkStandardNewMacro(FrImageLayer);
 
-FrLayer::FrLayer() 
-: m_cmFilter(0), m_tbcFilter(0),
-  m_actor(0), m_renderer(0) {
+FrImageLayer::FrImageLayer() 
+: m_cmFilter(0), m_tbcFilter(0), m_actor(0) {
     // Pipline stuff
     m_cmFilter = FrColormapFilter::New();
     m_tbcFilter = FrTBCFilter::New();
-    m_actor = vtkImageActor::New();
-    // renderer
-    m_renderer = vtkRenderer::New();
-    m_renderer->SetBackground(DEF_REN_BACKGROUND);
-    m_renderer->GetActiveCamera()->ParallelProjectionOn();
+    m_actor = vtkImageActor::New();    
     // add actor
-    m_renderer->AddActor(m_actor);
+    m_Renderer->AddActor(m_actor);
 }
 
-FrLayer::~FrLayer(){    
+FrImageLayer::~FrImageLayer(){    
     if(m_cmFilter) m_cmFilter->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
-    if(m_renderer){
-        m_renderer->RemoveActor(m_actor);
-        m_renderer->Delete();
-    }
     if(m_actor) m_actor->Delete();
 }
 
 // Accessors / Modifiers
-void FrLayer::SetInput(vtkImageData* data){
+void FrImageLayer::SetInput(vtkImageData* data){
     if(m_cmFilter){
         m_cmFilter->SetInput(data);
     }
 }
 
-vtkImageData* FrLayer::GetInput(){
+vtkImageData* FrImageLayer::GetInput(){
     vtkImageData* result = 0L;
     if(m_cmFilter){
         result = m_cmFilter->GetInput();
@@ -66,7 +51,7 @@ vtkImageData* FrLayer::GetInput(){
     return result;
 }
 
-void FrLayer::SetColormapSettings(FrColormapSettings& settings){
+void FrImageLayer::SetColormapSettings(FrColormapSettings& settings){
     if(!m_cmFilter) return;
 
     // Set type first
@@ -88,7 +73,7 @@ void FrLayer::SetColormapSettings(FrColormapSettings& settings){
     }
 }
 
-void FrLayer::GetColormapSettings(FrColormapSettings& settings){
+void FrImageLayer::GetColormapSettings(FrColormapSettings& settings){
     if(!m_cmFilter) return;
 
     // Get type first
@@ -106,7 +91,7 @@ void FrLayer::GetColormapSettings(FrColormapSettings& settings){
     settings.Threshold = m_cmFilter->GetThreshold();
 }
 
-void FrLayer::SetTBCSettings(FrTBCSettings& settings){
+void FrImageLayer::SetTBCSettings(FrTBCSettings& settings){
     if(!m_tbcFilter) return;
 
     m_tbcFilter->SetThreshold(settings.Threshold);
@@ -114,7 +99,7 @@ void FrLayer::SetTBCSettings(FrTBCSettings& settings){
     m_tbcFilter->SetContrast(settings.Contrast);
 }
 
-void FrLayer::GetTBCSettings(FrTBCSettings& settings){
+void FrImageLayer::GetTBCSettings(FrTBCSettings& settings){
     if(!m_tbcFilter) return;
 
     settings.Threshold = m_tbcFilter->GetThreshold();
@@ -122,33 +107,13 @@ void FrLayer::GetTBCSettings(FrTBCSettings& settings){
     settings.Contrast = m_tbcFilter->GetContrast();
 }
 
-void FrLayer::SetCameraSettings(FrCameraSettings& settings){
-    if(!m_renderer) return;
-
-    vtkCamera* cam = m_renderer->GetActiveCamera();
-    cam->SetPosition(settings.Position);
-    cam->SetFocalPoint(settings.FocalPoint);
-    cam->SetViewUp(settings.ViewUp);
-    cam->SetParallelScale(settings.Scale);
-}
-
-void FrLayer::GetCameraSettings(FrCameraSettings& settings){
-    if(!m_renderer) return;
-    
-    vtkCamera* cam = m_renderer->GetActiveCamera();
-    COPY_ARR3(settings.Position, cam->GetPosition());
-    COPY_ARR3(settings.FocalPoint, cam->GetFocalPoint());
-    COPY_ARR3(settings.ViewUp, cam->GetViewUp());
-    settings.Scale = cam->GetParallelScale();
-}
-
-void FrLayer::SetOpacity(double value){
+void FrImageLayer::SetOpacity(double value){
     if(m_actor){
         m_actor->SetOpacity(value);
     }
 }
 
-double FrLayer::GetOpacity(){
+double FrImageLayer::GetOpacity(){
     double result = 0.0;
     if(m_actor){
         result = m_actor->GetOpacity();
@@ -156,12 +121,12 @@ double FrLayer::GetOpacity(){
     return result;
 }
 
-void FrLayer::SetVisibility(bool value){
+void FrImageLayer::SetVisibility(bool value){
     if(m_actor){
         m_actor->SetVisibility(value ? 1 : 0);
     }
 }
-bool FrLayer::GetVisibility(){
+bool FrImageLayer::GetVisibility(){
     bool result = false;
     if(m_actor){
         result = (m_actor->GetVisibility() == 1);
@@ -170,7 +135,7 @@ bool FrLayer::GetVisibility(){
 }
 
 // Update methods
-void FrLayer::UpdateColormap(){
+void FrImageLayer::UpdateColormap(){
     if(m_cmFilter && m_cmFilter->GetInput()){
         m_cmFilter->Update();
 
@@ -182,7 +147,7 @@ void FrLayer::UpdateColormap(){
     }
 }
 
-void FrLayer::UpdateTBC(){
+void FrImageLayer::UpdateTBC(){
     if(m_tbcFilter && m_tbcFilter->GetInput()){
         m_tbcFilter->Update();
         
@@ -194,8 +159,8 @@ void FrLayer::UpdateTBC(){
     }
 }
 
-void FrLayer::UpdateCamera(){
-    if(m_renderer){
-        m_renderer->Render();        
+void FrImageLayer::UpdateCamera(){
+    if(m_Renderer){
+        m_Renderer->Render();        
     }
 }

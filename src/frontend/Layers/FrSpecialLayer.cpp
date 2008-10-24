@@ -2,86 +2,121 @@
 
 // VTK stuff
 #include "vtkRenderer.h"
-#include "vtkCamera.h"
+#include "vtkObjectFactory.h"
 #include "vtkTextActor.h"
+#include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
-#include "vtkCamera.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
+#include "vtkCellArray.h"
+#include "vtkPolyDataMapper2D.h"
+#include "vtkActor2D.h"
 
+vtkStandardNewMacro(FrSpecialLayer);
 
-FrSpecialLayer::FrSpecialLayer(vtkRenderWindow *renWindow)
-: FrBaseLayer(renWindow){
-
-	m_actor = Fr2DSliceActor::New();
-	m_tactor = vtkTextActor::New();
-	GetRenderer()->SetLayer(0);
-
-	dims[0] = 0; dims[1] = 0; dims[2] = 0;
+FrSpecialLayer::FrSpecialLayer() {
+    this->InitializeText();
+    this->InitializeBorder();
 }
 
-FrSpecialLayer::~FrSpecialLayer(){
-	if(m_actor) m_actor->Delete();
-	if(m_tactor) m_tactor->Delete();
-	if(m_inputData) m_inputData->Delete();
+FrSpecialLayer::~FrSpecialLayer() {
+    m_TextMapper->Delete();
+	m_TextActor->Delete();
 }
 
-void FrSpecialLayer::Initialize(){
-    GetRenderer()->GetActiveCamera()->ParallelProjectionOn();
-    GetRenderer()->SetBackground(0.0, 0.0, 0.0);
+void FrSpecialLayer::InitializeText(){
+    // Create mapper
+    m_TextMapper = vtkTextMapper::New();
+    m_TextMapper->SetInput("");
 
-	// add actors
-	GetRenderer()->AddActor(m_actor);
-	GetRenderer()->AddActor(m_tactor);
-
-	// set text actor properties
-	m_tactor->GetTextProperty()->SetColor(100, 100, 0);
-	m_tactor->GetTextProperty()->SetBold(5);
-	m_tactor->GetTextProperty()->SetFontSize(20);
-	m_tactor->SetPosition(20, 20);	// probably we should have a set of standard positions
+    // Init property
+    vtkTextProperty* pProperty = m_TextMapper->GetTextProperty();
+	pProperty->SetBold(1);
+    pProperty->SetItalic(0);
+    pProperty->SetFontSize(20);
+    pProperty->SetFontFamily(VTK_ARIAL);
+    pProperty->SetColor(100.0, 100.0, 0.0);
+    pProperty->SetJustification(VTK_TEXT_LEFT);
+    pProperty->SetVerticalJustification(VTK_TEXT_CENTERED);
+    
+    // Create actor
+    m_TextActor = vtkActor2D::New();
+    m_TextActor->SetMapper(m_TextMapper);
+    m_TextActor->SetPosition(20, 20);
+    m_TextActor->PickableOff();
+    m_Renderer->AddActor2D(m_TextActor);
 }
 
-void FrSpecialLayer::SetInput(vtkImageData *input){
-	// check here if input data has another dimensions than before, else return
-	// this should be done to reduce lags while setting new input
-	int new_dims[3];
-	input->GetDimensions(new_dims);
-	if (new_dims[0] != dims[0] || new_dims[1] != dims[1]){
-		for (int i = 0; i<3; i++)
-			dims[i] = new_dims[i];
-	}
-	else
-		return;
+void FrSpecialLayer::InitializeBorder(){
+    int minx, miny, maxx, maxy;
+    minx = miny = maxx = maxy = 0;
 
-	m_inputData = input;
+    m_BorderPts = vtkPoints::New();
+    m_BorderPts->InsertPoint(0, minx, miny, 0);
+    m_BorderPts->InsertPoint(1, maxx, miny, 0);
+    m_BorderPts->InsertPoint(2, maxx, maxy, 0);
+    m_BorderPts->InsertPoint(3, minx, maxy, 0);
 
-	m_actor->SetInput(input);
+    vtkCellArray* rect = vtkCellArray::New();
+    rect->InsertNextCell(5);
+    rect->InsertCellPoint(0);
+    rect->InsertCellPoint(1);
+    rect->InsertCellPoint(2);
+    rect->InsertCellPoint(3);
+    rect->InsertCellPoint(0);
+
+    vtkPolyData* selectRect = vtkPolyData::New();
+    selectRect->SetPoints(m_BorderPts);
+    selectRect->SetLines(rect);
+
+    m_BorderMapper = vtkPolyDataMapper2D::New();
+    m_BorderMapper->SetInput(selectRect);
+        
+    m_BorderActor = vtkActor2D::New();
+    m_BorderActor->PickableOff();
+    m_BorderActor->SetMapper(m_BorderMapper);
+    m_Renderer->AddActor2D(m_BorderActor);
+
+    // Free this stuff
+    rect->Delete();
+    selectRect->Delete();
 }
 
 void FrSpecialLayer::SetText(const char* text){
-	m_tactor->SetInput(text);
-
-	//Update();
+    m_TextMapper->SetInput(text);
 }
 
-void FrSpecialLayer::SetCamera(CameraSettings &camSettings){
-    vtkCamera* cam = 0L;    
-	
-	// Setup camera here 
-    cam = GetRenderer()->GetActiveCamera();
-    cam->ParallelProjectionOn();
-    cam->SetParallelScale(camSettings.Scale);
-    cam->SetFocalPoint(camSettings.FocalPoint);
-    cam->SetViewUp(camSettings.ViewUp);
-    cam->SetPosition(camSettings.Position);
+void FrSpecialLayer::UpdateBorder(int winWidth, int winHeight){
+    int minx = 0;
+    int miny = 0;
+    int maxx = winWidth;
+    int maxy = winHeight;
+        
+    m_BorderPts->InsertPoint(0, minx, miny, 0);
+    m_BorderPts->InsertPoint(1, maxx, miny, 0);
+    m_BorderPts->InsertPoint(2, maxx, maxy, 0);
+    m_BorderPts->InsertPoint(3, minx, maxy, 0);
+    m_BorderPts->Modified();
 
-	Update();
-}
+    /*vtkCellArray* rect = vtkCellArray::New();
+    rect->InsertNextCell(5);
+    rect->InsertCellPoint(0);
+    rect->InsertCellPoint(1);
+    rect->InsertCellPoint(2);
+    rect->InsertCellPoint(3);
+    rect->InsertCellPoint(0);
 
-void FrSpecialLayer::SetLayer(int value){
-	GetRenderer()->SetLayer(value);
+    vtkPolyData* selectRect = vtkPolyData::New();
+    selectRect->SetPoints(m_BorderPts);
+    selectRect->SetLines(rect);
 
-	Update();
-}
+    m_BorderMapper->SetInput(selectRect);*/
+    //m_BorderMapper->Update();
+        
+    /*m_Renderer->RemoveActor2D(m_BorderActor);
+    m_Renderer->AddActor2D(m_BorderActor);*/
 
-void FrSpecialLayer::Update(){
-	GetRenderer()->Render();
+    //// Free this stuff
+    //rect->Delete();
+    //selectRect->Delete();
 }

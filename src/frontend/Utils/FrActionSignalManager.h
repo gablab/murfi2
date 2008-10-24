@@ -40,6 +40,8 @@ public slots:
     void OnShowAboutAction();
     //Test
     void OnTestAction();
+    void OnLayerParamsChanged();
+    void OnLayerColormapChanged();
 
 private:
     void Initialize();

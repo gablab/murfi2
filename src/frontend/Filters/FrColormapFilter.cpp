@@ -18,7 +18,7 @@
 
 #define DEF_MIN_VALUE 0
 #define DEF_MAX_VALUE 255
-#define DEF_THRESHOLD 128
+#define DEF_THRESHOLD 50
 
 #define HUE_RED    0
 #define HUE_YELLOW 60
@@ -205,20 +205,22 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
     hsv[S_INDEX] = 1.0;
     hsv[V_INDEX] = 255.0;
 
+    // Calc threshold
+    int threshold = m_PxMin + ((m_PxMax - m_PxMin) * m_Threshold) / 100;
     for(int i=0; i < 256; ++i){
         // NOTE: range consists from two parts: left and right
         // [m_PxMin, m_Threshold] && [m_Threshold, m_PxMax]
         if(m_PxMin <= i && i <= m_PxMax){
             // get relative pos of i from threshold
-            if(i < m_Threshold){
+            if(i < threshold){
                 // ...in left part
                 min = HUE_LBLUE; max = HUE_BLUE;
-                iPos = double(i - m_Threshold) / double(m_PxMin - m_Threshold);
+                iPos = double(i - threshold) / double(m_PxMin - threshold);
             }
             else {
                 // ...in right part
                 min = HUE_YELLOW; max = HUE_RED;
-                iPos = double(i - m_Threshold) / double(m_PxMax - m_Threshold);
+                iPos = double(i - threshold) / double(m_PxMax - threshold);
             }
                 
             // calc delta for hue 

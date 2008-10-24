@@ -206,17 +206,37 @@ void FrMainController::DeleteLayer(){
     delete cmd;
 }
 
-void FrMainController::ChangeLayer(){
-    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Change);
-    // If not set ID is the same as current ID
-    // cmd1->SetID(CUR_LAYER_ID);
-
-    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-    
+void FrMainController::ChangeLayer(int action){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    cmd->AddCommand(cmd1);
-    cmd->AddCommand(cmd2);
+
+    // Changing using old style dialog
+    if(action == 0){
+        FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+        cmd1->SetAction(FrLayerCmd::ChangeOld);
+        // If not set ID is the same as current ID
+        //cmd1->SetID(CUR_LAYER_ID);
+        cmd->AddCommand(cmd1);
+        
+        FrRefreshLayerInfoCmd* cmd2 = 
+            FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+        cmd->AddCommand(cmd2);
+    }
+    // Changing Name, visibility, opacity
+    else if(action == 1){
+        FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+        cmd1->SetAction(FrLayerCmd::ChangeParams);
+        // If not set ID is the same as current ID
+        //cmd1->SetID(CUR_LAYER_ID);
+        cmd->AddCommand(cmd1);
+    }
+    else if (action == 2){
+        FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+        cmd1->SetAction(FrLayerCmd::ChangeColormap);
+        // If not set ID is the same as current ID
+        //cmd1->SetID(CUR_LAYER_ID);
+        cmd->AddCommand(cmd1);
+    }
+
     cmd->Execute();
     delete cmd;
 }

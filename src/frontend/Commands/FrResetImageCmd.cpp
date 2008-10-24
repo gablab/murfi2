@@ -7,6 +7,7 @@
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
 #include "FrLayeredImage.h"
+#include "FrUtils.h"
 
 // VTK stuff
 #include "vtkCamera.h"
@@ -28,18 +29,32 @@ bool FrResetImageCmd::Execute(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tsDO = doc->GetCurrentTabSettings();
     
-    // Determine target view
+    // Determine target view and get layer settings
+    std::vector<FrLayerSettings*> layerSettings;
     FrResetImageCmd::View targetView = m_TargetView;
     if(targetView == FrResetImageCmd::Current){
         switch(tsDO->GetActiveView()){
-            case FrTabSettingsDocObj::SliceView: targetView = FrResetImageCmd::Slice;
+            case FrTabSettingsDocObj::SliceView: 
+                targetView = FrResetImageCmd::Slice;
+                GetLayerSettings(tsDO->GetSliceViewSettings(), layerSettings);
                 break;
-            case FrTabSettingsDocObj::MosaicView: targetView = FrResetImageCmd::Mosaic;
+            case FrTabSettingsDocObj::MosaicView: 
+                targetView = FrResetImageCmd::Mosaic;
+                GetLayerSettings(tsDO->GetMosaicViewSettings(), layerSettings);
                 break;
-            case FrTabSettingsDocObj::OrthoView: targetView = FrResetImageCmd::Ortho;
+            case FrTabSettingsDocObj::OrthoView: 
+                targetView = FrResetImageCmd::Ortho;
+                for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                    std::vector<FrLayerSettings*> layers;
+                    GetLayerSettings(tsDO->GetOrthoViewSettings(), layers, i);
+                    layerSettings.insert(layerSettings.end(), 
+                                         layers.begin(), layers.end());
+                }
                 break;
         }
     }
+    // Reset TBC
+    this->ResetTBC(layerSettings);
 
     // Get actors and renderers
     std::vector<vtkImageActor*> actors;
@@ -71,12 +86,12 @@ bool FrResetImageCmd::Execute(){
     // Performe reset action
     bool result = false;
     for(int i=0; i < actors.size(); ++i){
-        ResetCamera(camSettings[i], actors[i], renderers[i]);
+        this->ResetCamera(camSettings[i], actors[i], renderers[i]);
         result = true;
     }
 
     if(result){
-        mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
+        mv->GetCurrentView()->UpdatePipeline(FRP_TBC);
     }
     return result;
 }
@@ -112,6 +127,16 @@ void FrResetImageCmd::ResetCamera(FrCameraSettings* camSets,
     COPY_ARR3(camSets->Position, newPosition);
     COPY_ARR3(camSets->ViewUp, newViewUp);
     camSets->Scale = newScale;
+}
+
+void FrResetImageCmd::ResetTBC(std::vector<FrLayerSettings*>& layers){
+    // Reset tBC to defaults
+    LayerCollection::iterator it, itEnd(layers.end());
+    for(it = layers.begin(); it != itEnd; ++it){
+        (*it)->TbcSettings.Threshold  = DEF_TBC_THRESHOLD;
+        (*it)->TbcSettings.Brightness = DEF_TBC_BRIGHTNESS;
+        (*it)->TbcSettings.Contrast   = DEF_TBC_CONTRAST;
+    }
 }
 
 ///////////////////////////////////////////////////////////////

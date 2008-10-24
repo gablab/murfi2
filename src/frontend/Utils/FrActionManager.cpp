@@ -69,10 +69,10 @@ void FrActionManager::Retranslate(){
     // File
     m_OpenImageAction->setText(DO_TRANSLATE(TR_CONTEXT, "Open Image"));
     m_OpenImageAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Open Image"));
-    m_SaveTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save Tabs"));
-    m_SaveTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save Tabs"));
-    m_LoadTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Load Tabs"));
-    m_LoadTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Load Tabs"));
+    m_SaveTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save Tabset"));
+    m_SaveTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save Tabset"));
+    m_LoadTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Load Tabset"));
+    m_LoadTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Load Tabset"));
     m_ExitAction->setText(DO_TRANSLATE(TR_CONTEXT, "Exit"));
     m_ExitAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Exit"));
     // Edit

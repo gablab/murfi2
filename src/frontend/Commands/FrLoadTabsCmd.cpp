@@ -164,6 +164,8 @@ bool FrLoadTabsCmd::LoadSliceViewSettings(QDomElement& elem,  FrSliceViewSetting
             if(!childElem.hasAttribute(FR_XML_VALUE_ATTR)) return false;
             vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
             if(!hasActiveLayer) return false;
+            // NOTE: add this fix
+            vs->ActiveLayerID = DEFAULT_LAYER_ID;
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -208,6 +210,8 @@ bool FrLoadTabsCmd::LoadMosaicViewSettings(QDomElement& elem, FrMosaicViewSettin
             if(!childElem.hasAttribute(FR_XML_VALUE_ATTR)) return false;
             vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
             if(!hasActiveLayer) return false;
+            // NOTE: add this fix
+            vs->ActiveLayerID = DEFAULT_LAYER_ID;
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -263,6 +267,8 @@ bool FrLoadTabsCmd::LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSetting
             if(!childElem.hasAttribute(FR_XML_VALUE_ATTR)) return false;
             vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
             if(!hasActiveLayer) return false;
+            // NOTE: add this fix
+            vs->ActiveLayerID = DEFAULT_LAYER_ID;
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -572,11 +578,16 @@ bool FrLoadTabsCmd::ValidateTabSettings(FrTabSettingsDocObj* tabs){
             break;
         }
 
-        // Check some layers params
+        // Check some layers params and also fix IDS
+        int layerID = 1;
         for(int layerNum = 0; layerNum < layers[i]->size(); ++layerNum){
             FrLayerSettings* ls0 = layers[i]->operator [](layerNum);
             FrLayerSettings* ls1 = testLayers->operator [](layerNum);
             
+            ls0->ID = layerID;
+            ls1->ID = layerID;
+            layerID++;
+
             result = (ls0->Opacity == ls1->Opacity) &&
                 (ls0->Visibility == ls1->Visibility) &&
                 (ls0->ColormapSettings.Type == ls1->ColormapSettings.Type) &&

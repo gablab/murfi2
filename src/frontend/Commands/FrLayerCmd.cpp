@@ -134,13 +134,7 @@ bool FrLayerCmd::DeleteLayer(){
             // remove and update layer IDs            
             if(it != itEnd){
                 delete (*it);
-                otherLayers[i]->erase(it);
-
-                int newID = 1;
-                LayerCollection::iterator it, itEnd(otherLayers[i]->end());
-                for(it = otherLayers[i]->begin(); it != itEnd; ++it){
-                    (*it)->ID = newID++;
-                }
+                otherLayers[i]->erase(it);                
                 isFound = true;
             }
         }

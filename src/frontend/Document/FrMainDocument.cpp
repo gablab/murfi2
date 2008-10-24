@@ -8,6 +8,14 @@ FrMainDocument::FrMainDocument()
 }
 
 FrMainDocument::~FrMainDocument(){
+    // Remove tab objects
+    std::vector<FrDocumentObj*> tabObjects;
+    this->GetObjectsByType(tabObjects, FrDocumentObj::TabSettings);
+    
+    std::vector<FrDocumentObj*>::iterator it, itEnd(tabObjects.end());
+    for(it = tabObjects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
 }
 
 void FrMainDocument::GetAllImages(std::vector<FrDocumentObj*>& images){

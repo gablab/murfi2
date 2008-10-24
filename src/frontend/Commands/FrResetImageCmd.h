@@ -2,6 +2,7 @@
 #define FR_RESET_IMAGE_CMD
 
 // Forward declarations
+class FrLayerSettings;
 class FrCameraSettings;
 class vtkRenderer;
 class vtkImageActor;
@@ -9,6 +10,8 @@ class vtkImageActor;
 // includes
 #include "FrMacro.h"
 #include "FrBaseCmd.h"
+
+#include <vector>
 
 // This command adjust camera such way that 
 // MRI image is visible at the center of view port
@@ -35,6 +38,8 @@ private:
     void ResetCamera(FrCameraSettings* camSets, 
                      vtkImageActor* actor, 
                      vtkRenderer* renderer);
+
+    void ResetTBC(std::vector<FrLayerSettings*>& layers);
 };
 
 #endif // FR_RESET_IMAGE_CMD

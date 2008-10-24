@@ -132,12 +132,15 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	vd.Position[2] = slice*dSpacing[2];							
 
 	// Get voxel index, position
-	// this should be done for all layers 
-	int nol = md->GetCurrentTabSettings()->GetSliceViewSettings()->OtherLayers.size();	// number of layers
-
-	for (int i = 0; i<nol+1; i++)	// plus default layer
-	{
-		pImageData = mv->GetSliceView()->GetImage()->GetLayerByID(i)->GetInput();		// get image data
+	// this should be done for all layers
+    std::vector<FrLayerSettings*> layers;
+    GetLayerSettings(md->GetCurrentTabSettings()->GetSliceViewSettings(), layers);
+	
+    std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
+    for (it = layers.begin(); it != itEnd; ++it){
+        // get image data
+        pImageData = mv->GetSliceView()->GetImage()->
+            GetLayerByID( (*it)->ID )->GetInput();		
 
 		switch (pImageData->GetNumberOfScalarComponents()) {
 			case 1:
@@ -167,11 +170,10 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 		
 		// Set table values
 		Voxel v;
-		if (i == 0)
-			v.name = "Default";
-		else
-			v.name = md->GetCurrentTabSettings()->GetSliceViewSettings()->OtherLayers[i-1]->Name;		// get layer name
-		v.value = usPix;					// get voxel value from current layer
+        v.name = (*it)->Name;
+        
+        // get voxel value from current layer
+		v.value = usPix;
 		vd.voxels.push_back(v);
 	}
 

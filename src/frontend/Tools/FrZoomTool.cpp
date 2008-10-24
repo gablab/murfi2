@@ -7,6 +7,9 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
+#include "Qt/QApplication.h"
+#include "Qt/QCursor.h"
+
 #define DEFAULT_ZOOM_FACTOR 10.0
 #define DEFAULT_BASE 1.1
 
@@ -25,7 +28,9 @@ void FrZoomTool::Stop(){
 }
 
 bool FrZoomTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
-    is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
+//    is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
+	QCursor cursor(Qt::ArrowCursor);
+	QApplication::setOverrideCursor(cursor);   
     return false;
 }
 
@@ -34,7 +39,9 @@ bool FrZoomTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         m_oldX = params.X;
         m_oldY = params.Y;
 
-        is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_SIZENS);
+        //is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_SIZENS);
+		QCursor cursor(Qt::SizeVerCursor);
+		QApplication::setOverrideCursor(cursor);
     }    
     return false;
 }

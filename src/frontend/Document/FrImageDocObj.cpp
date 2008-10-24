@@ -51,3 +51,10 @@ bool FrImageDocObj::LoadFromFile(QString& fileName){
     }
     return result;
 }
+
+bool FrImageDocObj::LoadFromMRIImage(RtMRIImage* img){
+	m_Image = img;
+    SetUpdateNeeded(true);
+
+	return true;
+}

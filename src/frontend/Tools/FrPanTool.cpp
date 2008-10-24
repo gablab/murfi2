@@ -6,6 +6,10 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
+#include "Qt/QApplication.h"
+#include "Qt/QCursor.h"
+
+
 FrPanTool::FrPanTool()
 : m_oldX(0), m_oldY(0){
 }
@@ -22,8 +26,10 @@ void FrPanTool::Stop(){
 
 bool FrPanTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     // NOTE: do nothing here
-    is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
-    return false;
+    //is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
+	QCursor cursor(Qt::ArrowCursor);
+	QApplication::setOverrideCursor(cursor);   
+	return false;
 }
 
 bool FrPanTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
@@ -32,8 +38,10 @@ bool FrPanTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         m_oldX = params.X;
         m_oldY = params.Y;
 
-        is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_HAND);
-    }
+        //is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_HAND);
+		QCursor cursor(Qt::ClosedHandCursor);
+		QApplication::setOverrideCursor(cursor);
+	}
     return false;
 }
 

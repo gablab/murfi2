@@ -10,6 +10,11 @@
 // VTK stuff
 #include "vtkRenderer.h"
 
+#include "Qt/QCursor.h"
+#include "Qt/QPixmap.h"
+#include "Qt/QApplication.h"
+
+
 FrCompositeTool::FrCompositeTool() {
     m_panTool = new FrPanTool();        
     m_zoomTool = new FrZoomTool();
@@ -17,6 +22,7 @@ FrCompositeTool::FrCompositeTool() {
 	m_ssTool = new FrSliceScrollTool();
 
 	isZoom = false;
+	ZoomActivated = false;
 }
 
 FrCompositeTool::~FrCompositeTool(){
@@ -86,6 +92,8 @@ bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
         m_tbcTool->OnMouseUp(is, params);
     }    
     
+	ZoomActivated = false;
+
     return false;
 }
 
@@ -95,8 +103,10 @@ bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 
 	// Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
-        if (isZoom)
+		if (isZoom){
 			m_zoomTool->OnMouseDown(is, params);
+			ZoomActivated = true;
+		}
 		else
 			m_panTool->OnMouseDown(is, params);
 	}
@@ -112,7 +122,27 @@ bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrCompositeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
-    return false;
+    // here we should check what tool to use: pan or zoom, it depends on mouse coords
+	//isZoom = CheckMouseParams(is, params);
+	////bool isInViewport = IsInViewPort(is, params);
+
+	//if (!isInViewport){
+	//	//change cursor to simple mode
+	//	QCursor cursor(Qt::ArrowCursor);
+	//	QApplication::setOverrideCursor(cursor);
+	//}
+	//else if (isZoom){
+	//	//change cursor to zoom mode
+	//	QCursor cursor(Qt::SizeVerCursor);
+	//	QApplication::setOverrideCursor(cursor);
+	//}
+	//else if (!ZoomActivated){
+	//	// change cursor to pan mode
+	//	QCursor cursor(Qt::OpenHandCursor);
+	//	QApplication::setOverrideCursor(cursor);
+	//}
+
+	return false;
 }
 
 bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
@@ -167,4 +197,23 @@ bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& par
 	/*if ((params.Y+40 >= YBorder) || (params.Y <= 40)) return true;*/
 
 	return false;
+}
+
+bool FrCompositeTool::IsInViewPort(FrInteractorStyle* is, FrMouseParams& params){
+	// check if coordinates are near left/right border of viewport
+	int *size = is->CurrentRenderer->GetSize();
+	int *origin = is->CurrentRenderer->GetOrigin();
+
+	int XBorder = size[0];
+	int YBorder = size[1];
+	int XOrigin = origin[0];
+	int YOrigin = origin[0];
+
+    // Leave side only
+	if (( (params.X - XOrigin) == XBorder) ||
+        ( (params.X - XOrigin) == 0) ||
+		( (params.Y - YOrigin) == YBorder) ||
+        ( (params.Y - YOrigin) == 0)) return false;
+	
+	return true;
 }

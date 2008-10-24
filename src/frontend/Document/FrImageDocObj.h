@@ -22,6 +22,7 @@ public:
     virtual ObjType GetType();
 
     bool LoadFromFile(QString& fileName);
+	bool LoadFromMRIImage(RtMRIImage* img);
     unsigned int GetMatrixSize();
 
     // Properties

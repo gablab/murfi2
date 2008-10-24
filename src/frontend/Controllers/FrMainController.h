@@ -29,7 +29,7 @@ public:
     void Test();
 
     // Interface for MainWindow
-    void LoadImage(QString& fileName);
+    void LoadImageFromFile(QString& fileName);
     void IoTabSettings(QString& fileName, bool isInput);
     
     void SaveCurrentViewToTab();

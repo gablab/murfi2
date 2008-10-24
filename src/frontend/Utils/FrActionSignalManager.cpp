@@ -83,7 +83,7 @@ void FrActionSignalManager::OnOpenImageAction(){
         tr("NIfTI Image (*.nii)"));
 
     if(!fileName.isNull() && !fileName.isEmpty()){
-        m_mainWindow->GetMainController()->LoadImage(fileName);
+        m_mainWindow->GetMainController()->LoadImageFromFile(fileName);
     }
 }
 

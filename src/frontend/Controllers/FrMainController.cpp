@@ -18,6 +18,13 @@
 #include "Qt/QMessageBox.h"
 #include "Qt/QString.h"
 
+// test
+#include "RtInputScannerImages.h"
+#include "RtConfig.h"
+#include "RtServerSocket.h"
+#include "RtConductor.h"
+#include "RtDataStore.h"
+
 
 // Implementation of FrMainController
 FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
@@ -85,7 +92,7 @@ FrTool* FrMainController::GetCurrentTool(){
     return result;
 }
 
-void FrMainController::LoadImage(QString& fileName){
+void FrMainController::LoadImageFromFile(QString& fileName){
         
     FrImageDocObj* imgObj = new FrImageDocObj();
 
@@ -275,5 +282,51 @@ void FrMainController::ResetImage(){
 }
 
 void FrMainController::Test(){    
-    
+    // run test input server
+	RtInputScannerImages* input =  new RtInputScannerImages();
+//	RtInputScannerImages input;
+	
+//	RtConfig config;
+	char *path[3];
+	path[0] = "test";
+	path[1] = "-f";
+	path[2] = "sensorymotor_singleimage.xml";
+//	bool result = config.parseArgs(3, path);
+	
+	//input->activate();
+	//input->init(3, path);
+//	result = input.open(config);
+//	input.svc();
+//	RtMRIImage img;
+//	if (result){
+//		input.saveImage(img);
+//		int g = 55;
+//	}
+//	else
+//		return;
+	
+	RtDataStore* ds = new RtDataStore();
+
+	RtConductor con(3, path);
+	con.init();
+	//con.addInput(input);
+	//con.addOutput(ds);
+	con.run();
+	
+	//input.close();
+
+	//FrImageDocObj* imgObj = new FrImageDocObj();
+
+	//if(imgObj->LoadFromMRIImage(&img)){		// we should process all received images in future
+ //       m_MainDocument->Add(imgObj);
+ //       m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
+ //       
+ //       FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
+ //       cmd->SetTargetView(FrResetImageCmd::Current);
+ //       cmd->Execute();
+ //       delete cmd;
+ //   }
+ //   else{
+ //       // TODO: process error
+ //   }
 }

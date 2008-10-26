@@ -145,7 +145,7 @@ int RtAccumCor::process(ACE_Message_Block *mb) {
 
   // build z
   for(unsigned int i = 0; i < numTrends; i++) {
-    z->put(i,trends.get(numTimepoints-1,i));
+    z->put(i,nuisance.get(numTimepoints-1,i));
   }
   z->put(numTrends,conditions.get(numTimepoints-1,0));
   

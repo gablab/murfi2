@@ -32,17 +32,34 @@ RtActivationEstimator::RtActivationEstimator() : RtStreamComponent() {
   // standard init
   componentID = moduleString;
 
-  // modeling 
+  // modeling
   numTrends = numConditions = numMeas = 0;
   numTimepoints = 0;
   conditionShift = 0;
 
-  modelMotionParameters = false;
-  modelTemporalDerivatives = false;
   modelEachBlock = false;
   blockLen = 0;
 
+  // nuisance regressors
+  modelMotionParameters = false;
+  modelTemporalDerivatives = false;
+
+  modelEvents = false;
+  maxNumEvents = 0;
+  eventDuration = 0;
+  convolveEventsWithHrf = true;
+  eventRegressorLength = 32;
+  numEvents = 0;
+
   // hrf
+  hrfIsBuilt = false;
+
+  hrfSamplePeriod = 1/16.0;
+  hrfLength = 32;
+  hrfTimeToPeakPos = 6;
+  hrfTimeToPeakNeg = 16;
+  hrfPosToNegRatio = 6;
+
   loadHrf = false;
   hrfFilename = "unset";
 
@@ -116,15 +133,15 @@ bool RtActivationEstimator::getCorrectMultipleComparisons() {
 
 // get the desired t statistic threshold
 double RtActivationEstimator::getTStatThreshold(unsigned int dof) {
-  return fabs(gsl_cdf_tdist_Pinv(probThreshold 
+  return fabs(gsl_cdf_tdist_Pinv(probThreshold
 		    / (correctForMultiComps ? numComparisons : 1.0),dof));
 }
 
 // process a configuration option
-//  in 
+//  in
 //   name of the option to process
 //   val  text of the option node
-bool RtActivationEstimator::processOption(const string &name, 
+bool RtActivationEstimator::processOption(const string &name,
 					  const string &text,
 					  const map<string,string> &attrMap) {
 
@@ -142,9 +159,9 @@ bool RtActivationEstimator::processOption(const string &name,
       cerr << "warning: max number of conditions exceeded." << endl;
       return false;
     }
-    
+
     // find the name, or just name it a number
-    map<string,string>::const_iterator condName 
+    map<string,string>::const_iterator condName
       = attrMap.find("conditionName");
     if(condName == attrMap.end()) {
       string nameNum = "condition";
@@ -154,14 +171,14 @@ bool RtActivationEstimator::processOption(const string &name,
     else {
       conditionNames.push_back((*condName).second);
     }
-    
+
     // parse the text string into a condition vector
     double el;
     size_t i = 0;
-    for(size_t i1 = 0, i2 = text.find(" "); 1; 
+    for(size_t i1 = 0, i2 = text.find(" "); 1;
 	i++, i1 = i2+1, i2 = text.find(" ", i1)) {
 
-      if(!RtConfigVal::convert<double>(el, 
+      if(!RtConfigVal::convert<double>(el,
 	  text.substr(i1,i2 == string::npos ? text.size()-i1 : i2-i1))) {
 	continue;
       }
@@ -188,6 +205,9 @@ bool RtActivationEstimator::processOption(const string &name,
   if(name == "conditionshift") {
     return RtConfigVal::convert<unsigned int>(conditionShift,text);
   }
+  if(name == "modelEachBlock") {
+    return RtConfigVal::convert<bool>(modelEachBlock,text);
+  }
   if(name == "loadHrf") {
     return RtConfigVal::convert<bool>(loadHrf,text);
   }
@@ -201,18 +221,30 @@ bool RtActivationEstimator::processOption(const string &name,
   if(name == "modelTemporalDerivatives") {
     return RtConfigVal::convert<bool>(modelTemporalDerivatives,text);
   }
-  if(name == "modelEachBlock") {
-    return RtConfigVal::convert<bool>(modelEachBlock,text);
+  if(name == "modelEvents") {
+    return RtConfigVal::convert<bool>(modelEvents,text);
+  }
+  if(name == "convolveEventsWithHrf") {
+    return RtConfigVal::convert<bool>(convolveEventsWithHrf,text);
+  }
+  if(name == "eventDuration") {
+    return RtConfigVal::convert<unsigned int>(eventDuration,text);
+  }
+  if(name == "eventRegressorLength") {
+    return RtConfigVal::convert<unsigned int>(eventRegressorLength,text);
+  }
+  if(name == "maxNumEvents") {
+    return RtConfigVal::convert<unsigned int>(maxNumEvents,text);
   }
   if(name == "trends") {
     return RtConfigVal::convert<unsigned int>(numTrends,text);
   }
   if(name == "probThreshold") {
     return RtConfigVal::convert<double>(probThreshold,text);
-  }  
+  }
   if(name == "correctForMultiComps") {
     return RtConfigVal::convert<bool>(correctForMultiComps,text);
-  }  
+  }
   if(name == "maskSource") {
     // match type string
     if(text == "none") {
@@ -247,7 +279,7 @@ bool RtActivationEstimator::processOption(const string &name,
   if(name == "roiID") {
     roiID = text;
     return true;
-  }  
+  }
   if(name == "maskIntensityThreshold") {
     return RtConfigVal::convert<double>(maskIntensityThreshold,text);
   }
@@ -290,18 +322,18 @@ bool RtActivationEstimator::processOption(const string &name,
   }
 
   return RtStreamComponent::processOption(name, text, attrMap);
-}  
+}
 
 
 // process gloabl config info or config from other modules
 bool RtActivationEstimator::processConfig(RtConfig &config) {
-  
+
   if(config.isSet("scanner:measurements")) {
     numMeas = config.get("scanner:measurements");
-  } 
+  }
   if(config.isSet("scanner:tr")) {
     tr= config.get("scanner:tr");
-  } 
+  }
   else {
     cerr << "error: number of measurements has not been set" << endl;
     return false;
@@ -310,12 +342,38 @@ bool RtActivationEstimator::processConfig(RtConfig &config) {
   return true;
 }
 
+
+// get the stored hrf vector for this experiment (or build it)
+vnl_vector<double> &RtActivationEstimator::getHrf() {
+  // build it if not built
+  if(!hrfIsBuilt) {
+    // try to load from file
+    if(loadHrf) { 
+      if(!loadHrfFile(hrf, hrfFilename)) { // try to load
+	cerr << "error: couldn't load hrf from "
+	     << hrfFilename << ". using cannonical instead" << endl;
+
+	// if fail, build cannonical
+	buildHrf(hrf, tr, hrfSamplePeriod, hrfLength,
+		 hrfTimeToPeakPos, hrfTimeToPeakNeg, hrfPosToNegRatio);
+      }
+    }
+    else { // build cannonical hrf
+      buildHrf(hrf, tr, hrfSamplePeriod, hrfLength,
+	       hrfTimeToPeakPos, hrfTimeToPeakNeg, hrfPosToNegRatio);
+    }
+
+    hrfIsBuilt = true;
+  }
+
+  return hrf;
+}
+
 // build a gamma pdf with shape and scale parms
 // see http://www.itl.nist.gov/div898/handbook/apr/section1/apr165.htm
 double gammaPDF(double t, double a, double b) {
   return pow(b,a)/vnl_gamma(a) * pow(t,a-1) * exp(-b*t);
 }
-
 
 // loads an hrf vector from a file
 bool RtActivationEstimator::loadHrfFile(vnl_vector<double> &hrf,
@@ -338,22 +396,21 @@ bool RtActivationEstimator::loadHrfFile(vnl_vector<double> &hrf,
 //  vnl_vector Hrf
 void RtActivationEstimator::buildHrf(vnl_vector<double> &hrf,
 				     double tr,
-				     double samplePeriod, 
-				     double length) {
-
-  double timeToPeakPos = 6;
-  double timeToPeakNeg = 16;
-  double posToNegRatio = 6;
+				     double samplePeriod,
+				     double length,
+				     double timeToPeakPos,
+				     double timeToPeakNeg,
+				     double posToNegRatio) {
 
   double dt = tr*samplePeriod;
   hrf.set_size((int)floor(length/tr+1));
   hrf.fill(0);
-  for(unsigned int i = 0, t = 0; t <= (unsigned int) ceil(length/samplePeriod); 
+  for(unsigned int i = 0, t = 0; t <= (unsigned int) ceil(length/samplePeriod);
       t += (unsigned int) ceil(tr/samplePeriod), i++) {
 
     hrf.put(i, gammaPDF(t/tr,timeToPeakPos,dt)
   	    - gammaPDF(t/tr,timeToPeakNeg,dt)/posToNegRatio);
-      
+
   }
   hrf.normalize();
 
@@ -368,7 +425,7 @@ void RtActivationEstimator::buildHrf(vnl_vector<double> &hrf,
 
 // finish initialization and prepare to run for a particular series
 bool RtActivationEstimator::finishInit() {
-  buildTrends();
+  buildNuisance();
   buildConditions();
 
   return true;
@@ -382,20 +439,8 @@ bool RtActivationEstimator::finishInit() {
 
 // build the condition regressors
 void RtActivationEstimator::buildConditions() {
-  // convolve the conditions with hrf (cannonical from SPM)
-  vnl_vector<double> hrf;
+  vnl_vector<double> hrf = getHrf();
 
-  if(loadHrf) {
-    if(!loadHrfFile(hrf, hrfFilename)) { // try to load
-      cerr << "error: couldn't load hrf from " 
-	   << hrfFilename << ". using cannonical instead" << endl;
-
-      buildHrf(hrf, tr, 1/16.0, 32);
-    }
-  }
-  else {
-    buildHrf(hrf, tr, 1/16.0, 32);
-  }
   //printVnlVector(hrf);
 
   // debugging
@@ -414,13 +459,13 @@ void RtActivationEstimator::buildConditions() {
       col.update(shiftcol.extract(col.size()));
 
       conditions.set_column(i,col);
-    }  
+    }
   }
 
   // build block-wise condition vectors if required
   if(modelEachBlock) {
     int numBlocks = (numMeas-conditionShift)/blockLen;
-    
+
     // make a new condition matrix
     vnl_matrix<double> newConds(numMeas, numConditions*numBlocks);
     newConds.fill(0);
@@ -450,9 +495,9 @@ void RtActivationEstimator::buildConditions() {
       for(unsigned int cond=0; cond < numConditions; cond++) {
 	newCondNames.push_back(conditionNames[cond]);
       }
-    } 
+    }
 
-    conditionNames = newCondNames; 
+    conditionNames = newCondNames;
 
     // update the number of conditions
     numConditions*=numBlocks;
@@ -482,7 +527,7 @@ void RtActivationEstimator::buildConditions() {
 
       // compute derivative for one condition for each measurement
       for(unsigned int meas=1; meas < numMeas; meas++) {
-	newConds.put(meas, 2*cond+1, 
+	newConds.put(meas, 2*cond+1,
 		     conditions[meas][cond]-conditions[meas-1][cond]);
       }
     }
@@ -499,11 +544,11 @@ void RtActivationEstimator::buildConditions() {
     for(unsigned int cond=0; cond < numConditions; cond++) {
       newCondNames.push_back(conditionNames[cond]);
       newCondNames.push_back(conditionNames[cond]+"_derivative");
-    } 
+    }
 
-    conditionNames = newCondNames; 
+    conditionNames = newCondNames;
 
-    numConditions*=2;    
+    numConditions*=2;
 
   }
 
@@ -514,40 +559,93 @@ void RtActivationEstimator::buildConditions() {
   }
 }
 
+
+// build the event regressor
+void RtActivationEstimator::buildEventRegressor(unsigned int length) {
+  cout << "event reg length " << length << endl;
+
+  eventRegressor.clear();
+  eventRegressor.set_size(length);
+  eventRegressor.fill(0);
+  for(unsigned int i = 0; i < eventDuration; i++) {
+    eventRegressor.put(i,1);
+  }
+
+  if(convolveEventsWithHrf) {
+    vnl_vector<double> hrf = getHrf();
+    vnl_vector<double> convhrf = vnl_convolve(eventRegressor,hrf);
+    eventRegressor.update(convhrf.extract(eventRegressor.size()));
+  }
+
+  // make total deviation one
+  unitDeviation(eventRegressor);
+}
+
+
 // test if a condition index is a derivative (index ignores trend regressors)
 bool RtActivationEstimator::conditionIsDerivative(unsigned int index) {
   return modelTemporalDerivatives && index % 2;
 }
 
 // build the trend regressors
-void RtActivationEstimator::buildTrends() {
-  trends.clear();
+void RtActivationEstimator::buildNuisance() {
+  nuisance.clear();
 
-  if(modelMotionParameters) { // add dummy columns for motion to be filled
-			      // as data arrives from scanner
-    trends.set_size(numMeas, numTrends + 6);
-  }
-  else {
-    trends.set_size(numMeas, numTrends);
-  }
+  nuisance.set_size(numMeas, getNumNuisanceRegressors());
+  nuisance.fill(0.0);
 
-  trends.fill(0.0);
+  // fill the trend colums
   for(unsigned int i = 0; i < numTrends; i++) {
     for(unsigned int j = 0; j < numMeas; j++) {
       switch(i) {
       case 0: // mean
-	trends.put(j,i,1.0);
+	nuisance.put(j, getNuisanceColumn(TREND, i),  1.0);
 	break;
       case 1: // linear
-	trends.put(j,i,j+1);
+	nuisance.put(j, getNuisanceColumn(TREND, i), j+1);
 	break;
       default:
-	trends.put(j,i,0.0);
+	nuisance.put(j, getNuisanceColumn(TREND, i), 0.0);
 	break;
       }
     }
   }
 
+
+  if(modelEvents) {
+    buildEventRegressor(eventRegressorLength);
+  }
+}
+
+// retreive the number of nuisance regressors in this model
+unsigned int RtActivationEstimator::getNumNuisanceRegressors() {
+  unsigned int numRegressors = 0;
+
+  numRegressors += numTrends;
+
+  if(modelMotionParameters) {
+    numRegressors += NUM_MOTION_DIMENSIONS;
+  }
+
+  if(modelEvents) {
+    numRegressors += maxNumEvents;
+  }
+
+  return numRegressors;
+}
+
+// retreive the column index of a nuisance regressor
+unsigned int RtActivationEstimator::getNuisanceColumn(Nuisance type, unsigned int index) {
+  switch(type) {
+  case TREND:
+    return index;
+  case MOTION:
+    return numTrends + index;
+  case EVENT:
+    return numTrends + (modelMotionParameters ? NUM_MOTION_DIMENSIONS : 0) + index;
+  default:
+    return index;
+  }
 }
 
 // initialize the estimation algorithm for a particular image size
@@ -562,21 +660,21 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
     mask.setAll(1);
   }
   else if(maskSource == THRESHOLD_FIRST_IMAGE_INTENSITY) {
-    numComparisons 
+    numComparisons
       = mask.initByMeanIntensityThreshold(image, maskIntensityThreshold);
   }
   else if(maskSource == LOAD_FROM_FILE) { // mask from file
     unsigned int seriesNum = image.getDataID().getSeriesNum();
 
     if(alignMask) { // align mask before reading it in?
-      FslJobID status 
+      FslJobID status
 	= RtFSLInterface::applyTransform(
-		RtExperiment::getSeriesRefVolFilename(seriesNum), 
-		RtExperiment::getExperimentRefVolFilename(), 
-		mask.getFilename(), 
-		RtExperiment::getSeriesXfmOutputFilename(seriesNum, 
-							 mask.getFilename()), 
-		RtExperiment::getSeriesXfmFilename(seriesNum), 
+		RtExperiment::getSeriesRefVolFilename(seriesNum),
+		RtExperiment::getExperimentRefVolFilename(),
+		mask.getFilename(),
+		RtExperiment::getSeriesXfmOutputFilename(seriesNum,
+							 mask.getFilename()),
+		RtExperiment::getSeriesXfmFilename(seriesNum),
 		true);
       if(status == FSL_JOB_FINISHED) {
 	mask.setFilename(RtExperiment::getSeriesXfmOutputFilename(seriesNum,
@@ -609,9 +707,6 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
     }
   }
 
-  // set the number of nuisance regressors
-  numNuisance = numTrends + (modelMotionParameters ? NUM_MOTION_DIMENSIONS : 0);
-
   // open the dump file
   if(dumpAlgoVars) {
     dumpFile.open(dumpAlgoVarsFilename.c_str());
@@ -634,7 +729,7 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
 //  in
 //   data result
 void RtActivationEstimator::setResult(RtStreamMessage *msg, RtData *data) {
-  // send the mask if desired 
+  // send the mask if desired
   if(putMaskOnMessage) {
     mask.getDataID().setRoiID(roiID);
     passData(&mask);
@@ -642,14 +737,14 @@ void RtActivationEstimator::setResult(RtStreamMessage *msg, RtData *data) {
 
   RtStreamComponent::setResult(msg,data);
 }
-  
-// start a logfile 
+
+// start a logfile
 void RtActivationEstimator::startDumpAlgoVarsFile() {
   dumpFile << "started at ";
   printNow(dumpFile);
   dumpFile << endl
 	   << "print variable names here separated by spaces "
-	   << "end" << endl;  
+	   << "end" << endl;
 }
 
 

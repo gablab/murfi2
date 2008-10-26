@@ -25,6 +25,12 @@ using namespace std;
 
 #define MAX_CONDITIONS 1024
 
+typedef enum {
+  TREND = 0,
+  MOTION,
+  EVENT
+} Nuisance;
+
 // class declaration
 class RtActivationEstimator : public RtStreamComponent {
 
@@ -62,8 +68,11 @@ public:
 
 protected:
 
+  // get the hrf vector
+  virtual vnl_vector<double> &getHrf();
+
   // loads an hrf vector from a file
-  bool loadHrfFile(vnl_vector<double> &hrf, string filename);
+  virtual bool loadHrfFile(vnl_vector<double> &hrf, string filename);
 
   // builds an hrf vector
   //
@@ -72,8 +81,10 @@ protected:
   //  length:     length of the HRF in milliseconds
   // out
   //  vnl_vector HRF
-  void buildHrf(vnl_vector<double> &hrf, double tr,
-		double sampleRate, double length);
+  virtual void buildHrf(vnl_vector<double> &hrf, double tr,
+			double sampleRate, double length,
+			double timeToPeakPos, double timeToPeakNeg,
+			double posToNegRatio);
 
   // process a single acquisition
   virtual int process(ACE_Message_Block *mb) = 0;
@@ -88,7 +99,7 @@ protected:
   //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
+  virtual bool processOption(const string &name, const string &text,
 			     const map<string,string> &attr);
 
   // finish initialization tasks for run
@@ -101,15 +112,24 @@ protected:
   virtual bool conditionIsDerivative(unsigned int index);
 
   // build the trend regressors
-  virtual void buildTrends();
+  virtual void buildNuisance();
+
+  // retreive the number of nuisance regressors in this model
+  virtual unsigned int getNumNuisanceRegressors();
+
+  // retreive the column index of a nuisance regressor
+  virtual unsigned int getNuisanceColumn(Nuisance, unsigned int index);
+
+  // build the event regressor
+  virtual void buildEventRegressor(unsigned int length);
 
   // initialize the estimation algorithm for a particular image size
   // in
   //  first acquired image to use as a template for parameter inits
   virtual void initEstimation(RtMRIImage &image);
 
-  // start a logfile 
-  virtual void startDumpAlgoVarsFile();  
+  // start a logfile
+  virtual void startDumpAlgoVarsFile();
 
   // sets the latest result of processing
   //  in
@@ -124,7 +144,18 @@ protected:
   unsigned int numMeas;        // total expected
   unsigned int numTimepoints;  // so far
 
-  // hrf spec 
+  // hrf spec
+  vnl_vector<double> hrf;
+  bool hrfIsBuilt;
+
+  // cannonical hrf parameters
+  double hrfSamplePeriod;      // temporal precision for hrf sampling (s)
+  double hrfLength;            // seconds
+  double hrfTimeToPeakPos;
+  double hrfTimeToPeakNeg;
+  double hrfPosToNegRatio;
+
+  // load hrf from file
   bool loadHrf;
   string hrfFilename;
 
@@ -132,17 +163,30 @@ protected:
   unsigned int numConditions;
   vnl_matrix<double> conditions;
   vector<string> conditionNames;
-  unsigned int conditionShift;  // shift all condition regressors
+  unsigned int conditionShift;
 
-  bool modelMotionParameters;
-  bool modelTemporalDerivatives;
   bool modelEachBlock;
   unsigned int blockLen;
 
-  // trend regressors
+  // nuisance regressors
+  vnl_matrix<double> nuisance;
+
   unsigned int numTrends;
-  vnl_matrix<double> trends;
-  unsigned int numNuisance;  // with motion and outliers
+
+  bool modelMotionParameters;
+  bool modelTemporalDerivatives;
+
+  // single event regressors
+  bool modelEvents;
+  unsigned int eventDuration;
+  bool convolveEventsWithHrf;
+  vnl_vector<double> eventRegressor;
+  unsigned int eventRegressorLength;
+  unsigned int maxNumEvents;
+  unsigned int numEvents;
+
+
+
 
   // probability of false positive at which to threshold activations
   double probThreshold;

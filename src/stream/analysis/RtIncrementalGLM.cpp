@@ -62,10 +62,6 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-//  tc.put(numTimepoints,(double) dat->getElement(16*32*32 + 28*32 + 14));
-//  gp.reset_plot();
-//  gp.plot_x(tc,"timeseries");
-  
   numTimepoints++;
 
   // initialize the computation if necessary
@@ -108,12 +104,32 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 	 << getProbThreshold() << ")" << endl;
   }
 
+  // allocate a new data images for the betas
+  RtActivation **betas = new RtActivation*[numConditions];
+  for(unsigned int i = 0; i < numConditions; i++) {
+    betas[i] = new RtActivation(*dat);
+
+    // setup the data id
+    betas[i]->getDataID().setFromInputData(*dat,*this);
+    betas[i]->getDataID().setDataName(string(NAME_INCREMENTALGLM_BETA)+"_"+conditionNames[i]);
+
+    betas[i]->initToZeros();
+  }
+
+  // residual sum of squares map
+  RtActivation *res = new RtActivation(*dat);
+  // setup the data id
+  res->getDataID().setFromInputData(*dat,*this);
+  res->getDataID().setDataName(NAME_INCREMENTALGLM_RESIDUAL);
+  res->initToZeros();
+
+
   //// element independent setup
   
   // build a design matrix xrow
   double *Xrow = new double[numConditions+numTrends];
   for(unsigned int i = 0; i < numTrends; i++) {
-    Xrow[i] = trends.get(numTimepoints-1,i);
+    Xrow[i] = nuisance.get(numTimepoints-1,i);
   }
   for(unsigned int i = 0; i < numConditions; i++) {
     Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
@@ -122,6 +138,11 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   //// compute t map for each element
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     if(!mask.getPixel(i)) {
+      for(unsigned int j = 0; j < numConditions; j++) {
+	betas[j]->setPixel(i,0.0/0.0); // nan
+      }
+      res->setPixel(i, 0.0/0.0);
+
       est->setPixel(i,0.0);
       continue;
     }
@@ -135,6 +156,13 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 //      double se = sqrt((solvers[i]->getTotalSquaredError(0)
 //			/(numTimepoints-numTrends))
 //		       /columnSEs[numTrends]);
+
+      // save beta and res and stat
+      for(unsigned int j = 0; j < numConditions; j++) {
+	betas[j]->setPixel(i,beta[j]);
+      }
+      res->setPixel(i, 
+	     sqrt(solvers[i]->getTotalSquaredError(0)/(numTimepoints-1)));
 
       est->setPixel(i,
 		    beta[numTrends]*sqrt(columnSEs[numTrends]
@@ -153,9 +181,10 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 
   delete Xrow;
 
-  // set the image id for handling
-  //est->addToID("voxel-incrglm");
-
+  for(unsigned int j = 0; j < numConditions; j++) {
+    setResult(msg,betas[j]);
+  }
+  setResult(msg,res);
   setResult(msg,est);
 
   // test if this is the last measurement for mask conversion and saving

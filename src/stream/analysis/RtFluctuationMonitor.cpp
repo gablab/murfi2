@@ -118,7 +118,8 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     // set up the solvers
     solvers = new RtLeastSquaresSolve*[numData];
     for(unsigned int i = 0; i < numData; i++) {
-      solvers[i] = new RtLeastSquaresSolve(numTrends+numConditions);
+      solvers[i] = new RtLeastSquaresSolve(getNumNuisanceRegressors()
+					   +numConditions);
     }
 
     // setup the estimation error sum of squares
@@ -127,6 +128,11 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     }
     absEstErrSum = new RtActivation(*dat);
     absEstErrSum->initToZeros();
+
+    // set up the event regressor
+//    if(modelEvents) {
+//      buildEventRegressor(2*afterTriggerSkip);
+//    }
 
     needsInit = false;
   }
@@ -155,6 +161,8 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   //// element independent setup
 
+  cout << "isTRIGGERED " << isTriggered << endl;
+
   
   bool dontInclude = false;
   if(numTimepoints > numDataPointsForErrEst) { // check for out of error est region
@@ -169,6 +177,7 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     else if(isTriggered) {
       isTriggered = false;
       dontInclude = false;
+      numEvents++;
     }
   }
 
@@ -184,12 +193,46 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 	 << fluct->getThreshold() << endl;
   }
 
-  // build a design matrix xrow
-  double *Xrow = new double[numConditions+numTrends];
-  for(unsigned int i = 0; i < numTrends; i++) {
-    Xrow[i] = trends.get(numTimepoints-1,i);
+  if(isTriggered && numImagesSinceTrigger++ >= afterTriggerSkip) {
+    isTriggered = false;
+    numEvents++;
   }
 
+
+  // build a design matrix xrow
+  double *Xrow = new double[getNumNuisanceRegressors() + numConditions];
+  for(unsigned int i = 0; i < getNumNuisanceRegressors() + numConditions; i++) {
+    Xrow[i] = 0.0;
+  }
+
+  unsigned int curCol = 0;
+  for(; curCol < numTrends; curCol++) {
+    Xrow[curCol] = nuisance.get(numTimepoints-1,curCol);
+  }
+
+
+  // copy the motion parameters
+  if(modelMotionParameters) {
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_X);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Y);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Z);
+
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_X);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Y);
+    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Z);  
+  }  
+
+  // copy the event regressor
+  if(modelEvents && isTriggered) {
+    Xrow[getNuisanceColumn(EVENT,numEvents)] 
+      = eventRegressor.get(numImagesSinceTrigger-1);
+    cout << "!!!! event column " << Xrow[getNuisanceColumn(EVENT,numEvents)] << endl;
+  }
+  else {
+    cout << "!!!! not event column " << Xrow[getNuisanceColumn(EVENT,numEvents)] << endl;
+  }
+  
+  
   //// compute t map for each element
   //double sum = 0.;
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
@@ -199,6 +242,7 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     }
 
     double y = dat->getElement(i);
+
     solvers[i]->include(&y,Xrow,1.0);
 
     // old method for discounting time points
@@ -222,8 +266,8 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     double err = y;
 
     // subtract the reconstruction based on trend fit
-    for(unsigned int j = 0; j < numTrends; j++) {
-      err -= beta[j]*trends.get(numTimepoints-1,j);
+    for(unsigned int j = 0; j < getNumNuisanceRegressors(); j++) {
+      err -= beta[j]*Xrow[j];
     }
 
     double stdDev;
@@ -239,9 +283,12 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 	<< numTimepoints << " " 
 	<< i << " " 
 	<< y << " "
+	<< beta[0] << " "
+	<< beta[1] << " "
 	<< err << " "
 	<< stdDev << " "
 	<< fluct->getPixel(i) << " "
+	<< isTriggered << " "
 	<< dontInclude;
       for(int b = 0; b < numConditions; b++) {
 	dumpFile << beta[b] << " ";
@@ -278,9 +325,12 @@ void RtFluctuationMonitor::startDumpAlgoVarsFile() {
 	   << "time_point "
 	   << "voxel_index "
 	   << "voxel_intensity "
+	   << "mean "
+	   << "linear "
 	   << "activation_signal "
 	   << "std_dev "
 	   << "fluctuation "
+	   << "trigerred "
 	   << "skipping ";
   dumpFile << "end" << endl;  
 }

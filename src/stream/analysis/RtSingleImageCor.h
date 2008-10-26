@@ -82,7 +82,7 @@ protected:
   Norm errorNorm;
 
   // store the per pixel sum of absolute error for the single image model fit
-  RtActivation **estErrSum;
+  RtActivation *estErrSum;
 
   // number of data actually in the error estimate so far
   int numDataPointsInErrEst;

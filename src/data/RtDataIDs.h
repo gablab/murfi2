@@ -61,6 +61,7 @@
   #define NAME_INCREMENTALGLM_COR              	"cor-img"
   #define NAME_INCREMENTALGLM_TSTAT            	"tstat-img"
   #define NAME_INCREMENTALGLM_BETA            	"beta-img"
+  #define NAME_INCREMENTALGLM_RESIDUAL         	"res-img"
 
 // note: the names here will be appended with <_conditionName>
 #define ID_SINGLEIMCOR                		"singleimcor"
@@ -78,6 +79,10 @@
 #define ID_FLUCTUATIONMONITOR         		"fluctuation-monitor"
   #define NAME_FLUCTUATIONMONITOR_ACTIVATION  	"activation-img"
   #define NAME_FLUCTUATIONMONITOR_BETA        	"beta-img"
+
+#define ID_CONTRAST             		"contrast"
+  #define NAME_CONTRAST_IMG            	        "con-img"
+  #define NAME_CONTRAST_TSTAT            	"tstat-img"
 
 #define ID_ROI2FEEDBACK             		"roi2feedback"
 

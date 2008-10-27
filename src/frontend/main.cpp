@@ -3,7 +3,6 @@
 #include "FrMainDocument.h"
 #include "FrMainController.h"
 
-#include "vtkMath.h"
 
 int main(int argc, char **argv){
 	FrApplication application(argc, argv);
@@ -21,5 +20,6 @@ int main(int argc, char **argv){
     if(!application.exec()){
         result = 1;
     }
+        
 	return result;
 }

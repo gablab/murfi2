@@ -14,14 +14,24 @@
 
 vtkStandardNewMacro(FrSpecialLayer);
 
-FrSpecialLayer::FrSpecialLayer() {
+FrSpecialLayer::FrSpecialLayer() 
+: m_TextMapper(0),	m_TextActor(0),
+    // Free border objectsBorder support
+    m_BorderPts->Delete();
+    m_BorderMapper->Delete();
+    m_BorderActor->Delete();{
     this->InitializeText();
     this->InitializeBorder();
 }
 
 FrSpecialLayer::~FrSpecialLayer() {
+    // Free text objects
     m_TextMapper->Delete();
 	m_TextActor->Delete();
+    // Free border objectsBorder support
+    m_BorderPts->Delete();
+    m_BorderMapper->Delete();
+    m_BorderActor->Delete();
 }
 
 void FrSpecialLayer::InitializeText(){
@@ -97,26 +107,4 @@ void FrSpecialLayer::UpdateBorder(int winWidth, int winHeight){
     m_BorderPts->InsertPoint(2, maxx, maxy, 0);
     m_BorderPts->InsertPoint(3, minx, maxy, 0);
     m_BorderPts->Modified();
-
-    /*vtkCellArray* rect = vtkCellArray::New();
-    rect->InsertNextCell(5);
-    rect->InsertCellPoint(0);
-    rect->InsertCellPoint(1);
-    rect->InsertCellPoint(2);
-    rect->InsertCellPoint(3);
-    rect->InsertCellPoint(0);
-
-    vtkPolyData* selectRect = vtkPolyData::New();
-    selectRect->SetPoints(m_BorderPts);
-    selectRect->SetLines(rect);
-
-    m_BorderMapper->SetInput(selectRect);*/
-    //m_BorderMapper->Update();
-        
-    /*m_Renderer->RemoveActor2D(m_BorderActor);
-    m_Renderer->AddActor2D(m_BorderActor);*/
-
-    //// Free this stuff
-    //rect->Delete();
-    //selectRect->Delete();
 }

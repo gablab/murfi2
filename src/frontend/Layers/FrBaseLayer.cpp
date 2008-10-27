@@ -26,6 +26,7 @@ FrBaseLayer::FrBaseLayer()
 
 FrBaseLayer::~FrBaseLayer(){        
     if(m_Renderer){
+        //m_Renderer->RemoveAllProps();
         m_Renderer->Delete();
     }
 }

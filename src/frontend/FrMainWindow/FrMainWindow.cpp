@@ -40,20 +40,14 @@ FrMainWindow::~FrMainWindow(){
     if(m_MosaicView) delete m_MosaicView;
     if(m_OrthoView) delete m_OrthoView;
     if(m_SignalManager) delete m_SignalManager;
+    if(m_ActionManager) delete m_ActionManager;
 }
 
 void FrMainWindow::SetupUi(QMainWindow* mainWindow){
     // Main window
-    //mainWindow->resize(600, 800);
-	//mainWindow->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	mainWindow->setWindowState(Qt::WindowMaximized);
 	if (mainWindow->objectName().isEmpty())
         mainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-
-    // Central widget
-//    m_centralWidget = new QWidget(mainWindow);
-//    m_centralWidget->setObjectName(QString::fromUtf8("m_centralWidget"));
-//    mainWindow->setCentralWidget(m_centralWidget);
 
     // Action manager
     m_ActionManager = new FrActionManager(mainWindow);
@@ -61,7 +55,6 @@ void FrMainWindow::SetupUi(QMainWindow* mainWindow){
     // Main menu
     m_mainMenu = new FrMainMenu(mainWindow, m_ActionManager);
     m_mainMenu->setObjectName(QString::fromUtf8("m_mainMenu"));
-    //m_mainMenu->setGeometry(QRect(0, 0, 800, 21));
 	mainWindow->setMenuBar(m_mainMenu);
 
     // Tool bar
@@ -91,12 +84,6 @@ void FrMainWindow::RetranslateUi(QMainWindow* mainWindow){
 }
 
 void FrMainWindow::InitializeWidgets(){
-    
-//    QWidget* centralWidget = this->centralWidget();
-    
-//	QDockWidget *dock = new QDockWidget(tr("3D View"), this);
-//	dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
     QWidget* topPane = new QWidget(this);
     topPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     
@@ -118,12 +105,9 @@ void FrMainWindow::InitializeWidgets(){
     viewLayout->addWidget(m_BookmarkWidget);
 
     topPane->setLayout(viewLayout);
-	this->setCentralWidget(topPane);		// test
+	this->setCentralWidget(topPane);
 
-//	dock->setWidget(topPane);
-//	addDockWidget(Qt::LeftDockWidgetArea, dock);
 	m_mainMenu->GetMenuView()->addSeparator();
-//	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
 	QDockWidget* dock = new QDockWidget(tr("Info Tab"), this);
 	dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea | Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -137,13 +121,7 @@ void FrMainWindow::InitializeWidgets(){
 	addDockWidget(Qt::RightDockWidgetArea, dock);
 	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 		
-//    QHBoxLayout* vcLayout = new QHBoxLayout();
-//    vcLayout->addLayout(viewLayout);
-//    vcLayout->addWidget(viewInfoControl);
-
-
 	dock = new QDockWidget(tr("Graph View"), this);
-//	dock->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
 	
     QWidget* btmPane = new QWidget(dock);
     btmPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -170,7 +148,6 @@ void FrMainWindow::InitializeWidgets(){
 
 	dock->setWidget(m_VoxelInfoWidget);
 	addDockWidget(Qt::LeftDockWidgetArea, dock);
-//	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	// ?
 
 	dock = new QDockWidget(tr("ROI Info"), this);
 
@@ -178,13 +155,6 @@ void FrMainWindow::InitializeWidgets(){
 
 	dock->setWidget(m_ROIInfoWidget);
 	addDockWidget(Qt::LeftDockWidgetArea, dock);
-
-    // Setup layout to  central widget
-    //QVBoxLayout* vLayout = new  QVBoxLayout();
-    //vLayout->addWidget(topPane);
-    //vLayout->addWidget(btmPane);
-
-    //centralWidget->setLayout(vLayout);
 }
 
 void FrMainWindow::Initialize(){

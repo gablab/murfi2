@@ -11,14 +11,8 @@
 #define DEF_FRAME 0
 
 
-FrSliceExtractor* FrSliceExtractor::New(){  
-  vtkObject* result = vtkObjectFactory::CreateInstance("FrSliceExtractor");
-  
-  if(result)
-      return (FrSliceExtractor*)result;
+vtkStandardNewMacro(FrSliceExtractor);
 
-  return new FrSliceExtractor();
-}
 
 FrSliceExtractor::FrSliceExtractor(){
     // Create reslicer
@@ -34,7 +28,7 @@ FrSliceExtractor::~FrSliceExtractor(){
 }
 
 void FrSliceExtractor::SetInput(vtkImageData *input){
-    if(input == m_Reslicer->GetInput()) return;
+    if(input == m_Reslicer->GetInput()) return;    
 
     m_Reslicer->SetInput(input);
     this->Modified();

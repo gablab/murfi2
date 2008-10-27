@@ -7,12 +7,13 @@
 
 class FrBaseFilter : public vtkImageSource {
 public:
-  // Set the Input of a filter. 
-  virtual void SetInput(vtkImageData *input);
-  vtkImageData *GetInput();
-  
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+    vtkTypeMacro(FrBaseFilter,vtkImageSource);
 
+    // Set the Input of a filter. 
+    virtual void SetInput(vtkImageData *input);
+    vtkImageData *GetInput();
+  
+    virtual int FillOutputPortInformation(int port, vtkInformation* info);
   
 protected:
     // This allow us to construct and destruct in derived classes
@@ -27,12 +28,12 @@ protected:
   // You don't have to touch this unless you have a good reason.
   virtual void ExecuteData(vtkDataObject *output);
   // In the simplest case, this is the only method you need to define.
-  virtual void SimpleExecute(vtkImageData* input, vtkImageData* output) = 0;
+  virtual void SimpleExecute(vtkImageData* input, vtkImageData* output)=0;
   
-private:
+private: 
     // VTK style
-  FrBaseFilter(const FrBaseFilter&);  // Not implemented.
-  void operator=(const FrBaseFilter&);  // Not implemented.
+    FrBaseFilter(const FrBaseFilter&);  // Not implemented.
+    void operator=(const FrBaseFilter&);  // Not implemented.
 };
 
 

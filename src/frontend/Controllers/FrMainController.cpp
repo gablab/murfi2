@@ -56,8 +56,12 @@ void FrMainController::Initialize(){
 
         // Setup interactor style
         if(m_MainView->GetQVTKWidget()) {
-            FrInteractorStyle* style = new FrInteractorStyle(this);
-            m_MainView->GetQVTKWidget()->GetInteractor()->SetInteractorStyle(style);
+            FrInteractorStyle* style = FrInteractorStyle::New();
+            style->SetMainController(this);
+            m_MainView->GetQVTKWidget()->
+                GetInteractor()->SetInteractorStyle(style);
+
+            style->Delete();
         }
         m_MainView->show();
     }

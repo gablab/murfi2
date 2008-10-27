@@ -17,8 +17,10 @@ class vtkActor2D;
 // Represents layer object
 class FrLayeredImage : public FrImageLayer {
 public:
+    vtkTypeMacro(FrLayeredImage,FrImageLayer);
     static FrLayeredImage* New();
     
+public:
     // Accessors/Modifiers
     virtual void SetInput(vtkImageData* data);
     

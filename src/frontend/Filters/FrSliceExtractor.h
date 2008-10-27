@@ -14,8 +14,10 @@ class vtkImageData;
 // vtkImageReslice class.
 class FrSliceExtractor : public vtkObject {
 public:
+    vtkTypeMacro(FrSliceExtractor,vtkObject);
     static FrSliceExtractor* New();
 
+public:
     // Makes output out-to-date. 
     // You should override this method
     virtual void Update();

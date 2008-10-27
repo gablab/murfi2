@@ -10,8 +10,10 @@ class FrColormapFilter : public FrBaseFilter{
 public:
     enum Type { SingleColor, MultiColor };
 public:
+    vtkTypeMacro(FrColormapFilter,FrBaseFilter);
 	static FrColormapFilter* New();
 
+public:
 	virtual void SetInput(vtkImageData* data);
 	
     virtual void ExecuteInformation();

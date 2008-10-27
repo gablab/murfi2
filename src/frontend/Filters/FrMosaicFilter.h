@@ -5,8 +5,10 @@
 
 class FrMosaicFilter : public FrBaseFilter {
 public:
+    vtkTypeMacro(FrMosaicFilter,FrBaseFilter);
     static FrMosaicFilter* New();
 
+public:
 	virtual void SetInput(vtkImageData* data);
 	void SetOutputDimensions(int w, int h, int num);
 	

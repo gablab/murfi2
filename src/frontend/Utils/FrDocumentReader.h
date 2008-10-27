@@ -9,7 +9,10 @@ class vtkImageData;
 
 class FrDocumentReader : public vtkObject {
 public:
+    vtkTypeMacro(FrDocumentReader,vtkObject);
     static FrDocumentReader* New();
+
+public:
 
     // Makes output out-to-date. 
     // You should override this method

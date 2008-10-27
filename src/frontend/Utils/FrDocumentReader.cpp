@@ -13,12 +13,7 @@
 // Backend includes
 #include "RtMRIImage.h"
 
-FrDocumentReader* FrDocumentReader::New(){  
-    vtkObject* result = vtkObjectFactory::CreateInstance("FrDocumentReader");
-  
-    if(result) return (FrDocumentReader*)result;
-    return new FrDocumentReader();
-}
+vtkStandardNewMacro(FrDocumentReader);
 
 
 FrDocumentReader::FrDocumentReader()
@@ -27,7 +22,7 @@ FrDocumentReader::FrDocumentReader()
 }
 
 FrDocumentReader::~FrDocumentReader(){
-    if(m_Output) m_Output->Delete();
+    //if(m_Output) m_Output->Delete();
 }
 
 void FrDocumentReader::Update(){
@@ -154,7 +149,7 @@ void FrDocumentReader::SetOutput(vtkImageData* output){
     // Setup output
     if(output){
         m_Output = output;
-        m_Output->Register(this);
+        //m_Output->Register(this);
     }
 }
 

@@ -5,15 +5,7 @@
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 
-FrMosaicFilter* FrMosaicFilter::New(){  
-  vtkObject* result = vtkObjectFactory::CreateInstance("FrMosaicFilter");
-  
-  if(result){
-      return (FrMosaicFilter*)result;
-  }
-
-  return new FrMosaicFilter();
-}
+vtkStandardNewMacro(FrMosaicFilter);
 
 FrMosaicFilter::FrMosaicFilter(){
 }

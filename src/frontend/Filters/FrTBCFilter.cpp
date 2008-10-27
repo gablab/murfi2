@@ -7,15 +7,8 @@
 #include "vtkDataArray.h"
 
 
-FrTBCFilter* FrTBCFilter::New(){  
-  vtkObject* result = vtkObjectFactory::CreateInstance("FrTBCFilter");
-  
-  if(result){
-      return (FrTBCFilter*)result;
-  }
+vtkStandardNewMacro(FrTBCFilter);
 
-  return new FrTBCFilter();
-}
 
 FrTBCFilter::FrTBCFilter()
 : m_Threshold(DEF_THRESHOLD),

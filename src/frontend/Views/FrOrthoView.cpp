@@ -27,7 +27,7 @@ FrSliceExtractor::Orientation g_Orientation[ORTHO_IMAGE_COUNT];
 // Default constructor
 FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
-       
+    // creating reader   
     m_docReader = FrDocumentReader::New();
 
     // Init orientations

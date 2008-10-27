@@ -12,8 +12,10 @@ class vtkActor2D;
 
 class FrSpecialLayer : public FrBaseLayer {
 public:
+    vtkTypeMacro(FrSpecialLayer,FrBaseLayer);
     static FrSpecialLayer *New();
 
+public:
     void SetText(const char* text);
     void UpdateBorder(int winWidth, int winHeight);
 

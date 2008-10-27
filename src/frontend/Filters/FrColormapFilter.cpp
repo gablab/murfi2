@@ -26,16 +26,8 @@
 #define HUE_BLUE   240
 #define HUE_NORM   360
  
+vtkStandardNewMacro(FrColormapFilter);
 
-FrColormapFilter* FrColormapFilter::New(){  
-  vtkObject* result = vtkObjectFactory::CreateInstance("FrColormapFilter");
-  
-  if(result){
-      return (FrColormapFilter*)result;
-  }
-
-  return new FrColormapFilter();
-}
 
 FrColormapFilter::FrColormapFilter()
 : m_Type(FrColormapFilter::SingleColor),

@@ -58,7 +58,7 @@ class vtkUnsignedCharArray;
 #endif
 
 //! QVTKWidget displays a VTK window in a Qt window.
-class QVTK_EXPORT QVTKWidget : public QWidget
+class QVTKWidget : public QWidget
 {
   Q_OBJECT
 
@@ -253,7 +253,7 @@ class QVTK_EXPORT QVTKWidget : public QWidget
 // .SECTION Description
 // QVTKInteractor is an interactor for a QVTKWiget.
 
-class QVTK_EXPORT QVTKInteractor : public QObject, public vtkRenderWindowInteractor
+class QVTKInteractor : public QObject, public vtkRenderWindowInteractor
 {
   Q_OBJECT
 public:

@@ -10,10 +10,13 @@ class FrPanTool;
 
 class FrInteractorStyle : public vtkInteractorStyle {
 public:
-    FrInteractorStyle(FrMainController* controller);
-    virtual ~FrInteractorStyle();
+    vtkTypeMacro(FrInteractorStyle,vtkInteractorStyle);
+    static FrInteractorStyle* New();
 
 public:
+    // Setup main controller
+    void SetMainController(FrMainController* ctrl);
+
     // Generic event overrides
     virtual void OnMouseMove();
     virtual void OnLeftButtonDown();
@@ -35,13 +38,23 @@ protected:
 	friend class FrCompositeTool;
 	friend class FrView2D;	// test
 
+protected:
+    FrInteractorStyle();
+    virtual ~FrInteractorStyle();
+
 private:
     enum State{
         Undefined, Left, Mid, Right
     };
+
 private:
     enum State m_state;
     FrMainController* m_controller;
+
+private:
+    // VTK style
+    FrInteractorStyle(const FrInteractorStyle&);  // Not implemented.
+    void operator=(const FrInteractorStyle&);  // Not implemented.
 };
 
 #endif

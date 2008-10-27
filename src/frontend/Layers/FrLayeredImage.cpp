@@ -22,7 +22,8 @@ vtkStandardNewMacro(FrLayeredImage);
 
 
 FrLayeredImage::FrLayeredImage() 
-: m_nextImageLayerID(DEFAULT_LAYER_ID) {
+: FrImageLayer(), m_nextImageLayerID(DEFAULT_LAYER_ID) {
+    
     this->InitDefault(this);
        
     // NOTE: remove colormap filter from pipline
@@ -36,7 +37,7 @@ FrLayeredImage::FrLayeredImage()
 FrLayeredImage::~FrLayeredImage(){
     // delete all layers here
     this->RemoveImageLayers();
-    // and special layer too
+    // and other stuff too
     if(m_SpecialLayer) m_SpecialLayer->Delete();
 }
 

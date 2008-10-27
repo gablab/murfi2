@@ -17,6 +17,7 @@
 
 vtkStandardNewMacro(FrImageLayer);
 
+
 FrImageLayer::FrImageLayer() 
 : m_cmFilter(0), m_tbcFilter(0), m_actor(0) {
     // Pipline stuff

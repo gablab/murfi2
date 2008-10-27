@@ -3,12 +3,19 @@
 #include "FrTool.h"
 
 #include <vtkRenderWindowInteractor.h>
+#include <vtkObjectFactory.h>
 
-FrInteractorStyle::FrInteractorStyle(FrMainController* controller)
-: m_controller(controller), m_state(Undefined){
+vtkStandardNewMacro(FrInteractorStyle);
+
+FrInteractorStyle::FrInteractorStyle()
+: m_controller(0), m_state(Undefined){
 }
 
 FrInteractorStyle::~FrInteractorStyle(){
+}
+
+void FrInteractorStyle::SetMainController(FrMainController* controller){
+    m_controller = controller;
 }
 
 void FrInteractorStyle::OnMouseMove(){

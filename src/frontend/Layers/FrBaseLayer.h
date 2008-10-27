@@ -13,8 +13,10 @@ class FrCameraSettings;
 // Represents layer object
 class FrBaseLayer : public vtkObject {
 public:
+    vtkTypeMacro(FrBaseLayer,vtkObject);
     static FrBaseLayer* New();
 
+public:
     // Properties
     FrPropMacro(int, ID);
 

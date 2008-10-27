@@ -19,8 +19,10 @@ class vtkRenderer;
 // Represents layer object
 class FrImageLayer : public FrBaseLayer {
 public:
+    vtkTypeMacro(FrImageLayer,FrBaseLayer);
     static FrImageLayer* New();
 
+public:
     // Properties
     FrPropMacro(int, ID);
 

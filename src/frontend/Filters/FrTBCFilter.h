@@ -24,6 +24,7 @@
 // of rendered image data
 class FrTBCFilter : public FrBaseFilter {
 public:
+    vtkTypeMacro(FrTBCFilter,FrBaseFilter);
     static FrTBCFilter* New();
 
 public:

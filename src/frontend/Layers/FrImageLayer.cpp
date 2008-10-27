@@ -156,6 +156,14 @@ void FrImageLayer::UpdateTBC(){
         if(data != m_actor->GetInput()){
             m_actor->SetInput(data);
         }
+
+        // Have to update display extent
+        if(data){
+            int extent[6];
+            extent[0] = -1;
+            extent[1] = extent[2] = extent[3] = extent[4] = extent[5] = 0;
+            m_actor->SetDisplayExtent(extent);
+        }
     }
 }
 

@@ -12,56 +12,51 @@ FrLoadImageCmd::FrLoadImageCmd(){
 
 }
 
-bool FrLoadImageCmd::Execute(){
-    FrImageDocObj* imgObj = new FrImageDocObj();
+bool FrLoadImageCmd::Execute(){    
+    if(!this->GetMainController()) return false;
+
 	FrMainDocument* md = this->GetMainController()->GetMainDocument();
 	FrMainWindow* mw = this->GetMainController()->GetMainView();
-	FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+	
+	// detect if any image's opened
+    std::vector<FrDocumentObj*> images;
+    md->GetAllImages(images);
 
-	// check if any image opened
-	std::vector<FrDocumentObj*> images;
-	md->GetAllImages(images);
-	int size = images.size();
-	if (size > 0){
-		// here goes dialog offering user to replace current image with new one (if any image is opened)
-		QMessageBox msgBox;
-		msgBox.setWindowTitle("Front: Attention");
-		msgBox.setText("Are you sure want to replace current image with this one?");
-		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-		FrTabSettingsDocObj* newts;
+    std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
+    bool hasOpenedImages = (images.begin() != itEnd);
+    bool openImage = !hasOpenedImages;
 
-		switch (msgBox.exec()) {
-			case QMessageBox::Yes:
-				md->DeleteAll();
-				// delete here all tab settings except default tab and all images
-				newts = new FrTabSettingsDocObj(true);
-				md->Add(newts);
+    // Ask user 
+    if(hasOpenedImages){
+        QMessageBox::StandardButton result = QMessageBox::information(mw,
+            QString("Front: Attention"), 
+            QString("Are you sure want to replace current image with this one?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
-				//md->Remove(images[0]);	// remove images
-				// continue
-				break;
-			case QMessageBox::No:
-				return false;	// exit
-				break;
-		}
-	}
-
+        if(result == QMessageBox::Yes){
+            // Delete all images and allow opening
+            for(it = images.begin(); it != itEnd; ++it){
+                md->Remove( (*it) );
+            }
+            openImage = true;
+        }
+    }
+    
 	// open image
-	if(imgObj->LoadFromFile(m_FileName)){
-		md->Add(imgObj);
-		//mw->GetCurrentView()->UpdatePipeline(FRP_FULL);
-		FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_FULL);
-
-		FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
-		cmd->SetTargetView(FrResetImageCmd::Current);
-		cmd->Execute();
-		delete cmd;
-	}
-	else{
-		// TODO: process error
-	}
-
-	return false;
+    bool result = true;
+    if(openImage){
+        FrImageDocObj* imgDO = new FrImageDocObj();
+        if(imgDO->LoadFromFile(m_FileName)){
+            md->Add(imgDO);
+            FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_FULL);
+        }
+        else{
+            delete imgDO;
+            QMessageBox::critical(mw, "Front: Load image", "Can't load image...");
+            result = false;
+        }
+    }
+	return result;
 }
 
 ///////////////////////////////////////////////////////////////

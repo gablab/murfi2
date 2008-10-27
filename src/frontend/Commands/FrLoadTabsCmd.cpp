@@ -1,5 +1,6 @@
 #include "FrLoadTabsCmd.h"
 #include "FrMainDocument.h"
+#include "FrMainWindow.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrXmlDefs.h"
 #include "FrUtils.h"
@@ -8,6 +9,7 @@
 #include "Qt/QFile.h"
 #include "Qt/QTextStream.h"
 #include "QtXml/QDom.h"
+#include "Qt/QMessageBox.h"
 
 FrLoadTabsCmd::FrLoadTabsCmd()
 : m_FileName(""), m_Document(0) {
@@ -50,8 +52,18 @@ bool FrLoadTabsCmd::Execute(){
                 }
                 else {
                     delete tsDO;
-                    // TODO: may be we have to indicate that 
-                    // TabSettings are broken and return false!!!
+
+                    // Delete all tabs
+                    TabSettingsVec::iterator it, itEnd(m_tabSets.end());
+                    for(it = m_tabSets.begin(); it != itEnd; ++it){
+                        delete (*it);
+                    }
+                    m_tabSets.clear();
+
+                    // Show message to user
+                    FrMainWindow* mv = this->GetMainController()->GetMainView();
+                    QMessageBox::critical(mv, "Loading Tab Sets", "Error: File is broken!");
+                    return false;
                 }
             }
             node = node.nextSibling();

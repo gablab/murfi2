@@ -38,6 +38,7 @@ FrMainController::~FrMainController(){
         delete m_ToolController;
     }
     
+    m_MainView->hide();
     if(m_MainDocument) delete m_MainDocument;
     if(m_MainView) delete m_MainView;
 }
@@ -93,35 +94,18 @@ FrTool* FrMainController::GetCurrentTool(){
 }
 
 void FrMainController::LoadImageFromFile(QString& fileName){
-    //    
-    //FrImageDocObj* imgObj = new FrImageDocObj();
+    // Load image
+    FrLoadImageCmd* cmd1 = FrCommandController::CreateCmd<FrLoadImageCmd>();
+    cmd1->SetFileName(fileName);
+    
+	FrResetImageCmd* cmd2 = FrCommandController::CreateCmd<FrResetImageCmd>();
+    cmd2->SetTargetView(FrResetImageCmd::Current);
 
-    //if(imgObj->LoadFromFile(fileName)){
-    //    m_MainDocument->Add(imgObj);
-    //    m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
-    //    
-    //    FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
-    //    cmd->SetTargetView(FrResetImageCmd::Current);
-    //    cmd->Execute();
-    //    delete cmd;
-    //}
-    //else{
-    //    // TODO: process error
-    //}
-
-    FrLoadImageCmd* cmd = FrCommandController::CreateCmd<FrLoadImageCmd>();
-    cmd->SetFileName(fileName);
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;
-
-	//   FrResetImageCmd* cmd2 = FrCommandController::CreateCmd<FrResetImageCmd>();
- //   cmd2->SetTargetView(FrResetImageCmd::Current);
-
-    //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    //cmd->AddCommand(cmd1);
-    //cmd->AddCommand(cmd2);
-    //cmd->Execute();
-    //delete cmd;
 }
 
 void FrMainController::IoTabSettings(QString& fileName, bool isInput){

@@ -23,7 +23,7 @@ FrSliceExtractor* FrSliceExtractor::New(){
 FrSliceExtractor::FrSliceExtractor(){
     // Create reslicer
 	m_Reslicer = vtkImageReslice::New();
-    
+        
 	m_Slice = DEF_FRAME;    
     m_Orientation = FrSliceExtractor::XY;
     m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = DEF_SPACING;
@@ -35,6 +35,7 @@ FrSliceExtractor::~FrSliceExtractor(){
 
 void FrSliceExtractor::SetInput(vtkImageData *input){
     if(input == m_Reslicer->GetInput()) return;
+
     m_Reslicer->SetInput(input);
     this->Modified();
     

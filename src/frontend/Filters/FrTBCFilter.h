@@ -40,6 +40,7 @@ public:
     void SetContrast(double value);
 
     // Overrides of base class
+    virtual void ExecuteInformation();
     virtual void SimpleExecute(vtkImageData *inData, 
                                vtkImageData *outData);
 private:

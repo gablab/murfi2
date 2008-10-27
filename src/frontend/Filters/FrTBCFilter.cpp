@@ -50,6 +50,22 @@ void FrTBCFilter::SetContrast(double value){
     }
 }
 
+void FrTBCFilter::ExecuteInformation() {
+    vtkImageData *input = this->GetInput();
+    vtkImageData *output = this->GetOutput();
+    
+    // Make sure the Input has been set.
+    if ( input == NULL){
+      vtkErrorMacro(<< "ExecuteInformation: Input is not set.");
+      return;
+    }
+
+    // Start with some defaults.
+    output->CopyTypeSpecificInformation(input);
+    // Update extent
+    output->SetUpdateExtent(input->GetWholeExtent());
+}
+
 // The execute method created by the subclass.
 void FrTBCFilter::SimpleExecute(vtkImageData *inData, 
                                 vtkImageData *outData){

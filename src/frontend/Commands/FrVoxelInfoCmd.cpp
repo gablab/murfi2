@@ -57,6 +57,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
 	
 	std::vector<vtkRenderer*> renCollection;
+	int imgNumber = -1;
 	
 	FrTabSettingsDocObj::View view = ts->GetActiveView();
 	switch(view){
@@ -71,7 +72,6 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 				FrOrthoView* ov =  mv->GetOrthoView();
 
 				// Find Image where click's occured
-				int imgNumber = -1;
 				for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
 					if (ov->GetImage(i)->GetRenderer()->IsInViewport(m_mouseX, m_mouseY)){
 						imgNumber = i; break;
@@ -107,7 +107,6 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     vtkImageData* pImageData = mv->GetSliceView()->GetImage()->GetLayerByID(0)->GetInput();		// get image data
     	
 	pImageData->GetSpacing(dSpacing);			
-	int slice = md->GetCurrentTabSettings()->GetSliceViewSettings()->SliceNumber;	// get slice number
     ptMapped[2] = 0;//slice*dSpacing[2];					
 
     // Get the volume index within the entire volume now.
@@ -123,13 +122,77 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	vd.name = "test";			// get layer (image?) name
 	vd.timepoint = 44;			// get timepoint
 
-	vd.Index[0] = ptMapped[0];			
-	vd.Index[1] = ptMapped[1];
-	vd.Index[2] = slice;							// set current slice number
+	switch(view){
+		case FrTabSettingsDocObj::View::SliceView:
+			{
+				int slice = md->GetCurrentTabSettings()->GetSliceViewSettings()->SliceNumber;	// get slice number
+	
+				vd.Index[0] = ptMapped[0];			
+				vd.Index[1] = ptMapped[1];
+				vd.Index[2] = slice;							// set current slice number
 
-	vd.Position[0] = ptMapped[0]*dSpacing[2];	
-	vd.Position[1] = ptMapped[1]*dSpacing[2];
-	vd.Position[2] = slice*dSpacing[2];							
+				vd.Position[0] = ptMapped[0]*dSpacing[2];	
+				vd.Position[1] = ptMapped[1]*dSpacing[2];
+				vd.Position[2] = slice*dSpacing[2];							
+			}
+			break;
+		case FrTabSettingsDocObj::View::MosaicView:
+			{
+				vd.Index[0] = ptMapped[0];			
+				vd.Index[1] = ptMapped[1];
+				vd.Index[2] = 0;
+
+				vd.Position[0] = ptMapped[0]*dSpacing[2];	
+				vd.Position[1] = ptMapped[1]*dSpacing[2];
+				vd.Position[2] = 0;							
+			}
+			break;
+		case FrTabSettingsDocObj::View::OrthoView:
+			{
+				switch(imgNumber){
+					case 0:			// coronal 
+						{
+							int slice = md->GetCurrentTabSettings()->GetOrthoViewSettings()->CoronalSlice;	// get slice number
+			
+							vd.Index[0] = ptMapped[0];			
+							vd.Index[1] = slice;
+							vd.Index[2] = ptMapped[1];
+
+							vd.Position[0] = ptMapped[0]*dSpacing[2];	
+							vd.Position[1] = slice*dSpacing[1];
+							vd.Position[2] = ptMapped[1]*dSpacing[2];							
+						}
+						break;
+					case 1:			// sagital
+						{
+							int slice = md->GetCurrentTabSettings()->GetOrthoViewSettings()->SagitalSlice;	// get slice number
+			
+							vd.Index[0] = slice;			
+							vd.Index[1] = ptMapped[0];
+							vd.Index[2] = ptMapped[1];
+
+							vd.Position[0] = slice*dSpacing[0];
+							vd.Position[1] = ptMapped[0]*dSpacing[2];	
+							vd.Position[2] = ptMapped[1]*dSpacing[2];					
+						}
+						break;
+					case 2:			// axial
+						{
+							int slice = md->GetCurrentTabSettings()->GetOrthoViewSettings()->AxialSlice;	// get slice number
+			
+							vd.Index[0] = ptMapped[0];			
+							vd.Index[1] = ptMapped[1];
+							vd.Index[2] = slice;
+
+							vd.Position[0] = ptMapped[0]*dSpacing[2];	
+							vd.Position[1] = ptMapped[1]*dSpacing[2];
+							vd.Position[2] = slice*dSpacing[2];							
+						}
+						break;
+				}
+			}
+			break;	
+	}
 
 	// Get voxel index, position
 	// this should be done for all layers

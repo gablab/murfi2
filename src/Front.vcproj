@@ -1173,6 +1173,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrLoadImageCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrLoadImageCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrLoadTabsCmd.cpp"
 				>
 			</File>

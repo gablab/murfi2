@@ -93,21 +93,35 @@ FrTool* FrMainController::GetCurrentTool(){
 }
 
 void FrMainController::LoadImageFromFile(QString& fileName){
-        
-    FrImageDocObj* imgObj = new FrImageDocObj();
+    //    
+    //FrImageDocObj* imgObj = new FrImageDocObj();
 
-    if(imgObj->LoadFromFile(fileName)){
-        m_MainDocument->Add(imgObj);
-        m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
-        
-        FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
-        cmd->SetTargetView(FrResetImageCmd::Current);
-        cmd->Execute();
-        delete cmd;
-    }
-    else{
-        // TODO: process error
-    }
+    //if(imgObj->LoadFromFile(fileName)){
+    //    m_MainDocument->Add(imgObj);
+    //    m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
+    //    
+    //    FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
+    //    cmd->SetTargetView(FrResetImageCmd::Current);
+    //    cmd->Execute();
+    //    delete cmd;
+    //}
+    //else{
+    //    // TODO: process error
+    //}
+
+    FrLoadImageCmd* cmd = FrCommandController::CreateCmd<FrLoadImageCmd>();
+    cmd->SetFileName(fileName);
+    cmd->Execute();
+    delete cmd;
+
+	//   FrResetImageCmd* cmd2 = FrCommandController::CreateCmd<FrResetImageCmd>();
+ //   cmd2->SetTargetView(FrResetImageCmd::Current);
+
+    //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    //cmd->AddCommand(cmd1);
+    //cmd->AddCommand(cmd2);
+    //cmd->Execute();
+    //delete cmd;
 }
 
 void FrMainController::IoTabSettings(QString& fileName, bool isInput){

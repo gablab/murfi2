@@ -34,11 +34,13 @@ private:
     bool ResetVoxelInfo();
 
     void GetVoxelInfo();
+	double* GetMappedPoint();
 
 private:
     int m_mouseX;
     int m_mouseY;
     bool m_isMouseXY;
+
 };
 
 #endif // FR_VOXEL_INFO_CMD

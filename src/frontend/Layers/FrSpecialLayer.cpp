@@ -16,22 +16,19 @@ vtkStandardNewMacro(FrSpecialLayer);
 
 FrSpecialLayer::FrSpecialLayer() 
 : m_TextMapper(0),	m_TextActor(0),
-    // Free border objectsBorder support
-    m_BorderPts->Delete();
-    m_BorderMapper->Delete();
-    m_BorderActor->Delete();{
+  m_BorderPts(0), m_BorderMapper(0), m_BorderActor(0){
     this->InitializeText();
     this->InitializeBorder();
 }
 
 FrSpecialLayer::~FrSpecialLayer() {
     // Free text objects
-    m_TextMapper->Delete();
-	m_TextActor->Delete();
+    if(m_TextMapper) m_TextMapper->Delete();
+	if(m_TextActor) m_TextActor->Delete();
     // Free border objectsBorder support
-    m_BorderPts->Delete();
-    m_BorderMapper->Delete();
-    m_BorderActor->Delete();
+    if(m_BorderPts) m_BorderPts->Delete();
+    if(m_BorderMapper) m_BorderMapper->Delete();
+    if(m_BorderActor) m_BorderActor->Delete();
 }
 
 void FrSpecialLayer::InitializeText(){

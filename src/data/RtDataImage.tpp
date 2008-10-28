@@ -609,6 +609,9 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
 
   }  unlock();
 
+  // SCOPIC added to fix memory leakage  
+  nifti_image_free(img);
+    
   // store filename if its not set
   if(filename.empty()) {
     filename = _filename;

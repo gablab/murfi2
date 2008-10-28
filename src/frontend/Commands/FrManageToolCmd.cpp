@@ -9,6 +9,7 @@
 // Qt stuff
 #include "Qt/QAction.h"
 
+
 FrManageToolCmd::FrManageToolCmd()
 : m_ToolType(UnknownTool), m_ToolAction(UnknownAct),
   m_IsChecked (false){

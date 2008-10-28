@@ -139,9 +139,11 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {
     if(!mask.getPixel(i)) {
       for(unsigned int j = 0; j < numConditions; j++) {
-	betas[j]->setPixel(i,0.0/0.0); // nan
+        // SCOPIC couldn't compile that in MS VS
+          // getting error C2124: divide or mod by zero
+	    // betas[j]->setPixel(i,0.0/0.0); // nan
       }
-      res->setPixel(i, 0.0/0.0);
+      //res->setPixel(i, 0.0/0.0);
 
       est->setPixel(i,0.0);
       continue;

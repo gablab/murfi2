@@ -5,6 +5,7 @@
 #include "FrMainWindow.h"
 #include "FrUtils.h"
 
+
 FrRefreshLayerInfoCmd::FrRefreshLayerInfoCmd(){
 }
 

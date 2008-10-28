@@ -10,6 +10,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
 
+
 // VTK stuff
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -152,7 +153,7 @@ void FrOrthoView::UpdatePipeline(int point){
         {
             // read document and connect filters
             m_docReader->SetDocument(document);
-            m_docReader->SetUnMosaicOn(true);
+            m_docReader->SetUnMosaicOn();
             m_docReader->Update();
 			
             // Setup slice extractor filter

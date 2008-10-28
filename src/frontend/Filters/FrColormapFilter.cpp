@@ -1,5 +1,6 @@
 #include "FrColormapFilter.h"
 
+
 // VTK stuff
 #include "vtkMath.h"
 #include "vtkImageData.h"

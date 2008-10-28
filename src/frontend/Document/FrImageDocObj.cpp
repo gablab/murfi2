@@ -1,6 +1,7 @@
 #include "FrImageDocObj.h"
 #include "FrDocument.h"
 
+
 // VTK includes
 #include "vtkImageData.h"
 #include "vtkPointData.h"

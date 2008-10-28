@@ -11,6 +11,7 @@
 #include "FrVoxelInfoWidget.h"
 #include "FrLayeredImage.h"
 
+
 #include "vtkPointPicker.h"
 #include "vtkCoordinate.h"
 #include "vtkRenderer.h"

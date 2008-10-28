@@ -2,6 +2,7 @@
 #include "FrDocument.h"
 #include "FrCommandController.h"
 
+
 #define DEF_VIEW FrTabSettingsDocObj::SliceView
 
 // Implementation
@@ -44,6 +45,9 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
 }
 
 FrTabSettingsDocObj::~FrTabSettingsDocObj(){
+    delete m_SliceViewSettings;
+    delete m_MosaicViewSettings;
+    delete m_OrthoViewSettings;
 }
 
 void FrTabSettingsDocObj::OnAdd(FrDocument* doc){    

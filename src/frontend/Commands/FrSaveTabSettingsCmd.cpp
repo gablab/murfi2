@@ -16,6 +16,7 @@
 
 #include "Qt/QString.h"
 
+
 FrSaveTabSettingsCmd::FrSaveTabSettingsCmd()
 : m_IsDefault(false), m_IsCurrent(false) {
 }

@@ -1,5 +1,6 @@
 #include "FrUtils.h"
 
+
 float Frange(float a, float minv, float maxv){
 	if (a<minv) 
 		a=minv;

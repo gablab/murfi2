@@ -3,6 +3,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrTabSettingsDocObj.h"
 
+
 FrMainDocument::FrMainDocument() 
 : FrDocument(){
 }

@@ -7,6 +7,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrUtils.h"
 
+
 // VTK stuff
 #include "vtkRenderer.h"
 #include "vtkCoordinate.h"

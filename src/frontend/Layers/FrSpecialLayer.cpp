@@ -1,5 +1,6 @@
 #include "FrSpecialLayer.h"
 
+
 // VTK stuff
 #include "vtkRenderer.h"
 #include "vtkObjectFactory.h"

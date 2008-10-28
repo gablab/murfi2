@@ -1,5 +1,6 @@
 #include "FrMultiCmd.h"
 
+
 #define FOR_EACH_CMD(Action,Result)                     \
     CmdList::iterator it, itEnd(m_commands.end());      \
     for(it = m_commands.begin(); it != itEnd; ++it){    \

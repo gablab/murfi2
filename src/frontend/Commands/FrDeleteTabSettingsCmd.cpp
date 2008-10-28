@@ -3,6 +3,7 @@
 #include "FrDocumentObj.h"
 #include "FrMainDocument.h"
 
+
 #define BAD_TAB_ID -1
 
 FrDeleteTabSettingsCmd::FrDeleteTabSettingsCmd()

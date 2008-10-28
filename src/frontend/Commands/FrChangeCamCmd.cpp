@@ -6,6 +6,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
 
+
 #include "vtkRenderer.h"
 
 // Defines

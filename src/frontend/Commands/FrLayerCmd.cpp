@@ -16,6 +16,7 @@
 
 #include "Qt/QMessageBox.h"
 
+
 #define ALL_ITEMS_COUNT 5
 
 FrLayerCmd::FrLayerCmd() 

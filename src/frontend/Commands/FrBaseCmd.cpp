@@ -5,6 +5,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrNotify.h"
 
+
 void FrBaseCmd::UpdatePipelineForID(int id, int point){
     if(id == BAD_LAYER_ID) return;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();

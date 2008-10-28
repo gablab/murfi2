@@ -4,6 +4,7 @@
 #include "FrMainDocument.h"
 #include "FrCommandController.h"
 
+
 #define MOUSE_MOVE_THRESHOLD 0.0
 
 FrTBCTool::FrTBCTool()

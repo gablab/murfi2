@@ -28,6 +28,8 @@ class FrMainController;
 #include "FrRefreshLayerInfoCmd.h"
 #include "FrLoadImageCmd.h"
 
+
+
 // This class allow user to create 
 // and manage commands. Organised like singletone;
 class FrCommandController : public FrController {
@@ -46,6 +48,8 @@ public:
         }
         return m_controller;
     }
+
+    
     
     // Using this method user can create command.
     // User is responsible to delete the created commands
@@ -55,6 +59,13 @@ public:
         FrMainController* mc = m_controller->GetMainController();
         cmd->SetMainController(mc);
         return cmd; 
+    }
+protected:
+    friend class FrMainController;
+
+    static void Delete(){
+        if(m_controller) delete m_controller;
+        m_controller = 0;
     }
 
 private:

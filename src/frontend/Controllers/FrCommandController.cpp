@@ -1,6 +1,7 @@
 #include "FrCommandController.h"
 #include "FrMainController.h"
 
+
 FrCommandController* FrCommandController::m_controller = 0L;
 
 FrCommandController::FrCommandController()

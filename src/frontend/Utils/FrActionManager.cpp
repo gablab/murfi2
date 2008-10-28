@@ -5,6 +5,8 @@
 #include "Qt/QAction.h"
 #include "Qt/QApplication.h"
 
+
+
 // Defines
 #define TR_CONTEXT "MainWindow"
 #define DO_TRANSLATE(context,name) \
@@ -12,6 +14,32 @@
 
 FrActionManager::FrActionManager(QObject* parent){
     this->Initialize(parent);
+}
+
+FrActionManager::~FrActionManager(){
+    delete m_OpenImageAction;    
+    delete m_SaveTabsAction;
+    delete m_LoadTabsAction;
+    delete m_ExitAction;
+    // Edit
+    delete m_SaveToTabAction;
+    delete m_NewLayerAction;
+    delete m_DeleteLayerAction;
+    delete m_ChangeLayerAction;
+    // View
+    delete m_ViewSliceAction;
+    delete m_ViewMosaicAction;
+    delete m_ViewOrthoAction;
+    delete m_ResetImageAction;
+    // Tool
+    delete m_ManipulatorToolAction;
+    delete m_VoxelToolAction;
+    delete m_RoiToolAction;
+    // Help
+    delete m_ShowHelpAction;
+    delete m_ShowAboutAction;
+    // Test
+    delete m_TestAction;
 }
 
 void FrActionManager::Initialize(QObject* parent){

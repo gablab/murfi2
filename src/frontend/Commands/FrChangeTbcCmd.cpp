@@ -5,6 +5,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrUtils.h"
 
+
 FrChangeTbcCmd::FrChangeTbcCmd()
 : m_isThreshold(false), m_isBrightness(false), 
   m_isContrast(false) {

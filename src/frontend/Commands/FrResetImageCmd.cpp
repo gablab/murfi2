@@ -9,6 +9,7 @@
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
 
+
 // VTK stuff
 #include "vtkCamera.h"
 #include "vtkRenderer.h"

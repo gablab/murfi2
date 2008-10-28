@@ -9,6 +9,7 @@
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
 
+
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
@@ -99,7 +100,7 @@ void FrMosaicView::UpdatePipeline(int point){
         {
             // read document and connect filters
             m_docReader->SetDocument(document);
-            m_docReader->SetMosaicOn(true);
+            m_docReader->SetMosaicOn();
             m_docReader->Update();
 			
             m_LayeredImage->SetInput(m_docReader->GetOutput());

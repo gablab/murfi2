@@ -10,6 +10,8 @@
 #include "Qt/QApplication.h"
 #include "Qt/QCursor.h"
 
+
+
 #define DEFAULT_ZOOM_FACTOR 10.0
 #define DEFAULT_BASE 1.1
 

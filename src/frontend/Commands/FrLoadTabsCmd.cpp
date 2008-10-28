@@ -11,6 +11,8 @@
 #include "QtXml/QDom.h"
 #include "Qt/QMessageBox.h"
 
+
+
 FrLoadTabsCmd::FrLoadTabsCmd()
 : m_FileName(""), m_Document(0) {
     m_Document = new QDomDocument();

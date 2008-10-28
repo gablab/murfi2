@@ -10,9 +10,11 @@
 // VTK stuff
 #include "vtkRenderer.h"
 
+// Qt stuff
 #include "Qt/QCursor.h"
 #include "Qt/QPixmap.h"
 #include "Qt/QApplication.h"
+
 
 
 FrCompositeTool::FrCompositeTool() {

@@ -11,6 +11,7 @@
 #include "FrImageDocObj.h"
 #include "QVTKWidget.h"
 
+
 // VTK stuff
 #include "vtkRenderWindowInteractor.h"
 
@@ -34,13 +35,18 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 }
 
 FrMainController::~FrMainController(){    
+    // delete tool controller
     if(m_ToolController) {
         delete m_ToolController;
     }
     
+    // delete all other stuff    
     m_MainView->hide();
     if(m_MainDocument) delete m_MainDocument;
     if(m_MainView) delete m_MainView;
+ 
+    // Delete command controller
+    FrCommandController::Delete();
 }
 
 void FrMainController::Initialize(){
@@ -79,6 +85,7 @@ void FrMainController::Initialize(){
     cmd->SetToolType(FrManageToolCmd::ManipulationTool);
     cmd->SetToolAction(FrManageToolCmd::NewToolAct);
     cmd->Execute();
+    delete cmd;
 }
 
 bool FrMainController::HasActiveTool(){

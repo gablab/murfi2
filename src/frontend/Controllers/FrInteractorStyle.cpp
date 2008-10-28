@@ -2,8 +2,10 @@
 #include "FrMainController.h"
 #include "FrTool.h"
 
+
 #include <vtkRenderWindowInteractor.h>
 #include <vtkObjectFactory.h>
+
 
 vtkStandardNewMacro(FrInteractorStyle);
 

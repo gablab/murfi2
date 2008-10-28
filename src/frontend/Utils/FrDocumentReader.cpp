@@ -13,16 +13,19 @@
 // Backend includes
 #include "RtMRIImage.h"
 
+
+
 vtkStandardNewMacro(FrDocumentReader);
 
 
 FrDocumentReader::FrDocumentReader()
 : m_Document(0), m_Output(0), 
-  m_MosaicOn(false), m_UnMosaicOn(false){
+  m_MosaicOn(false), m_UnMosaicOn(true){
 }
 
 FrDocumentReader::~FrDocumentReader(){
-    //if(m_Output) m_Output->Delete();
+    // Performe cleanup
+    SetOutput(0);
 }
 
 void FrDocumentReader::Update(){
@@ -63,7 +66,7 @@ void FrDocumentReader::Update(){
             }
             deleteImage = true;
         }
-        
+                
         // create output object
         vtkImageData* output = vtkImageData::New();
         
@@ -83,19 +86,24 @@ void FrDocumentReader::Update(){
         output->AllocateScalars();
                 
         // Copy image data with mapping into 0..255 range
+        // need src and dst pointers
         short* dataPtr = img->getDataCopy();
         unsigned int dataSize = img->getNumPix();
-        unsigned char* dstPtr = (unsigned char*)output->GetScalarPointer();
+        unsigned char* dstPtr = (unsigned char*)output->GetPointData()->
+            GetScalars()->GetVoidPointer(0);
 
+        // Need lookup table
         unsigned char* lut = 0;
         InitLookupTable(dataPtr, dataSize, &lut);
-
+        
+        // Do copy
         short* srcPtr = dataPtr;
         for(int i=0; i < dataSize; ++i){
             *dstPtr = lut[*srcPtr];
             dstPtr++;
             srcPtr++;
         }
+
         // clear all
         delete[] lut;
         delete[] dataPtr;
@@ -103,6 +111,7 @@ void FrDocumentReader::Update(){
 
         // Set output
         this->SetOutput(output);
+        output->Delete();
     }    
 }
 
@@ -142,39 +151,32 @@ void FrDocumentReader::SetDocument(FrDocument* document){
 void FrDocumentReader::SetOutput(vtkImageData* output){
     // Delete prev output if any
     if(m_Output){
-        m_Output->Delete();
-        m_Output = 0L;
+        m_Output->UnRegister(this);
     }
 
     // Setup output
-    if(output){
-        m_Output = output;
-        //m_Output->Register(this);
+    m_Output = output;
+    if(m_Output){
+        m_Output->Register(this);
     }
 }
 
-void FrDocumentReader::SetMosaicOn(bool isOn){
+void FrDocumentReader::SetMosaicOn(){
     // Change only if different value's set
-    if(m_MosaicOn != isOn){
-        m_MosaicOn = isOn;
-        
-        if(m_MosaicOn){
-            m_UnMosaicOn = false;
-        }
-        
+    if(!m_MosaicOn){
+        m_MosaicOn = true;
+        m_UnMosaicOn = false;
+
         // Clear output
         SetOutput(0);
     }
 }
 
-void FrDocumentReader::SetUnMosaicOn(bool isOn){
+void FrDocumentReader::SetUnMosaicOn(){
     // Change only if different value's set
-    if(m_UnMosaicOn != isOn){
-        m_UnMosaicOn = isOn;
-        
-        if(m_UnMosaicOn){
-            m_MosaicOn = false;
-        }
+    if(!m_UnMosaicOn){
+        m_UnMosaicOn = true;
+        m_MosaicOn = false;
         
         // Clear output
         SetOutput(0);

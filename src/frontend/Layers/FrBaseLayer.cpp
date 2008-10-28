@@ -4,6 +4,7 @@
 #include "FrSettings.h"
 #include "FrMacro.h"
 
+
 // VTK stuff
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"

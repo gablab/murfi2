@@ -23,9 +23,9 @@ public:
     // MosaicOn and UnMosaicOn are selfexculed.
     // i.e. they canot be both true.
     FrGetPropMacro(bool,MosaicOn);
-    void SetMosaicOn(bool isOn);
+    void SetMosaicOn();
     FrGetPropMacro(bool,UnMosaicOn);
-    void SetUnMosaicOn(bool isOn);
+    void SetUnMosaicOn();
 
     FrGetPropMacro(FrDocument*,Document);
     void SetDocument(FrDocument* document);

@@ -1,6 +1,7 @@
 #include "Fr2DSliceActor.h"
 #include "FrUtils.h"
 
+
 // VTK stuff
 #include "vtkObjectFactory.h"
 #include "vtkImageMapToColors.h"

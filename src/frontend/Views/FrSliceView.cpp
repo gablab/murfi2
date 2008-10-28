@@ -11,6 +11,7 @@
 #include "FrNotify.h"
 #include "FrUtils.h"
 
+
 // VTK
 #include "vtkRenderWindowInteractor.h"
 #include "vtkInteractorStyleImage.h"
@@ -18,6 +19,7 @@
 #include "vtkCamera.h"
 #include "vtkImageData.h"
 #include "vtkImageActor.h"
+#include "vtkPNGReader.h"
 #include "vtkRenderWindow.h"
 #include "vtkActorCollection.h"
 #include "vtkRendererCollection.h"
@@ -116,10 +118,8 @@ void FrSliceView::UpdatePipeline(int point){
         {
             // read document and connect filters
             m_docReader->SetDocument(document);
-            m_docReader->SetUnMosaicOn(true);
+            m_docReader->SetUnMosaicOn();
             m_docReader->Update();
-            
-       //     m_LayeredImage->GetActor()->SetInput(m_docReader->GetOutput());
 			
             m_SliceExtractor->SetInput(m_docReader->GetOutput());
         }
@@ -199,7 +199,7 @@ void FrSliceView::UpdatePipeline(int point){
     }
 
     // Draw border
-    //m_LayeredImage->UpdateBorder();
+    m_LayeredImage->UpdateBorder();
 
     // redraw scene
 	GetRenderWindow()->Render();

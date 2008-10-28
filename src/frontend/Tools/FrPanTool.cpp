@@ -2,10 +2,11 @@
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
 
+// VTK stuff
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-
+// Qt stuff
 #include "Qt/QApplication.h"
 #include "Qt/QCursor.h"
 

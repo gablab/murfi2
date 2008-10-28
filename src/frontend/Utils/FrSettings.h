@@ -115,6 +115,7 @@ public:
 
 // Mosaic view definitions
 class FrMosaicViewSettings {
+public:
     // Need destructor
     ~FrMosaicViewSettings(){
         while(OtherLayers.size() > 0){

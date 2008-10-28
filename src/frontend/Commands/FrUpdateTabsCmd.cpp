@@ -9,6 +9,7 @@
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
 
+
 #define ITEMS_NUM  5
 
 

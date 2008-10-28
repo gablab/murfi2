@@ -25,8 +25,9 @@
 
 
 FrMainWindow::FrMainWindow()
-    :  QMainWindow(0), m_MainDocument(0), m_MainController(0), 
-    m_SliceView(0), m_MosaicView(0), m_OrthoView(0), m_CurrentView(0){
+: QMainWindow(0), m_MainDocument(0), m_MainController(0), 
+  m_SliceView(0), m_MosaicView(0), m_OrthoView(0), m_CurrentView(0),
+  m_SignalManager(0), m_ActionManager(0) {
 	
     SetupUi(this);
     InitializeWidgets();
@@ -109,19 +110,9 @@ void FrMainWindow::InitializeWidgets(){
 
 	m_mainMenu->GetMenuView()->addSeparator();
 
-	QDockWidget* dock = new QDockWidget(tr("Info Tab"), this);
-	dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea | Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
-	QTabWidget* viewInfoControl = new QTabWidget(dock);
-    viewInfoControl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    viewInfoControl->addTab(new QWidget(viewInfoControl), QString("Info1"));
-    viewInfoControl->addTab(new QWidget(viewInfoControl), QString("Info2"));
-
-	dock->setWidget(viewInfoControl);
-	addDockWidget(Qt::RightDockWidgetArea, dock);
-	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
-		
-	dock = new QDockWidget(tr("Graph View"), this);
+	QDockWidget* dock = new QDockWidget(tr("Graph View"), this);
+    dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea | 
+                          Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	
     QWidget* btmPane = new QWidget(dock);
     btmPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

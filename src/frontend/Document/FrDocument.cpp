@@ -1,6 +1,8 @@
 #include "FrDocument.h"
 #include <algorithm>
 
+
+
 FrDocument::FrDocument(){
 }
 

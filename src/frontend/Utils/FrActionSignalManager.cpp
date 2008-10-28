@@ -14,6 +14,7 @@
 #include "QtGUI/QFileDialog.h"
 
 
+
 #define CONNECT_ACTION_TRIGGERED(action, slot)\
     connect(action,SIGNAL(triggered()),this,SLOT(slot))
     

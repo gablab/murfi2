@@ -8,6 +8,8 @@
 #include "Qt/QTextStream.h"
 #include "QtXml/QDom.h"
 
+
+
 // Some defines
 #define DEF_NODE_INDENT 4
 #define GET_HEX_COLOR_STRING(cl) ((cl == 0) ? QString("00") : QString().setNum(cl, 16))

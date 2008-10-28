@@ -5,6 +5,7 @@
 #include "FrBaseView.h"
 #include "FrActionManager.h"
 
+
 // Qt stuff
 #include "Qt/QAction.h"
 

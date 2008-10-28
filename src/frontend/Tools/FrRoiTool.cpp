@@ -6,6 +6,8 @@
 #include "Qt/QString.h"
 #include "Qt/QMessageBox.h"
 
+
+
 FrRoiTool::FrRoiTool(){
 }
 

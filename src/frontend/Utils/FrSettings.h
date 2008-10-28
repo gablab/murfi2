@@ -27,7 +27,8 @@ public:
 // Some defines
 #define DEF_CM_MIN_VALUE  0
 #define DEF_CM_MAX_VALUE  255
-#define DEF_CM_THRESHOLD  128
+#define DEF_CM_MID_VALUE  128
+#define DEF_CM_THRESHOLD  4
 #define DEF_CM_COLOR      0,0,255,255
 
 class FrColormapSettings {
@@ -37,7 +38,8 @@ public:
     Type    Type;
     int     MinValue;
 	int     MaxValue;
-    int     Threshold;
+    int     MidValue;
+	int		Threshold;
 	QColor  Color;
 };
 
@@ -171,6 +173,7 @@ inline void InitColormapDefault(FrColormapSettings* sets){
     sets->Color     = QColor(DEF_CM_COLOR);
     sets->MaxValue  = DEF_CM_MAX_VALUE;
     sets->MinValue  = DEF_CM_MIN_VALUE;
+    sets->MidValue = DEF_CM_MID_VALUE;
     sets->Threshold = DEF_CM_THRESHOLD;
     sets->Type      = DEF_CM_TYPE;
 }

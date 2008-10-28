@@ -20,12 +20,14 @@ public:
     virtual void SimpleExecute(vtkImageData* input, vtkImageData* output);
 
     // Properties
-	FrGetPropMacro(int, Threshold);
-    void SetThreshold(int value);
 	FrGetPropMacro(int, PxMin);
     void SetPxMin(int value);
 	FrGetPropMacro(int, PxMax);
     void SetPxMax(int value);
+	FrGetPropMacro(int, PxMid);
+    void SetPxMid(int value);
+	FrGetPropMacro(int, Threshold);
+    void SetThreshold(int value);
 	FrGetPropMacro(int, Type);
     void SetType(int value);
 	FrGetPropMacro(QColor, Color);

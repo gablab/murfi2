@@ -58,14 +58,20 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	
 	std::vector<vtkRenderer*> renCollection;
 	int imgNumber = -1;
+	FrLayeredImage* lim;
+    std::vector<FrLayerSettings*> layers;
 	
 	FrTabSettingsDocObj::View view = ts->GetActiveView();
 	switch(view){
 		case FrTabSettingsDocObj::View::SliceView:
 			mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
+			lim = mv->GetSliceView()->GetImage();
+		    GetLayerSettings(ts->GetSliceViewSettings(), layers);
 			break;
 		case FrTabSettingsDocObj::View::MosaicView:
 			mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
+			lim = mv->GetMosaicView()->GetImage();
+		    GetLayerSettings(ts->GetMosaicViewSettings(), layers);
 			break;
 		case FrTabSettingsDocObj::View::OrthoView:
 			{
@@ -74,11 +80,14 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 				// Find Image where click's occured
 				for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
 					if (ov->GetImage(i)->GetRenderer()->IsInViewport(m_mouseX, m_mouseY)){
-						imgNumber = i; break;
+						imgNumber = i; 
+						break;
 					}
 				}
 				if (imgNumber != -1){
 					ov->GetImage(imgNumber)->GetRenderers(renCollection);
+					lim = ov->GetImage(imgNumber);
+					GetLayerSettings(ts->GetOrthoViewSettings(), layers, imgNumber);
 				}
 				else{
 					ResetVoxelInfo();
@@ -88,7 +97,9 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 			break;	
 	}
 
-	vtkRenderer* renderer = renCollection[0];	// get renderer from current layer (from main layer atm)
+	// we should get any layer with visible actor
+	int visibleLayerNum = GetVisibleLayer(layers);
+	vtkRenderer* renderer = renCollection[visibleLayerNum];	
 	
 	if (!m_PointPicker->Pick(m_mouseX, m_mouseY, 0, renderer)) {
         ResetVoxelInfo();
@@ -104,7 +115,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     double dSpacing[3];
 
 	// Get a shortcut to the pixel data.
-    vtkImageData* pImageData = mv->GetSliceView()->GetImage()->GetLayerByID(0)->GetInput();		// get image data
+    vtkImageData* pImageData = lim->GetLayerByID(0)->GetInput();		// get image data
     	
 	pImageData->GetSpacing(dSpacing);			
     ptMapped[2] = 0;//slice*dSpacing[2];					
@@ -196,14 +207,14 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 
 	// Get voxel index, position
 	// this should be done for all layers
-    std::vector<FrLayerSettings*> layers;
-    GetLayerSettings(md->GetCurrentTabSettings()->GetSliceViewSettings(), layers);
+//    GetLayerSettings(md->GetCurrentTabSettings()->GetSliceViewSettings(), layers);
 	
     std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
     for (it = layers.begin(); it != itEnd; ++it){
         // get image data
-        pImageData = mv->GetSliceView()->GetImage()->
-            GetLayerByID( (*it)->ID )->GetInput();		
+    //    pImageData = mv->GetSliceView()->GetImage()->
+      //      GetLayerByID( (*it)->ID )->GetInput();		
+		pImageData = lim->GetLayerByID((*it)->ID)->GetInput();
 
 		switch (pImageData->GetNumberOfScalarComponents()) {
 			case 1:
@@ -254,6 +265,16 @@ bool FrVoxelInfoCmd::ResetVoxelInfo(){
 }
 
 void FrVoxelInfoCmd::GetVoxelInfo(){
+}
+
+int FrVoxelInfoCmd::GetVisibleLayer(std::vector<FrLayerSettings*> layers){
+    std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
+    for (it = layers.begin(); it != itEnd; ++it){
+		if ((*it)->Visibility)
+			return (*it)->ID;
+	}
+	
+	return 0;		// there are no visible actors atm
 }
 
 ///////////////////////////////////////////////////////////////

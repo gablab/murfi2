@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrColormapWidget.h'
 **
-** Created: Fri 24. Oct 22:52:44 2008
+** Created: Mon 27. Oct 23:08:40 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -18,7 +18,8 @@
 
 #define DEF_MIN_VALUE 0
 #define DEF_MAX_VALUE 255
-#define DEF_THRESHOLD 50
+#define DEF_MID_VALUE 50
+#define DEF_THRESHOLD 4
 
 #define HUE_RED    0
 #define HUE_YELLOW 60
@@ -32,6 +33,7 @@ vtkStandardNewMacro(FrColormapFilter);
 FrColormapFilter::FrColormapFilter()
 : m_Type(FrColormapFilter::SingleColor),
   m_PxMin(DEF_MIN_VALUE), m_PxMax(DEF_MAX_VALUE),
+  m_PxMid(DEF_MID_VALUE),
   m_Threshold(DEF_THRESHOLD),
   m_IsModified(true){
     // use blue color as default
@@ -54,9 +56,9 @@ void FrColormapFilter::SetInput(vtkImageData *data){
     }
 }
 
-void FrColormapFilter::SetThreshold(int value){
-    if(m_Threshold != value){
-        m_Threshold = value;
+void FrColormapFilter::SetPxMid(int value){
+    if(m_PxMid != value){
+        m_PxMid = value;
         // Property valide for 
         if(m_Type == FrColormapFilter::MultiColor){
             this->Modified();
@@ -98,6 +100,14 @@ void FrColormapFilter::SetColor(QColor value){
             this->Modified();
             m_IsModified = true;
         }
+    }
+}
+
+void FrColormapFilter::SetThreshold(int value){
+    if(m_Threshold != value){
+        m_Threshold = value;
+        this->Modified();
+        m_IsModified = true;
     }
 }
 
@@ -198,7 +208,7 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
     hsv[V_INDEX] = 255.0;
 
     // Calc threshold
-    int threshold = m_PxMin + ((m_PxMax - m_PxMin) * m_Threshold) / 100;
+    int threshold = m_PxMin + ((m_PxMax - m_PxMin) * m_PxMid) / 100;
     for(int i=0; i < 256; ++i){
         // NOTE: range consists from two parts: left and right
         // [m_PxMin, m_Threshold] && [m_Threshold, m_PxMax]
@@ -228,4 +238,9 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
             luTable[i][B_INDEX] = rgb[B_INDEX];
         }
     }
+
+	// special area with non significant pixels around threshold
+	for(int i = m_PxMid-m_Threshold/2; i<m_PxMid+m_Threshold/2; i++){
+		luTable[i][R_INDEX] =  luTable[i][G_INDEX] = luTable[i][B_INDEX] = 0;
+	}
 }

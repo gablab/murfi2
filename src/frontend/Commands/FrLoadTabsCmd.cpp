@@ -512,7 +512,8 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
             
         }
         else if(childElem.tagName() == FR_XML_CMAP_ELEM){
-            if(!childElem.hasAttribute(FR_XML_THRESH_ATTR) ||
+            if(!childElem.hasAttribute(FR_XML_MIDVALUE_ATTR) ||
+               !childElem.hasAttribute(FR_XML_THRESH_ATTR)   ||
                !childElem.hasAttribute(FR_XML_TYPE_ATTR)   ||
                !childElem.hasAttribute(FR_XML_COLOR_ATTR)) return false;
             // Get colormap type
@@ -539,8 +540,11 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
             if(!hasCm) return false;
             ls->ColormapSettings.Color.setRgb(r, g, b);
 
-            // Get theshold
-            ls->ColormapSettings.Threshold = 
+            // Get mid value
+			ls->ColormapSettings.MidValue = 
+                childElem.attribute(FR_XML_MIDVALUE_ATTR).toInt(&hasCm);
+            // Get threshold	(range of non significant values)
+			ls->ColormapSettings.Threshold = 
                 childElem.attribute(FR_XML_THRESH_ATTR).toInt(&hasCm);
             if(!hasCm) return false;
         }
@@ -605,7 +609,8 @@ bool FrLoadTabsCmd::ValidateTabSettings(FrTabSettingsDocObj* tabs){
                 (ls0->ColormapSettings.Type == ls1->ColormapSettings.Type) &&
                 (ls0->ColormapSettings.MinValue == ls1->ColormapSettings.MinValue) &&
                 (ls0->ColormapSettings.MaxValue == ls1->ColormapSettings.MaxValue) &&
-                (ls0->ColormapSettings.Threshold == ls1->ColormapSettings.Threshold) &&
+				(ls0->ColormapSettings.MidValue == ls1->ColormapSettings.MidValue) &&
+				(ls0->ColormapSettings.Threshold == ls1->ColormapSettings.Threshold) &&
                 (ls0->ColormapSettings.Color     == ls1->ColormapSettings.Color);
 
             if(!result) break;

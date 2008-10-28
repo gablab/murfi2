@@ -67,6 +67,7 @@ void FrImageLayer::SetColormapSettings(FrColormapSettings& settings){
     m_cmFilter->SetPxMin(settings.MinValue);
     m_cmFilter->SetPxMax(settings.MaxValue);    
     m_cmFilter->SetColor(settings.Color);
+	m_cmFilter->SetPxMid(settings.MidValue);
     m_cmFilter->SetThreshold(settings.Threshold);
 
     if(m_cmFilter->GetIsModified()){
@@ -89,6 +90,7 @@ void FrImageLayer::GetColormapSettings(FrColormapSettings& settings){
     settings.MinValue = m_cmFilter->GetPxMin();
     settings.MaxValue = m_cmFilter->GetPxMax();    
     settings.Color    = m_cmFilter->GetColor();
+	settings.MidValue = m_cmFilter->GetPxMid();
     settings.Threshold = m_cmFilter->GetThreshold();
 }
 

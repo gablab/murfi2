@@ -2,11 +2,14 @@
 #define FR_VOXEL_INFO_CMD
 
 // Forward declarations
+class FrLayerSettings;
 class vtkPointPicker;
 
 // Some headers
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
+
+#include <vector>
 
 // This command updates voxel information.
 class FrVoxelInfoCmd : public FrBaseCmd {
@@ -35,6 +38,7 @@ private:
 
     void GetVoxelInfo();
 	double* GetMappedPoint();
+	int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
 
 private:
     int m_mouseX;

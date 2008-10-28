@@ -119,74 +119,74 @@ void FrSliceView::UpdatePipeline(int point){
             m_docReader->SetUnMosaicOn(true);
             m_docReader->Update();
             
-            m_LayeredImage->GetActor()->SetInput(m_docReader->GetOutput());
+       //     m_LayeredImage->GetActor()->SetInput(m_docReader->GetOutput());
 			
-   //         m_SliceExtractor->SetInput(m_docReader->GetOutput());
+            m_SliceExtractor->SetInput(m_docReader->GetOutput());
         }
 	case FRP_SLICE:
         {
             // set slice to be rendered
-       //     maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
-       //     viewSets->SliceNumber = ClampValue(viewSets->SliceNumber, 0, maxSliceNumber);
-       //     m_SliceExtractor->SetSlice(viewSets->SliceNumber);
+            maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
+            viewSets->SliceNumber = ClampValue(viewSets->SliceNumber, 0, maxSliceNumber);
+            m_SliceExtractor->SetSlice(viewSets->SliceNumber);
 
-       //     if(m_SliceExtractor->GetInput()){
-			    //m_SliceExtractor->Update();
-       //         m_LayeredImage->SetInput(m_SliceExtractor->GetOutput());
+            if(m_SliceExtractor->GetInput()){
+			    m_SliceExtractor->Update();
+                m_LayeredImage->SetInput(m_SliceExtractor->GetOutput());
 
-       //         // Set text
-       //         char text[255];
-       //         sprintf(text, "Slice View: %d of %d", 
-       //             viewSets->SliceNumber, maxSliceNumber);
-       //         m_LayeredImage->SetText(text);
-       //     }
-       //     else {
-       //         m_LayeredImage->SetText("");
-       //     }
+                // Set text
+                char text[255];
+                sprintf(text, "Slice View: %d of %d", 
+                    viewSets->SliceNumber, maxSliceNumber);
+                m_LayeredImage->SetText(text);
+            }
+            else {
+                m_LayeredImage->SetText("");
+            }
         }
     case FRP_COLORMAP:
         {
-            //// Update here colormap values
-            //if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-            //    for(it=layers.begin(); it != itEnd; ++it){
-            //        m_LayeredImage->SetColormapSettings(
-            //            (*it)->ColormapSettings, (*it)->ID);
-            //    }
-            //}
-            //else {
-            //    m_LayeredImage->SetColormapSettings(
-            //        layer->ColormapSettings, layer->ID);
-            //}
-            //m_LayeredImage->UpdateColormap();
+            // Update here colormap values
+            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                for(it=layers.begin(); it != itEnd; ++it){
+                    m_LayeredImage->SetColormapSettings(
+                        (*it)->ColormapSettings, (*it)->ID);
+                }
+            }
+            else {
+                m_LayeredImage->SetColormapSettings(
+                    layer->ColormapSettings, layer->ID);
+            }
+            m_LayeredImage->UpdateColormap();
         }
     case FRP_TBC:
         {
-            //// set TBC values
-            //if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-            //    for(it=layers.begin(); it != itEnd; ++it){
-            //        m_LayeredImage->SetTBCSettings(
-            //            (*it)->TbcSettings, (*it)->ID);
-            //    }
-            //}
-            //else {
-            //    m_LayeredImage->SetTBCSettings(
-            //        layer->TbcSettings, layer->ID);
-            //}
-            //m_LayeredImage->UpdateTBC();
+            // set TBC values
+            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                for(it=layers.begin(); it != itEnd; ++it){
+                    m_LayeredImage->SetTBCSettings(
+                        (*it)->TbcSettings, (*it)->ID);
+                }
+            }
+            else {
+                m_LayeredImage->SetTBCSettings(
+                    layer->TbcSettings, layer->ID);
+            }
+            m_LayeredImage->UpdateTBC();
         }
     case FRP_OPACITY_VISIBILITY:
         {
-            //// Opacity and visibility
-            //if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-            //    for(it=layers.begin(); it != itEnd; ++it){
-            //        m_LayeredImage->SetOpacity((*it)->Opacity, (*it)->ID);
-            //        m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
-            //    }
-            //}
-            //else {
-            //    m_LayeredImage->SetOpacity(layer->Opacity, layer->ID);
-            //    m_LayeredImage->SetVisibility(layer->Visibility, layer->ID);
-            //}
+            // Opacity and visibility
+            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
+                for(it=layers.begin(); it != itEnd; ++it){
+                    m_LayeredImage->SetOpacity((*it)->Opacity, (*it)->ID);
+                    m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
+                }
+            }
+            else {
+                m_LayeredImage->SetOpacity(layer->Opacity, layer->ID);
+                m_LayeredImage->SetVisibility(layer->Visibility, layer->ID);
+            }
         }
     case FRP_SETCAM:
         {
@@ -199,7 +199,7 @@ void FrSliceView::UpdatePipeline(int point){
     }
 
     // Draw border
-    m_LayeredImage->UpdateBorder();
+    //m_LayeredImage->UpdateBorder();
 
     // redraw scene
 	GetRenderWindow()->Render();

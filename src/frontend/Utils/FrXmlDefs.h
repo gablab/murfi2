@@ -57,6 +57,7 @@
 #define FR_XML_MINVAL_ATTR "minValue"
 #define FR_XML_MAXVAL_ATTR "maxValue"
 #define FR_XML_TYPE_ATTR "type"
+#define FR_XML_MIDVALUE_ATTR "midValue"
 #define FR_XML_THRESH_ATTR "threshold"
 #define FR_XML_COLOR_ATTR "color"
 

@@ -245,7 +245,8 @@ void FrSaveTabsCmd::SaveLayerSettings(QDomElement& parent, FrLayerSettings* liSe
             // Do nothing here
             break;
     }
-    cmElem.setAttribute(FR_XML_THRESH_ATTR, liSets->ColormapSettings.Threshold);
+    cmElem.setAttribute(FR_XML_MIDVALUE_ATTR, liSets->ColormapSettings.MidValue);
+	cmElem.setAttribute(FR_XML_THRESH_ATTR, liSets->ColormapSettings.Threshold);
 
     // Save color value
     QColor color = liSets->ColormapSettings.Color;

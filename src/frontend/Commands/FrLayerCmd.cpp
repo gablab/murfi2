@@ -228,6 +228,7 @@ bool FrLayerCmd::ChangeLayerOld(){
                         ls.ColormapSettings.Type = layerSets->ColormapSettings.Type;
                         ls.ColormapSettings.MinValue = layerSets->ColormapSettings.MinValue;
                         ls.ColormapSettings.MaxValue = layerSets->ColormapSettings.MaxValue;
+						ls.ColormapSettings.MidValue = layerSets->ColormapSettings.MidValue;
                         ls.ColormapSettings.Threshold = layerSets->ColormapSettings.Threshold;
                         ls.ColormapSettings.Color = layerSets->ColormapSettings.Color;
                         break;

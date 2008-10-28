@@ -124,17 +124,33 @@ QGroupBox* FrColormapWidget::CreateSingleParams(){
 QGroupBox* FrColormapWidget::CreateMultiParams(){
     QGroupBox* result = new QGroupBox("Additional Params", this);
 
-    QLabel* label = new QLabel(QString("Threshold: "), result); 
+    QLabel* label = new QLabel(QString("PxMid: "), result); 
 
-    m_threshWidget = new FrSpinSliderWidget(result);
-    m_threshWidget->SetMinMax(0, 100);
-    m_threshWidget->SetValue(50);
-    connect(m_threshWidget, SIGNAL(ValueChanged(int)),
+    m_midWidget = new FrSpinSliderWidget(result);
+    m_midWidget->SetMinMax(0, 100);
+    m_midWidget->SetValue(50);
+    connect(m_midWidget, SIGNAL(ValueChanged(int)),
             this, SLOT(OnSpinSliderValueChanged(int)));
     
-    QHBoxLayout* layout = new QHBoxLayout(result);
+    QLabel* label2 = new QLabel(QString("Threshold: "), result); 
+
+    m_threshWidget = new FrSpinSliderWidget(result);
+    m_threshWidget->SetMinMax(0, 10);
+    m_threshWidget->SetValue(4);
+    connect(m_threshWidget, SIGNAL(ValueChanged(int)),
+            this, SLOT(OnSpinSliderValueChanged(int)));
+
+	QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(label);
-    layout->addWidget(m_threshWidget);
+    layout->addWidget(label2);
+    
+    QVBoxLayout* layout2 = new QVBoxLayout();
+    layout2->addWidget(m_midWidget);
+    layout2->addWidget(m_threshWidget);
+
+    QHBoxLayout* layout3 = new QHBoxLayout(result);
+    layout3->addLayout(layout);
+    layout3->addLayout(layout2);
 
     return result;
 }
@@ -177,7 +193,8 @@ void FrColormapWidget::GetColormapParams(FrColormapSettings& params){
     params.Type = m_cmType;
     params.MinValue = m_minWidget->GetValue();
     params.MaxValue = m_maxWidget->GetValue();
-    params.Threshold = m_threshWidget->GetValue();
+	params.MidValue = m_midWidget->GetValue();
+	params.Threshold = m_threshWidget->GetValue();
     params.Color = m_color;
 }
 
@@ -185,7 +202,8 @@ void FrColormapWidget::SetColormapParams(FrColormapSettings& params){
     // Set colormap settings
     m_minWidget->SetValue(params.MinValue);
     m_maxWidget->SetValue(params.MaxValue);
-    m_threshWidget->SetValue(params.Threshold);
+	m_midWidget->SetValue(params.MidValue);
+	m_threshWidget->SetValue(params.Threshold);
 
     switch(params.Type){
         case FrColormapSettings::MultiColor:

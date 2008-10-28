@@ -52,7 +52,8 @@ void FrLayerWidget::GetLayerParams(FrLayerSettings& params){
     params.ColormapSettings.Type      = m_params.ColormapSettings.Type;
     params.ColormapSettings.MinValue  = m_params.ColormapSettings.MinValue;
     params.ColormapSettings.MaxValue  = m_params.ColormapSettings.MaxValue;
-    params.ColormapSettings.Threshold = m_params.ColormapSettings.Threshold;
+	params.ColormapSettings.MidValue = m_params.ColormapSettings.MidValue;
+	params.ColormapSettings.Threshold	  = m_params.ColormapSettings.Threshold;
     params.ColormapSettings.Color     = m_params.ColormapSettings.Color;
 }
 
@@ -65,6 +66,7 @@ void FrLayerWidget::SetLayerParams(FrLayerSettings& params){
     m_params.ColormapSettings.Type = params.ColormapSettings.Type;
     m_params.ColormapSettings.MinValue = params.ColormapSettings.MinValue;
     m_params.ColormapSettings.MaxValue = params.ColormapSettings.MaxValue;
+	m_params.ColormapSettings.MidValue = params.ColormapSettings.MidValue;
     m_params.ColormapSettings.Threshold = params.ColormapSettings.Threshold;
     m_params.ColormapSettings.Color = params.ColormapSettings.Color;
 

@@ -57,6 +57,7 @@ private:
     QGroupBox* m_gbSingle;
     QGroupBox* m_gbMulti;
     QWidget* m_wgtColor;
+    FrSpinSliderWidget* m_midWidget;
     FrSpinSliderWidget* m_threshWidget;
 
     // Params

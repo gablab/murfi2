@@ -1,12 +1,11 @@
 #ifndef FR_IMAGEDOC_OBJ
 #define FR_IMAGEDOC_OBJ
 
-class vtkImageData;
+// Forward declarations
 class RtMRIImage;
-
 class QString;
 
-// includes
+// Includes
 #include "FrMacro.h"
 #include "FrDocumentObj.h"
 

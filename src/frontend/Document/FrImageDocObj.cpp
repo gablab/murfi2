@@ -7,6 +7,9 @@
 #include "vtkPointData.h"
 // Backend includes
 #include "RtMRIImage.h"
+// Qt stuff
+#include <Qt/QString.h>
+#include <Qt/QFile.h>
 
 
 FrImageDocObj::FrImageDocObj()
@@ -33,8 +36,7 @@ unsigned int FrImageDocObj::GetMatrixSize(){
 	return m_Image->getMatrixSize();
 }
 
-#include <Qt/QString.h>
-#include <Qt/QFile.h>
+
 bool FrImageDocObj::LoadFromFile(QString& fileName){
     bool result = false;
     

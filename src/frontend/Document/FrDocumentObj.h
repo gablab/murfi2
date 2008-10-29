@@ -6,13 +6,14 @@ class FrDocument;
 
 // One have to provide valid type system
 // All object types have to be registered here.
-class FrDocumentObj
-{
-public: // Object types
+class FrDocumentObj {
+public: 
+    // Object types
     enum ObjType{
         BaseObject,
         ImageObject,
         TabSettings,
+        RoiObject,
         OtherType    // etc
     };
 

@@ -105,25 +105,22 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	if (!m_PointPicker->Pick(m_mouseX, m_mouseY, 0, renderer)) {
         ResetVoxelInfo();
 		return false;
-    }	
+    }
+
+    // get image data
+    vtkImageData* pImageData = lim->GetLayerByID(0)->GetInput();
 
     // Get the mapped position of the mouse using the picker.
     double ptMapped[3];
     m_PointPicker->GetMapperPosition(ptMapped);
-
-    // We have to manually set the physical z-coordinate which requires
-    // us to get the volume spacing.
-    double dSpacing[3];
-
-	// Get a shortcut to the pixel data.
-    vtkImageData* pImageData = lim->GetLayerByID(0)->GetInput();		// get image data
-    	
-	pImageData->GetSpacing(dSpacing);			
-    ptMapped[2] = 0;//slice*dSpacing[2];					
+    ptMapped[2] = 0;
+    
+    double dSpacing[3];	
+	pImageData->GetSpacing(dSpacing);		
 
     // Get the volume index within the entire volume now.
-    int nVolIdx = pImageData->FindPoint(ptMapped);
-
+    int nPointIdx = pImageData->FindPoint(ptMapped);
+    
     // We have to handle different number of scalar components.
     unsigned short usPix;
     unsigned char usPixR;
@@ -134,28 +131,32 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 	vd.name = "test";			// get layer (image?) name
 	vd.timepoint = 44;			// get timepoint
 
+    // TODO: fix for side values
 	switch(view){
 		case FrTabSettingsDocObj::View::SliceView:
 			{
-				int slice = md->GetCurrentTabSettings()->GetSliceViewSettings()->SliceNumber;	// get slice number
+                // get slice number
+				int slice = md->GetCurrentTabSettings()->
+                    GetSliceViewSettings()->SliceNumber;	
 	
-				vd.Index[0] = ptMapped[0];			
-				vd.Index[1] = ptMapped[1];
-				vd.Index[2] = slice;							// set current slice number
-
-				vd.Position[0] = ptMapped[0]*dSpacing[2];	
-				vd.Position[1] = ptMapped[1]*dSpacing[2];
-				vd.Position[2] = slice*dSpacing[2];							
+                // set current indices of point
+				vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
+				vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
+				vd.Index[2] = slice;							
+                // and positions
+				vd.Position[0] = vd.Index[0] * dSpacing[0];
+				vd.Position[1] = vd.Index[1] * dSpacing[1];
+				vd.Position[2] = vd.Index[3] * dSpacing[2];							
 			}
 			break;
 		case FrTabSettingsDocObj::View::MosaicView:
 			{
-				vd.Index[0] = ptMapped[0];			
-				vd.Index[1] = ptMapped[1];
+				vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
+				vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
 				vd.Index[2] = 0;
 
-				vd.Position[0] = ptMapped[0]*dSpacing[2];	
-				vd.Position[1] = ptMapped[1]*dSpacing[2];
+				vd.Position[0] = vd.Index[0] * dSpacing[0];
+				vd.Position[1] = vd.Index[1] * dSpacing[1];
 				vd.Position[2] = 0;							
 			}
 			break;
@@ -164,41 +165,45 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 				switch(imgNumber){
 					case 0:			// coronal 
 						{
-							int slice = md->GetCurrentTabSettings()->GetOrthoViewSettings()->CoronalSlice;	// get slice number
+                            // get slice number
+							int slice = md->GetCurrentTabSettings()->
+                                GetOrthoViewSettings()->CoronalSlice;	
 			
-							vd.Index[0] = ptMapped[0];			
+							vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
 							vd.Index[1] = slice;
-							vd.Index[2] = ptMapped[1];
+							vd.Index[2] = int((ptMapped[1]+1) / dSpacing[2]);
 
-							vd.Position[0] = ptMapped[0]*dSpacing[2];	
-							vd.Position[1] = slice*dSpacing[1];
-							vd.Position[2] = ptMapped[1]*dSpacing[2];							
+							vd.Position[0] = vd.Index[0] * dSpacing[0];	
+							vd.Position[1] = vd.Index[1] * dSpacing[1];
+							vd.Position[2] = vd.Index[2]* dSpacing[2];
 						}
 						break;
 					case 1:			// sagital
 						{
-							int slice = md->GetCurrentTabSettings()->GetOrthoViewSettings()->SagitalSlice;	// get slice number
+							int slice = md->GetCurrentTabSettings()->
+                                GetOrthoViewSettings()->SagitalSlice;	// get slice number
 			
 							vd.Index[0] = slice;			
-							vd.Index[1] = ptMapped[0];
-							vd.Index[2] = ptMapped[1];
+							vd.Index[1] = int( (ptMapped[0]+1) / dSpacing[1]);
+							vd.Index[2] = int( (ptMapped[1]+1) / dSpacing[2]);
 
-							vd.Position[0] = slice*dSpacing[0];
-							vd.Position[1] = ptMapped[0]*dSpacing[2];	
-							vd.Position[2] = ptMapped[1]*dSpacing[2];					
+							vd.Position[0] = vd.Index[0] * dSpacing[0];
+							vd.Position[1] = vd.Index[1] * dSpacing[1];	
+							vd.Position[2] = vd.Index[2] * dSpacing[2];					
 						}
 						break;
 					case 2:			// axial
 						{
-							int slice = md->GetCurrentTabSettings()->GetOrthoViewSettings()->AxialSlice;	// get slice number
+							int slice = md->GetCurrentTabSettings()->
+                                GetOrthoViewSettings()->AxialSlice;	// get slice number
 			
-							vd.Index[0] = ptMapped[0];			
-							vd.Index[1] = ptMapped[1];
+							vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
+							vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
 							vd.Index[2] = slice;
 
-							vd.Position[0] = ptMapped[0]*dSpacing[2];	
-							vd.Position[1] = ptMapped[1]*dSpacing[2];
-							vd.Position[2] = slice*dSpacing[2];							
+							vd.Position[0] = vd.Index[0] * dSpacing[0];
+							vd.Position[1] = vd.Index[1] * dSpacing[1];
+							vd.Position[2] = vd.Index[2] * dSpacing[2];							
 						}
 						break;
 				}
@@ -221,25 +226,22 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 			case 1:
 				{
 					unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
-					usPix = pPix[nVolIdx];
-				//    FmtStr(m_strDetails, "Pixel val = [" << usPix << "]   at index [" << nVolIdx << "],  coordinates(" << ptMapped[0] << "," << ptMapped[1] << ")");
+					usPix = pPix[nPointIdx];
 				}
 				break;
 	        
 			case 3:
 				{
 					unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
-					usPixR = pPix[nVolIdx * 3 + 0];
-					usPixG = pPix[nVolIdx * 3 + 1];
-					usPixB = pPix[nVolIdx * 3 + 2];
+					usPixR = pPix[nPointIdx * 3 + 0];
+					usPixG = pPix[nPointIdx * 3 + 1];
+					usPixB = pPix[nPointIdx * 3 + 2];
 
 					usPix = (usPixR + usPixG + usPixB)/3;
-				   // FmtStr(m_strDetails, "Pixel val = [" << (int)usPixR << "," << (int)usPixG << "," << (int)usPixB << "]   at index [" << nVolIdx << "],  coordinates(" << ptMapped[0] << "," << ptMapped[1] << ")");
 				}
 				break;
 
-			default:
-				//FmtStr(m_strDetails, "Unsupported number of scalar components [" << pImageData->GetNumberOfScalarComponents() << "] for pixel picker.");
+			default:				
 				break;
 		}
 		

@@ -7,16 +7,19 @@
 
 
 int main(int argc, char **argv){
+    char* b = new char[111];
+    strcpy(b, "TEST MEMORY LEAK");
+
     _CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_FILE );
     _CrtSetReportFile( _CRT_ERROR, _CRTDBG_FILE_STDERR );
 
     int tmpDbgFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-    tmpDbgFlag |= _CRTDBG_CHECK_ALWAYS_DF;
+    //tmpDbgFlag |= _CRTDBG_CHECK_ALWAYS_DF;
     tmpDbgFlag |= _CRTDBG_DELAY_FREE_MEM_DF;
     tmpDbgFlag |= _CRTDBG_LEAK_CHECK_DF;
     _CrtSetDbgFlag(tmpDbgFlag);
 
-    _CrtSetBreakAlloc(1028);
+    //_CrtSetBreakAlloc(1028);
 
 	FrApplication application(argc, argv);
     

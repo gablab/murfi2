@@ -17,14 +17,22 @@
 
 #define CONNECT_ACTION_TRIGGERED(action, slot)\
     connect(action,SIGNAL(triggered()),this,SLOT(slot))
+#define DISCONNECT_ACTION_TRIGGERED(action, slot)\
+    disconnect(action,SIGNAL(triggered()),this,SLOT(slot))
     
 
 FrActionSignalManager::FrActionSignalManager(FrMainWindow* mainWindow)
-: QObject(mainWindow), m_mainWindow(mainWindow) {
+: QObject(mainWindow), m_mainWindow(mainWindow), m_isInit(false) {
     this->Initialize();
 }
 
+FrActionSignalManager::~FrActionSignalManager(){
+    this->Deinitialize();
+}
+
 void FrActionSignalManager::Initialize(){
+    if(m_isInit) return;
+
     // Connect signals
     FrActionManager* am = m_mainWindow->m_ActionManager;
 
@@ -79,6 +87,67 @@ void FrActionSignalManager::Initialize(){
 
     // Connect test action
     CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
+    m_isInit = true;
+}
+
+void FrActionSignalManager::Deinitialize(){
+    if(!m_isInit) return;
+
+    // Connect signals
+    FrActionManager* am = m_mainWindow->m_ActionManager;
+    
+    // File 
+    DISCONNECT_ACTION_TRIGGERED(am->GetOpenImageAction(), OnOpenImageAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetSaveTabsAction(), OnSaveTabsAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetLoadTabsAction(), OnLoadTabsAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetExitAction(), OnExitAction());
+     
+    //Edit 
+    DISCONNECT_ACTION_TRIGGERED(am->GetSaveToTabAction(), OnSaveToTabAction());
+	DISCONNECT_ACTION_TRIGGERED(am->GetNewLayerAction(),  OnNewLayerAction());
+	DISCONNECT_ACTION_TRIGGERED(am->GetDeleteLayerAction(), OnDeleteLayerAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetChangeLayerAction(), OnChangeLayerAction());
+    
+    //View
+    DISCONNECT_ACTION_TRIGGERED(am->GetViewSliceAction(), OnViewSliceAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetViewMosaicAction(), OnViewMosaicAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetViewOrthoAction(), OnViewOrthoAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetResetImageAction(), OnResetImageAction());
+
+    // Tools 
+    DISCONNECT_ACTION_TRIGGERED(am->GetManipulatorToolAction(), OnManipulatorToolAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetVoxelToolAction(), OnVoxelToolAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetRoiToolAction(), OnRoiToolAction());
+    
+    // Help
+    DISCONNECT_ACTION_TRIGGERED(am->GetShowHelpAction(), OnShowHelpAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetShowAboutAction(), OnShowAboutAction());
+
+    // Connect some signals of BookmarkWidget 
+    // to MainWindow object
+    disconnect( m_mainWindow->m_BookmarkWidget, SIGNAL(CurrentChanged(int)),
+             m_mainWindow, SLOT(OnBookmarkChanged(int)) );
+    disconnect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(int)),
+             m_mainWindow, SLOT(OnBookmarkDelete(int)) );
+
+    // Connect signals to layer list widget
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerSelected(int)),
+             m_mainWindow, SLOT(OnLayerSelected(int)) );
+
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(NewLayer()),
+             this, SLOT(OnNewLayerAction()) );
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(DeleteLayer()),
+             this, SLOT(OnDeleteLayerAction()) );
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayer()),
+             this, SLOT(OnChangeLayerAction()) );
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerParams()),
+             this, SLOT(OnLayerParamsChanged()) );
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerColormap()),
+             this, SLOT(OnLayerColormapChanged()) );
+
+    // Connect test action
+    DISCONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
+    m_isInit = false;
 }
 
  // File 

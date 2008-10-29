@@ -23,6 +23,7 @@ FrMosaicView::FrMosaicView(FrMainWindow* mainWindow)
 }
 
 FrMosaicView::~FrMosaicView(){
+    this->RemoveRenderers();
     if(m_docReader) m_docReader->Delete();
     if(m_LayeredImage) m_LayeredImage->Delete();
 }

@@ -39,7 +39,9 @@ FrLayeredImage::~FrLayeredImage(){
     // delete all layers here
     this->RemoveImageLayers();
     // and other stuff too
-    if(m_SpecialLayer) m_SpecialLayer->Delete();
+    if(m_SpecialLayer){
+        m_SpecialLayer->Delete();
+    }
 }
 
 // Modifiers
@@ -263,7 +265,9 @@ void FrLayeredImage::RemoveImageLayers(){
     for(it = m_ImageLayers.begin(); it != itEnd; ++it){
         FrImageLayer* layer = (*it);
         if(rw){
-            rw->RemoveRenderer(layer->GetRenderer());
+            vtkRenderer* ren = layer->GetRenderer();
+            rw->RemoveRenderer(ren);
+            ren->SetRenderWindow(0L);
         }
         layer->Delete();
     }

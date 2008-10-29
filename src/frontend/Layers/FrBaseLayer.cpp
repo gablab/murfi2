@@ -6,6 +6,7 @@
 
 
 // VTK stuff
+#include "vtkRenderWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 #include "vtkImageActor.h"
@@ -27,7 +28,11 @@ FrBaseLayer::FrBaseLayer()
 
 FrBaseLayer::~FrBaseLayer(){        
     if(m_Renderer){
-        //m_Renderer->RemoveAllProps();
+        vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
+        if(rw){
+            rw->RemoveRenderer(m_Renderer);
+            m_Renderer->SetRenderWindow(0);
+        }
         m_Renderer->Delete();
     }
 }

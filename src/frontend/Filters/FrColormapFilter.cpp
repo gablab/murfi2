@@ -241,7 +241,11 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
     }
 
 	// special area with non significant pixels around threshold
-	for(int i = m_PxMid-m_Threshold/2; i<m_PxMid+m_Threshold/2; i++){
-		luTable[i][R_INDEX] =  luTable[i][G_INDEX] = luTable[i][B_INDEX] = 0;
+    int iMin = threshold - (m_Threshold / 2);
+    int iMax = iMin + m_Threshold;
+    for(int i = iMin; i < iMax; ++i){
+		luTable[i][R_INDEX] = 
+        luTable[i][G_INDEX] = 
+        luTable[i][B_INDEX] = 0;
 	}
 }

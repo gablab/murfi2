@@ -36,6 +36,7 @@ FrSliceView::FrSliceView(FrMainWindow* mainWindow)
 }
 
 FrSliceView::~FrSliceView(){
+    this->RemoveRenderers();
 	if(m_SliceExtractor) m_SliceExtractor->Delete();
     if(m_docReader) m_docReader->Delete();
     if(m_LayeredImage) m_LayeredImage->Delete();

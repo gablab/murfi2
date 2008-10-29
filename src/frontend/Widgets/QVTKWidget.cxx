@@ -135,10 +135,9 @@ QVTKWidget::QVTKWidget(QWidget* parent, Qt::WFlags f)
 /*! destructor */
 
 QVTKWidget::~QVTKWidget()
-{
+{ 
   // get rid of the VTK window
   this->SetRenderWindow(NULL);
-  
   this->mCachedImage->Delete();
 }
 

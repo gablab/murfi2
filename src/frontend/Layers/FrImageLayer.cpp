@@ -32,6 +32,7 @@ FrImageLayer::FrImageLayer()
 FrImageLayer::~FrImageLayer(){    
     if(m_cmFilter) m_cmFilter->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
+    if(m_Renderer) m_Renderer->RemoveActor(m_actor);
     if(m_actor) m_actor->Delete();
 }
 

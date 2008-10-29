@@ -37,11 +37,11 @@ FrMainWindow::FrMainWindow()
 }
 
 FrMainWindow::~FrMainWindow(){
+    if(m_SignalManager) delete m_SignalManager;
+    if(m_ActionManager) delete m_ActionManager;
     if(m_SliceView) delete m_SliceView;
     if(m_MosaicView) delete m_MosaicView;
     if(m_OrthoView) delete m_OrthoView;
-    if(m_SignalManager) delete m_SignalManager;
-    if(m_ActionManager) delete m_ActionManager;
 }
 
 void FrMainWindow::SetupUi(QMainWindow* mainWindow){
@@ -171,4 +171,8 @@ void FrMainWindow::OnBookmarkDelete(int id){
 
 void FrMainWindow::OnLayerSelected(int id){
     this->GetMainController()->SelectLayer(id);
+}
+
+void FrMainWindow::DisconnectActions(){
+    m_SignalManager->Deinitialize();
 }

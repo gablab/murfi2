@@ -88,11 +88,12 @@ bool RemoveItemFromVector(std::vector<T*>& collection,
                           T* item, bool isDelete=false){
     LayerCollection::iterator it;
     it = std::find(collection.begin(), collection.end(), item);
-    if(it != collection.end()){
+    bool isFound = (it != collection.end());
+    if(isFound){
         collection.erase(it);
         if(isDelete) delete item;
     }
-    return (it != collection.end());
+    return isFound;
 }
 
 class FrSliceViewSettings {

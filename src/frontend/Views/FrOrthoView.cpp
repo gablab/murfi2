@@ -47,6 +47,7 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 }
 
 FrOrthoView::~FrOrthoView(){
+    this->RemoveRenderers();
     if(m_docReader) m_docReader->Delete();
 
     for(int i = 0; i < ORTHO_IMAGE_COUNT; i++){

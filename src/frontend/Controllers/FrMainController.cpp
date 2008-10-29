@@ -29,9 +29,9 @@
 
 // Implementation of FrMainController
 FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
-    : m_MainView(view), m_MainDocument(doc), m_ToolController(0){
+: m_MainView(view), m_MainDocument(doc), m_ToolController(0){
 
-    m_ToolController = new FrToolController(this);
+    m_ToolController = new FrToolController(this);    
 }
 
 FrMainController::~FrMainController(){    
@@ -39,12 +39,13 @@ FrMainController::~FrMainController(){
     if(m_ToolController) {
         delete m_ToolController;
     }
-    
-    // delete all other stuff    
+
+    // delete all other stuff
     m_MainView->hide();
+    m_MainView->DisconnectActions();
     if(m_MainDocument) delete m_MainDocument;
     if(m_MainView) delete m_MainView;
- 
+        
     // Delete command controller
     FrCommandController::Delete();
 }
@@ -63,10 +64,9 @@ void FrMainController::Initialize(){
         // Setup interactor style
         if(m_MainView->GetQVTKWidget()) {
             FrInteractorStyle* style = FrInteractorStyle::New();
-            style->SetMainController(this);
-            m_MainView->GetQVTKWidget()->
-                GetInteractor()->SetInteractorStyle(style);
-
+            style->SetMainController(this);            
+            //vtkInteractorStyle* style = vtkInteractorStyle::New();
+            m_MainView->GetQVTKWidget()->GetInteractor()->SetInteractorStyle(style);
             style->Delete();
         }
         m_MainView->show();

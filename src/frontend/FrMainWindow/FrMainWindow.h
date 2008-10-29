@@ -36,6 +36,7 @@ public:
     FrPropMacro(FrMainController*,MainController);
     
     void Initialize();
+    void DisconnectActions();
 
     // Properties
     FrPropMacro(FrBaseView*,      CurrentView);

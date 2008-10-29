@@ -14,6 +14,7 @@ class FrActionSignalManager : public QObject {
     Q_OBJECT
 public:
     FrActionSignalManager(FrMainWindow* mainWnd);
+    virtual ~FrActionSignalManager();
     
 public slots:
     // File 
@@ -43,11 +44,13 @@ public slots:
     void OnLayerParamsChanged();
     void OnLayerColormapChanged();
 
-private:
+public:
     void Initialize();
+    void Deinitialize();
 
 private:
     FrMainWindow* m_mainWindow;
+    bool m_isInit;
 };
 
 #endif

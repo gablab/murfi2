@@ -39,9 +39,7 @@ FrLayeredImage::~FrLayeredImage(){
     // delete all layers here
     this->RemoveImageLayers();
     // and other stuff too
-    if(m_SpecialLayer){
-        m_SpecialLayer->Delete();
-    }
+    if(m_SpecialLayer) m_SpecialLayer->Delete();
 }
 
 // Modifiers
@@ -53,6 +51,13 @@ void FrLayeredImage::SetInput(vtkImageData* data){
     // NOTE: Do not use colormap for default layer and 
     // set input to TBC filter immediatly
     m_tbcFilter->SetInput(data);
+}
+
+void FrLayeredImage::SetROIInput(vtkImageData *data, int layerId){
+    FrROILayer* layer = this->GetROILayerByID(layerId);
+    if(layer){
+        layer->SetInput(data);
+	}
 }
 
 void FrLayeredImage::SetColormapSettings(FrColormapSettings& settings, int layerId){
@@ -257,6 +262,39 @@ bool FrLayeredImage::RemoveLayer(int layerId){
     return result;
 }
 
+bool FrLayeredImage::RemoveROILayer(int layerId){
+    bool result = false;
+    ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
+    for(it = m_ROILayers.begin(); it != itEnd; ++it){
+        if((*it)->GetID() == layerId) break;
+    }
+    
+    // delete layer if it were found
+    if(it != itEnd){
+        FrROILayer* layer = (*it);
+        m_ROILayers.erase(it);
+
+        // Remove renderer from render window if any
+        vtkRenderWindow* rw = layer->GetRenderer()->GetRenderWindow();
+        if(rw != 0){
+            rw->RemoveRenderer(layer->GetRenderer());
+            rw->GetRenderers()->InitTraversal();
+
+            // HACK: GetRenderers() reorder all layers
+            // setting proper 'LayerNumber' !!!
+            std::vector<vtkRenderer*> rens;
+            this->GetRenderers(rens);
+            
+            rw->SetNumberOfLayers(rens.size());
+        }
+
+        // Delete layer object
+        layer->Delete();
+        result = true;
+    }
+    return result;
+}
+
 void FrLayeredImage::RemoveImageLayers(){
     vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
 
@@ -272,13 +310,50 @@ void FrLayeredImage::RemoveImageLayers(){
         layer->Delete();
     }
     // Update number of layers
+    //if(rw){
+    //    // NOTE: we have 2 layers : default and special
+    //    m_SpecialLayer->GetRenderer()->SetLayer(1);
+    //    rw->SetNumberOfLayers(2);
+    //}
+
+    m_ImageLayers.clear();
+}
+
+void FrLayeredImage::RemoveROILayers(){
+    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
+
+    // Delete all layers
+    ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
+    for(it = m_ROILayers.begin(); it != itEnd; ++it){
+        FrROILayer* layer = (*it);
+        if(rw){
+            vtkRenderer* ren = layer->GetRenderer();
+            rw->RemoveRenderer(ren);
+            ren->SetRenderWindow(0L);
+        }
+        layer->Delete();
+    }
+    // Update number of layers
+    //if(rw){
+    //    // NOTE: we have 2 layers : default and special
+    //    m_SpecialLayer->GetRenderer()->SetLayer(1);
+    //    rw->SetNumberOfLayers(2);
+    //}
+
+    m_ROILayers.clear();
+}
+
+
+void FrLayeredImage::RemoveAllLayers(){
+	RemoveImageLayers();
+	RemoveROILayers();
+
+    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
     if(rw){
         // NOTE: we have 2 layers : default and special
         m_SpecialLayer->GetRenderer()->SetLayer(1);
         rw->SetNumberOfLayers(2);
     }
-
-    m_ImageLayers.clear();
 }
 
 FrImageLayer* FrLayeredImage::GetLayerByID(int id){
@@ -294,6 +369,15 @@ FrImageLayer* FrLayeredImage::GetLayerByID(int id){
     return 0L;
 }
 
+FrROILayer* FrLayeredImage::GetROILayerByID(int id){
+    ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
+    for(it = m_ROILayers.begin(); it != itEnd; ++it){
+        if((*it)->GetID() == id) return (*it);
+    }
+    return 0L;
+}
+
+
 void FrLayeredImage::GetRenderers(std::vector<vtkRenderer*>& renderers){
     // First add default
     renderers.clear();
@@ -307,6 +391,16 @@ void FrLayeredImage::GetRenderers(std::vector<vtkRenderer*>& renderers){
     LayerCollection::iterator it, itEnd(m_ImageLayers.end());
     for(it = m_ImageLayers.begin(); it != itEnd; ++it){
         vtkRenderer* ren = (*it)->GetRenderer();
+        ren->SetLayer(layerNumber);
+        renderers.push_back(ren);
+        
+        ++layerNumber;
+    }
+
+	// Add renderer of each roi layer and udate layer number
+    ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
+    for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
+        vtkRenderer* ren = (*itr)->GetRenderer();
         ren->SetLayer(layerNumber);
         renderers.push_back(ren);
         

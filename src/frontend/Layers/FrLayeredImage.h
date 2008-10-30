@@ -9,6 +9,7 @@ class vtkActor2D;
 
 // Some includes
 #include "FrImageLayer.h"
+#include "FrROILayer.h"
 #include "FrSpecialLayer.h"
 #include "FrSettings.h"
 #include <vector>
@@ -23,6 +24,7 @@ public:
 public:
     // Accessors/Modifiers
     virtual void SetInput(vtkImageData* data);
+	void SetROIInput(vtkImageData* data, int layerId);	// ROI layers may have different input data
     
     void SetColormapSettings(FrColormapSettings& settings, int layerId);
     void SetTBCSettings(FrTBCSettings& settings, int layerId);
@@ -45,10 +47,18 @@ public:
     // Layer management
     //
     int  AddLayer();
+	int  AddROILayer();
+
     bool RemoveLayer(int id);
+	bool RemoveROILayer(int id);
+
     void RemoveImageLayers();
+	void RemoveROILayers();
+	void RemoveAllLayers();
+
     // Returns layer by ID
     FrImageLayer* GetLayerByID(int id);
+    FrROILayer* GetROILayerByID(int id);
 
     //
     // Text management
@@ -64,8 +74,11 @@ protected:
 private:
     int m_nextImageLayerID;
     typedef std::vector<FrImageLayer*> LayerCollection;
-    LayerCollection m_ImageLayers;
+    typedef std::vector<FrROILayer*> ROILayerCollection;
 
+    LayerCollection m_ImageLayers;
+    ROILayerCollection m_ROILayers;
+	
     FrSpecialLayer* m_SpecialLayer;
 
 private:

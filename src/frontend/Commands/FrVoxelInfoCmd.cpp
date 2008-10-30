@@ -136,8 +136,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 		case FrTabSettingsDocObj::View::SliceView:
 			{
                 // get slice number
-				int slice = md->GetCurrentTabSettings()->
-                    GetSliceViewSettings()->SliceNumber;	
+				int slice = ts->GetSliceViewSettings()->SliceNumber;	
 	
                 // set current indices of point
 				vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
@@ -166,8 +165,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 					case 0:			// coronal 
 						{
                             // get slice number
-							int slice = md->GetCurrentTabSettings()->
-                                GetOrthoViewSettings()->CoronalSlice;	
+							int slice = ts->GetOrthoViewSettings()->CoronalSlice;	
 			
 							vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
 							vd.Index[1] = slice;
@@ -180,8 +178,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 						break;
 					case 1:			// sagital
 						{
-							int slice = md->GetCurrentTabSettings()->
-                                GetOrthoViewSettings()->SagitalSlice;	// get slice number
+							int slice = ts->GetOrthoViewSettings()->SagitalSlice;	// get slice number
 			
 							vd.Index[0] = slice;			
 							vd.Index[1] = int( (ptMapped[0]+1) / dSpacing[1]);
@@ -194,8 +191,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 						break;
 					case 2:			// axial
 						{
-							int slice = md->GetCurrentTabSettings()->
-                                GetOrthoViewSettings()->AxialSlice;	// get slice number
+							int slice = ts->GetOrthoViewSettings()->AxialSlice;	// get slice number
 			
 							vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
 							vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);

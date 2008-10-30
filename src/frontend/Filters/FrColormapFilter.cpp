@@ -234,15 +234,19 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
             // calculate final color
 	        vtkMath::HSVToRGB(hsv, rgb);	
 
-	        luTable[i][R_INDEX] = rgb[R_INDEX];
-            luTable[i][G_INDEX] = rgb[G_INDEX];
-            luTable[i][B_INDEX] = rgb[B_INDEX];
+	        luTable[i][R_INDEX] = (unsigned char)rgb[R_INDEX];
+            luTable[i][G_INDEX] = (unsigned char)rgb[G_INDEX];
+            luTable[i][B_INDEX] = (unsigned char)rgb[B_INDEX];
         }
     }
 
 	// special area with non significant pixels around threshold
     int iMin = threshold - (m_Threshold / 2);
     int iMax = iMin + m_Threshold;
+	if (iMin<0)
+		iMin = 0;
+	if (iMax>256)
+		iMax = 256;
     for(int i = iMin; i < iMax; ++i){
 		luTable[i][R_INDEX] = 
         luTable[i][G_INDEX] = 

@@ -87,6 +87,7 @@ bool FrLayerCmd::AddLayer(){
         FrLayerSettings* layerSets = new FrLayerSettings(layerParams);
         layerSets->ID = id;
         otherLayers[i]->push_back(layerSets);
+		//delete layerSets;	// NEW: to prevent memory leaks
     }
     FrBaseCmd::UpdatePipelineForID(id, FRP_COLORMAP);
 }

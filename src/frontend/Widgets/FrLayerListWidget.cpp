@@ -10,11 +10,13 @@
 #include "Qt/QToolButton.h"
 #include "Qt/QVariant.h"
 #include "Qt/QLabel.h"
+#include <QtGui/QSpacerItem>
 
 
-#define TAB_ID_IDX      0
-#define TAB_LAYER_IDX   1
-#define COLUMN_COUNT    2
+#define TAB_ID_IDX			0
+#define TAB_LAYER_IDX		1
+#define COLUMN_COUNT		2
+#define DEFAULT_LAYER_ID	0
 
 #define MULTICOLOR_ITEM_IDX 0 
 #define SINGLECOLOR_ITEM_IDX 1 
@@ -77,10 +79,15 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
     opacityLayout->addWidget(lblOpacity);
     opacityLayout->addWidget(m_opacityWidget);
     
+	// spacer
+//	QSpacerItem *spacerItem;
+//	spacerItem = new QSpacerItem(40, 40, QSizePolicy::Fixed, QSizePolicy::Expanding);
+
     // Setup property layout (rightmost)
     QVBoxLayout* propLayout = new QVBoxLayout();
     propLayout->addWidget(m_colormapWidget);
     propLayout->addLayout(opacityLayout);
+//	propLayout->addItem(spacerItem);
 
     // Setup main layout
 	QHBoxLayout* mainLayout = new QHBoxLayout(this);
@@ -102,6 +109,8 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
 
     connect( m_colormapWidget, SIGNAL(ParamsChanged()), 
              this, SLOT(OnColormapParamsChanged()) );
+
+	this->setMinimumHeight(230);
 }
 
 // Common actions
@@ -170,6 +179,11 @@ void FrLayerListWidget::OnSelectionChanged(){
         // Setup widgets
         FrLayerSettings params;
         wgt->GetLayerParams(params);
+		
+		if (params.ID == DEFAULT_LAYER_ID)
+			m_colormapWidget->setVisible(false);
+		else
+			m_colormapWidget->setVisible(true);
 
         m_colormapWidget->BlockSignals(true);
         m_colormapWidget->SetColormapParams(params.ColormapSettings);

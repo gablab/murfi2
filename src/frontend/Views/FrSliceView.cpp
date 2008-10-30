@@ -200,7 +200,7 @@ void FrSliceView::UpdatePipeline(int point){
     }
 
     // Draw border
-    m_LayeredImage->UpdateBorder();
+    //m_LayeredImage->UpdateBorder();
 
     // redraw scene
 	GetRenderWindow()->Render();

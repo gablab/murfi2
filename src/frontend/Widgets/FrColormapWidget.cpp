@@ -13,6 +13,7 @@
 #include "Qt/QApplication.h"
 #include "Qt/QColorDialog.h"
 
+
 // Some defines 
 #define MULTICOLOR_ITEM_IDX 0 
 #define SINGLECOLOR_ITEM_IDX 1

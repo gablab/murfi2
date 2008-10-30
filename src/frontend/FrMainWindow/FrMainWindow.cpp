@@ -13,6 +13,7 @@
 #include "FrMainMenu.h"
 #include "FrActionManager.h"
 #include "FrActionSignalManager.h"
+#include "FrDrawingPanelWidget.h"
 
 #include "Qt/QGroupBox.h"
 #include "Qt/QBoxLayout.h"
@@ -140,12 +141,20 @@ void FrMainWindow::InitializeWidgets(){
 	dock->setWidget(m_VoxelInfoWidget);
 	addDockWidget(Qt::LeftDockWidgetArea, dock);
 
-	dock = new QDockWidget(tr("ROI Info"), this);
+	//dock = new QDockWidget(tr("ROI Info"), this);
 
-	m_ROIInfoWidget = new FrROIInfoWidget(dock);
+	//m_ROIInfoWidget = new FrROIInfoWidget(dock);
 
-	dock->setWidget(m_ROIInfoWidget);
+	//dock->setWidget(m_ROIInfoWidget);
+	//addDockWidget(Qt::LeftDockWidgetArea, dock);
+
+	dock = new QDockWidget(tr("Drawing Panel"), this);
+
+	m_DrawingPanelWidget = new FrDrawingPanelWidget(dock);
+
+	dock->setWidget(m_DrawingPanelWidget);
 	addDockWidget(Qt::LeftDockWidgetArea, dock);
+	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 }
 
 void FrMainWindow::Initialize(){

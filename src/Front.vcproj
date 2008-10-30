@@ -265,6 +265,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrDrawingPanelWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrLayerDialog_moc.cpp"
 				>
 			</File>
@@ -769,6 +773,24 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1286,6 +1308,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Layers\FrLayeredImage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrROILayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrROILayer.h"
 				>
 			</File>
 			<File

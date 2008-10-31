@@ -1142,6 +1142,14 @@
 				RelativePath=".\frontend\Actors\FrOrthoSliceActor.h"
 				>
 			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrSelection.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrSelection.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Commands"

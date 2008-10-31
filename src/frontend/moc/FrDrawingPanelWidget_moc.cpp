@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrDrawingPanelWidget.h'
 **
-** Created: Tue 28. Oct 21:18:46 2008
+** Created: Thu 30. Oct 22:27:44 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

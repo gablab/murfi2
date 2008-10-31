@@ -1,4 +1,5 @@
 #include "FrROILayer.h"
+#include "FrSelection.h"
 #include "FrSettings.h"
 #include "FrMacro.h"
 
@@ -20,9 +21,14 @@ vtkStandardNewMacro(FrROILayer);
 FrROILayer::FrROILayer() 
 : m_actor(0) {
     // Pipline stuff
-    m_actor = vtkImageActor::New();    
+    m_actor = vtkImageActor::New();
+	m_selection = FrSelection::New();
+
     // add actor
     m_Renderer->AddActor(m_actor);
+	m_Renderer->AddActor(m_selection);
+
+	m_selection->SetVisibility(false);	// selection is invisible by default
 }
 
 FrROILayer::~FrROILayer(){    
@@ -81,4 +87,8 @@ void FrROILayer::UpdateCamera(){
     if(m_Renderer){
         m_Renderer->Render();        
     }
+}
+
+void FrROILayer::SetSelection(){
+	// TODO: implement
 }

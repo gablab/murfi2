@@ -1,5 +1,3 @@
-// .NAME vtkpxImageSlice - create hierarchies of actors
-// .SECTION Description
 #ifndef FR_2DSLICE_ACTOR
 #define FR_2DSLICE_ACTOR
 

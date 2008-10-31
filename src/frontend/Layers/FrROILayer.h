@@ -3,11 +3,8 @@
 #define FR_ROI_LAYER
 
 //Forward declarations
-class FrColormapSettings;
-class FrTBCSettings;
 class FrCameraSettings;
-class FrColormapFilter;
-class FrTBCFilter;
+class FrSelection;
 class vtkImageData;
 class vtkImageActor;
 class vtkRenderer;
@@ -41,9 +38,13 @@ public:
     // Update methods
     virtual void UpdateCamera();
 
+	// Selection methods
+	void SetSelection();
+
 protected:
     // Pipeline stuff
     vtkImageActor* m_actor;
+	FrSelection* m_selection;
 
 private:
     FrROILayer(const FrROILayer&);  // Not implemented.

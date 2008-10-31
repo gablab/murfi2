@@ -148,13 +148,13 @@ void FrMainWindow::InitializeWidgets(){
 	//dock->setWidget(m_ROIInfoWidget);
 	//addDockWidget(Qt::LeftDockWidgetArea, dock);
 
-	dock = new QDockWidget(tr("Drawing Panel"), this);
+	//dock = new QDockWidget(tr("Drawing Panel"), this);
 
-	m_DrawingPanelWidget = new FrDrawingPanelWidget(dock);
+	//m_DrawingPanelWidget = new FrDrawingPanelWidget(dock);
 
-	dock->setWidget(m_DrawingPanelWidget);
-	addDockWidget(Qt::LeftDockWidgetArea, dock);
-	m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
+	//dock->setWidget(m_DrawingPanelWidget);
+	//addDockWidget(Qt::LeftDockWidgetArea, dock);
+	//m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 }
 
 void FrMainWindow::Initialize(){

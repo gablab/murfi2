@@ -146,7 +146,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
                 // and positions
 				vd.Position[0] = vd.Index[0] * dSpacing[0];
 				vd.Position[1] = vd.Index[1] * dSpacing[1];
-				vd.Position[2] = vd.Index[3] * dSpacing[2];							
+				vd.Position[2] = vd.Index[2] * dSpacing[2];							
 			}
 			break;
 		case FrTabSettingsDocObj::View::MosaicView:

@@ -15,24 +15,24 @@
 #include "FrActionSignalManager.h"
 #include "FrDrawingPanelWidget.h"
 
-#include "Qt/QGroupBox.h"
-#include "Qt/QBoxLayout.h"
-#include "Qt/QApplication.h"
-#include "Qt/QMessageBox.h"
-#include "Qt/QTabWidget.h"
-#include "Qt/QTextEdit.h"
-#include "QtGui/QStatusBar.h"
-#include "Qt/QDockWidget.h"
+#include "Qt/qgroupbox.h"
+#include "Qt/qboxlayout.h"
+#include "Qt/qapplication.h"
+#include "Qt/qmessagebox.h"
+#include "Qt/qtabwidget.h"
+#include "Qt/qtextedit.h"
+#include "QtGui/qstatusbar.h"
+#include "Qt/qdockwidget.h"
 
 
 FrMainWindow::FrMainWindow()
 : QMainWindow(0), m_MainDocument(0), m_MainController(0), 
   m_SliceView(0), m_MosaicView(0), m_OrthoView(0), m_CurrentView(0),
   m_SignalManager(0), m_ActionManager(0) {
-	
+
     SetupUi(this);
     InitializeWidgets();
-    
+
     // Initialize signals
     m_SignalManager = new FrActionSignalManager(this);
 }
@@ -57,7 +57,7 @@ void FrMainWindow::SetupUi(QMainWindow* mainWindow){
     // Main menu
     m_mainMenu = new FrMainMenu(mainWindow, m_ActionManager);
     m_mainMenu->setObjectName(QString::fromUtf8("m_mainMenu"));
-	mainWindow->setMenuBar(m_mainMenu);
+    mainWindow->setMenuBar(m_mainMenu);
 
     // Tool bar
     m_toolBar = new FrToolBar(mainWindow, m_ActionManager);
@@ -101,8 +101,10 @@ void FrMainWindow::InitializeWidgets(){
 	m_BookmarkWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
     QHBoxLayout* viewLayout = new QHBoxLayout();
-	viewLayout->setContentsMargins(0, 0, 0, 0);
-	viewLayout->setSpacing(0);
+#if QT_VERSION >= 0x040300
+    viewLayout->setContentsMargins(0, 0, 0, 0);
+#endif
+    viewLayout->setSpacing(0);
     viewLayout->addWidget(m_QVTKWidget);
     viewLayout->addWidget(m_BookmarkWidget);
 

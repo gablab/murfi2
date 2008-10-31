@@ -20,18 +20,18 @@ class FrROIInfoWidget;
 class FrDrawingPanelWidget;
 class QVTKWidget;
 class FrActionManager;
-class FrMainWindowSignalManager;
+class FrActionSignalManager;
 
 // Includes
 #include "FrMacro.h"
-#include "Qt/QMainWindow.h"
+#include "Qt/qmainwindow.h"
 
 // This is main window of application
 class FrMainWindow: public QMainWindow {
 	Q_OBJECT
 public:
-	FrMainWindow();
-    ~FrMainWindow();
+    FrMainWindow();
+    virtual ~FrMainWindow();
 
     FrPropMacro(FrMainDocument*,MainDocument);
     FrPropMacro(FrMainController*,MainController);

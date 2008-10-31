@@ -8,6 +8,11 @@
 #include"RtDisplayImage.h"
 #include"RtDataIDs.h"
 
+// Alexsid <scopic> 
+// commented since this stuff is not used 
+// int frontend app. (Remove errors).
+#ifndef USE_FRONTEND
+
 #include<vnl/vnl_vector.h>
 #include "gnuplot_i_vxl.h"
 
@@ -1232,6 +1237,7 @@ void RtDisplayImage::drawString(GLint x, GLint y, const char* s, float r, float 
   glMatrixMode(GL_MODELVIEW);
 }
 
+#endif //#ifndef USE_FRONTEND
 /*****************************************************************************
  * $Source$
  * Local Variables:

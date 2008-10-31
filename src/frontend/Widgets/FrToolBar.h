@@ -6,7 +6,7 @@ class QWidget;
 class FrActionManager;
 
 // inclused
-#include "Qt/QToolBar.h"
+#include "Qt/qtoolbar.h"
 
 // This class represents Toolbar of app
 class FrToolBar : public QToolBar {

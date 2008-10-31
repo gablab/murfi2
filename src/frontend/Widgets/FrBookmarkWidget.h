@@ -11,13 +11,12 @@ class QVBoxLayout;
 class FrBookmark;
 class FrTabSettingsDocObj;
 
-#include "Qt/QWidget.h"
+#include "Qt/qwidget.h"
 #include <vector>
 using namespace std;
 
 
-class FrBookmarkWidget: public QWidget
-{
+class FrBookmarkWidget: public QWidget {
 	Q_OBJECT
 public:
 	FrBookmarkWidget(QWidget *parent = 0);

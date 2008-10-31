@@ -6,10 +6,10 @@
 #include "FrUtils.h"
 
 // Qt stuff
-#include "Qt/QFile.h"
-#include "Qt/QTextStream.h"
-#include "QtXml/QDom.h"
-#include "Qt/QMessageBox.h"
+#include "Qt/qfile.h"
+#include "Qt/qtextstream.h"
+#include "QtXml/qdom.h"
+#include "Qt/qmessagebox.h"
 
 
 
@@ -34,7 +34,7 @@ bool FrLoadTabsCmd::Execute(){
         QDomElement root = m_Document->documentElement();
         if(root.tagName() != FR_XML_ROOT_ELEM ||
           !root.hasAttribute(FR_XML_VERSION_ATTR)) return false;
-        
+
         bool isVersionOk = false;
         int version = root.attribute(FR_XML_VERSION_ATTR).toInt(&isVersionOk);
         if(!isVersionOk || version != FR_TAB_SET_VERSION) return false;
@@ -64,7 +64,8 @@ bool FrLoadTabsCmd::Execute(){
 
                     // Show message to user
                     FrMainWindow* mv = this->GetMainController()->GetMainView();
-                    QMessageBox::critical(mv, "Loading Tab Sets", "Error: File is broken!");
+                    QMessageBox::critical(mv, "Loading Tab Sets",
+                                              "Error: File is broken!");
                     return false;
                 }
             }
@@ -73,8 +74,9 @@ bool FrLoadTabsCmd::Execute(){
 
         // Add all tabSets to document
         if(m_tabSets.size() > 0){
-            FrMainDocument* mainDoc = this->GetMainController()->GetMainDocument();
-            
+            FrMainDocument* mainDoc =
+                 this->GetMainController()->GetMainDocument();
+
             // Remove all tab setting objects from main doc
             std::vector<FrDocumentObj*> tabSettings;
             mainDoc->GetObjectsByType(tabSettings, FrDocumentObj::TabSettings);
@@ -109,7 +111,7 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
     // Read all attributes
     if(!elem.hasAttribute(FR_XML_NAME_ATTR)) return false;
     tabs->SetName(elem.attribute(FR_XML_NAME_ATTR));
-    
+
     if(!elem.hasAttribute(FR_XML_DESCRIPTION_ATTR)) return false;
     tabs->SetDescription(elem.attribute(FR_XML_DESCRIPTION_ATTR));
 
@@ -414,7 +416,7 @@ bool FrLoadTabsCmd::LoadTbcSettings(QDomElement& elem, FrTBCSettings* ts){
     bool hasThreshold, hasBrightness, hasContrast;
     hasThreshold = hasBrightness = hasContrast = false;
 
-    QDomElement& childElem = elem.firstChildElement();
+    QDomElement childElem = elem.firstChildElement();
     while(!childElem.isNull()){
         if(childElem.tagName() == FR_XML_THRESH_ELEM){
             if(!childElem.hasAttribute(FR_XML_VALUE_ATTR)) return false;
@@ -601,7 +603,7 @@ bool FrLoadTabsCmd::ValidateTabSettings(FrTabSettingsDocObj* tabs){
         for(int layerNum = 0; layerNum < layers[i]->size(); ++layerNum){
             FrLayerSettings* ls0 = layers[i]->operator [](layerNum);
             FrLayerSettings* ls1 = testLayers->operator [](layerNum);
-            
+
             ls0->ID = layerID;
             ls1->ID = layerID;
             layerID++;

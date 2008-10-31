@@ -1,6 +1,6 @@
 PROJECT=gnuplot_i_vxl
 
-VXL_DIR=/usr/local
+VXL_DIR=/usr/local/packages/vxl
 
 CFLAGS = -ggdb
 DEFINES = -DDEBUGGA
@@ -14,7 +14,7 @@ MAJOR_VER=1
 MINOR_VER=0
 RELEASE_VER=0
 
-INSTALL_TARGET=/usr/local
+INSTALL_TARGET=/usr/local/packages/gnuplot_i_vxl
 LIB_DIR=$(INSTALL_TARGET)/lib
 HDR_DIR=$(INSTALL_TARGET)/include
 

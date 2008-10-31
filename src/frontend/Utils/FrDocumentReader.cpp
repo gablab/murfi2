@@ -13,8 +13,6 @@
 // Backend includes
 #include "RtMRIImage.h"
 
-
-
 vtkStandardNewMacro(FrDocumentReader);
 
 
@@ -41,10 +39,10 @@ void FrDocumentReader::Update(){
     // Read images from document
     std::vector<FrDocumentObj*> images;
     m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
-    
+
     if(images.size() > 0){
         FrImageDocObj* ido = (FrImageDocObj*)images[0];
-        
+
         // Init image
         bool deleteImage = false;
         RtMRIImage* img = ido->GetImage();
@@ -95,7 +93,7 @@ void FrDocumentReader::Update(){
         // Need lookup table
         unsigned char* lut = 0;
         InitLookupTable(dataPtr, dataSize, &lut);
-        
+
         // Do copy
         short* srcPtr = dataPtr;
         for(int i=0; i < dataSize; ++i){
@@ -112,7 +110,7 @@ void FrDocumentReader::Update(){
         // Set output
         this->SetOutput(output);
         output->Delete();
-    }    
+    }
 }
 
 void FrDocumentReader::InitLookupTable(short* data, unsigned int dataSize,
@@ -131,12 +129,12 @@ void FrDocumentReader::InitLookupTable(short* data, unsigned int dataSize,
     }
 
     // create lut     
-    (*outLUT) = new unsigned char[VTK_SHORT_MAX];
+    (*outLUT) = new (unsigned char[VTK_SHORT_MAX]);
 
     float mult = 255.0f / float(max - min);
     for(int i=0; i < VTK_SHORT_MAX; ++i){
         (*outLUT)[i] = (min <= i && i <= max) ?  
-            unsigned char((i - min) * mult) : 0;
+            ((unsigned char)((i - min) * mult)) : 0;
     }
 }
 
@@ -147,7 +145,7 @@ void FrDocumentReader::SetDocument(FrDocument* document){
     // Clear output
     SetOutput(0);
 }
-    
+
 void FrDocumentReader::SetOutput(vtkImageData* output){
     // Delete prev output if any
     if(m_Output){
@@ -177,7 +175,7 @@ void FrDocumentReader::SetUnMosaicOn(){
     if(!m_UnMosaicOn){
         m_UnMosaicOn = true;
         m_MosaicOn = false;
-        
+
         // Clear output
         SetOutput(0);
     }

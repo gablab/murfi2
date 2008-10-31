@@ -14,7 +14,7 @@ class QGroupBox;
 // Includes 
 #include "FrMacro.h"
 #include "FrSettings.h"
-#include "QtGui/QWidget"
+#include "Qt/qwidget.h"
 
 class FrColormapWidget : public QWidget {
 	Q_OBJECT

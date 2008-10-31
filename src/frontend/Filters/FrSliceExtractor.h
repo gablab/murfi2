@@ -53,7 +53,4 @@ private:
 	vtkImageReslice* m_Reslicer;
 };
 
-
-
-
 #endif

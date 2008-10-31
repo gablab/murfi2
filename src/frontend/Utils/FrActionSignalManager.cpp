@@ -7,12 +7,11 @@
 #include "FrSettings.h"
 
 // Qt
-#include "Qt/QString.h"
-#include "Qt/QAction.h"
-#include "Qt/QApplication.h"
-#include "Qt/QMessageBox.h"
-#include "QtGUI/QFileDialog.h"
-
+#include "Qt/qstring.h"
+#include "Qt/qaction.h"
+#include "Qt/qapplication.h"
+#include "Qt/qmessagebox.h"
+#include <QtGui/QFileDialog>
 
 
 #define CONNECT_ACTION_TRIGGERED(action, slot)\

@@ -2,8 +2,8 @@
 #include "FrActionManager.h"
 
 //Qt
-#include "Qt/QWidget.h"
-#include "Qt/QApplication.h"
+#include "Qt/qwidget.h"
+#include "Qt/qapplication.h"
 
 FrToolBar::FrToolBar(QWidget* parent, FrActionManager* mngr)
 : QToolBar(parent), m_actManager(mngr){

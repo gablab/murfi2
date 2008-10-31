@@ -6,7 +6,7 @@ class QAction;
 
 // includes
 #include "FrMacro.h"
-#include "Qt/QObject.h"
+#include "Qt/qobject.h"
 
 // This class incapsulates all actions
 class FrActionManager : public QObject {

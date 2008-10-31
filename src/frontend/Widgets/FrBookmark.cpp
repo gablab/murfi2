@@ -1,6 +1,6 @@
 #include "FrBookmark.h"
 
-#include "Qt/QMessageBox.h"
+#include "Qt/qmessagebox.h"
 
 // Defines
 #define DEF_TAB_NAME        "NoName"

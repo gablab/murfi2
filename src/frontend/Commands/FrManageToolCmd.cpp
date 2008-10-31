@@ -7,7 +7,7 @@
 #include "FrActionManager.h"
 
 // Qt stuff
-#include "Qt/QAction.h"
+#include "Qt/qaction.h"
 
 
 FrManageToolCmd::FrManageToolCmd()

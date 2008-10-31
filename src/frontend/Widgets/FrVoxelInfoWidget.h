@@ -8,10 +8,11 @@
 #include "FrTabSettingsDocObj.h"
 
 
-#include "Qt/QWidget.h"
-#include "Qt/QTableWidget.h"
-#include "Qt/QBoxLayout.h"
-#include "Qt/QLabel.h"
+#include "Qt/qwidget.h"
+#include "Qt/qtablewidget.h"
+#include "Qt/qboxlayout.h"
+#include "Qt/qlabel.h"
+
 #include <vector>
 using namespace std;
 

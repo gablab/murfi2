@@ -58,7 +58,7 @@ void FrInteractorStyle::OnMouseMove(){
 
 void FrInteractorStyle::OnLeftButtonDown(){
     m_state = Left;
-    
+
     if(m_controller->HasActiveTool()){
         FrMouseParams params;
         params.X = Interactor->GetEventPosition()[0];
@@ -66,7 +66,7 @@ void FrInteractorStyle::OnLeftButtonDown(){
         params.IsShift = (Interactor->GetShiftKey() != 0);
         params.IsControl = (Interactor->GetControlKey() != 0);
         params.Button = FrMouseParams::LeftButton;
-        
+
         this->FindPokedRenderer(params.X, params.Y);
         if(m_controller->GetCurrentTool()->OnMouseDown(this, params)){
             this->Interactor->Render();
@@ -84,7 +84,7 @@ void FrInteractorStyle::OnLeftButtonUp(){
         params.IsShift = (Interactor->GetShiftKey() != 0);
         params.IsControl = (Interactor->GetControlKey() != 0);
         params.Button = FrMouseParams::LeftButton;
-        
+
         this->FindPokedRenderer(params.X, params.Y);
         if(m_controller->GetCurrentTool()->OnMouseUp(this, params)){
             this->Interactor->Render();
@@ -120,7 +120,7 @@ void FrInteractorStyle::OnMiddleButtonUp(){
         params.IsShift = (Interactor->GetShiftKey() != 0);
         params.IsControl = (Interactor->GetControlKey() != 0);
         params.Button = FrMouseParams::MidButton;
-        
+
         this->FindPokedRenderer(params.X, params.Y);
         if(m_controller->GetCurrentTool()->OnMouseUp(this, params)){
             this->Interactor->Render();
@@ -138,7 +138,7 @@ void FrInteractorStyle::OnRightButtonDown(){
         params.IsShift = (Interactor->GetShiftKey() != 0);
         params.IsControl = (Interactor->GetControlKey() != 0);
         params.Button = FrMouseParams::RightButton;
-        
+
         this->FindPokedRenderer(params.X, params.Y);
         if(m_controller->GetCurrentTool()->OnMouseDown(this, params)){
             this->Interactor->Render();
@@ -156,7 +156,7 @@ void FrInteractorStyle::OnRightButtonUp(){
         params.IsShift = (Interactor->GetShiftKey() != 0);
         params.IsControl = (Interactor->GetControlKey() != 0);
         params.Button = FrMouseParams::RightButton;
-        
+
         this->FindPokedRenderer(params.X, params.Y);
         if(m_controller->GetCurrentTool()->OnMouseUp(this, params)){
             this->Interactor->Render();
@@ -170,7 +170,7 @@ void FrInteractorStyle::OnMouseWheelForward(){
         params.Delta = int(this->MouseWheelMotionFactor);
         params.IsShift = (Interactor->GetShiftKey() != 0);
         params.IsControl = (Interactor->GetControlKey() != 0);
-        
+
         m_controller->GetCurrentTool()->OnMouseMove(params);
     }*/
 }
@@ -181,7 +181,7 @@ void FrInteractorStyle::OnMouseWheelBackward(){
         params.Delta = int(this->MouseWheelMotionFactor);
         params.IsShift = (Interactor->GetShiftKey() != 0);
         params.IsControl = (Interactor->GetControlKey() != 0);
-        
+
         m_controller->GetCurrentTool()->OnMouseMove(params);
     }*/
 }

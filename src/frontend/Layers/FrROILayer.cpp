@@ -85,7 +85,7 @@ bool FrROILayer::GetVisibility(){
 
 void FrROILayer::UpdateCamera(){
     if(m_Renderer){
-        m_Renderer->Render();        
+        m_Renderer->Render(); 
     }
 }
 

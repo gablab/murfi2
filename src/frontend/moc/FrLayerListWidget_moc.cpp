@@ -1,17 +1,17 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'frlayerlistwidget.h'
+** Meta object code from reading C++ file 'FrLayerListWidget.h'
 **
-** Created: Thu 30. Oct 23:03:35 2008
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
+** Created: Fri Oct 31 14:58:18 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.2.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../Widgets/frlayerlistwidget.h"
+#include "../Widgets/FrLayerListWidget.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'frlayerlistwidget.h' doesn't include <QObject>."
+#error "The header file 'FrLayerListWidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.3.3. It"
+#error "This file was generated using the moc from 4.2.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif

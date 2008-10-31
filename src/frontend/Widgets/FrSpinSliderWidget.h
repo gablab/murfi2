@@ -12,8 +12,8 @@ class QHBoxLayout;
 // Includes 
 #include "FrMacro.h"
 
-#include "Qt/QString.h"
-#include "QtGui/QWidget"
+#include "Qt/qstring.h"
+#include "Qt/qwidget.h"
 
 class FrSpinSliderWidget : public QWidget {
 	Q_OBJECT

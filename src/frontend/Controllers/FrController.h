@@ -9,7 +9,7 @@ class FrController {
 public:
     FrController(FrController* owner=0);
     virtual ~FrController();
-    
+
     // Used in notification mechanizm
     virtual void Notify(int notifyCode);
 

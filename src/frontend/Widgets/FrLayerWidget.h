@@ -11,7 +11,7 @@ class QLabel;
 
 // includes
 #include "FrSettings.h"
-#include "Qt/QWidget.h"
+#include "Qt/qwidget.h"
 
 // This class used to display layers
 // available on image and also manage them

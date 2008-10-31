@@ -96,7 +96,7 @@ PKG_DIR = /usr/local/packages
 
 # math
 
-MATH_LIB = -lm 
+MATH_LIB =-lm
 
 GSL_INCS=-I/usr/include/gsl
 GSL_LIB=-lgsl -lgslcblas
@@ -117,10 +117,11 @@ TINYXML_FLAGS=-DTIXML_USE_STL
 GLUT_LIB=-lglut
 
 VXL_INCS=-I$(PKG_DIR)/vxl/include/vxl/core -I$(PKG_DIR)/vxl/include/vxl/vcl
-VXL_LIBS=-lvnl -lvcl -lvnl_algo -lv3p_netlib -L$(PKG_DIR)/vxl/lib
+VXL_LIBS=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/vxl/lib
 
 GNUPLOT_INCS=-I$(PKG_DIR)/gnuplot_i_vxl/include
-GNUPLOT_LIBS=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
+GNUPLOT_LIBS=
+#-lgnuplot_i_vxl l -L$(PKG_DIR)/gnuplot_i_vxl/lib
 
 NIFTI_INCS=-I/usr/include/nifti
 NIFTI_LIBS=-lniftiio -lznz -lz

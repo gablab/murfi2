@@ -2,8 +2,8 @@
 #include "FrDocument.h"
 
 // Qt stuff
-#include <Qt/QString.h>
-#include <Qt/QFile.h>
+#include <Qt/qstring.h>
+#include <Qt/qfile.h>
 
 // VTK stuff
 #include "vtkImageData.h"

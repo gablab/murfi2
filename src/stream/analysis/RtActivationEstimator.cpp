@@ -10,9 +10,12 @@
 
 // scopic alexsid: set this preproc def
 // while no gnuplot wrapper for windows
-#ifndef WIN32
-#include<gnuplot_i_vxl.h>
+#ifndef WIN32 
+ #ifndef USE_FRONTEND
+  #include<gnuplot_i_vxl.h>
+ #endif
 #endif
+
 #include"gsl/gsl_cdf.h"
 
 // for gamma functions

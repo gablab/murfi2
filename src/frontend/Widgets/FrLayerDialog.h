@@ -13,8 +13,8 @@ class QHBoxLayout;
 class QCheckBox;
 
 
-#include "Qt/QString.h"
-#include "QtGui/QDialog.h"
+#include "Qt/qstring.h"
+#include "QtGui/qdialog.h"
 
 
 class FrLayerDialog: public QDialog {

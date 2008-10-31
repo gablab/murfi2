@@ -25,7 +25,7 @@ FrSpecialLayer::FrSpecialLayer()
 FrSpecialLayer::~FrSpecialLayer() {
     // Free text objects
     if(m_TextMapper) m_TextMapper->Delete();
-	if(m_TextActor) m_TextActor->Delete();
+    if(m_TextActor) m_TextActor->Delete();
     // Free border objectsBorder support
     if(m_BorderPts) m_BorderPts->Delete();
     if(m_BorderMapper) m_BorderMapper->Delete();
@@ -99,7 +99,7 @@ void FrSpecialLayer::UpdateBorder(int winWidth, int winHeight){
     int miny = 0;
     int maxx = winWidth;
     int maxy = winHeight;
-        
+
     m_BorderPts->InsertPoint(0, minx, miny, 0);
     m_BorderPts->InsertPoint(1, maxx, miny, 0);
     m_BorderPts->InsertPoint(2, maxx, maxy, 0);

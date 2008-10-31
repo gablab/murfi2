@@ -7,7 +7,7 @@
 
 
 // Qt stuff
-#include "Qt/QAction.h"
+#include "Qt/qaction.h"
 
 FrChangeViewCmd::FrChangeViewCmd()
 : m_TargetView(FrChangeViewCmd::Unknown){

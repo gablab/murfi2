@@ -29,14 +29,13 @@ void FrChangeTbcCmd::SetContrastDelta(double value){
 
 bool FrChangeTbcCmd::Execute(){
     if(!this->GetMainController()) return false;
-    
+
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrMainWindow* mv = this->GetMainController()->GetMainView(); 
-    
+
     int layerID = BAD_LAYER_ID;
     std::vector<FrLayerSettings*> layers;
     FrTabSettingsDocObj* sets = doc->GetCurrentTabSettings();
-    
+
     switch(sets->GetActiveView()){
     case FrTabSettingsDocObj::SliceView:
     {
@@ -65,7 +64,7 @@ bool FrChangeTbcCmd::Execute(){
     }
     m_isThreshold = m_isBrightness = m_isContrast = false;
     FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_TBC);
-    
+
     return true;
 }
 

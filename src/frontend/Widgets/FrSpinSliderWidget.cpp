@@ -2,10 +2,10 @@
 #include "FrUtils.h"
 
 //Qt stuff
-#include "Qt/QLabel.h"
-#include "Qt/QSpinBox.h"
-#include "Qt/QSlider.h"
-#include "Qt/QBoxLayout.h"
+#include "Qt/qlabel.h"
+#include "Qt/qspinbox.h"
+#include "Qt/qslider.h"
+#include "Qt/qboxlayout.h"
 
 // Some defines 
 #define DEF_MIN_VALUE 0
@@ -28,7 +28,9 @@ FrSpinSliderWidget::FrSpinSliderWidget(QWidget* parent)
 
     m_layout = new QHBoxLayout(this);
     m_layout->setSizeConstraint(QLayout::SetMinimumSize);
+#if QT_VERSION >= 0x040300
     m_layout->setContentsMargins(0, 0, 0, 0);
+#endif
     m_layout->addWidget(m_spin);
     m_layout->addWidget(m_slider);
 

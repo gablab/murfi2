@@ -5,8 +5,8 @@
 
 #include "FrMacro.h"
 
-#include "Qt/QString.h"
-#include "QtGui/QWidget"
+#include "Qt/qstring.h"
+#include "Qt/qwidget.h"
 
 class FrBookmark: public QWidget
 {

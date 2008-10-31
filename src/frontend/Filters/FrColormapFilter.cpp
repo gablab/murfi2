@@ -119,9 +119,9 @@ void FrColormapFilter::ExecuteInformation() {
 
     vtkImageData *input=this->GetInput();
     vtkImageData *output=this->GetOutput();
-    
+
 	output->SetScalarTypeToUnsignedChar();
-	output->SetNumberOfScalarComponents(4);				// ARGB
+	output->SetNumberOfScalarComponents(4); // ARGB
 	output->SetDimensions(input->GetDimensions());
 	output->SetSpacing(input->GetSpacing());
 }
@@ -190,9 +190,9 @@ void FrColormapFilter::InitSingleLookupTable(unsigned char luTable[][3]){
             hsv[V_INDEX] = double(i);
             vtkMath::HSVToRGB(hsv, rgb);
 
-            luTable[i][R_INDEX] = rgb[R_INDEX];
-            luTable[i][G_INDEX] = rgb[G_INDEX];
-            luTable[i][B_INDEX] = rgb[B_INDEX];
+            luTable[i][R_INDEX] = (unsigned char)rgb[R_INDEX];
+            luTable[i][G_INDEX] = (unsigned char)rgb[G_INDEX];
+            luTable[i][B_INDEX] = (unsigned char)rgb[B_INDEX];
         }
     }
 }
@@ -203,7 +203,7 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
     double iPos, delta, hue;
     double rgb[3];
     double hsv[3];
-    
+
     // set defaults
     hsv[S_INDEX] = 1.0;
     hsv[V_INDEX] = 255.0;
@@ -227,18 +227,19 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
                 double div = double(m_PxMax - threshold);
                 iPos = (div != 0.0) ? double(i - threshold) / div : 0.0;
             }
-                
+
             // calc delta for hue 
             // (NOTE: in left part delta is positive in right is negative)
             delta = (max - min) * iPos;
             hsv[H_INDEX] = (min + delta) / HUE_NORM;
 
             // calculate final color
-	        vtkMath::HSVToRGB(hsv, rgb);	
+	    vtkMath::HSVToRGB(hsv, rgb);	
 
-	        luTable[i][R_INDEX] = (unsigned char)rgb[R_INDEX];
+            luTable[i][R_INDEX] = (unsigned char)rgb[R_INDEX];
             luTable[i][G_INDEX] = (unsigned char)rgb[G_INDEX];
             luTable[i][B_INDEX] = (unsigned char)rgb[B_INDEX];
+
         }
     }
 

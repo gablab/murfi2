@@ -49,7 +49,7 @@ void FrBaseLayer::SetCameraSettings(FrCameraSettings& settings){
 
 void FrBaseLayer::GetCameraSettings(FrCameraSettings& settings){
     if(!m_Renderer) return;
-    
+
     vtkCamera* cam = m_Renderer->GetActiveCamera();
     COPY_ARR3(settings.Position, cam->GetPosition());
     COPY_ARR3(settings.FocalPoint, cam->GetFocalPoint());

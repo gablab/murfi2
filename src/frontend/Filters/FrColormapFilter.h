@@ -4,7 +4,7 @@
 #include "FrBaseFilter.h"
 #include "FrMacro.h"
 
-#include "Qt\QColor.h"
+#include "Qt/qcolor.h"
 
 class FrColormapFilter : public FrBaseFilter{
 public:

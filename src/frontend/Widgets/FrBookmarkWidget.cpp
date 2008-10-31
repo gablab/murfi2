@@ -2,12 +2,12 @@
 #include "FrBookmark.h"
 #include "FrTabSettingsDocObj.h"
 
-#include "Qt/QToolButton.h"
-#include "Qt/QTabWidget.h"
-#include "QtGui/QDialog"
-#include "Qt/QBoxLayout.h"
-#include "Qt/QMessageBox.h"
-#include "Qt/QAction.h"
+#include "Qt/qtoolbutton.h"
+#include "Qt/qtabwidget.h"
+#include "Qt/qdialog.h"
+#include "Qt/qboxlayout.h"
+#include "Qt/qmessagebox.h"
+#include "Qt/qaction.h"
 
 // STL stuff
 #include <algorithm>

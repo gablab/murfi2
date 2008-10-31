@@ -7,8 +7,8 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 // Qt stuff
-#include "Qt/QApplication.h"
-#include "Qt/QCursor.h"
+#include "Qt/qapplication.h"
+#include "Qt/qcursor.h"
 
 
 FrPanTool::FrPanTool()

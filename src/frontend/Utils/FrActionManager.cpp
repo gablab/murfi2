@@ -1,9 +1,9 @@
 #include "FrActionManager.h"
 
 // Qt
-#include "Qt/QString.h"
-#include "Qt/QAction.h"
-#include "Qt/QApplication.h"
+#include "Qt/qstring.h"
+#include "Qt/qaction.h"
+#include "Qt/qapplication.h"
 
 
 

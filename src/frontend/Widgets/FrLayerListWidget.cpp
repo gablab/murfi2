@@ -4,13 +4,14 @@
 #include "FrColormapWidget.h"
 #include "FrSpinSliderWidget.h"
 
-#include "Qt/QTableWidget.h"
-#include "Qt/QBoxLayout.h"
-#include "Qt/QCheckBox.h"
-#include "Qt/QToolButton.h"
-#include "Qt/QVariant.h"
-#include "Qt/QLabel.h"
-#include <QtGui/QSpacerItem>
+#include "Qt/qtablewidget.h"
+#include "Qt/qboxlayout.h"
+#include "Qt/qcheckbox.h"
+#include "Qt/qtoolbutton.h"
+#include "Qt/qvariant.h"
+#include "Qt/qlabel.h"
+#include "Qt/qlayoutitem.h"
+
 
 
 #define TAB_ID_IDX			0
@@ -189,7 +190,7 @@ void FrLayerListWidget::OnSelectionChanged(){
         m_colormapWidget->SetColormapParams(params.ColormapSettings);
         m_colormapWidget->BlockSignals(false);
 
-        int opacity = params.Opacity * m_opacityWidget->GetMaximum();
+        int opacity = int(params.Opacity * m_opacityWidget->GetMaximum());
         m_opacityWidget->SetValue(opacity);
         
         if(m_signalsBlocked) return;

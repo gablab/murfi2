@@ -14,7 +14,7 @@
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 
-#include "Qt/QString.h"
+#include "Qt/qstring.h"
 
 
 FrSaveTabSettingsCmd::FrSaveTabSettingsCmd()
@@ -29,7 +29,8 @@ bool FrSaveTabSettingsCmd::Execute(){
     FrMainWindow* mv = this->GetMainController()->GetMainView();
 
     FrTabInfoDialog dlg(mv, true);
-    dlg.SetCaption(QString("Save view to tab"));
+    QString caption = "Save view to tab";	
+    dlg.SetCaption(caption);
 
     bool result = false;
     if(!m_IsDefault && dlg.SimpleExec()){
@@ -50,7 +51,7 @@ bool FrSaveTabSettingsCmd::Execute(){
         docObj->SetIsCurrent(false);
         docObj->SetName(QString("Deafult"));
         docObj->SetDescription(QString("Default tab"));
-        
+
         // add to main document
         result = doc->Add(docObj);
     }

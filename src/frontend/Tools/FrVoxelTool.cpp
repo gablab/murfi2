@@ -4,8 +4,8 @@
 #include "FrCommandController.h"
 
 // Qt stuff
-#include "Qt/QString.h"
-#include "Qt/QMessageBox.h"
+#include "Qt/qstring.h"
+#include "Qt/qmessagebox.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -85,7 +85,7 @@ int FrVoxelTool::GetPickedPointIndex(int x, int y, vtkRenderer* renderer){
     if (!m_pointPicker->Pick(x, y, 0, renderer)) {
         return BAD_POINT_INDEX;
     }
-    
+
     int id = m_pointPicker->GetPointId();
     return id;
 }

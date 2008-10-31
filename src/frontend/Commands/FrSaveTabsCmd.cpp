@@ -4,9 +4,9 @@
 #include "FrXmlDefs.h"
 
 // Qt stuff
-#include "Qt/QFile.h"
-#include "Qt/QTextStream.h"
-#include "QtXml/QDom.h"
+#include "Qt/qfile.h"
+#include "Qt/qtextstream.h"
+#include "QtXml/qdom.h"
 
 
 

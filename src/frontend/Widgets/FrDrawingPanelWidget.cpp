@@ -1,6 +1,6 @@
 #include "FrDrawingPanelWidget.h"
 
-#include "Qt/QToolBox.h"
+#include "Qt/qtoolbox.h"
 
 FrDrawingPanelWidget::FrDrawingPanelWidget(QWidget* parent) 
 : QWidget(parent){

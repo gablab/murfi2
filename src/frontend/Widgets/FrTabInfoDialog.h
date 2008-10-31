@@ -10,8 +10,8 @@ class QVBoxLayout;
 class QHBoxLayout;
 
 
-#include "Qt/QString.h"
-#include "QtGui/QDialog.h"
+#include "Qt/qstring.h"
+#include "QtGui/qdialog.h"
 
 class FrTabInfoDialog: public QDialog
 {

@@ -1,11 +1,11 @@
 #include "FrTabInfoDialog.h"
 
-#include "Qt/QLayout.h"
-#include "Qt/QLabel.h"
-#include "Qt/QLineEdit.h"
-#include "Qt/QPushButton.h"
-#include "Qt/QBoxLayout.h"
-#include "Qt/QSizePolicy.h"
+#include "Qt/qlayout.h"
+#include "Qt/qlabel.h"
+#include "Qt/qlineedit.h"
+#include "Qt/qpushbutton.h"
+#include "Qt/qboxlayout.h"
+#include "Qt/qsizepolicy.h"
 
 
 FrTabInfoDialog::FrTabInfoDialog(QWidget* parent, bool isModal)

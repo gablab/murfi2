@@ -3,15 +3,15 @@
 #include "FrUtils.h"
 
 //Qt stuff
-#include "Qt/QString.h"
-#include "Qt/QLabel.h"
-#include "Qt/QPushButton.h"
-#include "Qt/QBoxLayout.h"
-#include "Qt/QGroupBox.h"
-#include "Qt/QFrame.h"
-#include "Qt/QComboBox.h"
-#include "Qt/QApplication.h"
-#include "Qt/QColorDialog.h"
+#include "Qt/qstring.h"
+#include "Qt/qlabel.h"
+#include "Qt/qpushbutton.h"
+#include "Qt/qboxlayout.h"
+#include "Qt/qgroupbox.h"
+#include "Qt/qframe.h"
+#include "Qt/qcombobox.h"
+#include "Qt/qapplication.h"
+#include "Qt/qcolordialog.h"
 
 
 // Some defines 
@@ -23,14 +23,14 @@ FrColormapWidget::FrColormapWidget(QWidget* parent)
 : QWidget(parent), m_isBlocked(false), m_color(DEF_CM_COLOR),
   m_cmType(FrColormapSettings::MultiColor){
     // init widgets and layouts
-	QHBoxLayout* titleLayout = this->CreateTitleLayout();
-    
+    QHBoxLayout* titleLayout = this->CreateTitleLayout();
+
     QGridLayout* paramsLayout = this->CreateMainParamsLayout();
-    
+
     m_gbSingle = this->CreateSingleParams();
 
     m_gbMulti = this->CreateMultiParams();
-    
+
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(titleLayout);
     mainLayout->addLayout(paramsLayout);
@@ -108,10 +108,12 @@ QGroupBox* FrColormapWidget::CreateSingleParams(){
 	m_wgtColor->setSizeIncrement(100, 20);
     m_wgtColor->setMinimumSize(24, 24);
 	m_wgtColor->setAutoFillBackground(true);
-    this->UpdateColorWidget(QColor(DEF_CM_COLOR));
 
-	QPushButton* btnColor = new QPushButton("Color", result);
-	connect(btnColor, SIGNAL(clicked()), 
+    QColor defColor = QColor(DEF_CM_COLOR);
+    this->UpdateColorWidget(defColor);
+
+    QPushButton* btnColor = new QPushButton("Color", result);
+    connect(btnColor, SIGNAL(clicked()), 
             this, SLOT(OnBtnColorClicked()));
 
 	QHBoxLayout* layout = new QHBoxLayout(result);

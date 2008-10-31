@@ -14,7 +14,7 @@
 #include "FrTBCFilter.h"
 #include "FrSliceExtractor.h"
 
-#include "Qt/QMessageBox.h"
+#include "Qt/qmessagebox.h"
 
 
 #define ALL_ITEMS_COUNT 5

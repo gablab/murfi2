@@ -28,7 +28,7 @@
 #include "Qt/qapplication.h"
 #include "Qt/qpainter.h"
 #if QT_VERSION >= 0x040000 && defined(Q_WS_X11)
-#include "qx11info_x11.h"
+#include "Qt/qx11info_x11.h"
 #endif
 
 #include "vtkInteractorStyleTrackballCamera.h"

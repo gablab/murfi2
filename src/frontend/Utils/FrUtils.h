@@ -3,7 +3,7 @@
 
 #include "FrSettings.h"
 
-#define M_PI 3.1415926854
+#define MY_PI 3.1415926854
 
 // This function is used to ensure that
 // value is in specified range [min..max].

@@ -16,7 +16,7 @@ class FrTBCSettings;
 #include "FrMacro.h"
 #include "FrBaseCmd.h"
 
-#include "Qt/QString.h"
+#include "Qt/qstring.h"
 #include <vector>
 
 // This command can save all tabs into file.

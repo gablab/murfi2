@@ -12,8 +12,7 @@ class FrMainDocument;
 
 // Composite tool. This tool delagate
 // all events to incapsulated tools.
-class FrCompositeTool : public FrTool
-{
+class FrCompositeTool : public FrTool {
 public:
     // Default constructor
 	FrCompositeTool();

@@ -1,0 +1,223 @@
+#####################################################################
+# 
+# master makefile for the FRONTEND of real-time fMRI system
+#
+# Alexey Sidorov scopicsoftware 2008-10-30
+#
+#####################################################################
+
+# os we build for
+OS=linux
+
+# project name
+export PROJECT = front
+
+# whether to compile with debug, optimize flags
+export DEBUG = 1
+export PROF  = 0
+export OPTIM = 0
+export STRIP = 0
+
+export MTRACE = 0
+
+# ace log levels
+export ACE_NTRACE   = 1
+export ACE_NDEBUG   = 0
+export ACE_NLOGGING = 0
+
+export SRC_DIR = $(PWD)/src
+export FSRC_DIR = $(PWD)/src/frontend
+export BIN_DIR = $(PWD)/bin
+export OBJ_DIR = $(PWD)/obj
+
+################################ APPS ###############################
+
+export RM = /bin/rm -v
+export ECHO = /bin/echo
+export CC = /usr/bin/g++
+export PKGCONFIG = /usr/bin/pkg-config
+export MOC = /usr/bin/moc
+
+################################ LIBS ###############################
+
+export SIGC_HOME=/usr/include/sigc++-2.0
+export CCPP_LIBS=-lccgnu2 -lccext2 -ldl -lpthread
+
+################################ FLAG ###############################
+
+# debug flag
+ifeq ($(DEBUG),1)
+	DEBUG_FLAG = -g
+endif
+
+# profile flag
+ifeq ($(PROF),1)
+	PROF_FLAG = -pg
+endif
+
+# optimize flag
+ifeq ($(OPTIM),1)
+	OPTIM_FLAG = -O2
+endif
+
+# optimize flag
+ifeq ($(STRIP),1)
+	STRIP_FLAG = -s
+endif
+
+# mtrace flag
+ifeq ($(MTRACE),1)
+	MTRACE_FLAG = -DMTRACE
+endif
+
+#####################################################################
+# ace log flags
+ifeq ($(ACE_NTRACE),1)
+	ACE_NTRACE_FLAG = -DACE_NTRACE=1
+else
+	ACE_NTRACE_FLAG = -DACE_NTRACE=0
+endif
+
+ifeq ($(ACE_NDEBUG),1)
+	ACE_NDEBUG_FLAG = -DACE_NDEBUG=1
+else
+	ACE_NDEBUG_FLAG = -DACE_NDEBUG=0
+endif
+
+ifeq ($(ACE_NLOGGING),1)
+	ACE_NLOGGING_FLAG = -DACE_NLOGGING=1
+else
+	ACE_NLOGGING_FLAG = -DACE_NLOGGING=0
+endif
+
+#####################################################################
+# sub directories for BACKEND
+BK_SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/stream -I$(SRC_DIR)/stream/analysis -I$(SRC_DIR)/stream/preprocess -I$(SRC_DIR)/stream/postprocess -I$(SRC_DIR)/display -I$(SRC_DIR)/util
+
+#####################################################################
+# subdirectories for FRONTEND
+FR_SUB_DIRS = -I$(FSRC_DIR)/Actors -I$(FSRC_DIR)/Commands -I$(FSRC_DIR)/Controllers -I$(FSRC_DIR)/Document -I$(FSRC_DIR)/Filters -I$(FSRC_DIR)/FrApplication -I$(FSRC_DIR)/FrMainWindow -I$(FSRC_DIR)/Layers -I$(FSRC_DIR)/Tools -I$(FSRC_DIR)/Utils -I$(FSRC_DIR)/Views -I$(FSRC_DIR)/Widgets
+
+#####################################################################
+# package directory
+PKG_DIR = /usr/local/packages
+
+#####################################################################
+# math includes, flags and libs
+MATH_LIB =-lm
+
+#####################################################################
+#gsl includes, flags and libs
+GSL_INCS=-I/usr/include/gsl
+GSL_LIB=-lgsl -lgslcblas
+
+#####################################################################
+#ace includes, flags and libs
+ACE_FLAGS=-D _REENTRANT $(ACE_NLOGGING_FLAG) $(ACE_NDEBUG_FLAG) $(ACE_NTRACE_FLAG)
+ACE_LIB=-lACE
+
+#####################################################################
+#BACKEND flags
+TINYXML_FLAGS=-DTIXML_USE_STL
+BACKEND_FLAGS=-DUSE_FRONTEND $(TINYXML_FLAGS)
+
+#####################################################################
+#glut lib
+GLUT_LIB=-lglut
+
+#####################################################################
+#vxl includes and libs
+VXL_INCS=-I$(PKG_DIR)/vxl/include/vxl/core -I$(PKG_DIR)/vxl/include/vxl/vcl
+VXL_LIBS=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/vxl/lib
+
+#####################################################################
+#nifti includes, flags and libs
+NIFTI_INCS=-I/usr/include/nifti
+NIFTI_LIBS=-lniftiio -lznz -lz
+
+# remove in future
+#GNUPLOT_INCS=-I$(PKG_DIR)/gnuplot_i_vxl/include
+#GNUPLOT_LIBS=
+#-lgnuplot_i_vxl l -L$(PKG_DIR)/gnuplot_i_vxl/lib
+
+#####################################################################
+#vtk includes, flags and libs
+VTK_INCS = -I$(PKG_DIR)/vtk/include
+VTK_LIBS = -lvtkGraphics -lvtkRendering -lvtkftgl -lvtkImaging -lvtkFiltering -lvtkCommon   -L$(PKG_DIR)/vtk/lib
+#-lvtkDICOMParser  -lvtkGenericFiltering -lvtkGraphics -lvtkHybrid -lvtkIO -lvtkImaging -lvtkNetCDF -lvtkRendering -lvtkVolumeRendering -lvtkWidgets -lvtkexoIIc -lvtkexpat -lvtkfreetype -lvtkjpeg -lvtkpng -lvtksys -lvtktiff -lvtkzlib -L$(PKG_DIR)/vtk/lib
+
+#####################################################################
+#qt includes, flags and libs
+QT_INCS=-I/usr/share/qt4/include
+export QT_LIBS=-lQtCore -lQtGui -lQtXml
+
+#####################################################################
+# build compiler flags
+#compiler includes
+export C_INCS = -I$(SRC_DIR) -I$(FSRC_DIR) $(BK_SUB_DIRS) $(FR_SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(VXL_INCS) $(GNUPLOT_INCS) $(NIFTI_INCS) $(VTK_INCS) $(QT_INCS)
+
+#compiler flags
+export C_FLAGS = -Wall $(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) $(BACKEND_FLAGS) $(C_INCS) -Wno-deprecated
+
+#all libs
+export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS) $(GNUPLOT_LIBS) $(NIFTI_LIBS) $(VTK_LIBS) $(QT_LIBS) $(PROF_FLAG)
+
+#pkgconfig
+export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
+export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)
+
+
+############################### SUFFIXES ##############################
+OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
+
+############################## TARGETS ###############################
+
+default: $(PROJECT)
+all:     $(PROJECT)
+debug:	 
+	$(MAKE) DEBUG=1 OPTIM=0 STRIP=0 $(PROJECT)
+profile:	 
+	$(MAKE) DEBUG=1 PROF=1 OPTIM=0 STRIP=0 $(PROJECT)
+
+setdebug:
+	export DEBUG = 1
+	export OPTIM 0
+	export STRIP 0
+
+dirs:
+	mkdir -p $(OBJ_DIR)
+	mkdir -p $(BIN_DIR)
+
+$(PROJECT): dirs $(OBJ_FILES)
+	@$(ECHO) '***********************************'
+	@$(ECHO) 'make: building BACKEND for $(OS)...'
+	@$(ECHO) '***********************************'
+	-cd $(SRC_DIR) && $(MAKE)
+
+	@$(ECHO) '***********************************'
+	@$(ECHO) 'make: building FRONTEND for $(OS)...'
+	@$(ECHO) '***********************************'
+	-cd $(FSRC_DIR) && $(MAKE)
+
+	@$(ECHO) 'make: building $@ for $(OS)...'
+	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(C_LIBS)
+
+	@$(ECHO) '############################################'
+	@$(ECHO) 'make: built [$@] successfully!'
+	@$(ECHO) '############################################'
+
+############################### CLEAN ################################
+
+clean:
+	@$(ECHO) 'make: removing object and autosave files'
+	cd $(SRC_DIR) && $(MAKE) clean
+	-cd $(FSRC_DIR) && $(MAKE) clean
+	-cd $(OBJ_DIR) && $(RM) -f *.o *~
+
+######################################################################
+### $Source$
+### Local Variables:
+### mode: makefile
+### fill-column: 76
+### comment-column: 0
+### End: 

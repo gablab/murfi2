@@ -36,5 +36,4 @@ private:
     void operator=(const FrBaseFilter&);  // Not implemented.
 };
 
-
 #endif

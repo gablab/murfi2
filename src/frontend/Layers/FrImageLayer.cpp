@@ -155,7 +155,7 @@ void FrImageLayer::UpdateColormap(){
 void FrImageLayer::UpdateTBC(){
     if(m_tbcFilter && m_tbcFilter->GetInput()){
         m_tbcFilter->Update();
-        
+
         // Pass data futher
         vtkImageData* data = m_tbcFilter->GetOutput();
         if(data != m_actor->GetInput()){
@@ -174,6 +174,6 @@ void FrImageLayer::UpdateTBC(){
 
 void FrImageLayer::UpdateCamera(){
     if(m_Renderer){
-        m_Renderer->Render();        
+        m_Renderer->Render();
     }
 }

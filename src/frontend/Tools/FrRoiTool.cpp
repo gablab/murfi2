@@ -3,8 +3,8 @@
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
 
-#include "Qt/QString.h"
-#include "Qt/QMessageBox.h"
+#include "Qt/qstring.h"
+#include "Qt/qmessagebox.h"
 
 
 

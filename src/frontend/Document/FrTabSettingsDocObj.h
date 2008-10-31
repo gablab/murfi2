@@ -6,8 +6,8 @@
 #include "FrSettings.h"
 #include "FrMacro.h"
 
-#include "Qt/QString.h"
-#include "Qt/QColor.h"
+#include "Qt/qstring.h"
+#include "Qt/qcolor.h"
 #include <vector>
 
 // This class represets settings of Tab
@@ -49,3 +49,4 @@ private:
 };
 
 #endif
+

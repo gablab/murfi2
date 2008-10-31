@@ -9,8 +9,7 @@ class FrLayerSettings;
 
 // This command allows user to add, remove 
 // and modify settings of the layer
-class FrLayerCmd : public FrBaseCmd
-{
+class FrLayerCmd : public FrBaseCmd {
 public:
     enum Action { Undefined, Add, Delete, 
         ChangeOld, ChangeParams, ChangeColormap, 

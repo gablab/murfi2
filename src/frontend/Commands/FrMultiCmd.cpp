@@ -1,12 +1,6 @@
 #include "FrMultiCmd.h"
 
 
-#define FOR_EACH_CMD(Action,Result)                     \
-    CmdList::iterator it, itEnd(m_commands.end());      \
-    for(it = m_commands.begin(); it != itEnd; ++it){    \
-        Result &= (*it)->##Action();                    \
-    }
-
 FrMultiCmd::FrMultiCmd(){
 }
 
@@ -22,28 +16,40 @@ FrMultiCmd::~FrMultiCmd(){
 bool FrMultiCmd::Execute(){
     bool result = true;
 
-    FOR_EACH_CMD(Execute, result);
+    CmdList::iterator it, itEnd(m_commands.end());
+    for(it = m_commands.begin(); it != itEnd; ++it){
+        result &= (*it)->Execute();
+    }
     return result;
 }
 
 bool FrMultiCmd::CanUndo(){
     bool result = true;
 
-    FOR_EACH_CMD(CanUndo, result);
+    CmdList::iterator it, itEnd(m_commands.end());
+    for(it = m_commands.begin(); it != itEnd; ++it){
+        result &= (*it)->CanUndo();
+    }
     return result;
 }
 
 bool FrMultiCmd::Undo(){
     bool result = true;
 
-    FOR_EACH_CMD(Undo, result);
+    CmdList::iterator it, itEnd(m_commands.end());
+    for(it = m_commands.begin(); it != itEnd; ++it){
+        result &= (*it)->Undo();
+    }
     return result;
 }
 
 bool FrMultiCmd::Redo(){
     bool result = true;
 
-    FOR_EACH_CMD(Redo, result);
+    CmdList::iterator it, itEnd(m_commands.end());
+    for(it = m_commands.begin(); it != itEnd; ++it){
+        result &= (*it)->Redo();
+    }
     return result;
 }
 

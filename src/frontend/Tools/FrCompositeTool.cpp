@@ -11,9 +11,9 @@
 #include "vtkRenderer.h"
 
 // Qt stuff
-#include "Qt/QCursor.h"
-#include "Qt/QPixmap.h"
-#include "Qt/QApplication.h"
+#include "Qt/qcursor.h"
+#include "Qt/qpixmap.h"
+#include "Qt/qapplication.h"
 
 
 
@@ -162,21 +162,8 @@ bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
         result = m_ssTool->OnMouseDrag(is, params);
     }
     else if(params.Button == FrMouseParams::RightButton){
-        int x = params.X;
-        int y = params.Y;
-		
-		params.Button = FrMouseParams::RightButton;
-		result = m_tbcTool->OnMouseDrag(is, params);
-
-        //// First change brightness
-        //params.X = x;
-        //params.Button = FrMouseParams::RightButton;
-        //result = m_tbcTool->OnMouseDrag(is, params);
-
-        //// Then change contrast
-        //params.Y = y;
-        //params.Button = FrMouseParams::RightButton;
-        //result = m_tbcTool->OnMouseDrag(is, params);
+        params.Button = FrMouseParams::RightButton;
+        result = m_tbcTool->OnMouseDrag(is, params);
     }
 
     return result;

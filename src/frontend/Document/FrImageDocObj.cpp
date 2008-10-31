@@ -8,8 +8,8 @@
 // Backend includes
 #include "RtMRIImage.h"
 // Qt stuff
-#include <Qt/QString.h>
-#include <Qt/QFile.h>
+#include <Qt/qstring.h>
+#include <Qt/qfile.h>
 
 
 FrImageDocObj::FrImageDocObj()
@@ -39,11 +39,11 @@ unsigned int FrImageDocObj::GetMatrixSize(){
 
 bool FrImageDocObj::LoadFromFile(QString& fileName){
     bool result = false;
-    
+
     if(QFile::exists(fileName)){
-        std::string stdFileName = fileName.toAscii();
+        std::string stdFileName(fileName.toAscii());
         RtMRIImage* img = new RtMRIImage();
-        
+
         if(img->readNifti(stdFileName)){
             if(m_Image) delete m_Image;
             m_Image = img;

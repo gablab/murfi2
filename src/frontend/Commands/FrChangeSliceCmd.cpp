@@ -37,7 +37,7 @@ void FrChangeSliceCmd::SetMouseXY(int x, int y){
 
 bool FrChangeSliceCmd::Execute(){
     if(!this->GetMainController()) return false;
-    
+
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrMainWindow* mv = this->GetMainController()->GetMainView(); 
 
@@ -47,7 +47,7 @@ bool FrChangeSliceCmd::Execute(){
         case FrTabSettingsDocObj::SliceView:
         {
             if(m_isSlice){
-                sets->GetSliceViewSettings()->SliceNumber += m_Slice;
+                sets->GetSliceViewSettings()->SliceNumber += (int)m_Slice;
                 result = true;
             }
             break;
@@ -95,23 +95,22 @@ bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
     if(imgNumber != INVALIDE_IMAGE_NUM){        
         // Get local renderer point
         double* point;
-        double localPoint[3];
+        int localPoint[3];
         vtkCoordinate* coordinate = vtkCoordinate::New();
 	    coordinate->SetCoordinateSystemToDisplay();
 	    coordinate->SetValue(m_X, m_Y, 0.0);
         point = coordinate->GetComputedWorldValue(ov->GetImage(imgNumber)->GetRenderer());
 
-        localPoint[0] = point[0];
-        localPoint[1] = point[1];
-        localPoint[2] = point[2];
+        localPoint[0] = int(point[0]);
+        localPoint[1] = int(point[1]);
+        localPoint[2] = int(point[2]);
         coordinate->Delete();
 
         for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
             double bounds[6];
             ov->GetImage(i)->GetActor()->GetBounds(bounds);
-            int bp = 0;
         }
-    
+
         FrTabSettingsDocObj* sets = doc->GetCurrentTabSettings();
         sets->GetOrthoViewSettings()->CoronalSlice = 
             GetCoronalSlice(localPoint[0], localPoint[1], imgNumber);

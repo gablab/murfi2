@@ -26,14 +26,14 @@ void FrMainDocument::GetAllImages(std::vector<FrDocumentObj*>& images){
 
 FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
     std::vector<FrDocumentObj*>& objects = this->GetObjects();
-        
+
     FrTabSettingsDocObj* result = 0L;
     if(objects.size() > 0){
         std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
         for(it = objects.begin(); it != itEnd; ++it){
             // Check for type 
             if((*it)->GetType() != FrDocumentObj::TabSettings) continue;
-            
+
             // returns first current
             FrTabSettingsDocObj* ts = (FrTabSettingsDocObj*)(*it);
             if(ts->GetIsCurrent()){

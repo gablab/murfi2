@@ -27,8 +27,12 @@ class RtDisplayImage : public RtOutput,
 
 public:
 
+// Alexsid <scopic> 
+// commented since this stuff is not used in frontend app.
+#ifndef USE_FRONTEND
+
   //*** constructors/destructors  ***//
-  
+
   // default constructor
   RtDisplayImage();
 
@@ -158,8 +162,9 @@ protected:
   //draws a string at the specified coordinates
   void drawString(GLint x, GLint y, const char* s, float r, float g, float b);
 
-};
+#endif //#ifndef USE_FRONTEND
 
+};
 
 #endif
 

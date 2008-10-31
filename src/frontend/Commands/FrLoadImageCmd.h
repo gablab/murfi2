@@ -7,7 +7,7 @@ class FrImageDocObj;
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
 
-#include "Qt/QString.h"
+#include "Qt/qstring.h"
 
 // This command allows user to load new images
 class FrLoadImageCmd : public FrBaseCmd

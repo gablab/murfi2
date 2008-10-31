@@ -39,8 +39,8 @@ int main(int argc, char **argv){
 #endif
 #endif
 
-	FrApplication application(argc, argv);
-    
+    FrApplication application(argc, argv);
+
     // Create main view and document of app
     FrMainWindow* mainWindow = new FrMainWindow();
     FrMainDocument* document = new FrMainDocument();
@@ -55,5 +55,5 @@ int main(int argc, char **argv){
         result = 1;
     }
 
-	return result;
+    return result;
 }

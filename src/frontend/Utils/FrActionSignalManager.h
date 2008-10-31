@@ -6,7 +6,7 @@ class FrMainWindow;
 
 // includes
 #include "FrMacro.h"
-#include "Qt/QObject.h"
+#include "Qt/qobject.h"
 
 
 // This class incapsulates all actions

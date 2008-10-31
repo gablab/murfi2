@@ -2,7 +2,8 @@
 #define FR_SETTINGS
 
 #include "FrMacro.h"
-#include "Qt/QColor.h"
+#include "Qt/qcolor.h"
+#include "Qt/qstring.h"
 
 // STL stuff
 #include <vector>

@@ -6,8 +6,8 @@ class QWidget;
 class FrActionManager;
 
 // includes
-#include "Qt/QMenuBar.h"
-#include "Qt/QMenu.h"
+#include "Qt/qmenubar.h"
+#include "Qt/qmenu.h"
 
 
 // This class represents main menu of app

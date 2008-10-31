@@ -2,11 +2,11 @@
 #include "FrActionManager.h"
 
 // Qt
-#include "Qt/QList.h"
-#include "Qt/QString.h"
-#include "Qt/QWidget.h"
-#include "Qt/QAction.h"
-#include "Qt/QApplication.h"
+#include "Qt/qlist.h"
+#include "Qt/qstring.h"
+#include "Qt/qwidget.h"
+#include "Qt/qaction.h"
+#include "Qt/qapplication.h"
 
 
 

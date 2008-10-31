@@ -16,8 +16,8 @@
 #include "vtkRenderWindowInteractor.h"
 
 // Qt stuff
-#include "Qt/QMessageBox.h"
-#include "Qt/QString.h"
+#include "Qt/qmessagebox.h"
+#include "Qt/qstring.h"
 
 // test
 #include "RtInputScannerImages.h"

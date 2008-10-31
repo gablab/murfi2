@@ -6,7 +6,7 @@
 #include "FrBaseView.h"
 #include "FrCommandController.h"
 
-#include "Qt/QMessageBox.h"
+#include "Qt/qmessagebox.h"
 
 
 FrLoadImageCmd::FrLoadImageCmd(){

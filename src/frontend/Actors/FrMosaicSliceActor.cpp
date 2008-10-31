@@ -10,15 +10,7 @@
 #include "vtkActor.h"
 #include "vtkPointData.h"
 
-FrMosaicSliceActor* FrMosaicSliceActor::New(){
-	// First try to create the object from the vtkObjectFactory
-	vtkObject* ret = vtkObjectFactory::CreateInstance("FrMosaicSliceActor");
-	if(ret){
-		return (FrMosaicSliceActor*)ret;
-	}
-	// If the factory was unable to create the object, then create it here.
-	return new FrMosaicSliceActor;
-}
+vtkStandardNewMacro(FrMosaicSliceActor);
 
 // Construct object with no children.
 FrMosaicSliceActor::FrMosaicSliceActor(){

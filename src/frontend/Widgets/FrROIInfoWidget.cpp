@@ -1,9 +1,9 @@
 #include "FrROIInfoWidget.h"
 
-#include "Qt/QApplication.h"
-#include "Qt/QCheckBox.h"
-#include "Qt/QVariant.h"
-#include "Qt/QGroupBox.h"
+#include "Qt/qapplication.h"
+#include "Qt/qcheckbox.h"
+#include "Qt/qvariant.h"
+#include "Qt/qgroupbox.h"
 
 
 FrROIInfoWidget::FrROIInfoWidget(QWidget *parent)

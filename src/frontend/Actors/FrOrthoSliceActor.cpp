@@ -10,15 +10,7 @@
 #include "vtkActor.h"
 #include "vtkPointData.h"
 
-FrOrthoSliceActor* FrOrthoSliceActor::New(){
-	// First try to create the object from the vtkObjectFactory
-	vtkObject* ret = vtkObjectFactory::CreateInstance("FrOrthoSliceActor");
-	if(ret){
-		return (FrOrthoSliceActor*)ret;
-	}
-	// If the factory was unable to create the object, then create it here.
-	return new FrOrthoSliceActor;
-}
+vtkStandardNewMacro(FrOrthoSliceActor);
 
 // Construct object with no children.
 FrOrthoSliceActor::FrOrthoSliceActor(){

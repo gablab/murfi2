@@ -1,0 +1,60 @@
+##########################################################################
+# 
+# subdir makefile for the FRONTEND of real-time fMRI system
+# Performes mocing
+#
+# Alexey Sidorov <scopicsoftware> 2008-10-30
+#
+##########################################################################
+
+############################## SUFFIXES ##############################
+
+.DELETE_ON_ERROR:
+.SUFFIXES:
+.SUFFIXES: .cpp .h
+
+# Some predefines macros
+WIN_DIR=$(FSRC_DIR)/FrMainWindow
+APP_DIR=$(FSRC_DIR)/FrApplication
+UTL_DIR=$(FSRC_DIR)/Utils
+WGT_DIR=$(FSRC_DIR)/Widgets
+
+# Define make rules for different dirs
+%_moc.cpp: $(WIN_DIR)/%.h
+	-$(MOC) $< -o $@
+
+%_moc.cpp: $(APP_DIR)/%.h
+	-$(MOC) $< -o $@
+
+%_moc.cpp: $(UTL_DIR)/%.h
+	-$(MOC) $< -o $@
+
+%_moc.cpp: $(WGT_DIR)/%.h
+	-$(MOC) $< -o $@
+
+# Header files from different dirs
+WIN_HDR_FILES = FrMainWindow.h
+APP_HDR_FILES = FrApplication.h
+UTL_HDR_FILES = FrActionManager.h FrActionSignalManager.h
+WGT_HDR_FILES = FrBookmark.h FrBookmarkWidget.h FrColormapWidget.h FrDrawingPanelWidget.h FrLayerDialog.h FrLayerListWidget.h FrLayerWidget.h FrMainMenu.h FrROIInfoWidget.h FrSpinSliderWidget.h FrTabInfoDialog.h FrToolBar.h FrVoxelInfoWidget.h QVTKWidget.h
+
+HDR_FILES := $(patsubst %, $(WIN_DIR)/%, $(WIN_HDR_FILES))
+HDR_FILES += $(patsubst %, $(APP_DIR)/%, $(APP_HDR_FILES))
+HDR_FILES += $(patsubst %, $(UTL_DIR)/%, $(UTL_HDR_FILES))
+HDR_FILES += $(patsubst %, $(WGT_DIR)/%, $(WGT_HDR_FILES))
+
+# Init list of mocing targets
+ALL_HDRS  = $(WIN_HDR_FILES) $(APP_HDR_FILES) $(UTL_HDR_FILES) $(WGT_HDR_FILES)
+MOC_FILES = $(patsubst %.h, %_moc.cpp, $(ALL_HDRS))
+
+default: $(MOC_FILES)
+clean:
+	@$(ECHO) "Cleaning..."
+
+######################################################################
+### $Source$
+### Local Variables:
+### mode: makefile
+### fill-column: 76
+### comment-column: 0
+### End: 

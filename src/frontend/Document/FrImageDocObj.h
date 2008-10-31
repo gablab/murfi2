@@ -15,13 +15,13 @@ class FrImageDocObj : public FrDocumentObj {
 public:
     FrImageDocObj();
     virtual ~FrImageDocObj();
-    
+
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
     virtual ObjType GetType();
 
     bool LoadFromFile(QString& fileName);
-	bool LoadFromMRIImage(RtMRIImage* img);
+    bool LoadFromMRIImage(RtMRIImage* img);
     unsigned int GetMatrixSize();
 
     // Properties
@@ -29,3 +29,4 @@ public:
 };
 
 #endif
+

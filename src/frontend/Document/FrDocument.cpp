@@ -21,7 +21,7 @@ bool FrDocument::Remove(FrDocumentObj* obj){
     // find appropriate object and remove it
     std::vector<FrDocumentObj*>::iterator it;
     it = std::find(m_Objects.begin(), m_Objects.end(), obj);
-    
+
     bool result = false;
     if(it != m_Objects.end()){
         m_Objects.erase(it);

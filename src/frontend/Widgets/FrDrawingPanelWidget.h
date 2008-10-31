@@ -14,7 +14,7 @@ class QToolBox;
 // Includes 
 #include "FrMacro.h"
 #include "FrSettings.h"
-#include "QtGui/QWidget"
+#include "Qt/qwidget.h"
 
 class FrDrawingPanelWidget : public QWidget {
 	Q_OBJECT

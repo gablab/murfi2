@@ -5,11 +5,11 @@
 
 // Control block for leak detection
 #ifdef WIN32
-    //#define MEM_LEAK_TEST 
+    #define MEM_LEAK_TEST 
 
     #ifdef MEM_LEAK_TEST
         #include <crtdbg.h>
-        #define BREAK_ON_LEAK
+        //#define BREAK_ON_LEAK
         #define BREAK_LEAK_ID 1024
     #endif
 #endif

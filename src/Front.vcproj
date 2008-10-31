@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -131,7 +131,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib vtkGraphics.lib vtkRendering.lib vtkCommon.lib vtkFiltering.lib vtkGenericFiltering.lib vtkHybrid.lib vtkImaging.lib vtkIO.lib vtkWidgets.lib vtkftgl.lib vtkVolumeRendering.lib vtksys.lib vtkfreetype.lib vtkDICOMParser.lib vtkexoIIc.lib vtkexpat.lib vtkjpeg.lib vtkNetCDF.lib vtkpng.lib vtktiff.lib vtkzlib.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib"
 				IgnoreDefaultLibraryNames="msvcp80d.lib;msvcr80d.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -414,6 +414,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Document\FrMainDocument.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrRoiDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrRoiDocObj.h"
 				>
 			</File>
 			<File

@@ -114,7 +114,8 @@ void FrTBCFilter::InitLookupTable(unsigned char* luTable, int brightness, int co
 	    iMax = 255 - iMin;
     }
     else{
-	    fContrast = 256.0f / (256.0f - float(contrast));
+        float div = (256.0f - float(contrast));
+        fContrast = (div != 0.0) ? 256.0f / div : 1.0;
 	    iOffsetX = int(((255.0f - (255.0f * fContrast)) / 2.0f) + 0.5f);
     }
         

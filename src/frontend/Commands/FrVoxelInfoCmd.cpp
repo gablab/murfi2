@@ -109,6 +109,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
 
     // get image data
     vtkImageData* pImageData = lim->GetLayerByID(0)->GetInput();
+    if(!pImageData) return false;
 
     // Get the mapped position of the mouse using the picker.
     double ptMapped[3];

@@ -218,12 +218,14 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
             if(i < threshold){
                 // ...in left part
                 min = HUE_LBLUE; max = HUE_BLUE;
-                iPos = double(i - threshold) / double(m_PxMin - threshold);
+                double div = double(m_PxMin - threshold);
+                iPos = (div != 0.0) ? double(i - threshold) / div : 0.0;
             }
             else {
                 // ...in right part
                 min = HUE_YELLOW; max = HUE_RED;
-                iPos = double(i - threshold) / double(m_PxMax - threshold);
+                double div = double(m_PxMax - threshold);
+                iPos = (div != 0.0) ? double(i - threshold) / div : 0.0;
             }
                 
             // calc delta for hue 

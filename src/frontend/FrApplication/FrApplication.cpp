@@ -3,7 +3,7 @@
 
 
 
-FrApplication::FrApplication(int argc, char **argv, bool useInterface)
+FrApplication::FrApplication(int& argc, char **argv, bool useInterface)
     :	QApplication( argc, argv, useInterface ) {
 	
 }

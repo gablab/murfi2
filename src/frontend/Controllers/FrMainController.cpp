@@ -170,28 +170,28 @@ void FrMainController::ChangeView(int view){
     cmd1->SetTargetView(targetView);
 
     FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-        
+
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
     cmd->Execute();
-    delete cmd;    
+    delete cmd;
 }
 
 void FrMainController::SelectLayer(int id){
-    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd->SetAction(FrLayerCmd::UpdateSelectedID);
+    FrImageLayerCmd* cmd = FrCommandController::CreateCmd<FrImageLayerCmd>();
+    cmd->SetAction(FrImageLayerCmd::UpdateSelectedID);
     cmd->SetID(id);
     cmd->Execute();
     delete cmd;
 }
 
 void FrMainController::AddLayer(){
-    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Add);
+    FrImageLayerCmd* cmd1 = FrCommandController::CreateCmd<FrImageLayerCmd>();
+    cmd1->SetAction(FrImageLayerCmd::Add);
 
     FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-    
+
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
@@ -201,13 +201,13 @@ void FrMainController::AddLayer(){
 
 void FrMainController::DeleteLayer(){
     // Deletes currently selected layer
-	FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Delete);
-    // If not set ID is the same as current ID
+    FrImageLayerCmd* cmd1 = FrCommandController::CreateCmd<FrImageLayerCmd>();
+    cmd1->SetAction(FrImageLayerCmd::Delete);
+    // NOTE: If not set ID it is the same as current layer ID
     // cmd1->SetID(CUR_LAYER_ID);
 
     FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-    
+
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
@@ -220,27 +220,27 @@ void FrMainController::ChangeLayer(int action){
 
     // Changing using old style dialog
     if(action == 0){
-        FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-        cmd1->SetAction(FrLayerCmd::ChangeOld);
+        FrImageLayerCmd* cmd1 = FrCommandController::CreateCmd<FrImageLayerCmd>();
+        cmd1->SetAction(FrImageLayerCmd::ChangeOld);
         // If not set ID is the same as current ID
         //cmd1->SetID(CUR_LAYER_ID);
         cmd->AddCommand(cmd1);
-        
+
         FrRefreshLayerInfoCmd* cmd2 = 
             FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
         cmd->AddCommand(cmd2);
     }
     // Changing Name, visibility, opacity
     else if(action == 1){
-        FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-        cmd1->SetAction(FrLayerCmd::ChangeParams);
+        FrImageLayerCmd* cmd1 = FrCommandController::CreateCmd<FrImageLayerCmd>();
+        cmd1->SetAction(FrImageLayerCmd::ChangeParams);
         // If not set ID is the same as current ID
         //cmd1->SetID(CUR_LAYER_ID);
         cmd->AddCommand(cmd1);
     }
     else if (action == 2){
-        FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-        cmd1->SetAction(FrLayerCmd::ChangeColormap);
+        FrImageLayerCmd* cmd1 = FrCommandController::CreateCmd<FrImageLayerCmd>();
+        cmd1->SetAction(FrImageLayerCmd::ChangeColormap);
         // If not set ID is the same as current ID
         //cmd1->SetID(CUR_LAYER_ID);
         cmd->AddCommand(cmd1);
@@ -261,7 +261,7 @@ void FrMainController::ChangeBookmark(int id){
     cmd2->SetTargetView(FrChangeViewCmd::Synchronize);
 
     FrRefreshLayerInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-        
+
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);

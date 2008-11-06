@@ -32,19 +32,19 @@ public:
 
     void SetVisibility(bool value);
     bool GetVisibility();
-    
+
     vtkImageActor* GetActor(){ return m_actor; }
 
     // Update methods
     virtual void UpdateCamera();
 
-	// Selection methods
-	void SetSelection();
+    // Selection methods
+    void SetSelection();
 
 protected:
     // Pipeline stuff
     vtkImageActor* m_actor;
-	FrSelection* m_selection;
+    FrSelection* m_selection;
 
 private:
     FrROILayer(const FrROILayer&);  // Not implemented.

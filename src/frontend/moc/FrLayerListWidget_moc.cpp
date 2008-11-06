@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrLayerListWidget.h'
 **
-** Created: Fri Oct 31 14:58:18 2008
+** Created: Thu Nov 6 16:19:39 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.2.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -35,14 +35,14 @@ static const uint qt_meta_data_FrLayerListWidget[] = {
      100,   18,   18,   18, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     122,   18,   18,   18, 0x08,
-     143,   18,   18,   18, 0x08,
-     158,   18,   18,   18, 0x08,
-     176,   18,   18,   18, 0x08,
-     194,   58,   18,   18, 0x08,
-     225,  219,   18,   18, 0x08,
-     247,   18,   18,   18, 0x08,
-     273,   18,   18,   18, 0x08,
+     130,  122,   18,   18, 0x08,
+     153,   18,   18,   18, 0x08,
+     168,   18,   18,   18, 0x08,
+     186,   18,   18,   18, 0x08,
+     204,   58,   18,   18, 0x08,
+     235,  229,   18,   18, 0x08,
+     257,   18,   18,   18, 0x08,
+     283,   18,   18,   18, 0x08,
 
        0        // eod
 };
@@ -51,11 +51,11 @@ static const char qt_meta_stringdata_FrLayerListWidget[] = {
     "FrLayerListWidget\0\0NewLayer()\0"
     "DeleteLayer()\0ChangeLayer()\0id\0"
     "LayerSelected(int)\0ChangeLayerParams()\0"
-    "ChangeLayerColormap()\0OnSelectionChanged()\0"
-    "OnAddClicked()\0OnDeleteClicked()\0"
-    "OnChangeClicked()\0OnVisibilityChanged(int)\0"
-    "value\0OnOpacityChanged(int)\0"
-    "OnColormapParamsChanged()\0"
+    "ChangeLayerColormap()\0row,col\0"
+    "OnCellClicked(int,int)\0OnAddClicked()\0"
+    "OnDeleteClicked()\0OnChangeClicked()\0"
+    "OnVisibilityChanged(int)\0value\0"
+    "OnOpacityChanged(int)\0OnColormapParamsChanged()\0"
     "UpdateCurrentLayerParams()\0"
 };
 
@@ -90,7 +90,7 @@ int FrLayerListWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 3: LayerSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 4: ChangeLayerParams(); break;
         case 5: ChangeLayerColormap(); break;
-        case 6: OnSelectionChanged(); break;
+        case 6: OnCellClicked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 7: OnAddClicked(); break;
         case 8: OnDeleteClicked(); break;
         case 9: OnChangeClicked(); break;

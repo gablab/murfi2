@@ -20,12 +20,12 @@ class FrLayeredImage : public FrImageLayer {
 public:
     vtkTypeMacro(FrLayeredImage,FrImageLayer);
     static FrLayeredImage* New();
-    
+
 public:
     // Accessors/Modifiers
     virtual void SetInput(vtkImageData* data);
-	void SetROIInput(vtkImageData* data, int layerId);	// ROI layers may have different input data
-    
+    void SetROIInput(vtkImageData* data, int layerId);	// ROI layers may have different input data
+
     void SetColormapSettings(FrColormapSettings& settings, int layerId);
     void SetTBCSettings(FrTBCSettings& settings, int layerId);
     void SetCameraSettings(FrCameraSettings& settings, int layerId);
@@ -41,23 +41,24 @@ public:
     virtual void UpdateCamera();
 
     // Initialization
-    void InitDefault(FrImageLayer* layer);
+    void InitImageLayerDefault(FrImageLayer* layer);
+    void InitROILayerDefault(FrROILayer* layer);
 
     //
     // Layer management
     //
-    int  AddLayer();
-	int  AddROILayer();
-
-    bool RemoveLayer(int id);
-	bool RemoveROILayer(int id);
-
+    int  AddImageLayer();
+    bool RemoveImageLayer(int id);
     void RemoveImageLayers();
-	void RemoveROILayers();
-	void RemoveAllLayers();
+
+    int  AddROILayer();
+    bool RemoveROILayer(int id);
+    void RemoveROILayers();
+
+    void RemoveAllLayers();
 
     // Returns layer by ID
-    FrImageLayer* GetLayerByID(int id);
+    FrImageLayer* GetImageLayerByID(int id);
     FrROILayer* GetROILayerByID(int id);
 
     //
@@ -78,7 +79,7 @@ private:
 
     LayerCollection m_ImageLayers;
     ROILayerCollection m_ROILayers;
-	
+
     FrSpecialLayer* m_SpecialLayer;
 
 private:

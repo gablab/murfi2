@@ -30,6 +30,8 @@ FrSpinSliderWidget::FrSpinSliderWidget(QWidget* parent)
     m_layout->setSizeConstraint(QLayout::SetMinimumSize);
 #if QT_VERSION >= 0x040300
     m_layout->setContentsMargins(0, 0, 0, 0);
+#else
+    m_layout->setMargin(0);
 #endif
     m_layout->addWidget(m_spin);
     m_layout->addWidget(m_slider);

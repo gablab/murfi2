@@ -20,25 +20,25 @@ public:
     // Constructor/destructor
     FrVoxelInfoCmd();
 
-	virtual bool Execute();
+    virtual bool Execute();
 
     // Undo/redo section
-	virtual bool CanUndo();
-	virtual bool Undo();
-	virtual bool Redo();
+    virtual bool CanUndo();
+    virtual bool Undo();
+    virtual bool Redo();
 
     // Properties
     void SetMouseXY(int x, int y);
     FrSetPropMacro(Action, Action);
     FrSetPropMacro(vtkPointPicker*, PointPicker);
 
-private:    
+private:
     bool UpdateVoxelInfo();
     bool ResetVoxelInfo();
 
     void GetVoxelInfo();
-	double* GetMappedPoint();
-	int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
+    double* GetMappedPoint();
+    int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
 
 private:
     int m_mouseX;

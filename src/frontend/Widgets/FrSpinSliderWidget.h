@@ -16,10 +16,10 @@ class QHBoxLayout;
 #include "Qt/qwidget.h"
 
 class FrSpinSliderWidget : public QWidget {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	FrSpinSliderWidget(QWidget *parent = 0);
-    
+    FrSpinSliderWidget(QWidget *parent = 0);
+
     // Modifiers
     void SetMinMax(int min, int max);
     void SetValue(int value);
@@ -31,7 +31,7 @@ public:
 
     // add signals here
 signals:
-	void ValueChanged(int newValue);
+    void ValueChanged(int newValue);
 
 private Q_SLOTS:
     void OnSpinValueChanged(int newValue);

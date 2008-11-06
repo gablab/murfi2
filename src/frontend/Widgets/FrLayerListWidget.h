@@ -8,6 +8,8 @@ class FrColormapWidget;
 class QTableWidget;
 class QHBoxLayout;
 class QToolButton;
+class QTableWidgetItem;
+class QModelIndex;
 
 // includes
 #include "Qt/qwidget.h"
@@ -40,32 +42,32 @@ signals:
     void ChangeLayerParams();
     // Emmited when colormap params are changed
     void ChangeLayerColormap();
-    
+
 private Q_SLOTS:
     // Add slots here
-    void OnSelectionChanged();
+    void OnCellClicked(int row, int col);
     // Manage whole layer
     void OnAddClicked();
     void OnDeleteClicked();
     void OnChangeClicked();
     // Manage some params
-	void OnVisibilityChanged(int id);
+    void OnVisibilityChanged(int id);
     void OnOpacityChanged(int value);
     void OnColormapParamsChanged();
 
     // Utility methods
     void UpdateCurrentLayerParams();
-		
+
 private:
-	QTableWidget*   m_layerTable;
-	QHBoxLayout*    m_layout;
+    QTableWidget*   m_layerTable;
+    QHBoxLayout*    m_layout;
     QToolButton*    m_btnAdd;
     QToolButton*    m_btnDelete;
     QToolButton*    m_btnChange;
 
     FrColormapWidget*   m_colormapWidget;
     FrSpinSliderWidget* m_opacityWidget;
-    
+
     bool m_signalsBlocked;
 };
 

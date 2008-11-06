@@ -1,5 +1,5 @@
-#ifndef FR_LAYER_CMD
-#define FR_LAYER_CMD
+#ifndef FR_IMGLAYER_CMD
+#define FR_IMGLAYER_CMD
 
 class FrTabSettingsDocObj;
 class FrLayerSettings;
@@ -9,7 +9,7 @@ class FrLayerSettings;
 
 // This command allows user to add, remove 
 // and modify settings of the layer
-class FrLayerCmd : public FrBaseCmd {
+class FrImageLayerCmd : public FrBaseCmd {
 public:
     enum Action { Undefined, Add, Delete, 
         ChangeOld, ChangeParams, ChangeColormap, 
@@ -17,15 +17,15 @@ public:
 
 public:
     // Constructor/destructor
-    FrLayerCmd();
+    FrImageLayerCmd();
 
-	virtual bool Execute();
+    virtual bool Execute();
 
     // Undo/redo section
-	virtual bool CanUndo();
-	virtual bool Undo();
-	virtual bool Redo();
-	
+    virtual bool CanUndo();
+    virtual bool Undo();
+    virtual bool Redo();
+
     // Properties
     FrSetPropMacro(Action, Action);
     void SetID(int id);
@@ -33,7 +33,7 @@ public:
 private:
     // Helper methods here
     bool AddLayer();
-    bool DeleteLayer();    
+    bool DeleteLayer();
     bool UpdateSelectedLayerID();
 
     bool ChangeLayerOld();

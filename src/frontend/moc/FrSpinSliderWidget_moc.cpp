@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrSpinSliderWidget.h'
 **
-** Created: Fri Oct 31 14:58:18 2008
+** Created: Thu Nov 6 13:06:01 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.2.3)
 **
 ** WARNING! All changes made in this file will be lost!

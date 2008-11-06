@@ -49,8 +49,6 @@ public:
         return m_controller;
     }
 
-    
-    
     // Using this method user can create command.
     // User is responsible to delete the created commands
     // if he executes them not through Command controller.

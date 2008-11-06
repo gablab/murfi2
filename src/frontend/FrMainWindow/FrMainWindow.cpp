@@ -123,7 +123,9 @@ void FrMainWindow::InitializeWidgets(){
     btmPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QHBoxLayout* graphLayout = new QHBoxLayout();
-    graphLayout->addWidget(new QGroupBox(QString("Graph View"), btmPane));
+    QGroupBox* gb = new QGroupBox(QString("Graph View"), btmPane);
+    gb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    graphLayout->addWidget(gb);
     btmPane->setLayout(graphLayout);
 
     dock->setWidget(btmPane);

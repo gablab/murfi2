@@ -109,7 +109,9 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
     connect( m_colormapWidget, SIGNAL(ParamsChanged()), 
              this, SLOT(OnColormapParamsChanged()) );
 
-	this->setMinimumHeight(230);
+    //this->setMinimumHeight(230);
+    this->setFixedHeight(this->sizeHint().height());
+    this->setFixedWidth(this->sizeHint().width());
 }
 
 // Common actions

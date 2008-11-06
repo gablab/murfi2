@@ -23,17 +23,17 @@
 #define SINGLECOLOR_ITEM_IDX 1 
 
 FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
-: QDialog(parent){    
+: QDialog(parent){
     this->setModal(isModal);
     this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-        
+
     QHBoxLayout* titleLayout = this->CreateTitleLayout();
 
     // Init params layout
     QHBoxLayout* generalLayout = this->CreateGeneralLayout();
     m_chkVisibility = new QCheckBox(QString("Visible"), this);
     m_chkVisibility->setChecked(true);
-    
+
     QVBoxLayout* paramsLayout = new QVBoxLayout();
     paramsLayout->addLayout(generalLayout);
     paramsLayout->addWidget(m_chkVisibility);
@@ -42,39 +42,42 @@ FrLayerDialog::FrLayerDialog(QWidget* parent, bool isModal)
 
     QHBoxLayout* btnLayout = this->CreateButtonLayout();
 
-	// Init main layout
+    // Init main layout
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(titleLayout);
     mainLayout->addLayout(paramsLayout);
     mainLayout->addWidget(m_colormapWidget);
     mainLayout->addLayout(btnLayout);
+
+    this->setFixedHeight(this->sizeHint().height());
+    this->setFixedWidth(this->sizeHint().width());
 }
 
 QHBoxLayout* FrLayerDialog::CreateTitleLayout(){
     // Create title
     QLabel *lblGeneral = new QLabel("General", this);
-	lblGeneral->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    lblGeneral->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	QFrame *frmGeneral = new QFrame(this);
+    QFrame *frmGeneral = new QFrame(this);
     frmGeneral->setFrameShape(QFrame::HLine);
     frmGeneral->setFrameShadow(QFrame::Sunken);
 
     QHBoxLayout* titleLayout = new QHBoxLayout();
-	titleLayout->addWidget(lblGeneral);
-	titleLayout->addWidget(frmGeneral);
+    titleLayout->addWidget(lblGeneral);
+    titleLayout->addWidget(frmGeneral);
 
     return titleLayout;
 }
 
 QHBoxLayout* FrLayerDialog::CreateGeneralLayout(){
-    
-    // Create labels
-	QLabel* lblName = new QLabel("Name: ", this);
-	QLabel* lblOpacity = new QLabel("Opacity: ", this);
 
-	QVBoxLayout* lblLayout = new QVBoxLayout();
-	lblLayout->addWidget(lblName);
-	lblLayout->addWidget(lblOpacity);
+    // Create labels
+    QLabel* lblName = new QLabel("Name: ", this);
+    QLabel* lblOpacity = new QLabel("Opacity: ", this);
+
+    QVBoxLayout* lblLayout = new QVBoxLayout();
+    lblLayout->addWidget(lblName);
+    lblLayout->addWidget(lblOpacity);
 
     // Create widgets
     m_txtName = new QLineEdit(QString("New Layer"), this);
@@ -115,7 +118,7 @@ void FrLayerDialog::SetCaption(QString& caption){
 void FrLayerDialog::GetLayerParams(FrLayerSettings& layerSets){
     // Common props
     layerSets.Name = m_txtName->text();
-	layerSets.ID = BAD_LAYER_ID;
+    layerSets.ID = BAD_LAYER_ID;
 
     // Get opacity amd normalize it
     layerSets.Opacity = double(m_opacityWidget->GetValue());
@@ -132,11 +135,11 @@ void FrLayerDialog::GetLayerParams(FrLayerSettings& layerSets){
 
 void FrLayerDialog::SetLayerParams(FrLayerSettings& layerSets){
     // Common props
-	m_txtName->setText(layerSets.Name);
+    m_txtName->setText(layerSets.Name);
     m_chkVisibility->setChecked(layerSets.Visibility);
     int opacity = int(layerSets.Opacity * m_opacityWidget->GetMaximum());
     m_opacityWidget->SetValue(opacity);
-        
+
     // Colormap props
     m_colormapWidget->SetColormapParams(layerSets.ColormapSettings);
 }
@@ -161,7 +164,7 @@ void FrLayerDialog::OnBtnOKClicked(){
         }
         isValid = true;
     }
-    
+
     // Process validation results 
     if(isValid){
         this->accept();

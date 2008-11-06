@@ -39,6 +39,7 @@ FrSpinSliderWidget::FrSpinSliderWidget(QWidget* parent)
     // Connect signals
     connect(m_spin, SIGNAL(valueChanged(int)), this, SLOT(OnSpinValueChanged(int)));
     connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
+    this->setFixedHeight(this->sizeHint().height());
 }
 
 void FrSpinSliderWidget::SetMinMax(int min, int max){
@@ -54,7 +55,7 @@ void FrSpinSliderWidget::SetValue(int value){
     int min = m_spin->minimum();
     int max = m_spin->maximum();
     value = ClampValue(value, min, max);
-    
+
     m_spin->blockSignals(true);
     m_spin->setValue(value);
     m_spin->blockSignals(false);

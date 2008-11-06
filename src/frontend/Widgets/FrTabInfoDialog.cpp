@@ -12,7 +12,7 @@ FrTabInfoDialog::FrTabInfoDialog(QWidget* parent, bool isModal)
 : QDialog(parent){    
     this->setModal(isModal);
     this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-        
+
     // create lables and text edits
     m_lblName = new QLabel(tr("Tab Name:"), this);
     m_txtName = new QLineEdit(tr(""), this);
@@ -36,6 +36,9 @@ FrTabInfoDialog::FrTabInfoDialog(QWidget* parent, bool isModal)
     m_btnLayout->addWidget(m_btnOk);
     m_btnLayout->addWidget(m_btnCancel);
     m_vLayout->addLayout(m_btnLayout);
+
+    this->setFixedHeight(this->sizeHint().height());
+    this->setFixedWidth(this->sizeHint().width());
 }
 
 void FrTabInfoDialog::SetCaption(QString& caption){

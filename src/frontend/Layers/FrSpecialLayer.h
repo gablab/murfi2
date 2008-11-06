@@ -6,6 +6,7 @@ class vtkTextMapper;
 class vtkPoints;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
+class FrSelection;
 
 // Includes
 #include "FrBaseLayer.h"
@@ -27,7 +28,8 @@ private:
     vtkPoints*           m_BorderPts;
     vtkPolyDataMapper2D* m_BorderMapper;
     vtkActor2D*          m_BorderActor;
-
+	FrSelection*		 m_Selection;
+	
 private:
     FrSpecialLayer(const FrSpecialLayer&); // Not implemented
     void operator=(const FrSpecialLayer&); // Not implemented

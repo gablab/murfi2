@@ -13,20 +13,38 @@
 #include "vtkExtractVOI.h"
 #include "vtkOutlineFilter.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkFollower.h"
+#include "vtkActor2d.h"
+
+#include <vector>
+
+typedef struct _pos{
+    int x, y, z;
+}Pos;
+
+typedef struct _selectionParams{
+	int type;	                    // selection type (sphere, rectangle, free shape polygon)
+    std::vector<Pos> points;        // for free shape polygon
+    int radius;                     // for sphere
+    int center;                     // for sphere
+    int leftCorner[2];              // for rectangle
+    int width;                      // for rectangle
+    int height;                     // for rectangle
+}SelectionParams;
 
 
 class FrSelection : public FrBaseActor
 {
 public:
-    enum Type { Unknown, Rectangle, Circle, Point };	// may be Points?
+ //   enum Type { Unknown, Rectangle, Circle, Polygon };	// may be Points?
 
 public:
 	static FrSelection *New();
 	vtkTypeMacro(FrSelection, FrBaseActor);
 
     // Properties
-    FrSetPropMacro(Type, CurrentType);
+    //FrSetPropMacro(Type, CurrentType);
+    void SetSelectionParams(SelectionParams params);
+    FrGetPropMacro(SelectionParams, params);
 
 protected:
 
@@ -34,6 +52,16 @@ protected:
 	virtual ~FrSelection();
 	FrSelection(const FrSelection&) {};
 	void operator=(const FrSelection&) {};
+
+private:
+    void DrawRectangle();
+    void DrawCircle();
+    void DrawPolygon();
+
+private:
+	vtkActor* m_actor;
+    vtkPolyDataMapper* m_mapper;
+
 
 };
 

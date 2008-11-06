@@ -1,5 +1,5 @@
 #include "FrSpecialLayer.h"
-
+#include "FrSelection.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -88,6 +88,10 @@ void FrSpecialLayer::InitializeBorder(){
     // Free this stuff
     rect->Delete();
     selectRect->Delete();
+
+	m_Selection = FrSelection::New();
+	m_Selection->PickableOff();
+    m_Renderer->AddActor(m_Selection);
 }
 
 void FrSpecialLayer::SetText(const char* text){

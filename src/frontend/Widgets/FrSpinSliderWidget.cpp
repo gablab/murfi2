@@ -18,7 +18,7 @@ FrSpinSliderWidget::FrSpinSliderWidget(QWidget* parent)
 
     m_spin = new QSpinBox(parent);
     m_spin->setMinimum(DEF_MIN_VALUE);
-    m_spin->setMinimum(DEF_MIN_VALUE);
+    m_spin->setMaximum(DEF_MAX_VALUE);
 
     m_slider = new QSlider(parent);
     m_slider->setMinimum(DEF_MIN_VALUE);

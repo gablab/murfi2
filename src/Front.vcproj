@@ -253,6 +253,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrBaseToolWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrBookmark_moc.cpp"
 				>
 			</File>
@@ -269,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrEmptyToolWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrLayerDialog_moc.cpp"
 				>
 			</File>
@@ -278,6 +286,10 @@
 			</File>
 			<File
 				RelativePath=".\frontend\moc\FrLayerWidget_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrListToolWidget_moc.cpp"
 				>
 			</File>
 			<File
@@ -293,7 +305,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrROIToolWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrSpinSliderWidget_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrSpinToolWidget_moc.cpp"
 				>
 			</File>
 			<File
@@ -671,6 +691,24 @@
 			Name="Widgets"
 			>
 			<File
+				RelativePath=".\frontend\Widgets\FrBaseToolWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrBaseToolWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrBookmark.cpp"
 				>
 				<FileConfiguration
@@ -809,6 +847,24 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrEmptyToolWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrEmptyToolWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrLayerDialog.cpp"
 				>
 			</File>
@@ -893,6 +949,24 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrListToolWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrListToolWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrMainMenu.cpp"
 				>
 			</File>
@@ -949,6 +1023,24 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrROIToolWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrROIToolWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrSpinSliderWidget.cpp"
 				>
 			</File>
@@ -972,6 +1064,24 @@
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
 						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrSpinToolWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrSpinToolWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1132,14 +1242,6 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Actors\FrMosaicSliceActor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Actors\FrOrthoSliceActor.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Actors\FrOrthoSliceActor.h"
 				>
 			</File>
 			<File

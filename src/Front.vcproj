@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL"
 				RuntimeLibrary="2"
 				WarningLevel="3"
@@ -703,7 +703,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -859,7 +859,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -961,7 +961,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1035,7 +1035,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1081,7 +1081,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1171,26 +1171,8 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\frontend\Widgets\QVTKWidget.cxx"
+				RelativePath=".\frontend\Widgets\QVTKWidget.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)\$(InputName)1.obj"
-						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\frontend\Widgets\QVTKWidget.h"
@@ -1400,6 +1382,74 @@
 				RelativePath=".\frontend\Commands\FrVoxelInfoCmd.h"
 				>
 			</File>
+			<Filter
+				Name="MaskCommands"
+				>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskBaseCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskBaseCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskCopyAdjacentCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskCopyAdjacentCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskDilateErodeCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskDilateErodeCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskFreeShapeCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskFreeShapeCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskMaskOperationCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskMaskOperationCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskPenCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskPenCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskRectangleCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskRectangleCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskSphereCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskSphereCmd.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Layers"

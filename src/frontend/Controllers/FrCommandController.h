@@ -27,8 +27,14 @@ class FrMainController;
 #include "FrLayerCmd.h"
 #include "FrRefreshLayerInfoCmd.h"
 #include "FrLoadImageCmd.h"
-
-
+// Mask commands
+#include "FrMaskPenCmd.h"
+#include "FrMaskRectangleCmd.h"
+#include "FrMaskSphereCmd.h"
+#include "FrMaskFreeShapeCmd.h"
+#include "FrMaskDilateErodeCmd.h"
+#include "FrMaskMaskOperationCmd.h"
+#include "FrMaskCopyAdjacentCmd.h"
 
 // This class allow user to create 
 // and manage commands. Organised like singletone;

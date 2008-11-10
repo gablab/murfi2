@@ -315,7 +315,7 @@ void FrOrthoSliceActor::UpdateSlicePolar(){
 
 	if (this->CurrentPlane>0){
 		double theta = 180.0*double(this->Level)/double(dim[2]);
-		theta *= M_PI/180.0;
+		theta *= MY_PI/180.0;
 		this->ImagePlane->SetOrigin(ox-r*cos(theta), ox-r*sin(theta), ori[1]-0.5*sp[0]);
 		this->ImagePlane->SetPoint1(ox+r*cos(theta), ox+r*sin(theta), ori[1]-0.5*sp[0]);
 		this->ImagePlane->SetPoint2(ox-r*cos(theta), ox-r*sin(theta), ori[1]+(dim[1]-0.5)*sp[0]);

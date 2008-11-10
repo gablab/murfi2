@@ -54,8 +54,8 @@ void FrLayeredImage::SetInput(vtkImageData* data){
     m_tbcFilter->SetInput(data);
 }
 
-void FrLayeredImage::SetROIInput(vtkImageData *data, int layerId){
-    FrROILayer* layer = this->GetROILayerByID(layerId);
+void FrLayeredImage::SetROIInput(int id, vtkImageData *data){
+    FrROILayer* layer = this->GetROILayerByID(id);
     if(layer){
         layer->SetInput(data);
     }
@@ -82,13 +82,18 @@ void FrLayeredImage::SetTBCSettings(FrTBCSettings& settings, int layerId){
         LayerCollection::iterator it, itEnd(m_ImageLayers.end());
         for(it = m_ImageLayers.begin(); it != itEnd; ++it){
             (*it)->SetTBCSettings(settings);
+            (*it)->GetTBCSettings(settings);
         }
         FrImageLayer::SetTBCSettings(settings);
+        // Values might be clamped so update them
+        FrImageLayer::GetTBCSettings(settings);
     }
     else{
         FrImageLayer* layer = this->GetImageLayerByID(layerId);
         if(layer){
             layer->SetTBCSettings(settings);
+            // Values might be clamped so update them
+            layer->GetTBCSettings(settings);
         }
     }
 }

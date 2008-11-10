@@ -19,12 +19,12 @@
 vtkStandardNewMacro(FrSelection);
 
 // Construct object with no children.
-FrSelection::FrSelection(){
-    vtkPolyDataMapper* m_BorderMapper = vtkPolyDataMapper::New();
-
-	m_actor = vtkActor::New();
-//    m_actor->PickableOff();
-
+FrSelection::FrSelection()
+    : m_actor(0), m_mapper(0) {
+    // Init actor and mapper
+    m_actor = vtkActor::New();
+    m_mapper = vtkPolyDataMapper::New();
+	
 	this->AddPart(m_actor);
 	this->PickableOff();
 }

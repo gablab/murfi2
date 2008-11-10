@@ -2,12 +2,14 @@
 #define FR_ROIDOC_OBJ
 
 // Forward declarations
-class vtkImageData;
+class RtMaskImage;
 class QString;
 
 // Some includes
 #include "FrDocumentObj.h"
 #include "FrMacro.h"
+
+#include "Qt/qstring.h"
 
 // One have to provide valid type system
 // All object types have to be registered here.
@@ -21,7 +23,11 @@ public:
     virtual ObjType GetType();
 
     // Properties
-    FrGetPropMacro(vtkImageData*,MaskImage);
+    FrGetPropMacro(RtMaskImage*,MaskImage);
+    FrPropMacro(int, ID);
+    FrPropMacro(QString, Name);
+    FrPropMacro(bool, Visibility);
+    FrPropMacro(double, Opacity);
 
     // Initialization
     bool LoadFromFile(QString& fileName);

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionManager.h'
 **
-** Created: Fri 7. Nov 01:04:45 2008
+** Created: Mon 10. Nov 10:57:24 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!

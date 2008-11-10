@@ -24,8 +24,11 @@ public:
 
     // input / output managing
 	void SetInput(vtkImageData* input);
+    void SetInput(int port, vtkImageData* input);
     vtkImageData* GetInput();
+    vtkImageData* GetInput(int port);
     vtkImageData* GetOutput();
+    vtkImageData* GetOutput(int port);
 	
     // Properties
     enum Orientation { YZ = 0, XZ = 1, XY = 2 };

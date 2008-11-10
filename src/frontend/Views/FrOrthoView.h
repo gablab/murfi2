@@ -10,6 +10,7 @@ class FrSliceExtractor;
 class FrLayeredImage;
 class FrLayerSettings;
 class FrOrthoViewSettings;
+class FrUpdateParams2;
 
 // Some includes
 #include "FrBaseView.h"
@@ -35,9 +36,17 @@ public:
     FrLayeredImage* GetImage(int idx){ return m_LayeredImage[idx]; }
 
 private:
-    FrLayerSettings* GetLayerAndInitLayers(std::vector<FrLayerSettings*>& layers, 
+    FrLayerSettings* GetLayerAndInitLayers(std::vector<FrLayerSettings*>* layers, 
                                            FrOrthoViewSettings* viewSets, 
                                            int rendererID);
+
+    // Update pipline helpers
+    void InitUpdateParams(FrUpdateParams2& params);
+    void ReadDocument(FrUpdateParams2& params);
+    void ExtractSlice(FrUpdateParams2& params);
+    void UpdateColormap(FrUpdateParams2& params);
+    void UpdateTBC(FrUpdateParams2& params);
+    void UpdateOpacityVisibility(FrUpdateParams2& params);
 
 private:
     // Render pipline

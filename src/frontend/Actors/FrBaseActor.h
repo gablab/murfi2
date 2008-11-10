@@ -14,7 +14,7 @@
 #include "vtkAssembly.h"
 
 
-class FrBaseActor : public vtkAssembly{
+class FrBaseActor : public vtkAssembly {
 public:
 	static FrBaseActor *New();
 	vtkTypeMacro(FrBaseActor, vtkAssembly);

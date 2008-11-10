@@ -8,8 +8,10 @@ class QVTKWidget;
 class FrMainWindow;
 class FrDocumentReader;
 class FrLayeredImage;
+class FrUpdateParams1;
 
 #include "FrBaseView.h"
+
 
 // Mosaic view
 class FrMosaicView : public FrBaseView { 
@@ -24,6 +26,14 @@ public:
 
     // Accessors
     FrLayeredImage* GetImage(){ return m_LayeredImage; }
+
+private:
+    // Update pipline helpers
+    void InitUpdateParams(FrUpdateParams1& params);
+    void ReadDocument(FrUpdateParams1& params);
+    void UpdateColormap(FrUpdateParams1& params);
+    void UpdateTBC(FrUpdateParams1& params);
+    void UpdateOpacityVisibility(FrUpdateParams1& params);
 
 private:
     // Pipline 

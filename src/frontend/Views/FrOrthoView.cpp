@@ -22,6 +22,35 @@
 #include "vtkCoordinate.h"
 #include "vtkTextProperty.h"
 
+#include <vector>
+
+// FrUpdateParams represents params 
+class FrUpdateParams2 {
+public:
+    FrMainDocument*      Document;
+    FrTabSettingsDocObj* TabSettings;
+    FrOrthoViewSettings* ViewSettings;
+    int                  ActiveLayerID;
+    FrLayerSettings*     ActiveLayer[3];
+    LayerCollection*     Layers[3];
+
+public:    
+    FrUpdateParams2(){
+        ActiveLayer[CORONAL_IMAGE] = 0L;
+        ActiveLayer[SAGITAL_IMAGE] = 0L;
+        ActiveLayer[AXIAL_IMAGE] = 0L;
+
+        Layers[CORONAL_IMAGE] = new LayerCollection();
+        Layers[SAGITAL_IMAGE] = new LayerCollection();
+        Layers[AXIAL_IMAGE] = new LayerCollection();
+    }
+
+    ~FrUpdateParams2(){
+        delete Layers[CORONAL_IMAGE];
+        delete Layers[SAGITAL_IMAGE];
+        delete Layers[AXIAL_IMAGE];
+    }
+};
 
 FrSliceExtractor::Orientation g_Orientation[ORTHO_IMAGE_COUNT];
 
@@ -121,27 +150,10 @@ void FrOrthoView::RemoveRenderers(){
 }
 
 void FrOrthoView::UpdatePipeline(int point){
-    // Setup some vars
-    int maxSliceNumber = 0;
 
-    // Get common settings
-    FrMainDocument* document = GetMainWindow()->GetMainDocument();
-    FrTabSettingsDocObj* tabSets = document->GetCurrentTabSettings();
-    FrOrthoViewSettings* viewSets = tabSets->GetOrthoViewSettings();
-
-    // Get settings of layers
-    LayerCollection  cLayers, sLayers, aLayers;
-    LayerCollection* layers[3];
-    layers[CORONAL_IMAGE] = &cLayers;
-    layers[SAGITAL_IMAGE] = &sLayers;
-    layers[AXIAL_IMAGE] = &aLayers;
-    
-    FrLayerSettings* layer[3];
-    layer[CORONAL_IMAGE] = GetLayerAndInitLayers(cLayers, viewSets, CORONAL_IMAGE);
-    layer[SAGITAL_IMAGE] = GetLayerAndInitLayers(sLayers, viewSets, SAGITAL_IMAGE);
-    layer[AXIAL_IMAGE] = GetLayerAndInitLayers(aLayers, viewSets, AXIAL_IMAGE);
-
-    LayerCollection::iterator it, itEnd;
+    // Init params
+    FrUpdateParams2 params;
+    this->InitUpdateParams(params);
                         	
     // Update pipeline
     switch(point)
@@ -152,112 +164,29 @@ void FrOrthoView::UpdatePipeline(int point){
         }
     case FRP_READIMAGE:
         {
-            // read document and connect filters
-            m_docReader->SetDocument(document);
-            m_docReader->SetUnMosaicOn();
-            m_docReader->Update();
-			
-            // Setup slice extractor filter
-            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
-            }
+            this->ReadDocument(params);
         }
 	case FRP_SLICE:
         {
-            // set slice to be rendered
-            m_SliceExtractor[CORONAL_IMAGE]->SetOrientation(g_Orientation[CORONAL_IMAGE]);
-            maxSliceNumber = m_SliceExtractor[CORONAL_IMAGE]->GetMaxSliceNumber();
-            viewSets->CoronalSlice = ClampValue(viewSets->CoronalSlice, 0, maxSliceNumber);
-            m_SliceExtractor[CORONAL_IMAGE]->SetSlice(viewSets->CoronalSlice);
-            
-            m_SliceExtractor[SAGITAL_IMAGE]->SetOrientation(g_Orientation[SAGITAL_IMAGE]);
-            maxSliceNumber = m_SliceExtractor[SAGITAL_IMAGE]->GetMaxSliceNumber();
-            viewSets->SagitalSlice = ClampValue(viewSets->SagitalSlice, 0, maxSliceNumber);
-            m_SliceExtractor[SAGITAL_IMAGE]->SetSlice(viewSets->SagitalSlice);
-
-            m_SliceExtractor[AXIAL_IMAGE]->SetOrientation(g_Orientation[AXIAL_IMAGE]);
-            maxSliceNumber = m_SliceExtractor[AXIAL_IMAGE]->GetMaxSliceNumber();
-            viewSets->AxialSlice = ClampValue(viewSets->AxialSlice, 0, maxSliceNumber);
-            m_SliceExtractor[AXIAL_IMAGE]->SetSlice(viewSets->AxialSlice);
-                    
-            // Connect output to layered image
-            char* text[3];
-            text[CORONAL_IMAGE] = "Ortho View: Coronal";
-            text[SAGITAL_IMAGE] = "Ortho View: Sagital";
-            text[AXIAL_IMAGE]   = "Ortho View: Axial";
-            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                if(m_SliceExtractor[i]->GetInput()){
-		            m_SliceExtractor[i]->Update();
-                    m_LayeredImage[i]->SetInput(m_SliceExtractor[i]->GetOutput());
-
-                    // Set text
-                    m_LayeredImage[i]->SetText(text[i]);
-                }
-                else {
-                    m_LayeredImage[i]->SetText("");
-                }
-            }
+            this->ExtractSlice(params);   
         }
     case FRP_COLORMAP:
         {
-            // Update here colormap values
-            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-                    it = layers[i]->begin();
-                    itEnd = layers[i]->end();
-                    for(; it != itEnd; ++it){
-                        m_LayeredImage[i]->SetColormapSettings(
-                            (*it)->ColormapSettings, (*it)->ID);
-                    }
-                }
-                else {
-                    m_LayeredImage[i]->SetColormapSettings(
-                        layer[i]->ColormapSettings, layer[i]->ID);
-                }
-                m_LayeredImage[i]->UpdateColormap();
-            }
+            this->UpdateColormap(params);
         }
     case FRP_TBC:
         {
-            // set TBC values
-            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-                    it = layers[i]->begin();
-                    itEnd = layers[i]->end();
-                    for(; it != itEnd; ++it){
-                        m_LayeredImage[i]->SetTBCSettings(
-                            (*it)->TbcSettings, (*it)->ID);
-                    }
-                }
-                else {
-                    m_LayeredImage[i]->SetTBCSettings(
-                        layer[i]->TbcSettings, layer[i]->ID);
-                }
-                m_LayeredImage[i]->UpdateTBC();
-            }
+            this->UpdateTBC(params);
         }
     case FRP_OPACITY_VISIBILITY:
         {
-            for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-                    it = layers[i]->begin();
-                    itEnd = layers[i]->end();
-                    for(; it != itEnd; ++it){
-                        m_LayeredImage[i]->SetOpacity((*it)->Opacity, (*it)->ID);
-                        m_LayeredImage[i]->SetVisibility((*it)->Visibility, (*it)->ID);
-                    }
-                }
-                else {
-                    m_LayeredImage[i]->SetOpacity(layer[i]->Opacity, layer[i]->ID);
-                    m_LayeredImage[i]->SetVisibility(layer[i]->Visibility, layer[i]->ID);
-                }
-            }
+            this->UpdateOpacityVisibility(params);
         }
     case FRP_SETCAM:
         {
             for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
                 m_LayeredImage[i]->SetCameraSettings(
-                    viewSets->CamSettings[i], ALL_LAYERS_ID);	
+                    params.ViewSettings->CamSettings[i], ALL_LAYERS_ID);	
                 m_LayeredImage[i]->UpdateCamera();
             }
         }
@@ -275,20 +204,41 @@ void FrOrthoView::UpdatePipeline(int point){
 	GetRenderWindow()->Render();
 }
 
+void FrOrthoView::InitUpdateParams(FrUpdateParams2& params){
+    // Get common settings
+    params.Document = this->GetMainWindow()->GetMainDocument();
+    params.TabSettings = params.Document->GetCurrentTabSettings();
+    params.ViewSettings = params.TabSettings->GetOrthoViewSettings();
+
+    // Get settings of layers
+    params.ActiveLayerID = params.ViewSettings->ActiveLayerID;
+    
+    // Coronal
+    params.ActiveLayer[CORONAL_IMAGE] = GetLayerAndInitLayers(
+        params.Layers[CORONAL_IMAGE], params.ViewSettings, CORONAL_IMAGE);
+
+    // Sagital
+    params.ActiveLayer[SAGITAL_IMAGE] = GetLayerAndInitLayers(
+        params.Layers[SAGITAL_IMAGE], params.ViewSettings, SAGITAL_IMAGE);
+
+    // Axial
+    params.ActiveLayer[AXIAL_IMAGE] = GetLayerAndInitLayers(
+        params.Layers[AXIAL_IMAGE], params.ViewSettings, AXIAL_IMAGE);
+}
 
 FrLayerSettings* FrOrthoView::GetLayerAndInitLayers(
-                                           std::vector<FrLayerSettings*>& layers, 
+                                           std::vector<FrLayerSettings*>* layers, 
                                            FrOrthoViewSettings* viewSets, 
                                            int rendererID){
     
     int layerID = viewSets->ActiveLayerID;
-    GetLayerSettings(viewSets, layers, rendererID);
-    LayerCollection::iterator it, itEnd(layers.end());    
+    GetLayerSettings(viewSets, *layers, rendererID);
+    LayerCollection::iterator it, itEnd(layers->end());    
 
     // If not 'broadcast update' then get layer settings 
     FrLayerSettings* layer = 0L;
     if(layerID != ALL_LAYERS_ID){
-        for(it = layers.begin(); it != itEnd; ++it){
+        for(it = layers->begin(); it != itEnd; ++it){
             if((*it)->ID == layerID){
                 layer = (*it);
                 break;
@@ -296,4 +246,133 @@ FrLayerSettings* FrOrthoView::GetLayerAndInitLayers(
         }
     }
     return layer;
+}
+
+void FrOrthoView::ReadDocument(FrUpdateParams2& params){
+    // Read document and connect filters
+    m_docReader->SetDocument(params.Document);
+    m_docReader->SetUnMosaicOn();
+    m_docReader->Update();
+	
+    // Setup slice extractor filter
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
+    }
+
+    // Pass ROI data from output starting from 1
+    // to each of slice extractors
+    int count = m_docReader->GetOutputCount();
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        for(int j=1; j < count; ++j){
+            m_SliceExtractor[i]->SetInput(j, m_docReader->GetOutput(j));
+        }
+    }
+}
+
+void FrOrthoView::ExtractSlice(FrUpdateParams2& params){
+    // set slice to be rendered
+    int maxSliceNumber = 0;
+    // Coronal
+    m_SliceExtractor[CORONAL_IMAGE]->SetOrientation(g_Orientation[CORONAL_IMAGE]);
+    maxSliceNumber = m_SliceExtractor[CORONAL_IMAGE]->GetMaxSliceNumber();
+    params.ViewSettings->CoronalSlice = ClampValue(
+        params.ViewSettings->CoronalSlice, 0, maxSliceNumber);
+    m_SliceExtractor[CORONAL_IMAGE]->SetSlice(params.ViewSettings->CoronalSlice);
+    //Sagital
+    m_SliceExtractor[SAGITAL_IMAGE]->SetOrientation(g_Orientation[SAGITAL_IMAGE]);
+    maxSliceNumber = m_SliceExtractor[SAGITAL_IMAGE]->GetMaxSliceNumber();
+    params.ViewSettings->SagitalSlice = ClampValue(
+        params.ViewSettings->SagitalSlice, 0, maxSliceNumber);
+    m_SliceExtractor[SAGITAL_IMAGE]->SetSlice(params.ViewSettings->SagitalSlice);
+    // Axial
+    m_SliceExtractor[AXIAL_IMAGE]->SetOrientation(g_Orientation[AXIAL_IMAGE]);
+    maxSliceNumber = m_SliceExtractor[AXIAL_IMAGE]->GetMaxSliceNumber();
+    params.ViewSettings->AxialSlice = ClampValue(
+        params.ViewSettings->AxialSlice, 0, maxSliceNumber);
+    m_SliceExtractor[AXIAL_IMAGE]->SetSlice(params.ViewSettings->AxialSlice);
+            
+    // Connect output to layered image
+    char* text[3];
+    text[CORONAL_IMAGE] = "Ortho View: Coronal";
+    text[SAGITAL_IMAGE] = "Ortho View: Sagital";
+    text[AXIAL_IMAGE]   = "Ortho View: Axial";
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        if(m_SliceExtractor[i]->GetInput()){
+            m_SliceExtractor[i]->Update();
+
+            // Set image data
+            m_LayeredImage[i]->SetInput(m_SliceExtractor[i]->GetOutput());
+            
+            // Set ROI data
+            int count = m_docReader->GetOutputCount();
+            for(int j=1; j < count; ++j){
+                m_LayeredImage[i]->SetROIInput(j, m_SliceExtractor[i]->GetOutput(j));
+            }
+
+            // Set text
+            m_LayeredImage[i]->SetText(text[i]);
+        }
+        else {
+            m_LayeredImage[i]->SetText("");
+        }
+    }
+}
+
+void FrOrthoView::UpdateColormap(FrUpdateParams2& params){
+    // Update here colormap values
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        if(params.ActiveLayerID == ALL_LAYERS_ID){
+            // Update all layers
+            LayerCollection::iterator it, itEnd(params.Layers[i]->end());
+            for(it = params.Layers[i]->begin(); it != itEnd; ++it){
+                m_LayeredImage[i]->SetColormapSettings(
+                    (*it)->ColormapSettings, (*it)->ID);
+            }
+        }
+        else {
+            m_LayeredImage[i]->SetColormapSettings(
+                params.ActiveLayer[i]->ColormapSettings, params.ActiveLayer[i]->ID);
+        }
+        m_LayeredImage[i]->UpdateColormap();
+    }
+}
+
+void FrOrthoView::UpdateTBC(FrUpdateParams2& params){
+    // set TBC values
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        if(params.ActiveLayerID == ALL_LAYERS_ID){
+            // Update all layers
+            LayerCollection::iterator it, itEnd(params.Layers[i]->end());
+            for(it = params.Layers[i]->begin(); it != itEnd; ++it){
+                m_LayeredImage[i]->SetTBCSettings(
+                    (*it)->TbcSettings, (*it)->ID);
+            }
+        }
+        else {
+            m_LayeredImage[i]->SetTBCSettings(
+                params.ActiveLayer[i]->TbcSettings, params.ActiveLayer[i]->ID);
+        }
+        m_LayeredImage[i]->UpdateTBC();
+    }
+}
+
+void FrOrthoView::UpdateOpacityVisibility(FrUpdateParams2& params){
+    for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+        if(params.ActiveLayerID == ALL_LAYERS_ID){
+            // Update all layers
+            LayerCollection::iterator it, itEnd(params.Layers[i]->end());
+            for(it = params.Layers[i]->begin(); it != itEnd; ++it){
+                m_LayeredImage[i]->SetOpacity((*it)->Opacity, (*it)->ID);
+                m_LayeredImage[i]->SetVisibility((*it)->Visibility, (*it)->ID);
+            }
+        }
+        else {
+            m_LayeredImage[i]->SetOpacity(
+                params.ActiveLayer[i]->Opacity, params.ActiveLayer[i]->ID);
+            m_LayeredImage[i]->SetVisibility(
+                params.ActiveLayer[i]->Visibility, params.ActiveLayer[i]->ID);
+        }
+    }
+
+    // TODO: add ROI opacity and visibility update ???
 }

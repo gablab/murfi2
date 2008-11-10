@@ -24,6 +24,17 @@
 #include "vtkActorCollection.h"
 #include "vtkRendererCollection.h"
 
+// FrUpdateParams represents params 
+class FrUpdateParams0 {
+public:
+    FrMainDocument*      Document;
+    FrTabSettingsDocObj* TabSettings;
+    FrSliceViewSettings* ViewSettings;
+    int                  ActiveLayerID;
+    FrLayerSettings*     ActiveLayer;
+    LayerCollection      Layers;
+};
+
 
 // Default constructor
 FrSliceView::FrSliceView(FrMainWindow* mainWindow)
@@ -82,31 +93,10 @@ void FrSliceView::RemoveRenderers(){
     renWin->SetNumberOfLayers(0);
 }
 
-void FrSliceView::UpdatePipeline(int point){
-    // Setup some vars
-    int maxSliceNumber = 0;
-
+void FrSliceView::UpdatePipeline(int point){    
     // Get common settings
-    FrMainDocument* document = GetMainWindow()->GetMainDocument();
-    FrTabSettingsDocObj* tabSets = document->GetCurrentTabSettings();
-    FrSliceViewSettings* viewSets = tabSets->GetSliceViewSettings();
-
-    // Get settings of layers
-    int layerID = viewSets->ActiveLayerID;
-    FrLayerSettings* layer = 0L;
-    LayerCollection  layers;
-    GetLayerSettings(viewSets, layers);
-    LayerCollection::iterator it, itEnd(layers.end());    
-
-    // If not 'broadcast update' then get layer settings 
-    if(layerID != ALL_LAYERS_ID){
-        for(it = layers.begin(); it != itEnd; ++it){
-            if((*it)->ID == viewSets->ActiveLayerID){
-                layer = (*it);
-                break;
-            }
-        }
-    }
+    FrUpdateParams0 params;
+    InitUpdateParams(params);
                     	
     // Update pipeline
     switch(point)
@@ -117,81 +107,28 @@ void FrSliceView::UpdatePipeline(int point){
         }
     case FRP_READIMAGE:
         {
-            // read document and connect filters
-            m_docReader->SetDocument(document);
-            m_docReader->SetUnMosaicOn();
-            m_docReader->Update();
-			
-            m_SliceExtractor->SetInput(m_docReader->GetOutput());
+            this->ReadDocument(params);
         }
 	case FRP_SLICE:
         {
-            // set slice to be rendered
-            maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
-            viewSets->SliceNumber = ClampValue(viewSets->SliceNumber, 0, maxSliceNumber);
-            m_SliceExtractor->SetSlice(viewSets->SliceNumber);
-
-            if(m_SliceExtractor->GetInput()){
-			    m_SliceExtractor->Update();
-                m_LayeredImage->SetInput(m_SliceExtractor->GetOutput());
-
-                // Set text
-                char text[255];
-                sprintf(text, "Slice View: %d of %d", 
-                    viewSets->SliceNumber, maxSliceNumber);
-                m_LayeredImage->SetText(text);
-            }
-            else {
-                m_LayeredImage->SetText("");
-            }
+            this->ExtractSlice(params);
         }
     case FRP_COLORMAP:
         {
-            // Update here colormap values
-            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-                for(it=layers.begin(); it != itEnd; ++it){
-                    m_LayeredImage->SetColormapSettings(
-                        (*it)->ColormapSettings, (*it)->ID);
-                }
-            }
-            else {
-                m_LayeredImage->SetColormapSettings(
-                    layer->ColormapSettings, layer->ID);
-            }
-            m_LayeredImage->UpdateColormap();
+            this->UpdateColormap(params);
         }
     case FRP_TBC:
         {
-            // set TBC values
-            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-                for(it=layers.begin(); it != itEnd; ++it){
-                    m_LayeredImage->SetTBCSettings(
-                        (*it)->TbcSettings, (*it)->ID);
-                }
-            }
-            else {
-                m_LayeredImage->SetTBCSettings(
-                    layer->TbcSettings, layer->ID);
-            }
-            m_LayeredImage->UpdateTBC();
+            this->UpdateTBC(params);
         }
     case FRP_OPACITY_VISIBILITY:
         {
-            // Opacity and visibility
-            if(viewSets->ActiveLayerID == ALL_LAYERS_ID){
-                for(it=layers.begin(); it != itEnd; ++it){
-                    m_LayeredImage->SetOpacity((*it)->Opacity, (*it)->ID);
-                    m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
-                }
-            }
-            else {
-                m_LayeredImage->SetOpacity(layer->Opacity, layer->ID);
-                m_LayeredImage->SetVisibility(layer->Visibility, layer->ID);
-            }
+            this->UpdateOpacityVisibility(params);
         }
     case FRP_SETCAM:
         {
-            m_LayeredImage->SetCameraSettings(viewSets->CamSettings, ALL_LAYERS_ID);	
+            m_LayeredImage->SetCameraSettings(
+                params.ViewSettings->CamSettings, ALL_LAYERS_ID);	
             m_LayeredImage->UpdateCamera();
         }
     default:
@@ -199,9 +136,130 @@ void FrSliceView::UpdatePipeline(int point){
         break;
     }
 
-    // Draw border
-    //m_LayeredImage->UpdateBorder();
-
     // redraw scene
 	GetRenderWindow()->Render();
+}
+
+void FrSliceView::InitUpdateParams(FrUpdateParams0& params){
+    // Init params used when updating
+    params.Document     = this->GetMainWindow()->GetMainDocument();
+    params.TabSettings  = params.Document->GetCurrentTabSettings();
+    params.ViewSettings = params.TabSettings->GetSliceViewSettings();
+
+    params.ActiveLayerID = params.ViewSettings->ActiveLayerID;    
+    GetLayerSettings(params.ViewSettings, params.Layers);
+
+    // If not 'broadcast update' then get layer settings 
+    if(params.ActiveLayerID != ALL_LAYERS_ID){
+        // Set default value
+        params.ActiveLayer = 0L;
+
+        // Look for layer settings
+        LayerCollection::iterator it, itEnd(params.Layers.end());
+        for(it = params.Layers.begin(); it != itEnd; ++it){
+            if((*it)->ID == params.ActiveLayerID){
+                params.ActiveLayer = (*it);
+                break;
+            }
+        }
+    }
+}
+
+void FrSliceView::ReadDocument(FrUpdateParams0& params){
+    // Read document and connect filters
+    m_docReader->SetDocument(params.Document);
+    m_docReader->SetUnMosaicOn();
+    m_docReader->Update();
+	
+    // Pass image Set image input
+    m_SliceExtractor->SetInput(m_docReader->GetOutput());
+
+    // Pass ROI data from output starting from 1
+    int count = m_docReader->GetOutputCount();
+    for(int i=1; i < count; ++i){
+        m_SliceExtractor->SetInput(i, m_docReader->GetOutput(i));
+    }
+}
+
+void FrSliceView::ExtractSlice(FrUpdateParams0& params){
+    // set slice to be rendered
+    int maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
+    params.ViewSettings->SliceNumber = ClampValue(
+        params.ViewSettings->SliceNumber, 0, maxSliceNumber);
+    m_SliceExtractor->SetSlice(params.ViewSettings->SliceNumber);
+
+    if(m_SliceExtractor->GetInput()){
+	    m_SliceExtractor->Update();
+
+        // Set image data
+        m_LayeredImage->SetInput(m_SliceExtractor->GetOutput());
+
+        // Set ROI data
+        int count = m_docReader->GetOutputCount();
+        for(int i=1; i < count; ++i){
+            m_LayeredImage->SetROIInput(i, m_SliceExtractor->GetOutput(i));
+        }
+
+        // Set text
+        char text[255];
+        sprintf(text, "Slice View: %d of %d", 
+            params.ViewSettings->SliceNumber, maxSliceNumber);
+
+        m_LayeredImage->SetText(text);
+    }
+    else {
+        m_LayeredImage->SetText("");
+    }
+}
+
+void FrSliceView::UpdateColormap(FrUpdateParams0& params){
+    if(params.ActiveLayerID == ALL_LAYERS_ID){
+        // Update all layers
+        LayerCollection::iterator it, itEnd(params.Layers.end());
+        for(it = params.Layers.begin(); it != itEnd; ++it){
+            m_LayeredImage->SetColormapSettings(
+                (*it)->ColormapSettings, (*it)->ID);
+        }
+    }
+    else {
+        m_LayeredImage->SetColormapSettings(
+            params.ActiveLayer->ColormapSettings, params.ActiveLayer->ID);
+    }
+    m_LayeredImage->UpdateColormap();
+}
+
+void FrSliceView::UpdateTBC(FrUpdateParams0& params){
+    // Update TBC
+    if(params.ActiveLayerID == ALL_LAYERS_ID){
+        // Update all layers
+        LayerCollection::iterator it, itEnd(params.Layers.end());
+        for(it = params.Layers.begin(); it != itEnd; ++it){
+            m_LayeredImage->SetTBCSettings((*it)->TbcSettings, (*it)->ID);
+        }
+    }
+    else {
+        m_LayeredImage->SetTBCSettings(
+            params.ActiveLayer->TbcSettings, params.ActiveLayer->ID);
+    }
+    m_LayeredImage->UpdateTBC();
+}
+
+void FrSliceView::UpdateOpacityVisibility(FrUpdateParams0& params){
+    // Update Opacity and visibility
+    if(params.ActiveLayerID == ALL_LAYERS_ID){
+        // Update all params
+        LayerCollection::iterator it, itEnd(params.Layers.end());
+        for(it = params.Layers.begin(); it != itEnd; ++it){
+            m_LayeredImage->SetOpacity((*it)->Opacity, (*it)->ID);
+            m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
+        }
+    }
+    else {
+        m_LayeredImage->SetOpacity(
+            params.ActiveLayer->Opacity, params.ActiveLayer->ID);
+        m_LayeredImage->SetVisibility(
+            params.ActiveLayer->Visibility, params.ActiveLayer->ID);
+    }
+
+    // TODO: add ROI opacity and visibility update ???
 }

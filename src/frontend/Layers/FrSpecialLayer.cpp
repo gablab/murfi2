@@ -30,6 +30,8 @@ FrSpecialLayer::~FrSpecialLayer() {
     if(m_BorderPts) m_BorderPts->Delete();
     if(m_BorderMapper) m_BorderMapper->Delete();
     if(m_BorderActor) m_BorderActor->Delete();
+    // Free Selection
+    if(m_Selection) m_Selection->Delete();
 }
 
 void FrSpecialLayer::InitializeText(){

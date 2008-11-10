@@ -10,6 +10,7 @@
 // Defines
 #define DEF_SPACING 1.0
 #define DEF_FRAME 0
+#define DEF_PORT_NUM 0
 
 
 vtkStandardNewMacro(FrSliceExtractor);
@@ -28,26 +29,41 @@ FrSliceExtractor::~FrSliceExtractor(){
     if(m_Reslicer) m_Reslicer->Delete();
 }
 
-void FrSliceExtractor::SetInput(vtkImageData *input){
-    if(input == m_Reslicer->GetInput()) return;    
+void FrSliceExtractor::SetInput(int port, vtkImageData* input){
+    if(input == m_Reslicer->GetInput(port)) return;    
 
-    m_Reslicer->SetInput(input);
+    m_Reslicer->SetInput(port, input);
     this->Modified();
     
-    if(input != 0L){
-        input->GetSpacing(m_Spacing);
+    // Set spacing using info from def port data
+    if(port == DEF_PORT_NUM){
+        if(input != 0L){
+            input->GetSpacing(m_Spacing);
+        }
+        else {
+            m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = DEF_SPACING;
+        }
     }
-    else {
-        m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = DEF_SPACING;
-    }
+}
+
+void FrSliceExtractor::SetInput(vtkImageData* input){
+    this->SetInput(DEF_PORT_NUM, input);
+}
+
+vtkImageData* FrSliceExtractor::GetInput(int port){
+    return (vtkImageData*)m_Reslicer->GetInput(port);
 }
 
 vtkImageData* FrSliceExtractor::GetInput(){
-    return (vtkImageData*)m_Reslicer->GetInput();
+    return this->GetInput(DEF_PORT_NUM);
 }
 
-vtkImageData* FrSliceExtractor::GetOutput(){    
-    return m_Reslicer->GetOutput();
+vtkImageData* FrSliceExtractor::GetOutput(int port){
+    return m_Reslicer->GetOutput(port);
+}
+
+vtkImageData* FrSliceExtractor::GetOutput(){
+    return this->GetOutput(DEF_PORT_NUM);
 }
 
 void FrSliceExtractor::SetOrientation(FrSliceExtractor::Orientation orient){

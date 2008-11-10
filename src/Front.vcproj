@@ -345,11 +345,43 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Tools\FrDilatoneErosionTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrDilatoneErosionTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrMaskMaskTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrMaskMaskTool.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Tools\FrPanTool.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\frontend\Tools\FrPanTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrPenTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrPenTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrRectangleTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrRectangleTool.h"
 				>
 			</File>
 			<File
@@ -366,6 +398,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Tools\FrSliceScrollTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrSphereTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrSphereTool.h"
 				>
 			</File>
 			<File

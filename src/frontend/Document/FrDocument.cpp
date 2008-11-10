@@ -43,6 +43,7 @@ void FrDocument::DeleteAll(){
     
 void FrDocument::GetObjectsByType(std::vector<FrDocumentObj*>& objects, 
                                   FrDocumentObj::ObjType type){
+    objects.clear();
     std::vector<FrDocumentObj*>::iterator it, itEnd(m_Objects.end());
 
     for(it = m_Objects.begin(); it != itEnd; ++it){

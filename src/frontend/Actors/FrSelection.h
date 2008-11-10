@@ -47,9 +47,11 @@ public:
     FrGetPropMacro(SelectionParams, params);
 
 protected:
-
 	FrSelection();
 	virtual ~FrSelection();
+
+private:
+    //VTK style
 	FrSelection(const FrSelection&) {};
 	void operator=(const FrSelection&) {};
 
@@ -61,8 +63,6 @@ private:
 private:
 	vtkActor* m_actor;
     vtkPolyDataMapper* m_mapper;
-
-
 };
 
 #endif

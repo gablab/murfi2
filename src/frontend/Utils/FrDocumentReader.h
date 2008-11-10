@@ -1,12 +1,21 @@
 #ifndef FR_DOC_READER
 #define FR_DOC_READER
 
+// Forward declarations
 class FrDocument;
 class vtkImageData;
+class FrImageDocObj;
+class FrRoiDocObj;
 
+// Some includes
 #include "FrMacro.h"
 #include "vtkObject.h"
 
+#include <vector>
+
+// This class performes reading of FrMainDocument objects.
+// It reads image data and also ROI data. Image data can be obtained 
+// using GetOutput() method or GetOutput(port#) where port# == 0
 class FrDocumentReader : public vtkObject {
 public:
     vtkTypeMacro(FrDocumentReader,vtkObject);
@@ -29,10 +38,19 @@ public:
 
     FrGetPropMacro(FrDocument*,Document);
     void SetDocument(FrDocument* document);
+    
+    // Output management
+    int GetOutputCount();
+    vtkImageData* GetOutput();
+    vtkImageData* GetOutput(int port);
 
-    FrGetPropMacro(vtkImageData*,Output);
-    void SetOutput(vtkImageData* output);
+private:    
+    void AddOutput(vtkImageData* data);
+    void ClearOutputs();
 
+    vtkImageData* ReadImage(FrImageDocObj* imgDO);
+    vtkImageData* ReadROI(FrRoiDocObj* roiDO);
+    
 protected:
     FrDocumentReader();
     ~FrDocumentReader();
@@ -44,6 +62,11 @@ protected:
 private:
     FrDocumentReader(const FrDocumentReader&);  // Not implemented.
     void operator=(const FrDocumentReader&);  // Not implemented.
+
+private:
+    // Collection of putput ports
+    typedef std::vector<vtkImageData*> OutputCollection;
+    OutputCollection m_Outputs;
 };
 
 #endif

@@ -7,7 +7,7 @@
 class FrTool;
 class FrMainController;
 
-class FrToolController : FrController
+class FrToolController : public FrController
 {
 public:
     FrToolController(FrController* controller=0L);

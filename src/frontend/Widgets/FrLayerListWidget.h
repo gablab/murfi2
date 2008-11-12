@@ -3,8 +3,11 @@
 
 // Forward declarations 
 class FrLayerSettings;
-class FrSpinSliderWidget; 
-class FrColormapWidget;
+//class FrSpinSliderWidget; 
+//class FrColormapWidget;
+class FrLayerToolWidget;
+class FrROIToolWidget;
+
 class QTableWidget;
 class QHBoxLayout;
 class QToolButton;
@@ -65,8 +68,10 @@ private:
     QToolButton*    m_btnDelete;
     QToolButton*    m_btnChange;
 
-    FrColormapWidget*   m_colormapWidget;
-    FrSpinSliderWidget* m_opacityWidget;
+    //FrColormapWidget*   m_colormapWidget;
+    //FrSpinSliderWidget* m_opacityWidget;
+    FrLayerToolWidget* m_layerToolWidget;
+    FrROIToolWidget* m_roiToolWidget;
 
     bool m_signalsBlocked;
 };

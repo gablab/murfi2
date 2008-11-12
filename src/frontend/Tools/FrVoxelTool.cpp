@@ -11,9 +11,6 @@
 #include "vtkRenderer.h"
 #include "vtkPointPicker.h"
 
-
-
-
 // Some defines 
 #define DEF_TOLERANCE 0.0
 #define BAD_POINT_INDEX -1

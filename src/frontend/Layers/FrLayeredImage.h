@@ -61,6 +61,8 @@ public:
     FrImageLayer* GetImageLayerByID(int id);
     FrROILayer* GetROILayerByID(int id);
 
+    FrSpecialLayer* GetSpecialLayer(){return m_SpecialLayer;};
+
     //
     // Text management
     //

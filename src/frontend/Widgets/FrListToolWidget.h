@@ -6,8 +6,9 @@
 #include "Qt/qwidget.h"
 #include "Qt/qstring.h"
 
-class QSpinBox;
 class QLabel;
+class QListWidget;
+class QListWidgetItem;
 
 class FrListToolWidget: public FrBaseToolWidget{
     Q_OBJECT
@@ -15,18 +16,18 @@ class FrListToolWidget: public FrBaseToolWidget{
 public:
     FrListToolWidget(QWidget* parent);
 
-    //int GetValue();
-    //void SetName(QString name);
-    //void SetValue(int value);
+    void SetName(QString name);
+    void SetList();
 
 signals:
+    virtual void ParamsChanged();
 
 private Q_SLOTS:
-
+    void ROIListItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 
 private:
-    QSpinBox* spinBox;
     QLabel* label;
+    QListWidget* roiList;
 
 };
 

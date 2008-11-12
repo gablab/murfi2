@@ -1,5 +1,5 @@
-#ifndef FR_EMTYTOOL_WIDGET
-#define FR_EMTYTOOL_WIDGET
+#ifndef FR_SPINTOOL_WIDGET
+#define FR_SPINTOOL_WIDGET
 
 #include "FrBaseToolWidget.h"
 
@@ -20,9 +20,10 @@ public:
     void SetValue(int value);
 
 signals:
+    virtual void ParamsChanged();
 
 private Q_SLOTS:
-
+    void spinBoxValueChanged(int value);
 
 private:
     QSpinBox* spinBox;

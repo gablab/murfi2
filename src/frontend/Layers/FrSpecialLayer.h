@@ -6,10 +6,11 @@ class vtkTextMapper;
 class vtkPoints;
 class vtkPolyDataMapper2D;
 class vtkActor2D;
-class FrSelection;
 
 // Includes
 #include "FrBaseLayer.h"
+#include "FrSelection.h"
+
 
 class FrSpecialLayer : public FrBaseLayer {
 public:
@@ -19,6 +20,8 @@ public:
 public:
     void SetText(const char* text);
     void UpdateBorder(int winWidth, int winHeight);
+    void SetSelection(SelectionParams params);
+    void SetSelectionVisibility(bool visible);
 
 private:
 	// Text support

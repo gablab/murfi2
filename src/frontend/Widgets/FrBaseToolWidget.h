@@ -9,6 +9,12 @@ class FrBaseToolWidget: public QWidget{
 public:
     FrBaseToolWidget(QWidget* parent);
 
+signals:
+     virtual void ParamsChanged();
+
+private Q_SLOTS:
+
+
 private:
     
 };

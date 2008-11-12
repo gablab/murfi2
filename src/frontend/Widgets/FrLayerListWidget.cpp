@@ -3,6 +3,8 @@
 #include "FrLayerWidget.h"
 #include "FrColormapWidget.h"
 #include "FrSpinSliderWidget.h"
+#include "FrLayerToolWidget.h"
+#include "FrROIToolWidget.h"
 
 #include "Qt/qtablewidget.h"
 #include "Qt/qboxlayout.h"
@@ -66,33 +68,40 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
     layerLayout->addWidget(m_layerTable);
     layerLayout->addWidget(btnBlock);
 
-    // colormap widget
-    m_colormapWidget = new FrColormapWidget(this);
+    //// colormap widget
+    //m_colormapWidget = new FrColormapWidget(this);
 
-    // opacity widget
-    QLabel*	lblOpacity = new QLabel("Opacity: ", this);
-    m_opacityWidget = new FrSpinSliderWidget(this);
-    m_opacityWidget->SetMinMax(0, 100);
-    m_opacityWidget->SetValue(100);
+    //// opacity widget
+    //QLabel*	lblOpacity = new QLabel("Opacity: ", this);
+    //m_opacityWidget = new FrSpinSliderWidget(this);
+    //m_opacityWidget->SetMinMax(0, 100);
+    //m_opacityWidget->SetValue(100);
 
-    QHBoxLayout* opacityLayout = new QHBoxLayout();
-    opacityLayout->addWidget(lblOpacity);
-    opacityLayout->addWidget(m_opacityWidget);
+    //QHBoxLayout* opacityLayout = new QHBoxLayout();
+    //opacityLayout->addWidget(lblOpacity);
+    //opacityLayout->addWidget(m_opacityWidget);
 
-    // spacer
-    //QSpacerItem *spacerItem;
-    //spacerItem = new QSpacerItem(40, 40, QSizePolicy::Fixed, QSizePolicy::Expanding);
+    //// spacer
+    ////QSpacerItem *spacerItem;
+    ////spacerItem = new QSpacerItem(40, 40, QSizePolicy::Fixed, QSizePolicy::Expanding);
 
-    // Setup property layout (rightmost)
-    QVBoxLayout* propLayout = new QVBoxLayout();
-    propLayout->addWidget(m_colormapWidget);
-    propLayout->addLayout(opacityLayout);
-    //propLayout->addItem(spacerItem);
+    //// Setup property layout (rightmost)
+    //QVBoxLayout* propLayout = new QVBoxLayout();
+    //propLayout->addWidget(m_colormapWidget);
+    //propLayout->addLayout(opacityLayout);
+    ////propLayout->addItem(spacerItem);
+
+    m_layerToolWidget = new FrLayerToolWidget(this);
+    //m_layerToolWidget->setVisible(false);   // test
+    m_roiToolWidget = new FrROIToolWidget(this);
+    m_roiToolWidget->setVisible(false);    
 
     // Setup main layout
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->addLayout(layerLayout);
-    mainLayout->addLayout(propLayout);
+    //mainLayout->addLayout(propLayout);
+    mainLayout->addWidget(m_layerToolWidget);
+    mainLayout->addWidget(m_roiToolWidget);
 
     // Connect signals
     // NOTE use cellClicked since problems for Qt 4.2.3
@@ -103,10 +112,16 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
     connect( m_btnDelete, SIGNAL(clicked()), this, SLOT(OnDeleteClicked()) );
     connect( m_btnChange, SIGNAL(clicked()), this, SLOT(OnChangeClicked()) );
 
-    connect( m_opacityWidget, SIGNAL(ValueChanged(int)), 
+    //connect( m_opacityWidget, SIGNAL(ValueChanged(int)), 
+    //         this, SLOT(OnOpacityChanged(int)) );
+
+    //connect( m_colormapWidget, SIGNAL(ParamsChanged()), 
+    //         this, SLOT(OnColormapParamsChanged()) );
+
+    connect( m_layerToolWidget->GetOpacityWidget(), SIGNAL(ValueChanged(int)), 
              this, SLOT(OnOpacityChanged(int)) );
 
-    connect( m_colormapWidget, SIGNAL(ParamsChanged()), 
+    connect( m_layerToolWidget->GetColormapWidget(), SIGNAL(ParamsChanged()), 
              this, SLOT(OnColormapParamsChanged()) );
 
     //this->setMinimumHeight(230);
@@ -130,12 +145,15 @@ void FrLayerListWidget::AddLayer(FrLayerSettings* layerSets){
             this, SLOT(OnVisibilityChanged(int)));
     m_layerTable->setCellWidget(INSERT_ROW_NUM, TAB_LAYER_IDX, lw);
 
+    FrColormapWidget* cmpw = m_layerToolWidget->GetColormapWidget();
+    FrSpinSliderWidget* opw = m_layerToolWidget->GetOpacityWidget();
+
     // Init opacity
-    int opacity = int(layerSets->Opacity * m_opacityWidget->GetMaximum());
-    m_opacityWidget->SetValue(opacity);
+    int opacity = int(layerSets->Opacity * opw->GetMaximum());
+    opw->SetValue(opacity);
 
     // Init Colormap settings
-    m_colormapWidget->SetColormapParams(layerSets->ColormapSettings);
+    cmpw->SetColormapParams(layerSets->ColormapSettings);
 }
 
 void FrLayerListWidget::RemoveLayers(){
@@ -179,18 +197,20 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
         // Setup widgets
         FrLayerSettings params;
         wgt->GetLayerParams(params);
+        FrColormapWidget* cmpw = m_layerToolWidget->GetColormapWidget();
+        FrSpinSliderWidget* opw = m_layerToolWidget->GetOpacityWidget();
 
         if (params.ID == DEFAULT_LAYER_ID)
-            m_colormapWidget->setVisible(false);
+            cmpw->setVisible(false);
         else
-            m_colormapWidget->setVisible(true);
+            cmpw->setVisible(true);
 
-        m_colormapWidget->BlockSignals(true);
-        m_colormapWidget->SetColormapParams(params.ColormapSettings);
-        m_colormapWidget->BlockSignals(false);
+        cmpw->BlockSignals(true);
+        cmpw->SetColormapParams(params.ColormapSettings);
+        cmpw->BlockSignals(false);
 
-        int opacity = int(params.Opacity * m_opacityWidget->GetMaximum());
-        m_opacityWidget->SetValue(opacity);
+        int opacity = int(params.Opacity * opw->GetMaximum());
+        opw->SetValue(opacity);
 
         if(m_signalsBlocked) return;
         emit LayerSelected(params.ID);
@@ -250,11 +270,13 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
 
         FrLayerSettings params;
         wgt->GetLayerParams(params);
+        FrColormapWidget* cmpw = m_layerToolWidget->GetColormapWidget();
+        FrSpinSliderWidget* opw = m_layerToolWidget->GetOpacityWidget();
 
-        params.Opacity = double(m_opacityWidget->GetValue()) / 
-                         double(m_opacityWidget->GetMaximum());
+        params.Opacity = double(opw->GetValue()) / 
+                         double(opw->GetMaximum());
 
-        m_colormapWidget->GetColormapParams(params.ColormapSettings);
+        cmpw->GetColormapParams(params.ColormapSettings);
         wgt->SetLayerParams(params);
 
         m_signalsBlocked = oldSB;

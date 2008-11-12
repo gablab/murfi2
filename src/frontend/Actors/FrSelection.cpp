@@ -19,12 +19,11 @@
 vtkStandardNewMacro(FrSelection);
 
 // Construct object with no children.
-FrSelection::FrSelection()
-    : m_actor(0), m_mapper(0) {
-    // Init actor and mapper
-    m_actor = vtkActor::New();
+FrSelection::FrSelection(){
     m_mapper = vtkPolyDataMapper::New();
-	
+	m_actor = vtkActor::New();
+//    m_actor->PickableOff();
+
 	this->AddPart(m_actor);
 	this->PickableOff();
 }
@@ -39,7 +38,7 @@ void FrSelection::SetSelectionParams(SelectionParams params){
 
     switch (m_params.type){
         case 0:
-            return; // no type selected, exit
+            // display nothing
             break;
         case 1:          // rectangle
             DrawRectangle();
@@ -54,7 +53,7 @@ void FrSelection::SetSelectionParams(SelectionParams params){
 }
 
 void FrSelection::DrawRectangle(){
-	int minx, miny, maxx, maxy;
+    int minx, miny, maxx, maxy;
     minx = m_params.leftCorner[0];
     miny = m_params.leftCorner[1];
     maxx = m_params.width;
@@ -79,7 +78,7 @@ void FrSelection::DrawRectangle(){
     selectRect->SetLines(rect);
 
     m_mapper->SetInput(selectRect);
-    m_mapper->Modified();
+//    m_mapper->Modified();
    
     m_actor->SetMapper(m_mapper);
     m_actor->Modified();

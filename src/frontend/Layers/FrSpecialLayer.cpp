@@ -1,5 +1,4 @@
 #include "FrSpecialLayer.h"
-#include "FrSelection.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -111,4 +110,14 @@ void FrSpecialLayer::UpdateBorder(int winWidth, int winHeight){
     m_BorderPts->InsertPoint(2, maxx, maxy, 0);
     m_BorderPts->InsertPoint(3, minx, maxy, 0);
     m_BorderPts->Modified();
+}
+
+void FrSpecialLayer::SetSelection(SelectionParams params){
+    m_Selection->SetSelectionParams(params);
+}
+
+void FrSpecialLayer::SetSelectionVisibility(bool visible){
+    if(m_Selection){
+        m_Selection->SetVisibility(visible);
+    }
 }

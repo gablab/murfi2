@@ -3,6 +3,12 @@
 
 #include "FrTool.h"
 
+class FrMaskRectangleTool;
+class FrLayerSettings;
+class vtkPointPicker;
+
+#include <vector>
+
 // ROI tool
 class FrRoiTool : public FrTool {
 public:
@@ -18,6 +24,15 @@ public:
 	FrRoiTool();
 	// Destructor
 	virtual ~FrRoiTool();
+
+private:
+    void GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params);
+    int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
+
+private:
+    FrMaskRectangleTool* m_maskRectTool;
+    vtkPointPicker* m_PointPicker;
+
 };
 
 #endif

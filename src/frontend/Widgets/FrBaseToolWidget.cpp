@@ -4,3 +4,4 @@ FrBaseToolWidget::FrBaseToolWidget(QWidget* parent)
 : QWidget(parent){
 
 }
+

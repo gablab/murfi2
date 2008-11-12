@@ -13,8 +13,9 @@ FrSpinToolWidget::FrSpinToolWidget(QWidget* parent)
     spinBox = new QSpinBox(this);
     spinBox->setMinimum(DEF_MIN_VALUE);
     spinBox->setMaximum(DEF_MAX_VALUE);
+    connect(spinBox, SIGNAL(valueChanged(int)), this, SLOT(spinBoxValueChanged(int)));
 
-    label = new QLabel(this);
+    label = new QLabel("test", this);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->addWidget(label);
@@ -31,4 +32,8 @@ void FrSpinToolWidget::SetName(QString name){
 
 int FrSpinToolWidget::GetValue(){
     return spinBox->value();
+}
+
+void FrSpinToolWidget::spinBoxValueChanged(int value){
+    emit ParamsChanged();
 }

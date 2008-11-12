@@ -4,7 +4,6 @@
 
 //Forward declarations
 class FrCameraSettings;
-class FrSelection;
 class vtkImageData;
 class vtkImageActor;
 class vtkRenderer;
@@ -38,13 +37,9 @@ public:
     // Update methods
     virtual void UpdateCamera();
 
-    // Selection methods
-    void SetSelection();
-
 protected:
     // Pipeline stuff
     vtkImageActor* m_actor;
-    FrSelection* m_selection;
 
 private:
     FrROILayer(const FrROILayer&);  // Not implemented.

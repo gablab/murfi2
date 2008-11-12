@@ -2,19 +2,42 @@
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
+#include "FrMaskRectangleTool.h"
+#include "FrSliceView.h"
+#include "FrMosaicView.h"
+#include "FrOrthoView.h"
+#include "FrLayeredImage.h"
+#include "FrMainDocument.h"
+#include "FrMainWindow.h"
+#include "FrUtils.h"
+
+// VTK stuff
+#include "vtkPointPicker.h"
+#include "vtkRenderer.h"
 
 #include "Qt/qstring.h"
 #include "Qt/qmessagebox.h"
 
+#define DEF_TOLERANCE 0.0
 
 
 FrRoiTool::FrRoiTool(){
+    m_maskRectTool = new FrMaskRectangleTool();
+    m_PointPicker = vtkPointPicker::New();
+    m_PointPicker->SetTolerance(DEF_TOLERANCE);
 }
 
 FrRoiTool::~FrRoiTool(){
+    if (m_maskRectTool) delete m_maskRectTool;
+    if (m_PointPicker) m_PointPicker->Delete();
 }
 
 void FrRoiTool::Start(){
+   // Setup controller
+    m_maskRectTool->SetController(this->GetController());
+
+    m_maskRectTool->Start();
+
     // Update interface to ensure tool is checked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
     cmd->SetToolType(FrManageToolCmd::RoiTool);
@@ -25,6 +48,11 @@ void FrRoiTool::Start(){
 }
 
 void FrRoiTool::Stop(){
+    // Unregister controller
+    m_maskRectTool->SetController(0);
+
+    m_maskRectTool->Stop();
+
     // Update interface to ensure tool is unchecked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
     cmd->SetToolType(FrManageToolCmd::RoiTool);
@@ -35,18 +63,111 @@ void FrRoiTool::Stop(){
 }
 
 bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
+    if(params.Button == FrMouseParams::LeftButton){
+        GetMappedCoords(is, params);
+        m_maskRectTool->OnMouseUp(is, params);
+    }
+
     return false;
 }
 
 bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    //QMessageBox::information(0, QString("Tool info"), QString("ROI tool is working"));
+    if(params.Button == FrMouseParams::LeftButton){
+        GetMappedCoords(is, params);
+        m_maskRectTool->OnMouseDown(is, params);
+    }
+
     return false;
 }
 
 bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
+    if(params.Button == FrMouseParams::LeftButton){
+        GetMappedCoords(is, params);
+        m_maskRectTool->OnMouseMove(is, params);
+    }
+
     return false;
 }
 
 bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
+    if(params.Button == FrMouseParams::LeftButton){
+        GetMappedCoords(is, params);
+        m_maskRectTool->OnMouseDrag(is, params);
+    }
+    
     return false;
+}
+
+void FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
+    FrMainController* mc = dynamic_cast<FrMainController*>(this->GetController()->GetOwner());
+    FrMainWindow* mv = mc->GetMainView();
+    FrMainDocument* md = mc->GetMainDocument();
+    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();       
+
+    std::vector<vtkRenderer*> renCollection;
+    int imgNumber = -1;
+    FrLayeredImage* lim = 0;
+    std::vector<FrLayerSettings*> layers;
+
+    enum FrTabSettingsDocObj::View view = ts->GetActiveView();
+    switch(view){
+        case FrTabSettingsDocObj::SliceView:
+            mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
+            lim = mv->GetSliceView()->GetImage();
+            GetLayerSettings(ts->GetSliceViewSettings(), layers);
+            break;
+        case FrTabSettingsDocObj::MosaicView:
+            mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
+            lim = mv->GetMosaicView()->GetImage();
+            GetLayerSettings(ts->GetMosaicViewSettings(), layers);
+            break;
+        case FrTabSettingsDocObj::OrthoView:
+            {
+                FrOrthoView* ov =  mv->GetOrthoView();
+
+                // Find Image where click's occured
+                for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                    if (ov->GetImage(i)->GetRenderer()->IsInViewport(params.X, params.Y)){
+                        imgNumber = i; 
+                        break;
+                    }
+                }
+                if (imgNumber != -1){
+                    ov->GetImage(imgNumber)->GetRenderers(renCollection);
+                    lim = ov->GetImage(imgNumber);
+                    GetLayerSettings(ts->GetOrthoViewSettings(), layers, imgNumber);
+                }
+                else{
+                    // do something
+                    return;
+                }
+                break;
+            }
+    } // end switch(view)
+
+    // we should get any layer with visible actor
+    int visibleLayerNum = GetVisibleLayer(layers);
+    vtkRenderer* renderer = renCollection[visibleLayerNum];	    
+
+    if (!m_PointPicker->Pick(params.X, params.Y, 0, renderer)) {
+        // do something
+    }
+
+    // Get the mapped position of the mouse using the picker.
+    double ptMapped[3];
+    m_PointPicker->GetMapperPosition(ptMapped);
+    
+    params.X = ptMapped[0];
+    params.Y = ptMapped[1];
+}
+
+int FrRoiTool::GetVisibleLayer(std::vector<FrLayerSettings*> layers){
+    std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
+    for (it = layers.begin(); it != itEnd; ++it){
+        if ((*it)->Visibility){
+            return (*it)->ID;
+        }
+    }
+
+    return 0;   // there are no visible actors atm
 }

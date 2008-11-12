@@ -26,9 +26,8 @@ typedef struct _selectionParams{
     std::vector<Pos> points;        // for free shape polygon
     int radius;                     // for sphere
     int center;                     // for sphere
-    int leftCorner[2];              // for rectangle
-    int width;                      // for rectangle
-    int height;                     // for rectangle
+    int firstPoint[2];              // for rectangle
+    int secondPoint[2];              // for rectangle
 }SelectionParams;
 
 

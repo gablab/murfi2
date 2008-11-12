@@ -14,6 +14,7 @@
 // VTK stuff
 #include "vtkPointPicker.h"
 #include "vtkRenderer.h"
+#include "vtkCoordinate.h"
 
 #include "Qt/qstring.h"
 #include "Qt/qmessagebox.h"
@@ -64,7 +65,8 @@ void FrRoiTool::Stop(){
 
 bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
-        GetMappedCoords(is, params);
+        //if (params.X != -1)
+            GetMappedCoords(is, params);
         m_maskRectTool->OnMouseUp(is, params);
     }
 
@@ -74,7 +76,8 @@ bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         GetMappedCoords(is, params);
-        m_maskRectTool->OnMouseDown(is, params);
+        //if (params.X != -1)
+            m_maskRectTool->OnMouseDown(is, params);
     }
 
     return false;
@@ -83,7 +86,8 @@ bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         GetMappedCoords(is, params);
-        m_maskRectTool->OnMouseMove(is, params);
+        //if (params.X != -1)
+            m_maskRectTool->OnMouseMove(is, params);
     }
 
     return false;
@@ -92,7 +96,8 @@ bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         GetMappedCoords(is, params);
-        m_maskRectTool->OnMouseDrag(is, params);
+        //if (params.X != -1)
+            m_maskRectTool->OnMouseDrag(is, params);
     }
     
     return false;
@@ -149,16 +154,35 @@ void FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     int visibleLayerNum = GetVisibleLayer(layers);
     vtkRenderer* renderer = renCollection[visibleLayerNum];	    
 
-    if (!m_PointPicker->Pick(params.X, params.Y, 0, renderer)) {
-        // do something
-    }
+//    bool notInside = false;
+//    if (!m_PointPicker->Pick(params.X, params.Y, 0, renderer)){
+//        // point is not inside of image actor
+//        notInside = true;
+//    }
+//
+//    // Get the mapped position of the mouse using the picker.
+//    double ptMapped[3];
+//    m_PointPicker->GetMapperPosition(ptMapped);
+//
+//    //if (notInside){
+//    //    ptMapped[0] = ptMapped[1] = ptMapped[2] = -1;
+//    //}
+//
+////    params.X = ptMapped[0];
+////    params.Y = ptMapped[1];
 
-    // Get the mapped position of the mouse using the picker.
-    double ptMapped[3];
-    m_PointPicker->GetMapperPosition(ptMapped);
-    
-    params.X = ptMapped[0];
-    params.Y = ptMapped[1];
+    // test
+    double* point;
+
+    vtkCoordinate* coordinate = vtkCoordinate::New();
+    coordinate->SetCoordinateSystemToDisplay();
+    coordinate->SetValue(params.X, params.Y, 0.0);
+    point = coordinate->GetComputedWorldValue(renderer);
+
+    params.X = int(point[0]);
+    params.Y = int(point[1]);
+
+    coordinate->Delete();
 }
 
 int FrRoiTool::GetVisibleLayer(std::vector<FrLayerSettings*> layers){

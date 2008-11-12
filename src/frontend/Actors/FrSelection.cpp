@@ -54,10 +54,10 @@ void FrSelection::SetSelectionParams(SelectionParams params){
 
 void FrSelection::DrawRectangle(){
     int minx, miny, maxx, maxy;
-    minx = m_params.leftCorner[0];
-    miny = m_params.leftCorner[1];
-    maxx = m_params.width;
-    maxy = m_params.height;
+    minx = m_params.firstPoint[0];
+    miny = m_params.firstPoint[1];
+    maxx = m_params.secondPoint[0];
+    maxy = m_params.secondPoint[1];
 
     vtkPoints* m_BorderPts = vtkPoints::New();
     m_BorderPts->InsertPoint(0, minx, miny, 0);

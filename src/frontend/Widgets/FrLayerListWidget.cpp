@@ -5,6 +5,7 @@
 #include "FrSpinSliderWidget.h"
 #include "FrLayerToolWidget.h"
 #include "FrROIToolWidget.h"
+#include "FrRoiDocObj.h"
 
 #include "Qt/qtablewidget.h"
 #include "Qt/qboxlayout.h"
@@ -123,8 +124,7 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
 
     connect( m_layerToolWidget->GetColormapWidget(), SIGNAL(ParamsChanged()), 
              this, SLOT(OnColormapParamsChanged()) );
-
-    //this->setMinimumHeight(230);
+   
     this->setFixedHeight(this->sizeHint().height());
     this->setFixedWidth(this->sizeHint().width());
 }
@@ -154,6 +154,29 @@ void FrLayerListWidget::AddLayer(FrLayerSettings* layerSets){
 
     // Init Colormap settings
     cmpw->SetColormapParams(layerSets->ColormapSettings);
+}
+
+void FrLayerListWidget::AddRoiLayer(FrRoiDocObj* roiDO){
+    // NOTE: Layers are added in the top
+    m_layerTable->insertRow(INSERT_ROW_NUM);
+    m_layerTable->setRowHeight(INSERT_ROW_NUM, 40);
+
+    // Set ID
+    QString strID = QString().setNum(roiDO->GetID());
+    m_layerTable->setItem(INSERT_ROW_NUM, TAB_ID_IDX, new QTableWidgetItem(strID));
+
+    // Create layer widget and add it to table
+    FrLayerWidget* lw = new FrLayerWidget(*roiDO, this);
+    connect(lw, SIGNAL(VisibilityChanged(int)), 
+            this, SLOT(OnVisibilityChanged(int)));
+    m_layerTable->setCellWidget(INSERT_ROW_NUM, TAB_LAYER_IDX, lw);
+
+    FrColormapWidget* cmpw = m_layerToolWidget->GetColormapWidget();
+    FrSpinSliderWidget* opw = m_layerToolWidget->GetOpacityWidget();
+
+    // Init opacity
+    int opacity = int(roiDO->GetOpacity() * opw->GetMaximum());
+    opw->SetValue(opacity);
 }
 
 void FrLayerListWidget::RemoveLayers(){
@@ -197,20 +220,34 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
         // Setup widgets
         FrLayerSettings params;
         wgt->GetLayerParams(params);
-        FrColormapWidget* cmpw = m_layerToolWidget->GetColormapWidget();
-        FrSpinSliderWidget* opw = m_layerToolWidget->GetOpacityWidget();
 
-        if (params.ID == DEFAULT_LAYER_ID)
-            cmpw->setVisible(false);
-        else
-            cmpw->setVisible(true);
+        if(wgt->IsRoiLayer()){
+            m_layerToolWidget->setVisible(false);
+            m_roiToolWidget->setVisible(true);
 
-        cmpw->BlockSignals(true);
-        cmpw->SetColormapParams(params.ColormapSettings);
-        cmpw->BlockSignals(false);
+            //m_roiToolWidget->GetOp
+        }
+        else {
+            // Not a ROI layer selected
+            m_roiToolWidget->setVisible(false);
+            m_layerToolWidget->setVisible(true);
+        
+            FrColormapWidget* cmpw = m_layerToolWidget->GetColormapWidget();
+            FrSpinSliderWidget* opw = m_layerToolWidget->GetOpacityWidget();
 
-        int opacity = int(params.Opacity * opw->GetMaximum());
-        opw->SetValue(opacity);
+            if (params.ID == DEFAULT_LAYER_ID){
+                cmpw->setVisible(false);
+            }
+            else {
+                cmpw->setVisible(true);
+                cmpw->BlockSignals(true);
+                cmpw->SetColormapParams(params.ColormapSettings);
+                cmpw->BlockSignals(false);
+            }
+
+            int opacity = int(params.Opacity * opw->GetMaximum());
+            opw->SetValue(opacity);
+        }
 
         if(m_signalsBlocked) return;
         emit LayerSelected(params.ID);

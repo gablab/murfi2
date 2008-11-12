@@ -26,6 +26,7 @@ FrActionManager::~FrActionManager(){
     delete m_NewLayerAction;
     delete m_DeleteLayerAction;
     delete m_ChangeLayerAction;
+    delete m_NewROIAction;
     // View
     delete m_ViewSliceAction;
     delete m_ViewMosaicAction;
@@ -61,6 +62,8 @@ void FrActionManager::Initialize(QObject* parent){
     m_DeleteLayerAction->setObjectName(QString::fromUtf8("m_DeleteLayerAction"));
     m_ChangeLayerAction = new QAction(parent);
     m_ChangeLayerAction->setObjectName(QString::fromUtf8("m_ChangeLayerAction"));
+    m_NewROIAction = new QAction(parent);
+    m_NewROIAction->setObjectName(QString::fromUtf8("m_NewROIAction"));
     // View
     m_ViewSliceAction = new QAction(parent);
     m_ViewSliceAction->setObjectName(QString::fromUtf8("m_ViewSliceAction"));
@@ -111,7 +114,9 @@ void FrActionManager::Retranslate(){
     m_DeleteLayerAction->setText(DO_TRANSLATE(TR_CONTEXT, "Delete Layer"));
     m_DeleteLayerAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Delete Layer"));
     m_ChangeLayerAction->setText(DO_TRANSLATE(TR_CONTEXT, "Change Layer"));
-    m_ChangeLayerAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Change Layer"));
+    m_ChangeLayerAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Change Layer"));    
+    m_NewROIAction->setText(DO_TRANSLATE(TR_CONTEXT, "Create ROI"));
+    m_NewROIAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Create ROI"));
     // View
     m_ViewSliceAction->setText(DO_TRANSLATE(TR_CONTEXT, "Slice View"));
     m_ViewSliceAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Slice View"));

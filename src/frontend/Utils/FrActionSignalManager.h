@@ -27,6 +27,7 @@ public slots:
 	void OnNewLayerAction();
 	void OnDeleteLayerAction();
     void OnChangeLayerAction();
+    void OnNewROIAction();
     //View
     void OnViewSliceAction();
     void OnViewMosaicAction();

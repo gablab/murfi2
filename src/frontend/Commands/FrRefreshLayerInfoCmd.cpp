@@ -4,7 +4,7 @@
 #include "FrMainDocument.h"
 #include "FrMainWindow.h"
 #include "FrUtils.h"
-
+#include "FrRoiDocObj.h"
 
 FrRefreshLayerInfoCmd::FrRefreshLayerInfoCmd(){
 }
@@ -43,9 +43,19 @@ bool FrRefreshLayerInfoCmd::Execute(){
 
         widget->RemoveLayers();
         
+        // Add colormap layers
         LayerCollection::iterator it, itEnd(layers.end());
         for(it = layers.begin(); it != itEnd; ++it){
             widget->AddLayer( (*it) );
+        }
+
+        // add roi too
+        std::vector<FrDocumentObj*> objects;
+        doc->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+        std::vector<FrDocumentObj*>::iterator itr, itrEnd(objects.end());
+        for(itr = objects.begin(); itr != itrEnd; ++itr){
+            FrRoiDocObj* roiDO = (FrRoiDocObj*) (*itr);
+            widget->AddRoiLayer( roiDO );
         }
 
         widget->SetSelectedLayer(layerID);

@@ -9,12 +9,19 @@ FrMainDocument::FrMainDocument()
 }
 
 FrMainDocument::~FrMainDocument(){
+    std::vector<FrDocumentObj*> objects;
+
+    // Remove ROI objects
+    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+    std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
     // Remove tab objects
-    std::vector<FrDocumentObj*> tabObjects;
-    this->GetObjectsByType(tabObjects, FrDocumentObj::TabSettings);
-    
-    std::vector<FrDocumentObj*>::iterator it, itEnd(tabObjects.end());
-    for(it = tabObjects.begin(); it != itEnd; ++it){
+    this->GetObjectsByType(objects, FrDocumentObj::TabSettings);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
         this->Remove( (*it) );
     }
 }

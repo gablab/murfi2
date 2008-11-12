@@ -310,6 +310,12 @@ void FrMainController::ResetImage(){
     delete cmd;
 }
 
+void FrMainController::CreatNewROI(){
+    FrCreateROICmd* cmd = FrCommandController::CreateCmd<FrCreateROICmd>();
+    cmd->Execute();
+    delete cmd;
+}
+
 void FrMainController::Test(){    
     // run test input server
 	RtInputScannerImages* input =  new RtInputScannerImages();

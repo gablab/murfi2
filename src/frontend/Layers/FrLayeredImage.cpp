@@ -23,7 +23,7 @@ vtkStandardNewMacro(FrLayeredImage);
 
 
 FrLayeredImage::FrLayeredImage() 
-: FrImageLayer(), m_nextImageLayerID(DEFAULT_LAYER_ID) {
+: FrImageLayer(), m_nextLayerID(DEFAULT_LAYER_ID) {
 
     this->InitImageLayerDefault(this);
 
@@ -38,7 +38,7 @@ FrLayeredImage::FrLayeredImage()
 FrLayeredImage::~FrLayeredImage(){
     // delete all layers here
     this->RemoveImageLayers();
-    this->RemoveROILayers();
+    this->RemoveRoiLayers();
     // and other stuff too
     if(m_SpecialLayer) m_SpecialLayer->Delete();
 }
@@ -55,7 +55,7 @@ void FrLayeredImage::SetInput(vtkImageData* data){
 }
 
 void FrLayeredImage::SetROIInput(int id, vtkImageData *data){
-    FrROILayer* layer = this->GetROILayerByID(id);
+    FrROILayer* layer = this->GetRoiLayerByID(id);
     if(layer){
         layer->SetInput(data);
     }
@@ -112,12 +112,6 @@ void FrLayeredImage::SetCameraSettings(FrCameraSettings& settings, int layerId){
         if(layer){
             layer->SetCameraSettings(settings);
         }
-        else{
-            FrROILayer* rLayer = this->GetROILayerByID(layerId);
-            if(rLayer){
-                rLayer->SetCameraSettings(settings);
-            }
-        }
     }
 
     // Update camera for all ROI layers
@@ -151,7 +145,7 @@ void FrLayeredImage::SetOpacity(double value, int layerId){
             layer->SetOpacity(value);
         }
         else {
-            FrROILayer* rLayer = this->GetROILayerByID(layerId);
+            FrROILayer* rLayer = this->GetRoiLayerByID(layerId);
             if(rLayer){
                  rLayer->SetOpacity(value);
             }
@@ -180,7 +174,7 @@ void FrLayeredImage::SetVisibility(bool value, int layerId){
             layer->SetVisibility(value);
         }
         else {
-            FrROILayer* rLayer = this->GetROILayerByID(layerId);
+            FrROILayer* rLayer = this->GetRoiLayerByID(layerId);
             if(rLayer){
                  rLayer->SetVisibility(value);
             }
@@ -207,11 +201,11 @@ void FrLayeredImage::InitImageLayerDefault(FrImageLayer* layer){
     layer->SetVisibility(DEF_LAYER_VISIBILITY);
 
     // init ID
-    layer->SetID(m_nextImageLayerID);
-    ++m_nextImageLayerID;
+    layer->SetID(m_nextLayerID);
+    ++m_nextLayerID;
 }
 
-void FrLayeredImage::InitROILayerDefault(FrROILayer* layer){
+void FrLayeredImage::InitRoiLayerDefault(FrROILayer* layer){
     FrCameraSettings cs;
     InitCameraDefault(&cs);
     layer->SetCameraSettings(cs);
@@ -221,8 +215,8 @@ void FrLayeredImage::InitROILayerDefault(FrROILayer* layer){
     layer->SetVisibility(DEF_LAYER_VISIBILITY);
 
     // init ID
-    layer->SetID(m_nextImageLayerID);
-    ++m_nextImageLayerID;
+    layer->SetID(m_nextLayerID);
+    ++m_nextLayerID;
 }
 
 // Update methods
@@ -329,11 +323,11 @@ bool FrLayeredImage::RemoveImageLayer(int layerId){
     return result;
 }
 
-int FrLayeredImage::AddROILayer(){
+int FrLayeredImage::AddRoiLayer(){
     FrROILayer* layer = FrROILayer::New();
 
     // Now init all ...    
-    this->InitROILayerDefault(layer);
+    this->InitRoiLayerDefault(layer);
 
     // ... and synchronize camera ...
     FrCameraSettings cs;
@@ -363,7 +357,7 @@ int FrLayeredImage::AddROILayer(){
     return layer->GetID();
 }
 
-bool FrLayeredImage::RemoveROILayer(int layerId){
+bool FrLayeredImage::RemoveRoiLayer(int layerId){
     bool result = false;
     ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
     for(it = m_ROILayers.begin(); it != itEnd; ++it){
@@ -413,7 +407,7 @@ void FrLayeredImage::RemoveImageLayers(){
     m_ImageLayers.clear();
 }
 
-void FrLayeredImage::RemoveROILayers(){
+void FrLayeredImage::RemoveRoiLayers(){
     vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
 
     // Delete all layers
@@ -433,7 +427,7 @@ void FrLayeredImage::RemoveROILayers(){
 
 void FrLayeredImage::RemoveAllLayers(){
     RemoveImageLayers();
-    RemoveROILayers();
+    RemoveRoiLayers();
 
     vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
     if(rw){
@@ -441,6 +435,7 @@ void FrLayeredImage::RemoveAllLayers(){
         m_SpecialLayer->GetRenderer()->SetLayer(1);
         rw->SetNumberOfLayers(2);
     }
+    m_nextLayerID = START_LAYER_ID;
 }
 
 FrImageLayer* FrLayeredImage::GetImageLayerByID(int id){
@@ -456,7 +451,7 @@ FrImageLayer* FrLayeredImage::GetImageLayerByID(int id){
     return 0L;
 }
 
-FrROILayer* FrLayeredImage::GetROILayerByID(int id){
+FrROILayer* FrLayeredImage::GetRoiLayerByID(int id){
     ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
     for(it = m_ROILayers.begin(); it != itEnd; ++it){
         if((*it)->GetID() == id) return (*it);

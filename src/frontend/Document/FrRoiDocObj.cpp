@@ -1,5 +1,7 @@
 #include "FrRoiDocObj.h"
 #include "FrDocument.h"
+#include "FrImageDocObj.h"
+#include "FrCommandController.h"
 
 // Qt stuff
 #include <Qt/qstring.h>
@@ -7,6 +9,7 @@
 
 // Backend includes
 #include "RtMaskImage.h"
+#include "RtMRIImage.h"
 
 #define DEF_MASK_VALUE  0
 #define DEF_ROI_ID      -3 // equ BAD_LAYER_ID
@@ -26,12 +29,37 @@ FrRoiDocObj::~FrRoiDocObj(){
 }
 
 void FrRoiDocObj::OnAdd(FrDocument* doc){
-    // TODO : Implement update
     // add roi layer to all images
+    FrRoiCmd* cmd1 = FrCommandController::CreateCmd<FrRoiCmd>();
+    cmd1->SetAction(FrRoiCmd::Add);
+    cmd1->SetRoi(this);
+    
+    // Need to refresh data in layer info widget
+    FrRefreshLayerInfoCmd* cmd2 = 
+        FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
+    cmd->Execute();
+    delete cmd;
 }
 
 void FrRoiDocObj::OnRemove(FrDocument* doc){
-    // TODO : Implement update
+    // remove roi layer from all images
+    FrRoiCmd* cmd1 = FrCommandController::CreateCmd<FrRoiCmd>();
+    cmd1->SetAction(FrRoiCmd::Remove);
+    cmd1->SetRoi(this);
+    
+    // Need to refresh data in layer info widget
+    FrRefreshLayerInfoCmd* cmd2 = 
+        FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
+    cmd->Execute();
+    delete cmd;
 }
 
 FrDocumentObj::ObjType FrRoiDocObj::GetType(){
@@ -55,23 +83,12 @@ bool FrRoiDocObj::LoadFromFile(QString& fileName){
     return result;
 }
 
-void FrRoiDocObj::CreateMaskImage(int x, int y, int z, 
-                                  int sx, int sy, int sz){
+void FrRoiDocObj::CreateMaskImage(FrImageDocObj* imgDO){
     
     if(m_MaskImage) delete m_MaskImage;
+    
     m_MaskImage = new RtMaskImage();
-
-    // set dimensions
-    std::vector<int>& dims = m_MaskImage->getDims();
-    dims.push_back(x);
-    dims.push_back(y);
-    dims.push_back(z);
-
-    // set spacing
-    std::vector<double>& pixDims = m_MaskImage->getPixDims();
-    pixDims.push_back(sx);
-    pixDims.push_back(sy);
-    pixDims.push_back(sz);
+    m_MaskImage->setInfo( *(imgDO->GetImage()) );
 
     // init all values to default (not selected)
     m_MaskImage->setAll(DEF_MASK_VALUE);

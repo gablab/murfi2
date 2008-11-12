@@ -33,6 +33,7 @@ public:
     int                  ActiveLayerID;
     FrLayerSettings*     ActiveLayer[3];
     LayerCollection*     Layers[3];
+    std::vector<int>     RoiIDs;
 
 public:    
     FrUpdateParams2(){

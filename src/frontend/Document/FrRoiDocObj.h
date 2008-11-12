@@ -2,6 +2,7 @@
 #define FR_ROIDOC_OBJ
 
 // Forward declarations
+class FrImageDocObj;
 class RtMaskImage;
 class QString;
 
@@ -31,7 +32,7 @@ public:
 
     // Initialization
     bool LoadFromFile(QString& fileName);
-    void CreateMaskImage(int x, int y, int z, int sx, int sy, int sz);
+    void CreateMaskImage(FrImageDocObj* imgDO);
 };
 
 #endif

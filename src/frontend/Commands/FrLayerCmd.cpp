@@ -6,6 +6,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
+#include "FrRoiDocObj.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -144,11 +145,11 @@ bool FrImageLayerCmd::DeleteLayer(){
 
     if(isFound){
         // Assume that there is good sync between layers 
-        tabSets->GetSliceViewSettings()->ActiveLayerID--;
-        tabSets->GetMosaicViewSettings()->ActiveLayerID--;
-        tabSets->GetOrthoViewSettings()->ActiveLayerID--;
+        tabSets->GetSliceViewSettings()->ActiveLayerID = DEFAULT_LAYER_ID;
+        tabSets->GetMosaicViewSettings()->ActiveLayerID = DEFAULT_LAYER_ID;
+        tabSets->GetOrthoViewSettings()->ActiveLayerID = DEFAULT_LAYER_ID;
 
-        FrBaseCmd::UpdatePipelineForID(0, FRP_COLORMAP);
+        FrBaseCmd::UpdatePipelineForID(DEFAULT_LAYER_ID, FRP_COLORMAP);
     }
     return true;
 }
@@ -249,38 +250,65 @@ bool FrImageLayerCmd::ChangeLayerParams(){
     if(!m_isID || m_ID == CUR_LAYER_ID){
         m_ID = this->GetActiveLayerID();
     }
-
-    // Init data
+    
     FrMainWindow* mw = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
-    LayerCollection sliceLayers, mosaicLayers, 
-                    orthoLayers0, orthoLayers1, orthoLayers2;
-    GetLayerSettings(tabSets->GetSliceViewSettings(), sliceLayers);
-    GetLayerSettings(tabSets->GetMosaicViewSettings(), mosaicLayers);
-    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers0, 0);
-    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers1, 1);
-    GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers2, 2);
 
-    LayerCollection* otherLayers[ALL_ITEMS_COUNT];    
-    otherLayers[0] = &sliceLayers;
-    otherLayers[1] = &mosaicLayers;
-    otherLayers[2] = &orthoLayers0;
-    otherLayers[3] = &orthoLayers1;
-    otherLayers[4] = &orthoLayers2;
+    if(this->IsRoiLayer(m_ID)){
+        // Update ROI layer
+        FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+        std::vector<FrDocumentObj*> objects;
+        doc->GetObjectsByType(objects, FrDocumentObj::RoiObject);
 
-    FrLayerSettings ls;
-    if(!mw->GetLayerListWidget()->GetLayerParams(m_ID, ls)) return false;
+        FrLayerSettings ls;
+        if(!mw->GetLayerListWidget()->GetLayerParams(m_ID, ls)) return false;
 
-    // Update simple params
-    for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-        LayerCollection::iterator it, itEnd(otherLayers[i]->end());
-        for(it = otherLayers[i]->begin(); it != itEnd; ++it){
-            if((*it)->ID == m_ID){
-                (*it)->Visibility = ls.Visibility;
-                (*it)->Opacity = ls.Opacity;
-                (*it)->Name = ls.Name;
+        // Iterate through all found rois
+        std::vector<FrDocumentObj*>::iterator itr, itrEnd(objects.end());
+        for(itr = objects.begin(); itr != itrEnd; ++itr){
+            FrRoiDocObj* roiDO = (FrRoiDocObj*)(*itr);
+            if(roiDO->GetID() == m_ID) {
+                roiDO->SetVisibility(ls.Visibility);
+                roiDO->SetOpacity(ls.Opacity);
+                roiDO->SetName(ls.Name);
                 break;
+            }
+        }
+    }
+    else {
+        // Update colormap layer
+
+        // Init data
+        FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
+        LayerCollection sliceLayers, mosaicLayers, 
+                        orthoLayers0, orthoLayers1, orthoLayers2;
+        GetLayerSettings(tabSets->GetSliceViewSettings(), sliceLayers);
+        GetLayerSettings(tabSets->GetMosaicViewSettings(), mosaicLayers);
+        GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers0, 0);
+        GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers1, 1);
+        GetLayerSettings(tabSets->GetOrthoViewSettings(), orthoLayers2, 2);
+
+        LayerCollection* otherLayers[ALL_ITEMS_COUNT];    
+        otherLayers[0] = &sliceLayers;
+        otherLayers[1] = &mosaicLayers;
+        otherLayers[2] = &orthoLayers0;
+        otherLayers[3] = &orthoLayers1;
+        otherLayers[4] = &orthoLayers2;
+
+        // Get layer params
+        FrLayerSettings ls;
+        if(!mw->GetLayerListWidget()->GetLayerParams(m_ID, ls)) return false;
+
+        // Update simple params
+        for(int i=0; i < ALL_ITEMS_COUNT; ++i){
+            LayerCollection::iterator it, itEnd(otherLayers[i]->end());
+            for(it = otherLayers[i]->begin(); it != itEnd; ++it){
+                if((*it)->ID == m_ID){
+                    (*it)->Visibility = ls.Visibility;
+                    (*it)->Opacity = ls.Opacity;
+                    (*it)->Name = ls.Name;
+                    break;
+                }
             }
         }
     }
@@ -348,6 +376,21 @@ int FrImageLayerCmd::GetActiveLayerID(){
             break;
     }
     return result;
+}
+
+bool FrImageLayerCmd::IsRoiLayer(int id){
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    
+    std::vector<FrDocumentObj*> objects;
+    doc->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+
+    // Iterate through all found rois
+    std::vector<FrDocumentObj*>::iterator itr, itrEnd(objects.end());
+    for(itr = objects.begin(); itr != itrEnd; ++itr){
+        FrRoiDocObj* roiDO = (FrRoiDocObj*)(*itr);
+        if(id == roiDO->GetID()) return true;
+    }
+    return false;
 }
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now

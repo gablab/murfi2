@@ -41,6 +41,7 @@ private:
     bool ChangeLayerColormap();
 
     int GetActiveLayerID();
+    bool IsRoiLayer(int id);
 
 private:
     bool m_isID;

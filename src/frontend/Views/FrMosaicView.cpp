@@ -23,6 +23,7 @@ public:
     int                  ActiveLayerID;
     FrLayerSettings*     ActiveLayer;
     LayerCollection      Layers;
+    std::vector<int>     RoiIDs;
 };
 
 

@@ -1,11 +1,12 @@
 #include "FrSliceExtractor.h"
 
-
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkImageReslice.h"
+
+#include <vector>
 
 // Defines
 #define DEF_SPACING 1.0
@@ -17,22 +18,42 @@ vtkStandardNewMacro(FrSliceExtractor);
 
 
 FrSliceExtractor::FrSliceExtractor(){
-    // Create reslicer
-	m_Reslicer = vtkImageReslice::New();
-        
+    // Create default reslicer
+    m_Reslicer.clear();
+
+    vtkImageReslice* rs = vtkImageReslice::New();
+    m_Reslicer[DEF_PORT_NUM] = rs;
+
 	m_Slice = DEF_FRAME;    
     m_Orientation = FrSliceExtractor::XY;
     m_Spacing[0] = m_Spacing[1] = m_Spacing[2] = DEF_SPACING;
 }
 
 FrSliceExtractor::~FrSliceExtractor(){
-    if(m_Reslicer) m_Reslicer->Delete();
+    ReslicerCollection::iterator it, itEnd(m_Reslicer.end());
+    for(it = m_Reslicer.begin(); it != itEnd; ++it){
+        if(it->second){
+            it->second->Delete();
+            it->second = 0L;
+        }
+    }
+
+    m_Reslicer.clear();
 }
 
 void FrSliceExtractor::SetInput(int port, vtkImageData* input){
-    if(input == m_Reslicer->GetInput(port)) return;    
+    if(input == this->GetInput(port)) return;    
 
-    m_Reslicer->SetInput(port, input);
+    ReslicerCollection::iterator it = m_Reslicer.find(port);
+    if(it == m_Reslicer.end()){
+        // add new reslicer
+        vtkImageReslice* rs = vtkImageReslice::New();
+        m_Reslicer[port] = rs;
+        
+        it = m_Reslicer.find(port);
+    }
+
+    it->second->SetInput(input);
     this->Modified();
     
     // Set spacing using info from def port data
@@ -51,7 +72,13 @@ void FrSliceExtractor::SetInput(vtkImageData* input){
 }
 
 vtkImageData* FrSliceExtractor::GetInput(int port){
-    return (vtkImageData*)m_Reslicer->GetInput(port);
+    vtkImageData* result = 0L;
+
+    ReslicerCollection::iterator it = m_Reslicer.find(port);
+    if(it != m_Reslicer.end()){
+        result = (vtkImageData*)it->second->GetInput();
+    }
+    return result;
 }
 
 vtkImageData* FrSliceExtractor::GetInput(){
@@ -59,7 +86,13 @@ vtkImageData* FrSliceExtractor::GetInput(){
 }
 
 vtkImageData* FrSliceExtractor::GetOutput(int port){
-    return m_Reslicer->GetOutput(port);
+    vtkImageData* result = 0L;
+
+    ReslicerCollection::iterator it = m_Reslicer.find(port);
+    if(it != m_Reslicer.end()){
+        result = it->second->GetOutput();
+    }
+    return result;
 }
 
 vtkImageData* FrSliceExtractor::GetOutput(){
@@ -82,42 +115,45 @@ void FrSliceExtractor::SetSlice(int slice){
 
 void FrSliceExtractor::Update(){
     // For safty
-    if(!m_Reslicer->GetInput()) return;
+    if(m_Reslicer.size() <= 0 || 
+      !m_Reslicer[0]->GetInput()) return;
 
-	switch (m_Orientation)
-	{
-    case FrSliceExtractor::XY:		// XY
-			m_Reslicer->SetResliceAxesOrigin(0, 0, m_Slice);
-			m_Reslicer->SetResliceAxesDirectionCosines(1,0,0, 0,1,0, 0,0,1);
-			break;
-
-    case FrSliceExtractor::XZ:		// XZ
-            m_Reslicer->SetResliceAxesOrigin(0, m_Slice, 0);
-            m_Reslicer->SetResliceAxesDirectionCosines(1,0,0, 0,0,1, 0,1,0);
-			break;
-
-    case FrSliceExtractor::YZ:		// YZ
-            m_Reslicer->SetResliceAxesOrigin(m_Slice, 0, 0);
-            m_Reslicer->SetResliceAxesDirectionCosines(0,1,0, 0,0,1, 1,0,0);
-			break;
-
-		default:
-			// unrecognized orientation
-			break;
-	}
-	
-    m_Reslicer->InterpolateOn();
-	m_Reslicer->SetOutputDimensionality(2);
-	m_Reslicer->SetOutputSpacing(m_Spacing);
-	m_Reslicer->Update();
+    ReslicerCollection::iterator it, itEnd(m_Reslicer.end());
+    for(it = m_Reslicer.begin(); it != itEnd; ++it){
+	    switch (m_Orientation)
+	    {
+        case FrSliceExtractor::XY:		// XY
+			    it->second->SetResliceAxesOrigin(0, 0, m_Slice);
+			    it->second->SetResliceAxesDirectionCosines(1,0,0, 0,1,0, 0,0,1);
+			    break;
+        case FrSliceExtractor::XZ:		// XZ
+                it->second->SetResliceAxesOrigin(0, m_Slice, 0);
+                it->second->SetResliceAxesDirectionCosines(1,0,0, 0,0,1, 0,1,0);
+			    break;
+        case FrSliceExtractor::YZ:		// YZ
+                it->second->SetResliceAxesOrigin(m_Slice, 0, 0);
+                it->second->SetResliceAxesDirectionCosines(0,1,0, 0,0,1, 1,0,0);
+			    break;
+		    default:
+			    // Do nothing
+                vtkErrorMacro(<<"FrSliceExtrator: unrecognized orientation");
+                return;
+	    }
+        it->second->InterpolateOn();
+	    it->second->SetOutputDimensionality(2);
+	    it->second->SetOutputSpacing(m_Spacing);
+	    it->second->Update();
+    }
 }
 
 int FrSliceExtractor::GetMaxSliceNumber(){
     int result = -1;
 
-    if(m_Reslicer->GetInput() != 0L){
+    if((m_Reslicer.size() > 0) && 
+       (m_Reslicer[0]->GetInput() != 0L) ){
+        
         int dimentions[3];
-        vtkImageData* img = (vtkImageData*)m_Reslicer->GetInput();
+        vtkImageData* img = (vtkImageData*)m_Reslicer[0]->GetInput();
         img->GetDimensions( dimentions);	
 	
 	    switch (m_Orientation)
@@ -134,4 +170,23 @@ int FrSliceExtractor::GetMaxSliceNumber(){
 	    }
     }
 	return result;
+}
+
+void FrSliceExtractor::ClearAdditionalPorts(){
+    std::vector<int> portsToDelete;
+
+    // Get all port# to be deleted
+    ReslicerCollection::iterator it, itEnd(m_Reslicer.end());
+    for(it = m_Reslicer.begin(); it != itEnd; ++it){
+        if(it->first != DEF_PORT_NUM) {
+            portsToDelete.push_back(it->first);
+            it->second->Delete();
+            it->second = 0L;
+        }
+    }
+
+    std::vector<int>::iterator itr, itrEnd(portsToDelete.end());
+    for(itr = portsToDelete.begin(); itr != itrEnd; ++itr){
+        m_Reslicer.erase( (*itr) );
+    }
 }

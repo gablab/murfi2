@@ -5,6 +5,7 @@ class vtkImageReslice;
 class vtkImageData;
 
 #include "FrMacro.h"
+#include <map>
 
 // VTK stuff
 #include "vtkObject.h"
@@ -12,6 +13,7 @@ class vtkImageData;
 // This class extract specified image from 
 // 3D volum image. It is simple wrapper for 
 // vtkImageReslice class.
+// Support multi port extracting.
 class FrSliceExtractor : public vtkObject {
 public:
     vtkTypeMacro(FrSliceExtractor,vtkObject);
@@ -29,6 +31,8 @@ public:
     vtkImageData* GetInput(int port);
     vtkImageData* GetOutput();
     vtkImageData* GetOutput(int port);
+    // Remove all oprts except port#0
+    void ClearAdditionalPorts();
 	
     // Properties
     enum Orientation { YZ = 0, XZ = 1, XY = 2 };
@@ -52,8 +56,10 @@ private:
 private:
 	int m_maxSliceNUmber;
     double m_Spacing[3];
-
-	vtkImageReslice* m_Reslicer;
+	
+    // Reslicers
+    typedef std::map<int, vtkImageReslice*> ReslicerCollection;
+    ReslicerCollection m_Reslicer;
 };
 
 #endif

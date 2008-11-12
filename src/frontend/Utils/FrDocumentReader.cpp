@@ -15,11 +15,14 @@
 #include "RtMRIImage.h"
 #include "RtMaskImage.h"
 
+#define DEF_READ_TARGET FrDocumentReader::Image
+
 vtkStandardNewMacro(FrDocumentReader);
 
 
 FrDocumentReader::FrDocumentReader()
-: m_Document(0), m_MosaicOn(false), m_UnMosaicOn(true){
+: m_Document(0), m_Target(DEF_READ_TARGET),
+  m_MosaicOn(false), m_UnMosaicOn(true){
 }
 
 FrDocumentReader::~FrDocumentReader(){
@@ -34,30 +37,35 @@ void FrDocumentReader::Update(){
     }
     this->ClearOutputs();
 
-    // NOTE: First output has to contain image data
-    // First input has port# == 0 (Zero)
     std::vector<FrDocumentObj*> images;
-    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+    if(m_Target == FrDocumentReader::Image){
+        // get image data from docment
+        m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
 
-    if(images.size() > 0){
-        FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
-        vtkImageData* img = this->ReadImage(imgDO);
+        if(images.size() > 0){
+            FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+            vtkImageData* img = this->ReadImage(imgDO);
 
-        if(img == 0L) return;
-        this->AddOutput(img);
-        // Do not forget to delete
-        img->Delete();
+            if(img == 0L) return;
+            this->AddOutput(img);
+            // Do not forget to delete to prevent mem leakage
+            img->Delete();
+        }
     }
-    
-    // All other outputs contain ROI mask data
-    m_Document->GetObjectsByType(images, FrDocumentObj::RoiObject);
-    std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
-    for(it = images.begin(); it != itEnd; ++it){
-        FrRoiDocObj* roiDO = (FrRoiDocObj*)(*it);
-        vtkImageData* roi = this->ReadROI(roiDO);
-        this->AddOutput(roi);
-        // Do not forget to delete
-        roi->Delete();
+    else if(m_Target == FrDocumentReader::ROI){
+        // get roi data
+        m_Document->GetObjectsByType(images, FrDocumentObj::RoiObject);
+        std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
+        for(it = images.begin(); it != itEnd; ++it){
+            FrRoiDocObj* roiDO = (FrRoiDocObj*)(*it);
+            vtkImageData* roi = this->ReadROI(roiDO);
+            this->AddOutput(roi);
+            // Do not forget to delete to prevent mem leakage
+            roi->Delete();
+        }
+    }
+    else {
+        vtkErrorMacro(<<"FrDocumentReader: Not supported read target...");
     }
 }
 
@@ -224,6 +232,11 @@ void FrDocumentReader::SetDocument(FrDocument* document){
     this->ClearOutputs();
 }
 
+void FrDocumentReader::SetTarget(Target tgt){
+    m_Target = tgt;
+    this->ClearOutputs();
+}
+
 void FrDocumentReader::SetMosaicOn(){
     // Change only if different value's set
     if(!m_MosaicOn){
@@ -277,9 +290,6 @@ vtkImageData* FrDocumentReader::GetOutput(int port){
     vtkImageData* result = 0L;
     if(0 <= port && port < m_Outputs.size()){
         result = m_Outputs[port];
-    }
-    else {
-        vtkErrorMacro(<<"FrDocumentReader has no output#"<<port);
     }
     return result;
 }

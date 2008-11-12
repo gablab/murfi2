@@ -42,7 +42,7 @@ public:
 
     // Initialization
     void InitImageLayerDefault(FrImageLayer* layer);
-    void InitROILayerDefault(FrROILayer* layer);
+    void InitRoiLayerDefault(FrROILayer* layer);
 
     //
     // Layer management
@@ -51,15 +51,15 @@ public:
     bool RemoveImageLayer(int id);
     void RemoveImageLayers();
 
-    int  AddROILayer();
-    bool RemoveROILayer(int id);
-    void RemoveROILayers();
+    int  AddRoiLayer();
+    bool RemoveRoiLayer(int id);
+    void RemoveRoiLayers();
 
     void RemoveAllLayers();
 
     // Returns layer by ID
     FrImageLayer* GetImageLayerByID(int id);
-    FrROILayer* GetROILayerByID(int id);
+    FrROILayer* GetRoiLayerByID(int id);
 
     FrSpecialLayer* GetSpecialLayer(){return m_SpecialLayer;};
 
@@ -75,7 +75,7 @@ protected:
     virtual ~FrLayeredImage();
 
 private:
-    int m_nextImageLayerID;
+    int m_nextLayerID;
     typedef std::vector<FrImageLayer*> LayerCollection;
     typedef std::vector<FrROILayer*> ROILayerCollection;
 

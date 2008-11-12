@@ -3,9 +3,12 @@
 
 class QVTKWidget;
 class FrMainWindow;
+class FrMainDocument;
 class vtkRenderWindow;
+class FrLayerSettings;
 
 #include "FrMacro.h"
+#include <vector>
 
 #define QTVIEW3D (this->GetQtView())
 
@@ -29,6 +32,12 @@ public:
     FrGetPropMacro(QVTKWidget*,QtView);
     FrGetPropMacro(FrMainWindow*,MainWindow);
     FrGetPropMacro(vtkRenderWindow*,RenderWindow);
+
+protected:
+    // Common method
+    FrLayerSettings* GetActiveLayer(std::vector<FrLayerSettings*>& layers, int activeLayerID);
+    void GetRoiIDs(FrMainDocument* document, std::vector<int>& ids);
+    bool GetRoiParams(FrMainDocument* document, int roiID, bool& roiVisibility, double& roiOpacity);
 };
 
 #endif

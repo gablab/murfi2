@@ -3,6 +3,7 @@
 
 // Forward declarations 
 class FrLayerSettings;
+class FrRoiDocObj;
 //class FrSpinSliderWidget; 
 //class FrColormapWidget;
 class FrLayerToolWidget;
@@ -26,6 +27,7 @@ public:
 
     // Common actions
     void AddLayer(FrLayerSettings* layerSets);
+    void AddRoiLayer(FrRoiDocObj* roiDO);
     void RemoveLayers();
     void SetSelectedLayer(int layerID);
     void BlockSignals(bool value){ 

@@ -14,9 +14,10 @@ class FrRoiDocObj;
 #include <vector>
 
 // This class performes reading of FrMainDocument objects.
-// It reads image data and also ROI data. Image data can be obtained 
-// using GetOutput() method or GetOutput(port#) where port# == 0
+// It reads image data or ROI data (depend on Target specified). 
 class FrDocumentReader : public vtkObject {
+public:
+    enum Target { Image, ROI };
 public:
     vtkTypeMacro(FrDocumentReader,vtkObject);
     static FrDocumentReader* New();
@@ -39,6 +40,9 @@ public:
     FrGetPropMacro(FrDocument*,Document);
     void SetDocument(FrDocument* document);
     
+    FrGetPropMacro(Target, Target)
+    void SetTarget(Target tgt);
+
     // Output management
     int GetOutputCount();
     vtkImageData* GetOutput();

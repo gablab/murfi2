@@ -11,7 +11,6 @@
 #include "FrNotify.h"
 #include "FrUtils.h"
 
-
 // VTK
 #include "vtkRenderWindowInteractor.h"
 #include "vtkInteractorStyleImage.h"
@@ -33,6 +32,7 @@ public:
     int                  ActiveLayerID;
     FrLayerSettings*     ActiveLayer;
     LayerCollection      Layers;
+    std::vector<int>     RoiIDs;
 };
 
 
@@ -41,7 +41,12 @@ FrSliceView::FrSliceView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
     	
     // Create pipeline stuff
-    m_docReader = FrDocumentReader::New();
+    m_imgReader = FrDocumentReader::New();
+    m_imgReader->SetTarget(FrDocumentReader::Image);
+
+    m_roiReader = FrDocumentReader::New();
+    m_roiReader->SetTarget(FrDocumentReader::ROI);
+
 	m_SliceExtractor = FrSliceExtractor::New();
     m_LayeredImage = FrLayeredImage::New();
 }
@@ -49,7 +54,8 @@ FrSliceView::FrSliceView(FrMainWindow* mainWindow)
 FrSliceView::~FrSliceView(){
     this->RemoveRenderers();
 	if(m_SliceExtractor) m_SliceExtractor->Delete();
-    if(m_docReader) m_docReader->Delete();
+    if(m_imgReader) m_imgReader->Delete();
+    if(m_roiReader) m_roiReader->Delete();
     if(m_LayeredImage) m_LayeredImage->Delete();
 }
 
@@ -107,7 +113,11 @@ void FrSliceView::UpdatePipeline(int point){
         }
     case FRP_READIMAGE:
         {
-            this->ReadDocument(params);
+            this->ReadImage(params);
+        }
+    case FRP_READROI:
+        {
+            this->ReadRoi(params);
         }
 	case FRP_SLICE:
         {
@@ -149,35 +159,35 @@ void FrSliceView::InitUpdateParams(FrUpdateParams0& params){
     params.ActiveLayerID = params.ViewSettings->ActiveLayerID;    
     GetLayerSettings(params.ViewSettings, params.Layers);
 
-    // If not 'broadcast update' then get layer settings 
-    if(params.ActiveLayerID != ALL_LAYERS_ID){
-        // Set default value
-        params.ActiveLayer = 0L;
-
-        // Look for layer settings
-        LayerCollection::iterator it, itEnd(params.Layers.end());
-        for(it = params.Layers.begin(); it != itEnd; ++it){
-            if((*it)->ID == params.ActiveLayerID){
-                params.ActiveLayer = (*it);
-                break;
-            }
-        }
-    }
+    params.ActiveLayer = this->GetActiveLayer(params.Layers, params.ActiveLayerID);
+    
+    // Add all roi IDs
+    this->GetRoiIDs(params.Document, params.RoiIDs);
 }
 
-void FrSliceView::ReadDocument(FrUpdateParams0& params){
+void FrSliceView::ReadImage(FrUpdateParams0& params){
     // Read document and connect filters
-    m_docReader->SetDocument(params.Document);
-    m_docReader->SetUnMosaicOn();
-    m_docReader->Update();
+    m_imgReader->SetDocument(params.Document);
+    m_imgReader->SetUnMosaicOn();
+    m_imgReader->Update();
 	
-    // Pass image Set image input
-    m_SliceExtractor->SetInput(m_docReader->GetOutput());
+    // Pass image to slice extractor
+    m_SliceExtractor->SetInput(m_imgReader->GetOutput());
+}
 
-    // Pass ROI data from output starting from 1
-    int count = m_docReader->GetOutputCount();
-    for(int i=1; i < count; ++i){
-        m_SliceExtractor->SetInput(i, m_docReader->GetOutput(i));
+void FrSliceView::ReadRoi(FrUpdateParams0& params){
+    m_roiReader->SetDocument(params.Document);
+    m_roiReader->SetUnMosaicOn();
+    m_roiReader->Update();
+
+    // Remove all ports except default
+    m_SliceExtractor->ClearAdditionalPorts();
+
+    // Pass ROI data from output starting from port#1
+    // since port#0 used for image data
+    int count = m_roiReader->GetOutputCount();
+    for(int i=0, port=1; i < count; ++i, ++port){
+        m_SliceExtractor->SetInput(port, m_roiReader->GetOutput(i));
     }
 }
 
@@ -186,6 +196,7 @@ void FrSliceView::ExtractSlice(FrUpdateParams0& params){
     int maxSliceNumber = m_SliceExtractor->GetMaxSliceNumber();
     params.ViewSettings->SliceNumber = ClampValue(
         params.ViewSettings->SliceNumber, 0, maxSliceNumber);
+
     m_SliceExtractor->SetSlice(params.ViewSettings->SliceNumber);
 
     if(m_SliceExtractor->GetInput()){
@@ -195,9 +206,10 @@ void FrSliceView::ExtractSlice(FrUpdateParams0& params){
         m_LayeredImage->SetInput(m_SliceExtractor->GetOutput());
 
         // Set ROI data
-        int count = m_docReader->GetOutputCount();
-        for(int i=1; i < count; ++i){
-            m_LayeredImage->SetROIInput(i, m_SliceExtractor->GetOutput(i));
+        int count = m_roiReader->GetOutputCount();
+        for(int i=0, port=1; i < count; ++i, ++port){
+            int roiID = params.RoiIDs[i];
+            m_LayeredImage->SetROIInput(roiID, m_SliceExtractor->GetOutput(port));
         }
 
         // Set text
@@ -221,7 +233,7 @@ void FrSliceView::UpdateColormap(FrUpdateParams0& params){
                 (*it)->ColormapSettings, (*it)->ID);
         }
     }
-    else {
+    else if(params.ActiveLayer != 0) {
         m_LayeredImage->SetColormapSettings(
             params.ActiveLayer->ColormapSettings, params.ActiveLayer->ID);
     }
@@ -237,7 +249,7 @@ void FrSliceView::UpdateTBC(FrUpdateParams0& params){
             m_LayeredImage->SetTBCSettings((*it)->TbcSettings, (*it)->ID);
         }
     }
-    else {
+    else if(params.ActiveLayer != 0) {
         m_LayeredImage->SetTBCSettings(
             params.ActiveLayer->TbcSettings, params.ActiveLayer->ID);
     }
@@ -254,12 +266,22 @@ void FrSliceView::UpdateOpacityVisibility(FrUpdateParams0& params){
             m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
         }
     }
-    else {
+    else if(params.ActiveLayer != 0) {
         m_LayeredImage->SetOpacity(
             params.ActiveLayer->Opacity, params.ActiveLayer->ID);
         m_LayeredImage->SetVisibility(
             params.ActiveLayer->Visibility, params.ActiveLayer->ID);
     }
-
-    // TODO: add ROI opacity and visibility update ???
+    else {
+        // Seems this is ROI layer
+        bool roiVisibility = true;
+        double roiOpacity = 1.0;
+        if(this->GetRoiParams(params.Document, 
+            params.ActiveLayerID, roiVisibility, roiOpacity)){
+            // apply roi params
+            m_LayeredImage->SetOpacity(roiOpacity, params.ActiveLayerID);
+            m_LayeredImage->SetVisibility(roiVisibility, params.ActiveLayerID);
+        }
+    }
 }
+

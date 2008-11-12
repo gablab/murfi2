@@ -28,6 +28,7 @@ public:
     FrGetPropMacro(QAction*, NewLayerAction);
     FrGetPropMacro(QAction*, DeleteLayerAction);
     FrGetPropMacro(QAction*, ChangeLayerAction);
+    FrGetPropMacro(QAction*, NewROIAction);
     //View
     FrGetPropMacro(QAction*, ViewSliceAction);
     FrGetPropMacro(QAction*, ViewMosaicAction);

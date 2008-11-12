@@ -46,6 +46,7 @@ void FrActionSignalManager::Initialize(){
 	CONNECT_ACTION_TRIGGERED(am->GetNewLayerAction(),  OnNewLayerAction());
 	CONNECT_ACTION_TRIGGERED(am->GetDeleteLayerAction(), OnDeleteLayerAction());
     CONNECT_ACTION_TRIGGERED(am->GetChangeLayerAction(), OnChangeLayerAction());
+    CONNECT_ACTION_TRIGGERED(am->GetNewROIAction(), OnNewROIAction());
     
     //View
     CONNECT_ACTION_TRIGGERED(am->GetViewSliceAction(), OnViewSliceAction());
@@ -106,6 +107,7 @@ void FrActionSignalManager::Deinitialize(){
 	DISCONNECT_ACTION_TRIGGERED(am->GetNewLayerAction(),  OnNewLayerAction());
 	DISCONNECT_ACTION_TRIGGERED(am->GetDeleteLayerAction(), OnDeleteLayerAction());
     DISCONNECT_ACTION_TRIGGERED(am->GetChangeLayerAction(), OnChangeLayerAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetNewROIAction(), OnNewROIAction());
     
     //View
     DISCONNECT_ACTION_TRIGGERED(am->GetViewSliceAction(), OnViewSliceAction());
@@ -198,6 +200,10 @@ void FrActionSignalManager::OnDeleteLayerAction(){
 
 void FrActionSignalManager::OnChangeLayerAction(){
     m_mainWindow->GetMainController()->ChangeLayer(0);
+}
+
+void FrActionSignalManager::OnNewROIAction(){
+    m_mainWindow->GetMainController()->CreatNewROI();
 }
 
 //View

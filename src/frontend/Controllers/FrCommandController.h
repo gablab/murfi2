@@ -25,8 +25,11 @@ class FrMainController;
 #include "FrLoadTabsCmd.h"
 #include "FrSaveTabsCmd.h"
 #include "FrLayerCmd.h"
+#include "FrRoiCmd.h"
 #include "FrRefreshLayerInfoCmd.h"
 #include "FrLoadImageCmd.h"
+#include "FrCreateROICmd.h"
+
 // Mask commands
 #include "FrMaskPenCmd.h"
 #include "FrMaskRectangleCmd.h"

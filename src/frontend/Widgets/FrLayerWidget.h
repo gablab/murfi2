@@ -3,6 +3,7 @@
 
 // Forward declarations 
 class FrLayerSettings;
+class FrRoiDocObj;
 class QTableWidget;
 class QHBoxLayout;
 class QToolButton;
@@ -18,10 +19,13 @@ class QLabel;
 class FrLayerWidget: public QWidget {
 	Q_OBJECT
 public:
-	FrLayerWidget(FrLayerSettings& params, QWidget *parent = 0);
+	FrLayerWidget(FrLayerSettings& params, QWidget* parent = 0);
+    FrLayerWidget(FrRoiDocObj& roiDO, QWidget* parent = 0);
+
     void GetLayerParams(FrLayerSettings& params);
     void SetLayerParams(FrLayerSettings& params);
 
+    bool IsRoiLayer(){ return m_isRoi; }
     int GetLayerID(){ return m_params.ID; }
 
 signals:
@@ -33,6 +37,7 @@ private Q_SLOTS:
 	
 private:
     // Some vars
+    bool m_isRoi;
     FrLayerSettings m_params;
 
     // Widgets

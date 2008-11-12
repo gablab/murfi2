@@ -26,7 +26,7 @@ public:
 	virtual ~FrRoiTool();
 
 private:
-    void GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params);
+    bool GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params);
     int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
 
 private:

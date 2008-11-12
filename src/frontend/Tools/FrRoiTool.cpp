@@ -103,7 +103,7 @@ bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-void FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
+bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     FrMainController* mc = dynamic_cast<FrMainController*>(this->GetController()->GetOwner());
     FrMainWindow* mv = mc->GetMainView();
     FrMainDocument* md = mc->GetMainDocument();
@@ -144,7 +144,7 @@ void FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
                 }
                 else{
                     // do something
-                    return;
+                    return false;
                 }
                 break;
             }
@@ -154,11 +154,11 @@ void FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     int visibleLayerNum = GetVisibleLayer(layers);
     vtkRenderer* renderer = renCollection[visibleLayerNum];	    
 
-//    bool notInside = false;
-//    if (!m_PointPicker->Pick(params.X, params.Y, 0, renderer)){
-//        // point is not inside of image actor
-//        notInside = true;
-//    }
+    bool isInside = true;
+    if (!m_PointPicker->Pick(params.X, params.Y, 0, renderer)){
+        // point is not inside of image actor
+        isInside = false;
+    }
 //
 //    // Get the mapped position of the mouse using the picker.
 //    double ptMapped[3];
@@ -183,6 +183,8 @@ void FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     params.Y = int(point[1]);
 
     coordinate->Delete();
+    
+    return isInside;
 }
 
 int FrRoiTool::GetVisibleLayer(std::vector<FrLayerSettings*> layers){

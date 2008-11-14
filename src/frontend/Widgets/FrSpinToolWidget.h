@@ -13,11 +13,12 @@ class FrSpinToolWidget: public FrBaseToolWidget{
     Q_OBJECT
 
 public:
-    FrSpinToolWidget(QWidget* parent);
+    FrSpinToolWidget(QWidget* parent=0L);
 
     int GetValue();
     void SetName(QString name);
     void SetValue(int value);
+    void SetMinMaxValues(int min, int max);
 
 signals:
     virtual void ParamsChanged();

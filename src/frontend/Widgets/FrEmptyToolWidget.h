@@ -9,7 +9,7 @@ class FrEmptyToolWidget: public FrBaseToolWidget{
     Q_OBJECT
 
 public:
-    FrEmptyToolWidget(QWidget* parent);
+    FrEmptyToolWidget(QWidget* parent=0L);
 
 private:
     

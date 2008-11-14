@@ -235,6 +235,12 @@ void FrLayeredImage::UpdateTBC(){
         (*it)->UpdateTBC();
     }
     FrImageLayer::UpdateTBC();
+
+    // Update ROI data
+    ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
+    for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
+        (*itr)->UpdateData();
+    }
 }
 
 void FrLayeredImage::UpdateCamera(){

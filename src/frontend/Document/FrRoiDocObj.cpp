@@ -66,30 +66,54 @@ FrDocumentObj::ObjType FrRoiDocObj::GetType(){
     return FrDocumentObj::RoiObject;
 }
 
-bool FrRoiDocObj::LoadFromFile(QString& fileName){
+void FrRoiDocObj::CreateEmptyMaskImage(FrImageDocObj* imgDO){
+    
+    if(m_MaskImage) delete m_MaskImage;
+    
+    m_MaskImage = new RtMaskImage();
+    m_MaskImage->setInfo( *(imgDO->GetImage()) );
+        
+    // init all values to default (not a ROI)
+    m_MaskImage->setAll(DEF_MASK_VALUE);
+}
+
+bool FrRoiDocObj::LoadFromFile(FrImageDocObj* imgDO, QString& fileName){
     bool result = false;
     if(QFile::exists(fileName)){
         std::string stdFileName(fileName.toAscii());
         RtMaskImage* img = new RtMaskImage();
 
         if(img->readNifti(stdFileName)){
-            if(m_MaskImage) delete m_MaskImage;
-            m_MaskImage = img;
-		
-            SetUpdateNeeded(true);
-            result = true;
+            // check params
+            bool hasSameDim = (img->getDims().size() == imgDO->GetImage()->getDims().size());
+            bool hasSamePDim = (img->getPixDims().size() == imgDO->GetImage()->getPixDims().size());
+            if(hasSameDim && hasSamePDim){
+                for(int i=0; i < img->getDims().size(); ++i){
+                    hasSameDim = (img->getDim(i) == imgDO->GetImage()->getDim(i));
+                    hasSamePDim = (img->getPixDim(i) == imgDO->GetImage()->getPixDim(i));
+                    if(!hasSameDim || !hasSamePDim) break;
+                }
+
+                // if OK set loaded image as current
+                if(hasSameDim && hasSamePDim){
+                    if(m_MaskImage) delete m_MaskImage;
+                    m_MaskImage = img;
+                    result = true;
+                }
+                else{
+                    delete img;
+                    result = false;
+                }
+            }
         }
     }
     return result;
 }
 
-void FrRoiDocObj::CreateMaskImage(FrImageDocObj* imgDO){
-    
+void FrRoiDocObj::CreateByThresholdMaskImage(FrImageDocObj* imgDO, double threshold){
+
     if(m_MaskImage) delete m_MaskImage;
     
-    m_MaskImage = new RtMaskImage();
-    m_MaskImage->setInfo( *(imgDO->GetImage()) );
-
-    // init all values to default (not selected)
-    m_MaskImage->setAll(DEF_MASK_VALUE);
+    m_MaskImage = new RtMaskImage(
+        *(imgDO->GetImage()), threshold);
 }

@@ -11,7 +11,7 @@
 #include "Qt/qaction.h"
 #include "Qt/qapplication.h"
 #include "Qt/qmessagebox.h"
-#include <QtGui/QFileDialog>
+#include "Qt/qfiledialog.h"
 
 
 #define CONNECT_ACTION_TRIGGERED(action, slot)\

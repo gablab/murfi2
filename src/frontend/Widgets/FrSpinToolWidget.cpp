@@ -26,6 +26,13 @@ void FrSpinToolWidget::SetValue(int value){
     spinBox->setValue(value);
 }
 
+void FrSpinToolWidget::SetMinMaxValues(int min, int max){
+    if(min < max){
+        spinBox->setMinimum(min);
+        spinBox->setMaximum(max);
+    }
+}
+
 void FrSpinToolWidget::SetName(QString name){
     label->setText(name);
 }

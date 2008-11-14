@@ -10,7 +10,7 @@ FrListToolWidget::FrListToolWidget(QWidget* parent)
 : FrBaseToolWidget(parent){
     roiList = new QListWidget(this);
     connect(roiList, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), 
-        this, SLOT(ROIListItemChanged));
+        this, SLOT(ROIListItemChanged(QListWidgetItem*, QListWidgetItem*)));
 
     label = new QLabel("test", this);  
 

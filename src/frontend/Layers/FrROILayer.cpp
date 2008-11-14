@@ -1,5 +1,5 @@
 #include "FrROILayer.h"
-#include "FrSelection.h"
+#include "FrMaskToRgbaFilter.h"
 #include "FrSettings.h"
 #include "FrMacro.h"
 
@@ -11,16 +11,14 @@
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 
-// Some defines
-#define DEF_REN_BACKGROUND 0.0, 0.0, 0.0
-
 
 vtkStandardNewMacro(FrROILayer);
 
 
 FrROILayer::FrROILayer() 
-: m_actor(0) {
+    : m_actor(0), m_filter(0) {
     // Pipline stuff
+    m_filter = FrMaskToRgbaFilter::New();
     m_actor = vtkImageActor::New();
 
     // add actor
@@ -29,25 +27,21 @@ FrROILayer::FrROILayer()
 
 FrROILayer::~FrROILayer(){    
     if(m_Renderer) m_Renderer->RemoveActor(m_actor);
+    if(m_filter) m_filter->Delete();
     if(m_actor) m_actor->Delete();
 }
 
 // Accessors / Modifiers
 void FrROILayer::SetInput(vtkImageData* data){
-    if(m_actor){
-        m_actor->SetInput(data);
-
-        int extent[6];
-        extent[0] = -1;
-        extent[1] = extent[2] = extent[3] = extent[4] = extent[5] = 0;
-        m_actor->SetDisplayExtent(extent);
+    if(m_filter){
+        m_filter->SetInput(data);
     }
 }
 
 vtkImageData* FrROILayer::GetInput(){
     vtkImageData* result = 0L;
-    if(m_actor){
-        result = m_actor->GetInput();
+    if(m_filter){
+        result = m_filter->GetInput();
     }
     return result;
 }
@@ -84,3 +78,24 @@ void FrROILayer::UpdateCamera(){
         m_Renderer->Render(); 
     }
 }
+
+void FrROILayer::UpdateData(){
+    if(m_filter && m_filter->GetInput()){
+        m_filter->Update();
+
+        // Pass data futher
+        vtkImageData* data = m_filter->GetOutput();
+        if(data != m_actor->GetInput()){
+            m_actor->SetInput(data);
+        }
+
+        // Have to update display extent
+        if(data){
+            int extent[6];
+            extent[0] = -1;
+            extent[1] = extent[2] = extent[3] = extent[4] = extent[5] = 0;
+            m_actor->SetDisplayExtent(extent);
+        }
+    }
+}
+

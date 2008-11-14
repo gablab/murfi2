@@ -3,6 +3,7 @@
 #define FR_ROI_LAYER
 
 //Forward declarations
+class FrMaskToRgbaFilter;
 class FrCameraSettings;
 class vtkImageData;
 class vtkImageActor;
@@ -36,9 +37,11 @@ public:
 
     // Update methods
     virtual void UpdateCamera();
+    void UpdateData();
 
 protected:
     // Pipeline stuff
+    FrMaskToRgbaFilter* m_filter;
     vtkImageActor* m_actor;
 
 private:

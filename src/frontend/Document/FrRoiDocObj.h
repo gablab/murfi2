@@ -30,9 +30,10 @@ public:
     FrPropMacro(bool, Visibility);
     FrPropMacro(double, Opacity);
 
-    // Initialization
-    bool LoadFromFile(QString& fileName);
-    void CreateMaskImage(FrImageDocObj* imgDO);
+    // Initialization    
+    void CreateEmptyMaskImage(FrImageDocObj* imgDO);
+    bool LoadFromFile(FrImageDocObj* imgDO, QString& fileName);
+    void CreateByThresholdMaskImage(FrImageDocObj* imgDO, double threshold);
 };
 
 #endif

@@ -7,7 +7,7 @@ class FrBaseToolWidget: public QWidget{
     Q_OBJECT
 
 public:
-    FrBaseToolWidget(QWidget* parent);
+    FrBaseToolWidget(QWidget* parent=0L);
 
 signals:
      virtual void ParamsChanged();

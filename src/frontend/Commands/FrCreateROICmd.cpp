@@ -1,6 +1,7 @@
 #include "FrCreateROICmd.h"
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
+#include "FrCreateRoiDialog.h"
 
 #include "FrRoiDocObj.h"
 #include "FrImageDocObj.h"
@@ -16,32 +17,42 @@ bool FrCreateROICmd::Execute(){
     // Check for safety
     if(!this->GetMainController()) return false;
     
-    // TODO: add ROI dialog with ability 
-    // to select how to create ROI
-
-    //FrMainWindow* mv = this->GetMainController()->GetMainView();
-    //FrLayerDialog dlg(mv, true);
-    //if(!dlg.SimpleExec()) return false;
-
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
+    
     // Get images from document
     std::vector<FrDocumentObj*> images;
     doc->GetObjectsByType(images, FrDocumentObj::ImageObject);
-
-    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    
     if(images.size() == 0){
         QMessageBox::critical(mv, QString("Creation of ROI"), 
             QString("Can't create ROI. None image opened.") );
         return false;
     }
+    
+    FrCreateRoiDialog dlg(mv, true);
+    if(!dlg.SimpleExec()) return false;
 
-    // Create from image 
+    bool result = false;
+    FrRoiDocObj* roiDO = 0L;
     FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
-    FrRoiDocObj* roiDO = new FrRoiDocObj();
-    roiDO->CreateMaskImage(imgDO);
-
-    bool result = doc->Add(roiDO);
+    switch(dlg.GetAction()){
+        case FrCreateRoiDialog::CreateEmpty:
+            roiDO = new FrRoiDocObj();
+            roiDO->CreateEmptyMaskImage(imgDO);
+            result = doc->Add(roiDO);
+            break;
+        case FrCreateRoiDialog::ThresholdToMask:
+            roiDO = new FrRoiDocObj();
+            roiDO->CreateByThresholdMaskImage(imgDO, dlg.GetThreshold());
+            result = doc->Add(roiDO);
+            break;
+        case FrCreateRoiDialog::LoadFromFile:
+            roiDO = new FrRoiDocObj();
+            roiDO->LoadFromFile(imgDO, dlg.GetFileName());
+            result = doc->Add(roiDO);
+            break;
+    }
     return result;
 }
 

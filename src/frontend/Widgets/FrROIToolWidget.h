@@ -1,65 +1,67 @@
 #ifndef FR_ROITOOL_WIDGET
 #define FR_ROITOOL_WIDGET
 
-#define DFN_TOOL_NUMBER 11
-
-#include "FrMacro.h"
-
-#include "Qt/qtoolbox.h"
-
+// Forward declarations
 class FrBaseWidget;
 class FrEmptyToolWidget;
 class FrSpinToolWidget;
 class FrListToolWidget;
 
-
-typedef FrEmptyToolWidget FrInfoWidget;
-typedef FrEmptyToolWidget FrRectToolWidget;
-typedef FrEmptyToolWidget FrFreeShapeToolWidget;
-typedef FrEmptyToolWidget FrInvertSelectionToolWidget;
-typedef FrEmptyToolWidget FrCopyToAdjucentToolWidget;
-
-typedef FrSpinToolWidget FrPenToolWidget;
-typedef FrSpinToolWidget FrSphereToolWidget;
-typedef FrSpinToolWidget FrDilationErosionToolWidget;
-
-typedef FrListToolWidget FrIntersectMaskToolWidget;
-typedef FrListToolWidget FrSubtractMaskToolWidget;
-typedef FrListToolWidget FrUnionMaskToolWidget;
+class QLabel;
+class QComboBox;
+class QGroupBox;
+class QHBoxLayout;
+class QStackedLayout;
 
 
-class FrROIToolWidget: public QToolBox{
+#include "FrMacro.h"
+#include "Qt/qwidget.h"
+
+// Class represents widgets with all ROI tools
+// together with params.
+class FrROIToolWidget: public QWidget{
     Q_OBJECT
 public:
-    FrROIToolWidget(QWidget *parent);
+    enum ToolType { 
+        Info, Rectangle, FreeShape, Invert, 
+        Copy, Pen, Sphere, DilateErode,
+        Intersect, Subtract, Union
+    };
+public:
+    FrROIToolWidget(QWidget *parent=0L);
 
-    FrPropMacro(int, CurrentId);     
+    ToolType GetCurrentToolType();
+    int GetCurrentValue();
 
-    FrGetPropMacro(FrInfoWidget*, InfoWidget);
-    FrGetPropMacro(FrRectToolWidget*, RectToolWidget);
-    FrGetPropMacro(FrFreeShapeToolWidget*, FreeShapeToolWidget);
-    FrGetPropMacro(FrInvertSelectionToolWidget*, InvertSelectionToolWidget);
-    FrGetPropMacro(FrCopyToAdjucentToolWidget*, CopyToAdjucentToolWidget);
-
-    FrGetPropMacro(FrPenToolWidget*, PenToolWidget);
-    FrGetPropMacro(FrSphereToolWidget*, SphereToolWidget);
-    FrGetPropMacro(FrDilationErosionToolWidget*, DilationErosionToolWidget);
-
-    FrGetPropMacro(FrIntersectMaskToolWidget*, IntersectMaskToolWidget);
-    FrGetPropMacro(FrSubtractMaskToolWidget*, SubtractMaskToolWidget);
-    FrGetPropMacro(FrUnionMaskToolWidget*, UnionMaskToolWidget);
-
-signals:
+Q_SIGNALS:
+    void CurrentToolChanged(ToolType toolType);
+    void CurrentToolParamChanged(int value);
 
 private Q_SLOTS:
-    void toolChanged(int index);
+    void OnToolChanged(int index);
+    void OnToolParamChanged();
 
 private:
-    void Initialize();
+    // helpers
+    QHBoxLayout* CreateSelectionLayout();
+    void InitAdditionalParams(QGroupBox* gb);
 
 private:
-    FrBaseWidget* widgets[DFN_TOOL_NUMBER];
+    QLabel* m_label;
+    QComboBox* m_cmbTool;
+    QStackedLayout* m_layout;
 
+    FrEmptyToolWidget* m_InfoWidget;
+    FrEmptyToolWidget* m_RectangleWidget;
+    FrEmptyToolWidget* m_FreeShapeWidget;
+    FrSpinToolWidget* m_PenWidget;
+    FrSpinToolWidget* m_SphereWidget;
+    FrSpinToolWidget* m_DilateErodeWidget;
+    FrEmptyToolWidget* m_InvertWidget;
+    FrListToolWidget* m_IntersectWidget;
+    FrListToolWidget* m_SubtractWidget;
+    FrListToolWidget* m_UnionWidget;
+    FrEmptyToolWidget* m_CopyWidget;
 };
 
 

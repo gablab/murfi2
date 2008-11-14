@@ -14,7 +14,7 @@ class FrListToolWidget: public FrBaseToolWidget{
     Q_OBJECT
 
 public:
-    FrListToolWidget(QWidget* parent);
+    FrListToolWidget(QWidget* parent=0);
 
     void SetName(QString name);
     void SetList();

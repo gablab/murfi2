@@ -8,6 +8,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -31,13 +32,19 @@ public:
 // Default constructor
 FrMosaicView::FrMosaicView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
-    m_docReader = FrDocumentReader::New();	
+    m_imgReader = FrDocumentReader::New();	
+    m_imgReader->SetTarget(FrDocumentReader::Image);
+
+    m_roiReader = FrDocumentReader::New();	
+    m_roiReader->SetTarget(FrDocumentReader::ROI);
+
     m_LayeredImage = FrLayeredImage::New();
 }
 
 FrMosaicView::~FrMosaicView(){
     this->RemoveRenderers();
-    if(m_docReader) m_docReader->Delete();
+    if(m_imgReader) m_imgReader->Delete();
+    if(m_roiReader) m_roiReader->Delete();
     if(m_LayeredImage) m_LayeredImage->Delete();
 }
 
@@ -83,8 +90,13 @@ void FrMosaicView::RemoveRenderers(){
 void FrMosaicView::UpdatePipeline(int point){
     // Get common settings
     FrUpdateParams1 params;
-    InitUpdateParams(params);
-                    	
+    this->InitUpdateParams(params);
+
+    FrRoiDocObj* roi = 0L;
+    std::vector<FrDocumentObj*> rois;
+    params.Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
+    std::vector<FrDocumentObj*>::iterator it, itEnd(rois.end());
+
     // Update pipeline
     switch(point)
     {
@@ -94,12 +106,15 @@ void FrMosaicView::UpdatePipeline(int point){
         }
     case FRP_READIMAGE:
         {
-            this->ReadDocument(params);
+            this->ReadImage(params);
+        }
+    case FRP_READROI:
+        {
+            this->ReadRoi(params);
         }
 	case FRP_SLICE:
         {
             // NOTE: Do nothing here but setup text
-            // Set text
             if(m_LayeredImage->GetInput()){
                 m_LayeredImage->SetText("Mosaic View:");
             }
@@ -118,6 +133,15 @@ void FrMosaicView::UpdatePipeline(int point){
     case FRP_OPACITY_VISIBILITY:
         {
             this->UpdateOpacityVisibility(params);
+            
+            // have to update rois
+            if(params.ActiveLayerID == ALL_LAYERS_ID){
+                for(it = rois.begin(); it != itEnd; ++it){
+                    roi = (FrRoiDocObj*)(*it);
+                    m_LayeredImage->SetOpacity(roi->GetOpacity(), roi->GetID());
+                    m_LayeredImage->SetVisibility(roi->GetVisibility(), roi->GetID());
+                }
+            }
         }
     case FRP_SETCAM:
         {
@@ -146,35 +170,33 @@ void FrMosaicView::InitUpdateParams(FrUpdateParams1& params){
     params.ActiveLayerID = params.ViewSettings->ActiveLayerID;    
     GetLayerSettings(params.ViewSettings, params.Layers);
 
-    // If not 'broadcast update' then get layer settings 
-    if(params.ActiveLayerID != ALL_LAYERS_ID){
-        // Set default value
-        params.ActiveLayer = 0L;
-
-        // Look for layer settings
-        LayerCollection::iterator it, itEnd(params.Layers.end());
-        for(it = params.Layers.begin(); it != itEnd; ++it){
-            if((*it)->ID == params.ActiveLayerID){
-                params.ActiveLayer = (*it);
-                break;
-            }
-        }
-    }
+    params.ActiveLayer = this->GetActiveLayer(params.Layers, params.ActiveLayerID);
+    
+    // add all ROI IDs
+    this->GetRoiIDs(params.Document, params.RoiIDs);
 }
 
-void FrMosaicView::ReadDocument(FrUpdateParams1& params){
+void FrMosaicView::ReadImage(FrUpdateParams1& params){
     // read document and connect filters
-    m_docReader->SetDocument(params.Document);
-    m_docReader->SetMosaicOn();
-    m_docReader->Update();
+    m_imgReader->SetDocument(params.Document);
+    m_imgReader->SetMosaicOn();
+    m_imgReader->Update();
 	
     // Pass image input 
-    m_LayeredImage->SetInput(m_docReader->GetOutput());
-    
+    m_LayeredImage->SetInput(m_imgReader->GetOutput());
+}
+
+void FrMosaicView::ReadRoi(FrUpdateParams1& params){
+    // read document and connect filters
+    m_roiReader->SetDocument(params.Document);
+    m_roiReader->SetMosaicOn();
+    m_roiReader->Update();
+	    
     // Pass ROI data from output starting from 1
-    int count = m_docReader->GetOutputCount();
-    for(int i=1; i < count; ++i){
-        m_LayeredImage->SetROIInput(i, m_docReader->GetOutput(i));
+    int count = m_roiReader->GetOutputCount();
+    for(int i=0; i < count; ++i){
+        int roiID = params.RoiIDs[i];
+        m_LayeredImage->SetROIInput(roiID, m_roiReader->GetOutput(i));
     }
 }
 
@@ -187,7 +209,7 @@ void FrMosaicView::UpdateColormap(FrUpdateParams1& params){
                 (*it)->ColormapSettings, (*it)->ID);
         }
     }
-    else {
+    else if(params.ActiveLayer != 0) {
         m_LayeredImage->SetColormapSettings(
             params.ActiveLayer->ColormapSettings, params.ActiveLayer->ID);
     }
@@ -203,7 +225,7 @@ void FrMosaicView::UpdateTBC(FrUpdateParams1& params){
             m_LayeredImage->SetTBCSettings((*it)->TbcSettings, (*it)->ID);
         }
     }
-    else {
+    else if(params.ActiveLayer != 0) {
         m_LayeredImage->SetTBCSettings(
             params.ActiveLayer->TbcSettings, params.ActiveLayer->ID);
     }
@@ -213,19 +235,28 @@ void FrMosaicView::UpdateTBC(FrUpdateParams1& params){
 void FrMosaicView::UpdateOpacityVisibility(FrUpdateParams1& params){
     // Update Opacity and visibility
     if(params.ActiveLayerID == ALL_LAYERS_ID){
-        // Update all params
+        // Update all layers
         LayerCollection::iterator it, itEnd(params.Layers.end());
         for(it = params.Layers.begin(); it != itEnd; ++it){
             m_LayeredImage->SetOpacity((*it)->Opacity, (*it)->ID);
             m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
         }
     }
-    else {
+    else if(params.ActiveLayer != 0) {
         m_LayeredImage->SetOpacity(
             params.ActiveLayer->Opacity, params.ActiveLayer->ID);
         m_LayeredImage->SetVisibility(
             params.ActiveLayer->Visibility, params.ActiveLayer->ID);
     }
-
-    // TODO: add ROI opacity and visibility update ???
+    else {
+        // Seems this is ROI layer
+        bool roiVisibility = true;
+        double roiOpacity = 1.0;
+        if(this->GetRoiParams(params.Document, 
+            params.ActiveLayerID, roiVisibility, roiOpacity)){
+            // apply roi params
+            m_LayeredImage->SetOpacity(roiOpacity, params.ActiveLayerID);
+            m_LayeredImage->SetVisibility(roiVisibility, params.ActiveLayerID);
+        }
+    }
 }

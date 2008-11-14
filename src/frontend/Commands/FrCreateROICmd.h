@@ -17,6 +17,9 @@ public:
     virtual bool Undo();
     virtual bool Redo();
 
+    // Properties
+    FrSetPropMacro(bool, CreateTest);
+
 private:
     // Helpers
 };

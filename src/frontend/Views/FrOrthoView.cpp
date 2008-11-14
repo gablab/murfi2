@@ -2,14 +2,13 @@
 #include "FrMainWindow.h"
 #include "QVTKWidget.h"
 #include "FrDocumentReader.h"
-#include "FrDocument.h"
 #include "FrMainDocument.h"
 #include "FrNotify.h"
 #include "FrUtils.h"
 #include "FrSliceExtractor.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
-
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkCamera.h"
@@ -58,8 +57,12 @@ FrSliceExtractor::Orientation g_Orientation[ORTHO_IMAGE_COUNT];
 // Default constructor
 FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
-    // creating reader   
-    m_docReader = FrDocumentReader::New();
+    // creating reader
+    m_imgReader = FrDocumentReader::New();
+    m_imgReader->SetTarget(FrDocumentReader::Image);
+
+    m_roiReader = FrDocumentReader::New();
+    m_roiReader->SetTarget(FrDocumentReader::ROI);
 
     // Init orientations
     g_Orientation[CORONAL_IMAGE] = FrSliceExtractor::XZ;
@@ -78,7 +81,8 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 
 FrOrthoView::~FrOrthoView(){
     this->RemoveRenderers();
-    if(m_docReader) m_docReader->Delete();
+    if(m_imgReader) m_imgReader->Delete();
+    if(m_roiReader) m_roiReader->Delete();
 
     for(int i = 0; i < ORTHO_IMAGE_COUNT; i++){
         if(m_SliceExtractor[i]) m_SliceExtractor[i]->Delete();
@@ -155,6 +159,11 @@ void FrOrthoView::UpdatePipeline(int point){
     // Init params
     FrUpdateParams2 params;
     this->InitUpdateParams(params);
+
+    FrRoiDocObj* roi = 0L;
+    std::vector<FrDocumentObj*> rois;
+    params.Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
+    std::vector<FrDocumentObj*>::iterator it, itEnd(rois.end());
                         	
     // Update pipeline
     switch(point)
@@ -165,7 +174,11 @@ void FrOrthoView::UpdatePipeline(int point){
         }
     case FRP_READIMAGE:
         {
-            this->ReadDocument(params);
+            this->ReadImage(params);
+        }
+    case FRP_READROI:
+        {
+            this->ReadRoi(params);
         }
 	case FRP_SLICE:
         {
@@ -182,6 +195,16 @@ void FrOrthoView::UpdatePipeline(int point){
     case FRP_OPACITY_VISIBILITY:
         {
             this->UpdateOpacityVisibility(params);
+            if(params.ActiveLayerID == ALL_LAYERS_ID){
+                // have to update rois
+                for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                    for(it = rois.begin(); it != itEnd; ++it){
+                        roi = (FrRoiDocObj*)(*it);
+                        m_LayeredImage[i]->SetOpacity(roi->GetOpacity(), roi->GetID());
+                        m_LayeredImage[i]->SetVisibility(roi->GetVisibility(), roi->GetID());
+                    }
+                }
+            }
         }
     case FRP_SETCAM:
         {
@@ -213,59 +236,54 @@ void FrOrthoView::InitUpdateParams(FrUpdateParams2& params){
 
     // Get settings of layers
     params.ActiveLayerID = params.ViewSettings->ActiveLayerID;
-    
+
     // Coronal
-    params.ActiveLayer[CORONAL_IMAGE] = GetLayerAndInitLayers(
-        params.Layers[CORONAL_IMAGE], params.ViewSettings, CORONAL_IMAGE);
+    GetLayerSettings(params.ViewSettings, *(params.Layers[CORONAL_IMAGE]), CORONAL_IMAGE);
+    params.ActiveLayer[CORONAL_IMAGE] = this->GetActiveLayer(
+        *(params.Layers[CORONAL_IMAGE]), params.ActiveLayerID);
 
     // Sagital
-    params.ActiveLayer[SAGITAL_IMAGE] = GetLayerAndInitLayers(
-        params.Layers[SAGITAL_IMAGE], params.ViewSettings, SAGITAL_IMAGE);
+    GetLayerSettings(params.ViewSettings, *(params.Layers[SAGITAL_IMAGE]), SAGITAL_IMAGE);
+    params.ActiveLayer[SAGITAL_IMAGE] = this->GetActiveLayer(
+        *(params.Layers[SAGITAL_IMAGE]), params.ActiveLayerID);
 
     // Axial
-    params.ActiveLayer[AXIAL_IMAGE] = GetLayerAndInitLayers(
-        params.Layers[AXIAL_IMAGE], params.ViewSettings, AXIAL_IMAGE);
+    GetLayerSettings(params.ViewSettings, *(params.Layers[AXIAL_IMAGE]), AXIAL_IMAGE);
+    params.ActiveLayer[AXIAL_IMAGE] = this->GetActiveLayer(
+        *(params.Layers[AXIAL_IMAGE]), params.ActiveLayerID);
+
+    // ROIs
+    this->GetRoiIDs(params.Document, params.RoiIDs);
 }
 
-FrLayerSettings* FrOrthoView::GetLayerAndInitLayers(
-                                           std::vector<FrLayerSettings*>* layers, 
-                                           FrOrthoViewSettings* viewSets, 
-                                           int rendererID){
-    
-    int layerID = viewSets->ActiveLayerID;
-    GetLayerSettings(viewSets, *layers, rendererID);
-    LayerCollection::iterator it, itEnd(layers->end());    
-
-    // If not 'broadcast update' then get layer settings 
-    FrLayerSettings* layer = 0L;
-    if(layerID != ALL_LAYERS_ID){
-        for(it = layers->begin(); it != itEnd; ++it){
-            if((*it)->ID == layerID){
-                layer = (*it);
-                break;
-            }
-        }
-    }
-    return layer;
-}
-
-void FrOrthoView::ReadDocument(FrUpdateParams2& params){
+void FrOrthoView::ReadImage(FrUpdateParams2& params){
     // Read document and connect filters
-    m_docReader->SetDocument(params.Document);
-    m_docReader->SetUnMosaicOn();
-    m_docReader->Update();
+    m_imgReader->SetDocument(params.Document);
+    m_imgReader->SetUnMosaicOn();
+    m_imgReader->Update();
 	
     // Setup slice extractor filter
     for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-        m_SliceExtractor[i]->SetInput(m_docReader->GetOutput());
+        m_SliceExtractor[i]->SetInput(m_imgReader->GetOutput());
     }
+}
 
+void FrOrthoView::ReadRoi(FrUpdateParams2& params){
+    // Read document and connect filters
+    m_roiReader->SetDocument(params.Document);
+    m_roiReader->SetUnMosaicOn();
+    m_roiReader->Update();
+	
     // Pass ROI data from output starting from 1
     // to each of slice extractors
-    int count = m_docReader->GetOutputCount();
+    int count = m_imgReader->GetOutputCount();
     for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-        for(int j=1; j < count; ++j){
-            m_SliceExtractor[i]->SetInput(j, m_docReader->GetOutput(j));
+        // first clear all
+        m_SliceExtractor[i]->ClearAdditionalPorts();
+
+        for(int j=0, port=1; j < count; ++j, ++port){
+            m_SliceExtractor[i]->SetInput(
+                port, m_roiReader->GetOutput(j));
         }
     }
 }
@@ -305,9 +323,10 @@ void FrOrthoView::ExtractSlice(FrUpdateParams2& params){
             m_LayeredImage[i]->SetInput(m_SliceExtractor[i]->GetOutput());
             
             // Set ROI data
-            int count = m_docReader->GetOutputCount();
-            for(int j=1; j < count; ++j){
-                m_LayeredImage[i]->SetROIInput(j, m_SliceExtractor[i]->GetOutput(j));
+            int count = m_roiReader->GetOutputCount();
+            for(int j=0, port=1; j < count; ++j, ++port){
+                int roiID = params.RoiIDs[j];
+                m_LayeredImage[i]->SetROIInput(roiID, m_SliceExtractor[i]->GetOutput(port));
             }
 
             // Set text
@@ -330,7 +349,7 @@ void FrOrthoView::UpdateColormap(FrUpdateParams2& params){
                     (*it)->ColormapSettings, (*it)->ID);
             }
         }
-        else {
+        else if(params.ActiveLayer[i] != 0) {
             m_LayeredImage[i]->SetColormapSettings(
                 params.ActiveLayer[i]->ColormapSettings, params.ActiveLayer[i]->ID);
         }
@@ -349,7 +368,7 @@ void FrOrthoView::UpdateTBC(FrUpdateParams2& params){
                     (*it)->TbcSettings, (*it)->ID);
             }
         }
-        else {
+        else if(params.ActiveLayer[i] != 0) {
             m_LayeredImage[i]->SetTBCSettings(
                 params.ActiveLayer[i]->TbcSettings, params.ActiveLayer[i]->ID);
         }
@@ -367,13 +386,22 @@ void FrOrthoView::UpdateOpacityVisibility(FrUpdateParams2& params){
                 m_LayeredImage[i]->SetVisibility((*it)->Visibility, (*it)->ID);
             }
         }
-        else {
+        else if(params.ActiveLayer[i] != 0) {
             m_LayeredImage[i]->SetOpacity(
                 params.ActiveLayer[i]->Opacity, params.ActiveLayer[i]->ID);
             m_LayeredImage[i]->SetVisibility(
                 params.ActiveLayer[i]->Visibility, params.ActiveLayer[i]->ID);
         }
+        else {
+            // Seems this is ROI layer
+            bool roiVisibility = true;
+            double roiOpacity = 1.0;
+            if(this->GetRoiParams(params.Document, 
+                params.ActiveLayerID, roiVisibility, roiOpacity)){
+                // apply roi params
+                m_LayeredImage[i]->SetOpacity(roiOpacity, params.ActiveLayerID);
+                m_LayeredImage[i]->SetVisibility(roiVisibility, params.ActiveLayerID);
+            }
+        }
     }
-
-    // TODO: add ROI opacity and visibility update ???
 }

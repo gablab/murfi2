@@ -10,6 +10,7 @@
 #include "FrLayeredImage.h"
 #include "FrNotify.h"
 #include "FrUtils.h"
+#include "FrRoiDocObj.h"
 
 // VTK
 #include "vtkRenderWindowInteractor.h"
@@ -102,7 +103,12 @@ void FrSliceView::RemoveRenderers(){
 void FrSliceView::UpdatePipeline(int point){    
     // Get common settings
     FrUpdateParams0 params;
-    InitUpdateParams(params);
+    this->InitUpdateParams(params);
+
+    FrRoiDocObj* roi = 0L;
+    std::vector<FrDocumentObj*> rois;
+    params.Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
+    std::vector<FrDocumentObj*>::iterator it, itEnd(rois.end());
                     	
     // Update pipeline
     switch(point)
@@ -134,6 +140,15 @@ void FrSliceView::UpdatePipeline(int point){
     case FRP_OPACITY_VISIBILITY:
         {
             this->UpdateOpacityVisibility(params);
+
+            // have to update rois
+            if(params.ActiveLayerID == ALL_LAYERS_ID){
+                for(it = rois.begin(); it != itEnd; ++it){
+                    roi = (FrRoiDocObj*)(*it);
+                    m_LayeredImage->SetOpacity(roi->GetOpacity(), roi->GetID());
+                    m_LayeredImage->SetVisibility(roi->GetVisibility(), roi->GetID());
+                }
+            }
         }
     case FRP_SETCAM:
         {

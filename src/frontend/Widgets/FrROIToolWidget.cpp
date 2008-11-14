@@ -3,6 +3,7 @@
 #include "FrEmptyToolWidget.h"
 #include "FrSpinToolWidget.h"
 #include "FrListToolWidget.h"
+#include "FrSpinSliderWidget.h"
 
 #include "Qt/qlayout.h"
 #include "Qt/qboxlayout.h"
@@ -19,11 +20,12 @@ FrROIToolWidget::FrROIToolWidget(QWidget *parent)
     QGroupBox* gbParams = new QGroupBox(
         QString("Parameters/Description"), this);
     this->InitAdditionalParams(gbParams);
-
+    
+    // Init main layout
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(selectionLayout);
     mainLayout->addWidget(gbParams);
-
+   
     this->setFixedHeight(this->sizeHint().height());
 }
 

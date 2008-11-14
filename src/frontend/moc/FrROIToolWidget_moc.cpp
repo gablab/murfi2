@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrROIToolWidget.h'
 **
-** Created: Fri 14. Nov 19:37:34 2008
+** Created: Fri 14. Nov 21:24:39 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!

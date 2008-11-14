@@ -36,13 +36,11 @@ public:
     FrLayeredImage* GetImage(int idx){ return m_LayeredImage[idx]; }
 
 private:
-    FrLayerSettings* GetLayerAndInitLayers(std::vector<FrLayerSettings*>* layers, 
-                                           FrOrthoViewSettings* viewSets, 
-                                           int rendererID);
 
     // Update pipline helpers
     void InitUpdateParams(FrUpdateParams2& params);
-    void ReadDocument(FrUpdateParams2& params);
+    void ReadImage(FrUpdateParams2& params);
+    void ReadRoi(FrUpdateParams2& params);
     void ExtractSlice(FrUpdateParams2& params);
     void UpdateColormap(FrUpdateParams2& params);
     void UpdateTBC(FrUpdateParams2& params);
@@ -50,7 +48,8 @@ private:
 
 private:
     // Render pipline
-    FrDocumentReader* m_docReader;
+    FrDocumentReader* m_imgReader;
+    FrDocumentReader* m_roiReader;
     FrSliceExtractor* m_SliceExtractor[ORTHO_IMAGE_COUNT];
     FrLayeredImage* m_LayeredImage[ORTHO_IMAGE_COUNT];
 

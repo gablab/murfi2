@@ -6,6 +6,7 @@ class FrBaseWidget;
 class FrEmptyToolWidget;
 class FrSpinToolWidget;
 class FrListToolWidget;
+class FrSpinSliderWidget;
 
 class QLabel;
 class QComboBox;
@@ -30,6 +31,7 @@ public:
 public:
     FrROIToolWidget(QWidget *parent=0L);
 
+    // Accessors
     ToolType GetCurrentToolType();
     int GetCurrentValue();
 
@@ -45,7 +47,7 @@ private:
     // helpers
     QHBoxLayout* CreateSelectionLayout();
     void InitAdditionalParams(QGroupBox* gb);
-
+    
 private:
     QLabel* m_label;
     QComboBox* m_cmbTool;

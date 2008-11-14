@@ -1,32 +1,101 @@
-#include "FrRectangleTool.h"
+#include "FrFreeShapeTool.h"
+#include "FrInteractorStyle.h"
+#include "FrCommandController.h"
+#include "FrUtils.h"
 
 
-FrRectangleTool::FrRectangleTool(){
+FrFreeShapeTool::FrFreeShapeTool(){
+    SetCurrentState(State::None); 
 }
 
-FrRectangleTool::~FrRectangleTool(){
+FrFreeShapeTool::~FrFreeShapeTool(){
 }
 
-void FrRectangleTool::Start(){
-
-}
-
-void FrRectangleTool::Stop(){
+void FrFreeShapeTool::Start(){
 
 }
 
-bool FrRectangleTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
+void FrFreeShapeTool::Stop(){
+
+}
+
+bool FrFreeShapeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrRectangleTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
+bool FrFreeShapeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
+    if(params.Button == FrMouseParams::LeftButton){
+        SetCurrentState(State::Drawing);     
+        Pos pos;
+        pos.x = params.X;
+        pos.y = params.Y;
+
+        Points.push_back(pos);
+
+        // check if new point is close to first point, in thic case call cmd with Param:Write
+        if (CheckPoint(pos)){
+            SetCurrentState(State::None); 
+
+            FrMaskFreeShapeCmd* cmd = FrCommandController::CreateCmd<FrMaskFreeShapeCmd>();
+            cmd->SetAction(FrMaskFreeShapeCmd::Action::Write);
+            Points.pop_back();
+            Points.push_back(pos);
+
+            cmd->SetPoints(Points);
+            cmd->SetImageNumber(m_ImageNumber);
+            cmd->Execute();
+            delete cmd;
+
+            Points.clear();
+        }
+    }
+
     return false;
 }
 
-bool FrRectangleTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
+bool FrFreeShapeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
+    int x, y;
+
+    if (GetCurrentState() == Drawing)
+    {
+        x = params.X;
+        y = params.Y;
+        // TODO: execute command with Param:Draw
+        FrMaskFreeShapeCmd* cmd = FrCommandController::CreateCmd<FrMaskFreeShapeCmd>();
+        cmd->SetAction(FrMaskFreeShapeCmd::Action::Draw);
+        // set point set
+        Pos pos;
+        pos.x = params.X;
+        pos.y = params.Y;
+        Points.push_back(pos);
+
+        cmd->SetPoints(Points);
+        cmd->SetImageNumber(m_ImageNumber);
+        cmd->Execute();
+        delete cmd;
+        
+        Points.pop_back();
+    }
+        
     return false;
 }
 
-bool FrRectangleTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
+bool FrFreeShapeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
+
+bool FrFreeShapeTool::CheckPoint(Pos &pos){
+    bool result = false;
+   
+    double length = GetLength(Points[0].x, Points[0].y, pos.x, pos.y);
+    if (length<10 && Points.size()>1){
+        pos.x = Points[0].x;
+        pos.y = Points[0].y;
+        result = true;
+    }
+
+    return result;
+}
+
+
+

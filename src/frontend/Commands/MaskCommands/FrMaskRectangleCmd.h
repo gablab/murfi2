@@ -6,10 +6,10 @@
 // Some includes 
 #include "FrMaskBaseCmd.h"
 #include "FrMacro.h"
+#include "FrSelection.h"
 
 #include <vector>
 
-class vtkPointPicker;
 
 // This class implements command that support 
 // dilation and erosion for ROI mask data.
@@ -17,8 +17,8 @@ class FrMaskRectangleCmd : public FrMaskBaseCmd {
 public:
     enum Action { Undefined, Draw, Write };
     typedef struct _rect{
-        int leftX, leftY;
-        int rightX, rightY;
+        Pos firstPoint;
+        Pos secondPoint;
     }Rect;
 
 public:
@@ -33,10 +33,10 @@ public:
     virtual bool Undo();
     virtual bool Redo();
     
-    // Prrperties
+    // Properties
     FrSetPropMacro(Action, Action);
     FrSetPropMacro(Rect, Rect);
-    FrSetPropMacro(vtkPointPicker*, PointPicker);
+    FrSetPropMacro(int, ImageNumber);
 
 private:
     // Helpers

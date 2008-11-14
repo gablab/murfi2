@@ -6,10 +6,16 @@
 // Some includes 
 #include "FrMaskBaseCmd.h"
 #include "FrMacro.h"
+#include "FrSelection.h"
+
 
 // This class implements command that support 
 // dilation and erosion for ROI mask data.
 class FrMaskFreeShapeCmd : public FrMaskBaseCmd {
+public:
+    enum Action { Undefined, Draw, Write };
+    typedef std::vector<Pos> Points;
+
 public:
     // Constructor/destructor
     FrMaskFreeShapeCmd();
@@ -22,8 +28,16 @@ public:
     virtual bool Undo();
     virtual bool Redo();
 
+    // Properties
+    FrSetPropMacro(Action, Action);
+    FrSetPropMacro(Points, Points);
+    FrSetPropMacro(int, ImageNumber);
+
 private:
     // Helpers
+    bool DrawMask();
+    bool WriteMask();
+
 private:
 };
 

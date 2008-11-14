@@ -13,6 +13,8 @@ FrMaskBaseCmd::~FrMaskBaseCmd(){
 }
 
 vtkImageData* FrMaskBaseCmd::GetCurrentROIImageData(){
+    
+
     // TODO: implement
     return 0L;
 }

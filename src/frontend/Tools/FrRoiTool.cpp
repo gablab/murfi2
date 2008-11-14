@@ -2,7 +2,8 @@
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
-#include "FrMaskRectangleTool.h"
+#include "FrRectangleTool.h"
+#include "FrFreeShapeTool.h"
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
@@ -23,21 +24,27 @@
 
 
 FrRoiTool::FrRoiTool(){
-    m_maskRectTool = new FrMaskRectangleTool();
+    m_maskRectTool = new FrRectangleTool();
+    m_maskFSTool = new FrFreeShapeTool();
+
     m_PointPicker = vtkPointPicker::New();
     m_PointPicker->SetTolerance(DEF_TOLERANCE);
 }
 
 FrRoiTool::~FrRoiTool(){
     if (m_maskRectTool) delete m_maskRectTool;
+    if (m_maskFSTool) delete m_maskFSTool;
+
     if (m_PointPicker) m_PointPicker->Delete();
 }
 
 void FrRoiTool::Start(){
    // Setup controller
     m_maskRectTool->SetController(this->GetController());
+    m_maskFSTool->SetController(this->GetController());
 
     m_maskRectTool->Start();
+    m_maskFSTool->Start();
 
     // Update interface to ensure tool is checked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
@@ -51,8 +58,10 @@ void FrRoiTool::Start(){
 void FrRoiTool::Stop(){
     // Unregister controller
     m_maskRectTool->SetController(0);
+    m_maskFSTool->SetController(0);
 
     m_maskRectTool->Stop();
+    m_maskFSTool->Stop();
 
     // Update interface to ensure tool is unchecked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
@@ -66,8 +75,10 @@ void FrRoiTool::Stop(){
 bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         //if (params.X != -1)
-            GetMappedCoords(is, params);
-        m_maskRectTool->OnMouseUp(is, params);
+        bool isInside = GetMappedCoords(is, params);
+        //m_maskRectTool->OnMouseUp(is, params);
+        m_maskFSTool->OnMouseUp(is, params);
+        m_maskFSTool->SetImageNumber(imgNumber);
     }
 
     return false;
@@ -75,29 +86,33 @@ bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
-        GetMappedCoords(is, params);
+            bool isInside = GetMappedCoords(is, params);
         //if (params.X != -1)
-            m_maskRectTool->OnMouseDown(is, params);
+//            m_maskRectTool->OnMouseDown(is, params);
+            m_maskFSTool->OnMouseDown(is, params);
+            m_maskFSTool->SetImageNumber(imgNumber);
     }
 
     return false;
 }
 
 bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
-        GetMappedCoords(is, params);
-        //if (params.X != -1)
-            m_maskRectTool->OnMouseMove(is, params);
-    }
+    bool isInside = GetMappedCoords(is, params);
+    //if (params.X != -1)
+//            m_maskRectTool->OnMouseMove(is, params);
+        m_maskFSTool->OnMouseMove(is, params);
+        m_maskFSTool->SetImageNumber(imgNumber);
 
     return false;
 }
 
 bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
-        GetMappedCoords(is, params);
+        bool isInside = GetMappedCoords(is, params);
         //if (params.X != -1)
-            m_maskRectTool->OnMouseDrag(is, params);
+//            m_maskRectTool->OnMouseDrag(is, params);
+            m_maskFSTool->OnMouseDrag(is, params);
+            m_maskFSTool->SetImageNumber(imgNumber);
     }
     
     return false;
@@ -110,7 +125,7 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();       
 
     std::vector<vtkRenderer*> renCollection;
-    int imgNumber = -1;
+    //int imgNumber = -1;
     FrLayeredImage* lim = 0;
     std::vector<FrLayerSettings*> layers;
 
@@ -120,11 +135,13 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
             GetLayerSettings(ts->GetSliceViewSettings(), layers);
+            imgNumber = -1;
             break;
         case FrTabSettingsDocObj::MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
             GetLayerSettings(ts->GetMosaicViewSettings(), layers);
+            imgNumber = -1;
             break;
         case FrTabSettingsDocObj::OrthoView:
             {

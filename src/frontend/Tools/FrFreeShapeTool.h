@@ -1,13 +1,24 @@
-#ifndef FR_RECTANGLE_TOOL
-#define FR_RECTANGLE_TOOL
+#ifndef FR_FREESHAPE_TOOL
+#define FR_FREESHAPE_TOOL
 
 // includes
 #include "FrTool.h"
 #include "FrMacro.h"
+#include "FrSelection.h"
+
+#include <vector>
 
 // abstract class for all tools
 // used by application
-class FrRectangleTool : public FrTool {
+class FrFreeShapeTool : public FrTool {
+public:
+    enum State{None, FirstPoint, Drawing};
+public:
+	/// Default constructor
+	FrFreeShapeTool();
+	/// Destructor
+	virtual ~FrFreeShapeTool();
+
 public:
 	virtual void Start();
 	virtual void Stop();
@@ -16,11 +27,15 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
-public:
-	/// Default constructor
-	FrRectangleTool();
-	/// Destructor
-	virtual ~FrRectangleTool();
+    FrSetPropMacro(int, ImageNumber);
+
+private:
+    bool CheckPoint(Pos &pos);
+
+private:
+    FrPropMacro(State, CurrentState);
+    std::vector<Pos> Points;
+
 };
 
-#endif // FR_RECTANGLE_TOOL
+#endif // FR_FREESHAPE_TOOL

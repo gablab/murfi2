@@ -133,79 +133,85 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     vd.name = "test";   // get layer (image?) name
     vd.timepoint = 44;  // get timepoint
 
-    // TODO: fix for side values
-    switch(view){
-        case FrTabSettingsDocObj::SliceView:
-            {
-                // get slice number
-                int slice = ts->GetSliceViewSettings()->SliceNumber;
-                // set current indices of point
-                vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
-                vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
-                vd.Index[2] = slice;
+    //// TODO: fix for side values
+    //switch(view){
+    //    case FrTabSettingsDocObj::SliceView:
+    //        {
+    //            // get slice number
+    //            int slice = ts->GetSliceViewSettings()->SliceNumber;
+    //            // set current indices of point
+    //            vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
+    //            vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
+    //            vd.Index[2] = slice;
 
-                vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
-                vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
-                vd.Position[2] = int(vd.Index[3] * dSpacing[2]);
-            }
-            break;
-        case FrTabSettingsDocObj::MosaicView:
-            {
-                vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
-                vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
-                vd.Index[2] = 0;
+    //            vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
+    //            vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
+    //            vd.Position[2] = int(vd.Index[3] * dSpacing[2]);
+    //        }
+    //        break;
+    //    case FrTabSettingsDocObj::MosaicView:
+    //        {
+    //            vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
+    //            vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
+    //            vd.Index[2] = 0;
 
-                vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
-                vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
-                vd.Position[2] = 0;
-            }
-            break;
-        case FrTabSettingsDocObj::OrthoView:
-            {
-                switch(imgNumber){
-                    case 0: // coronal 
-                    {
-                        // get slice number
-                        int slice = ts->GetOrthoViewSettings()->CoronalSlice;	
+    //            vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
+    //            vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
+    //            vd.Position[2] = 0;
+    //        }
+    //        break;
+    //    case FrTabSettingsDocObj::OrthoView:
+    //        {
+    //            switch(imgNumber){
+    //                case 0: // coronal 
+    //                {
+    //                    // get slice number
+    //                    int slice = ts->GetOrthoViewSettings()->CoronalSlice;	
 
-                        vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
-                        vd.Index[1] = slice;
-                        vd.Index[2] = int((ptMapped[1]+1) / dSpacing[2]);
+    //                    vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
+    //                    vd.Index[1] = slice;
+    //                    vd.Index[2] = int((ptMapped[1]+1) / dSpacing[2]);
 
-                        vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
-                        vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
-                        vd.Position[2] = int(vd.Index[2]* dSpacing[2]);
-                        break;
-                        }
-                    case 1: // sagital
-                    {
-                        int slice = ts->GetOrthoViewSettings()->SagitalSlice; // get slice number
-                        vd.Index[0] = slice;
-                        vd.Index[1] = int( (ptMapped[0]+1) / dSpacing[1]);
-                        vd.Index[2] = int( (ptMapped[1]+1) / dSpacing[2]);
+    //                    vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
+    //                    vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
+    //                    vd.Position[2] = int(vd.Index[2] * dSpacing[2]);
+    //                    break;
+    //                    }
+    //                case 1: // sagital
+    //                {
+    //                    int slice = ts->GetOrthoViewSettings()->SagitalSlice; // get slice number
+    //                    vd.Index[0] = slice;
+    //                    vd.Index[1] = int( (ptMapped[0]+1) / dSpacing[1]);
+    //                    vd.Index[2] = int( (ptMapped[1]+1) / dSpacing[2]);
 
-                        vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
-                        vd.Position[1] = int(vd.Index[1] * dSpacing[1]);	
-                        vd.Position[2] = int(vd.Index[2] * dSpacing[2]);
-                        break;
-                    }
-                    case 2: // axial
-                    {
-                        int slice = ts->GetOrthoViewSettings()->AxialSlice; // get slice number
+    //                    vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
+    //                    vd.Position[1] = int(vd.Index[1] * dSpacing[1]);	
+    //                    vd.Position[2] = int(vd.Index[2] * dSpacing[2]);
+    //                    break;
+    //                }
+    //                case 2: // axial
+    //                {
+    //                    int slice = ts->GetOrthoViewSettings()->AxialSlice; // get slice number
 
-                        vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
-                            vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
-                            vd.Index[2] = slice;
+    //                    vd.Index[0] = int((ptMapped[0]+1) / dSpacing[0]);
+    //                    vd.Index[1] = int((ptMapped[1]+1) / dSpacing[1]);
+    //                    vd.Index[2] = slice;
 
-                            vd.Position[0] = vd.Index[0] * dSpacing[0];
-                            vd.Position[1] = vd.Index[1] * dSpacing[1];
-                            vd.Position[2] = vd.Index[2] * dSpacing[2];
-                            break;
-                    }
-                }
-            }
-            break;
-        }
+    //                    vd.Position[0] = vd.Index[0] * dSpacing[0];
+    //                    vd.Position[1] = vd.Index[1] * dSpacing[1];
+    //                    vd.Position[2] = vd.Index[2] * dSpacing[2];
+    //                    break;
+    //                }
+    //            }
+    //        }
+    //        break;
+    //    }
+
+    GetRealImagePosition(ts, pImageData, vd.Index, imgNumber);
+    vd.Position[0] = vd.Index[0] * dSpacing[0];
+    vd.Position[1] = vd.Index[1] * dSpacing[1];
+    vd.Position[2] = vd.Index[2] * dSpacing[2];
+
 
 // Get voxel index, position
 // this should be done for all layers

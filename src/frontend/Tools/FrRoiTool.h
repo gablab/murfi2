@@ -3,7 +3,8 @@
 
 #include "FrTool.h"
 
-class FrMaskRectangleTool;
+class FrRectangleTool;
+class FrFreeShapeTool;
 class FrLayerSettings;
 class vtkPointPicker;
 
@@ -30,8 +31,12 @@ private:
     int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
 
 private:
-    FrMaskRectangleTool* m_maskRectTool;
+    // tools
+    FrRectangleTool* m_maskRectTool;
+    FrFreeShapeTool* m_maskFSTool;
+    
     vtkPointPicker* m_PointPicker;
+    int imgNumber;
 
 };
 

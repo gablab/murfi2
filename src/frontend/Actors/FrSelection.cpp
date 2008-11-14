@@ -22,7 +22,6 @@ vtkStandardNewMacro(FrSelection);
 FrSelection::FrSelection(){
     m_mapper = vtkPolyDataMapper::New();
 	m_actor = vtkActor::New();
-//    m_actor->PickableOff();
 
 	this->AddPart(m_actor);
 	this->PickableOff();
@@ -54,10 +53,10 @@ void FrSelection::SetSelectionParams(SelectionParams params){
 
 void FrSelection::DrawRectangle(){
     int minx, miny, maxx, maxy;
-    minx = m_params.firstPoint[0];
-    miny = m_params.firstPoint[1];
-    maxx = m_params.secondPoint[0];
-    maxy = m_params.secondPoint[1];
+    minx = m_params.firstPoint.x;
+    miny = m_params.firstPoint.y;
+    maxx = m_params.secondPoint.x;
+    maxy = m_params.secondPoint.y;
 
     vtkPoints* m_BorderPts = vtkPoints::New();
     m_BorderPts->InsertPoint(0, minx, miny, 0);
@@ -88,8 +87,8 @@ void FrSelection::DrawRectangle(){
     selectRect->Delete();
     m_BorderPts->Delete();
 
-	this->AddPart(m_actor);
-	this->PickableOff();
+//	this->AddPart(m_actor);
+//	this->PickableOff();
 }
 
 void FrSelection::DrawCircle(){
@@ -99,7 +98,7 @@ void FrSelection::DrawCircle(){
 	circle->SetRadius(100);
 
 	m_mapper->SetInputConnection(circle->GetOutputPort());
-    m_mapper->Modified();
+//    m_mapper->Modified();
 
 	m_actor->SetMapper(m_mapper);
     m_actor->Modified();
@@ -107,8 +106,8 @@ void FrSelection::DrawCircle(){
     // cleanup
     circle->Delete();
 
-    this->AddPart(m_actor);
-	this->PickableOff();
+//    this->AddPart(m_actor);
+//	this->PickableOff();
 }
 
 void FrSelection::DrawPolygon(){
@@ -117,22 +116,22 @@ void FrSelection::DrawPolygon(){
     vtkPoints* m_BorderPts = vtkPoints::New();
 
     vtkCellArray* rect = vtkCellArray::New();
-    rect->InsertNextCell(size+1);
+    rect->InsertNextCell(size);
 
     // get all points from params
     for (int i = 0; i<size; i++){
-        m_BorderPts->InsertPoint(i, m_params.points[i].x, m_params.points[i].y, m_params.points[i].z);
+        m_BorderPts->InsertPoint(i, m_params.points[i].x, m_params.points[i].y, 0);
         rect->InsertCellPoint(i);
     }
 
-    rect->InsertCellPoint(0);
+    //rect->InsertCellPoint(0);
 
 	vtkPolyData* selectRect = vtkPolyData::New();
 	selectRect->SetPoints(m_BorderPts);
     selectRect->SetLines(rect);
 
     m_mapper->SetInput(selectRect);
-    m_mapper->Modified();
+//    m_mapper->Modified();
    
     m_actor->SetMapper(m_mapper);
     m_actor->Modified();

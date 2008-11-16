@@ -66,7 +66,7 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 
     // Init orientations
     g_Orientation[CORONAL_IMAGE] = FrSliceExtractor::XZ;
-    g_Orientation[SAGITAL_IMAGE] = FrSliceExtractor::YZ;
+    g_Orientation[SAGITAL_IMAGE] = FrSliceExtractor::ZY;
     g_Orientation[AXIAL_IMAGE]   = FrSliceExtractor::XY;
 
     // create renderers

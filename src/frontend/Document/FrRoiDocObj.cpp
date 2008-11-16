@@ -84,6 +84,11 @@ bool FrRoiDocObj::LoadFromFile(FrImageDocObj* imgDO, QString& fileName){
         RtMaskImage* img = new RtMaskImage();
 
         if(img->readNifti(stdFileName)){
+            // have to unmosaic
+            if(img->seemsMosaic()){
+                img->unmosaic();
+            }
+
             // check params
             bool hasSameDim = (img->getDims().size() == imgDO->GetImage()->getDims().size());
             bool hasSamePDim = (img->getPixDims().size() == imgDO->GetImage()->getPixDims().size());

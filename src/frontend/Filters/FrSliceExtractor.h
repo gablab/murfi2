@@ -35,7 +35,7 @@ public:
     void ClearAdditionalPorts();
 	
     // Properties
-    enum Orientation { YZ = 0, XZ = 1, XY = 2 };
+    enum Orientation { ZY = 0, XZ = 1, XY = 2 };
 	FrGetPropMacro(Orientation, Orientation);
     void SetOrientation(Orientation orient);
 

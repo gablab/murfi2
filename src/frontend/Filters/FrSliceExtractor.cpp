@@ -130,7 +130,7 @@ void FrSliceExtractor::Update(){
                 it->second->SetResliceAxesOrigin(0, m_Slice, 0);
                 it->second->SetResliceAxesDirectionCosines(1,0,0, 0,0,1, 0,1,0);
 			    break;
-        case FrSliceExtractor::YZ:		// YZ
+        case FrSliceExtractor::ZY:		// ZY
                 it->second->SetResliceAxesOrigin(m_Slice, 0, 0);
                 it->second->SetResliceAxesDirectionCosines(0,1,0, 0,0,1, 1,0,0);
 			    break;
@@ -164,7 +164,7 @@ int FrSliceExtractor::GetMaxSliceNumber(){
 	    case FrSliceExtractor::XZ:		// XZ	
 		    result = dimentions[1];
 		    break;
-	    case FrSliceExtractor::YZ:		// YZ
+	    case FrSliceExtractor::ZY:		// ZY
 		    result = dimentions[0];
 		    break;
 	    }

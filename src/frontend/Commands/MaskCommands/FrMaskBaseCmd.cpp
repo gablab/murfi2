@@ -1,4 +1,5 @@
-#include "FrMaskbaseCmd.h"
+#include "FrMaskBaseCmd.h"
+#include "FrMaskEditor.h"
 
 // VTK includes
 #include "vtkImageData.h"
@@ -21,4 +22,12 @@ vtkImageData* FrMaskBaseCmd::GetCurrentROIImageData(){
     
 void FrMaskBaseCmd::ApplyToCurrentROI(vtkImageData* data){
     // TODO: implement
+
+    // Get Current ROI
+    FrMaskEditor* me;    
+    me->SetInput(data);
+    me->SetView(FrMaskEditor::Slice);
+    me->SetOrientation(FrMaskEditor::XY);
+    me->SetSliceNumber(0);
+    me->Update();
 }

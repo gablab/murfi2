@@ -45,6 +45,11 @@ bool FrImageDocObj::LoadFromFile(QString& fileName){
         RtMRIImage* img = new RtMRIImage();
 
         if(img->readNifti(stdFileName)){
+            // unmosaic
+            if(img->seemsMosaic()){
+                img->unmosaic();
+            }
+
             if(m_Image) delete m_Image;
             m_Image = img;
 		
@@ -56,6 +61,11 @@ bool FrImageDocObj::LoadFromFile(QString& fileName){
 }
 
 bool FrImageDocObj::LoadFromMRIImage(RtMRIImage* img){
+    // unmosaic!
+    if(img->seemsMosaic()){
+        img->unmosaic();
+    }
+
 	m_Image = img;
     SetUpdateNeeded(true);
 

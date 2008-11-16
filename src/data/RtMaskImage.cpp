@@ -13,7 +13,7 @@
 #include<fstream>
 
 using namespace std;
-  
+
 // default constructor
 RtMaskImage::RtMaskImage() : RtDataImage<short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage()")); 

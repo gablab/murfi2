@@ -56,10 +56,9 @@ double GetLength(int x1, int y1, int x2, int y2)
 	return length;
 }
 
-int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[3], int imgNumber){
-    if(!data) return -1;
+void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[3], int imgNumber){
+    if(!data) return;
 
-    int axis = -1;
     int oldPoint[2];
     oldPoint[0] = point[0];
     oldPoint[1] = point[1];
@@ -69,8 +68,6 @@ int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[
 
     enum FrTabSettingsDocObj::View view = ts->GetActiveView();
     
-    //int imgNumber = 2; // test
-
     switch(view){
         case FrTabSettingsDocObj::SliceView:
             {
@@ -80,7 +77,6 @@ int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[
                 point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                 point[1] = int((oldPoint[1]+1) / dSpacing[1]);
                 point[2] = slice;
-                axis = 2;
             }
             break;
         case FrTabSettingsDocObj::MosaicView:
@@ -88,7 +84,6 @@ int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[
                 point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                 point[1] = int((oldPoint[1]+1) / dSpacing[1]);
                 point[2] = 0;
-                axis = 2;
             }
             break;
         case FrTabSettingsDocObj::OrthoView:
@@ -102,7 +97,6 @@ int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[
                         point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                         point[1] = slice;
                         point[2] = int((oldPoint[1]+1) / dSpacing[2]);
-                        axis = 1;
                         break;
                         }
                     case 1: // sagital
@@ -112,7 +106,6 @@ int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[
                         point[0] = slice;
                         point[1] = int((oldPoint[0]+1) / dSpacing[1]);
                         point[2] = int((oldPoint[1]+1) / dSpacing[2]);
-                        axis = 0;
 			            break;
                     }
                     case 2: // axial
@@ -122,15 +115,12 @@ int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[
                         point[0] = int((oldPoint[0]+1) / dSpacing[0]);
 		                point[1] = int((oldPoint[1]+1) / dSpacing[1]);
 			            point[2] = slice;
-                        axis = 2;
 			            break;
                     }
                 }
             }
             break;
     }
-
-    return axis;
 }
 
 int Min(int a, int b){
@@ -190,4 +180,13 @@ bool IsPointInsideOfPolygon(std::vector<Pos> Points, Pos point){
           yold = ynew;
      }
      return inside;
+}
+
+bool IsPointInsideOfSphere(Pos center, int radius, Pos point){
+    bool inside = false;
+
+    if ( (pow(double(center.x - point.x), 2) + pow(double(center.y - point.y), 2) + pow(double(center.z - point.z), 2))<pow((double)radius, 2) )
+        inside = true;
+    
+    return inside;
 }

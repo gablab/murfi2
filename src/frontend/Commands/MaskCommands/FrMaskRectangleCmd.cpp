@@ -127,13 +127,13 @@ bool FrMaskRectangleCmd::WriteMask(){
         secondPoint[0] = m_Rect.secondPoint.x;
         secondPoint[1] = m_Rect.secondPoint.y;
 
-        int axis = GetRealImagePosition(ts, imageData, firstPoint, m_ImageNumber);
+        GetRealImagePosition(ts, imageData, firstPoint, m_ImageNumber);
         GetRealImagePosition(ts, imageData, secondPoint, m_ImageNumber);
 
         int xmin, xmax, ymin, ymax, zmin, zmax;
         xmin = ymin = zmin = 0;    
 
-        switch(axis){
+        switch(m_ImageNumber){
             case 0:             // x fixed
                 xmin = xmax = firstPoint[0];
                 ymin = Min(firstPoint[0], secondPoint[0]);
@@ -148,6 +148,7 @@ bool FrMaskRectangleCmd::WriteMask(){
                 zmin = Min(firstPoint[1], secondPoint[1]);
                 zmax = Max(firstPoint[1], secondPoint[1]);
                 break;
+            case -1:
             case 2:             // z fixed
                 zmin = zmax = firstPoint[2];
                 xmin = Min(firstPoint[0], secondPoint[0]);

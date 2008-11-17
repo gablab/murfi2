@@ -108,7 +108,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
         point[1] = m_Points[1].y;
         point[2] = m_Points[2].z;
 
-        int axis = GetRealImagePosition(ts, imageData, point, m_ImageNumber);
+        GetRealImagePosition(ts, imageData, point, m_ImageNumber);
         // we should change all points to real coordinates
 
         int xmin, xmax, ymin, ymax, zmin, zmax;
@@ -117,13 +117,14 @@ bool FrMaskFreeShapeCmd::WriteMask(){
         ymax = dims[1];
         zmax = dims[2];
 
-        switch(axis){
+        switch(m_ImageNumber){
             case 0:             // x fixed
                 xmin = xmax = point[0];
                 break;
             case 1:             // y fixed
                 ymin = ymax = point[1];
                 break;
+            case -1:
             case 2:             // z fixed
                 zmin = zmax = point[2];
                 break;

@@ -16,6 +16,8 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
+    FrSetPropMacro(int, ImageNumber);
+
 public:
 	/// Default constructor
 	FrPenTool();

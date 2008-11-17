@@ -32,8 +32,8 @@ void GetLayerSettings(FrOrthoViewSettings*  sets, LayerCollection& layers, int v
 
 // Utils
 double GetLength(int x1, int y1, int x2, int y2);
-int GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[3], int imgNumber);
+void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[3], int imgNumber);
 bool IsPointInsideOfPolygon(std::vector<Pos> Points, Pos point);
-
+bool IsPointInsideOfSphere(Pos center, int radius, Pos point);
 
 #endif

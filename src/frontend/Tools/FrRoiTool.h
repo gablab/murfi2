@@ -2,6 +2,7 @@
 #define FR_ROI_TOOL
 
 #include "FrBaseRoiTool.h"
+#include "FrMacro.h"
 
 class FrRoiInfoTool;
 class FrPenTool;
@@ -19,6 +20,8 @@ class FrMainController;
 
 // ROI tool
 class FrRoiTool : public FrBaseRoiTool {
+public:
+    enum Tool {None, RectTool, FreeShapeTool, SphereTool, PenTool};
 public:
 	virtual void Start();
 	virtual void Stop();

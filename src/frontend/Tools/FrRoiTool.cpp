@@ -2,6 +2,8 @@
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
+#include "FrSphereTool.h"
+#include "FrPenTool.h"
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
@@ -102,6 +104,7 @@ bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         //if (params.X != -1)
         bool isInside = GetMappedCoords(is, params);
+
         m_curTool->OnMouseUp(is, params);
         m_curTool->SetImageNumber(m_ImgNumber);
     }
@@ -111,7 +114,7 @@ bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
-            bool isInside = GetMappedCoords(is, params);
+        bool isInside = GetMappedCoords(is, params);
         //if (params.X != -1)
 //            m_maskRectTool->OnMouseDown(is, params);
             m_curTool->OnMouseDown(is, params);
@@ -125,8 +128,8 @@ bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     bool isInside = GetMappedCoords(is, params);
         //if (params.X != -1)
         //m_maskRectTool->OnMouseMove(is, params);
-        m_curTool->OnMouseMove(is, params);
-        m_curTool->SetImageNumber(m_ImgNumber);
+    m_curTool->OnMouseMove(is, params);
+    m_curTool->SetImageNumber(m_ImgNumber);
 
     return false;
 }
@@ -136,6 +139,7 @@ bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
         bool isInside = GetMappedCoords(is, params);
         //if (params.X != -1)
         //m_maskRectTool->OnMouseDrag(is, params);
+
         m_curTool->OnMouseDrag(is, params);
         m_curTool->SetImageNumber(m_ImgNumber);
     }

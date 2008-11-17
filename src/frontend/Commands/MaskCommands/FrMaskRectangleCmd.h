@@ -36,7 +36,6 @@ public:
     // Properties
     FrSetPropMacro(Action, Action);
     FrSetPropMacro(Rect, Rect);
-    FrSetPropMacro(int, ImageNumber);
 
 private:
     // Helpers

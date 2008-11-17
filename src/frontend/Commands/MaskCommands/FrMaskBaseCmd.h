@@ -3,6 +3,7 @@
 
 // Forward declarations
 class vtkImageData;
+class FrRoiDocObj;
 
 // Some includes
 #include "FrBaseCmd.h"
@@ -14,11 +15,16 @@ public:
     FrMaskBaseCmd();
     virtual ~FrMaskBaseCmd();
 
+    // Properties
+    FrSetPropMacro(int, ImageNumber);
+
 protected:
+    // Returns current 
+    FrRoiDocObj* GetCurrentRoi();
     // Returns vtkImageData of current slice of the current ROI.
-    vtkImageData* GetCurrentROIImageData();
+    vtkImageData* GetRoiImageData(int id);
     // Applys given image data to current ROI
-    virtual void ApplyToCurrentROI(vtkImageData* data);
+    virtual void ApplyToCurrentROI(vtkImageData* data);    
 };
 
 #endif // FR_MASKBASE_CMD

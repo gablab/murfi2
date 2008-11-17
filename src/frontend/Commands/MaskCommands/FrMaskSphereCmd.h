@@ -13,6 +13,8 @@
 // dilation and erosion for ROI mask data.
 class FrMaskSphereCmd : public FrMaskBaseCmd {
 public:
+    enum Action { Undefined, Write, Erase };
+public:
     // Constructor/destructor
     FrMaskSphereCmd();
     virtual ~FrMaskSphereCmd();
@@ -25,6 +27,7 @@ public:
     virtual bool Redo();
 
     // Properties
+    FrSetPropMacro(Action, Action);
     FrSetPropMacro(Pos, Center);
     FrSetPropMacro(int, Radius);
     FrSetPropMacro(int, ImageNumber);

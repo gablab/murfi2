@@ -37,7 +37,7 @@ void FrSelection::SetSelectionParams(SelectionParams params){
 
     switch (m_params.type){
         case 0:
-            // display nothing
+            HideAll();   // hide actor
             break;
         case 1:          // rectangle
             DrawRectangle();
@@ -78,7 +78,8 @@ void FrSelection::DrawRectangle(){
 
     m_mapper->SetInput(selectRect);
 //    m_mapper->Modified();
-   
+    
+    m_actor->SetVisibility(true);   
     m_actor->SetMapper(m_mapper);
     m_actor->Modified();
 
@@ -99,7 +100,8 @@ void FrSelection::DrawCircle(){
 
 	m_mapper->SetInputConnection(circle->GetOutputPort());
 //    m_mapper->Modified();
-
+    
+    m_actor->SetVisibility(true);
 	m_actor->SetMapper(m_mapper);
     m_actor->Modified();
 
@@ -133,6 +135,7 @@ void FrSelection::DrawPolygon(){
     m_mapper->SetInput(selectRect);
 //    m_mapper->Modified();
    
+    m_actor->SetVisibility(true);
     m_actor->SetMapper(m_mapper);
     m_actor->Modified();
 
@@ -140,4 +143,8 @@ void FrSelection::DrawPolygon(){
     rect->Delete();
     selectRect->Delete();
     m_BorderPts->Delete();
+}
+
+void FrSelection::HideAll(){
+    m_actor->SetVisibility(false);
 }

@@ -27,57 +27,59 @@ bool FrMaskSphereCmd::Execute(){
     if(!this->GetMainController()) return false;
 
     bool result = false;
+
+    int pixelValue = 0;
+
+    switch (m_Action){
+        case Action::Erase:
+            pixelValue = 0;
+            break;
+        case Action::Write:
+            pixelValue = 1;
+            break;
+    }
+
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
     if(roiDO){
         vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
-        // TODO: not finished
 
-        FrMainWindow* mv = this->GetMainController()->GetMainView();
-        FrMainDocument* md = this->GetMainController()->GetMainDocument();
-        FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+        if(imageData){
+            FrMainWindow* mv = this->GetMainController()->GetMainView();
+            FrMainDocument* md = this->GetMainController()->GetMainDocument();
+            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
 
-        int dims[3];
-        imageData->GetDimensions(dims);
+            int dims[3];
+            imageData->GetDimensions(dims);
 
-        int center[3];
-        center[0] = m_Center.x;
-        center[1] = m_Center.y;
+            int center[3];
+            center[0] = m_Center.x;
+            center[1] = m_Center.y;
 
-        GetRealImagePosition(ts, imageData, center, m_ImageNumber);
+            GetRealImagePosition(ts, imageData, center, m_ImageNumber);
 
-        int xmin, xmax, ymin, ymax, zmin, zmax;
-        xmin = ymin = zmin = 0;    
-        xmax = dims[0];
-        ymax = dims[1];
-        zmax = dims[2];
+            int xmin, xmax, ymin, ymax, zmin, zmax;
+            xmin = ymin = zmin = 0;    
+            xmax = dims[0];
+            ymax = dims[1];
+            zmax = dims[2];
 
-        //switch(axis){
-        //    case 0:             // x fixed
-        //        xmin = xmax = point[0];
-        //        break;
-        //    case 1:             // y fixed
-        //        ymin = ymax = point[1];
-        //        break;
-        //    case 2:             // z fixed
-        //        zmin = zmax = point[2];
-        //        break;
-        
-        unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
+            unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
 
-        for (int x = xmin; x<xmax; x++)
-            for (int y = ymin; y<ymax; y++)
-                for (int z = zmin; z<zmax; z++){
-                    // check if point is inside of sphere and if yes then write it
-                    Pos p;
-                    p.x = x;    p.y = y;    p.z = z;
-                    if(IsPointInsideOfSphere(m_Center, m_Radius, p)){
-                        int id = imageData->FindPoint(x, y, z);
-                        if (id>=0)      // point found
-                            imgPtr[id] = 1;
+            for (int x = xmin; x<xmax; x++)
+                for (int y = ymin; y<ymax; y++)
+                    for (int z = zmin; z<zmax; z++){
+                        // check if point is inside of sphere and if yes then write it
+                        Pos p;
+                        p.x = x;    p.y = y;    p.z = z;
+                        if(IsPointInsideOfSphere(m_Center, m_Radius, p)){
+                            int id = imageData->FindPoint(x, y, z);
+                            if (id>=0)      // point found
+                                imgPtr[id] = pixelValue;
+                        }
                     }
-                }
 
-        result = true;
+            result = true;
+        }
     }
     
     return result;

@@ -13,6 +13,8 @@
 // dilation and erosion for ROI mask data.
 class FrMaskPenCmd : public FrMaskBaseCmd {
 public:
+    enum Action { Undefined, Draw, Write, Erase };
+public:
     // Constructor/destructor
     FrMaskPenCmd();
     virtual ~FrMaskPenCmd();
@@ -25,12 +27,15 @@ public:
     virtual bool Redo();
 
     // Properties
+    FrSetPropMacro(Action, Action);
     FrSetPropMacro(Pos, Center);
     FrSetPropMacro(int, Radius);
     FrSetPropMacro(int, ImageNumber);
 
 private:
     // Helpers
+    bool DrawMask();
+    bool WriteMask();
 
 private:
 };

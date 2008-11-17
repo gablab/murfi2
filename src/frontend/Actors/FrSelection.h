@@ -58,6 +58,7 @@ private:
     void DrawRectangle();
     void DrawCircle();
     void DrawPolygon();
+    void HideAll();
 
 private:
 	vtkActor* m_actor;

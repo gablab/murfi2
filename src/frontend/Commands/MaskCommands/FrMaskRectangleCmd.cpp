@@ -34,6 +34,7 @@ bool FrMaskRectangleCmd::Execute(){
         case Action::Draw:
             result = DrawMask();
             break;
+        case Action::Erase:
         case Action::Write:
             result = WriteMask();
             break;
@@ -84,91 +85,90 @@ bool FrMaskRectangleCmd::DrawMask(){
     params.secondPoint = m_Rect.secondPoint;
 
     sl->SetSelection(params);
-    //char text[256] = "Left.x = ";
-    //char tmp[20] = "";
-    //itoa(m_Rect.leftX, tmp, 10);
-    //strcat(text, tmp);
-    //strcat(text, ", Left.y = ");
-    //itoa(m_Rect.leftY, tmp, 10);
-    //strcat(text, tmp);
-    //strcat(text, ", Right.x = ");
-    //itoa(m_Rect.rightX, tmp, 10);
-    //strcat(text, tmp);
-    //strcat(text, ", RIght.y = ");
-    //itoa(m_Rect.rightY, tmp, 10);
-    //strcat(text, tmp);
-
-    //sl->SetText(text);
-    mv->GetSliceView()->UpdatePipeline(FRP_SETCAM);
+    mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
 
     return result;
 }
 
 bool FrMaskRectangleCmd::WriteMask(){
+    bool result = false;
+
     //FrMainWindow* mv = this->GetMainController()->GetMainView();
     //mv->GetSliceView()->UpdatePipeline(FRP_SETCAM);
     // TODO: hide selection
 
-    bool result = false;
+    int pixelValue = 0;
+
+    switch (m_Action){
+        case Action::Erase:
+            pixelValue = 0;
+            break;
+        case Action::Write:
+            pixelValue = 1;
+            break;
+    }
+
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
     if(roiDO){
         vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
-        // TODO: not finished
 
-        FrMainWindow* mv = this->GetMainController()->GetMainView();
-        FrMainDocument* md = this->GetMainController()->GetMainDocument();
-        FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+        if(imageData){
+            FrMainWindow* mv = this->GetMainController()->GetMainView();
+            FrMainDocument* md = this->GetMainController()->GetMainDocument();
+            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
 
-        int firstPoint[3];
-        firstPoint[0] = m_Rect.firstPoint.x;
-        firstPoint[1] = m_Rect.firstPoint.y;
+            int firstPoint[3];
+            firstPoint[0] = m_Rect.firstPoint.x;
+            firstPoint[1] = m_Rect.firstPoint.y;
 
-        int secondPoint[3];
-        secondPoint[0] = m_Rect.secondPoint.x;
-        secondPoint[1] = m_Rect.secondPoint.y;
+            int secondPoint[3];
+            secondPoint[0] = m_Rect.secondPoint.x;
+            secondPoint[1] = m_Rect.secondPoint.y;
 
-        GetRealImagePosition(ts, imageData, firstPoint, m_ImageNumber);
-        GetRealImagePosition(ts, imageData, secondPoint, m_ImageNumber);
+            GetRealImagePosition(ts, imageData, firstPoint, m_ImageNumber);
+            GetRealImagePosition(ts, imageData, secondPoint, m_ImageNumber);
 
-        int xmin, xmax, ymin, ymax, zmin, zmax;
-        xmin = ymin = zmin = 0;    
+            int xmin, xmax, ymin, ymax, zmin, zmax;
+            xmin = ymin = zmin = 0;    
 
-        switch(m_ImageNumber){
-            case 0:             // x fixed
-                xmin = xmax = firstPoint[0];
-                ymin = Min(firstPoint[0], secondPoint[0]);
-                ymax = Max(firstPoint[0], secondPoint[0]);
-                zmin = Min(firstPoint[1], secondPoint[1]);
-                zmax = Max(firstPoint[1], secondPoint[1]);
-                break;
-            case 1:             // y fixed
-                ymin = ymax = firstPoint[1];
-                xmin = Min(firstPoint[0], secondPoint[0]);
-                xmax = Max(firstPoint[0], secondPoint[0]);
-                zmin = Min(firstPoint[1], secondPoint[1]);
-                zmax = Max(firstPoint[1], secondPoint[1]);
-                break;
-            case -1:
-            case 2:             // z fixed
-                zmin = zmax = firstPoint[2];
-                xmin = Min(firstPoint[0], secondPoint[0]);
-                xmax = Max(firstPoint[0], secondPoint[0]);
-                ymin = Min(firstPoint[1], secondPoint[1]);
-                ymax = Max(firstPoint[1], secondPoint[1]);
-                break;
+            switch(m_ImageNumber){
+                case 0:             // x fixed
+                    xmin = xmax = firstPoint[0];
+                    ymin = Min(firstPoint[0], secondPoint[0]);
+                    ymax = Max(firstPoint[0], secondPoint[0]);
+                    zmin = Min(firstPoint[1], secondPoint[1]);
+                    zmax = Max(firstPoint[1], secondPoint[1]);
+                    break;
+                case 1:             // y fixed
+                    ymin = ymax = firstPoint[1];
+                    xmin = Min(firstPoint[0], secondPoint[0]);
+                    xmax = Max(firstPoint[0], secondPoint[0]);
+                    zmin = Min(firstPoint[1], secondPoint[1]);
+                    zmax = Max(firstPoint[1], secondPoint[1]);
+                    break;
+                case -1:
+                case 2:             // z fixed
+                    zmin = zmax = firstPoint[2];
+                    xmin = Min(firstPoint[0], secondPoint[0]);
+                    xmax = Max(firstPoint[0], secondPoint[0]);
+                    ymin = Min(firstPoint[1], secondPoint[1]);
+                    ymax = Max(firstPoint[1], secondPoint[1]);
+                    break;
+            }
+            
+            unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
+
+            for (int x = xmin; x<xmax; x++)
+                for (int y = ymin; y<ymax; y++)
+                    for (int z = zmin; z<zmax; z++){
+                        int id = imageData->FindPoint(x, y, z);
+                        if (id>=0)      // point found
+                            imgPtr[id] = pixelValue;
+                    }
+
+            this->ApplyDataToRoi(imageData, roiDO);
+            result = true;
         }
-        
-        unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
-
-        for (int x = xmin; x<xmax; x++)
-            for (int y = ymin; y<ymax; y++)
-                for (int z = zmin; z<zmax; z++){
-                    int id = imageData->FindPoint(x, y, z);
-                    if (id>=0)      // point found
-                        imgPtr[id] = 1;
-                }
-
-        result = true;
     }
 
     return result;

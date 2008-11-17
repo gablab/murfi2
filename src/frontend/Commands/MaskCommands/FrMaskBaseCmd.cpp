@@ -85,9 +85,28 @@ void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int s
     FrMaskEditor* me = FrMaskEditor::New();
     me->SetInput(data);
     me->SetDocumentObj(roiDO);
-    me->SetView(FrMaskEditor::Slice);
-    me->SetOrientation(FrMaskEditor::XY);
 
+    // Setup proper view
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    me->SetView(doc->GetCurrentTabSettings()->GetActiveView());
+
+    // Set orientation
+    switch(m_ImageNumber){
+        case CORONAL_IMAGE:
+            me->SetOrientation(FrMaskEditor::XY);
+            break;
+        case SAGITAL_IMAGE:
+            me->SetOrientation(FrMaskEditor::ZY);
+            break;
+        case AXIAL_IMAGE:
+            me->SetOrientation(FrMaskEditor::XZ);
+            break;
+        default:
+            // NOTE: Do we need it?
+            me->SetOrientation(FrMaskEditor::XY);
+            break;
+    }
+    
     // Setup slice number
     if (sliceNumber == -1)
         sliceNumber = this->GetCurrentRoiSliceNumber();

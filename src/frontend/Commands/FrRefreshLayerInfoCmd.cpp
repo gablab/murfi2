@@ -59,6 +59,7 @@ bool FrRefreshLayerInfoCmd::Execute(){
         }
 
         widget->SetSelectedLayer(layerID);
+        widget->UpdateRoiList();
         widget->BlockSignals(false);
     }
     return result;

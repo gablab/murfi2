@@ -1,4 +1,8 @@
 #include "FrMaskMaskOperationCmd.h"
+#include "FrMainWindow.h"
+#include "FrLayerListWidget.h"
+#include "FrROIToolWidget.h"
+#include "FrListToolWidget.h"
 #include "FrRoiDocObj.h"
 
 // VTK stuff
@@ -28,7 +32,7 @@ bool FrMaskMaskOperationCmd::Execute(){
     if(roiDO){
         vtkImageData* imageData1 = this->GetRoiImageData(roiDO->GetID()); 
         vtkImageData* imageData2 = this->GetTargetRoiImageData();
-
+        
         switch(m_Action){
         case FrMaskMaskOperationCmd::None:
             break;
@@ -48,6 +52,7 @@ bool FrMaskMaskOperationCmd::Execute(){
 
         if(result){
             this->ApplyDataToRoi(imageData1, roiDO);
+            this->UpdatePipelineForID(roiDO->GetID(), FRP_READROI);
         }
     }
     return result;
@@ -76,7 +81,7 @@ bool FrMaskMaskOperationCmd::PerformeInvertOperation(vtkImageData* in1, vtkImage
         int size = in1->GetPointData()->GetScalars()->GetSize();
         unsigned char* dstPtr = (unsigned char*)in1->GetScalarPointer();
         for(int i=0; i < size; ++i){
-            (*dstPtr) = (*dstPtr) ?  DEF_OUTPUT_FALSE : DEF_OUTPUT_TRUE;
+            (*dstPtr) = ((*dstPtr) ?  DEF_OUTPUT_FALSE : DEF_OUTPUT_TRUE);
             ++dstPtr;
         }
         result = true;
@@ -119,8 +124,27 @@ bool FrMaskMaskOperationCmd::PerformeSubtractOperation(vtkImageData* in1, vtkIma
 vtkImageData* FrMaskMaskOperationCmd::GetTargetRoiImageData(){
     // TODO: implement
     vtkImageData* result = 0L;
-    // Get mainView, LayerListWidget, current roi tool Widget
-    // and retrive params from there
+    
+    if(this->GetMainController()){
+        
+        FrMainWindow* mv = this->GetMainController()->GetMainView();
+        FrROIToolWidget* rtWidget = mv->GetLayerListWidget()->GetRoiToolWidget();
+        
+        int roiID = -1;
+        if(rtWidget->GetCurrentToolType() == FrROIToolWidget::Union){
+            roiID = rtWidget->GetUnionWidget()->GetCurrentItemID();
+        }
+        else if(rtWidget->GetCurrentToolType() == FrROIToolWidget::Intersect){
+            roiID = rtWidget->GetIntersectWidget()->GetCurrentItemID();
+        }
+        else if(rtWidget->GetCurrentToolType() == FrROIToolWidget::Subtract){
+            roiID = rtWidget->GetSubtractWidget()->GetCurrentItemID();
+        }        
+        
+        if(roiID > 0){
+            result = this->GetRoiImageData(roiID);
+        }
+    }
     return result;
 }
 

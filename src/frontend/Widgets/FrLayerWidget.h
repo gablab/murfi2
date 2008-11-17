@@ -27,6 +27,7 @@ public:
 
     bool IsRoiLayer(){ return m_isRoi; }
     int GetLayerID(){ return m_params.ID; }
+    QString GetLayerName(){ return m_params.Name; }
 
 signals:
 	void VisibilityChanged(int id);

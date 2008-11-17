@@ -1,5 +1,5 @@
 #include "FrMaskMaskTool.h"
-
+#include "FrCommandController.h"
 
 FrMaskMaskTool::FrMaskMaskTool() 
 : m_Mode(FrMaskMaskTool::Undefined){
@@ -17,6 +17,37 @@ void FrMaskMaskTool::Stop(){
 }
 
 bool FrMaskMaskTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
+    
+    // Setup action
+    bool result = false;
+    if(m_Mode == FrMaskMaskTool::Copy){
+       // Create command and performe action
+        FrMaskCopyAdjacentCmd* cmd = FrCommandController::CreateCmd<FrMaskCopyAdjacentCmd>();
+        cmd->SetImageNumber(m_ImageNumber);
+        result = cmd->Execute();
+        delete cmd;
+    }
+    else {
+        // Create command and performe action
+        FrMaskMaskOperationCmd* cmd = FrCommandController::CreateCmd<FrMaskMaskOperationCmd>();
+        switch(m_Mode){
+            case FrMaskMaskTool::Union:
+                cmd->SetAction(FrMaskMaskOperationCmd::Union);
+                break;
+            case FrMaskMaskTool::Subtract:
+                cmd->SetAction(FrMaskMaskOperationCmd::Subtract);
+                break;
+            case FrMaskMaskTool::Intersect:
+                cmd->SetAction(FrMaskMaskOperationCmd::Intersect);
+                break;
+            default:
+                cmd->SetAction(FrMaskMaskOperationCmd::None);
+                break;
+        }
+        cmd->SetImageNumber(m_ImageNumber);    
+        result = cmd->Execute();
+        delete cmd;
+    }
     return false;
 }
 

@@ -17,8 +17,11 @@ public:
     FrListToolWidget(QWidget* parent=0);
 
     void SetName(QString name);
-    void SetList();
+    void ClearAll();
+    void AddListItem(int ID, QString& name);
 
+    int GetCurrentItemID();
+    
 signals:
     virtual void ParamsChanged();
 

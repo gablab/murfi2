@@ -37,6 +37,20 @@ void FrMaskEditor::SetInput(vtkImageData* in){
     m_Data = in;
 }
 
+void FrMaskEditor::SetView(FrTabSettingsDocObj::View view){
+    switch(view){
+        case FrTabSettingsDocObj::SliceView: 
+            m_View = FrMaskEditor::Slice;
+            break;
+        case FrTabSettingsDocObj::MosaicView: 
+            m_View = FrMaskEditor::Mosaic;
+            break;
+        case FrTabSettingsDocObj::OrthoView: 
+            m_View = FrMaskEditor::Ortho;
+            break;
+    }
+}
+
 void FrMaskEditor::Update(){
     // Check input data
     if(!m_Data || !m_DocumentObj) return;
@@ -73,33 +87,65 @@ void FrMaskEditor::Update(){
         int dataSize = m_Data->GetPointData()->GetScalars()->GetSize();
         int imgSize = img->getNumPix();        
         if(dataSize >= imgSize){
-            // init some params
-            int* dataDims = m_Data->GetDimensions();            
+            // Params 
+            int* dataDims = m_Data->GetDimensions();
+            unsigned char* basePtr = (unsigned char*)m_Data->GetScalarPointer();
+            int dataWidth = dataDims[DEF_XDIM];
+            int stride = dataWidth;
+            
             int sliceWidth = img->getDim(DEF_XDIM);
             int sliceHeight = img->getDim(DEF_YDIM);
             int sliceSize = sliceWidth * sliceHeight;
-            int numOfSlices = img->getDim(DEF_ZDIM);
+            int cols = (dataDims[DEF_XDIM] / sliceWidth);
+                        
+            // for each slice
             
-            short* dstPtr = 0;
-            unsigned char* srcPtr = (unsigned char*)m_Data->GetScalarPointer();
-            for(int i=0; i < dataSize; ++i){
-                // calc slice
-                int slice = (i % dataDims[DEF_XDIM]) / sliceWidth + // slice column
-                    ( i / (dataDims[DEF_XDIM] * sliceWidth) ) *  // slice row
-                    (dataDims[DEF_XDIM] / sliceWidth);   // num of slices in row
+            for(int i=0; i < img->getDim(DEF_ZDIM); ++i){
+                // set pointers
+                int row = i / cols;
+                int col = i % cols;
+                unsigned char* srcPtr = basePtr + 
+                    (row * sliceHeight * dataWidth) +  // offset to row of slice
+                    (col * sliceWidth); // offset to column of slice
 
-                if(slice > numOfSlices) {
-                    continue;
+                short* dstPtr = img->data + (i * sliceSize);
+
+                // copy data from source to destiny
+                for(int y = 0; y < sliceHeight; ++y){
+                    for(int x = 0; x < sliceWidth; ++x){
+                        (*dstPtr) = (*srcPtr);
+                        ++dstPtr; ++srcPtr;
+                    }
+                    srcPtr += stride;
                 }
-
-                // calc row & column
-                int row = (i / dataDims[DEF_XDIM]) % sliceHeight;
-                int col = (i / dataDims[DEF_XDIM]) % sliceWidth;
-
-                dstPtr = img->data + (slice * sliceSize) + (row * sliceWidth) + col;
-                *dstPtr = *srcPtr;
-                ++srcPtr;
             }
+            //// init some params
+            //int* dataDims = m_Data->GetDimensions();
+            //int sliceWidth = img->getDim(DEF_XDIM);
+            //int sliceHeight = img->getDim(DEF_YDIM);
+            //int sliceSize = sliceWidth * sliceHeight;
+            //int numOfSlices = img->getDim(DEF_ZDIM);
+            //
+            //short* dstPtr = 0;
+            //unsigned char* srcPtr = (unsigned char*)m_Data->GetScalarPointer();
+            //for(int i=0; i < imgSize; ++i){
+            //    // calc slice
+            //    int slice = (i % dataDims[DEF_XDIM]) / sliceWidth + // slice column
+            //        ( i / (dataDims[DEF_XDIM] * sliceWidth) ) *  // slice row
+            //        (dataDims[DEF_XDIM] / sliceWidth);   // num of slices in row
+
+            //    if(slice > numOfSlices) {
+            //        continue;
+            //    }
+
+            //    // calc row & column
+            //    int row = (i / dataDims[DEF_XDIM]) % sliceHeight;
+            //    int col = (i / dataDims[DEF_XDIM]) % sliceWidth;
+
+            //    dstPtr = img->data + (slice * sliceSize) + (row * sliceWidth) + col;
+            //    *dstPtr = *srcPtr;
+            //    ++srcPtr;
+            //}
         }
     }
 }
@@ -112,9 +158,10 @@ void FrMaskEditor::UpdateSliceXY(RtMaskImage* img, vtkImageData* data){
     short* dstPtr = img->data + (sliceSize * m_SliceNumber);    
     unsigned char* srcPtr = (unsigned char*)m_Data->GetScalarPointer();
         
-    for(int i=0; i < sliceSize; ++i){
-        *dstPtr = *srcPtr;
-        ++dstPtr; ++srcPtr;
+    for(int i=0; i < sliceSize; ++i){ 
+        (*dstPtr) = (*srcPtr);
+        ++dstPtr; 
+        ++srcPtr;
     }
 }
 
@@ -163,26 +210,27 @@ void FrMaskEditor::UpdateSliceZX(RtMaskImage* img, vtkImageData* data){
 
 bool FrMaskEditor::IsDataValid(RtMaskImage* img, vtkImageData* data){
     // Check slice number
+    bool goodDims = false;
     bool goodSlice = ( (0 <= m_SliceNumber) && 
-        (m_SliceNumber < img->getDim((int)m_Orientation)) );
+        (m_SliceNumber <= img->getDim((int)m_Orientation)) );
     
     // Check dimentions
-    bool goodDims = false;
-    int* dims = data->GetDimensions();
-    switch(m_Orientation){
-        case FrMaskEditor::XY:
-            goodDims = (img->getDim(DEF_XDIM) == dims[DEF_XDIM]) &&
-                (img->getDim(DEF_YDIM) == dims[DEF_YDIM]);
-            break;
-        case FrMaskEditor::ZY:
-            goodDims = ((img->getDim(DEF_ZDIM) == dims[DEF_XDIM]) &&
-                (img->getDim(DEF_YDIM) == dims[DEF_YDIM]));
-            break;
-        case FrMaskEditor::XZ:
-            goodDims = ((img->getDim(DEF_XDIM) == dims[DEF_XDIM]) &&
-                (img->getDim(DEF_ZDIM) == dims[DEF_YDIM]));
-            break;
+    if(goodSlice){
+        int* dims = data->GetDimensions();
+        switch(m_Orientation){
+            case FrMaskEditor::XY:
+                goodDims = (img->getDim(DEF_XDIM) == dims[DEF_XDIM]) &&
+                    (img->getDim(DEF_YDIM) == dims[DEF_YDIM]);
+                break;
+            case FrMaskEditor::ZY:
+                goodDims = ((img->getDim(DEF_ZDIM) == dims[DEF_XDIM]) &&
+                    (img->getDim(DEF_YDIM) == dims[DEF_YDIM]));
+                break;
+            case FrMaskEditor::XZ:
+                goodDims = ((img->getDim(DEF_XDIM) == dims[DEF_XDIM]) &&
+                    (img->getDim(DEF_ZDIM) == dims[DEF_YDIM]));
+                break;
+        }
     }
-
     return (goodSlice && goodDims);
 }

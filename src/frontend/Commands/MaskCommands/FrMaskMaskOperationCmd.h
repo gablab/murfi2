@@ -12,7 +12,9 @@ class vtkImageData;
 // This class implements command that support 
 // dilation and erosion for ROI mask data.
 class FrMaskMaskOperationCmd : public FrMaskBaseCmd {
+public:
     enum Action { None, Intersect, Union, Subtract, Invert };
+
 public:
     // Constructor/destructor
     FrMaskMaskOperationCmd();

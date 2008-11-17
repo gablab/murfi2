@@ -29,11 +29,11 @@ bool FrMaskFreeShapeCmd::Execute(){
 
     switch (m_Action){
         case Action::Draw:
-            result = DrawMask();
+            result = DrawMask(true);
             break;
         case Action::Erase:
         case Action::Write:
-            result = WriteMask();
+            result = WriteMask() && DrawMask(false);
             break;
         case Action::Undefined:
             result = false;
@@ -43,7 +43,7 @@ bool FrMaskFreeShapeCmd::Execute(){
     return result;
 }
 
-bool FrMaskFreeShapeCmd::DrawMask(){
+bool FrMaskFreeShapeCmd::DrawMask(bool show){
     bool result = false;   
 
     // get special layer and set selection params
@@ -51,12 +51,19 @@ bool FrMaskFreeShapeCmd::DrawMask(){
     FrSpecialLayer* sl = this->GetSpecialLayer();
     
     // set params
-    SelectionParams params;
-    params.type = 3;                // polygon
-    params.points = m_Points;
+    if(show){
+        SelectionParams params;
+        params.type = 3;                // polygon
+        params.points = m_Points;
 
-    sl->SetSelection(params);
-
+        sl->SetSelection(params);
+        sl->SetSelectionVisibility(true);
+        result = true;
+    }
+    else{
+        sl->SetSelectionVisibility(false);
+        result = true;
+    }
     mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
 
     return result;

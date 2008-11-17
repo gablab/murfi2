@@ -24,7 +24,6 @@ FrListToolWidget::FrListToolWidget(QWidget* parent)
     mainLayout->addWidget(label);
     mainLayout->addWidget(roiList);
 
-    this->SetList();      // test
     this->setFixedHeight(this->sizeHint().height());
 }
 
@@ -32,16 +31,24 @@ void FrListToolWidget::SetName(QString name){
     label->setText(name);
 }
 
-void FrListToolWidget::SetList(){
-    // add items to list
+void FrListToolWidget::ClearAll(){
     roiList->clear();
+}
 
-    QListWidgetItem *item1 = new QListWidgetItem("ROI 1", roiList);
-    item1->setCheckState(Qt::Checked);
-    QListWidgetItem *item2 = new QListWidgetItem("ROI 2", roiList);
-    item2->setCheckState(Qt::Checked);
-    QListWidgetItem *item3 = new QListWidgetItem("ROI 3", roiList);
-    item3->setCheckState(Qt::Checked);
+void FrListToolWidget::AddListItem(int ID, QString& name){
+    QListWidgetItem *item = new QListWidgetItem(name, roiList);
+    item->setToolTip(QString("%1 : %2").arg(ID).arg(name));
+    item->setData(Qt::UserRole, QVariant(ID));
+    item->setCheckState(Qt::Unchecked);
+}
+
+int FrListToolWidget::GetCurrentItemID(){
+    int ID = -1;
+    QListWidgetItem *item = roiList->currentItem();
+    if(item){
+        ID = item->data(Qt::UserRole).toInt();
+    }
+    return ID;
 }
 
 void FrListToolWidget::ROIListItemChanged(QListWidgetItem* current, QListWidgetItem* previous){

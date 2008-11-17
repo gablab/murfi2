@@ -102,9 +102,6 @@ void FrROIToolWidget::InitAdditionalParams(QGroupBox* gb){
     m_layout->addWidget(m_SubtractWidget);
     m_layout->addWidget(m_UnionWidget);
     m_layout->addWidget(m_CopyWidget);
-
-    // TODO: connect signals  ???
-    // Do we need this
 }
 
 FrROIToolWidget::ToolType FrROIToolWidget::GetCurrentToolType(){
@@ -123,4 +120,33 @@ void FrROIToolWidget::OnToolParamChanged(){
     // TODO: get value of current tool
     int value = 0;
     emit CurrentToolParamChanged(value);
+}
+
+void FrROIToolWidget::UpdateRoiInfo(std::vector<RoiInfo>& roiInfos){
+    // get widget
+    FrListToolWidget* wgt = 0L;
+    switch(this->GetCurrentToolType()){
+        case FrROIToolWidget::Union: 
+            wgt = m_UnionWidget;
+            break;
+        case FrROIToolWidget::Subtract: 
+            wgt = m_SubtractWidget;
+            break;
+        case FrROIToolWidget::Intersect: 
+            wgt = m_IntersectWidget;
+            break;
+        default:
+           // NOTE: do nothing
+            break;
+    }
+
+    // update list
+    if(wgt){
+        wgt->ClearAll();
+
+        std::vector<RoiInfo>::iterator it, itEnd(roiInfos.end());
+        for(it = roiInfos.begin(); it != itEnd; ++it){
+            wgt->AddListItem(it->ID, it->Name);
+        }
+    }
 }

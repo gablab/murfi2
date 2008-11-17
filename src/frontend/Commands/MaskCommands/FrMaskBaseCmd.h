@@ -32,7 +32,7 @@ protected:
     virtual void ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int sliceNumber = -1);
     // Returns Special Layer
     FrSpecialLayer* GetSpecialLayer();
-
+    
 protected:
     int m_ImageNumber;
 };

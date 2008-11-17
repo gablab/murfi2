@@ -15,7 +15,7 @@
 // dilation and erosion for ROI mask data.
 class FrMaskRectangleCmd : public FrMaskBaseCmd {
 public:
-    enum Action { Undefined, Draw, Write, Erase };
+    enum Action { Undefined, DrawSelection, HideSelection, Write, Erase };
     typedef struct _rect{
         Pos firstPoint;
         Pos secondPoint;
@@ -39,7 +39,7 @@ public:
 
 private:
     // Helpers
-    bool DrawMask();
+    bool DrawMask(bool show);
     bool WriteMask();
 
 private:

@@ -171,6 +171,34 @@ void FrLayerListWidget::RemoveLayers(){
     }
 }
 
+void FrLayerListWidget::UpdateRoiList(){    
+    // Get selected layer widget
+    int curRow = m_layerTable->currentRow();
+    FrLayerWidget* curWgt = dynamic_cast<FrLayerWidget*>(
+            m_layerTable->cellWidget(curRow, TAB_LAYER_IDX));
+    
+    // Update only when ROI layer selected
+    if(curWgt && curWgt->IsRoiLayer()){
+        // get all roi infos except current
+        std::vector<FrROIToolWidget::RoiInfo> roiInfos;
+        for(int row = 0; row < m_layerTable->rowCount(); ++row){
+            // skip current row
+            if(row == curRow) continue;
+
+            FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
+                m_layerTable->cellWidget(row, TAB_LAYER_IDX));
+
+            if(wgt && wgt->IsRoiLayer()){
+                FrROIToolWidget::RoiInfo info;
+                info.ID = wgt->GetLayerID();
+                info.Name = wgt->GetLayerName();
+                roiInfos.push_back(info);
+            }
+        }
+        m_roiToolWidget->UpdateRoiInfo(roiInfos);
+    }
+}
+
 void FrLayerListWidget::SetSelectedLayer(int layerID){
     for(int row = 0; row < m_layerTable->rowCount(); ++row){
         FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
@@ -210,6 +238,7 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
         if(wgt->IsRoiLayer()){
             m_colormapWidget->setVisible(false);
             m_roiToolWidget->setVisible(true);
+            this->UpdateRoiList();
         }
         else {
             // Not a ROI layer selected
@@ -279,6 +308,7 @@ void FrLayerListWidget::OnColormapParamsChanged(){
 }
 
 void FrLayerListWidget::OnRoiToolChanged(){
+    this->UpdateRoiList();
     emit RoiToolChanged();
 }
 

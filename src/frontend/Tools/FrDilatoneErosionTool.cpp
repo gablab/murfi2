@@ -1,5 +1,10 @@
 #include "FrDilatoneErosionTool.h"
-
+#include "FrCommandController.h"
+#include "FrMainController.h"
+#include "FrMainWindow.h"
+#include "FrLayerListWidget.h"
+#include "FrROIToolWidget.h"
+#include "FrSpinToolWidget.h"
 
 FrDilatoneErosionTool::FrDilatoneErosionTool(){
 }
@@ -16,7 +21,23 @@ void FrDilatoneErosionTool::Stop(){
 }
 
 bool FrDilatoneErosionTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
-    return false;
+    // Result of execution
+    bool result = false;
+
+    FrMainController* mc = this->GetMainController();
+    if(mc != 0){
+        
+        FrROIToolWidget* rtw = mc->GetMainView()->GetLayerListWidget()->GetRoiToolWidget();
+        int kernelSize = rtw->GetDilateErodeWidget()->GetValue();
+
+        FrMaskDilateErodeCmd* cmd = FrCommandController::CreateCmd<FrMaskDilateErodeCmd>();
+        cmd->SetImageNumber(m_ImageNumber);
+        cmd->SetKernelSize(kernelSize);
+        result = cmd->Execute();
+        delete cmd;
+    }
+
+    return result;
 }
 
 bool FrDilatoneErosionTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){

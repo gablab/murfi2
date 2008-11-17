@@ -31,12 +31,15 @@ bool FrMaskRectangleCmd::Execute(){
     bool result = false;
 
     switch (m_Action){
-        case Action::Draw:
-            result = DrawMask();
+        case Action::DrawSelection:
+            result = this->DrawMask(true);
+            break;
+        case Action::HideSelection:
+            result = this->DrawMask(false);
             break;
         case Action::Erase:
         case Action::Write:
-            result = WriteMask();
+            result = this->WriteMask() && this->DrawMask(false);
             break;
         case Action::Undefined:
             result = false;
@@ -46,22 +49,30 @@ bool FrMaskRectangleCmd::Execute(){
     return result;
 }
 
-bool FrMaskRectangleCmd::DrawMask(){
+bool FrMaskRectangleCmd::DrawMask(bool show){
     bool result = false;
 
     // get special layer and set selection params
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrSpecialLayer* sl = this->GetSpecialLayer();
 
-    // set params
-    SelectionParams params;
-    params.type = 1;
-    params.firstPoint = m_Rect.firstPoint;
-    params.secondPoint = m_Rect.secondPoint;
+    if(show){
+        // set params
+        SelectionParams params;
+        params.type = 1;
+        params.firstPoint = m_Rect.firstPoint;
+        params.secondPoint = m_Rect.secondPoint;
 
-    sl->SetSelection(params);
-    mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
-
+        sl->SetSelection(params);
+        sl->SetSelectionVisibility(true);
+        mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
+        result = true;
+    }
+    else {
+        sl->SetSelectionVisibility(false);
+        mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
+        result = true;
+    }
     return result;
 }
 

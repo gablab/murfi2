@@ -49,7 +49,7 @@ void FrDocumentReader::Update(){
             if(img == 0L) return;
             this->AddOutput(img);
             // Do not forget to delete to prevent mem leakage
-            img->Delete();
+            if(img) img->Delete();
         }
     }
     else if(m_Target == FrDocumentReader::ROI){
@@ -61,7 +61,7 @@ void FrDocumentReader::Update(){
             vtkImageData* roi = this->ReadROI(roiDO);
             this->AddOutput(roi);
             // Do not forget to delete to prevent mem leakage
-            roi->Delete();
+            if(roi) roi->Delete();
         }
     }
     else {

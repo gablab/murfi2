@@ -35,6 +35,10 @@ public:
     ToolType GetCurrentToolType();
     int GetCurrentValue();
 
+    // Methods
+    typedef struct _roiInfo { int ID; QString Name; } RoiInfo;
+    void UpdateRoiInfo(std::vector<RoiInfo>& roiInfos);
+
     // Properties
     FrGetPropMacro(FrEmptyToolWidget*, InfoWidget);
     FrGetPropMacro(FrEmptyToolWidget*, RectangleWidget);
@@ -48,7 +52,7 @@ public:
     FrGetPropMacro(FrListToolWidget*,  UnionWidget);
     FrGetPropMacro(FrEmptyToolWidget*, CopyWidget);
 
-Q_SIGNALS:
+Q_SIGNALS:    
     void CurrentToolChanged();
     void CurrentToolParamChanged(int value);
 

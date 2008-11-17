@@ -38,6 +38,7 @@ bool FrRectangleTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
             // execute command with Action:Write
             FrMaskRectangleCmd* cmd = FrCommandController::CreateCmd<FrMaskRectangleCmd>();
             cmd->SetAction(FrMaskRectangleCmd::Action::Write);
+
             FrMaskRectangleCmd::Rect rect;
             rect.firstPoint.x = m_firstPointX;
             rect.firstPoint.y = m_firstPointY;
@@ -79,7 +80,7 @@ bool FrRectangleTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
             y = params.Y;
             // execute command with Action:Draw
             FrMaskRectangleCmd* cmd = FrCommandController::CreateCmd<FrMaskRectangleCmd>();
-            cmd->SetAction(FrMaskRectangleCmd::Action::Draw);
+            cmd->SetAction(FrMaskRectangleCmd::Action::DrawSelection);
             FrMaskRectangleCmd::Rect rect;
             rect.firstPoint.x = m_firstPointX;
             rect.firstPoint.y = m_firstPointY;

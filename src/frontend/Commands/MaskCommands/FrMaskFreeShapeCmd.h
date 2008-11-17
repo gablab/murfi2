@@ -34,7 +34,7 @@ public:
 
 private:
     // Helpers
-    bool DrawMask();
+    bool DrawMask(bool show);
     bool WriteMask();
 
 private:

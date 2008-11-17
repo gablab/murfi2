@@ -17,10 +17,15 @@ bool FrMaskCopyAdjacentCmd::Execute(){
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
     if(roiDO){
         vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID()); 
-        // TODO: implement 
-        
+               
+        int currentSliceNumber = this->GetCurrentRoiSliceNumber();
+        this->ApplyDataToRoi(imageData, roiDO, currentSliceNumber-1);
+        this->ApplyDataToRoi(imageData, roiDO, currentSliceNumber+1);
+
+        this->UpdatePipelineForID(roiDO->GetID(), FRP_READROI);
         result = true;
     }
+
     return result;
 }
 

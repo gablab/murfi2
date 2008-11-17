@@ -28,6 +28,8 @@ public:
     void AddLayer(FrLayerSettings* layerSets);
     void AddRoiLayer(FrRoiDocObj* roiDO);
     void RemoveLayers();
+    void UpdateRoiList();
+
     void SetSelectedLayer(int layerID);
     void BlockSignals(bool value){ 
         m_signalsBlocked = value;
@@ -51,8 +53,7 @@ signals:
     void ChangeLayerColormap();
     //Emited when current ROI tool is changed
     void RoiToolChanged();
-
-
+    
 private Q_SLOTS:
     // Add slots here
     void OnCellClicked(int row, int col);

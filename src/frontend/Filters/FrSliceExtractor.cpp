@@ -5,6 +5,7 @@
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkImageReslice.h"
+#include "vtkMatrix4x4.h"
 
 #include <vector>
 
@@ -139,6 +140,9 @@ void FrSliceExtractor::Update(){
                 vtkErrorMacro(<<"FrSliceExtrator: unrecognized orientation");
                 return;
 	    }
+        
+
+        it->second->SetOutputOrigin(0, 0, 0);
         it->second->InterpolateOff();
 	    it->second->SetOutputDimensionality(2);
 	    it->second->SetOutputSpacing(m_Spacing);
@@ -159,13 +163,13 @@ int FrSliceExtractor::GetMaxSliceNumber(){
 	    switch (m_Orientation)
 	    {
 	    case FrSliceExtractor::XY:		// XY
-		    result = dimentions[2]; 
+		    result = dimentions[2]-1; 
 		    break;
 	    case FrSliceExtractor::XZ:		// XZ	
-		    result = dimentions[1];
+		    result = dimentions[1]-1;
 		    break;
 	    case FrSliceExtractor::ZY:		// ZY
-		    result = dimentions[0];
+		    result = dimentions[0]-1;
 		    break;
 	    }
     }

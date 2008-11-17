@@ -1,6 +1,7 @@
 #include "FrUtils.h"
 #include "math.h"
 
+
 float Frange(float a, float minv, float maxv){
 	if (a<minv) 
 		a=minv;
@@ -191,28 +192,3 @@ bool IsPointInsideOfSphere(Pos center, int radius, Pos point){
     return inside;
 }
 
-FrSpecialLayer* GetSpecialLayer(FrTabSettingsDocObj* ts, int imgNumber){
-    FrSpecialLayer* sl;
-
-    enum FrTabSettingsDocObj::View view = ts->GetActiveView();
-    switch(view){
-        case FrTabSettingsDocObj::SliceView:
-            sl = mv->GetSliceView()->GetImage()->GetSpecialLayer();
-            break;
-        case FrTabSettingsDocObj::MosaicView:
-            sl = mv->GetMosaicView()->GetImage()->GetSpecialLayer();
-            break;
-        case FrTabSettingsDocObj::OrthoView:
-            {
-                FrOrthoView* ov =  mv->GetOrthoView();
-
-                if (m_ImageNumber != -1){
-                    sl = ov->GetImage(m_ImageNumber)->GetSpecialLayer();
-                }
-                else{
-                    return false;
-                }
-                break;
-            }
-    } // end switch(view)
-}

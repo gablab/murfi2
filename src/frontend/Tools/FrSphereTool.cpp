@@ -1,6 +1,11 @@
 #include "FrSphereTool.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
+#include "FrMainWindow.h"
+#include "FrUtils.h"
+#include "FrLayerListWidget.h"
+#include "FrROIToolWidget.h"
+#include "FrSpinToolWidget.h"
 
 
 FrSphereTool::FrSphereTool(){
@@ -25,13 +30,18 @@ bool FrSphereTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         // execute command 
         FrMaskSphereCmd* cmd = FrCommandController::CreateCmd<FrMaskSphereCmd>();
+        cmd->SetAction(FrMaskSphereCmd::Action::Write);
+
         Pos center;
         center.x = params.X;
         center.y = params.Y;
 
         cmd->SetCenter(center);
         // get radius
-        cmd->SetRadius(100);    // test
+        FrMainWindow* mv = this->GetMainController()->GetMainView();
+        int rad = mv->GetLayerListWidget()->GetRoiToolWidget()->GetSphereWidget()->GetValue();
+
+        cmd->SetRadius(rad);
         cmd->SetImageNumber(m_ImageNumber);
         cmd->Execute();
         delete cmd;

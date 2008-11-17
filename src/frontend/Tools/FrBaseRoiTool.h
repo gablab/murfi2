@@ -5,6 +5,8 @@
 #include "FrTool.h"
 #include "FrMacro.h"
 
+class FrMainController;
+
 // Base class for all ROI tools.
 // Provides common functionality.
 class FrBaseRoiTool : public FrTool {
@@ -28,7 +30,11 @@ public:
 	virtual ~FrBaseRoiTool();
 
 protected:
+    FrMainController* GetMainController();
+
+protected:
     int m_ImageNumber;
+
 };
 
 #endif // FR_BASEROI_TOOL

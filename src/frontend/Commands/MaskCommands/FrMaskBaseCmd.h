@@ -4,6 +4,7 @@
 // Forward declarations
 class vtkImageData;
 class FrRoiDocObj;
+class FrSpecialLayer;
 
 // Some includes
 #include "FrBaseCmd.h"
@@ -28,7 +29,9 @@ protected:
     // Returns vtkImageData of current slice of the current ROI.
     vtkImageData* GetRoiImageData(int id);    
     // Applys given image data to current ROI
-    virtual void ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO);
+    virtual void ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int sliceNumber = -1);
+    // Returns Special Layer
+    FrSpecialLayer* GetSpecialLayer();
 
 protected:
     int m_ImageNumber;

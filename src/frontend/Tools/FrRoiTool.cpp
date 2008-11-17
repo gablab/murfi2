@@ -154,7 +154,7 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     FrMainDocument* md = mc->GetMainDocument();
     FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
     
-    int m_ImgNumber = -1;
+    int m_ImgNumber = -1;       
     FrLayeredImage* lim = 0;
     std::vector<FrLayerSettings*> layers;
     std::vector<vtkRenderer*> renCollection;
@@ -299,12 +299,4 @@ void FrRoiTool::StartCurrentTool(){
     // start it
     m_curTool->SetController(this->GetController());
     m_curTool->Start();
-}
-
-FrMainController* FrRoiTool::GetMainController(){
-     // HACK: getting main controller
-     FrMainController* result = 
-         dynamic_cast<FrMainController*>
-         (this->GetController()->GetOwner());
-     return result;
 }

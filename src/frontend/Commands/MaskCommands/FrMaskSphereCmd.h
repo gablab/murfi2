@@ -34,6 +34,8 @@ public:
 
 private:
     // Helpers
+    void DrawCircle(vtkImageData* imageData, int radius);
+    int GetCircleRadiusForSlice(int slice);
 
 private:
 };

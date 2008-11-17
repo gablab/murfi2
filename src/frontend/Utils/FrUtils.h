@@ -4,7 +4,6 @@
 #include "FrSettings.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrSelection.h"
-#include "FrSpecialLayer.h"
 
 #include "vtkImageData.h"
 
@@ -30,8 +29,6 @@ int Max(int a, int b);
 void GetLayerSettings(FrSliceViewSettings*  sets, LayerCollection& layers);
 void GetLayerSettings(FrMosaicViewSettings* sets, LayerCollection& layers);
 void GetLayerSettings(FrOrthoViewSettings*  sets, LayerCollection& layers, int viewID);
-
-FrSpecialLayer* GetSpecialLayer(FrTabSettingsDocObj* ts, int imgNumber);
 
 // Utils
 double GetLength(int x1, int y1, int x2, int y2);

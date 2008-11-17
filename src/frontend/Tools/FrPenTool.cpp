@@ -1,6 +1,11 @@
 #include "FrPenTool.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
+#include "FrMainWindow.h"
+#include "FrUtils.h"
+#include "FrLayerListWidget.h"
+#include "FrROIToolWidget.h"
+#include "FrSpinToolWidget.h"
 
 
 FrPenTool::FrPenTool(){
@@ -40,8 +45,12 @@ bool FrPenTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         center.y = params.Y;
 
         cmd->SetCenter(center);
+
         // get radius
-        cmd->SetRadius(10);    // test
+        FrMainWindow* mv = this->GetMainController()->GetMainView();
+        int rad = mv->GetLayerListWidget()->GetRoiToolWidget()->GetPenWidget()->GetValue();
+
+        cmd->SetRadius(rad);    // test
         cmd->SetImageNumber(m_ImageNumber);
         cmd->Execute();
         delete cmd;
@@ -65,8 +74,11 @@ bool FrPenTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
         center.y = params.Y;
 
         cmd->SetCenter(center);
+
         // get radius
-        cmd->SetRadius(10);    // test
+        FrMainWindow* mv = this->GetMainController()->GetMainView();
+        int rad = mv->GetLayerListWidget()->GetRoiToolWidget()->GetPenWidget()->GetValue();
+        cmd->SetRadius(rad);    // test
         cmd->SetImageNumber(m_ImageNumber);
         cmd->Execute();
         delete cmd;

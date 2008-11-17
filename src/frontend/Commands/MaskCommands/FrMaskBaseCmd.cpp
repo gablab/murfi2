@@ -80,7 +80,7 @@ vtkImageData* FrMaskBaseCmd::GetRoiImageData(int id){
     return result;
 }
     
-void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO){
+void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int sliceNumber){
     
     FrMaskEditor* me = FrMaskEditor::New();
     me->SetInput(data);
@@ -89,7 +89,8 @@ void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO){
     me->SetOrientation(FrMaskEditor::XY);
 
     // Setup slice number
-    int sliceNumber = this->GetCurrentRoiSliceNumber();
+    if (sliceNumber == -1)
+        sliceNumber = this->GetCurrentRoiSliceNumber();
     me->SetSliceNumber(sliceNumber);
         
     me->Update();
@@ -129,4 +130,36 @@ int FrMaskBaseCmd::GetCurrentRoiSliceNumber(){
         }
     }
     return sliceNumber;
+}
+
+FrSpecialLayer* FrMaskBaseCmd::GetSpecialLayer(){
+    FrSpecialLayer* sl;
+    
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrMainDocument* md = this->GetMainController()->GetMainDocument();
+    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+
+    enum FrTabSettingsDocObj::View view = ts->GetActiveView();
+    switch(view){
+        case FrTabSettingsDocObj::SliceView:
+            sl = mv->GetSliceView()->GetImage()->GetSpecialLayer();
+            break;
+        case FrTabSettingsDocObj::MosaicView:
+            sl = mv->GetMosaicView()->GetImage()->GetSpecialLayer();
+            break;
+        case FrTabSettingsDocObj::OrthoView:
+            {
+                FrOrthoView* ov =  mv->GetOrthoView();
+
+                if (m_ImageNumber != -1){
+                    sl = ov->GetImage(m_ImageNumber)->GetSpecialLayer();
+                }
+                else{
+                    return false;
+                }
+                break;
+            }
+    } // end switch(view)
+
+    return sl;
 }

@@ -39,7 +39,6 @@ public:
 	virtual ~FrRoiTool();
 
 private:
-    FrMainController* GetMainController();
     bool GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params);
     int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
     void EnableRoiToolWidget();

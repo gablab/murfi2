@@ -139,7 +139,7 @@ void FrSliceExtractor::Update(){
                 vtkErrorMacro(<<"FrSliceExtrator: unrecognized orientation");
                 return;
 	    }
-        it->second->InterpolateOn();
+        it->second->InterpolateOff();
 	    it->second->SetOutputDimensionality(2);
 	    it->second->SetOutputSpacing(m_Spacing);
 	    it->second->Update();

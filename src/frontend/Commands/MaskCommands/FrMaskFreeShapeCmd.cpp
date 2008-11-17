@@ -48,33 +48,8 @@ bool FrMaskFreeShapeCmd::DrawMask(){
 
     // get special layer and set selection params
     FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrMainDocument* md = this->GetMainController()->GetMainDocument();
-    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
-
-    FrSpecialLayer* sl;
+    FrSpecialLayer* sl = this->GetSpecialLayer();
     
-    enum FrTabSettingsDocObj::View view = ts->GetActiveView();
-    switch(view){
-        case FrTabSettingsDocObj::SliceView:
-            sl = mv->GetSliceView()->GetImage()->GetSpecialLayer();
-            break;
-        case FrTabSettingsDocObj::MosaicView:
-            sl = mv->GetMosaicView()->GetImage()->GetSpecialLayer();
-            break;
-        case FrTabSettingsDocObj::OrthoView:
-            {
-                FrOrthoView* ov =  mv->GetOrthoView();
-
-                if (m_ImageNumber != -1){
-                    sl = ov->GetImage(m_ImageNumber)->GetSpecialLayer();
-                }
-                else{
-                    return false;
-                }
-                break;
-            }
-    } // end switch(view)
-
     // set params
     SelectionParams params;
     params.type = 3;                // polygon
@@ -99,7 +74,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
             pixelValue = 0;
             break;
         case Action::Write:
-            pixelValue = 1;
+            pixelValue = 255;
             break;
     }
 
@@ -110,53 +85,47 @@ bool FrMaskFreeShapeCmd::WriteMask(){
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
             FrMainDocument* md = this->GetMainController()->GetMainDocument();
-            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
-            
+            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();       
+
+            // get data dimensions
             int dims[3];
             imageData->GetDimensions(dims);
 
-            int point[3];
-            point[0] = m_Points[0].x;
-            point[1] = m_Points[1].y;
-            point[2] = m_Points[2].z;
-
-            GetRealImagePosition(ts, imageData, point, m_ImageNumber);
-            // we should change all points to real coordinates
-
-            int xmin, xmax, ymin, ymax, zmin, zmax;
-            xmin = ymin = zmin = 0;    
+            int xmin, xmax, ymin, ymax;
+            xmin = ymin = 0;    
             xmax = dims[0];
             ymax = dims[1];
-            zmax = dims[2];
 
-            switch(m_ImageNumber){
-                case 0:             // x fixed
-                    xmin = xmax = point[0];
-                    break;
-                case 1:             // y fixed
-                    ymin = ymax = point[1];
-                    break;
-                case -1:
-                case 2:             // z fixed
-                    zmin = zmax = point[2];
-                    break;
+            // translate all points to local image coordinates
+            for (int i = 0; i<m_Points.size(); i++){
+                int p[3];
+                p[0] = m_Points[i].x;   p[1] = m_Points[i].y;   
+                GetRealImagePosition(ts, imageData, p, m_ImageNumber);    
+
+                m_Points[i].x = p[0];   m_Points[i].y = p[1];   
             }
-            
+
             unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
 
             for (int x = xmin; x<xmax; x++)
-                for (int y = ymin; y<ymax; y++)
-                    for (int z = zmin; z<zmax; z++){
-                        // test if point is inside of polygon, if yes, find index and write it
-                        Pos p;
-                        p.x = x;    p.y = y;    p.z = z;
-                        if (IsPointInsideOfPolygon(m_Points, p)){
-                            int id = imageData->FindPoint(x, y, z);
-                            imgPtr[id] = pixelValue;
-                        }
+                for (int y = ymin; y<ymax; y++){
+                    // test if point is inside of polygon, if yes, find index and write it
+                    Pos p;
+                    p.x = x;    p.y = y;    p.z = 0;
+                    
+                    if (IsPointInsideOfPolygon(m_Points, p)){
+                        int pos[3];
+                        pos[0] = x;     pos[1] = y;     pos[2] = 0;
+                        int id = imageData->ComputePointId(pos);
+                        imgPtr[id] = pixelValue;
                     }
+                }
 
             this->ApplyDataToRoi(imageData, roiDO);
+
+            //FrMainWindow* mv = this->GetMainController()->GetMainView();
+            mv->GetCurrentView()->UpdatePipeline(FRP_READROI);
+
             result = true;
         }
     }

@@ -35,8 +35,21 @@ public:
     ToolType GetCurrentToolType();
     int GetCurrentValue();
 
+    // Properties
+    FrGetPropMacro(FrEmptyToolWidget*, InfoWidget);
+    FrGetPropMacro(FrEmptyToolWidget*, RectangleWidget);
+    FrGetPropMacro(FrEmptyToolWidget*, FreeShapeWidget);
+    FrGetPropMacro(FrSpinToolWidget*,  PenWidget);
+    FrGetPropMacro(FrSpinToolWidget*,  SphereWidget);
+    FrGetPropMacro(FrSpinToolWidget*,  DilateErodeWidget);
+    FrGetPropMacro(FrEmptyToolWidget*, InvertWidget);
+    FrGetPropMacro(FrListToolWidget*,  IntersectWidget);
+    FrGetPropMacro(FrListToolWidget*,  SubtractWidget);
+    FrGetPropMacro(FrListToolWidget*,  UnionWidget);
+    FrGetPropMacro(FrEmptyToolWidget*, CopyWidget);
+
 Q_SIGNALS:
-    void CurrentToolChanged(ToolType toolType);
+    void CurrentToolChanged();
     void CurrentToolParamChanged(int value);
 
 private Q_SLOTS:
@@ -52,18 +65,6 @@ private:
     QLabel* m_label;
     QComboBox* m_cmbTool;
     QStackedLayout* m_layout;
-
-    FrEmptyToolWidget* m_InfoWidget;
-    FrEmptyToolWidget* m_RectangleWidget;
-    FrEmptyToolWidget* m_FreeShapeWidget;
-    FrSpinToolWidget* m_PenWidget;
-    FrSpinToolWidget* m_SphereWidget;
-    FrSpinToolWidget* m_DilateErodeWidget;
-    FrEmptyToolWidget* m_InvertWidget;
-    FrListToolWidget* m_IntersectWidget;
-    FrListToolWidget* m_SubtractWidget;
-    FrListToolWidget* m_UnionWidget;
-    FrEmptyToolWidget* m_CopyWidget;
 };
 
 

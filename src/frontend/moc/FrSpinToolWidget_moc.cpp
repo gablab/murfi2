@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrSpinToolWidget.h'
 **
-** Created: Sun 16. Nov 17:36:43 2008
+** Created: Mon 17. Nov 10:19:40 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!

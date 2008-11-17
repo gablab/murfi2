@@ -349,6 +349,14 @@
 			Name="Tools"
 			>
 			<File
+				RelativePath=".\frontend\Tools\FrBaseRoiTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrBaseRoiTool.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Tools\FrCompositeTool.cpp"
 				>
 			</File>
@@ -370,6 +378,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Tools\FrFreeShapeTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrInvertTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrInvertTool.h"
 				>
 			</File>
 			<File
@@ -402,6 +418,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Tools\FrRectangleTool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrRoiInfoTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrRoiInfoTool.h"
 				>
 			</File>
 			<File

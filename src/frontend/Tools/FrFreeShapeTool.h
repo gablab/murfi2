@@ -2,7 +2,7 @@
 #define FR_FREESHAPE_TOOL
 
 // includes
-#include "FrTool.h"
+#include "FrBaseRoiTool.h"
 #include "FrMacro.h"
 #include "FrSelection.h"
 
@@ -10,7 +10,7 @@
 
 // abstract class for all tools
 // used by application
-class FrFreeShapeTool : public FrTool {
+class FrFreeShapeTool : public FrBaseRoiTool {
 public:
     enum State{None, FirstPoint, Drawing};
 public:
@@ -26,8 +26,6 @@ public:
 	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
-
-    FrSetPropMacro(int, ImageNumber);
 
 private:
     bool CheckPoint(Pos &pos);

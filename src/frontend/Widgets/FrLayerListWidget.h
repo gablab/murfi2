@@ -34,6 +34,9 @@ public:
     }
 
     bool GetLayerParams(int id, FrLayerSettings& params);
+    FrROIToolWidget* GetRoiToolWidget(){
+        return m_roiToolWidget;
+    }
 
 signals:
     void NewLayer();
@@ -46,6 +49,9 @@ signals:
     void ChangeLayerParams();
     // Emmited when colormap params are changed
     void ChangeLayerColormap();
+    //Emited when current ROI tool is changed
+    void RoiToolChanged();
+
 
 private Q_SLOTS:
     // Add slots here
@@ -58,6 +64,7 @@ private Q_SLOTS:
     void OnVisibilityChanged(int id);
     void OnOpacityChanged(int value);
     void OnColormapParamsChanged();
+    void OnRoiToolChanged();
 
     // Utility methods
     void UpdateCurrentLayerParams();

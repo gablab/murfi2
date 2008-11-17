@@ -47,6 +47,7 @@ public:
 
     void ResetImage();
     void CreatNewROI();
+    void UpdateRoiTool();
 
 	// Override from base class
     virtual void Notify(int notifyCode);

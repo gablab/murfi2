@@ -1,13 +1,13 @@
 #ifndef FR_RECTANGLE_TOOL
 #define FR_RECTANGLE_TOOL
 
-#include "FrTool.h"
+#include "FrBaseRoiTool.h"
 #include "FrMacro.h"
 
 
 /// abstract class for all tools
 // used by application
-class FrRectangleTool : public FrTool {
+class FrRectangleTool : public FrBaseRoiTool {
 public:
     enum State{None, FirstPoint, Drawing};
 public:
@@ -22,8 +22,6 @@ public:
 	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
-
-    FrSetPropMacro(int, ImageNumber);
 
 private:
     FrPropMacro(State, CurrentState);

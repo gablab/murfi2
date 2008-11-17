@@ -2,12 +2,12 @@
 #define FR_PEN_TOOL
 
 // includes
-#include "FrTool.h"
+#include "FrBaseRoiTool.h"
 #include "FrMacro.h"
 
 // abstract class for all tools
 // used by application
-class FrPenTool : public FrTool {
+class FrPenTool : public FrBaseRoiTool {
 public:
 	virtual void Start();
 	virtual void Stop();

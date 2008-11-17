@@ -1,13 +1,13 @@
-#ifndef FR_SPHERE_TOOL
-#define FR_SPHERE_TOOL
+#ifndef FR_BASEROI_TOOL
+#define FR_BASEROI_TOOL
 
 // includes
-#include "FrBaseRoiTool.h"
+#include "FrTool.h"
 #include "FrMacro.h"
 
-// abstract class for all tools
-// used by application
-class FrSphereTool : public FrBaseRoiTool {
+// Base class for all ROI tools.
+// Provides common functionality.
+class FrBaseRoiTool : public FrTool {
 public:
 	virtual void Start();
 	virtual void Stop();
@@ -16,11 +16,19 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
+    // Properties
+    void SetImageNumber(int value){
+        m_ImageNumber = value;
+    }
+
 public:
 	/// Default constructor
-	FrSphereTool();
+	FrBaseRoiTool();
 	/// Destructor
-	virtual ~FrSphereTool();
+	virtual ~FrBaseRoiTool();
+
+protected:
+    int m_ImageNumber;
 };
 
-#endif // FR_RECTANGLE_TOOL
+#endif // FR_BASEROI_TOOL

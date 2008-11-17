@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrROIToolWidget.h'
 **
-** Created: Sun 16. Nov 17:36:44 2008
+** Created: Mon 17. Nov 11:47:37 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -28,21 +28,20 @@ static const uint qt_meta_data_FrROIToolWidget[] = {
        0,    0, // enums/sets
 
  // signals: signature, parameters, type, tag, flags
-      26,   17,   16,   16, 0x05,
-      61,   55,   16,   16, 0x05,
+      17,   16,   16,   16, 0x05,
+      44,   38,   16,   16, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      96,   90,   16,   16, 0x08,
-     115,   16,   16,   16, 0x08,
+      79,   73,   16,   16, 0x08,
+      98,   16,   16,   16, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrROIToolWidget[] = {
-    "FrROIToolWidget\0\0toolType\0"
-    "CurrentToolChanged(ToolType)\0value\0"
-    "CurrentToolParamChanged(int)\0index\0"
-    "OnToolChanged(int)\0OnToolParamChanged()\0"
+    "FrROIToolWidget\0\0CurrentToolChanged()\0"
+    "value\0CurrentToolParamChanged(int)\0"
+    "index\0OnToolChanged(int)\0OnToolParamChanged()\0"
 };
 
 const QMetaObject FrROIToolWidget::staticMetaObject = {
@@ -70,7 +69,7 @@ int FrROIToolWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: CurrentToolChanged((*reinterpret_cast< ToolType(*)>(_a[1]))); break;
+        case 0: CurrentToolChanged(); break;
         case 1: CurrentToolParamChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 2: OnToolChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 3: OnToolParamChanged(); break;
@@ -81,10 +80,9 @@ int FrROIToolWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void FrROIToolWidget::CurrentToolChanged(ToolType _t1)
+void FrROIToolWidget::CurrentToolChanged()
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 
 // SIGNAL 1

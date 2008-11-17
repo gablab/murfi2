@@ -116,9 +116,7 @@ FrROIToolWidget::ToolType FrROIToolWidget::GetCurrentToolType(){
 
 void FrROIToolWidget::OnToolChanged(int index){
     m_layout->setCurrentIndex(index);
-    
-    int type = m_cmbTool->itemData(index).toInt();
-    emit CurrentToolChanged((FrROIToolWidget::ToolType)type);
+    emit CurrentToolChanged();
 }
 
 void FrROIToolWidget::OnToolParamChanged(){

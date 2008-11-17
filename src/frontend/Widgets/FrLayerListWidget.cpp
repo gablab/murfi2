@@ -84,7 +84,8 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
 
     // Setup property layout (rightmost)
     m_roiToolWidget = new FrROIToolWidget(this);
-    m_roiToolWidget->setVisible(false); 
+    m_roiToolWidget->setVisible(false);
+    m_roiToolWidget->setEnabled(false);
 
     // colormap widget
     m_colormapWidget = new FrColormapWidget(this);
@@ -114,6 +115,8 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
     connect( m_colormapWidget, SIGNAL(ParamsChanged()), 
              this, SLOT(OnColormapParamsChanged()) );
        
+    connect( m_roiToolWidget, SIGNAL(CurrentToolChanged()), this, SLOT(OnRoiToolChanged()) );
+
     this->setFixedHeight(this->sizeHint().height());
     this->setFixedWidth(this->sizeHint().width());
 }
@@ -273,6 +276,10 @@ void FrLayerListWidget::OnColormapParamsChanged(){
 
     if(m_signalsBlocked) return;
     emit ChangeLayerColormap();
+}
+
+void FrLayerListWidget::OnRoiToolChanged(){
+    emit RoiToolChanged();
 }
 
 // Utility methods

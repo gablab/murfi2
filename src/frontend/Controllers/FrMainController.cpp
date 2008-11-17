@@ -9,6 +9,7 @@
 #include "FrZoomTool.h"
 #include "FrCompositeTool.h"
 #include "FrImageDocObj.h"
+#include "FrRoiTool.h"
 #include "QVTKWidget.h"
 
 
@@ -328,6 +329,13 @@ void FrMainController::CreatNewROI(){
     FrCreateROICmd* cmd = FrCommandController::CreateCmd<FrCreateROICmd>();
     cmd->Execute();
     delete cmd;
+}
+
+void FrMainController::UpdateRoiTool(){    
+    FrRoiTool* tool = dynamic_cast<FrRoiTool*>(m_ToolController->GetCurrentTool());
+    if(tool != 0L){
+        tool->StartCurrentTool();
+    }
 }
 
 void FrMainController::Test(){    

@@ -2,12 +2,12 @@
 #define FR_DILEROD_TOOL
 
 // includes
-#include "FrTool.h"
+#include "FrBaseRoiTool.h"
 #include "FrMacro.h"
 
 // abstract class for all tools
 // used by application
-class FrDilatoneErosionTool : public FrTool {
+class FrDilatoneErosionTool : public FrBaseRoiTool {
 public:
 	virtual void Start();
 	virtual void Stop();

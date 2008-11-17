@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Sun 16. Nov 17:36:44 2008
+** Created: Mon 17. Nov 11:21:08 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      21,   10, // methods
+      22,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -49,6 +49,7 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
      381,   22,   22,   22, 0x0a,
      396,   22,   22,   22, 0x0a,
      419,   22,   22,   22, 0x0a,
+     444,   22,   22,   22, 0x0a,
 
        0        // eod
 };
@@ -65,6 +66,7 @@ static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "OnRoiToolAction()\0OnShowHelpAction()\0"
     "OnShowAboutAction()\0OnTestAction()\0"
     "OnLayerParamsChanged()\0OnLayerColormapChanged()\0"
+    "OnRoiToolChanged()\0"
 };
 
 const QMetaObject FrActionSignalManager::staticMetaObject = {
@@ -113,8 +115,9 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 18: OnTestAction(); break;
         case 19: OnLayerParamsChanged(); break;
         case 20: OnLayerColormapChanged(); break;
+        case 21: OnRoiToolChanged(); break;
         }
-        _id -= 21;
+        _id -= 22;
     }
     return _id;
 }

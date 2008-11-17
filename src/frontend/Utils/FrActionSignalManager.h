@@ -42,8 +42,10 @@ public slots:
     void OnShowAboutAction();
     //Test
     void OnTestAction();
+    // Other stuff
     void OnLayerParamsChanged();
     void OnLayerColormapChanged();
+    void OnRoiToolChanged();
 
 public:
     void Initialize();

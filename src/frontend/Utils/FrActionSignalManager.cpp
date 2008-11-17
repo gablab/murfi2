@@ -85,6 +85,9 @@ void FrActionSignalManager::Initialize(){
     connect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerColormap()),
              this, SLOT(OnLayerColormapChanged()) );
 
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(RoiToolChanged()),
+             this, SLOT(OnRoiToolChanged()) );
+
     // Connect test action
     CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
     m_isInit = true;
@@ -258,4 +261,8 @@ void FrActionSignalManager::OnLayerParamsChanged(){
 
 void FrActionSignalManager::OnLayerColormapChanged(){
     m_mainWindow->GetMainController()->ChangeLayer(2);
+}
+
+void FrActionSignalManager::OnRoiToolChanged(){
+    m_mainWindow->GetMainController()->UpdateRoiTool();
 }

@@ -50,9 +50,11 @@ FrTool* FrToolController::PopTool(){
     FrTool* tool = 0;
     if(m_tools.size()){
         tool = GetCurrentTool();
-        tool->SetController(0);
-        tool->Stop();
 
+        // NOTE first stop then delete controller
+        tool->Stop();
+        tool->SetController(0);
+        
         m_tools.pop_back();
     }
 

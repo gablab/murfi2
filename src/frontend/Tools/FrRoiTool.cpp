@@ -2,8 +2,6 @@
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
-#include "FrRectangleTool.h"
-#include "FrFreeShapeTool.h"
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
@@ -11,6 +9,17 @@
 #include "FrMainDocument.h"
 #include "FrMainWindow.h"
 #include "FrUtils.h"
+#include "FrLayerListWidget.h"
+#include "FrROIToolWidget.h"
+
+#include "FrRoiInfoTool.h"
+#include "FrPenTool.h"
+#include "FrRectangleTool.h"
+#include "FrFreeShapeTool.h"
+#include "FrSphereTool.h"
+#include "FrMaskMaskTool.h"
+#include "FrInvertTool.h"
+#include "FrDilatoneErosionTool.h"
 
 // VTK stuff
 #include "vtkPointPicker.h"
@@ -23,28 +32,43 @@
 #define DEF_TOLERANCE 0.0
 
 
-FrRoiTool::FrRoiTool(){
-    m_maskRectTool = new FrRectangleTool();
-    m_maskFSTool = new FrFreeShapeTool();
+FrRoiTool::FrRoiTool()
+: m_curTool(0), m_ImgNumber(0) {
+    // create tools
+    m_riTool = new FrRoiInfoTool();
+    m_penTool = new FrPenTool();
+    m_rectTool = new FrRectangleTool();
+    m_fsTool = new FrFreeShapeTool();
+    m_sphereTool = new FrSphereTool();
+    m_mmTool = new FrMaskMaskTool();
+    m_deTool = new FrDilatoneErosionTool();
+    m_invTool = new FrInvertTool();
 
     m_PointPicker = vtkPointPicker::New();
     m_PointPicker->SetTolerance(DEF_TOLERANCE);
 }
 
 FrRoiTool::~FrRoiTool(){
-    if (m_maskRectTool) delete m_maskRectTool;
-    if (m_maskFSTool) delete m_maskFSTool;
+    // delete tools
+    if(m_riTool) delete m_riTool;
+    if(m_penTool) delete m_penTool;
+    if(m_rectTool) delete m_rectTool;
+    if(m_fsTool) delete m_fsTool;
+    if(m_sphereTool) delete m_sphereTool;
+    if(m_mmTool) delete m_mmTool;
+    if(m_invTool) delete m_invTool;
+    if(m_deTool) delete m_deTool;
 
     if (m_PointPicker) m_PointPicker->Delete();
 }
 
 void FrRoiTool::Start(){
-   // Setup controller
-    m_maskRectTool->SetController(this->GetController());
-    m_maskFSTool->SetController(this->GetController());
+    // start subtool
+    this->StartCurrentTool();
 
-    m_maskRectTool->Start();
-    m_maskFSTool->Start();
+    // Enable roi tool widget
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    mv->GetLayerListWidget()->GetRoiToolWidget()->setEnabled(true);
 
     // Update interface to ensure tool is checked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
@@ -56,12 +80,14 @@ void FrRoiTool::Start(){
 }
 
 void FrRoiTool::Stop(){
+    // Disable roi tool widget
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    mv->GetLayerListWidget()->GetRoiToolWidget()->setEnabled(false);
+    
     // Unregister controller
-    m_maskRectTool->SetController(0);
-    m_maskFSTool->SetController(0);
-
-    m_maskRectTool->Stop();
-    m_maskFSTool->Stop();
+    m_curTool->Stop();
+    m_curTool->SetController(0L);
+    m_curTool = 0L;
 
     // Update interface to ensure tool is unchecked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
@@ -76,9 +102,8 @@ bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         //if (params.X != -1)
         bool isInside = GetMappedCoords(is, params);
-        //m_maskRectTool->OnMouseUp(is, params);
-        m_maskFSTool->OnMouseUp(is, params);
-        m_maskFSTool->SetImageNumber(imgNumber);
+        m_curTool->OnMouseUp(is, params);
+        m_curTool->SetImageNumber(m_ImgNumber);
     }
 
     return false;
@@ -89,8 +114,8 @@ bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
             bool isInside = GetMappedCoords(is, params);
         //if (params.X != -1)
 //            m_maskRectTool->OnMouseDown(is, params);
-            m_maskFSTool->OnMouseDown(is, params);
-            m_maskFSTool->SetImageNumber(imgNumber);
+            m_curTool->OnMouseDown(is, params);
+            m_curTool->SetImageNumber(m_ImgNumber);
     }
 
     return false;
@@ -98,10 +123,10 @@ bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     bool isInside = GetMappedCoords(is, params);
-    //if (params.X != -1)
-//            m_maskRectTool->OnMouseMove(is, params);
-        m_maskFSTool->OnMouseMove(is, params);
-        m_maskFSTool->SetImageNumber(imgNumber);
+        //if (params.X != -1)
+        //m_maskRectTool->OnMouseMove(is, params);
+        m_curTool->OnMouseMove(is, params);
+        m_curTool->SetImageNumber(m_ImgNumber);
 
     return false;
 }
@@ -110,24 +135,25 @@ bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         bool isInside = GetMappedCoords(is, params);
         //if (params.X != -1)
-//            m_maskRectTool->OnMouseDrag(is, params);
-            m_maskFSTool->OnMouseDrag(is, params);
-            m_maskFSTool->SetImageNumber(imgNumber);
+        //m_maskRectTool->OnMouseDrag(is, params);
+        m_curTool->OnMouseDrag(is, params);
+        m_curTool->SetImageNumber(m_ImgNumber);
     }
     
     return false;
 }
 
 bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
-    FrMainController* mc = dynamic_cast<FrMainController*>(this->GetController()->GetOwner());
+    // HACK: getting main controller
+    FrMainController* mc = this->GetMainController();
     FrMainWindow* mv = mc->GetMainView();
     FrMainDocument* md = mc->GetMainDocument();
-    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();       
-
-    std::vector<vtkRenderer*> renCollection;
-    //int imgNumber = -1;
+    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+    
+    int m_ImgNumber = -1;
     FrLayeredImage* lim = 0;
     std::vector<FrLayerSettings*> layers;
+    std::vector<vtkRenderer*> renCollection;
 
     enum FrTabSettingsDocObj::View view = ts->GetActiveView();
     switch(view){
@@ -135,13 +161,13 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
             GetLayerSettings(ts->GetSliceViewSettings(), layers);
-            imgNumber = -1;
+            m_ImgNumber = 0;
             break;
         case FrTabSettingsDocObj::MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
             GetLayerSettings(ts->GetMosaicViewSettings(), layers);
-            imgNumber = -1;
+            m_ImgNumber = 0;
             break;
         case FrTabSettingsDocObj::OrthoView:
             {
@@ -150,14 +176,14 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
                 // Find Image where click's occured
                 for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
                     if (ov->GetImage(i)->GetRenderer()->IsInViewport(params.X, params.Y)){
-                        imgNumber = i; 
+                        m_ImgNumber = i; 
                         break;
                     }
                 }
-                if (imgNumber != -1){
-                    ov->GetImage(imgNumber)->GetRenderers(renCollection);
-                    lim = ov->GetImage(imgNumber);
-                    GetLayerSettings(ts->GetOrthoViewSettings(), layers, imgNumber);
+                if (m_ImgNumber != -1){
+                    ov->GetImage(m_ImgNumber)->GetRenderers(renCollection);
+                    lim = ov->GetImage(m_ImgNumber);
+                    GetLayerSettings(ts->GetOrthoViewSettings(), layers, m_ImgNumber);
                 }
                 else{
                     // do something
@@ -189,12 +215,10 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
 ////    params.Y = ptMapped[1];
 
     // test
-    double* point;
-
     vtkCoordinate* coordinate = vtkCoordinate::New();
     coordinate->SetCoordinateSystemToDisplay();
     coordinate->SetValue(params.X, params.Y, 0.0);
-    point = coordinate->GetComputedWorldValue(renderer);
+    double* point = coordinate->GetComputedWorldValue(renderer);
 
     params.X = int(point[0]);
     params.Y = int(point[1]);
@@ -213,4 +237,70 @@ int FrRoiTool::GetVisibleLayer(std::vector<FrLayerSettings*> layers){
     }
 
     return 0;   // there are no visible actors atm
+}
+
+void FrRoiTool::StartCurrentTool(){
+    // stop prev tool if any
+    if(m_curTool &&  m_curTool->GetController()){
+        m_curTool->Stop();
+        m_curTool->SetController(0);
+    }
+    
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+
+    // select current roi tool
+    enum FrROIToolWidget::ToolType toolType = 
+        mv->GetLayerListWidget()->GetRoiToolWidget()->GetCurrentToolType();
+
+    switch(toolType){
+        case FrROIToolWidget::Info:
+            m_curTool = m_riTool;
+            break;
+        case FrROIToolWidget::Rectangle:
+            m_curTool = m_rectTool;
+            break;
+        case FrROIToolWidget::FreeShape:
+            m_curTool = m_fsTool;
+            break;
+        case FrROIToolWidget::Pen:
+            m_curTool = m_penTool;
+            break;
+        case FrROIToolWidget::Sphere:
+            m_curTool = m_sphereTool;
+            break;
+        case FrROIToolWidget::Invert:
+            m_curTool = m_invTool;
+            break;
+        case FrROIToolWidget::DilateErode:
+            m_curTool = m_riTool;
+            break;
+        case FrROIToolWidget::Intersect:
+            m_curTool = m_mmTool;
+            m_mmTool->SetMode(FrMaskMaskTool::Intersect);
+            break;
+        case FrROIToolWidget::Subtract:
+            m_curTool = m_mmTool;
+            m_mmTool->SetMode(FrMaskMaskTool::Subtract);
+            break;
+        case FrROIToolWidget::Union:
+            m_curTool = m_mmTool;
+            m_mmTool->SetMode(FrMaskMaskTool::Union);
+            break;
+        case FrROIToolWidget::Copy:
+            m_curTool = m_mmTool;
+            m_mmTool->SetMode(FrMaskMaskTool::Copy);
+            break;
+    }
+
+    // start it
+    m_curTool->SetController(this->GetController());
+    m_curTool->Start();
+}
+
+FrMainController* FrRoiTool::GetMainController(){
+     // HACK: getting main controller
+     FrMainController* result = 
+         dynamic_cast<FrMainController*>
+         (this->GetController()->GetOwner());
+     return result;
 }

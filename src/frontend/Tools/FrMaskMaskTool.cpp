@@ -1,7 +1,8 @@
 #include "FrMaskMaskTool.h"
 
 
-FrMaskMaskTool::FrMaskMaskTool(){
+FrMaskMaskTool::FrMaskMaskTool() 
+: m_Mode(FrMaskMaskTool::Undefined){
 }
 
 FrMaskMaskTool::~FrMaskMaskTool(){

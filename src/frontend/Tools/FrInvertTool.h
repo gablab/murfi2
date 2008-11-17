@@ -1,5 +1,5 @@
-#ifndef FR_SPHERE_TOOL
-#define FR_SPHERE_TOOL
+#ifndef FR_INVERT_TOOL
+#define FR_INVERT_TOOL
 
 // includes
 #include "FrBaseRoiTool.h"
@@ -7,7 +7,7 @@
 
 // abstract class for all tools
 // used by application
-class FrSphereTool : public FrBaseRoiTool {
+class FrInvertTool : public FrBaseRoiTool {
 public:
 	virtual void Start();
 	virtual void Stop();
@@ -18,9 +18,9 @@ public:
 
 public:
 	/// Default constructor
-	FrSphereTool();
+	FrInvertTool();
 	/// Destructor
-	virtual ~FrSphereTool();
+	virtual ~FrInvertTool();
 };
 
-#endif // FR_RECTANGLE_TOOL
+#endif // FR_INVERT_TOOL

@@ -8,6 +8,7 @@
 #include "FrUtils.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrMainDocument.h"
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -53,7 +54,6 @@ bool FrMaskRectangleCmd::DrawMask(){
     FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
 
     FrSpecialLayer* sl;
-    //int imgNumber = -1;
     
     enum FrTabSettingsDocObj::View view = ts->GetActiveView();
     switch(view){
@@ -105,14 +105,14 @@ bool FrMaskRectangleCmd::DrawMask(){
 }
 
 bool FrMaskRectangleCmd::WriteMask(){
-    bool result = false;
-
     //FrMainWindow* mv = this->GetMainController()->GetMainView();
     //mv->GetSliceView()->UpdatePipeline(FRP_SETCAM);
     // TODO: hide selection
 
-    vtkImageData* imageData = this->GetCurrentROIImageData();
-    if(imageData){
+    bool result = false;
+    FrRoiDocObj* roiDO = this->GetCurrentRoi();
+    if(roiDO){
+        vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
         // TODO: not finished
 
         FrMainWindow* mv = this->GetMainController()->GetMainView();

@@ -54,13 +54,22 @@ void FrLayeredImage::SetInput(vtkImageData* data){
     m_tbcFilter->SetInput(data);
 }
 
-void FrLayeredImage::SetROIInput(int id, vtkImageData *data){
+void FrLayeredImage::SetRoiInput(int id, vtkImageData *data){
     FrROILayer* layer = this->GetRoiLayerByID(id);
     if(layer){
         layer->SetInput(data);
     }
 }
 
+vtkImageData* FrLayeredImage::GetRoiInput(int id){
+    vtkImageData* result = 0L;
+    FrROILayer* layer = this->GetRoiLayerByID(id);
+    if(layer){
+        result = layer->GetInput();
+    }
+    return result;
+}
+    
 void FrLayeredImage::SetColormapSettings(FrColormapSettings& settings, int layerId){
     if(layerId == ALL_LAYERS_ID){
         LayerCollection::iterator it, itEnd(m_ImageLayers.end());

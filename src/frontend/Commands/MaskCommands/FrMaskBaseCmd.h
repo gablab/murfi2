@@ -16,15 +16,22 @@ public:
     virtual ~FrMaskBaseCmd();
 
     // Properties
-    FrSetPropMacro(int, ImageNumber);
+    void SetImageNumber(int value){
+        m_ImageNumber = value;
+    }
 
 protected:
-    // Returns current 
+    // Returns current ROI document object
     FrRoiDocObj* GetCurrentRoi();
+    // Return current slice number of ROI
+    int GetCurrentRoiSliceNumber();
     // Returns vtkImageData of current slice of the current ROI.
-    vtkImageData* GetRoiImageData(int id);
+    vtkImageData* GetRoiImageData(int id);    
     // Applys given image data to current ROI
-    virtual void ApplyToCurrentROI(vtkImageData* data);    
+    virtual void ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO);
+
+protected:
+    int m_ImageNumber;
 };
 
 #endif // FR_MASKBASE_CMD

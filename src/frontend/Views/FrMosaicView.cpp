@@ -196,7 +196,7 @@ void FrMosaicView::ReadRoi(FrUpdateParams1& params){
     int count = m_roiReader->GetOutputCount();
     for(int i=0; i < count; ++i){
         int roiID = params.RoiIDs[i];
-        m_LayeredImage->SetROIInput(roiID, m_roiReader->GetOutput(i));
+        m_LayeredImage->SetRoiInput(roiID, m_roiReader->GetOutput(i));
     }
 }
 

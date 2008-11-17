@@ -26,16 +26,15 @@ public:
     virtual bool Redo();
 
     // Properties
-    FrSetPropMacro(Action, Action);
+    FrSetPropMacro(Action, Action);    
 
 private:
     // Helpers
-    bool PerformeStandardOperation();
-    bool PerformeSubtractOperation();
-    vtkImageData* GetTargetROIImageData();
-
-private:
-    vtkImageLogic* m_Filter;
+    bool PerformeUnionOperation(vtkImageData* in1, vtkImageData* in2);
+    bool PerformeInvertOperation(vtkImageData* in1, vtkImageData* in2);
+    bool PerformeIntersectOperation(vtkImageData* in1, vtkImageData* in2);
+    bool PerformeSubtractOperation(vtkImageData* in1, vtkImageData* in2);
+    vtkImageData* GetTargetRoiImageData();
 };
 
 #endif // FR_2MASKOPER_CMD

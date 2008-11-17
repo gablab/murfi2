@@ -24,7 +24,8 @@ public:
 public:
     // Accessors/Modifiers
     virtual void SetInput(vtkImageData* data);
-    void SetROIInput(int id, vtkImageData* data);	// ROI layers may have different input data
+    void SetRoiInput(int id, vtkImageData* data);
+    vtkImageData* GetRoiInput(int id);
 
     void SetColormapSettings(FrColormapSettings& settings, int layerId);
     void SetTBCSettings(FrTBCSettings& settings, int layerId);

@@ -4,6 +4,12 @@
 #include "FrMainDocument.h"
 #include "FrRoiDocObj.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrLayeredImage.h"
+#include "FrSettings.h"
+
+#include "FrSliceView.h"
+#include "FrMosaicView.h"
+#include "FrOrthoView.h"
 
 // VTK includes
 #include "vtkImageData.h"
@@ -31,13 +37,13 @@ FrRoiDocObj* FrMaskBaseCmd::GetCurrentRoi(){
             FrTabSettingsDocObj* tsDO = doc->GetCurrentTabSettings();
             switch(tsDO->GetActiveView()){
                 case FrTabSettingsDocObj::SliceView:
-                    layerID = tsDO->GetSliceViewSettings()->ActiveLayerID();
+                    layerID = tsDO->GetSliceViewSettings()->ActiveLayerID;
                     break;
                 case FrTabSettingsDocObj::MosaicView:
-                    layerID = tsDO->GetMosaicViewSettings()->ActiveLayerID();
+                    layerID = tsDO->GetMosaicViewSettings()->ActiveLayerID;
                     break;
                 case FrTabSettingsDocObj::OrthoView:
-                    layerID = tsDO->GetOrthoViewSettings()->ActiveLayerID();
+                    layerID = tsDO->GetOrthoViewSettings()->ActiveLayerID;
                     break;
             }
 
@@ -45,7 +51,7 @@ FrRoiDocObj* FrMaskBaseCmd::GetCurrentRoi(){
             for(it = rois.begin(); it != itEnd; ++it){
                 FrRoiDocObj* roiDO = (FrRoiDocObj*)(*it);
                 if(roiDO->GetID() == layerID){
-                    result = foiDO;
+                    result = roiDO;
                     break;
                 }
             }
@@ -59,19 +65,68 @@ vtkImageData* FrMaskBaseCmd::GetRoiImageData(int id){
     if(this->GetMainController()){
         FrMainWindow* mv = this->GetMainController()->GetMainView();
         
-        // TODO: implement        
+        if(mv->GetCurrentView() == mv->GetSliceView()){
+            result = mv->GetSliceView()->GetImage()->GetRoiInput(id);
+        }
+        else if(mv->GetCurrentView() == mv->GetMosaicView()){
+            result = mv->GetMosaicView()->GetImage()->GetRoiInput(id);
+        }
+        else if(mv->GetCurrentView() == mv->GetOrthoView()){
+            if(0 <= m_ImageNumber && m_ImageNumber < ORTHO_IMAGE_COUNT){
+                result = mv->GetOrthoView()->GetImage(m_ImageNumber)->GetRoiInput(id);
+            }
+        }
     }
     return result;
 }
     
-void FrMaskBaseCmd::ApplyToCurrentROI(vtkImageData* data){
-    // TODO: implement
-
-    // Get Current ROI
-    FrMaskEditor* me;    
+void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO){
+    
+    FrMaskEditor* me = FrMaskEditor::New();
     me->SetInput(data);
+    me->SetDocumentObj(roiDO);
     me->SetView(FrMaskEditor::Slice);
     me->SetOrientation(FrMaskEditor::XY);
-    me->SetSliceNumber(0);
+
+    // Setup slice number
+    int sliceNumber = this->GetCurrentRoiSliceNumber();
+    me->SetSliceNumber(sliceNumber);
+        
     me->Update();
+    me->Delete();
+}
+
+int FrMaskBaseCmd::GetCurrentRoiSliceNumber(){
+    int sliceNumber = -1;
+    if(this->GetMainController()){
+        FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+        
+        FrTabSettingsDocObj* tsDO = doc->GetCurrentTabSettings();
+        switch(tsDO->GetActiveView()){
+            case FrTabSettingsDocObj::SliceView:
+                sliceNumber = tsDO->GetSliceViewSettings()->SliceNumber;
+                break;
+            case FrTabSettingsDocObj::MosaicView:
+                // NOTE: always 0 fo mosaic view
+                sliceNumber = 0;
+                break;
+            case FrTabSettingsDocObj::OrthoView:
+                // Setup proper slice for ortho view
+                switch(m_ImageNumber){
+                    case CORONAL_IMAGE: 
+                        sliceNumber = tsDO->GetOrthoViewSettings()->CoronalSlice;
+                        break;
+                    case SAGITAL_IMAGE:
+                        sliceNumber = tsDO->GetOrthoViewSettings()->SagitalSlice;
+                        break;
+                    case AXIAL_IMAGE:
+                        sliceNumber = tsDO->GetOrthoViewSettings()->AxialSlice;
+                        break;
+                }
+                break;
+            default: ;
+                // NOTE: do nothing
+        }
+    }
+    return sliceNumber;
 }

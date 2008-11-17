@@ -1,4 +1,5 @@
 #include "FrMaskDilateErodeCmd.h"
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -41,16 +42,17 @@ bool FrMaskDilateErodeCmd::Execute(){
 // Helpers
 bool FrMaskDilateErodeCmd::DoDilate(){
     bool result = false;
-    vtkImageData* imageData = this->GetCurrentROIImageData(); 
-
-    if(imageData){
+    FrRoiDocObj* roiDO = this->GetCurrentRoi();
+    if(roiDO){
+        vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID()); 
+    
         m_Filter->SetKernelSize(m_KernelSize, m_KernelSize, 1);
         m_Filter->SetDilateValue(DEF_DDILATE_VALUE);
         m_Filter->SetErodeValue(DEF_DERODE_VALUE);
         m_Filter->SetInput(imageData);
         m_Filter->Update();
         
-        this->ApplyToCurrentROI(m_Filter->GetOutput());
+        this->ApplyDataToRoi(m_Filter->GetOutput(), roiDO);
         result = true;
     }
     return result;
@@ -58,16 +60,17 @@ bool FrMaskDilateErodeCmd::DoDilate(){
 
 bool FrMaskDilateErodeCmd::DoErode(){
     bool result = false;
-    vtkImageData* imageData = this->GetCurrentROIImageData(); 
-
-    if(imageData){
+    FrRoiDocObj* roiDO = this->GetCurrentRoi();
+    if(roiDO){
+        vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID()); 
+    
         m_Filter->SetKernelSize(m_KernelSize, m_KernelSize, 1);
         m_Filter->SetDilateValue(DEF_EDILATE_VALUE);
         m_Filter->SetErodeValue(DEF_EERODE_VALUE);
         m_Filter->SetInput(imageData);
         m_Filter->Update();
         
-        this->ApplyToCurrentROI(m_Filter->GetOutput());
+        this->ApplyDataToRoi(m_Filter->GetOutput(), roiDO);
         result = true;
     }
     return result;

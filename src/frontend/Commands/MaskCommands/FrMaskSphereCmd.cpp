@@ -8,6 +8,7 @@
 #include "FrSliceView.h"
 #include "FrOrthoView.h"
 #include "FrUtils.h"
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -26,9 +27,9 @@ bool FrMaskSphereCmd::Execute(){
     if(!this->GetMainController()) return false;
 
     bool result = false;
-
-    vtkImageData* imageData = this->GetCurrentROIImageData();
-    if(imageData){
+    FrRoiDocObj* roiDO = this->GetCurrentRoi();
+    if(roiDO){
+        vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
         // TODO: not finished
 
         FrMainWindow* mv = this->GetMainController()->GetMainView();

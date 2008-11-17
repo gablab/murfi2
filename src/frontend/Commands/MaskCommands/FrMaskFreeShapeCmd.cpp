@@ -8,6 +8,7 @@
 #include "FrUtils.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrMainDocument.h"
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -92,8 +93,10 @@ bool FrMaskFreeShapeCmd::WriteMask(){
     //mv->GetSliceView()->UpdatePipeline(FRP_SETCAM);
     // TODO: hide selection
 
-    vtkImageData* imageData = this->GetCurrentROIImageData();
-    if(imageData){
+    FrRoiDocObj* roiDO = this->GetCurrentRoi();
+    if(roiDO){
+        vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID()); 
+    
         // TODO: not finished
 
         FrMainWindow* mv = this->GetMainController()->GetMainView();
@@ -144,6 +147,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
                     }
                 }
 
+        this->ApplyDataToRoi(imageData, roiDO);
         result = true;
     }
 

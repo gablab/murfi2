@@ -1,4 +1,5 @@
 #include "FrMaskCopyAdjacentCmd.h"
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -13,9 +14,11 @@ bool FrMaskCopyAdjacentCmd::Execute(){
     if(!this->GetMainController()) return false;
 
     bool result = false;
-    vtkImageData* imageData = this->GetCurrentROIImageData();
-    if(imageData){
-        // TODO: implement
+    FrRoiDocObj* roiDO = this->GetCurrentRoi();
+    if(roiDO){
+        vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID()); 
+        // TODO: implement 
+        
         result = true;
     }
     return result;

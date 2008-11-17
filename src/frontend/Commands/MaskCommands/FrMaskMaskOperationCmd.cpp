@@ -1,4 +1,5 @@
 #include "FrMaskMaskOperationCmd.h"
+#include "FrRoiDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -12,98 +13,115 @@
 
 
 FrMaskMaskOperationCmd::FrMaskMaskOperationCmd()
-: m_Filter(0), m_Action(FrMaskMaskOperationCmd::None) {
-    m_Filter = vtkImageLogic::New();
+: m_Action(FrMaskMaskOperationCmd::None) {
 }
 
 FrMaskMaskOperationCmd::~FrMaskMaskOperationCmd(){
-    if(m_Filter) m_Filter->Delete();
 }
 
 bool FrMaskMaskOperationCmd::Execute(){
     if(!this->GetMainController()) return false;
 
     bool result = false;
-    switch(m_Action){
-    case FrMaskMaskOperationCmd::None:
-        break;
-        // NOTE: Fall through
-    case FrMaskMaskOperationCmd::Intersect:
-    case FrMaskMaskOperationCmd::Union:
-    case FrMaskMaskOperationCmd::Invert:
-        result = this->PerformeStandardOperation();
-        break;
-    case FrMaskMaskOperationCmd::Subtract:
-        result = this->PerformeSubtractOperation();
-        break;
-    }
-    return result;
-}
 
-bool FrMaskMaskOperationCmd::PerformeStandardOperation(){
-    bool result = false;
+    FrRoiDocObj* roiDO = this->GetCurrentRoi();
+    if(roiDO){
+        vtkImageData* imageData1 = this->GetRoiImageData(roiDO->GetID()); 
+        vtkImageData* imageData2 = this->GetTargetRoiImageData();
 
-    int operation = FR_INVALID_OPERATION;
-    switch(m_Action){
+        switch(m_Action){
+        case FrMaskMaskOperationCmd::None:
+            break;
         case FrMaskMaskOperationCmd::Intersect:
-            operation = VTK_AND;
+            result = this->PerformeIntersectOperation(imageData1, imageData2);
             break;
         case FrMaskMaskOperationCmd::Union:
-            operation = VTK_OR;
+            result = this->PerformeUnionOperation(imageData1, imageData2);
             break;
         case FrMaskMaskOperationCmd::Invert:
-            operation = VTK_NOT;
+            result = this->PerformeInvertOperation(imageData1, imageData2);
             break;
-        default:
-            // do nothing here
+        case FrMaskMaskOperationCmd::Subtract:
+            result = this->PerformeSubtractOperation(imageData1, imageData2);
             break;
-    }
-
-    vtkImageData* imageData1 = this->GetCurrentROIImageData(); 
-    vtkImageData* imageData2 = this->GetTargetROIImageData();
-
-    if(imageData1 && imageData2 && (operation != FR_INVALID_OPERATION)){
-        m_Filter->SetInput1(imageData1);
-        m_Filter->SetInput2(imageData2);  
-        m_Filter->SetOperation(operation);
-        m_Filter->SetOutputTrueValue(double(DEF_OUTPUT_TRUE));
-        m_Filter->Update();
-        
-        this->ApplyToCurrentROI(m_Filter->GetOutput());
-        result = true;
-    }
-    return result;
-}
-
-bool FrMaskMaskOperationCmd::PerformeSubtractOperation(){
-    bool result = false;
-    vtkImageData* imageData1 = this->GetCurrentROIImageData(); 
-    vtkImageData* imageData2 = this->GetTargetROIImageData();
-    
-    if(imageData1 && imageData2){
-        vtkImageData* output = vtkImageData::New();
-        output->CopyStructure(imageData1);
-        output->AllocateScalars();
-
-        unsigned char* srcPtr1 = (unsigned char*)imageData1->GetScalarPointer();
-        unsigned char* srcPtr2 = (unsigned char*)imageData2->GetScalarPointer();
-        unsigned char* dstPtr  = (unsigned char*)output->GetScalarPointer();
-        int size = output->GetPointData()->GetScalars()->GetSize();
-        for(int i=0; i < size; ++i){
-            (*dstPtr) = ((*srcPtr1) & (*srcPtr2)) ? DEF_OUTPUT_TRUE : DEF_OUTPUT_FALSE;
-            ++dstPtr; ++srcPtr1; ++srcPtr2;
         }
 
-        this->ApplyToCurrentROI(output);
-        output->Delete();
+        if(result){
+            this->ApplyDataToRoi(imageData1, roiDO);
+        }
+    }
+    return result;
+}
+
+bool FrMaskMaskOperationCmd::PerformeUnionOperation(vtkImageData* in1, vtkImageData* in2){
+    bool result = false;
+        
+    if(in1 && in2){
+        int size = in1->GetPointData()->GetScalars()->GetSize();
+        unsigned char* dstPtr = (unsigned char*)in1->GetScalarPointer();
+        unsigned char* srcPtr = (unsigned char*)in2->GetScalarPointer();
+        for(int i=0; i < size; ++i){
+            (*dstPtr) = ((*dstPtr) | (*srcPtr)) ? DEF_OUTPUT_TRUE : DEF_OUTPUT_FALSE;
+            ++dstPtr; ++srcPtr;
+        }
         result = true;
     }
     return result;
 }
 
-vtkImageData* FrMaskMaskOperationCmd::GetTargetROIImageData(){
+bool FrMaskMaskOperationCmd::PerformeInvertOperation(vtkImageData* in1, vtkImageData* in2){
+    bool result = false;
+        
+    if(in1){
+        int size = in1->GetPointData()->GetScalars()->GetSize();
+        unsigned char* dstPtr = (unsigned char*)in1->GetScalarPointer();
+        for(int i=0; i < size; ++i){
+            (*dstPtr) = (*dstPtr) ?  DEF_OUTPUT_FALSE : DEF_OUTPUT_TRUE;
+            ++dstPtr;
+        }
+        result = true;
+    }
+    return result;
+}
+
+bool FrMaskMaskOperationCmd::PerformeIntersectOperation(vtkImageData* in1, vtkImageData* in2){
+    bool result = false;
+        
+    if(in1 && in2){
+        int size = in1->GetPointData()->GetScalars()->GetSize();
+        unsigned char* dstPtr = (unsigned char*)in1->GetScalarPointer();
+        unsigned char* srcPtr = (unsigned char*)in2->GetScalarPointer();
+        for(int i=0; i < size; ++i){
+            (*dstPtr) = ((*dstPtr) & (*srcPtr)) ? DEF_OUTPUT_TRUE : DEF_OUTPUT_FALSE;
+            ++dstPtr; ++srcPtr;
+        }
+        result = true;
+    }
+    return result;
+}
+
+bool FrMaskMaskOperationCmd::PerformeSubtractOperation(vtkImageData* in1, vtkImageData* in2){
+    bool result = false;
+        
+    if(in1 && in2){
+        int size = in1->GetPointData()->GetScalars()->GetSize();
+        unsigned char* dstPtr = (unsigned char*)in1->GetScalarPointer();
+        unsigned char* srcPtr = (unsigned char*)in2->GetScalarPointer();
+        for(int i=0; i < size; ++i){
+            (*dstPtr) = ((*dstPtr) && !(*srcPtr)) ? DEF_OUTPUT_TRUE : DEF_OUTPUT_FALSE;
+            ++dstPtr; ++srcPtr;
+        }
+        result = true;
+    }
+    return result;
+}
+
+vtkImageData* FrMaskMaskOperationCmd::GetTargetRoiImageData(){
     // TODO: implement
-    return 0L;
+    vtkImageData* result = 0L;
+    // Get mainView, LayerListWidget, current roi tool Widget
+    // and retrive params from there
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////

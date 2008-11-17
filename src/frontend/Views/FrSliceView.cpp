@@ -224,7 +224,7 @@ void FrSliceView::ExtractSlice(FrUpdateParams0& params){
         int count = m_roiReader->GetOutputCount();
         for(int i=0, port=1; i < count; ++i, ++port){
             int roiID = params.RoiIDs[i];
-            m_LayeredImage->SetROIInput(roiID, m_SliceExtractor->GetOutput(port));
+            m_LayeredImage->SetRoiInput(roiID, m_SliceExtractor->GetOutput(port));
         }
 
         // Set text

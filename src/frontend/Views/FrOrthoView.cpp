@@ -326,7 +326,7 @@ void FrOrthoView::ExtractSlice(FrUpdateParams2& params){
             int count = m_roiReader->GetOutputCount();
             for(int j=0, port=1; j < count; ++j, ++port){
                 int roiID = params.RoiIDs[j];
-                m_LayeredImage[i]->SetROIInput(roiID, m_SliceExtractor[i]->GetOutput(port));
+                m_LayeredImage[i]->SetRoiInput(roiID, m_SliceExtractor[i]->GetOutput(port));
             }
 
             // Set text

@@ -93,13 +93,13 @@ void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int s
     // Set orientation
     switch(m_ImageNumber){
         case CORONAL_IMAGE:
-            me->SetOrientation(FrMaskEditor::XY);
+            me->SetOrientation(FrMaskEditor::XZ);
             break;
         case SAGITAL_IMAGE:
-            me->SetOrientation(FrMaskEditor::ZY);
+            me->SetOrientation(FrMaskEditor::YZ);
             break;
         case AXIAL_IMAGE:
-            me->SetOrientation(FrMaskEditor::XZ);
+            me->SetOrientation(FrMaskEditor::XY);
             break;
         default:
             // NOTE: Do we need it?

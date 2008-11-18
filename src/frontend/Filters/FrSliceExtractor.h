@@ -1,7 +1,7 @@
 #ifndef FR_SLICE_EXTRACTOR
 #define FR_SLICE_EXTRACTOR
 
-class vtkImageReslice;
+// Forward declarations
 class vtkImageData;
 
 #include "FrMacro.h"
@@ -31,19 +31,33 @@ public:
     vtkImageData* GetInput(int port);
     vtkImageData* GetOutput();
     vtkImageData* GetOutput(int port);
-    // Remove all oprts except port#0
-    void ClearAdditionalPorts();
+
+    // Remove all ports except port#0
+    void RemoveAdditionalPorts();
 	
     // Properties
-    enum Orientation { ZY = 0, XZ = 1, XY = 2 };
+    enum Orientation { YZ = 0, XZ = 1, XY = 2 };
 	FrGetPropMacro(Orientation, Orientation);
     void SetOrientation(Orientation orient);
 
 	FrGetPropMacro(int, Slice);
     void SetSlice(int slice);
 
-    // Returns max slice number
+    // Returns max slice number for default port
+    // if it has data connected.
 	int GetMaxSliceNumber();
+
+private:
+    // Helpers
+    void ClearOutput();
+    void SetOutput(int port, vtkImageData* data);
+    void SetModified(int port);
+    bool IsModified(int port);
+    
+    void SetImageInfo(vtkImageData* in, vtkImageData* out);
+    bool ExtractYZ(vtkImageData* in, vtkImageData* out);
+    bool ExtractXZ(vtkImageData* in, vtkImageData* out);
+    bool ExtractXY(vtkImageData* in, vtkImageData* out);
 
 protected:
     FrSliceExtractor();
@@ -54,12 +68,12 @@ private:
     void operator=(const FrSliceExtractor&);  // Not implemented.
 
 private:
-	int m_maxSliceNUmber;
     double m_Spacing[3];
 	
     // Reslicers
-    typedef std::map<int, vtkImageReslice*> ReslicerCollection;
-    ReslicerCollection m_Reslicer;
+    typedef std::map<int, vtkImageData*> DataPorts;
+    DataPorts m_Inputs;
+    DataPorts m_Outputs;
 };
 
 #endif

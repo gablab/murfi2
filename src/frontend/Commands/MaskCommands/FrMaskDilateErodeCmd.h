@@ -12,6 +12,7 @@ class vtkImageDilateErode3D;
 // dilation and erosion for ROI mask data.
 // Used square kernel for operation.
 class FrMaskDilateErodeCmd : public FrMaskBaseCmd {
+public:
     enum Action { None, Dilate, Erode };
 public:
     // Constructor/destructor

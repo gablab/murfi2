@@ -23,6 +23,7 @@ FrMaskDilateErodeCmd::~FrMaskDilateErodeCmd(){
 
 bool FrMaskDilateErodeCmd::Execute(){
     if(!this->GetMainController()) return false;
+    if(m_KernelSize <= 0) return false;
 
     bool result = false;
     switch(m_Action){

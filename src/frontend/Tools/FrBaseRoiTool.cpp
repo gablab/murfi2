@@ -2,8 +2,13 @@
 #include "FrMainController.h"
 #include "FrToolController.h"
 
+// This correspond to XY slice
+// It is important for proper work of tools
+#define DEF_IMAGE_NUMBER 2
 
-FrBaseRoiTool::FrBaseRoiTool(){
+
+FrBaseRoiTool::FrBaseRoiTool()
+:m_ImageNumber(DEF_IMAGE_NUMBER){
 }
 
 FrBaseRoiTool::~FrBaseRoiTool(){

@@ -56,7 +56,6 @@ private:
     FrDilatoneErosionTool* m_deTool;
     
     vtkPointPicker* m_PointPicker;
-    int m_ImgNumber;
 
 };
 

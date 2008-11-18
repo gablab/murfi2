@@ -17,7 +17,7 @@ class RtMaskImage;
 // It reads image data or ROI data (depend on Target specified).
 class FrMaskEditor : public vtkObject {
 public:
-    enum Orientation { Undefined=3, ZY=0, XZ=1, XY=2 };
+    enum Orientation { Undefined=3, YZ=0, XZ=1, XY=2 };
     enum View { Unknown, Slice, Mosaic, Ortho };
 
 public:
@@ -39,8 +39,9 @@ private:
     // Helpers
     bool IsDataValid(RtMaskImage* img, vtkImageData* data);
     void UpdateSliceXY(RtMaskImage* img, vtkImageData* data);
-    void UpdateSliceZY(RtMaskImage* img, vtkImageData* data);
-    void UpdateSliceZX(RtMaskImage* img, vtkImageData* data);
+    void UpdateSliceYZ(RtMaskImage* img, vtkImageData* data);
+    void UpdateSliceXZ(RtMaskImage* img, vtkImageData* data);
+    void UpdateMosaic(RtMaskImage* img, vtkImageData* data);
     
 protected:
     FrMaskEditor();

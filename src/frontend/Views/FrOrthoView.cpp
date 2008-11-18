@@ -66,7 +66,7 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 
     // Init orientations
     g_Orientation[CORONAL_IMAGE] = FrSliceExtractor::XZ;
-    g_Orientation[SAGITAL_IMAGE] = FrSliceExtractor::ZY;
+    g_Orientation[SAGITAL_IMAGE] = FrSliceExtractor::YZ;
     g_Orientation[AXIAL_IMAGE]   = FrSliceExtractor::XY;
 
     // create renderers
@@ -279,7 +279,7 @@ void FrOrthoView::ReadRoi(FrUpdateParams2& params){
     int count = m_imgReader->GetOutputCount();
     for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
         // first clear all
-        m_SliceExtractor[i]->ClearAdditionalPorts();
+        m_SliceExtractor[i]->RemoveAdditionalPorts();
 
         for(int j=0, port=1; j < count; ++j, ++port){
             m_SliceExtractor[i]->SetInput(

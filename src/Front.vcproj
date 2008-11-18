@@ -1563,6 +1563,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrSaveImageCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveImageCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrSaveTabsCmd.cpp"
 				>
 			</File>

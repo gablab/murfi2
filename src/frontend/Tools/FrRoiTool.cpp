@@ -32,10 +32,12 @@
 #include "Qt/qmessagebox.h"
 
 #define DEF_TOLERANCE 0.0
-
+// This correspond to XY slice
+// It is important for proper work of tools
+#define DEF_IMAGE_NUMBER 2
 
 FrRoiTool::FrRoiTool()
-: m_curTool(0), m_ImgNumber(0) {
+: m_curTool(0) {
     // create tools
     m_riTool = new FrRoiInfoTool();
     m_penTool = new FrPenTool();
@@ -101,50 +103,37 @@ void FrRoiTool::Stop(){
 }
 
 bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
-        //if (params.X != -1)
-        bool isInside = GetMappedCoords(is, params);
+    
+    //if (params.X != -1)
+    bool isInside = this->GetMappedCoords(is, params);
 
-        m_curTool->OnMouseUp(is, params);
-        m_curTool->SetImageNumber(m_ImgNumber);
-    }
-
-    return false;
+    m_curTool->SetImageNumber(m_ImageNumber);
+    return m_curTool->OnMouseUp(is, params);
 }
 
 bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
-        bool isInside = GetMappedCoords(is, params);
-        //if (params.X != -1)
-//            m_maskRectTool->OnMouseDown(is, params);
-            m_curTool->OnMouseDown(is, params);
-            m_curTool->SetImageNumber(m_ImgNumber);
-    }
+    
+    bool isInside = GetMappedCoords(is, params);
 
-    return false;
+    m_curTool->SetImageNumber(m_ImageNumber);
+    return m_curTool->OnMouseDown(is, params);
 }
 
 bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     bool isInside = GetMappedCoords(is, params);
-        //if (params.X != -1)
-        //m_maskRectTool->OnMouseMove(is, params);
-    m_curTool->OnMouseMove(is, params);
-    m_curTool->SetImageNumber(m_ImgNumber);
-
-    return false;
+    
+    m_curTool->SetImageNumber(m_ImageNumber);
+    return m_curTool->OnMouseMove(is, params);
 }
 
 bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
-        bool isInside = GetMappedCoords(is, params);
-        //if (params.X != -1)
-        //m_maskRectTool->OnMouseDrag(is, params);
-
-        m_curTool->OnMouseDrag(is, params);
-        m_curTool->SetImageNumber(m_ImgNumber);
-    }
     
-    return false;
+    bool isInside = GetMappedCoords(is, params);
+    //if (params.X != -1)
+    //m_maskRectTool->OnMouseDrag(is, params);
+
+    m_curTool->SetImageNumber(m_ImageNumber);
+    return m_curTool->OnMouseDrag(is, params);
 }
 
 bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
@@ -153,8 +142,7 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     FrMainWindow* mv = mc->GetMainView();
     FrMainDocument* md = mc->GetMainDocument();
     FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
-    
-    int m_ImgNumber = -1;       
+              
     FrLayeredImage* lim = 0;
     std::vector<FrLayerSettings*> layers;
     std::vector<vtkRenderer*> renCollection;
@@ -165,13 +153,13 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
             GetLayerSettings(ts->GetSliceViewSettings(), layers);
-            m_ImgNumber = 0;
+            m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
         case FrTabSettingsDocObj::MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
             GetLayerSettings(ts->GetMosaicViewSettings(), layers);
-            m_ImgNumber = 0;
+            m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
         case FrTabSettingsDocObj::OrthoView:
             {
@@ -180,14 +168,14 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
                 // Find Image where click's occured
                 for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
                     if (ov->GetImage(i)->GetRenderer()->IsInViewport(params.X, params.Y)){
-                        m_ImgNumber = i; 
+                        m_ImageNumber = i; 
                         break;
                     }
                 }
-                if (m_ImgNumber != -1){
-                    ov->GetImage(m_ImgNumber)->GetRenderers(renCollection);
-                    lim = ov->GetImage(m_ImgNumber);
-                    GetLayerSettings(ts->GetOrthoViewSettings(), layers, m_ImgNumber);
+                if (m_ImageNumber != -1){
+                    ov->GetImage(m_ImageNumber)->GetRenderers(renCollection);
+                    lim = ov->GetImage(m_ImageNumber);
+                    GetLayerSettings(ts->GetOrthoViewSettings(), layers, m_ImageNumber);
                 }
                 else{
                     // do something
@@ -276,7 +264,7 @@ void FrRoiTool::StartCurrentTool(){
             m_curTool = m_invTool;
             break;
         case FrROIToolWidget::DilateErode:
-            m_curTool = m_riTool;
+            m_curTool = m_deTool;
             break;
         case FrROIToolWidget::Intersect:
             m_curTool = m_mmTool;

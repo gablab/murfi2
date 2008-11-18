@@ -73,8 +73,9 @@ void FrRoiDocObj::CreateEmptyMaskImage(FrImageDocObj* imgDO){
     m_MaskImage = new RtMaskImage();
     m_MaskImage->setInfo( *(imgDO->GetImage()) );
         
-    // init all values to default (not a ROI)
-    m_MaskImage->setAll(DEF_MASK_VALUE);
+    // init all values to default (not a ROI)    
+    // DEF_MASK_VALUE == 0
+    m_MaskImage->initToZeros();
 }
 
 bool FrRoiDocObj::LoadFromFile(FrImageDocObj* imgDO, QString& fileName){

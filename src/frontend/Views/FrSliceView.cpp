@@ -196,7 +196,7 @@ void FrSliceView::ReadRoi(FrUpdateParams0& params){
     m_roiReader->Update();
 
     // Remove all ports except default
-    m_SliceExtractor->ClearAdditionalPorts();
+    m_SliceExtractor->RemoveAdditionalPorts();
 
     // Pass ROI data from output starting from port#1
     // since port#0 used for image data

@@ -69,11 +69,11 @@ void FrMaskEditor::Update(){
                 case FrMaskEditor::XY:
                     this->UpdateSliceXY(img, m_Data);
                     break;
-                case FrMaskEditor::ZY:
-                    this->UpdateSliceXY(img, m_Data);
+                case FrMaskEditor::YZ:
+                    this->UpdateSliceYZ(img, m_Data);
                     break;
                 case FrMaskEditor::XZ:
-                    this->UpdateSliceXY(img, m_Data);
+                    this->UpdateSliceXZ(img, m_Data);
                     break;
             }
         }   
@@ -81,72 +81,7 @@ void FrMaskEditor::Update(){
     else if(m_View == FrMaskEditor::Mosaic){
         // Assume data data in our 'RtMaksImage* img' always unmosaic
         RtMaskImage* img = m_DocumentObj->GetMaskImage();
-
-        // Little check
-        // NOTE mosaiced image may have more pix then 
-        int dataSize = m_Data->GetPointData()->GetScalars()->GetSize();
-        int imgSize = img->getNumPix();        
-        if(dataSize >= imgSize){
-            // Params 
-            int* dataDims = m_Data->GetDimensions();
-            unsigned char* basePtr = (unsigned char*)m_Data->GetScalarPointer();
-            int dataWidth = dataDims[DEF_XDIM];
-            int stride = dataWidth;
-            
-            int sliceWidth = img->getDim(DEF_XDIM);
-            int sliceHeight = img->getDim(DEF_YDIM);
-            int sliceSize = sliceWidth * sliceHeight;
-            int cols = (dataDims[DEF_XDIM] / sliceWidth);
-                        
-            // for each slice
-            
-            for(int i=0; i < img->getDim(DEF_ZDIM); ++i){
-                // set pointers
-                int row = i / cols;
-                int col = i % cols;
-                unsigned char* srcPtr = basePtr + 
-                    (row * sliceHeight * dataWidth) +  // offset to row of slice
-                    (col * sliceWidth); // offset to column of slice
-
-                short* dstPtr = img->data + (i * sliceSize);
-
-                // copy data from source to destiny
-                for(int y = 0; y < sliceHeight; ++y){
-                    for(int x = 0; x < sliceWidth; ++x){
-                        (*dstPtr) = (*srcPtr);
-                        ++dstPtr; ++srcPtr;
-                    }
-                    srcPtr += stride;
-                }
-            }
-            //// init some params
-            //int* dataDims = m_Data->GetDimensions();
-            //int sliceWidth = img->getDim(DEF_XDIM);
-            //int sliceHeight = img->getDim(DEF_YDIM);
-            //int sliceSize = sliceWidth * sliceHeight;
-            //int numOfSlices = img->getDim(DEF_ZDIM);
-            //
-            //short* dstPtr = 0;
-            //unsigned char* srcPtr = (unsigned char*)m_Data->GetScalarPointer();
-            //for(int i=0; i < imgSize; ++i){
-            //    // calc slice
-            //    int slice = (i % dataDims[DEF_XDIM]) / sliceWidth + // slice column
-            //        ( i / (dataDims[DEF_XDIM] * sliceWidth) ) *  // slice row
-            //        (dataDims[DEF_XDIM] / sliceWidth);   // num of slices in row
-
-            //    if(slice > numOfSlices) {
-            //        continue;
-            //    }
-
-            //    // calc row & column
-            //    int row = (i / dataDims[DEF_XDIM]) % sliceHeight;
-            //    int col = (i / dataDims[DEF_XDIM]) % sliceWidth;
-
-            //    dstPtr = img->data + (slice * sliceSize) + (row * sliceWidth) + col;
-            //    *dstPtr = *srcPtr;
-            //    ++srcPtr;
-            //}
-        }
+        this->UpdateMosaic(img, m_Data);
     }
 }
 
@@ -160,51 +95,41 @@ void FrMaskEditor::UpdateSliceXY(RtMaskImage* img, vtkImageData* data){
         
     for(int i=0; i < sliceSize; ++i){ 
         (*dstPtr) = (*srcPtr);
-        ++dstPtr; 
+        ++dstPtr; ++srcPtr;
+    }
+}
+
+void FrMaskEditor::UpdateSliceYZ(RtMaskImage* img, vtkImageData* data){
+    // YZ update vertical line for each slice
+    short* dstPtr = img->data + m_SliceNumber;
+    unsigned char* srcPtr = (unsigned char*)data->GetScalarPointer();
+     
+    int stride = img->getDim(DEF_XDIM);
+    int dataSize = img->getDim(DEF_ZDIM) * img->getDim(DEF_YDIM);
+    for(int i=0; i < dataSize; ++i){
+        // copy to vertical line for each slice
+        (*dstPtr) = (*srcPtr);
+        dstPtr += stride;
         ++srcPtr;
     }
 }
 
-void FrMaskEditor::UpdateSliceZY(RtMaskImage* img, vtkImageData* data){
-    // ZY update vertical line for each slice
-    int srcPixInRow = data->GetDimensions()[DEF_XDIM];
-    int dstPixInRow = img->getDim(DEF_XDIM);
-    int pixInColumn = img->getDim(DEF_YDIM);
-    int sliceSize = img->getDim(DEF_XDIM) * img->getDim(DEF_YDIM);
-
-    int sliceCount = img->getDim(DEF_ZDIM);
-    for(int i=0; i < sliceCount; ++i){
-        // get data pointers
-        short* dstPtr = img->data + (i * sliceSize) + m_SliceNumber;
-        unsigned char* srcPtr = ((unsigned char*)m_Data->GetScalarPointer()) + i;
-
-        for(int j=0; j < pixInColumn; ++j){
-            *dstPtr = *srcPtr;
-            dstPtr += dstPixInRow;
-            srcPtr += srcPixInRow;
-        }
-    }
-}
-
-void FrMaskEditor::UpdateSliceZX(RtMaskImage* img, vtkImageData* data){
+void FrMaskEditor::UpdateSliceXZ(RtMaskImage* img, vtkImageData* data){
     // ZX update horizontal line for each slice
-    int srcPixInRow = data->GetDimensions()[DEF_XDIM];
-    int pixInRow = img->getDim(DEF_XDIM);
-    int sliceSize = img->getDim(DEF_XDIM) * img->getDim(DEF_YDIM);
+    int lineSize = img->getDim(DEF_XDIM);
+
+    short* dstPtr = img->data + (m_SliceNumber * lineSize);
+    unsigned char* srcPtr = (unsigned char*)m_Data->GetScalarPointer();
 
     int sliceCount = img->getDim(DEF_ZDIM);
+    int lineStride = (img->getDim(DEF_XDIM) * img->getDim(DEF_YDIM)) - lineSize;
     for(int i=0; i < sliceCount; ++i){
-        // get data pointers
-        int offset1 = m_SliceNumber * pixInRow;
-        short* dstPtr = img->data + (i * sliceSize) + offset1;
-
-        int offset2 = i * pixInRow;
-        unsigned char* srcPtr = ((unsigned char*)m_Data->GetScalarPointer()) + offset2;
-
-        for(int j=0; j < pixInRow; ++j){
+        // Copy line data
+        for(int j=0; j < lineSize; ++j){
             *dstPtr = *srcPtr;
             ++dstPtr; ++srcPtr;
         }
+        dstPtr += lineStride;
     }
 }
 
@@ -222,9 +147,9 @@ bool FrMaskEditor::IsDataValid(RtMaskImage* img, vtkImageData* data){
                 goodDims = (img->getDim(DEF_XDIM) == dims[DEF_XDIM]) &&
                     (img->getDim(DEF_YDIM) == dims[DEF_YDIM]);
                 break;
-            case FrMaskEditor::ZY:
-                goodDims = ((img->getDim(DEF_ZDIM) == dims[DEF_XDIM]) &&
-                    (img->getDim(DEF_YDIM) == dims[DEF_YDIM]));
+            case FrMaskEditor::YZ:
+                goodDims = ((img->getDim(DEF_YDIM) == dims[DEF_XDIM]) &&
+                    (img->getDim(DEF_ZDIM) == dims[DEF_YDIM]));
                 break;
             case FrMaskEditor::XZ:
                 goodDims = ((img->getDim(DEF_XDIM) == dims[DEF_XDIM]) &&
@@ -233,4 +158,41 @@ bool FrMaskEditor::IsDataValid(RtMaskImage* img, vtkImageData* data){
         }
     }
     return (goodSlice && goodDims);
+}
+
+void FrMaskEditor::UpdateMosaic(RtMaskImage* img, vtkImageData* data){
+    // NOTE: mosaiced source image may have 
+    // more or equal pixs than destiny image
+    int dataSize = data->GetPointData()->GetScalars()->GetSize();
+    int imgSize = img->getNumPix();
+    if(dataSize < imgSize) return;
+
+    // Preset some params
+    int* dataDims = m_Data->GetDimensions();
+    unsigned char* basePtr = (unsigned char*)m_Data->GetScalarPointer();
+        
+    int sliceWidth = img->getDim(DEF_XDIM);
+    int sliceHeight = img->getDim(DEF_YDIM);
+    int sliceSize = sliceWidth * sliceHeight;
+    int rowSize = dataDims[DEF_XDIM] * sliceHeight;
+
+    // for each slice
+    int cols = dataDims[DEF_XDIM] / sliceWidth;
+    int stride = dataDims[DEF_XDIM] - sliceWidth;
+    for(int i=0; i < img->getDim(DEF_ZDIM); ++i){
+        // set pointers
+        int row = i / cols;
+        int col = i % cols;
+        unsigned char* srcPtr = basePtr + (row * rowSize) + (col * sliceWidth);
+        short* dstPtr = img->data + (i * sliceSize);
+        
+        // copy data from source to destiny
+        for(int y = 0; y < sliceHeight; ++y){
+            for(int x = 0; x < sliceWidth; ++x){
+                (*dstPtr) = (*srcPtr);
+                ++dstPtr; ++srcPtr;
+            }
+            srcPtr += stride;
+        }
+    } // end for slice
 }

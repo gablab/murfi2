@@ -33,6 +33,12 @@ bool FrDilatoneErosionTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& para
         FrMaskDilateErodeCmd* cmd = FrCommandController::CreateCmd<FrMaskDilateErodeCmd>();
         cmd->SetImageNumber(m_ImageNumber);
         cmd->SetKernelSize(kernelSize);
+        if(params.Button == FrMouseParams::LeftButton){
+            cmd->SetAction(FrMaskDilateErodeCmd::Dilate);
+        }
+        else if(params.Button == FrMouseParams::RightButton) {
+            cmd->SetAction(FrMaskDilateErodeCmd::Erode);
+        }
         result = cmd->Execute();
         delete cmd;
     }

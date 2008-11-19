@@ -14,16 +14,16 @@ vtkStandardNewMacro(FrMosaicSliceActor);
 
 // Construct object with no children.
 FrMosaicSliceActor::FrMosaicSliceActor(){
-	this->ImageSlice = NULL;         
-	this->ImagePlane = NULL;         
+	this->ImageSlice = NULL;
+	this->ImagePlane = NULL;
 	this->ImageTexture = NULL; 
 	this->CurrentImage = NULL;
 
-	this->Level = -1;              
-	this->Opacity = 1.0;            
-	this->Interpolation = 0;      
-	this->ColorMap = NULL;           
-	this->OwnsColorMap = 1;   
+	this->Level = -1;
+	this->Opacity = 1.0;
+	this->Interpolation = 0;
+	this->ColorMap = NULL;
+	this->OwnsColorMap = 1;
 
 	this->CurrentPlane = 2;
 

@@ -91,14 +91,14 @@ vtkImageData* FrDocumentReader::ReadImage(FrImageDocObj* imgDO){
         }
         deleteImage = true;
     }
-            
+
     // create output data object
     vtkImageData* output = vtkImageData::New();
-    
+
     // Init params
-    double dimW = double(img->getDim(0));
-    double dimH = double(img->getDim(1));
-    double dimZ = (img->getDim(2) < 1) ? 1.0 : img->getDim(2);
+    int dimW = img->getDim(0);
+    int dimH = img->getDim(1);
+    int dimZ = (img->getDim(2) < 1) ? 1 : img->getDim(2);
     output->SetDimensions(dimW, dimH, dimZ);
 
     double pxW = img->getPixDim(0);
@@ -107,9 +107,9 @@ vtkImageData* FrDocumentReader::ReadImage(FrImageDocObj* imgDO){
     output->SetSpacing(pxW, pxH, pxZ);
 
     output->SetNumberOfScalarComponents(1);
-    output->SetScalarTypeToUnsignedChar();        
+    output->SetScalarTypeToUnsignedChar();
     output->AllocateScalars();
-            
+
     // Copy image data with mapping into 0..255 range
     // need src and dst pointers
     short* dataPtr = img->getDataCopy();

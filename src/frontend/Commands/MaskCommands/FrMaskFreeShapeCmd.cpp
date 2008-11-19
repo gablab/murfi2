@@ -28,14 +28,14 @@ bool FrMaskFreeShapeCmd::Execute(){
     bool result = false;
 
     switch (m_Action){
-        case Action::Draw:
+        case FrMaskFreeShapeCmd::Draw:
             result = DrawMask(true);
             break;
-        case Action::Erase:
-        case Action::Write:
+        case FrMaskFreeShapeCmd::Erase:
+        case FrMaskFreeShapeCmd::Write:
             result = WriteMask() && DrawMask(false);
             break;
-        case Action::Undefined:
+        case FrMaskFreeShapeCmd::Undefined:
             result = false;
             break;
     }
@@ -77,10 +77,10 @@ bool FrMaskFreeShapeCmd::WriteMask(){
     int pixelValue = 0;
 
     switch (m_Action){
-        case Action::Erase:
+        case FrMaskFreeShapeCmd::Erase:
             pixelValue = 0;
             break;
-        case Action::Write:
+        case FrMaskFreeShapeCmd::Write:
             pixelValue = 255;
             break;
     }
@@ -99,7 +99,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
             imageData->GetDimensions(dims);
 
             int xmin, xmax, ymin, ymax;
-            xmin = ymin = 0;    
+            xmin = ymin = 0;
             xmax = dims[0];
             ymax = dims[1];
 
@@ -119,7 +119,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
                     // test if point is inside of polygon, if yes, find index and write it
                     Pos p;
                     p.x = x;    p.y = y;    p.z = 0;
-                    
+
                     if (IsPointInsideOfPolygon(m_Points, p)){
                         int pos[3];
                         pos[0] = x;     pos[1] = y;     pos[2] = 0;

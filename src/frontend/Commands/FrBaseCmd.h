@@ -14,12 +14,12 @@ public:
     FrBaseCmd() : m_MainController(0) { }
     virtual ~FrBaseCmd(){}
 
-	virtual bool Execute() = 0;
+    virtual bool Execute() = 0;
 
     // Undo/redo section
-	virtual bool CanUndo() = 0;
-	virtual bool Undo() = 0;
-	virtual bool Redo() = 0;
+    virtual bool CanUndo() = 0;
+    virtual bool Undo() = 0;
+    virtual bool Redo() = 0;
 
     // Properties
     FrPropMacro(FrMainController*, MainController);

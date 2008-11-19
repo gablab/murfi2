@@ -31,7 +31,7 @@ FrRoiDocObj* FrMaskBaseCmd::GetCurrentRoi(){
 
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
         doc->GetObjectsByType(rois, FrDocumentObj::RoiObject);
-        
+
         if(rois.size() > 0){
             int layerID = -1;
             FrTabSettingsDocObj* tsDO = doc->GetCurrentTabSettings();
@@ -153,7 +153,7 @@ int FrMaskBaseCmd::GetCurrentRoiSliceNumber(){
 
 FrSpecialLayer* FrMaskBaseCmd::GetSpecialLayer(){
     FrSpecialLayer* sl;
-    
+
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* md = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();

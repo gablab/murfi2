@@ -133,12 +133,11 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     vd.name = "test";   // get layer (image?) name
     vd.timepoint = 44;  // get timepoint
 
-    //// TODO: fix for side values
-
+    // TODO: fix for side values
     GetRealImagePosition(ts, pImageData, vd.Index, imgNumber);
-    vd.Position[0] = vd.Index[0] * dSpacing[0];
-    vd.Position[1] = vd.Index[1] * dSpacing[1];
-    vd.Position[2] = vd.Index[2] * dSpacing[2];
+    vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
+    vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
+    vd.Position[2] = int(vd.Index[2] * dSpacing[2]);
 
 
 // Get voxel index, position

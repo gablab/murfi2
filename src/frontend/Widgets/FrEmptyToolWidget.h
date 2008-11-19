@@ -12,7 +12,7 @@ public:
     FrEmptyToolWidget(QWidget* parent=0L);
 
 private:
-    
+
 };
 
 #endif

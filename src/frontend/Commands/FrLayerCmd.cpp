@@ -91,6 +91,7 @@ bool FrImageLayerCmd::AddLayer(){
         //delete layerSets;	// NEW: to prevent memory leaks
     }
     FrBaseCmd::UpdatePipelineForID(id, FRP_COLORMAP);
+    return true;
 }
 
 bool FrImageLayerCmd::DeleteLayer(){
@@ -163,6 +164,7 @@ bool FrImageLayerCmd::UpdateSelectedLayerID(){
     tabSets->GetSliceViewSettings()->ActiveLayerID = m_ID;
     tabSets->GetMosaicViewSettings()->ActiveLayerID = m_ID;
     tabSets->GetOrthoViewSettings()->ActiveLayerID = m_ID;
+    return true;
 }
 
 bool FrImageLayerCmd::ChangeLayerOld(){
@@ -250,7 +252,7 @@ bool FrImageLayerCmd::ChangeLayerParams(){
     if(!m_isID || m_ID == CUR_LAYER_ID){
         m_ID = this->GetActiveLayerID();
     }
-    
+
     FrMainWindow* mw = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 

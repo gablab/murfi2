@@ -26,14 +26,12 @@ TMP_FILES = $(patsubst ./%,$(OBJ_DIR)/%,$(SRC_FILES))
 OBJ_FILES = $(TMP_FILES:.cpp=.o) 
 
 default: $(OBJ_FILES)
-	-cd ./MaskCommands	&&	$(MAKE)
 
 ############################### CLEAN ################################
 
 clean:
 	@$(ECHO) 'make: removing object and autosave files'
 	-$(RM) -f *.o *~
-	-cd ./MaskCommands	&&	$(MAKE) clean
 
 ######################################################################
 ### $Source$

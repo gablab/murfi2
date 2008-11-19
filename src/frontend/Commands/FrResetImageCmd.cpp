@@ -29,7 +29,7 @@ bool FrResetImageCmd::Execute(){
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tsDO = doc->GetCurrentTabSettings();
-    
+
     // Determine target view and get layer settings
     std::vector<FrLayerSettings*> layerSettings;
     FrResetImageCmd::View targetView = m_TargetView;
@@ -59,7 +59,7 @@ bool FrResetImageCmd::Execute(){
 
     // Get actors and renderers
     std::vector<vtkImageActor*> actors;
-	std::vector<vtkRenderer*> renderers;
+    std::vector<vtkRenderer*> renderers;
     std::vector<FrCameraSettings*> camSettings;
     switch(targetView){
          case FrResetImageCmd::Slice:
@@ -78,7 +78,7 @@ bool FrResetImageCmd::Execute(){
                 renderers.push_back(mv->GetOrthoView()->GetImage(i)->GetRenderer());
                 camSettings.push_back(&tsDO->GetOrthoViewSettings()->CamSettings[i]);
              }
-             break;         
+             break;
          default:
              // Do noting
              break;
@@ -114,13 +114,13 @@ void FrResetImageCmd::ResetCamera(FrCameraSettings* camSets,
     newFocalPt[1] = newPosition[1] = imgCenter[1];
     newFocalPt[2] = imgCenter[2];
     newPosition[2] = imgCenter[2] + 1.0;
-    
+
     // Calculate scale 
     double bounds[6];
     actor->GetBounds(bounds);    
     double width = bounds[1] - bounds[0];
     double height = bounds[3] - bounds[2];
-        
+
     double newScale = std::max(width, height) / 2;
     newScale = newScale + DEF_DELTA;
 

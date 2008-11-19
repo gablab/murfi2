@@ -31,10 +31,10 @@ void FrMaskToRgbaFilter::ExecuteInformation() {
     vtkImageData *input=this->GetInput();
     vtkImageData *output=this->GetOutput();
 
-	output->SetScalarTypeToUnsignedChar();
-	output->SetNumberOfScalarComponents(4); // ARGB
-	output->SetDimensions(input->GetDimensions());
-	output->SetSpacing(input->GetSpacing());
+    output->SetScalarTypeToUnsignedChar();
+    output->SetNumberOfScalarComponents(4); // ARGB
+    output->SetDimensions(input->GetDimensions());
+    output->SetSpacing(input->GetSpacing());
 }
 
 // The execute method created by the subclass.
@@ -44,9 +44,9 @@ void FrMaskToRgbaFilter::SimpleExecute(vtkImageData *inData,
     if(!inData) return;
     vtkDataArray* inArray = inData->GetPointData()->GetScalars();
     vtkDataArray* outArray = outData->GetPointData()->GetScalars();
-    	
+
     // Apply transformation
-    
+
     // NOTE: assume that input is a single component grayscale data
     unsigned char* srcPtr = (unsigned char*)inArray->GetVoidPointer(0);
     unsigned char* dstPtr = (unsigned char*)outArray->GetVoidPointer(0);

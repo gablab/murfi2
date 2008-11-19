@@ -8,7 +8,7 @@
 #include "vtkImageToStructuredPoints.h"
 #include "vtkActor.h"
 #include "vtkPointData.h"
-#include "vtkActor2d.h"
+#include "vtkActor2D.h"
 #include "vtkCellArray.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyDataMapper2D.h"

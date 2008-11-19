@@ -613,8 +613,8 @@ bool FrLoadTabsCmd::ValidateTabSettings(FrTabSettingsDocObj* tabs){
                 (ls0->ColormapSettings.Type == ls1->ColormapSettings.Type) &&
                 (ls0->ColormapSettings.MinValue == ls1->ColormapSettings.MinValue) &&
                 (ls0->ColormapSettings.MaxValue == ls1->ColormapSettings.MaxValue) &&
-				(ls0->ColormapSettings.MidValue == ls1->ColormapSettings.MidValue) &&
-				(ls0->ColormapSettings.Threshold == ls1->ColormapSettings.Threshold) &&
+                (ls0->ColormapSettings.MidValue == ls1->ColormapSettings.MidValue) &&
+                (ls0->ColormapSettings.Threshold == ls1->ColormapSettings.Threshold) &&
                 (ls0->ColormapSettings.Color     == ls1->ColormapSettings.Color);
 
             if(!result) break;

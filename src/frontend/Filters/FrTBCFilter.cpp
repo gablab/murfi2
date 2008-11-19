@@ -68,7 +68,7 @@ void FrTBCFilter::SimpleExecute(vtkImageData *inData,
         vtkErrorMacro(<<"FrTBCFilter: vtkImageData has to have only unsigned char data type.");
         return;
     }
-            
+
     vtkDataArray* inArray = inData->GetPointData()->GetScalars();
     vtkDataArray* outArray = outData->GetPointData()->GetScalars();
 
@@ -80,8 +80,8 @@ void FrTBCFilter::SimpleExecute(vtkImageData *inData,
 
     // Process all values
     double maxValue   = inData->GetScalarTypeMax();
-    double brightness = maxValue * m_Brightness;
-    double contrast   = maxValue * m_Contrast;
+    int brightness = int(maxValue * m_Brightness);
+    int contrast   = int(maxValue * m_Contrast);
 
     // Create lookup table
     unsigned char luTable[256];
@@ -109,9 +109,9 @@ void FrTBCFilter::InitLookupTable(unsigned char* luTable, int brightness, int co
     // Init vars
     float fContrast;
     if (contrast < 0){
-	    fContrast = 1.0f + ((float)contrast / 255.0f);
-	    iMin = int( ((255.0f - (255.0f * fContrast)) / 2.0f) + 0.5f );
-	    iMax = 255 - iMin;
+        fContrast = 1.0f + ((float)contrast / 255.0f);
+        iMin = int( ((255.0f - (255.0f * fContrast)) / 2.0f) + 0.5f );
+        iMax = 255 - iMin;
     }
     else{
         float div = (256.0f - float(contrast));

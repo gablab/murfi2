@@ -13,8 +13,7 @@ class QHBoxLayout;
 #include "Qt/qstring.h"
 #include "QtGui/qdialog.h"
 
-class FrTabInfoDialog: public QDialog
-{
+class FrTabInfoDialog: public QDialog {
 	Q_OBJECT
 public:
     FrTabInfoDialog(QWidget* parent = 0L, bool isModal = true);

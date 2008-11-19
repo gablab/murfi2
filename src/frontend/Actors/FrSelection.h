@@ -13,7 +13,7 @@
 #include "vtkExtractVOI.h"
 #include "vtkOutlineFilter.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkActor2d.h"
+#include "vtkActor2D.h"
 
 #include <vector>
 

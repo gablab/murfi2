@@ -119,7 +119,7 @@ bool FrRoiDocObj::LoadFromFile(FrImageDocObj* imgDO, QString& fileName){
 void FrRoiDocObj::CreateByThresholdMaskImage(FrImageDocObj* imgDO, double threshold){
 
     if(m_MaskImage) delete m_MaskImage;
-    
+
     m_MaskImage = new RtMaskImage(
         *(imgDO->GetImage()), threshold);
 }

@@ -32,7 +32,7 @@ public:
     virtual bool CanUndo();
     virtual bool Undo();
     virtual bool Redo();
-    
+ 
     // Properties
     FrSetPropMacro(Action, Action);
     FrSetPropMacro(Rect, Rect);

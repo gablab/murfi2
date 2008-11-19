@@ -14,6 +14,7 @@ bool FrUpdatePipelineCmd::Execute(){
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     mv->GetCurrentView()->UpdatePipeline(m_PipelinePoint);
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////

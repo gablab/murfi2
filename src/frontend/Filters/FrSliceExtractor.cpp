@@ -52,13 +52,13 @@ void FrSliceExtractor::SetInput(int port, vtkImageData* input){
                 return;
         }
     }
-    
+
     // Performe check and ...
     DataPorts::iterator it = m_Inputs.find(port);
     if(it != m_Inputs.end()){
         // ...update existing port 
         if(it->second != input){
-            // Update            
+            // Update
             if(it->second) it->second->UnRegister(this);
             if(input) input->Register(this);
             it->second = input;
@@ -131,17 +131,17 @@ void FrSliceExtractor::Update(){
 
             bool result = false;
             switch (m_Orientation)
-	        {
-	        case FrSliceExtractor::XY:
+            {
+            case FrSliceExtractor::XY:
                 result = this->ExtractXY(it->second, output);
-		        break;
-	        case FrSliceExtractor::XZ:
-		        result = this->ExtractXZ(it->second, output);
-		        break;
-	        case FrSliceExtractor::YZ:
-		        result = this->ExtractYZ(it->second, output);
-		        break;
-	        }
+                break;
+            case FrSliceExtractor::XZ:
+                result = this->ExtractXZ(it->second, output);
+                break;
+            case FrSliceExtractor::YZ:
+                result = this->ExtractYZ(it->second, output);
+                break;
+            }
 
             if(result){
                 this->SetOutput(it->first, output);
@@ -159,19 +159,19 @@ int FrSliceExtractor::GetMaxSliceNumber(){
     if(img){
         int dimentions[3];
         img->GetDimensions( dimentions);	
-	
-	    switch (m_Orientation)
-	    {
-	    case FrSliceExtractor::XY:
-		    result = dimentions[2]-1; 
-		    break;
-	    case FrSliceExtractor::XZ:
-		    result = dimentions[1]-1;
-		    break;
-	    case FrSliceExtractor::YZ:
-		    result = dimentions[0]-1;
-		    break;
-	    }
+
+        switch (m_Orientation)
+        {
+        case FrSliceExtractor::XY:
+                result = dimentions[2]-1; 
+                break;
+        case FrSliceExtractor::XZ:
+                result = dimentions[1]-1;
+                break;
+        case FrSliceExtractor::YZ:
+                result = dimentions[0]-1;
+                break;
+        }
     }
 	return result;
 }
@@ -241,28 +241,28 @@ void FrSliceExtractor::SetImageInfo(vtkImageData* in, vtkImageData* out){
 
     int* dims = in->GetDimensions();
     double* spacing = in->GetSpacing();
-    
+
     switch (m_Orientation)
     {
     case FrSliceExtractor::XY:
         out->SetDimensions(dims[0], dims[1], 1);
         out->SetSpacing(spacing[0], spacing[1], 1.0);
-	    break;
+        break;
     case FrSliceExtractor::XZ:
-	    out->SetDimensions(dims[0], dims[2], 1);
+        out->SetDimensions(dims[0], dims[2], 1);
         out->SetSpacing(spacing[0], spacing[2], 1.0);
-	    break;
+        break;
     case FrSliceExtractor::YZ:
-	    out->SetDimensions(dims[1], dims[2], 1);
+        out->SetDimensions(dims[1], dims[2], 1);
         out->SetSpacing(spacing[1], spacing[2], 1.0);
-	    break;
+        break;
     }
 
     out->SetOrigin(0.0, 0.0, 0.0);
     out->SetNumberOfScalarComponents(1);
     out->SetScalarTypeToUnsignedChar();
 }
-    
+
 bool FrSliceExtractor::ExtractYZ(vtkImageData* in, vtkImageData* out){
     if(!in || !out) return false;
 
@@ -272,7 +272,7 @@ bool FrSliceExtractor::ExtractYZ(vtkImageData* in, vtkImageData* out){
         // Init data
         unsigned char* srcPtr = ((unsigned char*)in->GetScalarPointer()) + m_Slice;
         unsigned char* dstPtr = (unsigned char*)out->GetScalarPointer();
-                
+
         int stride = dataDims[0];
         int dataSize = dataDims[2] * dataDims[1];
         for(int i=0; i < dataSize; ++i){
@@ -296,7 +296,7 @@ bool FrSliceExtractor::ExtractXZ(vtkImageData* in, vtkImageData* out){
         int lineSize = dataDims[0];
         unsigned char* srcPtr = ((unsigned char*)in->GetScalarPointer()) + (m_Slice * lineSize);
         unsigned char* dstPtr = (unsigned char*)out->GetScalarPointer();
-        
+
         int lineCnt = dataDims[2];
         int lineStride = dataDims[0] * dataDims[1] - lineSize;
         for(int i=0; i < lineCnt; ++i){
@@ -322,7 +322,7 @@ bool FrSliceExtractor::ExtractXY(vtkImageData* in, vtkImageData* out){
         int dataSize = dataDims[0] * dataDims[1];
         unsigned char* srcPtr = ((unsigned char*)in->GetScalarPointer()) + (m_Slice * dataSize);
         unsigned char* dstPtr = (unsigned char*)out->GetScalarPointer();
-        
+
         memcpy(dstPtr, srcPtr, dataSize);
         result = true;
     }

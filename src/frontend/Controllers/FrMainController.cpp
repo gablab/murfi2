@@ -362,20 +362,20 @@ void FrMainController::Test(){
 //	}
 //	else
 //		return;
-	
-	RtDataStore* ds = new RtDataStore();
+    
+    RtDataStore* ds = new RtDataStore();
 
-	RtConductor con(3, path);
-	con.init();
-	//con.addInput(input);
-	//con.addOutput(ds);
-	con.run();
-	
-	//input.close();
+    RtConductor con(3, path);
+    con.init();
+    //con.addInput(input);
+    //con.addOutput(ds);
+    con.run();
+    
+    //input.close();
 
-	//FrImageDocObj* imgObj = new FrImageDocObj();
+    //FrImageDocObj* imgObj = new FrImageDocObj();
 
-	//if(imgObj->LoadFromMRIImage(&img)){		// we should process all received images in future
+        //if(imgObj->LoadFromMRIImage(&img)){// we should process all received images in future
  //       m_MainDocument->Add(imgObj);
  //       m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
  //       

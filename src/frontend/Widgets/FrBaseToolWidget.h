@@ -16,7 +16,7 @@ private Q_SLOTS:
 
 
 private:
-    
+
 };
 
 #endif

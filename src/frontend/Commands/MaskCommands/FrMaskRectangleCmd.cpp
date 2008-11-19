@@ -31,17 +31,17 @@ bool FrMaskRectangleCmd::Execute(){
     bool result = false;
 
     switch (m_Action){
-        case Action::DrawSelection:
+        case FrMaskRectangleCmd::DrawSelection:
             result = this->DrawMask(true);
             break;
-        case Action::HideSelection:
+        case FrMaskRectangleCmd::HideSelection:
             result = this->DrawMask(false);
             break;
-        case Action::Erase:
-        case Action::Write:
+        case FrMaskRectangleCmd::Erase:
+        case FrMaskRectangleCmd::Write:
             result = this->WriteMask() && this->DrawMask(false);
             break;
-        case Action::Undefined:
+        case FrMaskRectangleCmd::Undefined:
             result = false;
             break;
     }
@@ -86,10 +86,10 @@ bool FrMaskRectangleCmd::WriteMask(){
     int pixelValue = 0;
 
     switch (m_Action){
-        case Action::Erase:
+        case FrMaskRectangleCmd::Erase:
             pixelValue = 0;
             break;
-        case Action::Write:
+        case FrMaskRectangleCmd::Write:
             pixelValue = 255;
             break;
     }
@@ -101,8 +101,8 @@ bool FrMaskRectangleCmd::WriteMask(){
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
             FrMainDocument* md = this->GetMainController()->GetMainDocument();
-            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();            
-            
+            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+
             // get data dimensions
             int dims[3];
             imageData->GetDimensions(dims);
@@ -141,7 +141,7 @@ bool FrMaskRectangleCmd::WriteMask(){
                     }
 
             this->ApplyDataToRoi(imageData, roiDO);
-            
+
             //FrMainWindow* mv = this->GetMainController()->GetMainView();
             mv->GetCurrentView()->UpdatePipeline(FRP_READROI);
 

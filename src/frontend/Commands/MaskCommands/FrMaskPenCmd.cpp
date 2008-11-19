@@ -25,18 +25,18 @@ FrMaskPenCmd::~FrMaskPenCmd(){
 
 bool FrMaskPenCmd::Execute(){
     if(!this->GetMainController()) return false;
-    
+
     bool result = false;
 
     switch (m_Action){
-        case Action::Draw:
+        case FrMaskPenCmd::Draw:
             result = DrawMask();
             break;
-        case Action::Erase:
-        case Action::Write:
+        case FrMaskPenCmd::Erase:
+        case FrMaskPenCmd::Write:
             result = WriteMask();
             break;
-        case Action::Undefined:
+        case FrMaskPenCmd::Undefined:
             result = false;
             break;
     }
@@ -50,24 +50,24 @@ bool FrMaskPenCmd::DrawMask(){
     int pixelValue = 0;
 
     switch (m_Action){
-        case Action::Erase:
+        case FrMaskPenCmd::Erase:
             pixelValue = 0;
             break;
-        case Action::Draw:
-        case Action::Write:
+        case FrMaskPenCmd::Draw:
+        case FrMaskPenCmd::Write:
             pixelValue = 255;
             break;
-    }    
+    }
 
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
     if(roiDO){
         vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
-    
+
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
             FrMainDocument* md = this->GetMainController()->GetMainDocument();
             FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();  
-    
+
             // get data dimensions
             int dims[3];
             imageData->GetDimensions(dims);
@@ -81,7 +81,7 @@ bool FrMaskPenCmd::DrawMask(){
             Pos new_center;
             new_center.x = center[0];
             new_center.y = center[1];
-            new_center.z = 0;            
+            new_center.z = 0;
 
             int xmin, xmax, ymin, ymax;
             xmin = new_center.x - m_Radius;  
@@ -99,26 +99,26 @@ bool FrMaskPenCmd::DrawMask(){
 
                     if (IsPointInsideOfSphere(new_center, m_Radius, pos)){
                         int point[3];
-                        point[0] = x;     point[1] = y;     point[2] = 0;                       
+                        point[0] = x;     point[1] = y;     point[2] = 0;
                         int id = imageData->ComputePointId(point);
                         if (id>=0)      // point found
                             imgPtr[id] = pixelValue;
                     }
                 }
-            
+
             this->ApplyDataToRoi(imageData, roiDO);
             mv->GetCurrentView()->UpdatePipeline(FRP_READROI);
 
             result = true;
         }
     }
-    
+
     return result;
 }
 
 bool FrMaskPenCmd::WriteMask(){
     bool result = false;
-    
+
     //FrRoiDocObj* roiDO = this->GetCurrentRoi();
     //if(roiDO){
     //    vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());

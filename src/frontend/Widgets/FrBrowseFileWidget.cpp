@@ -9,11 +9,11 @@
 
 FrBrowseFileWidget::FrBrowseFileWidget(QWidget* parent){
     this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    
+
     m_txtFile = new QLineEdit(QString(""), this);
     m_btnBrowse = new QPushButton(QString("Browse..."), this);
     connect(m_btnBrowse, SIGNAL(clicked()), this, SLOT(OnBrowseClick()));
-    
+
     m_layout = new QHBoxLayout(this);
     m_layout->addWidget(m_txtFile);
     m_layout->addWidget(m_btnBrowse);
@@ -27,7 +27,7 @@ QString FrBrowseFileWidget::GetFileName(){
 void FrBrowseFileWidget::SetFileName(const QString& fileName){
     m_txtFile->setText(fileName);
 }
-    
+
 
 void FrBrowseFileWidget::OnBrowseClick(){
     QString fileName = QFileDialog::getOpenFileName(

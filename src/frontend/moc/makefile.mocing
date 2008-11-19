@@ -36,7 +36,7 @@ WGT_DIR=$(FSRC_DIR)/Widgets
 WIN_HDR_FILES = FrMainWindow.h
 APP_HDR_FILES = FrApplication.h
 UTL_HDR_FILES = FrActionManager.h FrActionSignalManager.h
-WGT_HDR_FILES = FrBookmark.h FrBookmarkWidget.h FrColormapWidget.h FrDrawingPanelWidget.h FrLayerDialog.h FrLayerListWidget.h FrLayerWidget.h FrMainMenu.h FrROIInfoWidget.h FrSpinSliderWidget.h FrTabInfoDialog.h FrToolBar.h FrVoxelInfoWidget.h QVTKWidget.h
+WGT_HDR_FILES = FrBaseToolWidget.h FrBookmark.h FrBookmarkWidget.h FrBrowseFileWidget.h FrColormapWidget.h FrCreateRoiDialog.h FrDrawingPanelWidget.h FrEmptyToolWidget.h FrLayerDialog.h FrLayerListWidget.h FrLayerToolWidget.h FrLayerWidget.h FrListToolWidget.h FrMainMenu.h FrROIInfoWidget.h FrROIToolWidget.h FrSpinSliderWidget.h FrSpinToolWidget.h FrTabInfoDialog.h FrToolBar.h FrVoxelInfoWidget.h QVTKWidget.h
 
 HDR_FILES := $(patsubst %, $(WIN_DIR)/%, $(WIN_HDR_FILES))
 HDR_FILES += $(patsubst %, $(APP_DIR)/%, $(APP_HDR_FILES))

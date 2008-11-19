@@ -52,5 +52,5 @@ int FrListToolWidget::GetCurrentItemID(){
 }
 
 void FrListToolWidget::ROIListItemChanged(QListWidgetItem* current, QListWidgetItem* previous){
-    emit ParamsChanged();    
+    emit ParamsChanged();
 }

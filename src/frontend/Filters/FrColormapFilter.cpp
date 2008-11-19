@@ -200,7 +200,7 @@ void FrColormapFilter::InitSingleLookupTable(unsigned char luTable[][3]){
 void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
     // params for initialization
     double min, max;
-    double iPos, delta, hue;
+    double iPos, delta;
     double rgb[3];
     double hsv[3];
 
@@ -234,7 +234,7 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
             hsv[H_INDEX] = (min + delta) / HUE_NORM;
 
             // calculate final color
-	    vtkMath::HSVToRGB(hsv, rgb);	
+            vtkMath::HSVToRGB(hsv, rgb);	
 
             luTable[i][R_INDEX] = (unsigned char)rgb[R_INDEX];
             luTable[i][G_INDEX] = (unsigned char)rgb[G_INDEX];
@@ -243,16 +243,15 @@ void FrColormapFilter::InitMultiLookupTable(unsigned char luTable[][3]){
         }
     }
 
-	// special area with non significant pixels around threshold
+    // special area with non significant pixels around threshold
     int iMin = threshold - (m_Threshold / 2);
     int iMax = iMin + m_Threshold;
-	if (iMin<0)
-		iMin = 0;
-	if (iMax>256)
-		iMax = 256;
+    if (iMin<0) iMin = 0;
+    if (iMax>256) iMax = 256;
+
     for(int i = iMin; i < iMax; ++i){
-		luTable[i][R_INDEX] = 
-        luTable[i][G_INDEX] = 
+        luTable[i][R_INDEX] =
+        luTable[i][G_INDEX] =
         luTable[i][B_INDEX] = 0;
-	}
+    }
 }

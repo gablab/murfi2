@@ -50,7 +50,7 @@ bool FrCreateROICmd::Execute(){
         threshold = dlg.GetThreshold();
         fileName = dlg.GetFileName();
     }
-    
+
     // process params
     bool result = false;
     FrRoiDocObj* roiDO = 0L;

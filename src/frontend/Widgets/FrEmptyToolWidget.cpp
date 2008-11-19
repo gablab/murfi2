@@ -2,5 +2,5 @@
 
 FrEmptyToolWidget::FrEmptyToolWidget(QWidget* parent)
 : FrBaseToolWidget(parent){
-        
+
 }

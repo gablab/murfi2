@@ -39,38 +39,38 @@ bool FrMaskSphereCmd::Execute(){
                 DrawCircle(imageData, radius);
                 ApplyDataToRoi(imageData, roiDO, slice);
             }
-            
+
             FrMainWindow* mv = this->GetMainController()->GetMainView();
             mv->GetCurrentView()->UpdatePipeline(FRP_READROI);
 
             result = true;
         }
     }
-    
+
     return result;
 }
 
 void FrMaskSphereCmd::DrawCircle(vtkImageData* imageData, int radius){
     int pixelValue = 0;
-            
+
     FrMainDocument* md = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();  
 
     switch (m_Action){
-        case Action::Erase:
+        case FrMaskSphereCmd::Erase:
             pixelValue = 0;
             break;
-        case Action::Write:
+        case FrMaskSphereCmd::Write:
             pixelValue = 255;
             break;
     }
 
     // get data dimensions 
     int dims[3];
-    imageData->GetDimensions(dims);   
+    imageData->GetDimensions(dims);
 
     int xmin, xmax, ymin, ymax;
-    xmin = ymin = 0;    
+    xmin = ymin = 0; 
     xmax = dims[0];
     ymax = dims[1];
 
@@ -108,7 +108,7 @@ int FrMaskSphereCmd::GetCircleRadiusForSlice(int slice){
     int d = abs(midSlice - abs(slice));
 
     radius = (int)sqrt(pow((double)m_Radius, 2) - pow((double)slice, 2));
-    
+
     return radius;
 }
 

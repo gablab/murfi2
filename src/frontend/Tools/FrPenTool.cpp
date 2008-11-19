@@ -26,7 +26,7 @@ bool FrPenTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         // execute command 
         FrMaskPenCmd* cmd = FrCommandController::CreateCmd<FrMaskPenCmd>();
-        cmd->SetAction(FrMaskPenCmd::Action::Write);
+        cmd->SetAction(FrMaskPenCmd::Write);
         cmd->Execute();
         delete cmd;
     }
@@ -38,7 +38,7 @@ bool FrPenTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         // execute command 
         FrMaskPenCmd* cmd = FrCommandController::CreateCmd<FrMaskPenCmd>();
-        cmd->SetAction(FrMaskPenCmd::Action::Draw);
+        cmd->SetAction(FrMaskPenCmd::Draw);
  
         Pos center;
         center.x = params.X;
@@ -67,7 +67,7 @@ bool FrPenTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         // execute command 
         FrMaskPenCmd* cmd = FrCommandController::CreateCmd<FrMaskPenCmd>();
-        cmd->SetAction(FrMaskPenCmd::Action::Draw);
+        cmd->SetAction(FrMaskPenCmd::Draw);
  
         Pos center;
         center.x = params.X;

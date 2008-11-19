@@ -30,7 +30,7 @@ bool FrSphereTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
         // execute command 
         FrMaskSphereCmd* cmd = FrCommandController::CreateCmd<FrMaskSphereCmd>();
-        cmd->SetAction(FrMaskSphereCmd::Action::Write);
+        cmd->SetAction(FrMaskSphereCmd::Write);
 
         Pos center;
         center.x = params.X;

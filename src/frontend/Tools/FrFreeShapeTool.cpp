@@ -5,7 +5,7 @@
 
 
 FrFreeShapeTool::FrFreeShapeTool(){
-    SetCurrentState(State::None); 
+    SetCurrentState(FrFreeShapeTool::None); 
 }
 
 FrFreeShapeTool::~FrFreeShapeTool(){
@@ -25,7 +25,7 @@ bool FrFreeShapeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrFreeShapeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
-        SetCurrentState(State::Drawing);     
+        SetCurrentState(FrFreeShapeTool::Drawing);
         Pos pos;
         pos.x = params.X;
         pos.y = params.Y;
@@ -34,10 +34,10 @@ bool FrFreeShapeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 
         // check if new point is close to first point, in thic case call cmd with Param:Write
         if (CheckPoint(pos)){
-            SetCurrentState(State::None); 
+            SetCurrentState(FrFreeShapeTool::None); 
 
             FrMaskFreeShapeCmd* cmd = FrCommandController::CreateCmd<FrMaskFreeShapeCmd>();
-            cmd->SetAction(FrMaskFreeShapeCmd::Action::Write);
+            cmd->SetAction(FrMaskFreeShapeCmd::Write);
             Points.pop_back();
             Points.push_back(pos);
 
@@ -62,7 +62,7 @@ bool FrFreeShapeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
         y = params.Y;
         // TODO: execute command with Param:Draw
         FrMaskFreeShapeCmd* cmd = FrCommandController::CreateCmd<FrMaskFreeShapeCmd>();
-        cmd->SetAction(FrMaskFreeShapeCmd::Action::Draw);
+        cmd->SetAction(FrMaskFreeShapeCmd::Draw);
         // set point set
         Pos pos;
         pos.x = params.X;
@@ -73,10 +73,10 @@ bool FrFreeShapeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
         cmd->SetImageNumber(m_ImageNumber);
         cmd->Execute();
         delete cmd;
-        
+
         Points.pop_back();
     }
-        
+
     return false;
 }
 
@@ -86,7 +86,7 @@ bool FrFreeShapeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrFreeShapeTool::CheckPoint(Pos &pos){
     bool result = false;
-   
+
     double length = GetLength(Points[0].x, Points[0].y, pos.x, pos.y);
     if (length<10 && Points.size()>1){
         pos.x = Points[0].x;

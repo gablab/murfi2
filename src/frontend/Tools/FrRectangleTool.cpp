@@ -12,7 +12,7 @@
 
 FrRectangleTool::FrRectangleTool()
 : m_firstPointX(0), m_firstPointY(0){
-    SetCurrentState(State::None); 
+    SetCurrentState(FrRectangleTool::None); 
 }
 
 FrRectangleTool::~FrRectangleTool(){
@@ -31,13 +31,13 @@ bool FrRectangleTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     if (GetCurrentState() == Drawing)
     {
         if(params.Button == FrMouseParams::LeftButton){
-            SetCurrentState(State::None);     
+            SetCurrentState(FrRectangleTool::None);     
             x = params.X;
             y = params.Y;
-   
+
             // execute command with Action:Write
             FrMaskRectangleCmd* cmd = FrCommandController::CreateCmd<FrMaskRectangleCmd>();
-            cmd->SetAction(FrMaskRectangleCmd::Action::Write);
+            cmd->SetAction(FrMaskRectangleCmd::Write);
 
             FrMaskRectangleCmd::Rect rect;
             rect.firstPoint.x = m_firstPointX;
@@ -57,7 +57,7 @@ bool FrRectangleTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if (GetCurrentState() == None)
     {
         if(params.Button == FrMouseParams::LeftButton){
-            SetCurrentState(State::Drawing);     
+            SetCurrentState(FrRectangleTool::Drawing);     
             m_firstPointX = params.X;
             m_firstPointY = params.Y;
         }
@@ -80,7 +80,7 @@ bool FrRectangleTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
             y = params.Y;
             // execute command with Action:Draw
             FrMaskRectangleCmd* cmd = FrCommandController::CreateCmd<FrMaskRectangleCmd>();
-            cmd->SetAction(FrMaskRectangleCmd::Action::DrawSelection);
+            cmd->SetAction(FrMaskRectangleCmd::DrawSelection);
             FrMaskRectangleCmd::Rect rect;
             rect.firstPoint.x = m_firstPointX;
             rect.firstPoint.y = m_firstPointY;

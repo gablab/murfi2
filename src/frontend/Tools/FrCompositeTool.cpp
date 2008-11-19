@@ -21,10 +21,10 @@ FrCompositeTool::FrCompositeTool() {
     m_panTool = new FrPanTool();        
     m_zoomTool = new FrZoomTool();
     m_tbcTool = new FrTBCTool();
-	m_ssTool = new FrSliceScrollTool();
+    m_ssTool = new FrSliceScrollTool();
 
-	isZoom = false;
-	ZoomActivated = false;
+    isZoom = false;
+    ZoomActivated = false;
 }
 
 FrCompositeTool::~FrCompositeTool(){
@@ -39,7 +39,7 @@ void FrCompositeTool::Start(){
     m_panTool->SetController(this->GetController());
     m_tbcTool->SetController(this->GetController());
     m_zoomTool->SetController(this->GetController());
-	m_ssTool->SetController(this->GetController());
+    m_ssTool->SetController(this->GetController());
 
     m_panTool->Start();
     m_tbcTool->Start();
@@ -61,12 +61,12 @@ void FrCompositeTool::Stop(){
     m_panTool->SetController(0);
     m_tbcTool->SetController(0);
     m_zoomTool->SetController(0);
-	m_ssTool->SetController(0);
+    m_ssTool->SetController(0);
 
     m_panTool->Stop();
     m_tbcTool->Stop();
     m_zoomTool->Stop();
-	m_ssTool->Stop();
+    m_ssTool->Stop();
 
     // Update interface to ensure tool is unchecked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
@@ -81,11 +81,11 @@ bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     // Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
         if (isZoom)
-			m_zoomTool->OnMouseUp(is, params);
-		else
-			m_panTool->OnMouseUp(is, params);
-	}
-	else if(params.Button == FrMouseParams::MidButton){
+            m_zoomTool->OnMouseUp(is, params);
+        else
+            m_panTool->OnMouseUp(is, params);
+    }
+    else if(params.Button == FrMouseParams::MidButton){
         params.Button = FrMouseParams::LeftButton;
         m_ssTool->OnMouseUp(is, params);
     }
@@ -94,24 +94,24 @@ bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
         m_tbcTool->OnMouseUp(is, params);
     }    
     
-	ZoomActivated = false;
+    ZoomActivated = false;
 
     return false;
 }
 
 bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){    
     // here we should check what tool to use: pan or zoom, it depends on mouse coords
-	isZoom = CheckMouseParams(is, params);
+    isZoom = CheckMouseParams(is, params);
 
-	// Delegate events to appropriate tool
+    // Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
-		if (isZoom){
-			m_zoomTool->OnMouseDown(is, params);
-			ZoomActivated = true;
-		}
-		else
-			m_panTool->OnMouseDown(is, params);
-	}
+        if (isZoom){
+            m_zoomTool->OnMouseDown(is, params);
+            ZoomActivated = true;
+        }
+        else
+            m_panTool->OnMouseDown(is, params);
+    }
     else if(params.Button == FrMouseParams::MidButton){
         params.Button = FrMouseParams::LeftButton;
         m_ssTool->OnMouseDown(is, params);
@@ -125,26 +125,26 @@ bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrCompositeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     // here we should check what tool to use: pan or zoom, it depends on mouse coords
-	//isZoom = CheckMouseParams(is, params);
-	////bool isInViewport = IsInViewPort(is, params);
+    //isZoom = CheckMouseParams(is, params);
+    ////bool isInViewport = IsInViewPort(is, params);
 
-	//if (!isInViewport){
-	//	//change cursor to simple mode
-	//	QCursor cursor(Qt::ArrowCursor);
-	//	QApplication::setOverrideCursor(cursor);
-	//}
-	//else if (isZoom){
-	//	//change cursor to zoom mode
-	//	QCursor cursor(Qt::SizeVerCursor);
-	//	QApplication::setOverrideCursor(cursor);
-	//}
-	//else if (!ZoomActivated){
-	//	// change cursor to pan mode
-	//	QCursor cursor(Qt::OpenHandCursor);
-	//	QApplication::setOverrideCursor(cursor);
-	//}
+    //if (!isInViewport){
+    //	//change cursor to simple mode
+    //	QCursor cursor(Qt::ArrowCursor);
+    //	QApplication::setOverrideCursor(cursor);
+    //}
+    //else if (isZoom){
+    //	//change cursor to zoom mode
+    //	QCursor cursor(Qt::SizeVerCursor);
+    //	QApplication::setOverrideCursor(cursor);
+    //}
+    //else if (!ZoomActivated){
+    //	// change cursor to pan mode
+    //	QCursor cursor(Qt::OpenHandCursor);
+    //	QApplication::setOverrideCursor(cursor);
+    //}
 
-	return false;
+    return false;
 }
 
 bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
@@ -153,10 +153,10 @@ bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     // Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
         if (isZoom)
-			result = m_zoomTool->OnMouseDrag(is, params);
-		else
-			result = m_panTool->OnMouseDrag(is, params);
-	}
+            result = m_zoomTool->OnMouseDrag(is, params);
+        else
+            result = m_panTool->OnMouseDrag(is, params);
+    }
     else if(params.Button == FrMouseParams::MidButton){
         params.Button = FrMouseParams::LeftButton;
         result = m_ssTool->OnMouseDrag(is, params);
@@ -170,39 +170,38 @@ bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params){
-	// check if coordinates are near left/right border of viewport
-	int *size = is->CurrentRenderer->GetSize();
-	int *origin = is->CurrentRenderer->GetOrigin();
+    // check if coordinates are near left/right border of viewport
+    int *size = is->CurrentRenderer->GetSize();
+    int *origin = is->CurrentRenderer->GetOrigin();
 
-	int XBorder = size[0];
-	int YBorder = size[1];
-	int XOrigin = origin[0];
-	int YOrigin = origin[0];
+    int XBorder = size[0];
+    int XOrigin = origin[0];
+
 
     // Leave side only
     int xDelta = size[0] / 6; // delta is about 15%
-	if (( (params.X - XOrigin) >= (XBorder-xDelta)) ||
-        ( (params.X - XOrigin) <= xDelta)) return true;
-	/*if ((params.Y+40 >= YBorder) || (params.Y <= 40)) return true;*/
+    if (( (params.X - XOrigin) >= (XBorder-xDelta)) ||
+    ( (params.X - XOrigin) <= xDelta)) return true;
+    /*if ((params.Y+40 >= YBorder) || (params.Y <= 40)) return true;*/
 
-	return false;
+    return false;
 }
 
 bool FrCompositeTool::IsInViewPort(FrInteractorStyle* is, FrMouseParams& params){
-	// check if coordinates are near left/right border of viewport
-	int *size = is->CurrentRenderer->GetSize();
-	int *origin = is->CurrentRenderer->GetOrigin();
+    // check if coordinates are near left/right border of viewport
+    int *size = is->CurrentRenderer->GetSize();
+    int *origin = is->CurrentRenderer->GetOrigin();
 
-	int XBorder = size[0];
-	int YBorder = size[1];
-	int XOrigin = origin[0];
-	int YOrigin = origin[0];
+    int XBorder = size[0];
+    int YBorder = size[1];
+    int XOrigin = origin[0];
+    int YOrigin = origin[0];
 
     // Leave side only
-	if (( (params.X - XOrigin) == XBorder) ||
-        ( (params.X - XOrigin) == 0) ||
-		( (params.Y - YOrigin) == YBorder) ||
-        ( (params.Y - YOrigin) == 0)) return false;
-	
-	return true;
+    if (( (params.X - XOrigin) == XBorder) ||
+    ( (params.X - XOrigin) == 0) ||
+            ( (params.Y - YOrigin) == YBorder) ||
+    ( (params.Y - YOrigin) == 0)) return false;
+
+    return true;
 }

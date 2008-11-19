@@ -178,7 +178,7 @@ $(PROJECT): dirs $(OBJ_FILES)
 
 clean:
 	@$(ECHO) 'make: removing object and autosave files'
-	cd $(SRC_DIR) && $(MAKE) clean
+	-cd $(SRC_DIR) && $(MAKE) clean
 	-cd $(OBJ_DIR) && $(RM) -f *.o *~
 
 ######################################################################

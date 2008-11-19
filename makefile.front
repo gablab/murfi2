@@ -96,7 +96,7 @@ BK_SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_D
 
 #####################################################################
 # subdirectories for FRONTEND
-FR_SUB_DIRS = -I$(FSRC_DIR)/Actors -I$(FSRC_DIR)/Commands -I$(FSRC_DIR)/Controllers -I$(FSRC_DIR)/Document -I$(FSRC_DIR)/Filters -I$(FSRC_DIR)/FrApplication -I$(FSRC_DIR)/FrMainWindow -I$(FSRC_DIR)/Layers -I$(FSRC_DIR)/Tools -I$(FSRC_DIR)/Utils -I$(FSRC_DIR)/Views -I$(FSRC_DIR)/Widgets
+FR_SUB_DIRS = -I$(FSRC_DIR)/Actors -I$(FSRC_DIR)/Commands -I$(FSRC_DIR)/Controllers -I$(FSRC_DIR)/Document -I$(FSRC_DIR)/Filters -I$(FSRC_DIR)/FrApplication -I$(FSRC_DIR)/FrMainWindow -I$(FSRC_DIR)/Layers -I$(FSRC_DIR)/Tools -I$(FSRC_DIR)/Utils -I$(FSRC_DIR)/Views -I$(FSRC_DIR)/Widgets -I$(FSRC_DIR)/Commands/MaskCommands
 
 #####################################################################
 # package directory

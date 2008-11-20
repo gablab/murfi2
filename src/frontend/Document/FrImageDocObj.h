@@ -9,6 +9,8 @@ class QString;
 #include "FrMacro.h"
 #include "FrDocumentObj.h"
 
+// TODO: use vtkImageData instead RtMRIImage!!!
+
 // One have to provide valid type system
 // All object types have to be registered here.
 class FrImageDocObj : public FrDocumentObj {
@@ -18,7 +20,7 @@ public:
 
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
-    virtual ObjType GetType();
+    virtual ObjTypes GetType();
 
     bool LoadFromFile(QString& fileName);
     bool LoadFromMRIImage(RtMRIImage* img);

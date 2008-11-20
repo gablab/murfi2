@@ -28,7 +28,7 @@ void FrImageDocObj::OnRemove(FrDocument* doc){
     // NOTE : Do nothing in base class 
 }
 
-FrDocumentObj::ObjType FrImageDocObj::GetType(){
+FrDocumentObj::ObjTypes FrImageDocObj::GetType(){
     return FrDocumentObj::ImageObject;
 }
 
@@ -52,8 +52,6 @@ bool FrImageDocObj::LoadFromFile(QString& fileName){
 
             if(m_Image) delete m_Image;
             m_Image = img;
-		
-            SetUpdateNeeded(true);
             result = true;
         }
     }
@@ -65,9 +63,7 @@ bool FrImageDocObj::LoadFromMRIImage(RtMRIImage* img){
     if(img->seemsMosaic()){
         img->unmosaic();
     }
-
 	m_Image = img;
-    SetUpdateNeeded(true);
 
 	return true;
 }

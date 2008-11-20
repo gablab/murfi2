@@ -68,7 +68,7 @@ void FrTabSettingsDocObj::OnRemove(FrDocument* doc){
     delete cmd;
 }
 
-FrDocumentObj::ObjType FrTabSettingsDocObj::GetType(){
+FrDocumentObj::ObjTypes FrTabSettingsDocObj::GetType(){
     return FrDocumentObj::TabSettings;
 }
 

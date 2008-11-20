@@ -53,7 +53,7 @@ bool FrSphereTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 bool FrSphereTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     // execute command 
     FrMaskSphereCmd* cmd = FrCommandController::CreateCmd<FrMaskSphereCmd>();
-    cmd->SetAction(FrMaskSphereCmd::Action::DrawSelection);
+    cmd->SetAction(FrMaskSphereCmd::DrawSelection);
 
     Pos center;
     center.x = params.X;

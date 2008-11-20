@@ -62,7 +62,7 @@ void FrRoiDocObj::OnRemove(FrDocument* doc){
     delete cmd;
 }
 
-FrDocumentObj::ObjType FrRoiDocObj::GetType(){
+FrDocumentObj::ObjTypes FrRoiDocObj::GetType(){
     return FrDocumentObj::RoiObject;
 }
 

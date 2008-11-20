@@ -317,6 +317,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrPlayControlWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrQwtPlotWidget_moc.cpp"
 				>
 			</File>
@@ -510,6 +514,22 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Document\FrDocumentObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrGraphDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrGraphDocObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrGraphTabDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrGraphTabDocObj.h"
 				>
 			</File>
 			<File
@@ -763,6 +783,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Utils\FrGraphSettings.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Utils\FrMacro.h"
 				>
 			</File>
@@ -973,6 +997,24 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrEmptyToolWidget.cpp"
 				>
 			</File>
@@ -1013,7 +1055,17 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1187,6 +1239,34 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrPlayControlWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrPlayControlWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrQwtPlotWidget.cpp"
 				>
 			</File>
@@ -1195,6 +1275,16 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1586,6 +1676,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrRoiCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveImageCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveImageCmd.h"
 				>
 			</File>
 			<File

@@ -9,13 +9,9 @@ class FrDocument;
 class FrDocumentObj {
 public: 
     // Object types
-    enum ObjType{
-        BaseObject,
-        ImageObject,
-        TabSettings,
-        RoiObject,
-        OtherType    // etc
-    };
+    typedef enum _ObjTypes { BaseObject, ImageObject,
+                             TabSettings, RoiObject, 
+                             GraphObject, GraphTab } ObjTypes;
 
 public:
     FrDocumentObj();
@@ -23,13 +19,7 @@ public:
 
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
-    virtual ObjType GetType();
-
-    bool IsUpdateNeeded(){ return m_updateNeeded; }
-    void SetUpdateNeeded(bool value){ m_updateNeeded = value; }
-
-private:
-    bool m_updateNeeded;
+    virtual ObjTypes GetType();
 };
 
 #endif

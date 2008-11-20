@@ -21,7 +21,7 @@ public:
 
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
-    virtual ObjType GetType();
+    virtual ObjTypes GetType();
 
     // Properties
     FrGetPropMacro(RtMaskImage*,MaskImage);

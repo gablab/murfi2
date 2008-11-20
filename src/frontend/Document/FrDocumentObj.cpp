@@ -2,8 +2,7 @@
 #include "FrDocument.h"
 
 
-FrDocumentObj::FrDocumentObj()
-: m_updateNeeded(false) {
+FrDocumentObj::FrDocumentObj(){
 }
 
 FrDocumentObj::~FrDocumentObj(){
@@ -17,6 +16,6 @@ void FrDocumentObj::OnRemove(FrDocument* doc){
     // NOTE : Do nothing in base class 
 }
 
-FrDocumentObj::ObjType FrDocumentObj::GetType(){
+FrDocumentObj::ObjTypes FrDocumentObj::GetType(){
     return FrDocumentObj::BaseObject;
 }

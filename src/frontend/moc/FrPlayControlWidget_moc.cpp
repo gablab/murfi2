@@ -1,15 +1,15 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'FrLayerToolWidget.h'
+** Meta object code from reading C++ file 'FrPlayControlWidget.h'
 **
-** Created: Thu 20. Nov 17:50:17 2008
+** Created: Thu 20. Nov 17:50:16 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../Widgets/FrLayerToolWidget.h"
+#include "../Widgets/FrPlayControlWidget.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'FrLayerToolWidget.h' doesn't include <QObject>."
+#error "The header file 'FrPlayControlWidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
 #error "This file was generated using the moc from 4.4.1. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -17,7 +17,7 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-static const uint qt_meta_data_FrLayerToolWidget[] = {
+static const uint qt_meta_data_FrPlayControlWidget[] = {
 
  // content:
        1,       // revision
@@ -30,29 +30,29 @@ static const uint qt_meta_data_FrLayerToolWidget[] = {
        0        // eod
 };
 
-static const char qt_meta_stringdata_FrLayerToolWidget[] = {
-    "FrLayerToolWidget\0"
+static const char qt_meta_stringdata_FrPlayControlWidget[] = {
+    "FrPlayControlWidget\0"
 };
 
-const QMetaObject FrLayerToolWidget::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_FrLayerToolWidget,
-      qt_meta_data_FrLayerToolWidget, 0 }
+const QMetaObject FrPlayControlWidget::staticMetaObject = {
+    { &QWidget::staticMetaObject, qt_meta_stringdata_FrPlayControlWidget,
+      qt_meta_data_FrPlayControlWidget, 0 }
 };
 
-const QMetaObject *FrLayerToolWidget::metaObject() const
+const QMetaObject *FrPlayControlWidget::metaObject() const
 {
     return &staticMetaObject;
 }
 
-void *FrLayerToolWidget::qt_metacast(const char *_clname)
+void *FrPlayControlWidget::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_FrLayerToolWidget))
-        return static_cast<void*>(const_cast< FrLayerToolWidget*>(this));
+    if (!strcmp(_clname, qt_meta_stringdata_FrPlayControlWidget))
+        return static_cast<void*>(const_cast< FrPlayControlWidget*>(this));
     return QWidget::qt_metacast(_clname);
 }
 
-int FrLayerToolWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int FrPlayControlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)

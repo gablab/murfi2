@@ -96,7 +96,8 @@ void FrSelection::DrawCircle(){
 	vtkRegularPolygonSource *circle = vtkRegularPolygonSource::New();
 	circle->GeneratePolygonOff();
 	circle->SetNumberOfSides(360);
-	circle->SetRadius(100);
+    circle->SetRadius(m_params.radius);
+    circle->SetCenter(m_params.center.x, m_params.center.y, m_params.center.z);
 
 	m_mapper->SetInputConnection(circle->GetOutputPort());
 //    m_mapper->Modified();

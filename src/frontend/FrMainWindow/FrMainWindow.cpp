@@ -13,7 +13,7 @@
 #include "FrMainMenu.h"
 #include "FrActionManager.h"
 #include "FrActionSignalManager.h"
-#include "FrDrawingPanelWidget.h"
+#include "FrGraphPaneWidget.h"
 
 #include "Qt/qgroupbox.h"
 #include "Qt/qboxlayout.h"
@@ -119,16 +119,16 @@ void FrMainWindow::InitializeWidgets(){
     dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea | 
                           Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    QWidget* btmPane = new QWidget(dock);
-    btmPane->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_GraphPaneWidget = new FrGraphPaneWidget(dock);
+    m_GraphPaneWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    QHBoxLayout* graphLayout = new QHBoxLayout();
-    QGroupBox* gb = new QGroupBox(QString("Graph View"), btmPane);
-    gb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    graphLayout->addWidget(gb);
-    btmPane->setLayout(graphLayout);
+    //QHBoxLayout* graphLayout = new QHBoxLayout();
+    //QGroupBox* gb = new QGroupBox(QString("Graph View"), btmPane);
+    //gb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //graphLayout->addWidget(gb);
+    //btmPane->setLayout(graphLayout);
 
-    dock->setWidget(btmPane);
+    dock->setWidget(m_GraphPaneWidget);
     addDockWidget(Qt::BottomDockWidgetArea, dock);
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 

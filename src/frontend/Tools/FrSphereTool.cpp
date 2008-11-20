@@ -51,6 +51,24 @@ bool FrSphereTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrSphereTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
+    // execute command 
+    FrMaskSphereCmd* cmd = FrCommandController::CreateCmd<FrMaskSphereCmd>();
+    cmd->SetAction(FrMaskSphereCmd::Action::DrawSelection);
+
+    Pos center;
+    center.x = params.X;
+    center.y = params.Y;
+
+    cmd->SetCenter(center);
+    // get radius
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    int rad = mv->GetLayerListWidget()->GetRoiToolWidget()->GetSphereWidget()->GetValue();
+
+    cmd->SetRadius(rad);
+    cmd->SetImageNumber(m_ImageNumber);
+    cmd->Execute();
+    delete cmd;
+
     return false;
 }
 

@@ -285,6 +285,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrGraphPaneWidget_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrLayerDialog_moc.cpp"
 				>
 			</File>
@@ -310,6 +314,10 @@
 			</File>
 			<File
 				RelativePath=".\frontend\moc\FrMainWindow_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrQwtPlotWidget_moc.cpp"
 				>
 			</File>
 			<File
@@ -965,24 +973,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\frontend\Widgets\FrEmptyToolWidget.cpp"
 				>
 			</File>
@@ -1001,6 +991,24 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrGraphPaneWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrGraphPaneWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1174,6 +1182,24 @@
 						Name="VCCustomBuildTool"
 						Description="Mocing &quot;$(InputPath)&quot;"
 						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrQwtPlotWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrQwtPlotWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1563,14 +1589,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Commands\FrSaveImageCmd.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Commands\FrSaveImageCmd.h"
-				>
-			</File>
-			<File
 				RelativePath=".\frontend\Commands\FrSaveTabsCmd.cpp"
 				>
 			</File>
@@ -1722,6 +1740,10 @@
 				RelativePath=".\frontend\Layers\FrSpecialLayer.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Qwt"
+			>
 		</Filter>
 		<File
 			RelativePath=".\frontend\main.cpp"

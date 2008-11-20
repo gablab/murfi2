@@ -13,7 +13,7 @@
 // dilation and erosion for ROI mask data.
 class FrMaskSphereCmd : public FrMaskBaseCmd {
 public:
-    enum Action { Undefined, Write, Erase };
+    enum Action { Undefined, DrawSelection, HideSelection, Write, Erase };
 public:
     // Constructor/destructor
     FrMaskSphereCmd();
@@ -36,6 +36,8 @@ private:
     // Helpers
     void DrawCircle(vtkImageData* imageData, int radius);
     int GetCircleRadiusForSlice(int slice);
+    bool DrawMask(bool show);
+    bool WriteMask();
 
 private:
 };

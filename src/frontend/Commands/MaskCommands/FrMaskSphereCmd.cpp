@@ -28,6 +28,56 @@ bool FrMaskSphereCmd::Execute(){
 
     bool result = false;
 
+    switch (m_Action){
+        case Action::DrawSelection:
+            result = this->DrawMask(true);
+            break;
+        case Action::HideSelection:
+            result = this->DrawMask(false);
+            break;
+        case Action::Erase:
+        case Action::Write:
+            result = this->WriteMask() && this->DrawMask(false);
+            break;
+        case Action::Undefined:
+            result = false;
+            break;
+    }
+
+    return result;
+}
+
+bool FrMaskSphereCmd::DrawMask(bool show){
+    bool result = false;
+
+    // get special layer and set selection params
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrSpecialLayer* sl = this->GetSpecialLayer();
+
+    if(show){
+        // set params
+        SelectionParams params;
+        params.type = 2;        // sphere
+        params.center = m_Center;
+        params.radius = m_Radius;
+
+        sl->SetSelection(params);
+        sl->SetSelectionVisibility(true);
+        mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
+        result = true;
+    }
+    else {
+        sl->SetSelectionVisibility(false);
+        mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
+        result = true;
+    }
+
+    return result;
+}
+
+bool FrMaskSphereCmd::WriteMask(){
+    bool result = false;
+
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
     if(roiDO){
         vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
@@ -45,7 +95,7 @@ bool FrMaskSphereCmd::Execute(){
 
             result = true;
         }
-    }
+    }   
 
     return result;
 }

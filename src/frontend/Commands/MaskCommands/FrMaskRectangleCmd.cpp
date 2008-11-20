@@ -73,6 +73,7 @@ bool FrMaskRectangleCmd::DrawMask(bool show){
         mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
         result = true;
     }
+
     return result;
 }
 

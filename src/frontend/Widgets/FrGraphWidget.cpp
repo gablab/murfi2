@@ -1,11 +1,11 @@
-#include "FrGraphPaneWidget.h"
+#include "FrGraphWidget.h"
 
 // Qt stuff
 #include "Qt/qtoolbox.h"
 #include "Qt/qlayout.h"
 
 
-FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent) 
+FrGraphWidget::FrGraphWidget(QWidget* parent) 
 : QWidget(parent){
     
 }

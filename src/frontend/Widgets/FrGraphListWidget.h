@@ -1,7 +1,7 @@
 // class for graphs panel
 
-#ifndef FR_GRAPHPANE_WIDGET
-#define FR_GRAPHPANE_WIDGET
+#ifndef FR_GRAPHLIST_WIDGET
+#define FR_GRAPHLIST_WIDGET
 
 // Forward declarations
 class FrSpinSliderWidget;
@@ -16,10 +16,10 @@ class QToolBox;
 #include "FrSettings.h"
 #include "Qt/qwidget.h"
 
-class FrGraphPaneWidget : public QWidget {
+class FrGraphListWidget : public QWidget {
 	Q_OBJECT
 public:
-	FrGraphPaneWidget(QWidget *parent = 0);
+	FrGraphListWidget(QWidget *parent = 0);
 
     // Properties
 

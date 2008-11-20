@@ -1,15 +1,15 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'FrGraphPaneWidget.h'
+** Meta object code from reading C++ file 'FrGraphDialog.h'
 **
-** Created: Thu 20. Nov 19:03:20 2008
+** Created: Thu 20. Nov 19:06:02 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../Widgets/FrGraphPaneWidget.h"
+#include "../Widgets/FrGraphDialog.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'FrGraphPaneWidget.h' doesn't include <QObject>."
+#error "The header file 'FrGraphDialog.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
 #error "This file was generated using the moc from 4.4.1. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -17,7 +17,7 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-static const uint qt_meta_data_FrGraphPaneWidget[] = {
+static const uint qt_meta_data_FrGraphDialog[] = {
 
  // content:
        1,       // revision
@@ -30,31 +30,31 @@ static const uint qt_meta_data_FrGraphPaneWidget[] = {
        0        // eod
 };
 
-static const char qt_meta_stringdata_FrGraphPaneWidget[] = {
-    "FrGraphPaneWidget\0"
+static const char qt_meta_stringdata_FrGraphDialog[] = {
+    "FrGraphDialog\0"
 };
 
-const QMetaObject FrGraphPaneWidget::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_FrGraphPaneWidget,
-      qt_meta_data_FrGraphPaneWidget, 0 }
+const QMetaObject FrGraphDialog::staticMetaObject = {
+    { &QDialog::staticMetaObject, qt_meta_stringdata_FrGraphDialog,
+      qt_meta_data_FrGraphDialog, 0 }
 };
 
-const QMetaObject *FrGraphPaneWidget::metaObject() const
+const QMetaObject *FrGraphDialog::metaObject() const
 {
     return &staticMetaObject;
 }
 
-void *FrGraphPaneWidget::qt_metacast(const char *_clname)
+void *FrGraphDialog::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_FrGraphPaneWidget))
-        return static_cast<void*>(const_cast< FrGraphPaneWidget*>(this));
-    return QWidget::qt_metacast(_clname);
+    if (!strcmp(_clname, qt_meta_stringdata_FrGraphDialog))
+        return static_cast<void*>(const_cast< FrGraphDialog*>(this));
+    return QDialog::qt_metacast(_clname);
 }
 
-int FrGraphPaneWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int FrGraphDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QWidget::qt_metacall(_c, _id, _a);
+    _id = QDialog::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     return _id;

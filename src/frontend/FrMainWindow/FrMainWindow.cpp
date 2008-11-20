@@ -122,12 +122,6 @@ void FrMainWindow::InitializeWidgets(){
     m_GraphPaneWidget = new FrGraphPaneWidget(dock);
     m_GraphPaneWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    //QHBoxLayout* graphLayout = new QHBoxLayout();
-    //QGroupBox* gb = new QGroupBox(QString("Graph View"), btmPane);
-    //gb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    //graphLayout->addWidget(gb);
-    //btmPane->setLayout(graphLayout);
-
     dock->setWidget(m_GraphPaneWidget);
     addDockWidget(Qt::BottomDockWidgetArea, dock);
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	

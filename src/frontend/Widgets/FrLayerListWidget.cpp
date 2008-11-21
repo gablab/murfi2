@@ -117,7 +117,7 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
        
     connect( m_roiToolWidget, SIGNAL(CurrentToolChanged()), this, SLOT(OnRoiToolChanged()) );
 
-    this->setFixedHeight(this->sizeHint().height());
+    this->setMinimumHeight(this->sizeHint().height());
     this->setFixedWidth(this->sizeHint().width());
 }
 

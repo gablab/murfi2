@@ -4,17 +4,15 @@
 #define FR_GRAPHPANE_WIDGET
 
 // Forward declarations
-class FrSpinSliderWidget;
-class QComboBox;
 class QHBoxLayout;
-class QGridLayout;
-class QGroupBox;
-class QToolBox;
 class FrQwtPlotWidget;
+class FrGraphListWidget;
+class FrPlayControlWidget;
 
 // Includes 
 #include "FrMacro.h"
 #include "FrSettings.h"
+
 #include "Qt/qwidget.h"
 
 class FrGraphPaneWidget : public QWidget {
@@ -24,13 +22,13 @@ public:
 
     // Properties
     FrGetPropMacro(FrQwtPlotWidget*, QwtPlotWidget);
+    FrGetPropMacro(FrGraphListWidget*, GraphListWidget);
+    FrGetPropMacro(FrPlayControlWidget*, PlayControlWidget);
     
     // Here all signals
 Q_SIGNALS:
 
 private Q_SLOTS:
-
-private:
 
 };
 

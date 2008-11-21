@@ -2,7 +2,12 @@
 #ifndef FR_PLAYCTL_WGT
 #define FR_PLAYCTL_WGT
 
+//Forward declarations
+class QToolBar;
+class QActionBar;
+class QLabel;
 
+// includes 
 #include "FrMacro.h"
 
 #include "Qt/qstring.h"
@@ -12,20 +17,39 @@ class FrPlayControlWidget : public QWidget {
 	Q_OBJECT
 public:
 	FrPlayControlWidget(QWidget *parent = 0);
-	
-public Q_SLOTS:
-    // Add slots here 
 
 Q_SIGNALS:    
     // add signals here
+    void LifeModeChanged(bool isOn);
+    void Play();
+    void Pause();
+    void Reset();
+    void Speedup();
+    void Slowdown();
+
+private Q_SLOTS:
+    void OnLifeModeChanged();
+    void OnPlayPressed();
+    void OnPausePressed();
+    void OnResetPressed();
+    void OnSlowerPressed();
+    void OnFasterPressed();
 
 private:
-    /*QAction* m_Play;
+    // Toolbars
+    QToolBar* m_tbAddition;
+    QToolBar* m_tbPlayback;
+    QLabel* m_lblInfo;
+
+    // Play toolbar actions
+    QAction* m_LifeMode;
+    QAction* m_Play;
     QAction* m_Pause;
     QAction* m_Reset;
     QAction* m_Faster;
     QAction* m_Slower;
-    QToolBar* m_Pane; */
+
+    // Additional toolbar Actions
 
 };
 

@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				AdditionalIncludeDirectories="./frontend/Qwt;./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
 				PreprocessorDefinitions="WIN32;TIXML_USE_STL;USE_FRONTEND"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib qwt.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -1934,10 +1934,6 @@
 				RelativePath=".\frontend\Layers\FrSpecialLayer.h"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="Qwt"
-			>
 		</Filter>
 		<File
 			RelativePath=".\frontend\main.cpp"

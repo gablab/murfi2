@@ -10,6 +10,7 @@ class QHBoxLayout;
 class QGridLayout;
 class QGroupBox;
 class QToolBox;
+class FrQwtPlotWidget;
 
 // Includes 
 #include "FrMacro.h"
@@ -22,7 +23,7 @@ public:
 	FrGraphPaneWidget(QWidget *parent = 0);
 
     // Properties
-
+    FrGetPropMacro(FrQwtPlotWidget*, QwtPlotWidget);
     
     // Here all signals
 Q_SIGNALS:

@@ -16,7 +16,10 @@ class QToolBox;
 #include "FrSettings.h"
 #include "Qt/qwidget.h"
 
-class FrQwtPlotWidget : public QWidget {
+#include "qwt_plot.h"
+
+
+class FrQwtPlotWidget : public QwtPlot {
 	Q_OBJECT
 public:
 	FrQwtPlotWidget(QWidget *parent = 0);

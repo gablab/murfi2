@@ -17,24 +17,43 @@ class QToolBox;
 #include "Qt/qwidget.h"
 
 #include "qwt_plot.h"
+#include "qwt_plot_curve.h"
+
+#include <vector>
+
+// forward declarations
+class QwtPlotMarker;
 
 
 class FrQwtPlotWidget : public QwtPlot {
 	Q_OBJECT
 public:
 	FrQwtPlotWidget(QWidget *parent = 0);
+    ~FrQwtPlotWidget();
+
+    void AddGraph();                // FrGraph
+    void RemoveGraph(int id);
+    void SetData(int id);
+    void SetVisibility(int id, bool visible);
+
+    void RemoveAll();
 
     // Properties
-
+    
     
     // Here all signals
 signals:
-
+    
+        
 private:
 
 private Q_SLOTS:
+    void test(const QwtDoublePoint& point);
+    void test2(double x, double y);
 
 private:
+    std::vector<QwtPlotCurve*> m_Curves;    
+    QwtPlotMarker* m_PlotMarker;
 
 };
 

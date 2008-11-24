@@ -1,5 +1,5 @@
-#ifndef FR_COMPOSITE_TOOL
-#define FR_COMPOSITE_TOOL
+#ifndef FR_MANIPULATION_TOOL
+#define FR_MANIPULATION_TOOL
 
 #include "FrTool.h"
 #include "FrMacro.h"
@@ -12,12 +12,12 @@ class FrMainDocument;
 
 // Composite tool. This tool delagate
 // all events to incapsulated tools.
-class FrCompositeTool : public FrTool {
+class FrManipulationTool : public FrTool {
 public:
     // Default constructor
-	FrCompositeTool();
+	FrManipulationTool();
 	// Destructor
-	virtual ~FrCompositeTool();
+	virtual ~FrManipulationTool();
 	
     virtual void Start();
 	virtual void Stop();
@@ -38,7 +38,6 @@ private:
 	
 	bool isZoom;
 	bool ZoomActivated;
-
 };
 
 #endif

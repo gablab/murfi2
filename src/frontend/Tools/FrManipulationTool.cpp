@@ -1,8 +1,8 @@
-#include "FrCompositeTool.h"
+#include "FrManipulationTool.h"
 #include "FrMainDocument.h"
 #include "FrPanTool.h"
-#include "FrTBCTool.h"
 #include "FrZoomTool.h"
+#include "FrTBCTool.h"
 #include "FrSliceScrollTool.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
@@ -17,7 +17,7 @@
 
 
 
-FrCompositeTool::FrCompositeTool() {
+FrManipulationTool::FrManipulationTool() {
     m_panTool = new FrPanTool();        
     m_zoomTool = new FrZoomTool();
     m_tbcTool = new FrTBCTool();
@@ -27,23 +27,23 @@ FrCompositeTool::FrCompositeTool() {
     ZoomActivated = false;
 }
 
-FrCompositeTool::~FrCompositeTool(){
+FrManipulationTool::~FrManipulationTool(){
     delete m_panTool;
-    delete m_tbcTool;
     delete m_zoomTool;
+    delete m_tbcTool;
 	delete m_ssTool;
 }
 
-void FrCompositeTool::Start(){
-    // Setup controller
+void FrManipulationTool::Start(){
+    // Setup controller and start tools
     m_panTool->SetController(this->GetController());
-    m_tbcTool->SetController(this->GetController());
     m_zoomTool->SetController(this->GetController());
-    m_ssTool->SetController(this->GetController());
-
     m_panTool->Start();
-    m_tbcTool->Start();
     m_zoomTool->Start();
+
+    m_tbcTool->SetController(this->GetController());
+    m_ssTool->SetController(this->GetController());
+    m_tbcTool->Start();
 	m_ssTool->Start();
 
     // Update interface to ensure tool is checked
@@ -55,18 +55,17 @@ void FrCompositeTool::Start(){
     delete cmd;
 }
 
-void FrCompositeTool::Stop(){
-
-    // Unregister controller
-    m_panTool->SetController(0);
-    m_tbcTool->SetController(0);
-    m_zoomTool->SetController(0);
-    m_ssTool->SetController(0);
-
+void FrManipulationTool::Stop(){
+    // Stop tools and unregister controller
     m_panTool->Stop();
-    m_tbcTool->Stop();
     m_zoomTool->Stop();
+    m_panTool->SetController(0);
+    m_zoomTool->SetController(0);
+
+    m_tbcTool->Stop();
     m_ssTool->Stop();
+    m_tbcTool->SetController(0);
+    m_ssTool->SetController(0);
 
     // Update interface to ensure tool is unchecked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
@@ -77,7 +76,7 @@ void FrCompositeTool::Stop(){
     delete cmd;
 }
 
-bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
+bool FrManipulationTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     // Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
         if (isZoom)
@@ -92,14 +91,14 @@ bool FrCompositeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     else if(params.Button == FrMouseParams::RightButton){
         params.Button = FrMouseParams::LeftButton;
         m_tbcTool->OnMouseUp(is, params);
-    }    
+    }
     
     ZoomActivated = false;
 
     return false;
 }
 
-bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){    
+bool FrManipulationTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){    
     // here we should check what tool to use: pan or zoom, it depends on mouse coords
     isZoom = CheckMouseParams(is, params);
 
@@ -123,7 +122,7 @@ bool FrCompositeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrCompositeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
+bool FrManipulationTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     // here we should check what tool to use: pan or zoom, it depends on mouse coords
     //isZoom = CheckMouseParams(is, params);
     ////bool isInViewport = IsInViewPort(is, params);
@@ -147,7 +146,7 @@ bool FrCompositeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
+bool FrManipulationTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     bool result = false;
 
     // Delegate events to appropriate tool
@@ -169,7 +168,7 @@ bool FrCompositeTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return result;
 }
 
-bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params){
+bool FrManipulationTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params){
     // check if coordinates are near left/right border of viewport
     int *size = is->CurrentRenderer->GetSize();
     int *origin = is->CurrentRenderer->GetOrigin();
@@ -187,7 +186,7 @@ bool FrCompositeTool::CheckMouseParams(FrInteractorStyle* is, FrMouseParams& par
     return false;
 }
 
-bool FrCompositeTool::IsInViewPort(FrInteractorStyle* is, FrMouseParams& params){
+bool FrManipulationTool::IsInViewPort(FrInteractorStyle* is, FrMouseParams& params){
     // check if coordinates are near left/right border of viewport
     int *size = is->CurrentRenderer->GetSize();
     int *origin = is->CurrentRenderer->GetOrigin();

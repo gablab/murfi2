@@ -4,6 +4,8 @@
 // Forward declaration
 class vtkRenderer;
 class vtkPointPicker;
+class FrTBCTool;
+class FrSliceScrollTool;
 
 // Some includes
 #include "FrTool.h"
@@ -29,6 +31,8 @@ private:
 
 private:
     vtkPointPicker* m_pointPicker;
+    FrTBCTool*  m_tbcTool;
+	FrSliceScrollTool* m_ssTool;
 };
 
 #endif

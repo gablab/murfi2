@@ -15,6 +15,8 @@ class FrDilatoneErosionTool;
 class FrLayerSettings;
 class vtkPointPicker;
 class FrMainController;
+class FrTBCTool;
+class FrSliceScrollTool;
 
 #include <vector>
 
@@ -56,7 +58,8 @@ private:
     FrDilatoneErosionTool* m_deTool;
     
     vtkPointPicker* m_PointPicker;
-
+    FrTBCTool*  m_tbcTool;
+	FrSliceScrollTool* m_ssTool;
 };
 
 #endif

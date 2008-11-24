@@ -13,6 +13,7 @@ class QWidget;
 #include "FrMacro.h"
 #include "FrSettings.h"
 
+#include "Qt/qcolor.h"
 #include "Qt/qstring.h"
 #include "Qt/qscrollarea.h"
 
@@ -24,7 +25,7 @@ public:
 
     // Methods
     void AddGraphWidget(FrGraphWidget* widget);
-    void AddGraphWidget(int id, QString& name, bool isVisible=true);
+    void AddGraphWidget(int id, QString& name, QColor& color, bool isVisible=true);
     
     bool RemoveGraphWidget(int id, bool doDelete = false);
     bool RemoveGraphWidget(FrGraphWidget* widget, bool doDelete = false);

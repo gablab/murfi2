@@ -7,7 +7,7 @@
 #include "FrBaseView.h"
 #include "FrPanTool.h"
 #include "FrZoomTool.h"
-#include "FrCompositeTool.h"
+#include "FrManipulationTool.h"
 #include "FrImageDocObj.h"
 #include "FrRoiTool.h"
 #include "QVTKWidget.h"

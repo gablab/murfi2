@@ -22,14 +22,19 @@ public:
     // Properties
 	FrGetPropMacro(int, PxMin);
     void SetPxMin(int value);
-	FrGetPropMacro(int, PxMax);
+	
+    FrGetPropMacro(int, PxMax);
     void SetPxMax(int value);
-	FrGetPropMacro(int, PxMid);
+	
+    FrGetPropMacro(int, PxMid);
     void SetPxMid(int value);
-	FrGetPropMacro(int, Threshold);
+	
+    FrGetPropMacro(int, Threshold);
     void SetThreshold(int value);
-	FrGetPropMacro(int, Type);
+	
+    FrGetPropMacro(int, Type);
     void SetType(int value);
+
 	FrGetPropMacro(QColor, Color);
     void SetColor(QColor value);
 
@@ -41,8 +46,8 @@ private:
     FrColormapFilter(const FrColormapFilter&);  // Not implemented.
     void operator=(const FrColormapFilter&);  // Not implemented.  	
 
-    void InitSingleLookupTable(unsigned char luTable[][3]);
-    void InitMultiLookupTable(unsigned char luTable[][3]);
+    void InitSingleLookupTable(unsigned char luTable[][4]);
+    void InitMultiLookupTable(unsigned char luTable[][4]);
 
 private:
 	int m_Dims[3];

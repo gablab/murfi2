@@ -1,7 +1,7 @@
 #include "FrManageToolCmd.h"
 #include "FrToolController.h"
 #include "FrMainWindow.h"
-#include "FrCompositeTool.h"
+#include "FrManipulationTool.h"
 #include "FrVoxelTool.h"
 #include "FrRoiTool.h"
 #include "FrActionManager.h"
@@ -102,7 +102,7 @@ FrTool* FrManageToolCmd::CreateToolByType(FrManageToolCmd::ToolType toolType){
     FrTool* result = 0;
     switch(toolType){
         case FrManageToolCmd::ManipulationTool:
-            result = new FrCompositeTool();
+            result = new FrManipulationTool();
             break;
         case FrManageToolCmd::VoxelTool:
             result = new FrVoxelTool();

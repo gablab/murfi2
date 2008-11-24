@@ -2,6 +2,8 @@
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
+#include "FrTBCTool.h"
+#include "FrSliceScrollTool.h"
 
 // Qt stuff
 #include "Qt/qstring.h"
@@ -20,13 +22,24 @@ FrVoxelTool::FrVoxelTool()
 : m_pointPicker(0) {
     m_pointPicker = vtkPointPicker::New();
     m_pointPicker->SetTolerance(DEF_TOLERANCE);
+
+    m_tbcTool = new FrTBCTool();
+    m_ssTool = new FrSliceScrollTool();
 }
 
 FrVoxelTool::~FrVoxelTool(){
     if(m_pointPicker) m_pointPicker->Delete();
+    delete m_tbcTool;
+	delete m_ssTool;
 }
 
 void FrVoxelTool::Start(){
+    // Setup controllers and start other tools
+    m_tbcTool->SetController(this->GetController());
+    m_ssTool->SetController(this->GetController());
+    m_tbcTool->Start();
+	m_ssTool->Start();
+
     // Update interface to ensure tool is checked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
     cmd->SetToolType(FrManageToolCmd::VoxelTool);
@@ -37,6 +50,12 @@ void FrVoxelTool::Start(){
 }
 
 void FrVoxelTool::Stop(){
+    // Stop other tools and unregister controller
+    m_tbcTool->Stop();
+    m_ssTool->Stop();
+    m_tbcTool->SetController(0);
+    m_ssTool->SetController(0);
+
     // Update interface to ensure tool is unchecked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
     cmd->SetToolType(FrManageToolCmd::VoxelTool);
@@ -47,7 +66,16 @@ void FrVoxelTool::Stop(){
 }
 
 bool FrVoxelTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
-    return false;
+    bool result = false;
+    if(params.Button == FrMouseParams::MidButton){
+        params.Button = FrMouseParams::LeftButton;
+        result = m_ssTool->OnMouseUp(is, params);
+    }
+    else if(params.Button == FrMouseParams::RightButton){
+        params.Button = FrMouseParams::LeftButton;
+        result = m_tbcTool->OnMouseUp(is, params);
+    }
+    return result;
 }
 
 bool FrVoxelTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
@@ -58,6 +86,14 @@ bool FrVoxelTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         cmd->SetMouseXY(params.X, params.Y);
         cmd->Execute();
         delete cmd;
+    }
+    else if(params.Button == FrMouseParams::MidButton){
+        params.Button = FrMouseParams::LeftButton;
+        m_ssTool->OnMouseDown(is, params);
+    }
+    else if(params.Button == FrMouseParams::RightButton){
+        params.Button = FrMouseParams::LeftButton;
+        m_tbcTool->OnMouseDown(is, params);
     }
 	return false;
 }
@@ -74,6 +110,14 @@ bool FrVoxelTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
         cmd->SetMouseXY(params.X, params.Y);
         cmd->Execute();
         delete cmd;
+    }
+    else if(params.Button == FrMouseParams::MidButton){
+        params.Button = FrMouseParams::LeftButton;
+        m_ssTool->OnMouseDrag(is, params);
+    }
+    else if(params.Button == FrMouseParams::RightButton){
+        params.Button = FrMouseParams::RightButton;
+        m_tbcTool->OnMouseDrag(is, params);
     }
     return false;
 }

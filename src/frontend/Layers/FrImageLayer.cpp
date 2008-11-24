@@ -24,7 +24,8 @@ FrImageLayer::FrImageLayer()
     // Pipline stuff
     m_cmFilter = FrColormapFilter::New();
     m_tbcFilter = FrTBCFilter::New();
-    m_actor = vtkImageActor::New();    
+    m_actor = vtkImageActor::New();
+    m_actor->InterpolateOff();
     // add actor
     m_Renderer->AddActor(m_actor);
 }

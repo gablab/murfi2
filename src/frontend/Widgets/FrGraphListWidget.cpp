@@ -34,8 +34,9 @@ FrGraphListWidget::FrGraphListWidget(QWidget* parent)
 #endif
 
     // NOTE: for testing 
+    QColor colors[] = { QColor(255, 0, 0), QColor(0, 255, 0), QColor(0, 0, 255) };
     for(int i=0; i < 3; ++i){
-        this->AddGraphWidget(i, QString("Graph %1").arg(i));
+        this->AddGraphWidget(i, QString("Graph %1").arg(i), colors[i]);
     }
 }
 
@@ -46,9 +47,10 @@ void FrGraphListWidget::AddGraphWidget(FrGraphWidget* widget){
             this, SLOT(OnGraphVisibilityChanged(int)));
 }
 
-void FrGraphListWidget::AddGraphWidget(int id, QString& name, bool isVisible){
+void FrGraphListWidget::AddGraphWidget(int id, QString& name, QColor& color, bool isVisible){
     FrGraphWidget* gw = new FrGraphWidget(id);
     gw->SetName(name);
+    gw->SetColor(color);
     gw->SetVisibility(isVisible);
     this->AddGraphWidget(gw);
 }

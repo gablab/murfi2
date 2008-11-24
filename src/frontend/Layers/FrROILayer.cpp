@@ -20,6 +20,7 @@ FrROILayer::FrROILayer()
     // Pipline stuff
     m_filter = FrMaskToRgbaFilter::New();
     m_actor = vtkImageActor::New();
+    m_actor->InterpolateOff();
 
     // add actor
     m_Renderer->AddActor(m_actor);

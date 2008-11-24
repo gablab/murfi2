@@ -23,6 +23,9 @@
 #include "FrInvertTool.h"
 #include "FrDilatoneErosionTool.h"
 
+#include "FrTBCTool.h"
+#include "FrSliceScrollTool.h"
+
 // VTK stuff
 #include "vtkPointPicker.h"
 #include "vtkRenderer.h"
@@ -50,6 +53,9 @@ FrRoiTool::FrRoiTool()
 
     m_PointPicker = vtkPointPicker::New();
     m_PointPicker->SetTolerance(DEF_TOLERANCE);
+
+    m_tbcTool = new FrTBCTool();
+    m_ssTool = new FrSliceScrollTool();
 }
 
 FrRoiTool::~FrRoiTool(){
@@ -64,11 +70,19 @@ FrRoiTool::~FrRoiTool(){
     if(m_deTool) delete m_deTool;
 
     if (m_PointPicker) m_PointPicker->Delete();
+    delete m_tbcTool;
+	delete m_ssTool;
 }
 
 void FrRoiTool::Start(){
     // start subtool
     this->StartCurrentTool();
+
+    // Setup controllers and start other tools
+    m_tbcTool->SetController(this->GetController());
+    m_ssTool->SetController(this->GetController());
+    m_tbcTool->Start();
+	m_ssTool->Start();
 
     // Enable roi tool widget
     FrMainWindow* mv = this->GetMainController()->GetMainView();
@@ -88,10 +102,16 @@ void FrRoiTool::Stop(){
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     mv->GetLayerListWidget()->GetRoiToolWidget()->setEnabled(false);
     
-    // Unregister controller
+    // Stop and unregister controller
     m_curTool->Stop();
     m_curTool->SetController(0L);
     m_curTool = 0L;
+
+    // Stop other tools and unregister controller
+    m_tbcTool->Stop();
+    m_ssTool->Stop();
+    m_tbcTool->SetController(0);
+    m_ssTool->SetController(0);
 
     // Update interface to ensure tool is unchecked
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
@@ -103,20 +123,34 @@ void FrRoiTool::Stop(){
 }
 
 bool FrRoiTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
-    
-    //if (params.X != -1)
-    bool isInside = this->GetMappedCoords(is, params);
+    bool result = false;
+    if(params.Button == FrMouseParams::MidButton){
+        params.Button = FrMouseParams::LeftButton;
+        result = m_ssTool->OnMouseUp(is, params);
+    }
+    else {
+        bool isInside = this->GetMappedCoords(is, params);
+        m_curTool->SetImageNumber(m_ImageNumber);
+        result = m_curTool->OnMouseUp(is, params);
+    }
 
-    m_curTool->SetImageNumber(m_ImageNumber);
-    return m_curTool->OnMouseUp(is, params);
+    return result;
 }
 
 bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    
-    bool isInside = GetMappedCoords(is, params);
+    bool result = false;
+    if(params.Button == FrMouseParams::MidButton){
+        params.Button = FrMouseParams::LeftButton;
+        result = m_ssTool->OnMouseDown(is, params);
+    }
+    else {
+        bool isInside = this->GetMappedCoords(is, params);
+        m_curTool->SetImageNumber(m_ImageNumber);
+        m_curTool->SetImageNumber(m_ImageNumber);
+        result = m_curTool->OnMouseDown(is, params);
+    }
 
-    m_curTool->SetImageNumber(m_ImageNumber);
-    return m_curTool->OnMouseDown(is, params);
+    return result;
 }
 
 bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
@@ -128,12 +162,18 @@ bool FrRoiTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 
 bool FrRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     
-    bool isInside = GetMappedCoords(is, params);
-    //if (params.X != -1)
-    //m_maskRectTool->OnMouseDrag(is, params);
+    bool result = false;
 
-    m_curTool->SetImageNumber(m_ImageNumber);
-    return m_curTool->OnMouseDrag(is, params);
+    if(params.Button == FrMouseParams::MidButton){
+        params.Button = FrMouseParams::LeftButton;
+        result = m_ssTool->OnMouseDrag(is, params);
+    }
+    else {
+        bool isInside = GetMappedCoords(is, params);
+        m_curTool->SetImageNumber(m_ImageNumber);
+        result = m_curTool->OnMouseDrag(is, params);
+    }
+    return result;
 }
 
 bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){

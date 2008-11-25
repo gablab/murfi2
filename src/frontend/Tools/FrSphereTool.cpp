@@ -75,3 +75,7 @@ bool FrSphereTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 bool FrSphereTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
+
+bool FrSphereTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

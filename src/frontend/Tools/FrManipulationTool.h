@@ -25,7 +25,9 @@ public:
 	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
-    
+
+	virtual bool OnKeyPress(FrInteractorStyle* is, FrKeyParams& params);
+
 	// Check mouse coordinates for zoom/pan tool selection
 	bool CheckMouseParams(FrInteractorStyle* is, FrMouseParams& params);
 	bool IsInViewPort(FrInteractorStyle* is, FrMouseParams& params);

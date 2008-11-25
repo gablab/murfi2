@@ -29,6 +29,7 @@ class FrMainController;
 #include "FrRefreshLayerInfoCmd.h"
 #include "FrLoadImageCmd.h"
 #include "FrCreateROICmd.h"
+#include "FrSetCursorCmd.h"
 
 // Mask commands
 #include "FrMaskPenCmd.h"

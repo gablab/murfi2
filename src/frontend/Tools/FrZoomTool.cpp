@@ -31,8 +31,8 @@ void FrZoomTool::Stop(){
 
 bool FrZoomTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 //    is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
-	QCursor cursor(Qt::ArrowCursor);
-	QApplication::setOverrideCursor(cursor);   
+	//QCursor cursor(Qt::ArrowCursor);
+	//QApplication::setOverrideCursor(cursor);   
     return false;
 }
 
@@ -42,8 +42,8 @@ bool FrZoomTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         m_oldY = params.Y;
 
         //is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_SIZENS);
-		QCursor cursor(Qt::SizeVerCursor);
-		QApplication::setOverrideCursor(cursor);
+		//QCursor cursor(Qt::SizeVerCursor);
+		//QApplication::setOverrideCursor(cursor);
     }    
     return false;
 }
@@ -90,4 +90,8 @@ void FrZoomTool::ZoomByScaling(double factor, FrInteractorStyle* is){
             is->CurrentRenderer->ResetCameraClippingRange();
         }
     }
+}
+
+bool FrZoomTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
 }

@@ -37,3 +37,7 @@ bool FrInvertTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 bool FrInvertTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
+
+bool FrInvertTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

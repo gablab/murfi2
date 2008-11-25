@@ -67,3 +67,7 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
 	
     return true;
 }
+
+bool FrSliceScrollTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

@@ -57,3 +57,7 @@ bool FrDilatoneErosionTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& pa
 bool FrDilatoneErosionTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
+
+bool FrDilatoneErosionTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

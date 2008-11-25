@@ -28,8 +28,8 @@ void FrPanTool::Stop(){
 bool FrPanTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     // NOTE: do nothing here
     //is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_DEFAULT);
-	QCursor cursor(Qt::ArrowCursor);
-	QApplication::setOverrideCursor(cursor);   
+	//QCursor cursor(Qt::ArrowCursor);
+	//QApplication::setOverrideCursor(cursor);   
 	return false;
 }
 
@@ -40,8 +40,8 @@ bool FrPanTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         m_oldY = params.Y;
 
         //is->CurrentRenderer->GetRenderWindow()->SetCurrentCursor(VTK_CURSOR_HAND);
-		QCursor cursor(Qt::ClosedHandCursor);
-		QApplication::setOverrideCursor(cursor);
+		//QCursor cursor(Qt::ClosedHandCursor);
+		//QApplication::setOverrideCursor(cursor);
 	}
     return false;
 }
@@ -92,4 +92,8 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     delete cmd;
   
     return true;
+}
+
+bool FrPanTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
 }

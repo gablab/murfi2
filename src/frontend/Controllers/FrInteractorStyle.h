@@ -28,6 +28,8 @@ public:
     virtual void OnMouseWheelForward();
     virtual void OnMouseWheelBackward();
 
+    virtual void OnKeyPress();
+
 protected:
     // Declare tools as friends to get full access
     friend class FrTool;

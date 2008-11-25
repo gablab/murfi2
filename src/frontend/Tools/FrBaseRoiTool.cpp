@@ -38,11 +38,14 @@ bool FrBaseRoiTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
 
-
 FrMainController* FrBaseRoiTool::GetMainController(){
      // HACK: getting main controller
      FrMainController* result = 
          dynamic_cast<FrMainController*>
          (this->GetController()->GetOwner());
      return result;
+}
+
+bool FrBaseRoiTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
 }

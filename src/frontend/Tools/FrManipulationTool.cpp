@@ -1,11 +1,14 @@
 #include "FrManipulationTool.h"
 #include "FrMainDocument.h"
+#include "FrMainWindow.h"
 #include "FrPanTool.h"
 #include "FrZoomTool.h"
 #include "FrTBCTool.h"
 #include "FrSliceScrollTool.h"
 #include "FrInteractorStyle.h"
 #include "FrCommandController.h"
+#include "FrToolController.h"
+#include "QVTKWidget.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -124,24 +127,29 @@ bool FrManipulationTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& param
 
 bool FrManipulationTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     // here we should check what tool to use: pan or zoom, it depends on mouse coords
-    //isZoom = CheckMouseParams(is, params);
-    ////bool isInViewport = IsInViewPort(is, params);
+    isZoom = CheckMouseParams(is, params);
+    //bool isInViewport = IsInViewPort(is, params);
 
     //if (!isInViewport){
     //	//change cursor to simple mode
     //	QCursor cursor(Qt::ArrowCursor);
     //	QApplication::setOverrideCursor(cursor);
     //}
-    //else if (isZoom){
-    //	//change cursor to zoom mode
-    //	QCursor cursor(Qt::SizeVerCursor);
-    //	QApplication::setOverrideCursor(cursor);
-    //}
-    //else if (!ZoomActivated){
-    //	// change cursor to pan mode
-    //	QCursor cursor(Qt::OpenHandCursor);
-    //	QApplication::setOverrideCursor(cursor);
-    //}
+    
+    // get QVTK widget and set cursor
+    // HACK: getting main controller
+    //FrMainController* mc = dynamic_cast<FrMainController*>(this->GetController()->GetOwner());
+    //FrMainWindow* mw = mc->GetMainView();
+    //QVTKWidget* qvtkWidget = mw->GetQVTKWidget();
+
+    FrSetCursorCmd* cmd = FrCommandController::CreateCmd<FrSetCursorCmd>();
+    if (isZoom)
+        cmd->SetCursorType(FrSetCursorCmd::Zoom);
+    else
+        cmd->SetCursorType(FrSetCursorCmd::Pan);
+
+    cmd->Execute();
+    delete cmd;
 
     return false;
 }
@@ -203,4 +211,8 @@ bool FrManipulationTool::IsInViewPort(FrInteractorStyle* is, FrMouseParams& para
     ( (params.Y - YOrigin) == 0)) return false;
 
     return true;
+}
+
+bool FrManipulationTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
 }

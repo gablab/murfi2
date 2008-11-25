@@ -62,3 +62,7 @@ bool FrMaskMaskTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 bool FrMaskMaskTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
+
+bool FrMaskMaskTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

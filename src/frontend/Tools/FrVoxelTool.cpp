@@ -130,3 +130,7 @@ int FrVoxelTool::GetPickedPointIndex(int x, int y, vtkRenderer* renderer){
     int id = m_pointPicker->GetPointId();
     return id;
 }
+
+bool FrVoxelTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

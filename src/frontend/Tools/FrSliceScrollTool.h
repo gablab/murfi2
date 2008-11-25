@@ -22,6 +22,8 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
+	virtual bool OnKeyPress(FrInteractorStyle* is, FrKeyParams& params);
+
 private:
     int m_oldX;
     int m_oldY;

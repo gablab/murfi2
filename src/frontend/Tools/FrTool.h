@@ -25,6 +25,11 @@ public:
     }
 } FrMouseParams;
 
+typedef struct _frKeyParams{
+    char KeyCode;
+    char* KeySym;
+} FrKeyParams;
+
 // abstract class for all tools
 // used by application
 class FrTool {
@@ -35,6 +40,8 @@ public:
 	virtual bool OnMouseDown(FrInteractorStyle* is, FrMouseParams& params) = 0;
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params) = 0;
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params) = 0;
+
+	virtual bool OnKeyPress(FrInteractorStyle* is, FrKeyParams& params) = 0;
 
 public:
 	/// Default constructor

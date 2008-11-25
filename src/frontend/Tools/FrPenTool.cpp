@@ -86,3 +86,7 @@ bool FrPenTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 
     return false;
 }
+
+bool FrPenTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

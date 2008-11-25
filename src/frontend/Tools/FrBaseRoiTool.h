@@ -18,6 +18,8 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
+	virtual bool OnKeyPress(FrInteractorStyle* is, FrKeyParams& params);
+
     // Properties
     void SetImageNumber(int value){
         m_ImageNumber = value;

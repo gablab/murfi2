@@ -328,3 +328,7 @@ void FrRoiTool::StartCurrentTool(){
     m_curTool->SetController(this->GetController());
     m_curTool->Start();
 }
+
+bool FrRoiTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

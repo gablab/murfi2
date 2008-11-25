@@ -185,3 +185,14 @@ void FrInteractorStyle::OnMouseWheelBackward(){
         m_controller->GetCurrentTool()->OnMouseMove(params);
     }*/
 }
+
+void FrInteractorStyle::OnKeyPress(){
+    char keyCode = Interactor->GetKeyCode(); // PG_UP, PG_DOWN
+    char* keySym = Interactor->GetKeySym();
+
+    FrKeyParams params;
+    params.KeyCode = keyCode;
+    params.KeySym = keySym;
+
+    m_controller->GetCurrentTool()->OnKeyPress(this, params);
+}

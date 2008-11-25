@@ -18,6 +18,8 @@ public:
 
     FrSetPropMacro(int, ImageNumber);
 
+	virtual bool OnKeyPress(FrInteractorStyle* is, FrKeyParams& params);
+
 public:
 	/// Default constructor
 	FrSphereTool();

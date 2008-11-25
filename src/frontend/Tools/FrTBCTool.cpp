@@ -78,3 +78,7 @@ bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 
     return result;
 }
+
+bool FrTBCTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

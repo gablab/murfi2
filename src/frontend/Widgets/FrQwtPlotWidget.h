@@ -43,7 +43,7 @@ public:
     
     // Here all signals
 signals:
-    
+    void pointClicked(QPointF p);
         
 private:
 

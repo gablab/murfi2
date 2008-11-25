@@ -30,3 +30,7 @@ bool FrRoiInfoTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 bool FrRoiInfoTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     return false;
 }
+
+bool FrRoiInfoTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

@@ -162,6 +162,8 @@ void FrQwtPlotWidget::test(const QwtDoublePoint& point){
     
     // refresh the plot
     this->replot();
+
+    emit pointClicked(point);
 }
 
 void FrQwtPlotWidget::test2(double x, double y){

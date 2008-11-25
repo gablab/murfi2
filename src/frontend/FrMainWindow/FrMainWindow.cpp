@@ -138,6 +138,7 @@ void FrMainWindow::InitializeWidgets(){
 
     dock->setWidget(m_VoxelInfoWidget);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
+    m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
     //dock = new QDockWidget(tr("ROI Info"), this);
 

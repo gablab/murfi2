@@ -97,5 +97,8 @@ bool FrFreeShapeTool::CheckPoint(Pos &pos){
     return result;
 }
 
+bool FrFreeShapeTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}
 
 

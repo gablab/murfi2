@@ -95,3 +95,7 @@ bool FrRectangleTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
   
     return true;
 }
+
+bool FrRectangleTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
+    return false;
+}

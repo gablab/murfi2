@@ -1807,6 +1807,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrSetCursorCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSetCursorCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrUpdatePipelineCmd.cpp"
 				>
 			</File>

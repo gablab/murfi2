@@ -95,5 +95,21 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrPanTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
-    return false;
+    vtkCamera *camera = is->CurrentRenderer->GetActiveCamera();
+
+    // TODO: implement
+
+    //FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
+    //cmd->SetMouseXY(params.X, params.Y);
+    //cmd->SetPosition(motionVector[0] + viewPoint[0],
+    //                 motionVector[1] + viewPoint[1],
+    //                 motionVector[2] + viewPoint[2]);
+
+    //cmd->SetFocalPoint( motionVector[0] + viewFocus[0],
+    //                    motionVector[1] + viewFocus[1],
+    //                    motionVector[2] + viewFocus[2] );
+    //cmd->Execute();
+    //delete cmd;
+
+    return true;
 }

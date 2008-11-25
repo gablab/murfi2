@@ -26,8 +26,10 @@ public:
 } FrMouseParams;
 
 typedef struct _frKeyParams{
+public:
     char KeyCode;
     char* KeySym;
+    bool IsShift, IsControl;
 } FrKeyParams;
 
 // abstract class for all tools

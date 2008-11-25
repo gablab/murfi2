@@ -193,6 +193,8 @@ void FrInteractorStyle::OnKeyPress(){
     FrKeyParams params;
     params.KeyCode = keyCode;
     params.KeySym = keySym;
+    params.IsShift = (Interactor->GetShiftKey() != 0);
+    params.IsControl = (Interactor->GetControlKey() != 0);
 
     m_controller->GetCurrentTool()->OnKeyPress(this, params);
 }

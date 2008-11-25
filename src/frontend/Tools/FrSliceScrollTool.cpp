@@ -4,7 +4,7 @@
 #include "FrMainDocument.h"
 #include "FrCommandController.h"
 
-
+// VTK stuff
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkImageActor.h"
@@ -69,5 +69,28 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
 }
 
 bool FrSliceScrollTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
-    return false;
+    if (params.IsShift || params.IsControl ||
+        is->CurrentRenderer == NULL) return false;
+    
+    int sliceDelta = 0;
+    char keySym = params.KeySym[0];
+
+    switch (keySym){
+        case 0x26:
+            sliceDelta = 1;
+            break;
+        case 0x28:
+            sliceDelta = -1;
+            break;
+        default:
+            return false;
+            break;
+    }
+    
+    FrChangeSliceCmd* cmd = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+    cmd->SetSliceDelta(sliceDelta);
+    cmd->Execute();
+    delete cmd;   
+
+    return true;
 }

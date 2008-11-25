@@ -2,53 +2,69 @@
 #include <algorithm>
 
 
-
 FrDocument::FrDocument(){
 }
 
 FrDocument::~FrDocument(){
-    DeleteAll();
+    this->DeleteAll();
 }
 
 bool FrDocument::Add(FrDocumentObj* obj){
-    // NOTE: do not check for existance now!
-    m_Objects.push_back(obj); 
-    obj->OnAdd(this);
+    DocObjMap::iterator it = m_Objects.find(obj->GetType());
+    if(it != m_Objects.end()){
+        it->second.push_back(obj);
+        obj->OnAdd(this);
+    }
+    else {
+        DocObjCollection newCollection;
+        newCollection.push_back(obj);
+
+        m_Objects[obj->GetType()] = newCollection;
+        obj->OnAdd(this);
+    }
     return true;
 }
 
 bool FrDocument::Remove(FrDocumentObj* obj){
     // find appropriate object and remove it
-    std::vector<FrDocumentObj*>::iterator it;
-    it = std::find(m_Objects.begin(), m_Objects.end(), obj);
+    DocObjMap::iterator it;
+    it = m_Objects.find(obj->GetType());
 
     bool result = false;
     if(it != m_Objects.end()){
-        m_Objects.erase(it);
-        obj->OnRemove(this);
-        delete obj;
-
+        
+        DocObjCollection::iterator itr;
+        itr = std::find(it->second.begin(), it->second.end(), obj);
+        if(itr != it->second.end()){
+            it->second.erase(itr);
+            obj->OnRemove(this);
+            delete obj;
+        }
         result = true;
     }
     return result;
 }
 
 void FrDocument::DeleteAll(){
-    std::vector<FrDocumentObj*>::iterator it, itEnd(m_Objects.end());
+    DocObjMap::iterator it, itEnd(m_Objects.end());
 
-    while(m_Objects.size() > 0){
-        Remove( (*m_Objects.begin()) );
+    for(it = m_Objects.begin(); it != itEnd; ++it){
+        while(it->second.size()){
+            Remove( *(it->second.begin()) );
+        }
     }
+   m_Objects.clear();
 }
     
 void FrDocument::GetObjectsByType(std::vector<FrDocumentObj*>& objects, 
                                   FrDocumentObj::ObjTypes type){
     objects.clear();
-    std::vector<FrDocumentObj*>::iterator it, itEnd(m_Objects.end());
-
-    for(it = m_Objects.begin(); it != itEnd; ++it){
-        if((*it)->GetType() == type){
-            objects.push_back(*it);
-        }
+    
+    DocObjMap::iterator itr = m_Objects.find(type);
+    if(itr != m_Objects.end()){
+        objects.resize(itr->second.size());
+        std::copy(itr->second.begin(), 
+                  itr->second.end(), 
+                  objects.begin()); 
     }
 }

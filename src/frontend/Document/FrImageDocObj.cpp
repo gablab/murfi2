@@ -16,6 +16,10 @@ FrImageDocObj::FrImageDocObj()
 : m_Image(0){
 }
 
+FrImageDocObj::FrImageDocObj(RtMRIImage* img)
+: m_Image(img){
+}
+
 FrImageDocObj::~FrImageDocObj(){
     if(m_Image) delete m_Image;
 }

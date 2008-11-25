@@ -24,6 +24,13 @@ FrRoiDocObj::FrRoiDocObj()
     
 }
 
+FrRoiDocObj::FrRoiDocObj(RtMaskImage* roi)
+: m_MaskImage(roi), m_ID(DEF_ROI_ID),
+  m_Name(DEF_ROI_NAME), m_Visibility(DEF_ROI_VIS),
+  m_Opacity(DEF_ROI_OPAC){
+
+}
+
 FrRoiDocObj::~FrRoiDocObj(){
     if(m_MaskImage) delete m_MaskImage;
 }

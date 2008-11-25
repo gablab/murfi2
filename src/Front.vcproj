@@ -513,6 +513,14 @@
 			Name="Document"
 			>
 			<File
+				RelativePath=".\frontend\Document\FrDataStore.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrDataStore.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Document\FrDocument.cpp"
 				>
 			</File>

@@ -17,6 +17,7 @@ class QString;
 class FrRoiDocObj : public FrDocumentObj {
 public:
     FrRoiDocObj();
+    FrRoiDocObj(RtMaskImage* roi);
     virtual ~FrRoiDocObj();
 
     virtual void OnAdd(FrDocument* doc);

@@ -16,6 +16,7 @@ class QString;
 class FrImageDocObj : public FrDocumentObj {
 public:
     FrImageDocObj();
+    FrImageDocObj(RtMRIImage* img);
     virtual ~FrImageDocObj();
 
     virtual void OnAdd(FrDocument* doc);

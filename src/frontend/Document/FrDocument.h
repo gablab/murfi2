@@ -2,12 +2,18 @@
 #define FR_DOCUMENT
 
 // STL includes
+#include <map>
 #include <vector>
 #include "FrDocumentObj.h"
 #include "FrMacro.h"
 
 
 class FrDocument {
+public:
+    // Types
+    typedef std::vector<FrDocumentObj*> DocObjCollection;
+    typedef std::map<FrDocumentObj::ObjTypes, DocObjCollection> DocObjMap;
+
 public:
     FrDocument();
     virtual ~FrDocument();
@@ -17,14 +23,11 @@ public:
     void DeleteAll();
 
     // To be overloaded
-    void GetObjectsByType(std::vector<FrDocumentObj*>& objects, 
+    void GetObjectsByType(DocObjCollection& objects, 
                           FrDocumentObj::ObjTypes type);
 
     // Properties
-    // TODO: we have to use here map of vectors with 
-    // FrDocumentObj::ObjTypes as a key. This will make 
-    // access to objects much faster
-    FrGetRefPropMacro(std::vector< FrDocumentObj* >, Objects);
+    FrGetRefPropMacro(DocObjMap, Objects);
 };
 
 #endif

@@ -27,11 +27,16 @@ bool FrSphereTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrSphereTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
+    if(params.Button == FrMouseParams::LeftButton || params.Button == FrMouseParams::RightButton){
         // execute command 
         FrMaskSphereCmd* cmd = FrCommandController::CreateCmd<FrMaskSphereCmd>();
-        cmd->SetAction(FrMaskSphereCmd::Write);
+        //cmd->SetAction(FrMaskSphereCmd::Write);
 
+        if(params.Button == FrMouseParams::LeftButton)
+            cmd->SetAction(FrMaskSphereCmd::Write);
+        else 
+            cmd->SetAction(FrMaskSphereCmd::Erase); 
+        
         Pos center;
         center.x = params.X;
         center.y = params.Y;
@@ -69,7 +74,7 @@ bool FrSphereTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     cmd->Execute();
     delete cmd;
 
-    return false;
+    return true;
 }
 
 bool FrSphereTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){

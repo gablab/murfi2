@@ -24,7 +24,7 @@ bool FrFreeShapeTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrFreeShapeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
+    if(params.Button == FrMouseParams::LeftButton || params.Button == FrMouseParams::RightButton){
         SetCurrentState(FrFreeShapeTool::Drawing);
         Pos pos;
         pos.x = params.X;
@@ -37,7 +37,13 @@ bool FrFreeShapeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
             SetCurrentState(FrFreeShapeTool::None); 
 
             FrMaskFreeShapeCmd* cmd = FrCommandController::CreateCmd<FrMaskFreeShapeCmd>();
-            cmd->SetAction(FrMaskFreeShapeCmd::Write);
+            //cmd->SetAction(FrMaskFreeShapeCmd::Write);
+
+            if(params.Button == FrMouseParams::LeftButton)
+                cmd->SetAction(FrMaskFreeShapeCmd::Write);
+            else 
+                cmd->SetAction(FrMaskFreeShapeCmd::Erase); 
+
             Points.pop_back();
             Points.push_back(pos);
 

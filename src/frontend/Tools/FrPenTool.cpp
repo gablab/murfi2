@@ -23,10 +23,15 @@ void FrPenTool::Stop(){
 }
 
 bool FrPenTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
+    if(params.Button == FrMouseParams::LeftButton || params.Button == FrMouseParams::RightButton){
         // execute command 
         FrMaskPenCmd* cmd = FrCommandController::CreateCmd<FrMaskPenCmd>();
-        cmd->SetAction(FrMaskPenCmd::Write);
+
+        if(params.Button == FrMouseParams::LeftButton)
+            cmd->SetAction(FrMaskPenCmd::Write);
+        else 
+            cmd->SetAction(FrMaskPenCmd::Erase);
+
         cmd->Execute();
         delete cmd;
     }
@@ -35,11 +40,16 @@ bool FrPenTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrPenTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
+    if(params.Button == FrMouseParams::LeftButton || params.Button == FrMouseParams::RightButton){
         // execute command 
         FrMaskPenCmd* cmd = FrCommandController::CreateCmd<FrMaskPenCmd>();
-        cmd->SetAction(FrMaskPenCmd::Draw);
- 
+        //cmd->SetAction(FrMaskPenCmd::Draw);
+        
+        if(params.Button == FrMouseParams::LeftButton)
+            cmd->SetAction(FrMaskPenCmd::Draw);
+        else 
+            cmd->SetAction(FrMaskPenCmd::Erase); 
+        
         Pos center;
         center.x = params.X;
         center.y = params.Y;
@@ -64,11 +74,16 @@ bool FrPenTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrPenTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
-    if(params.Button == FrMouseParams::LeftButton){
+    if(params.Button == FrMouseParams::LeftButton || params.Button == FrMouseParams::RightButton){
         // execute command 
         FrMaskPenCmd* cmd = FrCommandController::CreateCmd<FrMaskPenCmd>();
-        cmd->SetAction(FrMaskPenCmd::Draw);
- 
+        //cmd->SetAction(FrMaskPenCmd::Draw);
+
+        if(params.Button == FrMouseParams::LeftButton)
+            cmd->SetAction(FrMaskPenCmd::Draw);
+        else 
+            cmd->SetAction(FrMaskPenCmd::Erase); 
+
         Pos center;
         center.x = params.X;
         center.y = params.Y;

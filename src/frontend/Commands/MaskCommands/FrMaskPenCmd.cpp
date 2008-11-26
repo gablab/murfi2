@@ -30,9 +30,10 @@ bool FrMaskPenCmd::Execute(){
 
     switch (m_Action){
         case FrMaskPenCmd::Draw:
+        case FrMaskPenCmd::Erase:
             result = DrawMask();
             break;
-        case FrMaskPenCmd::Erase:
+        //case FrMaskPenCmd::Erase:
         case FrMaskPenCmd::Write:
             result = WriteMask();
             break;

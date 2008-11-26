@@ -146,7 +146,6 @@ bool FrRoiTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     else {
         bool isInside = this->GetMappedCoords(is, params);
         m_curTool->SetImageNumber(m_ImageNumber);
-        m_curTool->SetImageNumber(m_ImageNumber);
         result = m_curTool->OnMouseDown(is, params);
     }
 

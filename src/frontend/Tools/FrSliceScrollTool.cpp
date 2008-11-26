@@ -76,10 +76,10 @@ bool FrSliceScrollTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
     char keySym = params.KeySym[0];
 
     switch (keySym){
-        case 0x26:
+        case 0x26:              // up arrow
             sliceDelta = 1;
             break;
-        case 0x28:
+        case 0x28:              // down arrow
             sliceDelta = -1;
             break;
         default:

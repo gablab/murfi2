@@ -14,41 +14,83 @@
 #include <Qt/qstring.h>
 #include <Qt/qfile.h>
 
+#define BAD_SERIES_NUM 0xffffffff
 
-FrImageDocObj::FrImageDocObj()
-: m_Image(0){
+FrImageDocObj::FrImageDocObj(){
+    m_Images.clear();
+    m_SeriesNumber = BAD_SERIES_NUM:
 }
 
-FrImageDocObj::FrImageDocObj(RtMRIImage* img)
-: m_Image(img){
+FrImageDocObj::FrImageDocObj(RtMRIImage* img){    
+    m_Images.push_back(img);
+    m_SeriesNumber = img->getDataID().getSeriesNum();
 }
 
 FrImageDocObj::~FrImageDocObj(){
-    if(m_Image) delete m_Image;
+    this->ClearAll();
 }
 
 void FrImageDocObj::OnAdd(FrDocument* doc){
-    // NOTE : Do nothing in base class
+    // NOTE : Add here Image layer
 }
 
 void FrImageDocObj::OnRemove(FrDocument* doc){
-    // NOTE : Do nothing in base class 
+    // NOTE : Remove here image layer
 }
 
 FrDocumentObj::ObjTypes FrImageDocObj::GetType(){
     return FrDocumentObj::ImageObject;
 }
 
-unsigned int FrImageDocObj::GetMatrixSize(){
-	return m_Image->getMatrixSize();
+RtMRIImage* FrImageDocObj::GetTimePointData(unsigned int timePoint){
+    RtMRIImage* result = 0;
+
+    ImageCollection::iterator it, itEnd(m_Images.end());
+    for(it = m_Images.begin(); it != itEnd; ++it){
+        RtMRIImage* img = (RtMRIImage*)(*it);
+        if(img->getDataID().getTimePoint() == timePoint){
+            result = img;
+            break;
+        }
+    }
+
+    return result;
 }
 
-int FrImageDocObj::GetSeries(){
-    return m_Image->getDataID().getSeriesNum();
+bool FrImageDocObj::AddTimePointData(RtMRIImage* mriImage){
+    // Some checks
+    if(!mriImage) return false;
+    if(m_SeriesNumber == BAD_SERIES_NUM){
+        m_SeriesNumber = mriImage->getDataID().getSeriesNum();
+    }
+
+    // Add only with the same series number
+    if(m_SeriesNumber != mriImage->getDataID().getSeriesNum()){
+        return false;
+    }
+
+    // Check if we have this timepoint
+    bool hasTP = false;
+    unsigned int timePoint = mriImage->getDataID().getTimePoint();
+    ImageCollection::iterator it, itEnd(m_Images.end());
+    for(it = m_Images.begin(); (it != itEnd) && !hasTP; ++it){
+        RtMRIImage* img = (RtMRIImage*)(*it);
+        hasTP = (img->getDataID().getTimePoint() == timePoint);
+    }
+
+    if(hasTP) return false;
+    m_Images.push_back(mriImage);
+
+    return false;
 }
 
-int FrImageDocObj::GetTimePoint(){
-    return m_Image->getDataID().getTimePoint();
+void FrImageDocObj::ClearAll(){
+    ImageCollection::iterator it, itEnd(m_Images.end());
+    for(it = m_Images.begin(); it != itEnd; ++it){
+        delete (*it);
+    }
+    m_Images.clear();
+    m_SeriesNumber = BAD_SERIES_NUM;
 }
 
 bool FrImageDocObj::LoadFromFile(QString& fileName){

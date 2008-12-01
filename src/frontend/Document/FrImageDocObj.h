@@ -9,7 +9,7 @@ class QString;
 #include "FrMacro.h"
 #include "FrDocumentObj.h"
 
-// TODO: use vtkImageData instead RtMRIImage!!!
+#include <vector>
 
 // One have to provide valid type system
 // All object types have to be registered here.
@@ -27,11 +27,16 @@ public:
     bool LoadFromMRIImage(RtMRIImage* img);
     unsigned int GetMatrixSize();
 
-    int GetSeries();
-    int GetTimePoint();
+    // Series identifiers
+    FrGetPropMacro(unsigned int, SeriesNumber);
+    RtMRIImage* GetTimePointData(unsigned int timePoint);
+    bool AddTimePointData(RtMRIImage* mriImage);
 
-    // Properties
-    FrGetPropMacro(RtMRIImage*,Image);
+    void ClearAll();
+    
+private:
+    typedef std::vector<RtMRIImage*> ImageCollection; 
+    ImageCollection m_Images;
 };
 
 #endif

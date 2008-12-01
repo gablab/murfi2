@@ -22,12 +22,10 @@
 // MainController can manage pipeline of view using specified
 // points in that pipeline. So define that points.
 #define FRP_FULL        0
-#define FRP_READIMAGE   1
-#define FRP_READROI     2
-#define FRP_SLICE       3
-#define FRP_COLORMAP	4
-#define FRP_TBC         5
-#define FRP_OPACITY_VISIBILITY  6
-#define FRP_SETCAM      7
+#define FRP_READ        1
+#define FRP_COLORMAP	2
+#define FRP_TBC         3
+#define FRP_OPACITY_VISIBILITY  4
+#define FRP_SETCAM      5
 
 #endif

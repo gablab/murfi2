@@ -8,6 +8,7 @@ class vtkRenderWindow;
 class FrLayerSettings;
 
 #include "FrMacro.h"
+#include "FrViewSettings.h"
 #include <vector>
 
 #define QTVIEW3D (this->GetQtView())

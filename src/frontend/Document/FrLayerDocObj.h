@@ -30,6 +30,9 @@ public:
     FrGetPropMacro(FrLayerSettings*, Settings);
     FrGetPropMacro(unsigned int, ID);
 
+    double GetOpacity();
+    bool GetVisibility();
+
     //Methods
     bool CopySettings(FrLayerSettings* src);
 };

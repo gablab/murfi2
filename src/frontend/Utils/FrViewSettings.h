@@ -37,9 +37,9 @@ public:
 
 // Ortho view definitions
 #define ORTHO_VIEWS_CNT 3
-#define CORONAL_SLICE  0
-#define SAGITAL_SLICE  1
-#define AXIAL_SLICE    2
+#define DEF_CORONAL  0
+#define DEF_SAGITAL  1
+#define DEF_AXIAL    2
 
 class FrOrthoViewSettings {
 public:

@@ -14,12 +14,7 @@ class FrUpdateParams2;
 
 // Some includes
 #include "FrBaseView.h"
-#include <vector>
-
-#define ORTHO_IMAGE_COUNT   3
-#define CORONAL_IMAGE 0
-#define SAGITAL_IMAGE 1
-#define AXIAL_IMAGE   2
+#include "FrViewSettings.h"
 
 // Class represents ortho view
 class FrOrthoView : public FrBaseView { 
@@ -33,25 +28,22 @@ public:
     virtual void RemoveRenderers();
 
     // Accessors
-    FrLayeredImage* GetImage(int idx){ return m_LayeredImage[idx]; }
+    FrLayeredImage* GetImage(int idx){ 
+        return m_LayeredImage[idx]; 
+    }
 
 private:
 
     // Update pipline helpers
-    void InitUpdateParams(FrUpdateParams2& params);
-    void ReadImage(FrUpdateParams2& params);
-    void ReadRoi(FrUpdateParams2& params);
-    void ExtractSlice(FrUpdateParams2& params);
+    bool InitUpdateParams(FrUpdateParams2& params);
+    void ReadDocument(FrUpdateParams2& params);
     void UpdateColormap(FrUpdateParams2& params);
-    void UpdateTBC(FrUpdateParams2& params);
-    void UpdateOpacityVisibility(FrUpdateParams2& params);
+    void UpdateTbc(FrUpdateParams2& params);
 
 private:
     // Render pipline
-    FrDocumentReader* m_imgReader;
-    FrDocumentReader* m_roiReader;
-    FrSliceExtractor* m_SliceExtractor[ORTHO_IMAGE_COUNT];
-    FrLayeredImage* m_LayeredImage[ORTHO_IMAGE_COUNT];
+    FrDocumentReader* m_docReader;
+    FrLayeredImage* m_LayeredImage[ORTHO_VIEWS_CNT];
 
     vtkRenderer* m_dummyRenderer;
 };

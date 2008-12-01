@@ -5,10 +5,10 @@
 #include "FrDocument.h"
 #include "FrMainDocument.h"
 #include "FrNotify.h"
-#include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
-#include "FrRoiDocObj.h"
+#include "FrLayerDocObj.h"
+#include "FrViewDocObj.h"
 
 // VTK stuff
 #include "vtkRenderer.h"
@@ -19,12 +19,9 @@
 class FrUpdateParams1 {
 public:
     FrMainDocument*      Document;
-    FrTabSettingsDocObj* TabSettings;
     FrMosaicViewSettings* ViewSettings;
-    int                  ActiveLayerID;
-    FrLayerSettings*     ActiveLayer;
-    LayerCollection      Layers;
-    std::vector<int>     RoiIDs;
+    typedef std::vector<FrLayerDocObj*> LayerCollection;
+    LayerCollection Layers;
 };
 
 
@@ -32,19 +29,13 @@ public:
 // Default constructor
 FrMosaicView::FrMosaicView(FrMainWindow* mainWindow)
 : FrBaseView(mainWindow) {
-    m_imgReader = FrDocumentReader::New();	
-    m_imgReader->SetTarget(FrDocumentReader::Image);
-
-    m_roiReader = FrDocumentReader::New();	
-    m_roiReader->SetTarget(FrDocumentReader::ROI);
-
+    m_docReader = FrDocumentReader::New();
     m_LayeredImage = FrLayeredImage::New();
 }
 
 FrMosaicView::~FrMosaicView(){
     this->RemoveRenderers();
-    if(m_imgReader) m_imgReader->Delete();
-    if(m_roiReader) m_roiReader->Delete();
+    if(m_docReader) m_docReader->Delete();
     if(m_LayeredImage) m_LayeredImage->Delete();
 }
 
@@ -87,40 +78,18 @@ void FrMosaicView::RemoveRenderers(){
     renWin->SetNumberOfLayers(0);
 }
 
-void FrMosaicView::UpdatePipeline(int point){
+void FrMosaicView::UpdatePipeline(int point){    
     // Get common settings
     FrUpdateParams1 params;
-    this->InitUpdateParams(params);
-
-    FrRoiDocObj* roi = 0L;
-    std::vector<FrDocumentObj*> rois;
-    params.Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
-    std::vector<FrDocumentObj*>::iterator it, itEnd(rois.end());
-
+    if(!this->InitUpdateParams(params)) return;
+                        	
     // Update pipeline
     switch(point)
     {
-    case FRP_FULL:
+    case FRP_FULL: // NOTE: Do nothing here !!!
+    case FRP_READ:
         {
-            // NOTE: Do nothing here !!!
-        }
-    case FRP_READIMAGE:
-        {
-            this->ReadImage(params);
-        }
-    case FRP_READROI:
-        {
-            this->ReadRoi(params);
-        }
-	case FRP_SLICE:
-        {
-            // NOTE: Do nothing here but setup text
-            if(m_LayeredImage->GetInput()){
-                m_LayeredImage->SetText("Mosaic View:");
-            }
-            else {            
-                m_LayeredImage->SetText("");
-            }
+            this->ReadDocument(params);
         }
     case FRP_COLORMAP:
         {
@@ -128,25 +97,25 @@ void FrMosaicView::UpdatePipeline(int point){
         }
     case FRP_TBC:
         {
-            this->UpdateTBC(params);
+            this->UpdateTbc(params);
         }
     case FRP_OPACITY_VISIBILITY:
-        {
-            this->UpdateOpacityVisibility(params);
-            
-            // have to update rois
-            if(params.ActiveLayerID == ALL_LAYERS_ID){
-                for(it = rois.begin(); it != itEnd; ++it){
-                    roi = (FrRoiDocObj*)(*it);
-                    m_LayeredImage->SetOpacity(roi->GetOpacity(), roi->GetID());
-                    m_LayeredImage->SetVisibility(roi->GetVisibility(), roi->GetID());
-                }
+        {   
+            FrUpdateParams1::LayerCollection::iterator it,
+                itEnd(params.Layers.end());
+
+            for(it = params.Layers.begin(); it != itEnd; ++it){
+                unsigned int id = (*it)->GetID();
+                m_LayeredImage->SetOpacity((*it)->GetOpacity(), id);
+                m_LayeredImage->SetVisibility((*it)->GetVisibility(), id); 
             }
         }
     case FRP_SETCAM:
         {
             m_LayeredImage->SetCameraSettings(
-                params.ViewSettings->CamSettings, ALL_LAYERS_ID);	
+                params.ViewSettings->CamSettings, 
+                ALL_LAYER_ID);
+
             m_LayeredImage->UpdateCamera();
         }
     default:
@@ -154,109 +123,92 @@ void FrMosaicView::UpdatePipeline(int point){
         break;
     }
 
-    // Draw border
-    // m_LayeredImage->UpdateBorder();
-
     // redraw scene
 	GetRenderWindow()->Render();
 }
 
-void FrMosaicView::InitUpdateParams(FrUpdateParams1& params){
+bool FrMosaicView::InitUpdateParams(FrUpdateParams1& params){
     // Init params used when updating
-    params.Document     = this->GetMainWindow()->GetMainDocument();
-    params.TabSettings  = params.Document->GetCurrentTabSettings();
-    params.ViewSettings = params.TabSettings->GetMosaicViewSettings();
+    params.Document = this->GetMainWindow()->GetMainDocument();
 
-    params.ActiveLayerID = params.ViewSettings->ActiveLayerID;    
-    GetLayerSettings(params.ViewSettings, params.Layers);
-
-    params.ActiveLayer = this->GetActiveLayer(params.Layers, params.ActiveLayerID);
+    // Get view settings
+    FrDocument::DocObjCollection objects;
+    params.Document->GetObjectsByType(objects, FrDocumentObj::ViewObject);
     
-    // add all ROI IDs
-    this->GetRoiIDs(params.Document, params.RoiIDs);
+    if(objects.size() <= 0) return false;
+    params.ViewSettings = ((FrViewDocObj*)objects[0])->GetMosaicViewSettings();
+
+    // Get layers for update
+    unsigned int activeLayerID = params.ViewSettings->ActiveLayerID;
+    params.Document->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+
+    params.Layers.clear();
+    FrDocument::DocObjCollection::iterator it, itEnd(objects.end());
+    for(it = objects.begin(); it != itEnd; ++it){
+        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+        if(activeLayerID == ALL_LAYER_ID){
+            params.Layers.push_back(layerDO);
+        }
+        else if(activeLayerID == layerDO->GetID()){
+            params.Layers.push_back(layerDO);
+            break;
+        }
+    }
+    return true;
 }
 
-void FrMosaicView::ReadImage(FrUpdateParams1& params){
-    // read document and connect filters
-    m_imgReader->SetDocument(params.Document);
-    m_imgReader->SetMosaicOn();
-    m_imgReader->Update();
-	
-    // Pass image input 
-    m_LayeredImage->SetInput(m_imgReader->GetOutput());
-}
+void FrMosaicView::ReadDocument(FrUpdateParams1& params){
+    m_docReader->SetDocument(params.Document);
+    m_docReader->SetMosaic(true);
+    m_docReader->SetOrientation(FrDocumentReader::XY);    
 
-void FrMosaicView::ReadRoi(FrUpdateParams1& params){
-    // read document and connect filters
-    m_roiReader->SetDocument(params.Document);
-    m_roiReader->SetMosaicOn();
-    m_roiReader->Update();
-	    
-    // Pass ROI data from output starting from 1
-    int count = m_roiReader->GetOutputCount();
-    for(int i=0; i < count; ++i){
-        int roiID = params.RoiIDs[i];
-        m_LayeredImage->SetRoiInput(roiID, m_roiReader->GetOutput(i));
+    FrUpdateParams1::LayerCollection::iterator it,
+        itEnd(params.Layers.end());
+
+    for(it = params.Layers.begin(); it != itEnd; ++it){
+        if((*it)->IsRoi()){
+            m_docReader->SetDataID((*it)->GetID());
+            m_docReader->Update();
+            m_LayeredImage->SetRoiInput(m_docReader->GetOutput(),
+                                        (*it)->GetID());
+        }
+        else if((*it)->IsImage()){  
+            // ID is current Timepoint since we have 
+            // just one time series 
+            m_docReader->SetDataID(0);
+            m_docReader->Update();
+
+            m_LayeredImage->SetImageInput(m_docReader->GetOutput());
+        }
     }
 }
 
 void FrMosaicView::UpdateColormap(FrUpdateParams1& params){
-    if(params.ActiveLayerID == ALL_LAYERS_ID){
-        // Update all layers
-        LayerCollection::iterator it, itEnd(params.Layers.end());
-        for(it = params.Layers.begin(); it != itEnd; ++it){
-            m_LayeredImage->SetColormapSettings(
-                (*it)->ColormapSettings, (*it)->ID);
+    FrUpdateParams1::LayerCollection::iterator it,
+        itEnd(params.Layers.end());
+
+    for(it = params.Layers.begin(); it != itEnd; ++it){
+        if((*it)->IsColormap()){
+            FrColormapLayerSettings* cmls = (FrColormapLayerSettings*)(*it)->GetSettings();
+            m_LayeredImage->SetColormapSettings(cmls->ColormapSettings, (*it)->GetID());
         }
-    }
-    else if(params.ActiveLayer != 0) {
-        m_LayeredImage->SetColormapSettings(
-            params.ActiveLayer->ColormapSettings, params.ActiveLayer->ID);
     }
     m_LayeredImage->UpdateColormap();
 }
 
-void FrMosaicView::UpdateTBC(FrUpdateParams1& params){
-    // Update TBC
-    if(params.ActiveLayerID == ALL_LAYERS_ID){
-        // Update all layers
-        LayerCollection::iterator it, itEnd(params.Layers.end());
-        for(it = params.Layers.begin(); it != itEnd; ++it){
-            m_LayeredImage->SetTBCSettings((*it)->TbcSettings, (*it)->ID);
-        }
-    }
-    else if(params.ActiveLayer != 0) {
-        m_LayeredImage->SetTBCSettings(
-            params.ActiveLayer->TbcSettings, params.ActiveLayer->ID);
-    }
-    m_LayeredImage->UpdateTBC();
-}
+void FrMosaicView::UpdateTbc(FrUpdateParams1& params){
+     FrUpdateParams1::LayerCollection::iterator it,
+        itEnd(params.Layers.end());
 
-void FrMosaicView::UpdateOpacityVisibility(FrUpdateParams1& params){
-    // Update Opacity and visibility
-    if(params.ActiveLayerID == ALL_LAYERS_ID){
-        // Update all layers
-        LayerCollection::iterator it, itEnd(params.Layers.end());
-        for(it = params.Layers.begin(); it != itEnd; ++it){
-            m_LayeredImage->SetOpacity((*it)->Opacity, (*it)->ID);
-            m_LayeredImage->SetVisibility((*it)->Visibility, (*it)->ID);
+    for(it = params.Layers.begin(); it != itEnd; ++it){
+        if((*it)->IsColormap()){
+            FrColormapLayerSettings* cmls = (FrColormapLayerSettings*)(*it)->GetSettings();
+            m_LayeredImage->SetTbcSettings(cmls->TbcSettings, (*it)->GetID());
+        }
+        else if((*it)->IsImage()){
+            FrImageLayerSettings* ils = (FrImageLayerSettings*)(*it)->GetSettings();
+            m_LayeredImage->SetTbcSettings(ils->TbcSettings, (*it)->GetID());
         }
     }
-    else if(params.ActiveLayer != 0) {
-        m_LayeredImage->SetOpacity(
-            params.ActiveLayer->Opacity, params.ActiveLayer->ID);
-        m_LayeredImage->SetVisibility(
-            params.ActiveLayer->Visibility, params.ActiveLayer->ID);
-    }
-    else {
-        // Seems this is ROI layer
-        bool roiVisibility = true;
-        double roiOpacity = 1.0;
-        if(this->GetRoiParams(params.Document, 
-            params.ActiveLayerID, roiVisibility, roiOpacity)){
-            // apply roi params
-            m_LayeredImage->SetOpacity(roiOpacity, params.ActiveLayerID);
-            m_LayeredImage->SetVisibility(roiVisibility, params.ActiveLayerID);
-        }
-    }
+    m_LayeredImage->UpdateTbc();
 }

@@ -125,10 +125,10 @@ bool FrMaskRectangleCmd::WriteMask(){
             //ymin = Min(m_Rect.firstPoint.y, m_Rect.secondPoint.y);
             //ymax = Max(m_Rect.firstPoint.y, m_Rect.secondPoint.y);
 
-            xmin = Min(firstPoint[0], secondPoint[0]);
-            xmax = Max(firstPoint[0], secondPoint[0]);
-            ymin = Min(firstPoint[1], secondPoint[1]);
-            ymax = Max(firstPoint[1], secondPoint[1]);
+            xmin = std::min(firstPoint[0], secondPoint[0]);
+            xmax = std::max(firstPoint[0], secondPoint[0]);
+            ymin = std::min(firstPoint[1], secondPoint[1]);
+            ymax = std::max(firstPoint[1], secondPoint[1]);
 
             unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
 

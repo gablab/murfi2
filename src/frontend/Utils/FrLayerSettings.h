@@ -12,7 +12,7 @@
 #define BAD_LAYER_ID 0
 #define DEF_LAYER_ID 1
 #define SPC_LAYER_ID 2
-#define ALL_LAYER_ID 2
+#define ALL_LAYER_ID 3
 
 #define DEF_LAYER_NAME "Default"
 #define DEF_LAYER_OPACITY    1.0

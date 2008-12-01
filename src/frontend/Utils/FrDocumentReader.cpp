@@ -3,6 +3,7 @@
 #include "FrDocumentObj.h"
 #include "FrImageDocObj.h"
 #include "FrRoiDocObj.h"
+#include "FrUtils.h"
 
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
@@ -46,7 +47,7 @@ void FrDocumentReader::Update(){
             break;
     }
 
-    this->SetOutput()
+    this->SetOutput(result);
 }
 
 void FrDocumentReader::SetMosaic(bool value){
@@ -111,19 +112,15 @@ vtkImageData* FrDocumentReader::ReadMri(){
     // NOTE Since we support the only one series 
     // Time point is a unique data ID.
     int timePoint = m_DataID;
-    FrDocument::DocObjCollection::iterator it, itEnd(images.end());
-    for(it = images.begin(); it != itEnd; ++it){
-
-        FrImageDocObj* imgDO = (FrImageDocObj*)(*it);
-        if(imgDO->GetTimePoint() == timePoint){
-            mri = imgDO->GetImage();
-            break;
-        }
+    if(images.size() > 0){
+        FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+        mri = imgDO->GetTimePointData(timePoint);
     }
-
-    // 
+    
+    // Process data
     vtkImageData* result = 0L;
     if(mri){
+        result = this->GetMriSlice(mri);
     }
 
     return result;
@@ -136,19 +133,19 @@ vtkImageData* FrDocumentReader::ReadRoi(){
     m_Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
 
     int roiID = m_DataID;
-    FrDocument::DocObjCollection::iterator it, itEnd(images.end());
-    for(it = images.begin(); it != itEnd; ++it){
-
+    FrDocument::DocObjCollection::iterator it, itEnd(rois.end());
+    for(it = rois.begin(); it != itEnd; ++it){
         FrRoiDocObj* roiDO = (FrRoiDocObj*)(*it);
-        if(roiDO->GetID() == timePoint){
-            mri = imgDO->GetImage();
+        if(roiDO->GetID() == roiID){
+            mask = roiDO->GetMaskImage();
             break;
         }
     }
 
     // 
     vtkImageData* result = 0L;
-    if(mri){
+    if(mask){
+        result = this->GetRoiSlice(mask);
     }
 
     return result;
@@ -160,13 +157,175 @@ vtkImageData* FrDocumentReader::ReadActivation(){
     return 0L;
 }
 
-void FrDocumentReader::InitMriLUT(short* data, unsigned int dataSize, 
+vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
+    // Params
+    RtMRIImage* image = 0;
+    bool deleteImage = false;
+    
+    int xDim = 0;
+    int yDim = 0;
+    unsigned int dataSize = 0;
+    short* pImageData = 0;
+    
+    // Assume that mri is always unmosaic
+    if(m_Mosaic){
+        deleteImage = true;
+        image = new RtMRIImage(*mri);
+                
+        if(!image->mosaic()){
+            delete image;
+            return 0L;
+        }
+        
+        xDim = image->getDim(0);
+        yDim = image->getDim(1);
+        dataSize = image->getImgDataLen();
+        pImageData = image->getDataCopy();
+    }
+    else {
+        deleteImage = false;
+        image = mri;
+                
+        switch(m_Orientation){
+            case XY:
+                xDim = image->getDim(0);
+                yDim = image->getDim(1);
+                dataSize = xDim * yDim;
+                // NOTE: here we clamp slice values
+                m_Slice = ClampValue(m_Slice, 0, image->getDim(2));
+                pImageData = this->GetSliceDataXY<short>(image, m_Slice);
+                break;
+            case YZ:
+                xDim = image->getDim(1);
+                yDim = image->getDim(2);
+                dataSize = xDim * yDim;
+                // NOTE: here we clamp slice values
+                m_Slice = ClampValue(m_Slice, 0, image->getDim(0));
+                pImageData = this->GetSliceDataYZ<short>(image, m_Slice);
+                break;
+            case XZ:
+                xDim = image->getDim(0);
+                yDim = image->getDim(2);
+                dataSize = xDim * yDim;
+                // NOTE: here we clamp slice values
+                m_Slice = ClampValue(m_Slice, 0, image->getDim(1));
+                pImageData = this->GetSliceDataXZ<short>(image, m_Slice);
+                break;
+        }
+    }
+
+    vtkImageData* result = vtkImageData::New();
+    result->SetScalarTypeToUnsignedChar();
+    result->SetDimensions(xDim, yDim, 1);
+    result->SetNumberOfScalarComponents(1);
+    result->AllocateScalars();
+    
+    // Copy data and map values through lookup table
+    unsigned char* LUT = 0;
+    this->CreateMriLUT(mri->data, mri->getImgDataLen(), &LUT);
+
+    short* pSrc = pImageData;
+    unsigned char* pDst = (unsigned char*)result->GetScalarPointer();
+    for(int i=0; i < dataSize; ++i){
+        (*pDst) = LUT[(*pSrc)];
+        ++pDst; ++pSrc;
+    }
+
+    // Cleanup
+    delete[] LUT;
+    delete[] pImageData;
+    if(deleteImage){
+        delete image;
+    }
+    return result;
+} 
+
+vtkImageData* FrDocumentReader::GetRoiSlice(RtMaskImage* roi){
+    // Params
+    RtMaskImage* mask = 0;
+    bool deleteMask = false;
+    
+    int xDim = 0;
+    int yDim = 0;
+    unsigned int dataSize = 0;
+    short* pMaskData = 0;
+    
+    // Assume that mri is always unmosaic
+    if(m_Mosaic){
+        deleteMask = true;
+        mask = new RtMaskImage(*roi);
+                
+        if(!mask->mosaic()){
+            delete mask;
+            return 0L;
+        }
+        
+        xDim = mask->getDim(0);
+        yDim = mask->getDim(1);
+        dataSize = mask->getImgDataLen();
+        pMaskData = mask->getDataCopy();
+    }
+    else {
+        deleteMask = false;
+        mask = roi;
+
+        switch(m_Orientation){
+            case XY:
+                xDim = mask->getDim(0);
+                yDim = mask->getDim(1);
+                dataSize = xDim * yDim;
+                // NOTE: here we clamp slice values
+                m_Slice = ClampValue(m_Slice, 0, mask->getDim(1));
+                pMaskData = this->GetSliceDataXY<short>(mask, m_Slice);
+                break;
+            case YZ:
+                xDim = mask->getDim(1);
+                yDim = mask->getDim(2);
+                dataSize = xDim * yDim;
+                // NOTE: here we clamp slice values
+                m_Slice = ClampValue(m_Slice, 0, mask->getDim(1));
+                pMaskData = this->GetSliceDataYZ<short>(mask, m_Slice);
+                break;
+            case XZ:
+                xDim = mask->getDim(0);
+                yDim = mask->getDim(2);
+                dataSize = xDim * yDim;
+                // NOTE: here we clamp slice values
+                m_Slice = ClampValue(m_Slice, 0, mask->getDim(1));
+                pMaskData = this->GetSliceDataXZ<short>(mask, m_Slice);
+                break;
+        }
+    }
+
+    vtkImageData* result = vtkImageData::New();
+    result->SetScalarTypeToUnsignedChar();
+    result->SetDimensions(xDim, yDim, 1);
+    result->SetNumberOfScalarComponents(1);
+    result->AllocateScalars();
+    
+    // Copy data 
+    short* pSrc = pMaskData;
+    unsigned char* pDst = (unsigned char*)result->GetScalarPointer();
+    for(int i=0; i < dataSize; ++i){
+        (*pDst) = (unsigned char)(*pSrc);
+        ++pDst; ++pSrc;
+    }
+
+    // Cleanup
+    delete[] pMaskData;
+    if(deleteMask){
+        delete mask;
+    }
+    return result;
+}
+
+void FrDocumentReader::CreateMriLUT(short* data, unsigned int dataSize, 
                                   unsigned char** outLUT){
     // assume that values cannot be negative
     short min = 0;
     short max = data[0]; 
     
-    // find max and min
+    // find max and min values
     short* ptr = data;
     short* pEnd = data + dataSize;
     for(; ptr != pEnd; ++ptr){

@@ -18,35 +18,35 @@ int  Irange(int a, int minv, int maxv){
 	return a;
 }
 
-void GetLayerSettings(FrSliceViewSettings*  sets, LayerCollection& layers){
-    layers.clear();
-    layers.push_back(&sets->MainLayer);
-    
-    LayerCollection::iterator it, itEnd(sets->OtherLayers.end());
-    for(it = sets->OtherLayers.begin(); it != itEnd; ++it){
-        layers.push_back( (*it) );
-    }
-}
-
-void GetLayerSettings(FrMosaicViewSettings* sets, LayerCollection& layers){
-    layers.clear();
-    layers.push_back(&sets->MainLayer);
-
-    LayerCollection::iterator it, itEnd(sets->OtherLayers.end());
-    for(it = sets->OtherLayers.begin(); it != itEnd; ++it){
-        layers.push_back( (*it) );
-    }
-}
-
-void GetLayerSettings(FrOrthoViewSettings*  sets, LayerCollection& layers, int viewID){
-    layers.clear();
-    layers.push_back(&sets->MainLayer[viewID]);
-
-    LayerCollection::iterator it, itEnd(sets->OtherLayers[viewID].end());
-    for(it = sets->OtherLayers[viewID].begin(); it != itEnd; ++it){
-        layers.push_back( (*it) );
-    }
-}
+//void GetLayerSettings(FrSliceViewSettings*  sets, LayerCollection& layers){
+//    layers.clear();
+//    layers.push_back(&sets->MainLayer);
+//    
+//    LayerCollection::iterator it, itEnd(sets->OtherLayers.end());
+//    for(it = sets->OtherLayers.begin(); it != itEnd; ++it){
+//        layers.push_back( (*it) );
+//    }
+//}
+//
+//void GetLayerSettings(FrMosaicViewSettings* sets, LayerCollection& layers){
+//    layers.clear();
+//    layers.push_back(&sets->MainLayer);
+//
+//    LayerCollection::iterator it, itEnd(sets->OtherLayers.end());
+//    for(it = sets->OtherLayers.begin(); it != itEnd; ++it){
+//        layers.push_back( (*it) );
+//    }
+//}
+//
+//void GetLayerSettings(FrOrthoViewSettings*  sets, LayerCollection& layers, int viewID){
+//    layers.clear();
+//    layers.push_back(&sets->MainLayer[viewID]);
+//
+//    LayerCollection::iterator it, itEnd(sets->OtherLayers[viewID].end());
+//    for(it = sets->OtherLayers[viewID].begin(); it != itEnd; ++it){
+//        layers.push_back( (*it) );
+//    }
+//}
 
 double GetLength(int x1, int y1, int x2, int y2)
 {
@@ -67,10 +67,10 @@ void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point
     double dSpacing[3];	
     data->GetSpacing(dSpacing);		
 
-    enum FrTabSettingsDocObj::View view = ts->GetActiveView();
+    Views view = ts->GetActiveView();
     
     switch(view){
-        case FrTabSettingsDocObj::SliceView:
+        case SliceView:
             {
                 // get slice number
                 int slice = ts->GetSliceViewSettings()->SliceNumber;			
@@ -80,38 +80,40 @@ void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point
                 point[2] = slice;
             }
             break;
-        case FrTabSettingsDocObj::MosaicView:
+        case MosaicView:
             {
                 point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                 point[1] = int((oldPoint[1]+1) / dSpacing[1]);
                 point[2] = 0;
             }
             break;
-        case FrTabSettingsDocObj::OrthoView:
+        case OrthoView:
             {
                 switch(imgNumber){				// должен быть номер рендерера в орто вью 
-                    case 0: // coronal 
+                    case DEF_CORONAL: // coronal 
                     {
                         // get slice number
-                        int slice = ts->GetOrthoViewSettings()->CoronalSlice;	
+                        int slice = ts->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL];
 
                         point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                         point[1] = slice;
                         point[2] = int((oldPoint[1]+1) / dSpacing[2]);
                         break;
                         }
-                    case 1: // sagital
+                    case DEF_SAGITAL: // sagital
                     {
-                        int slice = ts->GetOrthoViewSettings()->SagitalSlice; // get slice number
+                        // get slice number
+                        int slice = ts->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL];
 
                         point[0] = slice;
                         point[1] = int((oldPoint[0]+1) / dSpacing[1]);
                         point[2] = int((oldPoint[1]+1) / dSpacing[2]);
 			            break;
                     }
-                    case 2: // axial
+                    case DEF_AXIAL:
                     {
-                        int slice = ts->GetOrthoViewSettings()->AxialSlice; // get slice number
+                        int slice = ts->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL];
+
 
                         point[0] = int((oldPoint[0]+1) / dSpacing[0]);
 		                point[1] = int((oldPoint[1]+1) / dSpacing[1]);
@@ -122,18 +124,6 @@ void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point
             }
             break;
     }
-}
-
-int Min(int a, int b){
-    int min;
-    min = a<b ? a : b;
-    return min;
-}
-
-int Max(int a, int b){
-    int max;
-    max = a>b ? a : b;
-    return max;
 }
 
 bool IsPointInsideOfPolygon(std::vector<Pos> Points, Pos point){

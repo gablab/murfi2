@@ -7,6 +7,11 @@ class vtkImageData;
 class FrImageDocObj;
 class FrRoiDocObj;
 
+template <class T>
+class RtDataImage;
+class RtMRIImage;
+class RtMaskImage;
+
 // Some includes
 #include "FrMacro.h"
 #include "vtkObject.h"
@@ -55,7 +60,7 @@ public:
     FrGetPropMacro(Orientations, Orientation);
     void SetOrientation(Orientations value);
 
-    FrGetPropMacro(int, slice);
+    FrGetPropMacro(int, Slice);
     void SetSlice(int slice);
     
     // Output management
@@ -68,10 +73,18 @@ private:
     vtkImageData* ReadRoi();
     vtkImageData* ReadActivation();
 
-    // Lut has always 256 byte size
-    #define LUT_SIZE 256
-    void InitMriLUT(short* data, unsigned int dataSize, 
-                    unsigned char** outLUT);
+    vtkImageData* GetMriSlice(RtMRIImage* mri); 
+    vtkImageData* GetRoiSlice(RtMaskImage* mask);
+    ////vtkImageData* GetActivationSlice();
+    template <class T>
+    T* GetSliceDataXY(RtDataImage<T>* img, int slice);
+    template <class T>
+    T* GetSliceDataYZ(RtDataImage<T>* img, int slice);
+    template <class T>
+    T* GetSliceDataXZ(RtDataImage<T>* img, int slice);
+
+    void CreateMriLUT(short* data, unsigned int dataSize, 
+                      unsigned char** outLUT);
     
 protected:
     FrDocumentReader();
@@ -81,5 +94,8 @@ private:
     FrDocumentReader(const FrDocumentReader&);  // Not implemented.
     void operator=(const FrDocumentReader&);  // Not implemented.
 };
+
+// Due to gcc template compilation limitations
+#include "FrDocumentReader.tpp"
 
 #endif

@@ -29,17 +29,14 @@ public:
 
 private:
     // Update pipline helpers
-    void InitUpdateParams(FrUpdateParams1& params);
-    void ReadImage(FrUpdateParams1& params);
-    void ReadRoi(FrUpdateParams1& params);
+    bool InitUpdateParams(FrUpdateParams1& params);
+    void ReadDocument(FrUpdateParams1& params);
     void UpdateColormap(FrUpdateParams1& params);
-    void UpdateTBC(FrUpdateParams1& params);
-    void UpdateOpacityVisibility(FrUpdateParams1& params);
-
+    void UpdateTbc(FrUpdateParams1& params);
+    
 private:
     // Pipline 
-    FrDocumentReader* m_imgReader;
-    FrDocumentReader* m_roiReader;
+    FrDocumentReader* m_docReader;
 	FrLayeredImage* m_LayeredImage;
 };
 

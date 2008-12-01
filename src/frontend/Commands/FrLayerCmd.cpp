@@ -7,6 +7,7 @@
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
 #include "FrRoiDocObj.h"
+#include "FrLayerSettings.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -20,19 +21,19 @@
 
 #define ALL_ITEMS_COUNT 5
 
-FrImageLayerCmd::FrImageLayerCmd() 
-: m_Action(FrImageLayerCmd::Undefined), m_isID(false){
+FrLayerCmd::FrImageLayerCmd() 
+: m_Action(FrImageLayerCmd::Undefined), 
+  m_DocObj(0), m_isID(false){
 }
 
-void FrImageLayerCmd::SetID(int id){
+void FrLayerCmd::SetID(int id){
     m_ID = id;
     m_isID = true;
 }
 
-bool FrImageLayerCmd::Execute(){
+bool FrLayerCmd::Execute(){
     // Check for safety
-    if(!this->GetMainController() || 
-        m_Action == FrImageLayerCmd::Undefined) return false;
+    if(!this->GetMainController()) return false;
 
     bool result = false;
     switch(m_Action){
@@ -48,6 +49,7 @@ bool FrImageLayerCmd::Execute(){
             break;
         case FrImageLayerCmd::UpdateSelectedID: result = UpdateSelectedLayerID();
             break;
+        case FrImageLayerCmd::Undefined:
         default:
             // Do nothing here
             break;
@@ -55,11 +57,11 @@ bool FrImageLayerCmd::Execute(){
     return result;
 }
 
-bool FrImageLayerCmd::AddLayer(){
-    FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrLayerDialog dlg(mv, true);
-    if(!dlg.SimpleExec()) return false;
+bool FrLayerCmd::AddLayer(){
+    if(m_DocObj == 0) return false;
 
+    // Init data
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
     layeredImage[0] = mv->GetSliceView()->GetImage();
     layeredImage[1] = mv->GetMosaicView()->GetImage();
@@ -67,34 +69,34 @@ bool FrImageLayerCmd::AddLayer(){
     layeredImage[3] = mv->GetOrthoView()->GetImage(SAGITAL_IMAGE);
     layeredImage[4] = mv->GetOrthoView()->GetImage(AXIAL_IMAGE);
 
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
-    std::vector<FrLayerSettings*>* otherLayers[ALL_ITEMS_COUNT];
-    otherLayers[0] = &tabSets->GetSliceViewSettings()->OtherLayers;
-    otherLayers[1] = &tabSets->GetMosaicViewSettings()->OtherLayers;
-    otherLayers[2] = &tabSets->GetOrthoViewSettings()->OtherLayers[CORONAL_IMAGE];
-    otherLayers[3] = &tabSets->GetOrthoViewSettings()->OtherLayers[SAGITAL_IMAGE];
-    otherLayers[4] = &tabSets->GetOrthoViewSettings()->OtherLayers[AXIAL_IMAGE];
-
-    FrLayerSettings layerParams;
-    dlg.GetLayerParams(layerParams);
-
-    // we should update layer settings in all views
-    // NOTE: Assume that id is the same for all images
-    int id;
-    for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-        id = layeredImage[i]->AddImageLayer();
-
-        FrLayerSettings* layerSets = new FrLayerSettings(layerParams);
-        layerSets->ID = id;
-        otherLayers[i]->push_back(layerSets);
-        //delete layerSets;	// NEW: to prevent memory leaks
+    bool result = false
+    if(m_DocObj->IsImage()){
+        // NOTE: do nothing here for a while
     }
-    FrBaseCmd::UpdatePipelineForID(id, FRP_COLORMAP);
-    return true;
+    else if(m_DocObj->IsRoi()){
+        for(int i=0; i < ALL_ITEMS_COUNT; ++i){
+            // Do we need to copy values ???
+            layeredImage[i]->AddLayer(
+                m_DocObj->GetID(), 
+                FrLayeredImage::RoiLayer);
+        }
+        FrBaseCmd::UpdatePipelineForID(layerID, FRP_READIMAGE);
+        result = true;
+    }
+    else if(m_DocObj->IsColormap()){
+        for(int i=0; i < ALL_ITEMS_COUNT; ++i){
+            // Do we need copy params here???
+            layeredImage[i]->AddLayer(
+                m_DocObj->GetID(),
+                FrLayeredImage::ColormapLayer);
+        }
+        FrBaseCmd::UpdatePipelineForID(layerID, FRP_COLORMAP);
+        result = true;
+    }
+    return result;
 }
 
-bool FrImageLayerCmd::DeleteLayer(){
+bool FrLayerCmd::DeleteLayer(){
     // Get proper ID
     if(!m_isID || m_ID == CUR_LAYER_ID){
         m_ID = GetActiveLayerID();
@@ -107,15 +109,6 @@ bool FrImageLayerCmd::DeleteLayer(){
             "Delete Layer Command", "Can't delete default layer...");
         return false;
     }
-
-    // Init data
-    FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
-    layeredImage[0] = mv->GetSliceView()->GetImage();
-    layeredImage[1] = mv->GetMosaicView()->GetImage();
-    layeredImage[2] = mv->GetOrthoView()->GetImage(CORONAL_IMAGE);
-    layeredImage[3] = mv->GetOrthoView()->GetImage(SAGITAL_IMAGE);
-    layeredImage[4] = mv->GetOrthoView()->GetImage(AXIAL_IMAGE);
 
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
@@ -155,7 +148,7 @@ bool FrImageLayerCmd::DeleteLayer(){
     return true;
 }
 
-bool FrImageLayerCmd::UpdateSelectedLayerID(){
+bool FrLayerCmd::UpdateSelectedLayerID(){
     if(!m_isID || m_ID < DEFAULT_LAYER_ID) return false;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
@@ -167,7 +160,7 @@ bool FrImageLayerCmd::UpdateSelectedLayerID(){
     return true;
 }
 
-bool FrImageLayerCmd::ChangeLayerOld(){
+bool FrLayerCmd::ChangeLayerOld(){
     // Get proper ID
     if(!m_isID || m_ID == CUR_LAYER_ID){
         m_ID = this->GetActiveLayerID();
@@ -247,7 +240,7 @@ bool FrImageLayerCmd::ChangeLayerOld(){
     return result;
 }
 
-bool FrImageLayerCmd::ChangeLayerParams(){
+bool FrLayerCmd::ChangeLayerParams(){
     // Get proper ID
     if(!m_isID || m_ID == CUR_LAYER_ID){
         m_ID = this->GetActiveLayerID();
@@ -318,7 +311,7 @@ bool FrImageLayerCmd::ChangeLayerParams(){
     return true;
 }
 
-bool FrImageLayerCmd::ChangeLayerColormap(){
+bool FrLayerCmd::ChangeLayerColormap(){
     // Get proper ID
     if(!m_isID || m_ID == CUR_LAYER_ID){
         m_ID = this->GetActiveLayerID();
@@ -361,7 +354,7 @@ bool FrImageLayerCmd::ChangeLayerColormap(){
 }
 
 // delete active layer
-int FrImageLayerCmd::GetActiveLayerID(){
+int FrLayerCmd::GetActiveLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
 
@@ -380,7 +373,7 @@ int FrImageLayerCmd::GetActiveLayerID(){
     return result;
 }
 
-bool FrImageLayerCmd::IsRoiLayer(int id){
+bool FrLayerCmd::IsRoiLayer(int id){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     
     std::vector<FrDocumentObj*> objects;
@@ -396,14 +389,14 @@ bool FrImageLayerCmd::IsRoiLayer(int id){
 }
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now
-bool FrImageLayerCmd::CanUndo(){
+bool FrLayerCmd::CanUndo(){
     return false;
 }
 
-bool FrImageLayerCmd::Undo(){
+bool FrLayerCmd::Undo(){
     return false;
 }
 
-bool FrImageLayerCmd::Redo(){
+bool FrLayerCmd::Redo(){
     return false;
 }

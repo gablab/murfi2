@@ -1,4 +1,4 @@
-#include "FrTBCFilter.h"
+#include "FrTbcFilter.h"
 #include "FrUtils.h"
 
 
@@ -8,16 +8,16 @@
 #include "vtkDataArray.h"
 
 
-vtkStandardNewMacro(FrTBCFilter);
+vtkStandardNewMacro(FrTbcFilter);
 
 
-FrTBCFilter::FrTBCFilter()
+FrTbcFilter::FrTbcFilter()
 : m_Threshold(DEF_THRESHOLD),
   m_Brightness(DEF_BRIGHTNESS),
   m_Contrast(DEF_CONTRAST){
 }
 
-void FrTBCFilter::SetThreshold(double value){
+void FrTbcFilter::SetThreshold(double value){
     // need to set?    
     if(value != m_Threshold){
         // change threshold
@@ -26,7 +26,7 @@ void FrTBCFilter::SetThreshold(double value){
     }
 }
 
-void FrTBCFilter::SetBrightness(double value){
+void FrTbcFilter::SetBrightness(double value){
     // need to set?    
     if(value != m_Brightness){
         // change threshold
@@ -35,7 +35,7 @@ void FrTBCFilter::SetBrightness(double value){
     }
 }
 
-void FrTBCFilter::SetContrast(double value){
+void FrTbcFilter::SetContrast(double value){
     // need to set?    
     if(value != m_Contrast){
         // change threshold
@@ -44,7 +44,7 @@ void FrTBCFilter::SetContrast(double value){
     }
 }
 
-void FrTBCFilter::ExecuteInformation() {
+void FrTbcFilter::ExecuteInformation() {
     vtkImageData *input = this->GetInput();
     vtkImageData *output = this->GetOutput();
     
@@ -61,11 +61,11 @@ void FrTBCFilter::ExecuteInformation() {
 }
 
 // The execute method created by the subclass.
-void FrTBCFilter::SimpleExecute(vtkImageData *inData, 
+void FrTbcFilter::SimpleExecute(vtkImageData *inData, 
                                 vtkImageData *outData){
     // Check for valid data type
     if (inData->GetScalarType() != VTK_UNSIGNED_CHAR){
-        vtkErrorMacro(<<"FrTBCFilter: vtkImageData has to have only unsigned char data type.");
+        vtkErrorMacro(<<"FrTbcFilter: vtkImageData has to have only unsigned char data type.");
         return;
     }
 
@@ -100,7 +100,7 @@ void FrTBCFilter::SimpleExecute(vtkImageData *inData,
     }
 }
 
-void FrTBCFilter::InitLookupTable(unsigned char* luTable, int brightness, int contrast){
+void FrTbcFilter::InitLookupTable(unsigned char* luTable, int brightness, int contrast){
     // Declare vars
     int iMin = MIN_BYTE_VALUE;
     int iMax = MAX_BYTE_VALUE;

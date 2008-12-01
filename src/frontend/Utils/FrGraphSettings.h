@@ -20,9 +20,8 @@ class FrRoiStdGraphSettings;
 class FrGraphSettings {
 public:
     // Type of graphs supported by 
-    typedef enum _GraphTypes { GT_Base, GT_Intencity, 
-                               GT_Movements, GT_Stimulus,
-                               GT_RoiMean, GT_RoiStd } GraphTypes;
+    typedef enum _GraphTypes { GT_Intencity, GT_Movements, 
+                               GT_Stimulus,  GT_RoiMean, GT_RoiStd } GraphTypes;
     // Supported draw methods
     typedef enum _DrawMethods { DM_Linear, DM_Smooth } DrawMethods;
 
@@ -37,7 +36,7 @@ public:
     DrawMethods DrawMethod;
 
     // Methods
-    virtual GraphTypes GetType(){ return GT_Base; }
+    virtual GraphTypes GetType()=0;
 };
 
 // Concreate class represent settings for voxel intencity
@@ -78,8 +77,6 @@ public:
 // Implementaion of factory method
 inline FrGraphSettings* FrGraphSettings::Create(GraphTypes type){
     switch(type){
-        case GT_Base:
-            return new FrGraphSettings;
         case GT_Intencity: 
             return new FrIntencityGraphSettings;
         case GT_Movements:

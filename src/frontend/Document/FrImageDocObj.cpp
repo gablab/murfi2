@@ -5,8 +5,11 @@
 // VTK includes
 #include "vtkImageData.h"
 #include "vtkPointData.h"
+
 // Backend includes
 #include "RtMRIImage.h"
+#include "RtDataID.h"
+
 // Qt stuff
 #include <Qt/qstring.h>
 #include <Qt/qfile.h>
@@ -40,6 +43,13 @@ unsigned int FrImageDocObj::GetMatrixSize(){
 	return m_Image->getMatrixSize();
 }
 
+int FrImageDocObj::GetSeries(){
+    return m_Image->getDataID().getSeriesNum();
+}
+
+int FrImageDocObj::GetTimePoint(){
+    return m_Image->getDataID().getTimePoint();
+}
 
 bool FrImageDocObj::LoadFromFile(QString& fileName){
     bool result = false;

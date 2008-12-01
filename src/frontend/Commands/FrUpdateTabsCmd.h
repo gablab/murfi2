@@ -16,14 +16,16 @@ class FrTabSettingsDocObj;
 class FrUpdateTabsCmd : public FrBaseCmd
 {
 public:
-    enum CmdType { None, Add, Remove, Update, SetCurrentTab };
+    typedef enum _Actions { 
+        None, Add, Remove, Update, SetCurrentTab 
+    } Actions;
 
 public:
     // Constructor/destructor
     FrUpdateTabsCmd();
 
     // Properties
-    FrSetPropMacro(CmdType, Action);
+    FrSetPropMacro(Actions, Action);
     FrSetPropMacro(FrTabSettingsDocObj*, TabSettingsDocObj);
     FrSetPropMacro(int, TabID);
 
@@ -39,7 +41,8 @@ private:
     bool SetupTab();
     bool UpdateView();
 
-    void SetupImageLayers();
+    
+    void SetupTabObjects();
 };
 
 #endif // FR_UPDTABS_CMD

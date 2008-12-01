@@ -8,12 +8,11 @@
 #include "Qt/qstring.h"
 #include "Qt/qwidget.h"
 
-class FrBookmark: public QWidget
-{
+class FrBookmark: public QWidget {
 	Q_OBJECT
 public:
-	FrBookmark(QWidget *parent = 0);
-    FrGetPropMacro(int, ID);
+	FrBookmark(unsigned int id, QWidget *parent = 0);
+    FrGetPropMacro(unsigned int, ID);
 
     FrPropMacro(bool,IsDefault);
 	

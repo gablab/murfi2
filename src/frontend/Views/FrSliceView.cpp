@@ -109,6 +109,13 @@ void FrSliceView::UpdatePipeline(int point){
     std::vector<FrDocumentObj*> rois;
     params.Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
     std::vector<FrDocumentObj*>::iterator it, itEnd(rois.end());
+
+    FrDocument::DocObjCollection layers;
+    FrMainDocument* doc = this->GetMainWindow()->GetMainDocument();
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);
+
+    //m_imgReader->
+
                     	
     // Update pipeline
     switch(point)
@@ -181,6 +188,7 @@ void FrSliceView::InitUpdateParams(FrUpdateParams0& params){
 }
 
 void FrSliceView::ReadImage(FrUpdateParams0& params){
+    FrDocumentReader* docReader = 
     // Read document and connect filters
     m_imgReader->SetDocument(params.Document);
     m_imgReader->SetUnMosaicOn();

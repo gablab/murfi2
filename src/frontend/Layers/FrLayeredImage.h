@@ -14,55 +14,56 @@ class vtkActor2D;
 #include "FrSettings.h"
 #include <vector>
 
+#include "vtkObject.h"
 
-// Represents layer object
-class FrLayeredImage : public FrImageLayer {
+
+// Represents multi layer object.
+// It keeps and manages all layers.
+class FrLayeredImage : public vtkObject {
 public:
-    vtkTypeMacro(FrLayeredImage,FrImageLayer);
+    typedef enum _LType { Roi, Image, Colormap } LayerType;
+
+public:
+    vtkTypeMacro(FrLayeredImage, FrImageLayer);
     static FrLayeredImage* New();
 
 public:
     // Accessors/Modifiers
-    virtual void SetInput(vtkImageData* data);
-    void SetRoiInput(int id, vtkImageData* data);
-    vtkImageData* GetRoiInput(int id);
+    void SetImageInput(vtkImageData* data);
+    vtkImageData* GetImageInput();
 
-    void SetColormapSettings(FrColormapSettings& settings, int layerId);
-    void SetTBCSettings(FrTBCSettings& settings, int layerId);
-    void SetCameraSettings(FrCameraSettings& settings, int layerId);
-    void SetOpacity(double value, int layerId);
-    void SetVisibility(bool value, int layerId);
+    void SetRoiInput(vtkImageData* data, unsigned int id);
+    vtkImageData* GetRoiInput(unsigned int id);
 
-    // Returns set of renderers
-    void GetRenderers(std::vector<vtkRenderer*>& renderers);
+    // Setup different settings
+    void SetTbcSettings(FrTbcSettings& settings, unsigned int id);
+    void SetCameraSettings(FrCameraSettings& settings, unsigned int id);
+    void SetColormapSettings(FrColormapSettings& settings, unsigned int id);
+    void SetOpacity(double value, unsigned int id);
+    void SetVisibility(bool value, unsigned int id);
+    
 
     // Update methods
-    virtual void UpdateColormap();
-    virtual void UpdateTBC();
-    virtual void UpdateCamera();
-
-    // Initialization
-    void InitImageLayerDefault(FrImageLayer* layer);
-    void InitRoiLayerDefault(FrROILayer* layer);
-
+    void UpdateTbc();
+    void UpdateCamera();
+    void UpdateColormap();
+    
     //
     // Layer management
     //
-    int  AddImageLayer();
-    bool RemoveImageLayer(int id);
-    void RemoveImageLayers();
-
-    int  AddRoiLayer();
-    bool RemoveRoiLayer(int id);
-    void RemoveRoiLayers();
-
-    void RemoveAllLayers();
+    bool AddLayer(unsigned int id, LayerType type);
+    bool RemoveLayer(unsigned int id);
+    void RemoveLayers();
 
     // Returns layer by ID
-    FrImageLayer* GetImageLayerByID(int id);
-    FrROILayer* GetRoiLayerByID(int id);
+    FrBaseLayer* GetLayerByID(unsigned int id);
+    FrSpecialLayer* GetSpecialLayer(){
+        return m_SpecialLayer;
+    };
 
-    FrSpecialLayer* GetSpecialLayer(){return m_SpecialLayer;};
+    // Returns set of renderers (sorted in predefined order)
+    void GetRenderers(std::vector<vtkRenderer*>& renderers);
+    bool IsInViewport(int mouseX, int mouseY);
 
     //
     // Text management
@@ -76,13 +77,10 @@ protected:
     virtual ~FrLayeredImage();
 
 private:
-    int m_nextLayerID;
-    typedef std::vector<FrImageLayer*> LayerCollection;
-    typedef std::vector<FrROILayer*> ROILayerCollection;
-
-    LayerCollection m_ImageLayers;
-    ROILayerCollection m_ROILayers;
-
+    typedef std::vector<FrBaseLayer*> LayersCollection;
+    LayersCollection m_Layers;
+    
+    FrImageLayer*   m_ImageLayer;
     FrSpecialLayer* m_SpecialLayer;
 
 private:

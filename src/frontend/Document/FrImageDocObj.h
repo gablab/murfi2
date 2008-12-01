@@ -27,6 +27,9 @@ public:
     bool LoadFromMRIImage(RtMRIImage* img);
     unsigned int GetMatrixSize();
 
+    int GetSeries();
+    int GetTimePoint();
+
     // Properties
     FrGetPropMacro(RtMRIImage*,Image);
 };

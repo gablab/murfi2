@@ -14,63 +14,72 @@ class FrRoiDocObj;
 #include <vector>
 
 // This class performes reading of FrMainDocument objects.
-// It reads image data or ROI data (depend on Target specified). 
+// It reads image data specified by SetTarget() method.
+// MRI has unsigned char type, Roi has unsigned char type,
+// Activation has double. In addition Mri data are normalized
+// to be in the range [0..255]
 class FrDocumentReader : public vtkObject {
 public:
-    enum Target { Image, ROI };
+    typedef enum _Targets {
+        Mri, Roi, Activation
+    } Targets;
+
+    typedef enum _Orientaion { 
+        XY, YZ, XZ 
+    } Orientations;
+
 public:
     vtkTypeMacro(FrDocumentReader,vtkObject);
     static FrDocumentReader* New();
 
 public:
-
     // Makes output out-to-date. 
     // You should override this method
     virtual void Update();
 
     // Properties
-
-    // MosaicOn and UnMosaicOn are selfexculed.
-    // i.e. they canot be both true.
-    FrGetPropMacro(bool,MosaicOn);
-    void SetMosaicOn();
-    FrGetPropMacro(bool,UnMosaicOn);
-    void SetUnMosaicOn();
-
+    // Turns ON mosaic mode.
+    FrGetPropMacro(bool, Mosaic);
+    void SetMosaic(bool value);
+    
     FrGetPropMacro(FrDocument*,Document);
     void SetDocument(FrDocument* document);
     
-    FrGetPropMacro(Target, Target)
-    void SetTarget(Target tgt);
+    FrGetPropMacro(Targets, Target)
+    void SetTarget(Targets target);
 
+    // Slice management
+    FrGetPropMacro(unsigned int, DataID);
+    void SetDataID(unsigned int ID);
+
+    FrGetPropMacro(Orientations, Orientation);
+    void SetOrientation(Orientations value);
+
+    FrGetPropMacro(int, slice);
+    void SetSlice(int slice);
+    
     // Output management
-    int GetOutputCount();
-    vtkImageData* GetOutput();
-    vtkImageData* GetOutput(int port);
+    FrGetPropMacro(vtkImageData*, Output);
 
-private:    
-    void AddOutput(vtkImageData* data);
-    void ClearOutputs();
+private:
+    void SetOutput(vtkImageData* data);
+    
+    vtkImageData* ReadMri(); 
+    vtkImageData* ReadRoi();
+    vtkImageData* ReadActivation();
 
-    vtkImageData* ReadImage(FrImageDocObj* imgDO);
-    vtkImageData* ReadROI(FrRoiDocObj* roiDO);
+    // Lut has always 256 byte size
+    #define LUT_SIZE 256
+    void InitMriLUT(short* data, unsigned int dataSize, 
+                    unsigned char** outLUT);
     
 protected:
     FrDocumentReader();
     ~FrDocumentReader();
-
-    // Lut has always 256 byte size
-    void InitLookupTable(short* data, unsigned int dataSize, 
-                         unsigned char** outLUT);
     
 private:
     FrDocumentReader(const FrDocumentReader&);  // Not implemented.
     void operator=(const FrDocumentReader&);  // Not implemented.
-
-private:
-    // Collection of putput ports
-    typedef std::vector<vtkImageData*> OutputCollection;
-    OutputCollection m_Outputs;
 };
 
 #endif

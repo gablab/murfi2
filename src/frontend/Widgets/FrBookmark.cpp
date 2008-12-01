@@ -6,15 +6,11 @@
 #define DEF_TAB_NAME        "NoName"
 #define DEF_TAB_DESCRIPTION "No description"
 
-// NOTE: assume that int will be enought
-int FrBookmark::s_CurrentID = 0;
-
-FrBookmark::FrBookmark(QWidget *parent)
+FrBookmark::FrBookmark(unsigned int id, QWidget *parent)
 : QWidget(parent){
 
     //setup id
-    m_ID = s_CurrentID;
-    s_CurrentID++;
+    m_ID = id;
 
     //// set up default name and description
     //m_name = DEF_TAB_NAME;

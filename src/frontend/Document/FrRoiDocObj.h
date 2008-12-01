@@ -26,11 +26,8 @@ public:
 
     // Properties
     FrGetPropMacro(RtMaskImage*,MaskImage);
-    FrPropMacro(int, ID);
-    FrPropMacro(QString, Name);
-    FrPropMacro(bool, Visibility);
-    FrPropMacro(double, Opacity);
-
+    FrPropMacro(unsigned int, ID);
+    
     // Initialization    
     void CreateEmptyMaskImage(FrImageDocObj* imgDO);
     bool LoadFromFile(FrImageDocObj* imgDO, QString& fileName);

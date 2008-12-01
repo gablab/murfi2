@@ -37,10 +37,9 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent)
 }
 
 bool FrBookmarkWidget::AddBookmark(FrTabSettingsDocObj* ts){
-    FrBookmark* bookmark = new FrBookmark(this);
+    FrBookmark* bookmark = new FrBookmark(ts->GetID(), this);
     bookmark->SetIsDefault(ts->GetIsDefault());
-    ts->SetID(bookmark->GetID());
-    
+        
     m_tabWidget->addTab(bookmark, ts->GetName());
     // TODO: find the way how to setup tooltips
     //int idx = m_tabWidget->addTab(bookmark, ts->GetName());
@@ -49,18 +48,21 @@ bool FrBookmarkWidget::AddBookmark(FrTabSettingsDocObj* ts){
     if(ts->GetIsCurrent()){
         m_tabWidget->setCurrentWidget(bookmark);
     }
-	if(m_tabWidget->count()==1) 
+
+    // HACK: Catch this signal and init our app
+    if(m_tabWidget->count()==1) {
 		emit CurrentChanged(bookmark->GetID());
+    }
     return true;
 }
 
 bool FrBookmarkWidget::RemoveBookmark(FrTabSettingsDocObj* ts){
 
     // delete tab from TabWidget
-    int idx = ts->GetID();
+    unsigned int id = ts->GetID();
     for(int i=0; i < m_tabWidget->count(); ++i){
         FrBookmark* bmw = dynamic_cast<FrBookmark*>(m_tabWidget->widget(i));
-        if(bmw != 0L && idx == bmw->GetID()){
+        if(bmw != 0L && id == bmw->GetID()){
             // TODO: find somethinig for tooltip
             //m_tabWidget->removeToolTip(i);
             m_tabWidget->removeTab(i);

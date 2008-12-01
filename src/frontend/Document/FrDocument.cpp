@@ -16,6 +16,8 @@ bool FrDocument::Add(FrDocumentObj* obj){
         obj->OnAdd(this);
     }
     else {
+        // If not found then 
+        // add new slot
         DocObjCollection newCollection;
         newCollection.push_back(obj);
 
@@ -39,6 +41,12 @@ bool FrDocument::Remove(FrDocumentObj* obj){
             it->second.erase(itr);
             obj->OnRemove(this);
             delete obj;
+
+            // If no more objects of given type
+            // remove slot from map
+            if(it->second.size() <= 0){
+                m_Objects.erase(it);
+            }
         }
         result = true;
     }

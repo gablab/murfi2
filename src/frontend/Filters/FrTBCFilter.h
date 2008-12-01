@@ -22,10 +22,10 @@
 // This class is used to change 
 // threshold, brightness and contrast
 // of rendered image data
-class FrTBCFilter : public FrBaseFilter {
+class FrTbcFilter : public FrBaseFilter {
 public:
-    vtkTypeMacro(FrTBCFilter,FrBaseFilter);
-    static FrTBCFilter* New();
+    vtkTypeMacro(FrTbcFilter,FrBaseFilter);
+    static FrTbcFilter* New();
 
 public:
     // Get/Set threshold (in the range [0 .. 1])
@@ -53,9 +53,9 @@ private:
     void InitLookupTable(unsigned char* luTable, int brightness, int contrast);
 
 private:
-    FrTBCFilter(); // Do not allow using new
-    FrTBCFilter(const FrTBCFilter&);  // Not implemented.
-    void operator=(const FrTBCFilter&);  // Not implemented.
+    FrTbcFilter(); // Do not allow using new
+    FrTbcFilter(const FrTbcFilter&);  // Not implemented.
+    void operator=(const FrTbcFilter&);  // Not implemented.
 };
 
 #endif

@@ -10,8 +10,9 @@ class vtkCamera;
 // This command saves current active tab settings to document
 // After this command is executed a new FrTabSettingsDocObj 
 // is added into MainDocument.
-class FrSaveTabSettingsCmd : public FrBaseCmd
-{
+class FrSaveTabSettingsCmd : public FrBaseCmd {
+public:
+    typedef enum _Actions { Undefined, SaveNew, SaveCurrent } Actions;
 public:
     // Constructor/destructor
     FrSaveTabSettingsCmd();
@@ -24,10 +25,13 @@ public:
 	virtual bool Redo();
 
     // Properties
+    FrSetPropMacro(Actions, Action);
     FrSetPropMacro(bool, IsDefault);
     FrSetPropMacro(bool, IsCurrent);
 
 private:
+    bool SaveNewTab();
+    bool SaveCurrentTab();
     void InitDocObjFromActive(FrTabSettingsDocObj* docObj);
 };
 

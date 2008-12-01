@@ -561,6 +561,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Document\FrLayerDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrLayerDocObj.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Document\FrMainDocument.cpp"
 				>
 			</File>
@@ -582,6 +590,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Document\FrTabSettingsDocObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrViewDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrViewDocObj.h"
 				>
 			</File>
 		</Filter>
@@ -807,6 +823,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Utils\FrLayerSettings.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Utils\FrMacro.h"
 				>
 			</File>
@@ -832,6 +852,10 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Utils\FrUtils.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrViewSettings.h"
 				>
 			</File>
 			<File
@@ -1916,6 +1940,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Layers\FrBaseLayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrColormapLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Layers\FrColormapLayer.h"
 				>
 			</File>
 			<File

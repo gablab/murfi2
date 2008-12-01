@@ -14,29 +14,31 @@ class vtkRenderer;
 #include "FrMacro.h"
 
 // Represents layer object
-class FrROILayer : public FrBaseLayer {
+class FrRoiLayer : public FrBaseLayer {
 public:
-    vtkTypeMacro(FrROILayer, FrBaseLayer);
-    static FrROILayer* New();
+    vtkTypeMacro(FrRoiLayer, FrBaseLayer);
+    static FrRoiLayer* New();
+
+    virtual LayerTypes GetType(){
+        return FrBaseLayer::LtRoi;
+    }
 
 public:
-    // Properties
-    FrPropMacro(int, ID);
-
     // Accessors/Modifiers
     virtual void SetInput(vtkImageData* data);
-    vtkImageData* GetInput();
+    virtual vtkImageData* GetInput();
 
-    void SetOpacity(double value);
-    double GetOpacity();
+    virtual void SetOpacity(double value);
+    virtual double GetOpacity();
 
-    void SetVisibility(bool value);
-    bool GetVisibility();
+    virtual void SetVisibility(bool value);
+    virtual bool GetVisibility();
 
-    vtkImageActor* GetActor(){ return m_actor; }
+    vtkImageActor* GetActor(){ 
+        return m_actor; 
+    }
 
     // Update methods
-    virtual void UpdateCamera();
     void UpdateData();
 
 protected:
@@ -45,13 +47,13 @@ protected:
     vtkImageActor* m_actor;
 
 private:
-    FrROILayer(const FrROILayer&);  // Not implemented.
-    void operator=(const FrROILayer&);  // Not implemented.
+    FrRoiLayer(const FrRoiLayer&);  // Not implemented.
+    void operator=(const FrRoiLayer&);  // Not implemented.
 
 protected:
     // Constructor and destructor
-    FrROILayer();
-    virtual ~FrROILayer();
+    FrRoiLayer();
+    virtual ~FrRoiLayer();
 
 };
 

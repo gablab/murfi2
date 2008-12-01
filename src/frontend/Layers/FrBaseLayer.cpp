@@ -1,8 +1,7 @@
 #include "FrBaseLayer.h"
 #include "FrColormapFilter.h"
 #include "FrTBCFilter.h"
-#include "FrSettings.h"
-#include "FrMacro.h"
+
 
 
 // VTK stuff
@@ -41,8 +40,8 @@ void FrBaseLayer::SetCameraSettings(FrCameraSettings& settings){
     if(!m_Renderer) return;
 
     vtkCamera* cam = m_Renderer->GetActiveCamera();
-    cam->SetPosition(settings.Position);
     cam->SetFocalPoint(settings.FocalPoint);
+    cam->SetPosition(settings.Position);
     cam->SetViewUp(settings.ViewUp);
     cam->SetParallelScale(settings.Scale);
 }
@@ -51,8 +50,14 @@ void FrBaseLayer::GetCameraSettings(FrCameraSettings& settings){
     if(!m_Renderer) return;
 
     vtkCamera* cam = m_Renderer->GetActiveCamera();
-    COPY_ARR3(settings.Position, cam->GetPosition());
     COPY_ARR3(settings.FocalPoint, cam->GetFocalPoint());
-    COPY_ARR3(settings.ViewUp, cam->GetViewUp());
+    COPY_ARR3(settings.Position,   cam->GetPosition());
+    COPY_ARR3(settings.ViewUp,     cam->GetViewUp());
     settings.Scale = cam->GetParallelScale();
+}
+
+void FrBaseLayer::UpdateCamera(){
+    if(m_Renderer){
+        m_Renderer->Render();
+    }
 }

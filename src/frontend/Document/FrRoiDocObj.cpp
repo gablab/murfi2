@@ -18,17 +18,15 @@
 #define DEF_ROI_OPAC    1.0
 
 FrRoiDocObj::FrRoiDocObj()
-:  m_MaskImage(0), m_ID(DEF_ROI_ID),
-   m_Name(DEF_ROI_NAME), m_Visibility(DEF_ROI_VIS),
-   m_Opacity(DEF_ROI_OPAC) {
-    
+:  m_MaskImage(0) {
+    // Assign ID
+    m_ID = (unsigned int)((void*)this);
 }
 
 FrRoiDocObj::FrRoiDocObj(RtMaskImage* roi)
-: m_MaskImage(roi), m_ID(DEF_ROI_ID),
-  m_Name(DEF_ROI_NAME), m_Visibility(DEF_ROI_VIS),
-  m_Opacity(DEF_ROI_OPAC){
-
+: m_MaskImage(roi){
+    // Assign ID
+    m_ID = (unsigned int)((void*)this);
 }
 
 FrRoiDocObj::~FrRoiDocObj(){
@@ -36,45 +34,18 @@ FrRoiDocObj::~FrRoiDocObj(){
 }
 
 void FrRoiDocObj::OnAdd(FrDocument* doc){
-    // add roi layer to all images
-    FrRoiCmd* cmd1 = FrCommandController::CreateCmd<FrRoiCmd>();
-    cmd1->SetAction(FrRoiCmd::Add);
-    cmd1->SetRoi(this);
-    
-    // Need to refresh data in layer info widget
-    FrRefreshLayerInfoCmd* cmd2 = 
-        FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-
-    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    cmd->AddCommand(cmd1);
-    cmd->AddCommand(cmd2);
-    cmd->Execute();
-    delete cmd;
+    // Add ROI layer doc object
 }
 
 void FrRoiDocObj::OnRemove(FrDocument* doc){
-    // remove roi layer from all images
-    FrRoiCmd* cmd1 = FrCommandController::CreateCmd<FrRoiCmd>();
-    cmd1->SetAction(FrRoiCmd::Remove);
-    cmd1->SetRoi(this);
-    
-    // Need to refresh data in layer info widget
-    FrRefreshLayerInfoCmd* cmd2 = 
-        FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-
-    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    cmd->AddCommand(cmd1);
-    cmd->AddCommand(cmd2);
-    cmd->Execute();
-    delete cmd;
+    // remove ROI layer doc object
 }
 
 FrDocumentObj::ObjTypes FrRoiDocObj::GetType(){
     return FrDocumentObj::RoiObject;
 }
 
-void FrRoiDocObj::CreateEmptyMaskImage(FrImageDocObj* imgDO){
-    
+void FrRoiDocObj::CreateEmptyMaskImage(FrImageDocObj* imgDO){    
     if(m_MaskImage) delete m_MaskImage;
     
     m_MaskImage = new RtMaskImage();

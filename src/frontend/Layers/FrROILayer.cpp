@@ -1,4 +1,4 @@
-#include "FrROILayer.h"
+#include "FrRoiLayer.h"
 #include "FrMaskToRgbaFilter.h"
 #include "FrSettings.h"
 #include "FrMacro.h"
@@ -12,10 +12,10 @@
 #include "vtkCamera.h"
 
 
-vtkStandardNewMacro(FrROILayer);
+vtkStandardNewMacro(FrRoiLayer);
 
 
-FrROILayer::FrROILayer() 
+FrRoiLayer::FrRoiLayer() 
     : m_actor(0), m_filter(0) {
     // Pipline stuff
     m_filter = FrMaskToRgbaFilter::New();
@@ -26,20 +26,20 @@ FrROILayer::FrROILayer()
     m_Renderer->AddActor(m_actor);
 }
 
-FrROILayer::~FrROILayer(){    
+FrRoiLayer::~FrRoiLayer(){    
     if(m_Renderer) m_Renderer->RemoveActor(m_actor);
     if(m_filter) m_filter->Delete();
     if(m_actor) m_actor->Delete();
 }
 
 // Accessors / Modifiers
-void FrROILayer::SetInput(vtkImageData* data){
+void FrRoiLayer::SetInput(vtkImageData* data){
     if(m_filter){
         m_filter->SetInput(data);
     }
 }
 
-vtkImageData* FrROILayer::GetInput(){
+vtkImageData* FrRoiLayer::GetInput(){
     vtkImageData* result = 0L;
     if(m_filter){
         result = m_filter->GetInput();
@@ -47,13 +47,13 @@ vtkImageData* FrROILayer::GetInput(){
     return result;
 }
 
-void FrROILayer::SetOpacity(double value){
+void FrRoiLayer::SetOpacity(double value){
     if(m_actor){
         m_actor->SetOpacity(value);
     }
 }
 
-double FrROILayer::GetOpacity(){
+double FrRoiLayer::GetOpacity(){
     double result = 0.0;
     if(m_actor){
         result = m_actor->GetOpacity();
@@ -61,12 +61,12 @@ double FrROILayer::GetOpacity(){
     return result;
 }
 
-void FrROILayer::SetVisibility(bool value){
+void FrRoiLayer::SetVisibility(bool value){
     if(m_actor){
         m_actor->SetVisibility(value ? 1 : 0);
     }
 }
-bool FrROILayer::GetVisibility(){
+bool FrRoiLayer::GetVisibility(){
     bool result = false;
     if(m_actor){
         result = (m_actor->GetVisibility() == 1);
@@ -74,13 +74,7 @@ bool FrROILayer::GetVisibility(){
     return result;
 }
 
-void FrROILayer::UpdateCamera(){
-    if(m_Renderer){
-        m_Renderer->Render(); 
-    }
-}
-
-void FrROILayer::UpdateData(){
+void FrRoiLayer::UpdateData(){
     if(m_filter && m_filter->GetInput()){
         m_filter->Update();
 

@@ -1,6 +1,6 @@
 // class combining renderer and actors for single layer display
-#ifndef FR_IMG_LAYER
-#define FR_IMG_LAYER
+#ifndef FR_CM_LAYER
+#define FR_CM_LAYER
 
 //Forward declarations
 class FrColormapSettings;
@@ -17,19 +17,19 @@ class vtkRenderer;
 #include "FrMacro.h"
 
 // Represents layer object
-class FrImageLayer : public FrBaseLayer {
+class FrColormapLayer : public FrBaseLayer {
 public:
-    vtkTypeMacro(FrImageLayer,FrBaseLayer);
-    static FrImageLayer* New();
+    vtkTypeMacro(FrColormapLayer,FrBaseLayer);
+    static FrColormapLayer* New();
 
     virtual LayerTypes GetType(){
-        return FrBaseLayer::LtImage;
+        return FrBaseLayer::LtColormap;
     }
 
 public:
     // Accessors/Modifiers
     virtual void SetInput(vtkImageData* data);
-    virtual vtkImageData* GetInput();
+    vtkImageData* GetInput();
 
     void SetColormapSettings(FrColormapSettings& settings);
     void GetColormapSettings(FrColormapSettings& settings);
@@ -50,22 +50,21 @@ public:
     // Update methods
     virtual void UpdateColormap();
     virtual void UpdateTbc();
-    virtual void UpdateCamera();
 
 protected:
     // Pipline stuff
+    FrColormapFilter* m_cmFilter;
     FrTbcFilter* m_tbcFilter;
     vtkImageActor* m_actor;
 
 private:
-    FrImageLayer(const FrImageLayer&);  // Not implemented.
-    void operator=(const FrImageLayer&);  // Not implemented.
+    FrColormapLayer(const FrColormapLayer&);  // Not implemented.
+    void operator=(const FrColormapLayer&);  // Not implemented.
 
 protected:
     // Constructor and destructor
-    FrImageLayer();
-    virtual ~FrImageLayer();
-
+    FrColormapLayer();
+    virtual ~FrColormapLayer();
 };
 
 #endif

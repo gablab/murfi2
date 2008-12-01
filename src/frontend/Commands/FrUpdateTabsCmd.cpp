@@ -4,17 +4,16 @@
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrLayeredImage.h"
-#include "FrSliceView.h"
-#include "FrMosaicView.h"
-#include "FrOrthoView.h"
-
+#include "FrLayerDocObj.h"
+#include "FrViewDocObj.h"
 
 #define ITEMS_NUM  5
 
 
 FrUpdateTabsCmd::FrUpdateTabsCmd()
-: m_Action(FrUpdateTabsCmd::None), m_TabSettingsDocObj(0L), m_TabID(BAD_TAB_ID){
+: m_Action(FrUpdateTabsCmd::None),
+  m_TabSettingsDocObj(0L), 
+  m_TabID(BAD_TAB_ID) {
 
 }
 
@@ -38,8 +37,8 @@ bool FrUpdateTabsCmd::SetupTab(){
 
     // Update current tab in document!
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
     if(m_TabID != CURRENT_TAB_ID){
+        // First save all settings to prev tab if any
         std::vector<FrDocumentObj*> docTabs;
         doc->GetObjectsByType(docTabs, FrDocumentObj::TabSettings);
 
@@ -50,8 +49,8 @@ bool FrUpdateTabsCmd::SetupTab(){
         }
     }
 
-    // Setup layers to images
-    SetupImageLayers();
+    // Setup Tab objects (layers, settings etc)
+    this->SetupTabObjects();
     FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_FULL);
 
     return true;
@@ -66,7 +65,7 @@ bool FrUpdateTabsCmd::UpdateView(){
 
     bool result = false;
     switch(m_Action){
-        case FrUpdateTabsCmd::Add: ;
+        case FrUpdateTabsCmd::Add
             result = bmWidget->AddBookmark(m_TabSettingsDocObj);
             break;
         case FrUpdateTabsCmd::Remove: 
@@ -81,34 +80,46 @@ bool FrUpdateTabsCmd::UpdateView(){
 }
 
 
-void FrUpdateTabsCmd::SetupImageLayers(){
-    FrMainWindow* mv = this->GetMainController()->GetMainView();
+void FrUpdateTabsCmd::SetupTabObjects(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
 
-    FrLayeredImage* image[ITEMS_NUM];
-    image[0] = mv->GetSliceView()->GetImage();
-    image[1] = mv->GetMosaicView()->GetImage();
-    image[2] = mv->GetOrthoView()->GetImage(CORONAL_IMAGE);
-    image[3] = mv->GetOrthoView()->GetImage(SAGITAL_IMAGE);
-    image[4] = mv->GetOrthoView()->GetImage(AXIAL_IMAGE);
-
-    LayerCollection* layers[ITEMS_NUM];
-    layers[0] = &tabSets->GetSliceViewSettings()->OtherLayers;
-    layers[1] = &tabSets->GetMosaicViewSettings()->OtherLayers;
-    layers[2] = &tabSets->GetOrthoViewSettings()->OtherLayers[CORONAL_IMAGE];
-    layers[3] = &tabSets->GetOrthoViewSettings()->OtherLayers[SAGITAL_IMAGE];
-    layers[4] = &tabSets->GetOrthoViewSettings()->OtherLayers[AXIAL_IMAGE];
-
-    for(int i=0; i < ITEMS_NUM; ++i){
-        image[i]->RemoveImageLayers();
-
-        LayerCollection::iterator it, itEnd(layers[i]->end());
-        for(it = layers[i]->begin(); it != itEnd; ++it){
-            int layerID = image[i]->AddImageLayer();
-            (*it)->ID = layerID;
-        }
+    // Remove Image and Colormap layers
+    FrDocument::DocObjCollection oldLayers;
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);
+    
+    FrDocument::DocObjCollection::iterator it, itEnd(oldLayers.end());
+    for(it = oldLayers.begin(); it != itEnd; ++it){
+        FrLayerDocObj* layer = (FrLayerDocObj*)(*it);
+        // NOTE: do not touch ROI layers
+        if(!layer->IsRoi()) continue;
+        doc->Remove(ldo);
     }
+
+    // Remove view settings
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);
+    for(it = views.begin(); it != views.end(); ++it){
+        doc->Remove(*it);
+    }
+
+    ////////////////////////////
+    // Add new
+    FrViewDocObj* viewDO = new FrViewDocObj();
+    viewDO->CopySettingsFrom(tabSets);
+    doc->Add(viewDO);
+
+    FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType());
+    imgLayer->CopySettings(tabSets->GetImageLayer());
+    doc->Add(imgDO);
+    
+    FrTabSettingsDocObj::LayersCollection& layers = tabSets->GetLayers();
+    FrTabSettingsDocObj::LayersCollection::iterator itr, itrEnd(layers);
+    for(itr = layers.begin(); itr != itrEnd; ++itr){
+        FrLayerDocObj* layer = new FrLayerDocObj((*it)->GetType());
+        layer->CopySettings((*it));
+        doc->Add(layer);
+    }   
 }
 
 ///////////////////////////////////////////////////////////////

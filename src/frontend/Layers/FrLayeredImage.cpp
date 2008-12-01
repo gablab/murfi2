@@ -1,9 +1,9 @@
 #include "FrLayeredImage.h"
+#include "FrRoiLayer.h"
+#include "FrImageLayer.h"
+#include "FrColormapLayer.h"
 #include "FrSpecialLayer.h"
-#include "FrColormapFilter.h"
-#include "FrTBCFilter.h"
-#include "FrSettings.h"
-
+#include "FrLayerSettings.h"
 
 // VTK stuff
 #include "vtkRendererCollection.h"
@@ -22,300 +22,263 @@
 vtkStandardNewMacro(FrLayeredImage);
 
 
-FrLayeredImage::FrLayeredImage() 
-: FrImageLayer(), m_nextLayerID(DEFAULT_LAYER_ID) {
+FrLayeredImage::FrLayeredImage() {
+    m_ImageLayer = FrImageLayer::New();
+    m_ImageLayer->SetID(DEF_LAYER_ID);
 
-    this->InitImageLayerDefault(this);
-
-    // NOTE: remove colormap filter from pipline
-    if(m_cmFilter) {
-        m_cmFilter->Delete();
-        m_cmFilter = 0L;
-    }
     m_SpecialLayer = FrSpecialLayer::New();
+    m_SpecialLayer->SetID(SPC_LAYER_ID);
 }
 
 FrLayeredImage::~FrLayeredImage(){
     // delete all layers here
-    this->RemoveImageLayers();
-    this->RemoveRoiLayers();
-    // and other stuff too
-    if(m_SpecialLayer) m_SpecialLayer->Delete();
-}
-
-// Modifiers
-void FrLayeredImage::SetInput(vtkImageData* data){
-    LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-    for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-        (*it)->SetInput(data);
+    this->RemoveLayers();
+    if(m_ImageLayer){
+        m_ImageLayer->Delete();
     }
-    // NOTE: Do not use colormap for default layer and 
-    // set input to TBC filter immediatly
-    m_tbcFilter->SetInput(data);
-}
-
-void FrLayeredImage::SetRoiInput(int id, vtkImageData *data){
-    FrROILayer* layer = this->GetRoiLayerByID(id);
-    if(layer){
-        layer->SetInput(data);
+    if(m_SpecialLayer) {
+        m_SpecialLayer->Delete();
     }
 }
 
-vtkImageData* FrLayeredImage::GetRoiInput(int id){
-    vtkImageData* result = 0L;
-    FrROILayer* layer = this->GetRoiLayerByID(id);
-    if(layer){
-        result = layer->GetInput();
+// Accessors/Modifiers
+void FrLayeredImage::SetImageInput(vtkImageData* data){
+    if(m_ImageLayer){
+        m_ImageLayer->SetInput(data);
+    }
+
+    // Setup all colormap images
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if((*it)->GetType() == FrBaseLayer::LtColormap){
+            (*it)->SetInput(data);
+        }
+    }
+}
+
+vtkImageData* FrLayeredImage::GetImageInput(){
+    vtkImageData* result = 0;
+    if(m_ImageLayer){
+        result = m_ImageLayer->GetInput();
     }
     return result;
 }
-    
-void FrLayeredImage::SetColormapSettings(FrColormapSettings& settings, int layerId){
-    if(layerId == ALL_LAYERS_ID){
-        LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-        for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-            (*it)->SetColormapSettings(settings);
+
+void FrLayeredImage::SetRoiInput(vtkImageData* data, unsigned int id){
+}
+
+vtkImageData* FrLayeredImage::GetRoiInput(unsigned int id){
+    vtkImageData* result = 0;
+
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if((*it)->GetType() == FrBaseLayer::LtRoi &&
+            (*it)->GetID() == id){
+            result = (*it)->GetInput();
+            break;
         }
-        FrImageLayer::SetColormapSettings(settings);
+    }
+    return result;
+}
+
+void FrLayeredImage::SetColormapSettings(FrColormapSettings& settings, unsigned int id){
+    if(id == ALL_LAYER_ID){
+        LayersCollection::iterator it, itEnd(m_Layers.end());
+        for(it = m_Layers.begin(); it != itEnd; ++it){
+            if((*it)->GetType() == FrBaseLayer::LtColormap){
+                ((FrColormapLayer*)(*it))->SetColormapSettings(settings);
+            }
+        }
     }
     else{
-        FrImageLayer* layer = this->GetImageLayerByID(layerId);
-        if(layer){
-            layer->SetColormapSettings(settings);
+        FrBaseLayer* layer = this->GetLayerByID(id);
+        if(layer->GetType() == FrBaseLayer::LtColormap){
+            ((FrColormapLayer*)layer)->SetColormapSettings(settings);
         }
     }
 }
 
-void FrLayeredImage::SetTBCSettings(FrTBCSettings& settings, int layerId){
-    if(layerId == ALL_LAYERS_ID){
-        LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-        for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-            (*it)->SetTBCSettings(settings);
-            (*it)->GetTBCSettings(settings);
+void FrLayeredImage::SetTbcSettings(FrTbcSettings& settings, unsigned int id){
+    if(id == ALL_LAYER_ID){
+        LayersCollection::iterator it, itEnd(m_Layers.end());
+        for(it = m_Layers.begin(); it != itEnd; ++it){
+            switch((*it)->GetType()){
+            case FrBaseLayer::LtColormap:
+                ((FrColormapLayer*)(*it))->SetTbcSettings(settings);
+                break;
+            case FrBaseLayer::LtImage:
+                ((FrImageLayer*)(*it))->SetTbcSettings(settings);
+                break;
+            }
         }
-        FrImageLayer::SetTBCSettings(settings);
-        // Values might be clamped so update them
-        FrImageLayer::GetTBCSettings(settings);
+        m_ImageLayer->SetTbcSettings(settings);
     }
     else{
-        FrImageLayer* layer = this->GetImageLayerByID(layerId);
-        if(layer){
-            layer->SetTBCSettings(settings);
-            // Values might be clamped so update them
-            layer->GetTBCSettings(settings);
+        FrBaseLayer* layer = this->GetLayerByID(id);
+        switch(layer->GetType()){
+            case FrBaseLayer::LtColormap:
+                ((FrColormapLayer*)layer)->SetTbcSettings(settings);
+                break;
+            case FrBaseLayer::LtImage:
+                ((FrImageLayer*)layer)->SetTbcSettings(settings);
+                break;
         }
     }
 }
 
-void FrLayeredImage::SetCameraSettings(FrCameraSettings& settings, int layerId){
+void FrLayeredImage::SetCameraSettings(FrCameraSettings& settings, unsigned int id){
     // Setup camera for image layers
-    if(layerId == ALL_LAYERS_ID){
-        LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-        for(it = m_ImageLayers.begin(); it != itEnd; ++it){
+    if(id == ALL_LAYER_ID){
+        LayersCollection::iterator it, itEnd(m_Layers.end());
+        for(it = m_Layers.begin(); it != itEnd; ++it){
             (*it)->SetCameraSettings(settings);
         }
-        FrImageLayer::SetCameraSettings(settings);
+        m_ImageLayer->SetCameraSettings(settings);
     }
     else{
-        FrImageLayer* layer = this->GetImageLayerByID(layerId);
+        FrBaseLayer* layer = this->GetLayerByID(id);
         if(layer){
             layer->SetCameraSettings(settings);
         }
     }
-
-    // Update camera for all ROI layers
-    ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
-    for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
-        (*itr)->SetCameraSettings(settings);
-    }
-
     // Update camera for special layer
     m_SpecialLayer->SetCameraSettings(settings);
 }
 
-void FrLayeredImage::SetOpacity(double value, int layerId){
-    if(layerId == ALL_LAYERS_ID){
+void FrLayeredImage::SetOpacity(double value, unsigned int id){
+    if(id == ALL_LAYER_ID){
         // Image layers
-        LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-        for(it = m_ImageLayers.begin(); it != itEnd; ++it){
+        LayersCollection::iterator it, itEnd(m_Layers.end());
+        for(it = m_Layers.begin(); it != itEnd; ++it){
             (*it)->SetOpacity(value);
         }
-        FrImageLayer::SetOpacity(value);
-
-        // Update opacity for all ROI layers
-        ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
-        for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
-            (*itr)->SetOpacity(value);
-        }
+        m_ImageLayer->SetOpacity(value);
     }
     else{
-        FrImageLayer* layer = this->GetImageLayerByID(layerId);
+        FrBaseLayer* layer = this->GetLayerByID(id);
         if(layer){
             layer->SetOpacity(value);
         }
-        else {
-            FrROILayer* rLayer = this->GetRoiLayerByID(layerId);
-            if(rLayer){
-                 rLayer->SetOpacity(value);
-            }
-        }
     }
 }
 
-void FrLayeredImage::SetVisibility(bool value, int layerId){
-    if(layerId == ALL_LAYERS_ID){
+void FrLayeredImage::SetVisibility(bool value, unsigned int id){
+    if(id == ALL_LAYER_ID){
         // Image layers
-        LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-        for(it = m_ImageLayers.begin(); it != itEnd; ++it){
+        LayersCollection::iterator it, itEnd(m_Layers.end());
+        for(it = m_Layers.begin(); it != itEnd; ++it){
             (*it)->SetVisibility(value);
         }
-        FrImageLayer::SetVisibility(value);
-
-        // Update visibility for all ROI layers
-        ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
-        for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
-            (*itr)->SetVisibility(value);
-        }
+        m_ImageLayer->SetVisibility(value);
     }
     else{
-        FrImageLayer* layer = this->GetImageLayerByID(layerId);
+        FrBaseLayer* layer = this->GetLayerByID(id);
         if(layer){
-            layer->SetVisibility(value);
-        }
-        else {
-            FrROILayer* rLayer = this->GetRoiLayerByID(layerId);
-            if(rLayer){
-                 rLayer->SetVisibility(value);
-            }
+            layer->SetOpacity(value);
         }
     }
-}
-
-// Initialization
-void FrLayeredImage::InitImageLayerDefault(FrImageLayer* layer){
-    FrColormapSettings cms;
-    InitColormapDefault(&cms);
-    layer->SetColormapSettings(cms);
-
-    FrTBCSettings tbcs;
-    InitTbcDefault(&tbcs);
-    layer->SetTBCSettings(tbcs);
-
-    FrCameraSettings cs;
-    InitCameraDefault(&cs);
-    layer->SetCameraSettings(cs);
-
-    // other
-    layer->SetOpacity(DEF_LAYER_OPACITY);
-    layer->SetVisibility(DEF_LAYER_VISIBILITY);
-
-    // init ID
-    layer->SetID(m_nextLayerID);
-    ++m_nextLayerID;
-}
-
-void FrLayeredImage::InitRoiLayerDefault(FrROILayer* layer){
-    FrCameraSettings cs;
-    InitCameraDefault(&cs);
-    layer->SetCameraSettings(cs);
-
-    // other
-    layer->SetOpacity(DEF_LAYER_OPACITY);
-    layer->SetVisibility(DEF_LAYER_VISIBILITY);
-
-    // init ID
-    layer->SetID(m_nextLayerID);
-    ++m_nextLayerID;
 }
 
 // Update methods
 void FrLayeredImage::UpdateColormap(){
-    LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-    for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-        (*it)->UpdateColormap();
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if((*it)->GetType() == FrBaseLayer::LtColormap){
+            ((FrColormapLayer*)(*it))->UpdateColormap();
+        }
     }
-    // NOTE: skip colormap update for default layer
-    //FrImageLayer::UpdateColormap();
 }
 
-void FrLayeredImage::UpdateTBC(){    
-    LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-    for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-        (*it)->UpdateTBC();
+void FrLayeredImage::UpdateTbc(){    
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        switch((*it)->GetType()){
+            case FrBaseLayer::LtRoi:
+                ((FrRoiLayer*)(*it))->UpdateData();
+                break;
+            case FrBaseLayer::LtImage:
+                ((FrImageLayer*)(*it))->UpdateTbc();
+                break;
+            case FrBaseLayer::LtColormap:
+                ((FrColormapLayer*)(*it))->UpdateTbc();
+                break;
+        }
     }
-    FrImageLayer::UpdateTBC();
-
-    // Update ROI data
-    ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
-    for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
-        (*itr)->UpdateData();
-    }
+    m_ImageLayer->UpdateTbc();
 }
 
 void FrLayeredImage::UpdateCamera(){
     // Images
-    LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-    for(it = m_ImageLayers.begin(); it != itEnd; ++it){
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
         (*it)->UpdateCamera();
     }
-    FrImageLayer::UpdateCamera();
-
-    // ROI
-    ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
-    for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
-        (*itr)->UpdateCamera();
-    }
+    m_ImageLayer->UpdateCamera();
 }
 
 // Layer management
-int FrLayeredImage::AddImageLayer(){
-    FrImageLayer* layer = FrImageLayer::New();
-
-    // Now init all ...    
-    this->InitImageLayerDefault(layer);
-    layer->SetInput(m_tbcFilter->GetInput());
-
-    // ... and synchronize camera ...
-    FrCameraSettings cs;
-    this->GetCameraSettings(cs);
-    layer->SetCameraSettings(cs);
-
-    // ... and render window with viewport
-    // viewport's important for ortho view
-    vtkRenderer* ren = layer->GetRenderer();
-    ren->SetViewport(m_Renderer->GetViewport());
-    m_ImageLayers.push_back(layer);
-
-    // Update render window if any
-    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
-    if(rw){
-        // HACK: GetRenderers() reorder all layers
-        // setting proper 'LayerNumber' !!!
-        std::vector<vtkRenderer*> rens;
-        this->GetRenderers(rens);
-
-        // Add renderer to render window
-        rw->AddRenderer(ren);
-        rw->SetNumberOfLayers(int(rens.size()));
+bool FrLayeredImage::AddLayer(unsigned int id, LayerType type){    
+    // first create layer
+    FrBaseLayer* layer = 0;
+    switch(type){
+        case FrBaseLayer::LtRoi:
+            layer = FrRoiLayer::New();
+            break;
+        case FrBaseLayer::LtImage:
+            // HACK: just assign ID and return
+            m_ImageLayer->SetID(id);
+            return true;
+            break;
+        case FrBaseLayer::LtColormap:
+            layer = FrColormapLayer::New();
+            break;
     }
 
-    // Return layer's ID
-    return layer->GetID();
+    // If created then init params.
+    if(layer){
+        // Since special layer is always on so use it
+        layer->SetID(id);
+        
+        FrCameraSettings cs;
+        m_SpecialLayer->GetCameraSettings(cs);
+        layer->SetCameraSettings(cs);
+        
+        vtkRenderer* ren = m_SpecialLayer->GetRenderer();
+        layer->GetRenderer()->SetViewport(ren->GetViewport());
+
+        // Add layer to internal collection
+        m_Layers.push_back(layer);
+
+        // Update render window if any
+        vtkRenderWindow* rw = ren->GetRenderWindow();
+        if(rw){
+            // HACK: GetRenderers() reorder all layers
+            // by setting up proper 'LayerNumber' !!!
+            std::vector<vtkRenderer*> rens;
+            this->GetRenderers(rens);
+
+            // Add renderer to render window
+            rw->AddRenderer(layer->GetRenderer());
+            rw->SetNumberOfLayers(int(rens.size()));
+        }
+    }
+    return (layer != 0);
 }
 
-bool FrLayeredImage::RemoveImageLayer(int layerId){
-    if(layerId == DEFAULT_LAYER_ID) return false;
-
-    bool result = false;
-    LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-    for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-        if((*it)->GetID() == layerId) break;
+bool FrLayeredImage::RemoveLayer(unsigned int id){
+    // do not remove image layer!!!
+    if(m_ImageLayer->GetID() == id) return false;
+    
+    // Find layer to remove
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if((*it)->GetID() == id) break;
     }
 
-    // delete layer if it were found
+    bool result = false;
     if(it != itEnd){
-        FrImageLayer* layer = (*it);
-        m_ImageLayers.erase(it);
+        FrBaseLayer* layer = (*it);
+        m_Layers.erase(it);
 
         // Remove renderer from render window if any
         vtkRenderWindow* rw = layer->GetRenderer()->GetRenderWindow();
@@ -324,7 +287,7 @@ bool FrLayeredImage::RemoveImageLayer(int layerId){
             rw->GetRenderers()->InitTraversal();
 
             // HACK: GetRenderers() reorder all layers
-            // setting proper 'LayerNumber' !!!
+            // by setting up proper 'LayerNumber' !!!
             std::vector<vtkRenderer*> rens;
             this->GetRenderers(rens);
 
@@ -338,166 +301,46 @@ bool FrLayeredImage::RemoveImageLayer(int layerId){
     return result;
 }
 
-int FrLayeredImage::AddRoiLayer(){
-    FrROILayer* layer = FrROILayer::New();
-
-    // Now init all ...    
-    this->InitRoiLayerDefault(layer);
-
-    // ... and synchronize camera ...
-    FrCameraSettings cs;
-    this->GetCameraSettings(cs);
-    layer->SetCameraSettings(cs);
-
-    // ... and render window with viewport
-    // viewport's important for ortho view
-    vtkRenderer* ren = layer->GetRenderer();
-    ren->SetViewport(m_Renderer->GetViewport());
-    m_ROILayers.push_back(layer);
-
-    // Update render window if any
-    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
-    if(rw){
-        // HACK: GetRenderers() reorder all layers
-        // setting proper 'LayerNumber' !!!
-        std::vector<vtkRenderer*> rens;
-        this->GetRenderers(rens);
-
-        // Add renderer to render window
-        rw->AddRenderer(ren);
-        rw->SetNumberOfLayers(int(rens.size()));
-    }
-
-    // Return layer's ID
-    return layer->GetID();
-}
-
-bool FrLayeredImage::RemoveRoiLayer(int layerId){
-    bool result = false;
-    ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
-    for(it = m_ROILayers.begin(); it != itEnd; ++it){
-        if((*it)->GetID() == layerId) break;
-    }
-
-    // delete layer if it were found
-    if(it != itEnd){
-        FrROILayer* layer = (*it);
-        m_ROILayers.erase(it);
-
-        // Remove renderer from render window if any
-        vtkRenderWindow* rw = layer->GetRenderer()->GetRenderWindow();
-        if(rw != 0){
-            rw->RemoveRenderer(layer->GetRenderer());
-            rw->GetRenderers()->InitTraversal();
-
-            // HACK: GetRenderers() reorder all layers
-            // setting proper 'LayerNumber' !!!
-            std::vector<vtkRenderer*> rens;
-            this->GetRenderers(rens);
-
-            rw->SetNumberOfLayers(rens.size());
-        }
-
-        // Delete layer object
-        layer->Delete();
-        result = true;
-    }
-    return result;
-}
-
-void FrLayeredImage::RemoveImageLayers(){
-    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
-
-    // Delete all layers
-    LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-    for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-        FrImageLayer* layer = (*it);
-        if(rw){
-            vtkRenderer* ren = layer->GetRenderer();
-            rw->RemoveRenderer(ren);
-            ren->SetRenderWindow(0L);
-        }
+void FrLayeredImage::RemoveLayers(){
+    
+    while(m_Layers.size() > 0){
+        FrBaseLayer* layer = (FrBaseLayer*)(*(m_Layers.begin()));
         layer->Delete();
     }
-    m_ImageLayers.clear();
-}
 
-void FrLayeredImage::RemoveRoiLayers(){
-    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
+    vtkRenderWindow* rw = m_SpecialLayer->
+        GetRenderer()->GetRenderWindow();
 
-    // Delete all layers
-    ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
-    for(it = m_ROILayers.begin(); it != itEnd; ++it){
-        FrROILayer* layer = (*it);
-        if(rw){
-            vtkRenderer* ren = layer->GetRenderer();
-            rw->RemoveRenderer(ren);
-            ren->SetRenderWindow(0L);
-        }
-        layer->Delete();
-    }
-    m_ROILayers.clear();
-}
-
-
-void FrLayeredImage::RemoveAllLayers(){
-    RemoveImageLayers();
-    RemoveRoiLayers();
-
-    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
     if(rw){
         // NOTE: we have 2 layers : default and special
+        m_ImageLayer->GetRenderer()->SetLayer(1);
         m_SpecialLayer->GetRenderer()->SetLayer(1);
         rw->SetNumberOfLayers(2);
     }
-    m_nextLayerID = START_LAYER_ID;
 }
 
-FrImageLayer* FrLayeredImage::GetImageLayerByID(int id){
-    if(id == DEFAULT_LAYER_ID){
-        return (FrImageLayer*)this;
-    }
-    else{
-        LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-        for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-            if((*it)->GetID() == id) return (*it);
-        }
-    }
-    return 0L;
-}
-
-FrROILayer* FrLayeredImage::GetRoiLayerByID(int id){
-    ROILayerCollection::iterator it, itEnd(m_ROILayers.end());
-    for(it = m_ROILayers.begin(); it != itEnd; ++it){
+FrBaseLayer* FrLayeredImage::GetLayerByID(unsigned int id){
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
         if((*it)->GetID() == id) return (*it);
     }
     return 0L;
 }
-
 
 void FrLayeredImage::GetRenderers(std::vector<vtkRenderer*>& renderers){
     // First add default
     renderers.clear();
     int layerNumber = 0;
 
-    renderers.push_back(m_Renderer);
-    m_Renderer->SetLayer(layerNumber);
+    vtkRenderer* ren = m_ImageLayer->GetRenderer();
+    renderers.push_back(ren);
+    ren->SetLayer(layerNumber);
     ++layerNumber;
 
     // Add renderer of each layer and udate layer number
-    LayerCollection::iterator it, itEnd(m_ImageLayers.end());
-    for(it = m_ImageLayers.begin(); it != itEnd; ++it){
-        vtkRenderer* ren = (*it)->GetRenderer();
-        ren->SetLayer(layerNumber);
-        renderers.push_back(ren);
-
-        ++layerNumber;
-    }
-
-    // Add renderer of each roi layer and udate layer number
-    ROILayerCollection::iterator itr, itrEnd(m_ROILayers.end());
-    for(itr = m_ROILayers.begin(); itr != itrEnd; ++itr){
-        vtkRenderer* ren = (*itr)->GetRenderer();
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        ren = (*it)->GetRenderer();
         ren->SetLayer(layerNumber);
         renderers.push_back(ren);
 
@@ -505,7 +348,7 @@ void FrLayeredImage::GetRenderers(std::vector<vtkRenderer*>& renderers){
     }
 
     // Last add renderer from special layer
-    vtkRenderer* ren = m_SpecialLayer->GetRenderer();
+    ren = m_SpecialLayer->GetRenderer();
     ren->SetLayer(layerNumber);
     renderers.push_back(ren);
 }
@@ -516,9 +359,20 @@ void FrLayeredImage::SetText(const char* text){
 }
 
 void FrLayeredImage::UpdateBorder(){
-    vtkRenderWindow* rw = m_Renderer->GetRenderWindow();
+    vtkRenderer* ren = m_SpecialLayer->GetRenderer();
+    vtkRenderWindow* rw = ren->GetRenderWindow();
     if(rw){
-        int* size = m_Renderer->GetSize();
+        int* size = ren->GetSize();
         m_SpecialLayer->UpdateBorder(size[0]-1, size[1]);
     }
+}
+
+bool FrLayeredImage::IsInViewport(int mouseX, int mouseY){
+    // Use SpecialLayer since it is alway active
+    bool result = false;
+    if(m_SpecialLayer){
+        result = m_SpecialLayer->
+            GetRenderer()->IsInViewport(mouseX, mouseY);
+    }
+    return result;
 }

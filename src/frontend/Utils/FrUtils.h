@@ -11,6 +11,19 @@
 
 #define MY_PI 3.1415926854
 
+// This class used for casting
+// to remove ugly cast expressions for pointers
+class FrCast {
+    template<class Tr, class T=void>
+    static Tr* CLike(T* ptr){ return (Tr*)ptr; }
+
+    template<class Tr, class T=void>
+    static Tr Stat(T value){ return static_cast<Tr>(ptr); }
+
+    template<class Tr, class T=void>
+    static Tr* Dyn(T* ptr){ return dynamic_cast<Tr*>(ptr); }
+};
+
 // This function is used to ensure that
 // value is in specified range [min..max].
 template<class T>

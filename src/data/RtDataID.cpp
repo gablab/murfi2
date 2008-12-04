@@ -16,42 +16,42 @@
 
 // default constructor
 RtDataID::RtDataID() {
-  siteIDNum = SITE_ID_NUMBER;
-  studyNum =  DATAID_UNSET_VALUE;
-  seriesNum = DATAID_UNSET_VALUE;
-  timePoint = DATAID_UNSET_VALUE;
-  history = "";
-  moduleID = "";
-  dataName = "";
-  roiID = "";
+    siteIDNum = SITE_ID_NUMBER;
+    studyNum =  DATAID_UNSET_VALUE;
+    seriesNum = DATAID_UNSET_VALUE;
+    timePoint = DATAID_UNSET_VALUE;
+    history = "";
+    moduleID = "";
+    dataName = "";
+    roiID = "";
 
-  instantiationTime = RtExperiment::getExperimentElapsedTime();
+    instantiationTime = RtExperiment::getExperimentElapsedTime();
 }
 
 // constructor with known fields
 RtDataID::RtDataID(unsigned int _studyNum,
-		   unsigned int _seriesNum,
-		   unsigned int _timePoint,
-		   const string &_history,
-		   const string &_moduleID,
-		   const string &_dataName,
-		   const string &_roiID) {
-  siteIDNum = SITE_ID_NUMBER;
-  studyNum = _studyNum;
-  seriesNum = _seriesNum;
-  timePoint = _timePoint;
-  history = _history;
-  moduleID = _moduleID;
-  dataName = _dataName;
-  roiID = _roiID;
+                   unsigned int _seriesNum,
+                   unsigned int _timePoint,
+                   const string &_history,
+                   const string &_moduleID,
+                   const string &_dataName,
+                   const string &_roiID) {
+    siteIDNum = SITE_ID_NUMBER;
+    studyNum = _studyNum;
+    seriesNum = _seriesNum;
+    timePoint = _timePoint;
+    history = _history;
+    moduleID = _moduleID;
+    dataName = _dataName;
+    roiID = _roiID;
 
-  instantiationTime = RtExperiment::getExperimentElapsedTime();
+    instantiationTime = RtExperiment::getExperimentElapsedTime();
 }
 
 // constructor from a data id from a previous module
 RtDataID::RtDataID(RtDataID &prevModuleData,
-		   const RtStreamComponent &thisModule) {
-  setFromInputDataID(prevModuleData, thisModule);
+                   const RtStreamComponent &thisModule) {
+    setFromInputDataID(prevModuleData, thisModule);
 }
 
 
@@ -64,57 +64,95 @@ RtDataID::~RtDataID() {}
 
 //*** operators ***//
 
+bool RtDataID::operator!=(const RtDataID &other) const {
+    return !(*this==other);
+}
 // comparison
 // if either data id has a field blank ("") it is ignored in the comparison
 bool RtDataID::operator==(const RtDataID &other) const {
-  return
-     (siteIDNum          == other.siteIDNum 
-      || siteIDNum       == DATAID_UNSET_VALUE 
-      || other.siteIDNum == DATAID_UNSET_VALUE)
+    return
+        (siteIDNum          == other.siteIDNum
+         || siteIDNum       == DATAID_UNSET_VALUE
+         || other.siteIDNum == DATAID_UNSET_VALUE)
 
-  && (studyNum           == other.studyNum  
-      || studyNum        == DATAID_UNSET_VALUE 
-      || other.studyNum  == DATAID_UNSET_VALUE)
+        && (studyNum           == other.studyNum
+            || studyNum        == DATAID_UNSET_VALUE
+            || other.studyNum  == DATAID_UNSET_VALUE)
 
-  && (seriesNum          == other.seriesNum 
-      || seriesNum       == DATAID_UNSET_VALUE 
-      || other.seriesNum == DATAID_UNSET_VALUE)
+        && (seriesNum          == other.seriesNum
+            || seriesNum       == DATAID_UNSET_VALUE
+            || other.seriesNum == DATAID_UNSET_VALUE)
 
-  && (timePoint          == other.timePoint 
-      || timePoint       == DATAID_UNSET_VALUE 
-      || other.timePoint == DATAID_UNSET_VALUE)
+        && (timePoint          == other.timePoint
+            || timePoint       == DATAID_UNSET_VALUE
+            || other.timePoint == DATAID_UNSET_VALUE)
 
-  && (history            == other.history   
-      || history         == "" 
-      || other.history   == "")
+        && (history            == other.history
+            || history         == ""
+            || other.history   == "")
 
-  && (moduleID           == other.moduleID  
-      || moduleID        == "" 
-      || other.moduleID  == "")
+        && (moduleID           == other.moduleID
+            || moduleID        == ""
+            || other.moduleID  == "")
 
-  && (dataName           == other.dataName  
-      || dataName        == "" 
-      || other.dataName  == "")
+        && (dataName           == other.dataName
+            || dataName        == ""
+            || other.dataName  == "")
 
-  && (roiID              == other.roiID     
-      || roiID           == "" 
-      || other.roiID     == "")
-    ;
+        && (roiID              == other.roiID
+            || roiID           == ""
+            || other.roiID     == "");
 }
 
 // less
 bool RtDataID::operator<(const RtDataID &other) const {
-  return
-       siteIDNum < other.siteIDNum
-    || studyNum  < other.studyNum
-    || seriesNum < other.seriesNum
-    || timePoint < other.timePoint
-    || history   < other.history
-    || moduleID  < other.moduleID
-    || dataName  < other.dataName
-    || roiID     < other.roiID
-    ;
+    /* Logic:
+     * if a != b, return whether or not it's a < b or a > b
+     * if a == b, continue to next field
+     * NOTE: If fields are added to the DataID in the future, another logic block needs to be added*/
 
+    // siteIDNum
+    if (siteIDNum != other.siteIDNum) {
+        return (siteIDNum < other.siteIDNum);
+    };
+
+    // studyNum
+    if (studyNum != other.studyNum) {
+        return (studyNum < other.studyNum);
+    };
+
+    // seriesNum
+    if (seriesNum != other.seriesNum) {
+        return (seriesNum < other.seriesNum);
+    };
+
+    // timePoint
+    if (timePoint != other.timePoint) {
+        return (timePoint < other.timePoint);
+    };
+
+    // history
+    if (history != other.history) {
+        return (history < other.history);
+    };
+
+    // moduleID
+    if (moduleID != other.moduleID) {
+        return (moduleID < other.moduleID);
+    };
+
+    // dataName
+    if (dataName != other.dataName) {
+        return (dataName < other.dataName);
+    };
+
+    // roiID
+    if (roiID != other.roiID) {
+        return (roiID < other.roiID);
+    };
+
+    // If reached, all a == b, so return false (a !< b)
+    return false;
 }
 
 // output to a stream
@@ -134,9 +172,9 @@ bool RtDataID::operator<(const RtDataID &other) const {
 
 // get a string version of the ID
 string RtDataID::toString() const {
-  stringstream sstr("");
+    stringstream sstr("");
 
-  sstr
+    sstr
     << ":" << siteIDNum
     << ":" << studyNum
     << ":" << seriesNum
@@ -146,33 +184,33 @@ string RtDataID::toString() const {
     << ":" << dataName
     << ":" << roiID
     << ":";
-  return sstr.str();
+    return sstr.str();
 }
 
 // set the ID from a string
 string RtDataID::setFromString(const string &id) {
-  return "not yet implemented";
+    return "not yet implemented";
 }
 
 // set from input data
 void RtDataID::setFromInputData(RtData &prevModuleData,
-				const RtStreamComponent &thisModule) {
-  setFromInputDataID(prevModuleData.getDataID(), thisModule);
+                                const RtStreamComponent &thisModule) {
+    setFromInputDataID(prevModuleData.getDataID(), thisModule);
 }
 
 // set from input data
 void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
-				  const RtStreamComponent &thisModule) {
-  (*this) = prevModuleDataID;
-  siteIDNum = SITE_ID_NUMBER;
-  history = history + moduleID;
-  moduleID = thisModule.getID();
+                                  const RtStreamComponent &thisModule) {
+    (*this) = prevModuleDataID;
+    siteIDNum = SITE_ID_NUMBER;
+    history = history + moduleID;
+    moduleID = thisModule.getID();
 
-  instantiationTime = RtExperiment::getExperimentElapsedTime();
+    instantiationTime = RtExperiment::getExperimentElapsedTime();
 }
 
 // output to stream
 ostream &operator<<(ostream &out, const RtDataID &id)  {
-  out << id.toString();
-  return out;
+    out << id.toString();
+    return out;
 }

@@ -29,8 +29,13 @@ void RtDataStore::addOutputForNotify(RtOutput *out) {
 
 // hand off some data to be output
 void RtDataStore::setData(RtData *data) {
-  // save the pointer to the data
-  store[&data->getDataID()] = data;
+  
+  mut.acquire();
+
+  // put data into datastore with its dataID as the key
+  store[data->getDataID()] = data;
+
+  mut.release();
   
   // notify listeners
   for(vector<RtOutput*>::iterator i = outputNotifyList.begin();
@@ -43,15 +48,17 @@ void RtDataStore::setData(RtData *data) {
 RtData *RtDataStore::getData(RtDataID &dataID) {
   
   // iterator for map
-  map<RtDataID*,RtData*,RtDataIDCompare>::iterator it;
-  
-  // find iterator to mapped value
-  it = store.find(&dataID);
+  map<RtDataID,RtData*,RtDataIDCompare>::const_iterator it;
+    
+  mut.acquire();
+  it = store.find(dataID);
 
   // if not found
   if(it == store.end()) {
+    mut.release();
     return NULL;
   }
+  mut.release();
 
   return (*it).second;
 }

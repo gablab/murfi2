@@ -23,7 +23,7 @@
 using namespace std;
 
 // NOTES FOR SUBCLASSING:
-// when this class is subclassed it should get its own 
+// when this class is subclassed it should get its own
 //   static string moduleString;
 // then this string should be defined at the top of the source file and id
 // should be assigned to moduleString in all constructors. this rather
@@ -37,163 +37,170 @@ class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH>, public RtOutput {
 
 public:
 
-  //*** constructors/destructors  ***//
-  
-  // default constructor
-  RtStreamComponent();
+    //*** constructors/destructors  ***//
 
-  // destructor
-  virtual ~RtStreamComponent();
+    // default constructor
+    RtStreamComponent();
 
-  //*** initialization routines  ***//
+    // destructor
+    virtual ~RtStreamComponent();
 
-  // configure this stream component
-  //  in
-  //   configuration
-  virtual void init(TiXmlElement *module, RtConfig *config);
+    //*** initialization routines  ***//
 
-  // adds an output to receive the data of this stream component
-  //  in
-  //   output to add
-  virtual void addOutput(RtOutput *out, const RtDataID &dataId = RtDataID());
+    // configure this stream component
+    //  in
+    //   configuration
+    virtual void init(TiXmlElement *module, RtConfig *config);
 
-  // adds outputs from a vector
-  //  in:
-  //   out: vector of output objects
-  //  out:
-  //   true (for success) or false
-  virtual void addVectorOfOutputs(vector<RtOutput*> &outs);
+    // adds an output to receive the data of this stream component
+    //  in
+    //   output to add
+    virtual void addOutput(RtOutput *out, const RtDataID &dataId = RtDataID());
 
-  // initialize and run thread
-  //  out:
-  //   0 (for success) or -1 (failure)
-  virtual int open(void * = 0);
+    // adds outputs from a vector
+    //  in:
+    //   out: vector of output objects
+    //  out:
+    //   true (for success) or false
+    virtual void addVectorOfOutputs(vector<RtOutput*> &outs);
 
-  // send data when we're done
-  //  in 
-  //   msg: message to send
-  //   to:  timeout
-  virtual int put(ACE_Message_Block *msg, ACE_Time_Value *to);
+    // initialize and run thread
+    //  out:
+    //   0 (for success) or -1 (failure)
+    virtual int open(void * = 0);
 
-  // close a stream component
-  //  in
-  //   flags: flags to tell us who called
-  virtual int close(u_long flags);
-  
-  // run the stream
-  virtual int svc();
+    // send data when we're done
+    //  in
+    //   msg: message to send
+    //   to:  timeout
+    virtual int put(ACE_Message_Block *msg, ACE_Time_Value *to);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString() const;
+    // close a stream component
+    //  in
+    //   flags: flags to tell us who called
+    virtual int close(u_long flags);
 
-  // sets whether this data should be kept around after the stream is done
-  void setPersistent(bool p);
+    // run the stream
+    virtual int svc();
 
-  // gets whether this data should be kept around after the stream is done
-  bool getPersistent() const;
+    // get the version
+    //  out: char array that represents the cvs version
+    virtual char *getVersionString() const;
 
-  // gets the id for this stream component
-  string getID() const;
+    // sets whether this data should be kept around after the stream is done
+    void setPersistent(bool p);
 
-  // gets the data id for the input
-  string getInputModuleID() const;
+    // gets whether this data should be kept around after the stream is done
+    bool getPersistent() const;
 
-  // sets the data id for the input
-  void setInputModuleID(string id);
+    // gets the id for this stream component
+    string getID() const;
 
-  // gets the data name for the input
-  string getInputDataName() const;
+    // gets the data id for the input
+    string getInputModuleID() const;
 
-  // sets the data name for the input
-  void setInputDataName(string id);
+    // sets the data id for the input
+    void setInputModuleID(string id);
 
-  // module name for config
-  static string moduleString;
+    // gets the data name for the input
+    string getInputDataName() const;
+
+    // sets the data name for the input
+    void setInputDataName(string id);
+
+    // module name for config
+    static string moduleString;
 
 protected:
 
-  typedef ACE_Task<ACE_MT_SYNCH> super;
+    typedef ACE_Task<ACE_MT_SYNCH> super;
 
-  // call the next processing step
-  virtual int nextStep(ACE_Message_Block *mb);
+    // call the next processing step
+    virtual int nextStep(ACE_Message_Block *mb);
 
-  // process the configuration: only use this for cross module or global config
-  // that is not available in the xml node for this stream component
-  //  in 
-  //   config class
-  virtual bool processConfig(RtConfig &config);
+    // process the configuration: only use this for cross module or global config
+    // that is not available in the xml node for this stream component
+    //  in
+    //   config class
+    virtual bool processConfig(RtConfig &config);
 
-  // process an option
-  //  in 
-  //   name of the option to process
-  //   val  text of the option node
-  //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
-			     const map<string,string> &attr);
+    // process an option
+    //  in
+    //   name of the option to process
+    //   val  text of the option node
+    //   attr map bettwen attribute names and values
+    virtual bool processOption(const string &name, const string &text,
+                               const map<string,string> &attr);
 
-  // finish initialization tasks for run
-  virtual bool finishInit();
+    // finish initialization tasks for run
+    virtual bool finishInit();
 
-  // pure virtual for implementation of real processing
-  virtual int process(ACE_Message_Block *mb) = 0;
+    // pure virtual for implementation of real processing
+    virtual int process(ACE_Message_Block *mb) = 0;
 
-  // pass any results to outputs
-  virtual void passData(RtData* data);
+    // pass any results to outputs
+    virtual void passData(RtData* data);
 
-  // sets the latest result of processing
-  //  in
-  //   data result
-  virtual void setResult(RtStreamMessage *msg, RtData *data);
+    // store any results to data store
+    //  in: pointer to data to store
+    virtual void storeData(RtData* data);
 
-  // passer to send the results of our computation to outputs
-  RtPasser *passer;
+    // sets the latest result of processing
+    //  in
+    //   data result
+    virtual void setResult(RtStreamMessage *msg, RtData *data);
 
-  // pointer to the conductor controlling execution
-  RtConductor *conductor;
+    // passer to send the results of our computation to outputs
+    RtPasser *passer;
 
-  // whether data created by this component should be persistent
-  bool persistent;
+    // pointer to the conductor controlling execution
+    RtConductor *conductor;
 
-  // whether the result should be placed on the message data
-  bool putResultOnMessage;
+    // whether data created by this component should be persistent
+    bool persistent;
 
-  // whether the result should be made the current data on the message
-  bool makeCurrentData;
+    // whether the result should be placed on the message data
+    bool putResultOnMessage;
 
-  // pointer to the display output object
-  //RtDisplayImage *display;
+    // whether the result should be made the current data on the message
+    bool makeCurrentData;
 
-  // id string
-  string componentID; // for the module id
-  string roiID;       // roi to be operated on
-  string dataName;    // base dataname to assign result
+    // pointer to the display output object
+    //RtDisplayImage *display;
 
-  // input data
-  string inputModuleID;
-  string inputDataName;
+    // id string
+    string componentID; // for the module id
+    string roiID;       // roi to be operated on
+    string dataName;    // base dataname to assign result
 
-  // file to log processing results to
-  ofstream ofile;
-  string outFilename;
+    // input data
+    string inputModuleID;
+    string inputDataName;
+
+    // file to log processing results to
+    ofstream ofile;
+    string outFilename;
+
+    // create mutex for datastore lockdown
+    ACE_Mutex mut;
 };
 
 
 class RtEndTask : public RtStreamComponent {
 
 public:
-  RtEndTask() : RtStreamComponent() {
-    componentID = "end-task";
-  }
+    RtEndTask() : RtStreamComponent() {
+        componentID = "end-task";
+    }
 
 protected:
-  virtual int process(ACE_Message_Block*) {
-    return 0;
-  }
+    virtual int process(ACE_Message_Block*) {
+        return 0;
+    }
 
-  virtual int nextStep(ACE_Message_Block *) {
-    return 0;
-  }
+    virtual int nextStep(ACE_Message_Block *) {
+        return 0;
+    }
 };
 
 

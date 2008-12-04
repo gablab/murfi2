@@ -9,6 +9,7 @@
 
 #include"RtDataID.h"
 #include"RtData.h"
+#include"ace/Mutex.h"
 
 #include"RtOutput.h"
 #include<vector>
@@ -20,36 +21,39 @@ class RtDataStore : public RtOutput  {
 
 public:
 
-  //*** constructors/destructors  ***//
+    //*** constructors/destructors  ***//
 
-  // default constructor
-  RtDataStore();
+    // default constructor
+    RtDataStore();
 
-  // destructor
-  virtual ~RtDataStore();
+    // destructor
+    virtual ~RtDataStore();
 
-  // add an output to be notified when new data arrives
-  virtual void addOutputForNotify(RtOutput *out);
+    // add an output to be notified when new data arrives
+    virtual void addOutputForNotify(RtOutput *out);
 
-  //*** data methods ***//
+    //*** data methods ***//
 
-  // hand off some data to be output
-  virtual void setData(RtData *data);
+    // hand off some data to be output
+    virtual void setData(RtData *data);
 
-  // get data by id
-  virtual RtData *getData(RtDataID &id);
+    // get data by id
+    virtual RtData *getData(RtDataID &id);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
+    // get the version
+    //  out: char array that represents the cvs version
+    virtual char *getVersionString();
 
 protected:
 
-  // list of outputs to be notified when new data arrives
-  vector<RtOutput*> outputNotifyList;
+    // list of outputs to be notified when new data arrives
+    vector<RtOutput*> outputNotifyList;
 
-  // hash map to store pointers to acquired data
-  map<RtDataID*,RtData*,RtDataIDCompare> store;
+    // hash map to store pointers to acquired data
+    map<RtDataID,RtData*,RtDataIDCompare> store;
+
+    // create mutex for datastore lockdown
+    ACE_Mutex mut;
 
 };
 

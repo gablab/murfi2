@@ -5,9 +5,13 @@
 #include "FrImageDocObj.h"
 #include "FrBaseView.h"
 #include "FrCommandController.h"
+#include "FrUtils.h"
 
 #include "Qt/qmessagebox.h"
 
+#include "RtDataId.h"
+
+#define DEF_MRI_ID "mri"
 
 FrLoadImageCmd::FrLoadImageCmd(){
 
@@ -46,18 +50,42 @@ bool FrLoadImageCmd::Execute(){
 	// open image
     bool result = true;
     if(openImage){
-        FrImageDocObj* imgDO = new FrImageDocObj();
-        if(imgDO->LoadFromFile(m_FileName)){
-            md->Add(imgDO);
-            FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_FULL);
+        RtMRIImage* img = LoadMRIImageFromFile(m_FileName);
+    
+        if (img){
+            //// create appropriate data id
+            //RtDataID id;
+            //id.setModuleID(DEF_MRI_ID);
+            //
+            //img->setDataID(id);
+            md->AddDataToStore(img);
+            FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);        // ?
         }
         else{
-            delete imgDO;
+            delete img;
             QMessageBox::critical(mw, "Front: Load image", "Can't load image...");
             result = false;
         }
     }
 	return result;
+}
+
+RtMRIImage* FrLoadImageCmd::LoadMRIImageFromFile(QString& fileName){
+    if(QFile::exists(fileName)){
+        std::string stdFileName(fileName.toAscii());
+        RtMRIImage* img = new RtMRIImage();
+
+        if(img->readNifti(stdFileName)){
+            // unmosaic
+            if(img->seemsMosaic()){
+                img->unmosaic();
+            }
+        }
+        
+        return img;
+    }
+
+    return 0L;    
 }
 
 ///////////////////////////////////////////////////////////////

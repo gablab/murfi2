@@ -57,7 +57,7 @@ double GetLength(int x1, int y1, int x2, int y2)
 	return length;
 }
 
-void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[3], int imgNumber){
+void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3], int imgNumber){
     if(!data) return;
 
     int oldPoint[2];
@@ -67,13 +67,13 @@ void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point
     double dSpacing[3];	
     data->GetSpacing(dSpacing);		
 
-    Views view = ts->GetActiveView();
+    Views view = viewDO->GetActiveView();
     
     switch(view){
         case SliceView:
             {
                 // get slice number
-                int slice = ts->GetSliceViewSettings()->SliceNumber;			
+                int slice = viewDO->GetSliceViewSettings()->SliceNumber;			
                 // set current indices of point
                 point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                 point[1] = int((oldPoint[1]+1) / dSpacing[1]);
@@ -93,7 +93,7 @@ void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point
                     case DEF_CORONAL: // coronal 
                     {
                         // get slice number
-                        int slice = ts->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL];
+                        int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL];
 
                         point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                         point[1] = slice;
@@ -103,7 +103,7 @@ void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point
                     case DEF_SAGITAL: // sagital
                     {
                         // get slice number
-                        int slice = ts->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL];
+                        int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL];
 
                         point[0] = slice;
                         point[1] = int((oldPoint[0]+1) / dSpacing[1]);
@@ -112,7 +112,7 @@ void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point
                     }
                     case DEF_AXIAL:
                     {
-                        int slice = ts->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL];
+                        int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL];
 
 
                         point[0] = int((oldPoint[0]+1) / dSpacing[0]);
@@ -181,4 +181,3 @@ bool IsPointInsideOfSphere(Pos center, int radius, Pos point){
     
     return inside;
 }
-

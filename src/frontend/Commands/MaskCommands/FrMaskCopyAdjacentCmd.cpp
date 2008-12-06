@@ -22,7 +22,7 @@ bool FrMaskCopyAdjacentCmd::Execute(){
         this->ApplyDataToRoi(imageData, roiDO, currentSliceNumber-1);
         this->ApplyDataToRoi(imageData, roiDO, currentSliceNumber+1);
 
-        this->UpdatePipelineForID(roiDO->GetID(), FRP_READROI);
+        this->UpdatePipelineForID(roiDO->GetID(), FRP_READ);
         result = true;
     }
 

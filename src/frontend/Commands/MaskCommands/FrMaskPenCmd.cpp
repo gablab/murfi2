@@ -9,6 +9,7 @@
 #include "FrOrthoView.h"
 #include "FrUtils.h"
 #include "FrRoiDocObj.h"
+#include "FrViewDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -66,8 +67,14 @@ bool FrMaskPenCmd::DrawMask(){
 
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
-            FrMainDocument* md = this->GetMainController()->GetMainDocument();
-            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();  
+            FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+            FrViewDocObj* viewDO = 0L;
+            FrDocument::DocObjCollection views;
+            doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+            if(views.size() > 0){
+                viewDO = (FrViewDocObj*)views[0];
+            }
 
             // get data dimensions
             int dims[3];
@@ -77,7 +84,7 @@ bool FrMaskPenCmd::DrawMask(){
             center[0] = m_Center.x;
             center[1] = m_Center.y;
 
-            GetRealImagePosition(ts, imageData, center, m_ImageNumber);    
+            GetRealImagePosition(viewDO, imageData, center, m_ImageNumber);    
 
             Pos new_center;
             new_center.x = center[0];
@@ -108,7 +115,7 @@ bool FrMaskPenCmd::DrawMask(){
                 }
 
             this->ApplyDataToRoi(imageData, roiDO);
-            mv->GetCurrentView()->UpdatePipeline(FRP_READROI);
+            mv->GetCurrentView()->UpdatePipeline(FRP_READ);
 
             result = true;
         }

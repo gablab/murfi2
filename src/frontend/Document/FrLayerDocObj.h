@@ -27,7 +27,7 @@ public:
     bool IsColormap();
 
     // Properties
-    FrGetPropMacro(FrLayerSettings*, Settings);
+    FrPropMacro(FrLayerSettings*, Settings);
     FrGetPropMacro(unsigned int, ID);
 
     double GetOpacity();

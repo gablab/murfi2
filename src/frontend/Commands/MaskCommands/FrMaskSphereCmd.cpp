@@ -9,6 +9,7 @@
 #include "FrOrthoView.h"
 #include "FrUtils.h"
 #include "FrRoiDocObj.h"
+#include "FrViewDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -91,7 +92,7 @@ bool FrMaskSphereCmd::WriteMask(){
             }
 
             FrMainWindow* mv = this->GetMainController()->GetMainView();
-            mv->GetCurrentView()->UpdatePipeline(FRP_READROI);
+            mv->GetCurrentView()->UpdatePipeline(FRP_READ);
 
             result = true;
         }
@@ -103,8 +104,14 @@ bool FrMaskSphereCmd::WriteMask(){
 void FrMaskSphereCmd::DrawCircle(vtkImageData* imageData, int radius){
     int pixelValue = 0;
 
-    FrMainDocument* md = this->GetMainController()->GetMainDocument();
-    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();  
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }
 
     switch (m_Action){
         case FrMaskSphereCmd::Erase:
@@ -128,7 +135,7 @@ void FrMaskSphereCmd::DrawCircle(vtkImageData* imageData, int radius){
     center[0] = m_Center.x;
     center[1] = m_Center.y;
 
-    GetRealImagePosition(ts, imageData, center, m_ImageNumber);    
+    GetRealImagePosition(viewDO, imageData, center, m_ImageNumber);    
 
     Pos new_center;
     new_center.x = center[0];

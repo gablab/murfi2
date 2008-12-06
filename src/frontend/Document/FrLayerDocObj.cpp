@@ -23,19 +23,19 @@ FrLayerDocObj::~FrLayerDocObj(){
 
 void FrLayerDocObj::OnAdd(FrDocument* doc){
     // TODO: implement
-    /*FrLayerCmd* cmd1 = FrCommandController::Create<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Add);
-    cmd1->SetLayer(this);
+    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd->SetAction(FrLayerCmd::Add);
+    cmd->SetDocObj(this);
 
-    FrUpdateLayerInfoCmd* cmd2 = 
-        FrCommandController::Create<FrUpdateLayerInfoCmd>();
+//    FrUpdateLayerInfoCmd* cmd2 = 
+//        FrCommandController::CreateCmd<FrUpdateLayerInfoCmd>();
 
-    FrMultiCmd* cmd = FrCommandController::Create<FrMultiCmd>();
-    cmd->AddCommand(cmd1);
-    cmd->AddCommand(cmd2);
+//    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+//    cmd->AddCommand(cmd1);
+//    cmd->AddCommand(cmd2);
     cmd->Execute();
 
-    delete cmd;*/
+    delete cmd;
 }
 
 void FrLayerDocObj::OnRemove(FrDocument* doc){

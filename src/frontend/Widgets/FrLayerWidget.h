@@ -2,8 +2,7 @@
 #define FR_LAYERWIDGET
 
 // Forward declarations 
-class FrLayerSettings;
-class FrRoiDocObj;
+class FrLayerDocObj;
 class QTableWidget;
 class QHBoxLayout;
 class QToolButton;
@@ -12,6 +11,8 @@ class QLabel;
 
 // includes
 #include "FrSettings.h"
+#include "FrMacro.h"
+
 #include "Qt/qwidget.h"
 
 // This class used to display layers
@@ -19,15 +20,13 @@ class QLabel;
 class FrLayerWidget: public QWidget {
 	Q_OBJECT
 public:
-	FrLayerWidget(FrLayerSettings& params, QWidget* parent = 0);
-    FrLayerWidget(FrRoiDocObj& roiDO, QWidget* parent = 0);
+	FrLayerWidget(FrLayerDocObj* layerDO, QWidget* parent = 0);
 
-    void GetLayerParams(FrLayerSettings& params);
-    void SetLayerParams(FrLayerSettings& params);
+    void SetLayerParams(FrLayerDocObj* layerDO);
 
-    bool IsRoiLayer(){ return m_isRoi; }
-    int GetLayerID(){ return m_params.ID; }
-    QString GetLayerName(){ return m_params.Name; }
+    // Properties
+    FrPropMacro(int, ID);
+    FrPropMacro(bool, Visibility);
 
 signals:
 	void VisibilityChanged(int id);
@@ -37,10 +36,6 @@ private Q_SLOTS:
     void OnCheckBoxToggled();
 	
 private:
-    // Some vars
-    bool m_isRoi;
-    FrLayerSettings m_params;
-
     // Widgets
 	QHBoxLayout*    m_layout;
 	QLabel*			picLabel;

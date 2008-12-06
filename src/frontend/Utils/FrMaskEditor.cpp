@@ -37,15 +37,15 @@ void FrMaskEditor::SetInput(vtkImageData* in){
     m_Data = in;
 }
 
-void FrMaskEditor::SetView(FrTabSettingsDocObj::View view){
+void FrMaskEditor::SetView(Views view){
     switch(view){
-        case FrTabSettingsDocObj::SliceView: 
+        case Views::SliceView: 
             m_View = FrMaskEditor::Slice;
             break;
-        case FrTabSettingsDocObj::MosaicView: 
+        case Views::MosaicView: 
             m_View = FrMaskEditor::Mosaic;
             break;
-        case FrTabSettingsDocObj::OrthoView: 
+        case Views::OrthoView: 
             m_View = FrMaskEditor::Ortho;
             break;
     }

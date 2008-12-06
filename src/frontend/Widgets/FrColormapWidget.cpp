@@ -191,24 +191,24 @@ void FrColormapWidget::OnBtnColorClicked(){
     }
 }
 
-void FrColormapWidget::GetColormapParams(FrColormapSettings& params){
+void FrColormapWidget::GetColormapParams(FrColormapLayerSettings& params){
     // Colormap props
-    params.Type = m_cmType;
-    params.MinValue = m_minWidget->GetValue();
-    params.MaxValue = m_maxWidget->GetValue();
-	params.MidValue = m_midWidget->GetValue();
-	params.Threshold = m_threshWidget->GetValue();
-    params.Color = m_color;
+    params.ColormapSettings.Type = m_cmType;
+    params.ColormapSettings.MinValue = m_minWidget->GetValue();
+    params.ColormapSettings.MaxValue = m_maxWidget->GetValue();
+	params.ColormapSettings.MidValue = m_midWidget->GetValue();
+	params.ColormapSettings.Threshold = m_threshWidget->GetValue();
+    params.ColormapSettings.Color = m_color;
 }
 
-void FrColormapWidget::SetColormapParams(FrColormapSettings& params){
+void FrColormapWidget::SetColormapParams(FrColormapLayerSettings& params){
     // Set colormap settings
-    m_minWidget->SetValue(params.MinValue);
-    m_maxWidget->SetValue(params.MaxValue);
-	m_midWidget->SetValue(params.MidValue);
-	m_threshWidget->SetValue(params.Threshold);
+    m_minWidget->SetValue(params.ColormapSettings.MinValue);
+    m_maxWidget->SetValue(params.ColormapSettings.MaxValue);
+	m_midWidget->SetValue(params.ColormapSettings.MidValue);
+	m_threshWidget->SetValue(params.ColormapSettings.Threshold);
 
-    switch(params.Type){
+    switch(params.ColormapSettings.Type){
         case FrColormapSettings::MultiColor:
             m_cmbType->setCurrentIndex(MULTICOLOR_ITEM_IDX);
             break;
@@ -221,7 +221,7 @@ void FrColormapWidget::SetColormapParams(FrColormapSettings& params){
     }
 
     // Set color    
-    UpdateColorWidget(params.Color);
+    UpdateColorWidget(params.ColormapSettings.Color);
 }
 
 void FrColormapWidget::UpdateColorWidget(QColor& color){

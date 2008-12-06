@@ -8,6 +8,7 @@
 #include "FrOrthoView.h"
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
+#include "FrViewDocObj.h"
 
 
 // VTK stuff
@@ -35,19 +36,19 @@ bool FrResetImageCmd::Execute(){
     FrResetImageCmd::View targetView = m_TargetView;
     if(targetView == FrResetImageCmd::Current){
         switch(tsDO->GetActiveView()){
-            case FrTabSettingsDocObj::SliceView: 
+            case Views::SliceView: 
                 targetView = FrResetImageCmd::Slice;
-                GetLayerSettings(tsDO->GetSliceViewSettings(), layerSettings);
+                //GetLayerSettings(tsDO->GetSliceViewSettings(), layerSettings);
                 break;
-            case FrTabSettingsDocObj::MosaicView: 
+            case Views::MosaicView: 
                 targetView = FrResetImageCmd::Mosaic;
-                GetLayerSettings(tsDO->GetMosaicViewSettings(), layerSettings);
+                //GetLayerSettings(tsDO->GetMosaicViewSettings(), layerSettings);
                 break;
-            case FrTabSettingsDocObj::OrthoView: 
+            case Views::OrthoView: 
                 targetView = FrResetImageCmd::Ortho;
-                for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
+                for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
                     std::vector<FrLayerSettings*> layers;
-                    GetLayerSettings(tsDO->GetOrthoViewSettings(), layers, i);
+                    //GetLayerSettings(tsDO->GetOrthoViewSettings(), layers, i);
                     layerSettings.insert(layerSettings.end(), 
                                          layers.begin(), layers.end());
                 }

@@ -5,6 +5,8 @@
 #include "FrSpinSliderWidget.h"
 #include "FrROIToolWidget.h"
 #include "FrRoiDocObj.h"
+#include "FrLayerDocObj.h"
+#include "FrMainDocument.h"
 
 #include "Qt/qtablewidget.h"
 #include "Qt/qboxlayout.h"
@@ -17,15 +19,14 @@
 #define TAB_ID_IDX          0
 #define TAB_LAYER_IDX       1
 #define COLUMN_COUNT        2
-#define DEFAULT_LAYER_ID    0
 
 #define MULTICOLOR_ITEM_IDX     0
 #define SINGLECOLOR_ITEM_IDX    1
 
 #define INSERT_ROW_NUM 0
 
-FrLayerListWidget::FrLayerListWidget(QWidget *parent)
-: QWidget(parent), m_signalsBlocked(false) {    
+FrLayerListWidget::FrLayerListWidget(FrMainDocument* doc, QWidget *parent)
+: QWidget(parent), m_signalsBlocked(false), m_mainDoc(doc) {    
 
     // Create table widget
     m_layerTable = new QTableWidget(this);
@@ -122,47 +123,30 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent)
 }
 
 // Common actions
-void FrLayerListWidget::AddLayer(FrLayerSettings* layerSets){
+void FrLayerListWidget::AddLayer(FrLayerDocObj* layerDO){
     // NOTE: Layers are added in the top
     m_layerTable->insertRow(INSERT_ROW_NUM);
     m_layerTable->setRowHeight(INSERT_ROW_NUM, 40);
 
     // Set ID
-    QString strID = QString().setNum(layerSets->ID);
+    QString strID = QString().setNum(layerDO->GetID());
     m_layerTable->setItem(INSERT_ROW_NUM, TAB_ID_IDX, new QTableWidgetItem(strID));
 
     // Create layer widget and add it to table
-    FrLayerWidget* lw = new FrLayerWidget(*layerSets, this);
+    FrLayerWidget* lw = new FrLayerWidget(layerDO, this);
     connect(lw, SIGNAL(VisibilityChanged(int)), 
             this, SLOT(OnVisibilityChanged(int)));
     m_layerTable->setCellWidget(INSERT_ROW_NUM, TAB_LAYER_IDX, lw);
     
     // Init opacity
-    int opacity = int(layerSets->Opacity * m_opacityWidget->GetMaximum());
+    int opacity = int(layerDO->GetOpacity() * m_opacityWidget->GetMaximum());
     m_opacityWidget->SetValue(opacity);
 
-    // Init Colormap settings
-    m_colormapWidget->SetColormapParams(layerSets->ColormapSettings);
-}
-
-void FrLayerListWidget::AddRoiLayer(FrRoiDocObj* roiDO){
-    // NOTE: Layers are added in the top
-    m_layerTable->insertRow(INSERT_ROW_NUM);
-    m_layerTable->setRowHeight(INSERT_ROW_NUM, 40);
-
-    // Set ID
-    QString strID = QString().setNum(roiDO->GetID());
-    m_layerTable->setItem(INSERT_ROW_NUM, TAB_ID_IDX, new QTableWidgetItem(strID));
-
-    // Create layer widget and add it to table
-    FrLayerWidget* lw = new FrLayerWidget(*roiDO, this);
-    connect(lw, SIGNAL(VisibilityChanged(int)), 
-            this, SLOT(OnVisibilityChanged(int)));
-    m_layerTable->setCellWidget(INSERT_ROW_NUM, TAB_LAYER_IDX, lw);
-
-    // Init opacity
-    int opacity = int(roiDO->GetOpacity() * m_opacityWidget->GetMaximum());
-    m_opacityWidget->SetValue(opacity);
+    // if colormap layer then init Colormap settings
+    if (layerDO->IsColormap()){
+        FrColormapLayerSettings* cmlSet = (FrColormapLayerSettings*) layerDO->GetSettings();    
+        m_colormapWidget->SetColormapParams(*cmlSet);
+    }
 }
 
 void FrLayerListWidget::RemoveLayers(){
@@ -177,8 +161,14 @@ void FrLayerListWidget::UpdateRoiList(){
     FrLayerWidget* curWgt = dynamic_cast<FrLayerWidget*>(
             m_layerTable->cellWidget(curRow, TAB_LAYER_IDX));
     
+    int id = 0;
+    if (curWgt)
+        id = curWgt->GetID();
+    
+    FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
+    
     // Update only when ROI layer selected
-    if(curWgt && curWgt->IsRoiLayer()){
+    if(layerDO->IsRoi()){
         // get all roi infos except current
         std::vector<FrROIToolWidget::RoiInfo> roiInfos;
         for(int row = 0; row < m_layerTable->rowCount(); ++row){
@@ -187,11 +177,17 @@ void FrLayerListWidget::UpdateRoiList(){
 
             FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
                 m_layerTable->cellWidget(row, TAB_LAYER_IDX));
+            
+            int wid = 0;
+            if (wgt)
+                wid = wgt->GetID();
+            
+            FrLayerDocObj* layerDoc = GetLayerDocObjByID(wid);
 
-            if(wgt && wgt->IsRoiLayer()){
+            if(layerDoc->IsRoi()){
                 FrROIToolWidget::RoiInfo info;
-                info.ID = wgt->GetLayerID();
-                info.Name = wgt->GetLayerName();
+                info.ID = wid;
+                info.Name = layerDoc->GetSettings()->Name;
                 roiInfos.push_back(info);
             }
         }
@@ -204,7 +200,11 @@ void FrLayerListWidget::SetSelectedLayer(int layerID){
         FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
             m_layerTable->cellWidget(row, TAB_LAYER_IDX));
 
-        if(wgt && wgt->GetLayerID() == layerID){
+        int id = 0;
+        if (wgt)
+            id = wgt->GetID();
+
+        if(id == layerID){
             // NOTE setup current cell and emulate click
             m_layerTable->setCurrentCell(row, TAB_LAYER_IDX);
             this->OnCellClicked(row, TAB_LAYER_IDX);
@@ -213,18 +213,18 @@ void FrLayerListWidget::SetSelectedLayer(int layerID){
     }
 }
 
-bool FrLayerListWidget::GetLayerParams(int id, FrLayerSettings& params){
-    for(int row = 0; row < m_layerTable->rowCount(); ++row){
-        FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
-            m_layerTable->cellWidget(row, TAB_LAYER_IDX));
-
-        if(wgt && wgt->GetLayerID() == id){
-            wgt->GetLayerParams(params);
-            return true;
-        }
-    }
-    return false;
-}
+//bool FrLayerListWidget::GetLayerParams(int id, FrLayerSettings& params){
+//    for(int row = 0; row < m_layerTable->rowCount(); ++row){
+//        FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
+//            m_layerTable->cellWidget(row, TAB_LAYER_IDX));
+//
+//        if(wgt && wgt->GetID() == id){
+//            wgt->GetLayerParams(params);
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 // Private slots
 void FrLayerListWidget::OnCellClicked(int row, int col){
@@ -232,10 +232,12 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
 
     if(wgt){
         // Setup widgets
-        FrLayerSettings params;
-        wgt->GetLayerParams(params);
+        int id = wgt->GetID();
         
-        if(wgt->IsRoiLayer()){
+        // TODO: get layer DO with specified ID
+        FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
+
+        if(layerDO->IsRoi()){
             m_colormapWidget->setVisible(false);
             m_roiToolWidget->setVisible(true);
             this->UpdateRoiList();
@@ -245,26 +247,28 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
             m_roiToolWidget->setVisible(false);
             m_colormapWidget->setVisible(true);
             
-            if (params.ID == DEFAULT_LAYER_ID){
+            if (id == DEF_LAYER_ID){
                 m_colormapWidget->setVisible(false);
             }
             else {
+                FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+
                 m_colormapWidget->setVisible(true);
                 m_colormapWidget->BlockSignals(true);
-                m_colormapWidget->SetColormapParams(params.ColormapSettings);
+                m_colormapWidget->SetColormapParams(*cmlParams);
                 m_colormapWidget->BlockSignals(false);
             }
         }
 
         // Update opacity
-        int opacity = int(params.Opacity * m_opacityWidget->GetMaximum());
+        int opacity = int(layerDO->GetSettings()->Opacity * m_opacityWidget->GetMaximum());
         bool old = m_signalsBlocked;
         m_signalsBlocked = true;
         m_opacityWidget->SetValue(opacity);
         m_signalsBlocked = old;
 
         if(m_signalsBlocked) return;
-        emit LayerSelected(params.ID);
+        emit LayerSelected(id);
     }
 }
 
@@ -324,16 +328,51 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
         bool oldSB = m_signalsBlocked;
         m_signalsBlocked = true;
 
-        FrLayerSettings params;
-        wgt->GetLayerParams(params);
+        int id = wgt->GetID();
+        FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
                 
-        params.Opacity = double(m_opacityWidget->GetValue()) / 
+        layerDO->GetSettings()->Opacity = double(m_opacityWidget->GetValue()) / 
                          double(m_opacityWidget->GetMaximum());
 
-        m_colormapWidget->GetColormapParams(params.ColormapSettings);
-        wgt->SetLayerParams(params);
+        FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+        m_colormapWidget->GetColormapParams(*cmlParams);
+        wgt->SetLayerParams(layerDO);
 
         m_signalsBlocked = oldSB;
     }
 }
 
+
+FrLayerDocObj* FrLayerListWidget::GetLayerDocObjByID(int id){
+    FrLayerDocObj* layerDO = 0L;
+    FrDocument::DocObjCollection layers;
+    m_mainDoc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+
+    if(layers.size() > 0){
+        for (int i = 0; i < layers.size(); i++){
+            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
+            if (layerDO->GetID() == id)
+                return layerDO;
+        }
+    }
+
+    return 0L;
+}
+
+bool FrLayerListWidget::GetLayerVisibility(int id){
+    // find widget with given id
+    for(int row = 0; row < m_layerTable->rowCount(); ++row){
+        FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
+            m_layerTable->cellWidget(row, TAB_LAYER_IDX));
+
+        if(wgt && wgt->GetID() == id){
+            return wgt->GetVisibility();
+        }
+    }
+
+    return false;
+}
+
+int FrLayerListWidget::GetOpacity(){
+    return m_opacityWidget->GetValue();    
+}

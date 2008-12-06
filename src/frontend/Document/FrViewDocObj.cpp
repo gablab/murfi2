@@ -1,6 +1,7 @@
 #include "FrViewDocObj.h"
 #include "FrDocument.h"
 #include "FrCommandController.h"
+#include "FrTabSettingsDocObj.h"
 
 // VTK includes
 #include "vtkImageData.h"
@@ -11,8 +12,8 @@
 #include <Qt/qfile.h>
 
 
-FrViewDocObj::FrViewDocObj(FrLayerSettings::LTypes type)
-: m_TimePoint(0), m_ActiveView(DEF_TBS_VIEW){
+FrViewDocObj::FrViewDocObj()
+: m_TimePoint(0), m_ActiveView(SliceView){          // TODO: add constant for default view
     // Create view settings
     m_SliceViewSettings = new FrSliceViewSettings();
     m_MosaicViewSettings = new FrMosaicViewSettings();
@@ -58,14 +59,14 @@ void FrViewDocObj::CopySettingsFrom(FrTabSettingsDocObj* src){
     m_TimePoint = src->GetTimePoint();
     m_ActiveView = src->GetActiveView();
     *(m_SliceViewSettings) = *(src->GetSliceViewSettings());
-    *(m_MosaicViewSettings) = *(src->GetSliceViewSettings());
-    *(m_OrthoViewSettings) = *(src->GetSliceViewSettings());
+    *(m_MosaicViewSettings) = *(src->GetMosaicViewSettings());
+    *(m_OrthoViewSettings) = *(src->GetOrthoViewSettings());
 }
 
 void FrViewDocObj::SaveSettingsTo(FrTabSettingsDocObj* dst){
     dst->SetTimePoint(m_TimePoint);
     dst->SetActiveView(m_ActiveView);
     *(dst->GetSliceViewSettings()) = *(m_SliceViewSettings);
-    *(dst->GetSliceViewSettings()) = *(m_MosaicViewSettings);
-    *(dst->GetSliceViewSettings()) = *(m_OrthoViewSettings);
+    *(dst->GetMosaicViewSettings()) = *(m_MosaicViewSettings);
+    *(dst->GetOrthoViewSettings()) = *(m_OrthoViewSettings);
 }

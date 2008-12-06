@@ -2,11 +2,13 @@
 #define FR_LAYERLISTWIDGET
 
 // Forward declarations 
+class FrLayerDocObj;
 class FrLayerSettings;
 class FrRoiDocObj;
 class FrSpinSliderWidget; 
 class FrColormapWidget;
 class FrROIToolWidget;
+class FrMainDocument;
 
 class QTableWidget;
 class QHBoxLayout;
@@ -22,11 +24,10 @@ class QModelIndex;
 class FrLayerListWidget: public QWidget {
 	Q_OBJECT
 public:
-	FrLayerListWidget(QWidget *parent = 0);
+	FrLayerListWidget(FrMainDocument* doc, QWidget *parent = 0);
 
     // Common actions
-    void AddLayer(FrLayerSettings* layerSets);
-    void AddRoiLayer(FrRoiDocObj* roiDO);
+    void AddLayer(FrLayerDocObj* layerDO);
     void RemoveLayers();
     void UpdateRoiList();
 
@@ -35,7 +36,16 @@ public:
         m_signalsBlocked = value;
     }
 
-    bool GetLayerParams(int id, FrLayerSettings& params);
+    FrLayerDocObj* GetLayerDocObjByID(int id);
+    //bool GetLayerParams(int id, FrLayerSettings& params);
+    
+    int GetOpacity();
+    bool GetLayerVisibility(int id);
+
+    FrColormapWidget* GetColormapWidget(){
+        return m_colormapWidget;
+    }
+
     FrROIToolWidget* GetRoiToolWidget(){
         return m_roiToolWidget;
     }
@@ -80,6 +90,7 @@ private:
     FrColormapWidget*   m_colormapWidget;
     FrSpinSliderWidget* m_opacityWidget;
     FrROIToolWidget* m_roiToolWidget;
+    FrMainDocument* m_mainDoc;
 
     bool m_signalsBlocked;
 };

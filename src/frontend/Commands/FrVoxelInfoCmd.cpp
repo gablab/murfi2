@@ -10,7 +10,8 @@
 #include "FrUtils.h"
 #include "FrVoxelInfoWidget.h"
 #include "FrLayeredImage.h"
-
+#include "FrViewDocObj.h"
+#include "FrLayerDocObj.h"
 
 #include "vtkPointPicker.h"
 #include "vtkCoordinate.h"
@@ -54,33 +55,38 @@ bool FrVoxelInfoCmd::Execute(){
 bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     // get renderer    
     FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrMainDocument* md = this->GetMainController()->GetMainDocument();
-    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
     std::vector<vtkRenderer*> renCollection;
     int imgNumber = -1;
     FrLayeredImage* lim = 0;
-    std::vector<FrLayerSettings*> layers;
 
-    enum FrTabSettingsDocObj::View view = ts->GetActiveView();
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }
+
+    Views view = viewDO->GetActiveView();
     switch(view){
-        case FrTabSettingsDocObj::SliceView:
+        case Views::SliceView:
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
-            GetLayerSettings(ts->GetSliceViewSettings(), layers);
+            //GetLayerSettings(ts->GetSliceViewSettings(), layers);
             break;
-        case FrTabSettingsDocObj::MosaicView:
+        case Views::MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
-            GetLayerSettings(ts->GetMosaicViewSettings(), layers);
+            //GetLayerSettings(ts->GetMosaicViewSettings(), layers);
             break;
-        case FrTabSettingsDocObj::OrthoView:
+        case Views::OrthoView:
             {
                 FrOrthoView* ov =  mv->GetOrthoView();
 
                 // Find Image where click's occured
-                for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                    if (ov->GetImage(i)->GetRenderer()->IsInViewport(m_mouseX, m_mouseY)){
+                for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
+                    if (ov->GetImage(i)->IsInViewport(m_mouseX, m_mouseY)){
                         imgNumber = i; 
                         break;
                     }
@@ -88,7 +94,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
                 if (imgNumber != -1){
                     ov->GetImage(imgNumber)->GetRenderers(renCollection);
                     lim = ov->GetImage(imgNumber);
-                    GetLayerSettings(ts->GetOrthoViewSettings(), layers, imgNumber);
+                    //GetLayerSettings(ts->GetOrthoViewSettings(), layers, imgNumber);
                 }
                 else{
                     ResetVoxelInfo();
@@ -99,7 +105,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     } // end switch(view)
 
     // we should get any layer with visible actor
-    int visibleLayerNum = GetVisibleLayer(layers);
+    int visibleLayerNum = GetVisibleLayer(doc);
     vtkRenderer* renderer = renCollection[visibleLayerNum];	
 
     if (!m_PointPicker->Pick(m_mouseX, m_mouseY, 0, renderer)) {
@@ -108,7 +114,7 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     }
 
     // get image data
-    vtkImageData* pImageData = lim->GetImageLayerByID(0)->GetInput();
+    vtkImageData* pImageData = lim->GetImageInput();        // TODO: check
     if(!pImageData) return false;
 
     // Get the mapped position of the mouse using the picker.
@@ -134,53 +140,58 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     vd.timepoint = 44;  // get timepoint
 
     // TODO: fix for side values
-    GetRealImagePosition(ts, pImageData, vd.Index, imgNumber);
+    GetRealImagePosition(viewDO, pImageData, vd.Index, imgNumber);
     vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
     vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
     vd.Position[2] = int(vd.Index[2] * dSpacing[2]);
 
 
-// Get voxel index, position
-// this should be done for all layers
-//    GetLayerSettings(md->GetCurrentTabSettings()->GetSliceViewSettings(), layers);
+    // Get voxel index, position
+    // this should be done for all layers
 
-    std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
-    for (it = layers.begin(); it != itEnd; ++it){
-        // get image data
-        // pImageData = mv->GetSliceView()->GetImage()->
-        // GetLayerByID( (*it)->ID )->GetInput();		
-        pImageData = lim->GetImageLayerByID((*it)->ID)->GetInput();
+    // get all layer settings
+    FrLayerDocObj* layerDO = 0L;
+    FrDocument::DocObjCollection layers;
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
 
-        switch (pImageData->GetNumberOfScalarComponents()) {
-            case 1:
-                {
-                        unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
-                        usPix = pPix[nPointIdx];
-                }
-                break;
-            case 3:
-                {
-                        unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
-                        usPixR = pPix[nPointIdx * 3 + 0];
-                        usPixG = pPix[nPointIdx * 3 + 1];
-                        usPixB = pPix[nPointIdx * 3 + 2];
+    if(layers.size() > 0){
+        for (int i = 0; i < layers.size(); i++){
+            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
 
-                        usPix = (usPixR + usPixG + usPixB)/3;
-                }
-                break;
+            // get image data
+            pImageData = lim->GetLayerByID(layerDO->GetID())->GetInput();
 
-            default:
-                break;
+            switch (pImageData->GetNumberOfScalarComponents()) {
+                case 1:
+                    {
+                            unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
+                            usPix = pPix[nPointIdx];
+                    }
+                    break;
+                case 3:
+                    {
+                            unsigned char* pPix = (unsigned char*)pImageData->GetScalarPointer();
+                            usPixR = pPix[nPointIdx * 3 + 0];
+                            usPixG = pPix[nPointIdx * 3 + 1];
+                            usPixB = pPix[nPointIdx * 3 + 2];
+
+                            usPix = (usPixR + usPixG + usPixB)/3;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            // Set table values
+            Voxel v;
+            v.name = layerDO->GetSettings()->Name;
+
+            // get voxel value from current layer
+            v.value = usPix;
+            vd.voxels.push_back(v);
         }
-
-        // Set table values
-        Voxel v;
-        v.name = (*it)->Name;
-
-        // get voxel value from current layer
-        v.value = usPix;
-        vd.voxels.push_back(v);
-    }
+    }    
 
     mv->GetVoxelInfoWidget()->SetVoxelData(vd);
     return false;
@@ -197,13 +208,23 @@ bool FrVoxelInfoCmd::ResetVoxelInfo(){
 void FrVoxelInfoCmd::GetVoxelInfo(){
 }
 
-int FrVoxelInfoCmd::GetVisibleLayer(std::vector<FrLayerSettings*> layers){
-    std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
-    for (it = layers.begin(); it != itEnd; ++it){
-        if ((*it)->Visibility){
-            return (*it)->ID;
+int FrVoxelInfoCmd::GetVisibleLayer(FrMainDocument* doc){
+    // get all layer settings
+    FrLayerDocObj* layerDO = 0L;
+    FrDocument::DocObjCollection layers;
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+    
+    //std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
+    if(layers.size() > 0){
+        for (int i = 0; i < layers.size(); i++){
+            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
+
+            if (layerDO->GetVisibility()){
+                return layerDO->GetID();
+            }
         }
-    }
+//        layerDO = (FrLayerDocObj*)layers[0];
+    }    
 
     return 0;   // there are no visible actors atm
 }

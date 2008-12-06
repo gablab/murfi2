@@ -10,6 +10,8 @@
 //#define ALL_LAYER_ID  1
 //#define SPEC_LAYRE_ID 2
 
+class FrTabSettingsDocObj;
+
 // This class represents View settings
 // currently used by the Application.
 class FrViewDocObj : public FrDocumentObj {
@@ -40,5 +42,5 @@ public:
     FrGetPropMacro(FrOrthoViewSettings*,  OrthoViewSettings);
 };
 
-#endif // FR_GRAPHDOC_OBJ
+#endif // FR_VIEWDOC_OBJ
 

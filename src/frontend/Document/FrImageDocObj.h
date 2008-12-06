@@ -23,8 +23,8 @@ public:
     virtual void OnRemove(FrDocument* doc);
     virtual ObjTypes GetType();
 
-    bool LoadFromFile(QString& fileName);
-    bool LoadFromMRIImage(RtMRIImage* img);
+    //bool LoadFromFile(QString& fileName);
+    //bool LoadFromMRIImage(RtMRIImage* img);
     unsigned int GetMatrixSize();
 
     // Series identifiers

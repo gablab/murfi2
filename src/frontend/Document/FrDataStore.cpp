@@ -70,3 +70,7 @@ void FrDataStore::AddRoiToDocument(RtData* data){
         m_Document->Add(roiDO);
     }
 }
+
+void FrDataStore::AddData(RtData *data){
+    m_Store->setData(data);
+}

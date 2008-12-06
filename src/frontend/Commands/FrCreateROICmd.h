@@ -4,6 +4,8 @@
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
 
+class FrImageDocObj;
+
 // This command allows user to manage ROI
 class FrCreateROICmd : public FrBaseCmd {
 public:
@@ -22,6 +24,10 @@ public:
 
 private:
     // Helpers
+    bool CreateEmptyMask(FrImageDocObj* imgDO);
+    bool ThresholdToMask(FrImageDocObj* imgDO, double threshold);
+    bool LoadFromFile(FrImageDocObj* imgDO, QString filename);
+
 };
 
 #endif

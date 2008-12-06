@@ -18,7 +18,7 @@
 
 FrImageDocObj::FrImageDocObj(){
     m_Images.clear();
-    m_SeriesNumber = BAD_SERIES_NUM:
+    m_SeriesNumber = BAD_SERIES_NUM;
 }
 
 FrImageDocObj::FrImageDocObj(RtMRIImage* img){    
@@ -93,33 +93,33 @@ void FrImageDocObj::ClearAll(){
     m_SeriesNumber = BAD_SERIES_NUM;
 }
 
-bool FrImageDocObj::LoadFromFile(QString& fileName){
-    bool result = false;
+//bool FrImageDocObj::LoadFromFile(QString& fileName){
+//    bool result = false;
+//
+//    if(QFile::exists(fileName)){
+//        std::string stdFileName(fileName.toAscii());
+//        RtMRIImage* img = new RtMRIImage();
+//
+//        if(img->readNifti(stdFileName)){
+//            // unmosaic
+//            if(img->seemsMosaic()){
+//                img->unmosaic();
+//            }
+//
+//            if(m_Image) delete m_Image;
+//            m_Image = img;
+//            result = true;
+//        }
+//    }
+//    return result;
+//}
 
-    if(QFile::exists(fileName)){
-        std::string stdFileName(fileName.toAscii());
-        RtMRIImage* img = new RtMRIImage();
-
-        if(img->readNifti(stdFileName)){
-            // unmosaic
-            if(img->seemsMosaic()){
-                img->unmosaic();
-            }
-
-            if(m_Image) delete m_Image;
-            m_Image = img;
-            result = true;
-        }
-    }
-    return result;
-}
-
-bool FrImageDocObj::LoadFromMRIImage(RtMRIImage* img){
-    // unmosaic!
-    if(img->seemsMosaic()){
-        img->unmosaic();
-    }
-	m_Image = img;
-
-	return true;
-}
+//bool FrImageDocObj::LoadFromMRIImage(RtMRIImage* img){
+//    // unmosaic!
+//    if(img->seemsMosaic()){
+//        img->unmosaic();
+//    }
+//	m_Image = img;
+//
+//	return true;
+//}

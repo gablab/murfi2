@@ -57,3 +57,7 @@ FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
     }
     return result;
 }
+
+void FrMainDocument::AddDataToStore(RtData *data){
+    m_DataStore->AddData(data);
+}

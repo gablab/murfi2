@@ -4,6 +4,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrXmlDefs.h"
 #include "FrUtils.h"
+#include "FrViewDocObj.h"
 
 // Qt stuff
 #include "Qt/qfile.h"
@@ -122,10 +123,10 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
     if(!isActiveViewOk) return false;
     switch(activeView){
         // NOTE: Fall throuhg first 3 cases 
-        case FrTabSettingsDocObj::SliceView:
-        case FrTabSettingsDocObj::MosaicView:
-        case FrTabSettingsDocObj::OrthoView:
-            tabs->SetActiveView((FrTabSettingsDocObj::View)activeView);
+        case Views::SliceView:
+        case Views::MosaicView:
+        case Views::OrthoView:
+            tabs->SetActiveView((Views)activeView);
             break;
         default: 
             return false;
@@ -181,7 +182,7 @@ bool FrLoadTabsCmd::LoadSliceViewSettings(QDomElement& elem,  FrSliceViewSetting
             vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
             if(!hasActiveLayer) return false;
             // NOTE: add this fix
-            vs->ActiveLayerID = DEFAULT_LAYER_ID;
+            vs->ActiveLayerID = DEF_LAYER_ID;
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view

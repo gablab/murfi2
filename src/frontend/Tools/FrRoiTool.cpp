@@ -13,6 +13,9 @@
 #include "FrUtils.h"
 #include "FrLayerListWidget.h"
 #include "FrROIToolWidget.h"
+#include "FrViewDocObj.h"
+#include "FrViewSettings.h"
+#include "FrLayerDocObj.h"
 
 #include "FrRoiInfoTool.h"
 #include "FrPenTool.h"
@@ -179,34 +182,40 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     // HACK: getting main controller
     FrMainController* mc = this->GetMainController();
     FrMainWindow* mv = mc->GetMainView();
-    FrMainDocument* md = mc->GetMainDocument();
-    FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+    FrMainDocument* doc = mc->GetMainDocument();
+
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }    
               
     FrLayeredImage* lim = 0;
-    std::vector<FrLayerSettings*> layers;
+    //std::vector<FrLayerSettings*> layers;
     std::vector<vtkRenderer*> renCollection;
 
-    enum FrTabSettingsDocObj::View view = ts->GetActiveView();
+    Views view = viewDO->GetActiveView();
     switch(view){
-        case FrTabSettingsDocObj::SliceView:
+        case Views::SliceView:
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
-            GetLayerSettings(ts->GetSliceViewSettings(), layers);
+            //GetLayerSettings(viewDO->GetSliceViewSettings(), layers);       // TODO: get layer settings from layerDocObj
             m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
-        case FrTabSettingsDocObj::MosaicView:
+        case Views::MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
-            GetLayerSettings(ts->GetMosaicViewSettings(), layers);
+            //GetLayerSettings(ts->GetMosaicViewSettings(), layers);
             m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
-        case FrTabSettingsDocObj::OrthoView:
+        case Views::OrthoView:
             {
                 FrOrthoView* ov =  mv->GetOrthoView();
-
+                
                 // Find Image where click's occured
-                for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                    if (ov->GetImage(i)->GetRenderer()->IsInViewport(params.X, params.Y)){
+                for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
+                    if (ov->GetImage(i)->IsInViewport(params.X, params.Y)){
                         m_ImageNumber = i; 
                         break;
                     }
@@ -214,7 +223,7 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
                 if (m_ImageNumber != -1){
                     ov->GetImage(m_ImageNumber)->GetRenderers(renCollection);
                     lim = ov->GetImage(m_ImageNumber);
-                    GetLayerSettings(ts->GetOrthoViewSettings(), layers, m_ImageNumber);
+                    //GetLayerSettings(ts->GetOrthoViewSettings(), layers, m_ImageNumber);
                 }
                 else{
                     // do something
@@ -225,7 +234,7 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     } // end switch(view)
 
     // we should get any layer with visible actor
-    int visibleLayerNum = GetVisibleLayer(layers);
+    int visibleLayerNum = GetVisibleLayer(doc);
     vtkRenderer* renderer = renCollection[visibleLayerNum];	    
 
     bool isInside = true;
@@ -259,13 +268,23 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     return isInside;
 }
 
-int FrRoiTool::GetVisibleLayer(std::vector<FrLayerSettings*> layers){
-    std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
-    for (it = layers.begin(); it != itEnd; ++it){
-        if ((*it)->Visibility){
-            return (*it)->ID;
+int FrRoiTool::GetVisibleLayer(FrMainDocument* doc){
+    // get all layer settings
+    FrLayerDocObj* layerDO = 0L;
+    FrDocument::DocObjCollection layers;
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+    
+    //std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
+    if(layers.size() > 0){
+        for (int i = 0; i < layers.size(); i++){
+            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
+
+            if (layerDO->GetVisibility()){
+                return layerDO->GetID();
+            }
         }
-    }
+//        layerDO = (FrLayerDocObj*)layers[0];
+    }    
 
     return 0;   // there are no visible actors atm
 }

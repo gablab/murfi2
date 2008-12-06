@@ -23,10 +23,13 @@ public:
     FrPropMacro(RtDataStore*, Store);
     FrPropMacro(FrMainDocument*, Document);
 
+    void AddData(RtData *data);
+
 private:
     // helpers
     void AddImageToDocument(RtData* data);
     void AddRoiToDocument(RtData* data);
+
 };
 
 #endif

@@ -15,6 +15,7 @@
 #include "vtkTextMapper.h"
 #include "vtkActor2D.h"
 #include "vtkTextProperty.h"
+#include "vtkImageActor.h"
 
 #define START_LAYER_ID 1
 
@@ -375,4 +376,12 @@ bool FrLayeredImage::IsInViewport(int mouseX, int mouseY){
             GetRenderer()->IsInViewport(mouseX, mouseY);
     }
     return result;
+}
+
+double* FrLayeredImage::GetActorBounds(){
+    double *bounds;
+
+    bounds = m_ImageLayer->GetActor()->GetBounds();
+    
+    return bounds;
 }

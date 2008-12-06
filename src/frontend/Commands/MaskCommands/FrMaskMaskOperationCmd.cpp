@@ -52,7 +52,7 @@ bool FrMaskMaskOperationCmd::Execute(){
 
         if(result){
             this->ApplyDataToRoi(imageData1, roiDO);
-            this->UpdatePipelineForID(roiDO->GetID(), FRP_READROI);
+            this->UpdatePipelineForID(roiDO->GetID(), FRP_READ);
         }
     }
     return result;

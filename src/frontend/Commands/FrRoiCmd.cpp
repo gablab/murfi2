@@ -43,19 +43,19 @@ bool FrRoiCmd::AddRoi(){
     FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
     layeredImage[0] = mv->GetSliceView()->GetImage();
     layeredImage[1] = mv->GetMosaicView()->GetImage();
-    layeredImage[2] = mv->GetOrthoView()->GetImage(CORONAL_IMAGE);
-    layeredImage[3] = mv->GetOrthoView()->GetImage(SAGITAL_IMAGE);
-    layeredImage[4] = mv->GetOrthoView()->GetImage(AXIAL_IMAGE);
+    layeredImage[2] = mv->GetOrthoView()->GetImage(DEF_CORONAL);
+    layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
+    layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
     
     
     // NOTE: Assume that id is the same for all images
     int id = BAD_LAYER_ID; 
-    for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-        id = layeredImage[i]->AddRoiLayer();
+    for(int i=0; i < ALL_ITEMS_COUNT; ++i){             // TODO: not finished
+        id = layeredImage[i]->AddLayer();
         m_Roi->SetID(id);
     }
     
-    FrBaseCmd::UpdatePipelineForID(id, FRP_READROI);
+    FrBaseCmd::UpdatePipelineForID(id, FRP_READ);
     return true;
 }
 

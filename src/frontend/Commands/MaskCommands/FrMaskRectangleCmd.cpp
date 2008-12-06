@@ -9,6 +9,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrMainDocument.h"
 #include "FrRoiDocObj.h"
+#include "FrViewDocObj.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -101,8 +102,14 @@ bool FrMaskRectangleCmd::WriteMask(){
 
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
-            FrMainDocument* md = this->GetMainController()->GetMainDocument();
-            FrTabSettingsDocObj* ts = md->GetCurrentTabSettings();
+            FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+            FrViewDocObj* viewDO = 0L;
+            FrDocument::DocObjCollection views;
+            doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+            if(views.size() > 0){
+                viewDO = (FrViewDocObj*)views[0];
+            }
 
             // get data dimensions
             int dims[3];
@@ -116,8 +123,8 @@ bool FrMaskRectangleCmd::WriteMask(){
             secondPoint[0] = m_Rect.secondPoint.x;
             secondPoint[1] = m_Rect.secondPoint.y;
 
-            GetRealImagePosition(ts, imageData, firstPoint, m_ImageNumber);
-            GetRealImagePosition(ts, imageData, secondPoint, m_ImageNumber);
+            GetRealImagePosition(viewDO, imageData, firstPoint, m_ImageNumber);
+            GetRealImagePosition(viewDO, imageData, secondPoint, m_ImageNumber);
 
             int xmin, xmax, ymin, ymax;
             //xmin = Min(m_Rect.firstPoint.x, m_Rect.secondPoint.x);
@@ -144,7 +151,7 @@ bool FrMaskRectangleCmd::WriteMask(){
             this->ApplyDataToRoi(imageData, roiDO);
 
             //FrMainWindow* mv = this->GetMainController()->GetMainView();
-            mv->GetCurrentView()->UpdatePipeline(FRP_READROI);
+            mv->GetCurrentView()->UpdatePipeline(FRP_READ);
 
             result = true;
         }

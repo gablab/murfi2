@@ -49,7 +49,7 @@ void FrRoiDocObj::CreateEmptyMaskImage(FrImageDocObj* imgDO){
     if(m_MaskImage) delete m_MaskImage;
     
     m_MaskImage = new RtMaskImage();
-    m_MaskImage->setInfo( *(imgDO->GetImage()) );
+    m_MaskImage->setInfo( *(imgDO->GetTimePointData(0)) );
         
     // init all values to default (not a ROI)    
     // DEF_MASK_VALUE == 0
@@ -69,12 +69,12 @@ bool FrRoiDocObj::LoadFromFile(FrImageDocObj* imgDO, QString& fileName){
             }
 
             // check params
-            bool hasSameDim = (img->getDims().size() == imgDO->GetImage()->getDims().size());
-            bool hasSamePDim = (img->getPixDims().size() == imgDO->GetImage()->getPixDims().size());
+            bool hasSameDim = (img->getDims().size() == imgDO->GetTimePointData(0)->getDims().size());
+            bool hasSamePDim = (img->getPixDims().size() == imgDO->GetTimePointData(0)->getPixDims().size());
             if(hasSameDim && hasSamePDim){
                 for(int i=0; i < img->getDims().size(); ++i){
-                    hasSameDim = (img->getDim(i) == imgDO->GetImage()->getDim(i));
-                    hasSamePDim = (img->getPixDim(i) == imgDO->GetImage()->getPixDim(i));
+                    hasSameDim = (img->getDim(i) == imgDO->GetTimePointData(0)->getDim(i));
+                    hasSamePDim = (img->getPixDim(i) == imgDO->GetTimePointData(0)->getPixDim(i));
                     if(!hasSameDim || !hasSamePDim) break;
                 }
 
@@ -99,5 +99,5 @@ void FrRoiDocObj::CreateByThresholdMaskImage(FrImageDocObj* imgDO, double thresh
     if(m_MaskImage) delete m_MaskImage;
 
     m_MaskImage = new RtMaskImage(
-        *(imgDO->GetImage()), threshold);
+        *(imgDO->GetTimePointData(0)), threshold);
 }

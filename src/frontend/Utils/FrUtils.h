@@ -2,12 +2,18 @@
 #define FR_UTILS
 
 #include "FrSettings.h"
-#include "FrTabSettingsDocObj.h"
+#include "FrViewDocObj.h"
 #include "FrSelection.h"
 
 #include "vtkImageData.h"
 
+// Backend includes
+#include "RtMRIImage.h"
+
 #include <vector>
+
+#include <Qt/qfile.h>
+#include <Qt/qstring.h>
 
 #define MY_PI 3.1415926854
 
@@ -30,7 +36,7 @@ int  Irange(int a, int minv, int maxv);
 
 // Utils
 double GetLength(int x1, int y1, int x2, int y2);
-void GetRealImagePosition(FrTabSettingsDocObj* ts, vtkImageData* data, int point[3], int imgNumber);
+void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3], int imgNumber);
 bool IsPointInsideOfPolygon(std::vector<Pos> Points, Pos point);
 bool IsPointInsideOfSphere(Pos center, int radius, Pos point);
 

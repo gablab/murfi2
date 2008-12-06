@@ -3,6 +3,7 @@
 
 // Forward declarations
 class FrLayerSettings;
+class FrMainDocument;
 class vtkPointPicker;
 
 // Some headers
@@ -38,7 +39,7 @@ private:
 
     void GetVoxelInfo();
     double* GetMappedPoint();
-    int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
+    int GetVisibleLayer(FrMainDocument* doc);
 
 private:
     int m_mouseX;

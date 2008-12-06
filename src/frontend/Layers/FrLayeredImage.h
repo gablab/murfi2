@@ -64,6 +64,9 @@ public:
     // Returns set of renderers (sorted in predefined order)
     void GetRenderers(std::vector<vtkRenderer*>& renderers);
     bool IsInViewport(int mouseX, int mouseY);
+    
+    // get bounds of actor
+    double* GetActorBounds();
 
     //
     // Text management

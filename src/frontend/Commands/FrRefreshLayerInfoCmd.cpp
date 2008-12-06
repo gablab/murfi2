@@ -5,6 +5,8 @@
 #include "FrMainWindow.h"
 #include "FrUtils.h"
 #include "FrRoiDocObj.h"
+#include "FrViewDocObj.h"
+#include "FrLayerDocObj.h"
 
 FrRefreshLayerInfoCmd::FrRefreshLayerInfoCmd(){
 }
@@ -18,45 +20,56 @@ bool FrRefreshLayerInfoCmd::Execute(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
     int layerID = BAD_LAYER_ID;
-    LayerCollection layers;
-    FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
-    switch(tabSets->GetActiveView()){
-        case FrTabSettingsDocObj::SliceView:
-            GetLayerSettings(tabSets->GetSliceViewSettings(), layers);
-            layerID = tabSets->GetSliceViewSettings()->ActiveLayerID;
+ 
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }
+
+    switch(viewDO->GetActiveView()){
+        case Views::SliceView:
+            //GetLayerSettings(tabSets->GetSliceViewSettings(), layers);
+            layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
             break;
-        case FrTabSettingsDocObj::MosaicView:
-            GetLayerSettings(tabSets->GetMosaicViewSettings(), layers);
-            layerID = tabSets->GetMosaicViewSettings()->ActiveLayerID;
+        case Views::MosaicView:
+            //GetLayerSettings(tabSets->GetMosaicViewSettings(), layers);
+            layerID = viewDO->GetMosaicViewSettings()->ActiveLayerID;
             break;
-        case FrTabSettingsDocObj::OrthoView:
+        case Views::OrthoView:
             // All views have to be synchronized so just take one
-            GetLayerSettings(tabSets->GetOrthoViewSettings(), layers, CORONAL_SLICE);
-            layerID = tabSets->GetOrthoViewSettings()->ActiveLayerID;
+            //GetLayerSettings(tabSets->GetOrthoViewSettings(), layers, CORONAL_SLICE);
+            layerID = viewDO->GetOrthoViewSettings()->ActiveLayerID;
             break;
     }
 
     bool result = false;
+    
+    FrDocument::DocObjCollection layers;
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+
     if(layers.size() > 0){
         FrLayerListWidget* widget = mv->GetLayerListWidget();
         widget->BlockSignals(true);
 
         widget->RemoveLayers();
         
-        // Add colormap layers
-        LayerCollection::iterator it, itEnd(layers.end());
+        // Add all layers
+        std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
         for(it = layers.begin(); it != itEnd; ++it){
-            widget->AddLayer( (*it) );
+            FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
+            widget->AddLayer(layerDO);
         }
 
-        // add roi too
-        std::vector<FrDocumentObj*> objects;
-        doc->GetObjectsByType(objects, FrDocumentObj::RoiObject);
-        std::vector<FrDocumentObj*>::iterator itr, itrEnd(objects.end());
-        for(itr = objects.begin(); itr != itrEnd; ++itr){
-            FrRoiDocObj* roiDO = (FrRoiDocObj*) (*itr);
-            widget->AddRoiLayer( roiDO );
-        }
+        //// add roi too
+        //std::vector<FrDocumentObj*> objects;
+        //doc->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+        //std::vector<FrDocumentObj*>::iterator itr, itrEnd(objects.end());
+        //for(itr = objects.begin(); itr != itrEnd; ++itr){
+        //    FrRoiDocObj* roiDO = (FrRoiDocObj*) (*itr);
+        //    widget->AddLayer(roiDO);
+        //}
 
         widget->SetSelectedLayer(layerID);
         widget->UpdateRoiList();

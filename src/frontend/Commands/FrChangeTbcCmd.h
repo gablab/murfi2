@@ -2,7 +2,7 @@
 #define FR_CHANGETBC_CMD
 
 // Forwward declarations
-class FrTBCSettings;
+class FrTbcSettings;
 class FrLayerSettings;
 
 // includes
@@ -34,7 +34,7 @@ public:
 
 private:
     void ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, int ID);
-    void SetupTbcSettings(FrTBCSettings& settings);
+    void SetupTbcSettings(FrTbcSettings& settings);
 
 private:
     bool m_isThreshold;

@@ -2,6 +2,7 @@
 #include "FrSpinSliderWidget.h"
 #include "FrColormapWidget.h"
 #include "FrSettings.h"
+#include "FrLayerSettings.h"
 
 #include "Qt/qlayout.h"
 #include "Qt/qlabel.h"
@@ -115,10 +116,10 @@ void FrLayerDialog::SetCaption(QString& caption){
     this->setWindowTitle(caption);
 }
 
-void FrLayerDialog::GetLayerParams(FrLayerSettings& layerSets){
+void FrLayerDialog::GetLayerParams(FrColormapLayerSettings& layerSets){
     // Common props
     layerSets.Name = m_txtName->text();
-    layerSets.ID = BAD_LAYER_ID;
+    //layerSets.ID = BAD_LAYER_ID;
 
     // Get opacity amd normalize it
     layerSets.Opacity = double(m_opacityWidget->GetValue());
@@ -127,13 +128,13 @@ void FrLayerDialog::GetLayerParams(FrLayerSettings& layerSets){
     layerSets.Visibility = m_chkVisibility->isChecked();
 
     // TBC props
-    InitTbcDefault(&layerSets.TbcSettings);
+//    InitTbcDefault(&layerSets.TbcSettings);
 
     // Colormap props
-    m_colormapWidget->GetColormapParams(layerSets.ColormapSettings);
+    m_colormapWidget->GetColormapParams(layerSets);
 }
 
-void FrLayerDialog::SetLayerParams(FrLayerSettings& layerSets){
+void FrLayerDialog::SetLayerParams(FrColormapLayerSettings& layerSets){
     // Common props
     m_txtName->setText(layerSets.Name);
     m_chkVisibility->setChecked(layerSets.Visibility);
@@ -141,7 +142,7 @@ void FrLayerDialog::SetLayerParams(FrLayerSettings& layerSets){
     m_opacityWidget->SetValue(opacity);
 
     // Colormap props
-    m_colormapWidget->SetColormapParams(layerSets.ColormapSettings);
+    m_colormapWidget->SetColormapParams(layerSets);
 }
 
 bool FrLayerDialog::SimpleExec(){
@@ -154,11 +155,11 @@ void FrLayerDialog::OnBtnOKClicked(){
     bool isValid = false;
     QString message = "Validation OK";
     VALIDATING_PIPELINE {
-        FrColormapSettings params;
+        FrColormapLayerSettings params;
         m_colormapWidget->GetColormapParams(params);
 
         // Check min and max
-        if(params.MinValue >= params.MaxValue){
+        if(params.ColormapSettings.MinValue >= params.ColormapSettings.MaxValue){
             message = "MIN value has to be less then MAX value...";
             break;
         }

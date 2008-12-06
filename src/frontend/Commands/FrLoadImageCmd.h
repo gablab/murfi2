@@ -3,6 +3,7 @@
 
 class FrTabSettingsDocObj;
 class FrImageDocObj;
+class RtMRIImage;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
@@ -27,7 +28,8 @@ public:
     FrSetPropMacro(QString, FileName);
 
 private:
-	
+    // helpers
+    RtMRIImage* LoadMRIImageFromFile(QString& fileName);
 
 private:
 

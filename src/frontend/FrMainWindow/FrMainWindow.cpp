@@ -127,7 +127,7 @@ void FrMainWindow::InitializeWidgets(){
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
     dock = new QDockWidget(tr("Layer List"), this);
-    m_LayerListWidget = new FrLayerListWidget(dock);
+    m_LayerListWidget = new FrLayerListWidget(this->GetMainDocument(), dock);
 
     dock->setWidget(m_LayerListWidget);
     addDockWidget(Qt::BottomDockWidgetArea, dock);

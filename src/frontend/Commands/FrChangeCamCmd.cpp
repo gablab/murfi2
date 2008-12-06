@@ -5,7 +5,7 @@
 #include "FrOrthoView.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrLayeredImage.h"
-
+#include "FrViewDocObj.h"
 
 #include "vtkRenderer.h"
 
@@ -80,15 +80,24 @@ bool FrChangeCamCmd::Execute(){
     // Suppose command is working well in common case
     // bad in case of unknown active view or if ortho view has some problems
     bool result = true;
-    FrTabSettingsDocObj* sets = doc->GetCurrentTabSettings();
-    switch(sets->GetActiveView()){
-    case FrTabSettingsDocObj::SliceView:
-        SetupCameraSettings(sets->GetSliceViewSettings()->CamSettings);
+    
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }
+        
+    Views view = viewDO->GetActiveView();
+
+    switch(view){
+    case Views::SliceView:
+        SetupCameraSettings(viewDO->GetSliceViewSettings()->CamSettings);
         break;
-    case FrTabSettingsDocObj::MosaicView:
-        SetupCameraSettings(sets->GetMosaicViewSettings()->CamSettings);
+    case Views::MosaicView:
+        SetupCameraSettings(viewDO->GetMosaicViewSettings()->CamSettings);
         break;
-    case FrTabSettingsDocObj::OrthoView:
+    case Views::OrthoView:
         result = SetupOrthoViewCamSettings();
         break;
     default:
@@ -105,14 +114,15 @@ bool FrChangeCamCmd::SetupOrthoViewCamSettings(){
     if( !m_isXY ) return false;
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrOrthoView* orthoView = mv->GetOrthoView();
+    FrOrthoView* ov = mv->GetOrthoView();
     
     // Find working renderer
     // Find Image where click's occured
     int imgIndex = INVALIDE_IMAGE_NUM;
-    for(int idx=0; idx < ORTHO_IMAGE_COUNT; ++idx){
-        if (orthoView->GetImage(idx)->GetRenderer()->IsInViewport(m_X, m_Y)){
-            imgIndex = idx; break;
+    for(int idx=0; idx < ORTHO_VIEWS_CNT; ++idx){
+        if (ov->GetImage(idx)->IsInViewport(m_X, m_Y)){
+            imgIndex = idx; 
+            break;
         }
     }
     
@@ -120,7 +130,15 @@ bool FrChangeCamCmd::SetupOrthoViewCamSettings(){
     if(imgIndex != INVALIDE_IMAGE_NUM){
         // Change info in document
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-        FrOrthoViewSettings* settings = doc->GetCurrentTabSettings()->GetOrthoViewSettings();
+
+        FrViewDocObj* viewDO = 0L;
+        FrDocument::DocObjCollection views;
+        doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+        if(views.size() > 0){
+            viewDO = (FrViewDocObj*)views[0];
+        }
+
+        FrOrthoViewSettings* settings = viewDO->GetOrthoViewSettings();
         SetupCameraSettings(settings->CamSettings[imgIndex]);
         result = true;
     }

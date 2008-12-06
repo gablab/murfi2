@@ -54,7 +54,7 @@ bool FrMaskDilateErodeCmd::DoDilate(){
         m_Filter->Update();
         
         this->ApplyDataToRoi(m_Filter->GetOutput(), roiDO);
-        this->UpdatePipelineForID(roiDO->GetID(), FRP_READROI);
+        this->UpdatePipelineForID(roiDO->GetID(), FRP_READ);
         result = true;
     }
     return result;
@@ -73,7 +73,7 @@ bool FrMaskDilateErodeCmd::DoErode(){
         m_Filter->Update();
         
         this->ApplyDataToRoi(m_Filter->GetOutput(), roiDO);
-        this->UpdatePipelineForID(roiDO->GetID(), FRP_READROI);
+        this->UpdatePipelineForID(roiDO->GetID(), FRP_READ);
         result = true;
     }
     return result;

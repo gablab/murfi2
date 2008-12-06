@@ -15,6 +15,7 @@ class FrDilatoneErosionTool;
 class FrLayerSettings;
 class vtkPointPicker;
 class FrMainController;
+class FrMainDocument;
 class FrTBCTool;
 class FrSliceScrollTool;
 
@@ -44,7 +45,7 @@ public:
 
 private:
     bool GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params);
-    int GetVisibleLayer(std::vector<FrLayerSettings*> layers);
+    int GetVisibleLayer(FrMainDocument* doc);
     void EnableRoiToolWidget();
 
 private:

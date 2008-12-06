@@ -51,7 +51,7 @@ bool FrUpdateTabsCmd::SetupTab(){
 
     // Setup Tab objects (layers, settings etc)
     this->SetupTabObjects();
-    FrBaseCmd::UpdatePipelineForID(ALL_LAYERS_ID, FRP_FULL);
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);
 
     return true;
 }

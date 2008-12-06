@@ -11,6 +11,7 @@ class RtMaskImage;
 #include "FrMacro.h"
 #include "vtkObject.h"
 #include "FrTabSettingsDocObj.h"
+#include "FrViewSettings.h"
 
 
 // This class performes editing of FrRoiDocObj objects.
@@ -29,7 +30,7 @@ public:
 
     // Properties
     FrSetPropMacro(View, View);
-    void SetView(FrTabSettingsDocObj::View view);
+    void SetView(Views view);
 
     FrSetPropMacro(Orientation, Orientation);    
     FrSetPropMacro(FrRoiDocObj*, DocumentObj);

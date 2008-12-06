@@ -5,7 +5,7 @@
 class FrDataStore;
 class FrDocumentObj;
 class FrTabSettingsDocObj;
-
+class RtData;
 
 // Some includes
 #include "FrDocument.h"
@@ -20,6 +20,7 @@ public:
     // Some helper methods
     void GetAllImages(std::vector<FrDocumentObj*>& images);
     FrTabSettingsDocObj* GetCurrentTabSettings();
+    void AddDataToStore(RtData *data);
 
     // Properties
     friend class FrDataStore;

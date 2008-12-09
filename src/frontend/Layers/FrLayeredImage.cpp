@@ -227,15 +227,15 @@ bool FrLayeredImage::AddLayer(unsigned int id, LayerType type){
     // first create layer
     FrBaseLayer* layer = 0;
     switch(type){
-        case FrBaseLayer::LtRoi:
+        case FrLayeredImage::Roi:
             layer = FrRoiLayer::New();
             break;
-        case FrBaseLayer::LtImage:
+        case FrLayeredImage::Image:
             // HACK: just assign ID and return
             m_ImageLayer->SetID(id);
             return true;
             break;
-        case FrBaseLayer::LtColormap:
+        case FrLayeredImage::Colormap:
             layer = FrColormapLayer::New();
             break;
     }

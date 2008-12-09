@@ -86,7 +86,7 @@ bool FrLayerCmd::AddLayer(){
             // Do we need to copy values ???
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Roi);
         }
-        FrBaseCmd::UpdatePipelineForID(m_DocObj->GetID(), FRP_READ);
+        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
         result = true;
     }
     else if(m_DocObj->IsColormap()){
@@ -94,9 +94,24 @@ bool FrLayerCmd::AddLayer(){
             // Do we need copy params here???
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Colormap);
         }
-        FrBaseCmd::UpdatePipelineForID(m_DocObj->GetID(), FRP_COLORMAP);
+        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
         result = true;
     }
+    
+    // set new layer as active
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+   
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }    
+    
+    int id = m_DocObj->GetID();
+    viewDO->GetSliceViewSettings()->ActiveLayerID = id;
+    viewDO->GetMosaicViewSettings()->ActiveLayerID = id;
+    viewDO->GetOrthoViewSettings()->ActiveLayerID = id;
 
     return result;
 }
@@ -270,10 +285,13 @@ bool FrLayerCmd::ChangeLayerParams(){
 
     FrLayerDocObj* layerDO = 0L;
     if(layers.size() > 0){
-        // delete appropriate LayerDocObj
+        // get appropriate LayerDocObj
         for (int i = 0; i < layers.size(); i++){
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-            if (layerDO->GetID() == m_ID) break;
+            if (layerDO->GetID() == m_ID) 
+                break;
+            else 
+                layerDO = 0L;
         }
     }    
 

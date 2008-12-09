@@ -30,16 +30,12 @@ bool FrRefreshLayerInfoCmd::Execute(){
 
     switch(viewDO->GetActiveView()){
         case Views::SliceView:
-            //GetLayerSettings(tabSets->GetSliceViewSettings(), layers);
             layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
             break;
         case Views::MosaicView:
-            //GetLayerSettings(tabSets->GetMosaicViewSettings(), layers);
             layerID = viewDO->GetMosaicViewSettings()->ActiveLayerID;
             break;
         case Views::OrthoView:
-            // All views have to be synchronized so just take one
-            //GetLayerSettings(tabSets->GetOrthoViewSettings(), layers, CORONAL_SLICE);
             layerID = viewDO->GetOrthoViewSettings()->ActiveLayerID;
             break;
     }
@@ -62,17 +58,8 @@ bool FrRefreshLayerInfoCmd::Execute(){
             widget->AddLayer(layerDO);
         }
 
-        //// add roi too
-        //std::vector<FrDocumentObj*> objects;
-        //doc->GetObjectsByType(objects, FrDocumentObj::RoiObject);
-        //std::vector<FrDocumentObj*>::iterator itr, itrEnd(objects.end());
-        //for(itr = objects.begin(); itr != itrEnd; ++itr){
-        //    FrRoiDocObj* roiDO = (FrRoiDocObj*) (*itr);
-        //    widget->AddLayer(roiDO);
-        //}
-
-        widget->SetSelectedLayer(layerID);
         widget->SetMainDoc(doc);
+        widget->SetSelectedLayer(layerID);
         widget->UpdateRoiList();
         widget->BlockSignals(false);
     }

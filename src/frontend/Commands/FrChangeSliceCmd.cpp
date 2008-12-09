@@ -80,7 +80,8 @@ bool FrChangeSliceCmd::Execute(){
     m_isXY = false;
     m_isSlice = false;
     if(result){
-        mv->GetCurrentView()->UpdatePipeline(FRP_READ);     // FRP_READ??
+        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+    //        mv->GetCurrentView()->UpdatePipeline(FRP_READ);     // FRP_READ??
     }
     return result;
 }

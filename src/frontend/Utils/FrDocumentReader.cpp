@@ -179,7 +179,7 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
         
         xDim = image->getDim(0);
         yDim = image->getDim(1);
-        dataSize = image->getImgDataLen();
+        dataSize = xDim * yDim;//image->getImgDataLen();
         pImageData = image->getDataCopy();
     }
     else {

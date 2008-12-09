@@ -16,12 +16,6 @@ class RtActivation;
 
 // class declaration
 class RtMaskImage : public RtDataImage<short> {
-
-#ifdef USE_FRONTEND
-// We need method to access data in frontend
-friend class FrMaskEditor;
-#endif
-
 public:
 
   const static unsigned int MAGIC_NUMBER = 0x5084;

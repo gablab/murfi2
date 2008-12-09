@@ -119,13 +119,15 @@ void FrLayeredImage::SetTbcSettings(FrTbcSettings& settings, unsigned int id){
     }
     else{
         FrBaseLayer* layer = this->GetLayerByID(id);
-        switch(layer->GetType()){
-            case FrBaseLayer::LtColormap:
-                ((FrColormapLayer*)layer)->SetTbcSettings(settings);
-                break;
-            case FrBaseLayer::LtImage:
-                ((FrImageLayer*)layer)->SetTbcSettings(settings);
-                break;
+        if(layer){
+            switch(layer->GetType()){
+                case FrBaseLayer::LtColormap:
+                    ((FrColormapLayer*)layer)->SetTbcSettings(settings);
+                    break;
+                case FrBaseLayer::LtImage:
+                    ((FrImageLayer*)layer)->SetTbcSettings(settings);
+                    break;
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ FrDocumentReader::FrDocumentReader()
 : m_Document(0), m_Mosaic(false), 
   m_Target(FrDocumentReader::Mri),
   m_Orientation(FrDocumentReader::XY), 
-  m_Slice(0), m_DataID(0) {
+  m_Slice(0), m_DataID(0), m_Output(0) {
 }
 
 FrDocumentReader::~FrDocumentReader(){
@@ -222,7 +222,7 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
     
     // Copy data and map values through lookup table
     unsigned char* LUT = 0;
-    this->CreateMriLUT(mri->data, mri->getImgDataLen(), &LUT);
+    this->CreateMriLUT(mri->data, mri->getNumPix(), &LUT);
 
     short* pSrc = pImageData;
     unsigned char* pDst = (unsigned char*)result->GetScalarPointer();
@@ -328,11 +328,9 @@ void FrDocumentReader::CreateMriLUT(short* data, unsigned int dataSize,
     // find max and min values
     short* ptr = data;
     short* pEnd = data + dataSize;
-    int test = 0;
 
-    for(; ptr != pEnd; ++ptr){
-        if(*ptr > max) max = *ptr;
-        test++;
+    for(int i=0; i < dataSize; ++i){
+        if(ptr[i] > max) max = ptr[i];
     }
 
     // create lut     

@@ -27,6 +27,9 @@ FrLayeredImage::FrLayeredImage() {
     m_ImageLayer = FrImageLayer::New();
     m_ImageLayer->SetID(DEF_LAYER_ID);
 
+    // Add layer to internal collection
+//    m_Layers.push_back(m_ImageLayer);
+
     m_SpecialLayer = FrSpecialLayer::New();
     m_SpecialLayer->SetID(SPC_LAYER_ID);
 }
@@ -322,6 +325,9 @@ void FrLayeredImage::RemoveLayers(){
 
 FrBaseLayer* FrLayeredImage::GetLayerByID(unsigned int id){
     LayersCollection::iterator it, itEnd(m_Layers.end());
+    if (m_ImageLayer->GetID() == id)        // should we include m_ImageLayer to the layer collection??
+        return m_ImageLayer;
+
     for(it = m_Layers.begin(); it != itEnd; ++it){
         if((*it)->GetID() == id) return (*it);
     }
@@ -384,4 +390,16 @@ double* FrLayeredImage::GetActorBounds(){
     bounds = m_ImageLayer->GetActor()->GetBounds();
     
     return bounds;
+}
+
+double* FrLayeredImage::GetActorCenter(){
+    double* center;
+
+    center = m_ImageLayer->GetActor()->GetCenter();
+
+    return center;
+}
+
+vtkImageActor* FrLayeredImage::GetActor(){
+    return m_ImageLayer->GetActor();
 }

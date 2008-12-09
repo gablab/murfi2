@@ -823,6 +823,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Utils\FrLayerSettings.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Utils\FrLayerSettings.h"
 				>
 			</File>

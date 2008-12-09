@@ -11,7 +11,8 @@
 #include "FrImageDocObj.h"
 #include "FrRoiTool.h"
 #include "QVTKWidget.h"
-
+#include "FrLayerDialog.h"
+#include "FrLayerDocObj.h"
 
 // VTK stuff
 #include "vtkRenderWindowInteractor.h"
@@ -76,6 +77,7 @@ void FrMainController::Initialize(){
     // Initialize document
     if(m_MainDocument){
         FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+        cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);      
         cmd->SetIsDefault(true);
         cmd->Execute();
         delete cmd;
@@ -89,19 +91,19 @@ void FrMainController::Initialize(){
     delete cmd;
 
     // NOTE for ROI testing 
-    FrLoadImageCmd* cmd1 = FrCommandController::CreateCmd<FrLoadImageCmd>();
-    cmd1->SetFileName("../example_data/img/f-00001-00000.nii");
-    //cmd1->SetFileName("../example_data/img/MNI_T1_1mm.nii");
-    FrCreateROICmd* cmd2 = FrCommandController::CreateCmd<FrCreateROICmd>();
-    cmd2->SetCreateTest(true);
-    FrResetImageCmd* cmd3 = FrCommandController::CreateCmd<FrResetImageCmd>();
-    cmd3->SetTargetView(FrResetImageCmd::Current);
-    FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    multiCmd->AddCommand(cmd1);
-    multiCmd->AddCommand(cmd2);
-    multiCmd->AddCommand(cmd3);
-    multiCmd->Execute();
-    delete multiCmd;
+    //FrLoadImageCmd* cmd1 = FrCommandController::CreateCmd<FrLoadImageCmd>();
+    //cmd1->SetFileName("../example_data/img/f-00001-00000.nii");
+    ////cmd1->SetFileName("../example_data/img/MNI_T1_1mm.nii");
+    //FrCreateROICmd* cmd2 = FrCommandController::CreateCmd<FrCreateROICmd>();
+    //cmd2->SetCreateTest(true);
+    //FrResetImageCmd* cmd3 = FrCommandController::CreateCmd<FrResetImageCmd>();
+    //cmd3->SetTargetView(FrResetImageCmd::Current);
+    //FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    //multiCmd->AddCommand(cmd1);
+    //multiCmd->AddCommand(cmd2);
+    //multiCmd->AddCommand(cmd3);
+    //multiCmd->Execute();
+    //delete multiCmd;
 }
 
 bool FrMainController::HasActiveTool(){
@@ -203,14 +205,30 @@ void FrMainController::SelectLayer(int id){
 }
 
 void FrMainController::AddLayer(){
-    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Add);
+    // create new layer doc object and get settings from dialog
+    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LColormap);
 
-    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    FrMainWindow* mv = this->GetMainView();
+    FrLayerDialog dlg(mv, true);
+    if(!dlg.SimpleExec()) return;
+    FrColormapLayerSettings* cmlSets = new FrColormapLayerSettings();
+    dlg.GetLayerParams(*cmlSets);
 
-    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    cmd->AddCommand(cmd1);
-    cmd->AddCommand(cmd2);
+    layerDO->SetSettings(cmlSets);
+
+    // finally add new doc to MainDocument
+    FrMainDocument* doc = this->GetMainDocument();
+    doc->Add(layerDO);    
+
+    //FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    //cmd1->SetAction(FrLayerCmd::Add);
+    //cmd1->SetDocObj(layerDO);
+
+    FrRefreshLayerInfoCmd* cmd = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+    //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    //cmd->AddCommand(cmd1);
+    //cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;
 }

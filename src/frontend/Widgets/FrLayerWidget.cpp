@@ -37,6 +37,7 @@ FrLayerWidget::FrLayerWidget(FrLayerDocObj* layerDO, QWidget *parent)
 	m_layout->addWidget(visibilityCheckBox);
     
     this->SetID(layerDO->GetID());
+    this->SetLayerParams(layerDO);
 
     // Connect signals
     connect(visibilityCheckBox, SIGNAL(stateChanged(int)),

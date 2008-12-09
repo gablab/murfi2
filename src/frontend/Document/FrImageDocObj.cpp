@@ -48,10 +48,10 @@ RtMRIImage* FrImageDocObj::GetTimePointData(unsigned int timePoint){
     ImageCollection::iterator it, itEnd(m_Images.end());
     for(it = m_Images.begin(); it != itEnd; ++it){
         RtMRIImage* img = (RtMRIImage*)(*it);
-        if(img->getDataID().getTimePoint() == timePoint){
+  //      if(img->getDataID().getTimePoint() == timePoint){
             result = img;
             break;
-        }
+  //      }
     }
 
     return result;

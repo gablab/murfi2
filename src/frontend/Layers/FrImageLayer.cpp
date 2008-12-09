@@ -118,3 +118,6 @@ void FrImageLayer::UpdateCamera(){
         m_Renderer->Render();
     }
 }
+
+void FrImageLayer::UpdateColormap(){
+}

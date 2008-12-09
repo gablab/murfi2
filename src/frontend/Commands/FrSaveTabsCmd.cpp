@@ -74,6 +74,7 @@ bool FrSaveTabsCmd::SaveTabSettings(QDomElement& root, FrTabSettingsDocObj* tabs
     tabSetsElem.setAttribute(FR_XML_ACTIVEVIEW_ATTR, int(tabs->GetActiveView()));
     root.appendChild(tabSetsElem);
     
+    // save view settings
     QDomElement sliceElem = m_Document->createElement(FR_XML_SLICEVIEW_ELEM);
     this->SaveSliceViewSettings(sliceElem,  tabs->GetSliceViewSettings());
     tabSetsElem.appendChild(sliceElem);
@@ -86,6 +87,12 @@ bool FrSaveTabsCmd::SaveTabSettings(QDomElement& root, FrTabSettingsDocObj* tabs
     this->SaveOrthoViewSettings(orthoElem,  tabs->GetOrthoViewSettings());
     tabSetsElem.appendChild(orthoElem);
     
+    // save layered image settings
+    QDomElement imagesElem = m_Document->createElement(FR_XML_LIS_ELEM);
+    imagesElem.setAttribute(FR_XML_COUNT_ATTR, 1);
+    SaveLayeredImageSettings(imagesElem, 0, tabs->GetImageLayer(), tabs->GetLayers());
+    tabSetsElem.appendChild(imagesElem);
+
     return true;
 }
 
@@ -105,12 +112,6 @@ void FrSaveTabsCmd::SaveSliceViewSettings(QDomElement& parent, FrSliceViewSettin
     camerasElem.setAttribute(FR_XML_COUNT_ATTR, 1);
     SaveCameraSettings(camerasElem, 0, &vs->CamSettings);
     parent.appendChild(camerasElem);
-
-    // images
-    QDomElement imagesElem = m_Document->createElement(FR_XML_LIS_ELEM);
-    imagesElem.setAttribute(FR_XML_COUNT_ATTR, 1);
-    SaveLayeredImageSettings(imagesElem, 0, &vs->MainLayer, vs->OtherLayers);
-    parent.appendChild(imagesElem);
 }
 
 void FrSaveTabsCmd::SaveMosaicViewSettings(QDomElement& parent, FrMosaicViewSettings* vs){
@@ -124,20 +125,14 @@ void FrSaveTabsCmd::SaveMosaicViewSettings(QDomElement& parent, FrMosaicViewSett
     camerasElem.setAttribute(FR_XML_COUNT_ATTR, 1);
     SaveCameraSettings(camerasElem, 0, &vs->CamSettings);
     parent.appendChild(camerasElem);
-
-    // images
-    QDomElement imagesElem = m_Document->createElement(FR_XML_LIS_ELEM);
-    imagesElem.setAttribute(FR_XML_COUNT_ATTR, 1);
-    SaveLayeredImageSettings(imagesElem, 0, &vs->MainLayer, vs->OtherLayers);
-    parent.appendChild(imagesElem);
 }
 
 void FrSaveTabsCmd::SaveOrthoViewSettings(QDomElement& parent, FrOrthoViewSettings* vs){
     // slice number
     QDomElement sliceNumElem = m_Document->createElement(FR_XML_SLICENUM_ELEM);
-    sliceNumElem.setAttribute(FR_XML_CORONAL_ATTR, vs->CoronalSlice);
-    sliceNumElem.setAttribute(FR_XML_SAGITAL_ATTR, vs->SagitalSlice);
-    sliceNumElem.setAttribute(FR_XML_AXIAL_ATTR,   vs->AxialSlice);
+    sliceNumElem.setAttribute(FR_XML_CORONAL_ATTR, vs->SliceNumber[DEF_CORONAL]);
+    sliceNumElem.setAttribute(FR_XML_SAGITAL_ATTR, vs->SliceNumber[DEF_SAGITAL]);
+    sliceNumElem.setAttribute(FR_XML_AXIAL_ATTR,   vs->SliceNumber[DEF_AXIAL]);
     parent.appendChild(sliceNumElem);
 
     // Active layer
@@ -147,19 +142,11 @@ void FrSaveTabsCmd::SaveOrthoViewSettings(QDomElement& parent, FrOrthoViewSettin
     
     // cameras
     QDomElement camerasElem = m_Document->createElement(FR_XML_CAMS_ELEM);
-    camerasElem.setAttribute(FR_XML_COUNT_ATTR, ORTHO_VIEW_NUM);
-    for(int i=0; i < ORTHO_VIEW_NUM; ++i){
+    camerasElem.setAttribute(FR_XML_COUNT_ATTR, ORTHO_VIEWS_CNT);
+    for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
         SaveCameraSettings(camerasElem, i, &vs->CamSettings[i]);
     }
     parent.appendChild(camerasElem);
-
-    // images
-    QDomElement imagesElem = m_Document->createElement(FR_XML_LIS_ELEM);
-    imagesElem.setAttribute(FR_XML_COUNT_ATTR, ORTHO_VIEW_NUM);
-    for(int i=0; i < ORTHO_VIEW_NUM; ++i){
-        SaveLayeredImageSettings(imagesElem, i, &vs->MainLayer[i], vs->OtherLayers[i]);
-    }
-    parent.appendChild(imagesElem);
 }
 
 void FrSaveTabsCmd::SaveCameraSettings(QDomElement& parent, int id, FrCameraSettings* camSets){
@@ -197,7 +184,7 @@ void FrSaveTabsCmd::SaveCameraSettings(QDomElement& parent, int id, FrCameraSett
 
 
 void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, int id, 
-                                             FrLayerSettings* mlSets, 
+                                             FrImageLayerSettings* mlSets, 
                                              std::vector<FrLayerSettings*>& olSets){
     // image
     QDomElement imageElem = m_Document->createElement(FR_XML_IMG_ELEM);
@@ -210,10 +197,10 @@ void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, int id,
     // Save tbc settings
     SaveTbcSettings(imageElem, &mlSets->TbcSettings);
 
-    // Layers
+    // Layers       // save colormap and roi settings with different functions?
     QDomElement layersElem = m_Document->createElement(FR_XML_LAYERS_ELEM);
     layersElem.setAttribute(FR_XML_COUNT_ATTR, olSets.size());
-    LayerCollection::iterator it, itEnd(olSets.end());
+    std::vector<FrLayerSettings*>::iterator it, itEnd(olSets.end());
     for(it = olSets.begin(); it != itEnd; ++it){
         SaveLayerSettings(layersElem, (*it));
     }
@@ -221,51 +208,65 @@ void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, int id,
 }
 
 void FrSaveTabsCmd::SaveLayerSettings(QDomElement& parent, FrLayerSettings* liSets){
-    
     QDomElement layerElem = m_Document->createElement(FR_XML_LAYER_ELEM);
-    layerElem.setAttribute(FR_XML_ID_ATTR, liSets->ID);
+//    layerElem.setAttribute(FR_XML_ID_ATTR, liSets->ID);
+    
+    FrLayerSettings::LTypes ltype = liSets->GetType();
+
+    layerElem.setAttribute(FR_XML_TYPE_ATTR, (int)ltype);
     layerElem.setAttribute(FR_XML_NAME_ATTR, liSets->Name);
     layerElem.setAttribute(FR_XML_OPACITY_ATTR, liSets->Opacity);
     layerElem.setAttribute(FR_XML_VISIBLE_ATTR, (liSets->Visibility ? 1 : 0) );
+    layerElem.setAttribute(FR_XML_NAME_ATTR, liSets->Name);
 
-    // pxRange
-    QDomElement prElem = m_Document->createElement(FR_XML_PXRANGE_ELEM);
-    prElem.setAttribute(FR_XML_MINVAL_ATTR, liSets->ColormapSettings.MinValue);
-    prElem.setAttribute(FR_XML_MAXVAL_ATTR, liSets->ColormapSettings.MaxValue);
-    layerElem.appendChild(prElem);
+    switch (ltype){
+        case FrLayerSettings::LRoi:
+            // do nothing
+            break;
+        case FrLayerSettings::LColormap:
+            FrColormapLayerSettings* cmlSets = (FrColormapLayerSettings*)liSets;
 
-    // colorMap
-    QDomElement cmElem = m_Document->createElement(FR_XML_CMAP_ELEM);
-    switch(liSets->ColormapSettings.Type){
-        case FrColormapSettings::MultiColor:
-            cmElem.setAttribute(FR_XML_TYPE_ATTR, FR_CMTYPE_MULTI);
-            break;
-        case FrColormapSettings::SingleColor:
-            cmElem.setAttribute(FR_XML_TYPE_ATTR, FR_CMTYPE_SINGLE);
-            break;
-        default:
-            // Do nothing here
+            // pxRange
+            QDomElement prElem = m_Document->createElement(FR_XML_PXRANGE_ELEM);
+            prElem.setAttribute(FR_XML_MINVAL_ATTR, cmlSets->ColormapSettings.MinValue);
+            prElem.setAttribute(FR_XML_MAXVAL_ATTR, cmlSets->ColormapSettings.MaxValue);
+            layerElem.appendChild(prElem);
+
+            // colorMap
+            QDomElement cmElem = m_Document->createElement(FR_XML_CMAP_ELEM);
+            switch(cmlSets->ColormapSettings.Type){
+                case FrColormapSettings::MultiColor:
+                    cmElem.setAttribute(FR_XML_TYPE_ATTR, FR_CMTYPE_MULTI);
+                    break;
+                case FrColormapSettings::SingleColor:
+                    cmElem.setAttribute(FR_XML_TYPE_ATTR, FR_CMTYPE_SINGLE);
+                    break;
+                default:
+                    // Do nothing here
+                    break;
+            }
+            cmElem.setAttribute(FR_XML_MIDVALUE_ATTR, cmlSets->ColormapSettings.MidValue);
+	        cmElem.setAttribute(FR_XML_THRESH_ATTR, cmlSets->ColormapSettings.Threshold);
+
+            // Save color value
+            QColor color = cmlSets->ColormapSettings.Color;
+            QString colorValue = "#";
+            colorValue += GET_HEX_COLOR_STRING(color.red());
+            colorValue += GET_HEX_COLOR_STRING(color.green());
+            colorValue += GET_HEX_COLOR_STRING(color.blue());
+            cmElem.setAttribute(FR_XML_COLOR_ATTR, colorValue);
+
+            layerElem.appendChild(cmElem);
+
+            // TBC
+            SaveTbcSettings(layerElem, &cmlSets->TbcSettings);
             break;
     }
-    cmElem.setAttribute(FR_XML_MIDVALUE_ATTR, liSets->ColormapSettings.MidValue);
-	cmElem.setAttribute(FR_XML_THRESH_ATTR, liSets->ColormapSettings.Threshold);
 
-    // Save color value
-    QColor color = liSets->ColormapSettings.Color;
-    QString colorValue = "#";
-    colorValue += GET_HEX_COLOR_STRING(color.red());
-    colorValue += GET_HEX_COLOR_STRING(color.green());
-    colorValue += GET_HEX_COLOR_STRING(color.blue());
-    cmElem.setAttribute(FR_XML_COLOR_ATTR, colorValue);
-
-    layerElem.appendChild(cmElem);
-
-    // TBC
-    SaveTbcSettings(layerElem, &liSets->TbcSettings);
     parent.appendChild(layerElem);
 }
 
-void FrSaveTabsCmd::SaveTbcSettings(QDomElement& parent, FrTBCSettings* tbcSets){
+void FrSaveTabsCmd::SaveTbcSettings(QDomElement& parent, FrTbcSettings* tbcSets){
 
     QDomElement tbcElem = m_Document->createElement(FR_XML_TBCSETS_ELEM);
 

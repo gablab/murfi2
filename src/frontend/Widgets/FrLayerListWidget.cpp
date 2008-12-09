@@ -25,8 +25,8 @@
 
 #define INSERT_ROW_NUM 0
 
-FrLayerListWidget::FrLayerListWidget(FrMainDocument* doc, QWidget *parent)
-: QWidget(parent), m_signalsBlocked(false), m_mainDoc(doc) {    
+FrLayerListWidget::FrLayerListWidget(QWidget *parent)
+: QWidget(parent), m_signalsBlocked(false) {    
 
     // Create table widget
     m_layerTable = new QTableWidget(this);
@@ -166,7 +166,9 @@ void FrLayerListWidget::UpdateRoiList(){
         id = curWgt->GetID();
     
     FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
-    
+    if (!layerDO)
+        return;
+
     // Update only when ROI layer selected
     if(layerDO->IsRoi()){
         // get all roi infos except current
@@ -247,7 +249,8 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
             m_roiToolWidget->setVisible(false);
             m_colormapWidget->setVisible(true);
             
-            if (id == DEF_LAYER_ID){
+            //if (id == DEF_LAYER_ID){
+            if (layerDO->IsImage()){        
                 m_colormapWidget->setVisible(false);
             }
             else {
@@ -346,7 +349,7 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
 FrLayerDocObj* FrLayerListWidget::GetLayerDocObjByID(int id){
     FrLayerDocObj* layerDO = 0L;
     FrDocument::DocObjCollection layers;
-    m_mainDoc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+    m_MainDoc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
 
     if(layers.size() > 0){
         for (int i = 0; i < layers.size(); i++){

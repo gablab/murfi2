@@ -116,10 +116,10 @@ void FrQwtPlotWidget::RemoveGraph(int id){
     curve->detach();
 
     // find appropriate object and remove it
-    std::vector<QwtPlotCurve*>::iterator it;
-    it = std::find(m_Curves.begin(), m_Curves.end(), curve);
+//    std::vector<QwtPlotCurve*>::iterator it;
+//    it = std::find(m_Curves.begin(), m_Curves.end(), curve);
 
-    m_Curves.erase(it);
+//    m_Curves.erase(it);
 
     // refresh the plot
     this->replot();

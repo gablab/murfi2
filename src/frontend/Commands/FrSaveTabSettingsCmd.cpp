@@ -66,6 +66,7 @@ bool FrSaveTabSettingsCmd::SaveNewTab(){
         // add to main document
         result = doc->Add(docObj);
     }
+    return result;
 }
 
 bool FrSaveTabSettingsCmd::SaveCurrentTab(){
@@ -103,7 +104,7 @@ void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
                 docObj->GetImageLayer());
         }
         else {
-            FrLayerSettings* dst = FrLayerSettings::Create((*it)->GetType());
+            FrLayerSettings* dst = FrLayerSettings::Create((FrLayerSettings::LTypes)(*it)->GetType());
             FrLayerSettings::CopySettings(layer->GetSettings(), dst);
             docObj->GetLayers().push_back(dst);
         }

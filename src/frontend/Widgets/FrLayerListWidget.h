@@ -16,6 +16,8 @@ class QToolButton;
 class QTableWidgetItem;
 class QModelIndex;
 
+#include "FrMacro.h"
+
 // includes
 #include "Qt/qwidget.h"
 
@@ -24,7 +26,7 @@ class QModelIndex;
 class FrLayerListWidget: public QWidget {
 	Q_OBJECT
 public:
-	FrLayerListWidget(FrMainDocument* doc, QWidget *parent = 0);
+	FrLayerListWidget(QWidget *parent = 0);
 
     // Common actions
     void AddLayer(FrLayerDocObj* layerDO);
@@ -49,6 +51,8 @@ public:
     FrROIToolWidget* GetRoiToolWidget(){
         return m_roiToolWidget;
     }
+
+    FrSetPropMacro(FrMainDocument*, MainDoc);
 
 signals:
     void NewLayer();

@@ -324,12 +324,15 @@ void FrDocumentReader::CreateMriLUT(short* data, unsigned int dataSize,
     // assume that values cannot be negative
     short min = 0;
     short max = data[0]; 
-    
+
     // find max and min values
     short* ptr = data;
     short* pEnd = data + dataSize;
+    int test = 0;
+
     for(; ptr != pEnd; ++ptr){
         if(*ptr > max) max = *ptr;
+        test++;
     }
 
     // create lut     

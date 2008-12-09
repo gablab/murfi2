@@ -75,13 +75,16 @@ bool FrLayerCmd::AddLayer(){
     bool result = false;
     if(m_DocObj->IsImage()){
         // NOTE: do nothing here for a while
+        // set id to image layer
+        for(int i=0; i < ALL_ITEMS_COUNT; ++i){
+            // Do we need to copy values ???
+            layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Image);
+        }
     }
     else if(m_DocObj->IsRoi()){
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
             // Do we need to copy values ???
-            layeredImage[i]->AddLayer(
-                m_DocObj->GetID(), 
-                FrLayeredImage::Roi);
+            layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Roi);
         }
         FrBaseCmd::UpdatePipelineForID(m_DocObj->GetID(), FRP_READ);
         result = true;
@@ -89,13 +92,12 @@ bool FrLayerCmd::AddLayer(){
     else if(m_DocObj->IsColormap()){
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
             // Do we need copy params here???
-            layeredImage[i]->AddLayer(
-                m_DocObj->GetID(),
-                FrLayeredImage::Colormap);
+            layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Colormap);
         }
         FrBaseCmd::UpdatePipelineForID(m_DocObj->GetID(), FRP_COLORMAP);
         result = true;
     }
+
     return result;
 }
 
@@ -276,11 +278,13 @@ bool FrLayerCmd::ChangeLayerParams(){
     }    
 
     int opacity = mw->GetLayerListWidget()->GetOpacity();
-    FrLayerSettings* params = layerDO->GetSettings();
+    FrLayerSettings* params = layerDO->GetSettings();           // probably we should use the old code below
     params->Opacity = opacity;
     
     bool visibility = mw->GetLayerListWidget()->GetLayerVisibility(m_ID);
     params->Visibility = visibility;
+
+    layerDO->SetSettings(params);
 
     //// TODO: visibility, name??
     //if (layerDO->IsRoi()){

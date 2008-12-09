@@ -65,7 +65,7 @@ bool FrUpdateTabsCmd::UpdateView(){
 
     bool result = false;
     switch(m_Action){
-        case FrUpdateTabsCmd::Add
+        case FrUpdateTabsCmd::Add:
             result = bmWidget->AddBookmark(m_TabSettingsDocObj);
             break;
         case FrUpdateTabsCmd::Remove: 
@@ -86,14 +86,14 @@ void FrUpdateTabsCmd::SetupTabObjects(){
 
     // Remove Image and Colormap layers
     FrDocument::DocObjCollection oldLayers;
-    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);
+    doc->GetObjectsByType(oldLayers, FrDocumentObj::LayerObject);
     
     FrDocument::DocObjCollection::iterator it, itEnd(oldLayers.end());
     for(it = oldLayers.begin(); it != itEnd; ++it){
-        FrLayerDocObj* layer = (FrLayerDocObj*)(*it);
+        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
         // NOTE: do not touch ROI layers
-        if(!layer->IsRoi()) continue;
-        doc->Remove(ldo);
+        if(!layerDO->IsRoi()) continue;
+        doc->Remove(layerDO);
     }
 
     // Remove view settings
@@ -111,13 +111,13 @@ void FrUpdateTabsCmd::SetupTabObjects(){
 
     FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType());
     imgLayer->CopySettings(tabSets->GetImageLayer());
-    doc->Add(imgDO);
+    doc->Add(imgLayer);
     
     FrTabSettingsDocObj::LayersCollection& layers = tabSets->GetLayers();
-    FrTabSettingsDocObj::LayersCollection::iterator itr, itrEnd(layers);
+    std::vector<FrLayerSettings*>::iterator itr, itrEnd(layers.end());
     for(itr = layers.begin(); itr != itrEnd; ++itr){
-        FrLayerDocObj* layer = new FrLayerDocObj((*it)->GetType());
-        layer->CopySettings((*it));
+        FrLayerDocObj* layer = new FrLayerDocObj((FrLayerSettings::LTypes)(*it)->GetType());
+        layer->CopySettings(((FrLayerDocObj*)(*it))->GetSettings());
         doc->Add(layer);
     }   
 }

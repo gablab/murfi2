@@ -7,10 +7,11 @@ class QDomElement;
 class FrTabSettingsDocObj;
 class FrCameraSettings;
 class FrLayerSettings;
+class FrImageLayerSettings;
 class FrOrthoViewSettings;
 class FrMosaicViewSettings;
 class FrSliceViewSettings;
-class FrTBCSettings;
+class FrTbcSettings;
 
 // Some includes
 #include "FrMacro.h"
@@ -48,12 +49,12 @@ private:
     void SaveCameraSettings(QDomElement& parent, int id, FrCameraSettings* camSets);
 
     void SaveLayeredImageSettings(QDomElement& parent, int id,
-                                  FrLayerSettings* mlSets, 
+                                  FrImageLayerSettings* mlSets, 
                                   std::vector<FrLayerSettings*>& olSets);
     
     void SaveLayerSettings(QDomElement& parent, FrLayerSettings* liSets);
     
-    void SaveTbcSettings(QDomElement& parent, FrTBCSettings* tbcSets);
+    void SaveTbcSettings(QDomElement& parent, FrTbcSettings* tbcSets);
 
 private:
     QDomDocument* m_Document;

@@ -78,10 +78,10 @@ bool FrLayerDocObj::CopySettings(FrLayerSettings* src){
     return FrLayerSettings::CopySettings(src, m_Settings);
 }
 
-inline double FrLayerDocObj::GetOpacity(){
+double FrLayerDocObj::GetOpacity(){
     return m_Settings->Opacity;
 }
 
-inline bool FrLayerDocObj::GetVisibility(){
+bool FrLayerDocObj::GetVisibility(){
     return m_Settings->Visibility;
 }

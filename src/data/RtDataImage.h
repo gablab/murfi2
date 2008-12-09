@@ -52,6 +52,11 @@ class RtMutex : public ACE_Mutex {
 // class declaration
 template<class T>
 class RtDataImage : public RtData {
+    #ifdef USE_FRONTEND
+        // We need method to access data in frontend
+        friend class FrMaskEditor;
+        friend class FrDocumentReader;
+    #endif
 
 public:
 

@@ -6,6 +6,7 @@
 class vtkRenderer;
 class vtkTextMapper;
 class vtkActor2D;
+class vtkImageActor;
 
 // Some includes
 #include "FrImageLayer.h"
@@ -65,8 +66,10 @@ public:
     void GetRenderers(std::vector<vtkRenderer*>& renderers);
     bool IsInViewport(int mouseX, int mouseY);
     
-    // get bounds of actor
+    // get actor properties
     double* GetActorBounds();
+    double* GetActorCenter();
+    vtkImageActor* GetActor();
 
     //
     // Text management

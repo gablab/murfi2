@@ -154,10 +154,26 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
         viewElem = viewElem.nextSiblingElement();
     }
 
-    bool result = (hasSlice && hasMosaic && hasOrtho);
-    if(result){
-        result = ValidateTabSettings(tabs);
+    // Read layered image settings
+    bool hasLayeredImage = false;
+
+    QDomElement layersElem = elem.nextSiblingElement();
+    if(layersElem.tagName() == FR_XML_LIS_ELEM){
+        if(!layersElem.hasAttribute(FR_XML_COUNT_ATTR)) return false;
+        int count = layersElem.attribute(FR_XML_COUNT_ATTR).toInt(&hasLayeredImage);
+        if(!hasLayeredImage || count != 1) return false;
+
+        QDomElement imgElem = layersElem.firstChildElement();
+        hasLayeredImage = LoadLayeredImageSettings(imgElem, 
+                          tabs->GetImageLayer(), tabs->GetLayers());
+
+        if(!hasLayeredImage) return false;
     }
+
+    bool result = (hasSlice && hasMosaic && hasOrtho && hasLayeredImage);
+//    if(result){
+//        result = ValidateTabSettings(tabs);
+//    }
     return result;
 }
 
@@ -196,18 +212,6 @@ bool FrLoadTabsCmd::LoadSliceViewSettings(QDomElement& elem,  FrSliceViewSetting
             hasCamera = LoadCameraSettings(camElem, &vs->CamSettings);
             if(!hasCamera) return false;
         }
-        else if(childElem.tagName() == FR_XML_LIS_ELEM){
-            // Load layered image settings
-            if(!childElem.hasAttribute(FR_XML_COUNT_ATTR)) return false;
-            int count = childElem.attribute(FR_XML_COUNT_ATTR).toInt(&hasLayeredImage);
-            if(!hasLayeredImage || count != 1) return false;
-
-            QDomElement imgElem = childElem.firstChildElement();
-            hasLayeredImage = LoadLayeredImageSettings(imgElem, 
-                &vs->MainLayer, vs->OtherLayers);
-
-            if(!hasLayeredImage) return false;
-        }
         childElem = childElem.nextSiblingElement();
     }
     return (hasSliceNum && hasActiveLayer && hasCamera && hasLayeredImage);
@@ -228,7 +232,7 @@ bool FrLoadTabsCmd::LoadMosaicViewSettings(QDomElement& elem, FrMosaicViewSettin
             vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
             if(!hasActiveLayer) return false;
             // NOTE: add this fix
-            vs->ActiveLayerID = DEFAULT_LAYER_ID;
+            vs->ActiveLayerID = DEF_LAYER_ID;
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -241,18 +245,6 @@ bool FrLoadTabsCmd::LoadMosaicViewSettings(QDomElement& elem, FrMosaicViewSettin
 
             hasCamera = LoadCameraSettings(camElem, &vs->CamSettings);
             if(!hasCamera) return false;
-        }
-        else if(childElem.tagName() == FR_XML_LIS_ELEM){
-            // Load layered image settings
-            if(!childElem.hasAttribute(FR_XML_COUNT_ATTR)) return false;
-            int count = childElem.attribute(FR_XML_COUNT_ATTR).toInt(&hasLayeredImage);
-            if(!hasLayeredImage || count != 1) return false;
-
-            QDomElement imgElem = childElem.firstChildElement();
-            hasLayeredImage = LoadLayeredImageSettings(imgElem, 
-                              &vs->MainLayer, vs->OtherLayers);
-
-            if(!hasLayeredImage) return false;
         }
         childElem = childElem.nextSiblingElement();
     }
@@ -271,7 +263,9 @@ bool FrLoadTabsCmd::LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSetting
         if(childElem.tagName() == FR_XML_SLICENUM_ELEM){
             // Load slice number
             char* attrNames[] = {FR_XML_CORONAL_ATTR, FR_XML_SAGITAL_ATTR, FR_XML_AXIAL_ATTR };
-            int* attributes[] = { &vs->CoronalSlice, &vs->SagitalSlice, &vs->AxialSlice };
+            int* attributes[] = { &vs->SliceNumber[DEF_CORONAL], 
+                &vs->SliceNumber[DEF_SAGITAL], 
+                &vs->SliceNumber[DEF_AXIAL] };
 
             for(int i=0; i < 3; ++i){
                 if(!childElem.hasAttribute(attrNames[i])) return false;
@@ -285,7 +279,7 @@ bool FrLoadTabsCmd::LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSetting
             vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
             if(!hasActiveLayer) return false;
             // NOTE: add this fix
-            vs->ActiveLayerID = DEFAULT_LAYER_ID;
+            vs->ActiveLayerID = DEF_LAYER_ID;
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -306,26 +300,6 @@ bool FrLoadTabsCmd::LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSetting
 
             hasCamera = (loadedCamCount == camCount);
             if(!hasCamera) return false;
-        }
-        else if(childElem.tagName() == FR_XML_LIS_ELEM){
-            // Load layered image settings
-            if(!childElem.hasAttribute(FR_XML_COUNT_ATTR)) return false;
-            int imgCount = childElem.attribute(FR_XML_COUNT_ATTR).toInt(&hasLayeredImage);
-            if(!hasLayeredImage || imgCount != 3) return false;
-
-            int loadedImgCount = 0;
-            QDomElement imgElem = childElem.firstChildElement();
-            while(!imgElem.isNull()){
-                int imgIdx = loadedImgCount % 3;
-                if(LoadLayeredImageSettings(imgElem, 
-                                            &vs->MainLayer[imgIdx], 
-                                            vs->OtherLayers[imgIdx])){
-                    loadedImgCount++;
-                }
-                imgElem = imgElem.nextSiblingElement();
-            }
-            hasLayeredImage = (imgCount == loadedImgCount);
-            if(!hasLayeredImage) return false;
         }
         childElem = childElem.nextSiblingElement();
     }
@@ -365,7 +339,7 @@ bool FrLoadTabsCmd::LoadCameraSettings(QDomElement& elem, FrCameraSettings* cs){
 }
 
 bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem, 
-                                             FrLayerSettings* mlSets, 
+                                             FrImageLayerSettings* mlSets, 
                                              std::vector<FrLayerSettings*>& olSets){
     if(elem.tagName() != FR_XML_IMG_ELEM) return false;
 
@@ -376,11 +350,11 @@ bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem,
     //mlSets->ID = elem.attribute(FR_XML_ID_ATTR).toInt(&isValid);
     //if(!isValid) return false;
     // NOTE: ID is always 0 for main layer of the image
-    mlSets->ID = DEFAULT_LAYER_ID;
+//    mlSets->ID = DEFAULT_LAYER_ID;
 
     if(!elem.hasAttribute(FR_XML_NAME_ATTR)) return false;
     mlSets->Name = elem.attribute(FR_XML_NAME_ATTR);
-    if(mlSets->Name != QString(DEF_DEFLAYER_NAME)) return false;
+    if(mlSets->Name != QString(DEF_LAYER_NAME)) return false;
 
     // Opacity    
     if(!elem.hasAttribute(FR_XML_OPACITY_ATTR)) return false;
@@ -411,7 +385,7 @@ bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem,
     return (hasTbc && hasLayers);
 }
 
-bool FrLoadTabsCmd::LoadTbcSettings(QDomElement& elem, FrTBCSettings* ts){
+bool FrLoadTabsCmd::LoadTbcSettings(QDomElement& elem, FrTbcSettings* ts){
     if(elem.tagName() != FR_XML_TBCSETS_ELEM) return false;
 
     bool hasThreshold, hasBrightness, hasContrast;
@@ -459,13 +433,32 @@ bool FrLoadTabsCmd::LoadLayersSettings(QDomElement& elem,
     QDomElement childElem = elem.firstChildElement();
     while(!childElem.isNull()){
         if(childElem.tagName() == FR_XML_LAYER_ELEM){
-            FrLayerSettings* layerSettings = new FrLayerSettings();
-            if(LoadLayerSettings(childElem, layerSettings)){
-                olSets.push_back(layerSettings);
+            // read layer type first
+            // TODO: implement
+            FrLayerSettings::LTypes ltype = (FrLayerSettings::LTypes)elem.attribute(FR_XML_TYPE_ATTR).toInt(&isValid);
+            if(!isValid) return false;
+
+            if(ltype == FrLayerSettings::LRoi){
+                FrRoiLayerSettings* layerSettings = new FrRoiLayerSettings();
+
+                if(LoadLayerSettings(childElem, layerSettings)){
+                    olSets.push_back(layerSettings);
+                }
+                else {
+                    delete layerSettings;
+                    return false;
+                }
             }
-            else {
-                delete layerSettings;
-                return false;
+            else{
+                FrColormapLayerSettings* layerSettings = new FrColormapLayerSettings();
+
+                if(LoadLayerSettings(childElem, layerSettings)){
+                    olSets.push_back(layerSettings);
+                }
+                else {
+                    delete layerSettings;
+                    return false;
+                }
             }
         }
         childElem = childElem.nextSiblingElement();
@@ -480,7 +473,7 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
 
     bool isValid = false;
     // NOTE for now ignore id attribute
-    ls->ID = BAD_LAYER_ID;    
+//    ls->ID = BAD_LAYER_ID;    
 
     // Name
     if(!elem.hasAttribute(FR_XML_NAME_ATTR)) return false;
@@ -497,67 +490,79 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
     if(!isValid || (intValue != 0 && intValue != 1)) return false;
     ls->Visibility = (intValue != 0);
 
-    // Load other
+    FrLayerSettings::LTypes ltype = ls->GetType();
     bool hasRange, hasCm, hasTbc;
-    hasRange = hasCm = hasTbc = false;
 
-    QDomElement childElem = elem.firstChildElement();
-    while(!childElem.isNull()){
-        if(childElem.tagName() == FR_XML_PXRANGE_ELEM){
-            if(!childElem.hasAttribute(FR_XML_MAXVAL_ATTR) ||
-               !childElem.hasAttribute(FR_XML_MINVAL_ATTR)) return false;
-
-            ls->ColormapSettings.MinValue = 
-                childElem.attribute(FR_XML_MINVAL_ATTR).toInt(&hasRange);
-            if(!hasRange) return false;
-
-            ls->ColormapSettings.MaxValue = 
-                childElem.attribute(FR_XML_MAXVAL_ATTR).toInt(&hasRange);
-            if(!hasRange) return false;
+    switch (ltype){
+        case FrLayerSettings::LRoi:
+            return true;
+            // do nothing
+            break;
+        case FrLayerSettings::LColormap:
+            FrColormapLayerSettings* cmlSets = (FrColormapLayerSettings*)ls;
             
-        }
-        else if(childElem.tagName() == FR_XML_CMAP_ELEM){
-            if(!childElem.hasAttribute(FR_XML_MIDVALUE_ATTR) ||
-               !childElem.hasAttribute(FR_XML_THRESH_ATTR)   ||
-               !childElem.hasAttribute(FR_XML_TYPE_ATTR)   ||
-               !childElem.hasAttribute(FR_XML_COLOR_ATTR)) return false;
-            // Get colormap type
-            hasCm = false;
-            QString value = childElem.attribute(FR_XML_TYPE_ATTR);
-            if(value == FR_CMTYPE_SINGLE){
-                ls->ColormapSettings.Type = FrColormapSettings::SingleColor;
-                hasCm = true;
-            }
-            else if(value == FR_CMTYPE_MULTI){
-                ls->ColormapSettings.Type = FrColormapSettings::MultiColor;
-                hasCm = true;
-            }
-            if(!hasCm) return false;
+            // Load other
+            hasRange = hasCm = hasTbc = false;
 
-            // Get color
-            value = childElem.attribute(FR_XML_COLOR_ATTR);
-            if(value.length() != 7) return false;
-            int r = value.mid(1,2).toInt(&hasCm, 16);
-            if(!hasCm) return false;
-            int g = value.mid(3,2).toInt(&hasCm, 16);
-            if(!hasCm) return false;
-            int b = value.mid(5,2).toInt(&hasCm, 16);
-            if(!hasCm) return false;
-            ls->ColormapSettings.Color.setRgb(r, g, b);
+            QDomElement childElem = elem.firstChildElement();
+            while(!childElem.isNull()){
+                if(childElem.tagName() == FR_XML_PXRANGE_ELEM){
+                    if(!childElem.hasAttribute(FR_XML_MAXVAL_ATTR) ||
+                       !childElem.hasAttribute(FR_XML_MINVAL_ATTR)) return false;
 
-            // Get mid value
-			ls->ColormapSettings.MidValue = 
-                childElem.attribute(FR_XML_MIDVALUE_ATTR).toInt(&hasCm);
-            // Get threshold	(range of non significant values)
-			ls->ColormapSettings.Threshold = 
-                childElem.attribute(FR_XML_THRESH_ATTR).toInt(&hasCm);
-            if(!hasCm) return false;
-        }
-        else if(childElem.tagName() == FR_XML_TBCSETS_ELEM){
-            hasTbc = LoadTbcSettings(childElem, &ls->TbcSettings);
-            if(!hasTbc) return false;
-        }
-        childElem = childElem.nextSiblingElement();
+                    cmlSets->ColormapSettings.MinValue = 
+                        childElem.attribute(FR_XML_MINVAL_ATTR).toInt(&hasRange);
+                    if(!hasRange) return false;
+
+                    cmlSets->ColormapSettings.MaxValue = 
+                        childElem.attribute(FR_XML_MAXVAL_ATTR).toInt(&hasRange);
+                    if(!hasRange) return false;
+                    
+                }
+                else if(childElem.tagName() == FR_XML_CMAP_ELEM){
+                    if(!childElem.hasAttribute(FR_XML_MIDVALUE_ATTR) ||
+                       !childElem.hasAttribute(FR_XML_THRESH_ATTR)   ||
+                       !childElem.hasAttribute(FR_XML_TYPE_ATTR)   ||
+                       !childElem.hasAttribute(FR_XML_COLOR_ATTR)) return false;
+                    // Get colormap type
+                    hasCm = false;
+                    QString value = childElem.attribute(FR_XML_TYPE_ATTR);
+                    if(value == FR_CMTYPE_SINGLE){
+                        cmlSets->ColormapSettings.Type = FrColormapSettings::SingleColor;
+                        hasCm = true;
+                    }
+                    else if(value == FR_CMTYPE_MULTI){
+                        cmlSets->ColormapSettings.Type = FrColormapSettings::MultiColor;
+                        hasCm = true;
+                    }
+                    if(!hasCm) return false;
+
+                    // Get color
+                    value = childElem.attribute(FR_XML_COLOR_ATTR);
+                    if(value.length() != 7) return false;
+                    int r = value.mid(1,2).toInt(&hasCm, 16);
+                    if(!hasCm) return false;
+                    int g = value.mid(3,2).toInt(&hasCm, 16);
+                    if(!hasCm) return false;
+                    int b = value.mid(5,2).toInt(&hasCm, 16);
+                    if(!hasCm) return false;
+                    cmlSets->ColormapSettings.Color.setRgb(r, g, b);
+
+                    // Get mid value
+			        cmlSets->ColormapSettings.MidValue = 
+                        childElem.attribute(FR_XML_MIDVALUE_ATTR).toInt(&hasCm);
+                    // Get threshold	(range of non significant values)
+			        cmlSets->ColormapSettings.Threshold = 
+                        childElem.attribute(FR_XML_THRESH_ATTR).toInt(&hasCm);
+                    if(!hasCm) return false;
+                }
+                else if(childElem.tagName() == FR_XML_TBCSETS_ELEM){
+                    hasTbc = LoadTbcSettings(childElem, &cmlSets->TbcSettings);
+                    if(!hasTbc) return false;
+                }
+                childElem = childElem.nextSiblingElement();
+            }
+            break;
     }
 
     return (hasRange && hasCm && hasTbc);
@@ -581,48 +586,45 @@ bool FrLoadTabsCmd::LoadAttrValuesXYZ(QDomElement& elem, double* vec){
     vec[2] = elem.attribute(FR_XML_Z_ATTR).toDouble(&isOk);
     return isOk;
 }
-
-bool FrLoadTabsCmd::ValidateTabSettings(FrTabSettingsDocObj* tabs){
-    // All views have to have the same layers
-    LayerCollection* layers[4];
-    layers[0]= &tabs->GetMosaicViewSettings()->OtherLayers;
-    layers[1]= &tabs->GetOrthoViewSettings()->OtherLayers[0];
-    layers[2]= &tabs->GetOrthoViewSettings()->OtherLayers[1];
-    layers[3]= &tabs->GetOrthoViewSettings()->OtherLayers[2];
-    
-    // Check for the same layers
-    bool result = true;
-    LayerCollection* testLayers = &tabs->GetSliceViewSettings()->OtherLayers;
-    for(int i=0; i < 4; ++i){
-        if(layers[i]->size() != testLayers->size()){
-            result = false;
-            break;
-        }
-
-        // Check some layers params and also fix IDS
-        int layerID = 1;
-        for(int layerNum = 0; layerNum < layers[i]->size(); ++layerNum){
-            FrLayerSettings* ls0 = layers[i]->operator [](layerNum);
-            FrLayerSettings* ls1 = testLayers->operator [](layerNum);
-
-            ls0->ID = layerID;
-            ls1->ID = layerID;
-            layerID++;
-
-            result = (ls0->Opacity == ls1->Opacity) &&
-                (ls0->Visibility == ls1->Visibility) &&
-                (ls0->ColormapSettings.Type == ls1->ColormapSettings.Type) &&
-                (ls0->ColormapSettings.MinValue == ls1->ColormapSettings.MinValue) &&
-                (ls0->ColormapSettings.MaxValue == ls1->ColormapSettings.MaxValue) &&
-                (ls0->ColormapSettings.MidValue == ls1->ColormapSettings.MidValue) &&
-                (ls0->ColormapSettings.Threshold == ls1->ColormapSettings.Threshold) &&
-                (ls0->ColormapSettings.Color     == ls1->ColormapSettings.Color);
-
-            if(!result) break;
-        }
-    }
-    return result;
-}
+//
+//bool FrLoadTabsCmd::ValidateTabSettings(FrTabSettingsDocObj* tabs){
+//    // All views have to have the same layers
+//    LayersCollection* layers;
+//    layers = &tabs->GetLayers();
+//    
+//    // Check for the same layers
+//    bool result = true;
+//    LayersCollection* testLayers = &tabs->GetSliceViewSettings()->OtherLayers;
+//    for(int i=0; i < 4; ++i){
+//        if(layers[i]->size() != testLayers->size()){
+//            result = false;
+//            break;
+//        }
+//
+//        // Check some layers params and also fix IDS
+////        int layerID = 1;
+//        for(int layerNum = 0; layerNum < layers[i]->size(); ++layerNum){
+//            FrLayerSettings* ls0 = layers[i]->operator [](layerNum);
+//            FrLayerSettings* ls1 = testLayers->operator [](layerNum);
+//
+////            ls0->ID = layerID;
+////            ls1->ID = layerID;
+////            layerID++;
+//
+//            result = (ls0->Opacity == ls1->Opacity) &&
+//                (ls0->Visibility == ls1->Visibility) &&
+//                (ls0->ColormapSettings.Type == ls1->ColormapSettings.Type) &&
+//                (ls0->ColormapSettings.MinValue == ls1->ColormapSettings.MinValue) &&
+//                (ls0->ColormapSettings.MaxValue == ls1->ColormapSettings.MaxValue) &&
+//                (ls0->ColormapSettings.MidValue == ls1->ColormapSettings.MidValue) &&
+//                (ls0->ColormapSettings.Threshold == ls1->ColormapSettings.Threshold) &&
+//                (ls0->ColormapSettings.Color     == ls1->ColormapSettings.Color);
+//
+//            if(!result) break;
+//        }
+//    }
+//    return result;
+//}
 
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now

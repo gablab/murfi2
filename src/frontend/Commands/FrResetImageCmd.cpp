@@ -9,7 +9,7 @@
 #include "FrLayeredImage.h"
 #include "FrUtils.h"
 #include "FrViewDocObj.h"
-
+#include "FrLayerDocObj.h"
 
 // VTK stuff
 #include "vtkCamera.h"
@@ -29,66 +29,44 @@ bool FrResetImageCmd::Execute(){
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrTabSettingsDocObj* tsDO = doc->GetCurrentTabSettings();
 
-    // Determine target view and get layer settings
-    std::vector<FrLayerSettings*> layerSettings;
-    FrResetImageCmd::View targetView = m_TargetView;
-    if(targetView == FrResetImageCmd::Current){
-        switch(tsDO->GetActiveView()){
-            case Views::SliceView: 
-                targetView = FrResetImageCmd::Slice;
-                //GetLayerSettings(tsDO->GetSliceViewSettings(), layerSettings);
-                break;
-            case Views::MosaicView: 
-                targetView = FrResetImageCmd::Mosaic;
-                //GetLayerSettings(tsDO->GetMosaicViewSettings(), layerSettings);
-                break;
-            case Views::OrthoView: 
-                targetView = FrResetImageCmd::Ortho;
-                for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
-                    std::vector<FrLayerSettings*> layers;
-                    //GetLayerSettings(tsDO->GetOrthoViewSettings(), layers, i);
-                    layerSettings.insert(layerSettings.end(), 
-                                         layers.begin(), layers.end());
-                }
-                break;
-        }
-    }
     // Reset TBC
-    this->ResetTBC(layerSettings);
+    this->ResetTBC();
 
-    // Get actors and renderers
+    // Get camera settings
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }
+
     std::vector<vtkImageActor*> actors;
-    std::vector<vtkRenderer*> renderers;
     std::vector<FrCameraSettings*> camSettings;
-    switch(targetView){
-         case FrResetImageCmd::Slice:
-             actors.push_back(mv->GetSliceView()->GetImage()->GetActor());
-             renderers.push_back(mv->GetSliceView()->GetImage()->GetRenderer());
-             camSettings.push_back(&tsDO->GetSliceViewSettings()->CamSettings);
-             break;
-         case FrResetImageCmd::Mosaic:
-             actors.push_back(mv->GetMosaicView()->GetImage()->GetActor());
-             renderers.push_back(mv->GetMosaicView()->GetImage()->GetRenderer());
-             camSettings.push_back(&tsDO->GetMosaicViewSettings()->CamSettings);
-             break;
-         case FrResetImageCmd::Ortho:
-             for(int i=0; i < ORTHO_IMAGE_COUNT; ++i){
-                actors.push_back(mv->GetOrthoView()->GetImage(i)->GetActor());
-                renderers.push_back(mv->GetOrthoView()->GetImage(i)->GetRenderer());
-                camSettings.push_back(&tsDO->GetOrthoViewSettings()->CamSettings[i]);
-             }
-             break;
-         default:
-             // Do noting
-             break;
-     };
+    switch(viewDO->GetActiveView()){
+        case Views::SliceView:
+            actors.push_back(mv->GetSliceView()->GetImage()->GetActor());
+            camSettings.push_back(&viewDO->GetSliceViewSettings()->CamSettings);
+        break;
+        case Views::MosaicView:
+            actors.push_back(mv->GetMosaicView()->GetImage()->GetActor());
+            camSettings.push_back(&viewDO->GetMosaicViewSettings()->CamSettings);
+        break;
+        case Views::OrthoView:
+            for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
+            actors.push_back(mv->GetOrthoView()->GetImage(i)->GetActor());
+            camSettings.push_back(&viewDO->GetOrthoViewSettings()->CamSettings[i]);
+            }
+        break;
+        default:
+        // Do noting
+        break;
+     }
 
     // Performe reset action
     bool result = false;
-    for(int i=0; i < actors.size(); ++i){
-        this->ResetCamera(camSettings[i], actors[i], renderers[i]);
+    for(int i=0; i < camSettings.size(); ++i){
+        this->ResetCamera(camSettings[i], actors[i]);
         result = true;
     }
 
@@ -98,9 +76,7 @@ bool FrResetImageCmd::Execute(){
     return result;
 }
 
-void FrResetImageCmd::ResetCamera(FrCameraSettings* camSets,
-                                  vtkImageActor* actor, 
-                                  vtkRenderer* renderer){
+void FrResetImageCmd::ResetCamera(FrCameraSettings* camSets, vtkImageActor* actor){
     // Up vector directed along Y axis
     double newViewUp[3];
     newViewUp[0] = 0.0;
@@ -131,13 +107,40 @@ void FrResetImageCmd::ResetCamera(FrCameraSettings* camSets,
     camSets->Scale = newScale;
 }
 
-void FrResetImageCmd::ResetTBC(std::vector<FrLayerSettings*>& layers){
+void FrResetImageCmd::ResetTBC(){
     // Reset tBC to defaults
-    LayerCollection::iterator it, itEnd(layers.end());
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    std::vector<FrDocumentObj*> layers;
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);
+
+    // Iterate through all found layers
+    std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
+
     for(it = layers.begin(); it != itEnd; ++it){
-        (*it)->TbcSettings.Threshold  = DEF_TBC_THRESHOLD;
-        (*it)->TbcSettings.Brightness = DEF_TBC_BRIGHTNESS;
-        (*it)->TbcSettings.Contrast   = DEF_TBC_CONTRAST;
+        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+
+        if (layerDO->IsRoi()){
+            // do nothing
+        }
+        else if (layerDO->IsImage()){
+            FrImageLayerSettings* imageParams = (FrImageLayerSettings*)layerDO->GetSettings();
+
+            imageParams->TbcSettings.Threshold  = DEF_TBC_THRESHOLD;
+            imageParams->TbcSettings.Brightness = DEF_TBC_BRIGHTNESS;
+            imageParams->TbcSettings.Contrast   = DEF_TBC_CONTRAST;
+
+            layerDO->SetSettings(imageParams);
+        }
+        else if (layerDO->IsColormap()){
+            FrColormapLayerSettings* colormapParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+            
+            colormapParams->TbcSettings.Threshold  = DEF_TBC_THRESHOLD;
+            colormapParams->TbcSettings.Brightness = DEF_TBC_BRIGHTNESS;
+            colormapParams->TbcSettings.Contrast   = DEF_TBC_CONTRAST;
+
+            layerDO->SetSettings(colormapParams);
+        }
     }
 }
 

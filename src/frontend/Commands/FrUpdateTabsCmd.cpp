@@ -6,6 +6,11 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrLayerDocObj.h"
 #include "FrViewDocObj.h"
+#include "FrLayeredImage.h"
+#include "FrBaseView.h"
+#include "FrSliceView.h"
+#include "FrMosaicView.h"
+#include "FrOrthoView.h"
 
 #define ITEMS_NUM  5
 
@@ -50,6 +55,7 @@ bool FrUpdateTabsCmd::SetupTab(){
     }
 
     // Setup Tab objects (layers, settings etc)
+    this->SetupLayeredImage();
     this->SetupTabObjects();
     FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);
 
@@ -92,8 +98,8 @@ void FrUpdateTabsCmd::SetupTabObjects(){
     for(it = oldLayers.begin(); it != itEnd; ++it){
         FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
         // NOTE: do not touch ROI layers
-        if(!layerDO->IsRoi()) continue;
-        doc->Remove(layerDO);
+        if(!layerDO->IsRoi()) 
+            doc->Remove(layerDO);
     }
 
     // Remove view settings
@@ -116,11 +122,48 @@ void FrUpdateTabsCmd::SetupTabObjects(){
     FrTabSettingsDocObj::LayersCollection& layers = tabSets->GetLayers();
     std::vector<FrLayerSettings*>::iterator itr, itrEnd(layers.end());
     for(itr = layers.begin(); itr != itrEnd; ++itr){
-        FrLayerDocObj* layer = new FrLayerDocObj((FrLayerSettings::LTypes)(*it)->GetType());
-        layer->CopySettings(((FrLayerDocObj*)(*it))->GetSettings());
-        doc->Add(layer);
+        // TODO: do not add roi(image) layers, just copy settings  ??
+        if ((*itr)->GetType() != FrLayerSettings::LRoi){
+            FrLayerDocObj* layer = new FrLayerDocObj((*itr)->GetType());
+            layer->CopySettings((*itr));
+            doc->Add(layer);
+        }
     }   
 }
+
+void FrUpdateTabsCmd::SetupLayeredImage(){
+    // Init data
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+ 
+    FrLayeredImage* layeredImage[ITEMS_NUM];
+    layeredImage[0] = mv->GetSliceView()->GetImage();
+    layeredImage[1] = mv->GetMosaicView()->GetImage();
+    layeredImage[2] = mv->GetOrthoView()->GetImage(DEF_CORONAL);
+    layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
+    layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);    
+
+    // remove all colormap layers from layered image in all views
+     for(int i = 0; i < ITEMS_NUM; i++){
+        layeredImage[i]->RemoveColormapLayers();
+    }
+
+    //FrDocument::DocObjCollection layers;
+    //doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);
+    //
+    //// add only colormap layers
+    //FrDocument::DocObjCollection::iterator it, itEnd(layers.end());
+    //for(it = layers.begin(); it != itEnd; ++it){
+    //    FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+
+    //    if(layerDO->IsColormap()){
+    //         for(int i = 0; i < ITEMS_NUM; i++){
+    //             layeredImage[i]->AddLayer(layerDO->GetID(), FrLayeredImage::Colormap);
+    //        }
+    //    }
+    //}
+}
+
 
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now

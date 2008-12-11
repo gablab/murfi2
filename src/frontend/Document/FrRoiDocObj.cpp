@@ -2,6 +2,7 @@
 #include "FrDocument.h"
 #include "FrImageDocObj.h"
 #include "FrCommandController.h"
+#include "FrLayerDocObj.h"
 
 // Qt stuff
 #include <Qt/qstring.h>
@@ -35,6 +36,9 @@ FrRoiDocObj::~FrRoiDocObj(){
 
 void FrRoiDocObj::OnAdd(FrDocument* doc){
     // Add ROI layer doc object
+    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LRoi);
+    layerDO->SetID(this->GetID());
+    doc->Add(layerDO);    
 }
 
 void FrRoiDocObj::OnRemove(FrDocument* doc){

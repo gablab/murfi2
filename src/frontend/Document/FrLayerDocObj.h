@@ -28,7 +28,7 @@ public:
 
     // Properties
     FrPropMacro(FrLayerSettings*, Settings);
-    FrGetPropMacro(unsigned int, ID);
+    FrPropMacro(unsigned int, ID);
 
     double GetOpacity();
     bool GetVisibility();

@@ -43,6 +43,7 @@ private:
 
     
     void SetupTabObjects();
+    void SetupLayeredImage();
 };
 
 #endif // FR_UPDTABS_CMD

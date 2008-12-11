@@ -280,7 +280,7 @@ int FrRoiTool::GetVisibleLayer(FrMainDocument* doc){
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
 
             if (layerDO->GetVisibility()){
-                return layerDO->GetID();
+                return i;
             }
         }
 //        layerDO = (FrLayerDocObj*)layers[0];

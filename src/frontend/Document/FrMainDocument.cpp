@@ -26,6 +26,21 @@ FrMainDocument::~FrMainDocument(){
     for(it = objects.begin(); it != itEnd; ++it){
         this->Remove( (*it) );
     }
+
+    // Remove layer objects
+    this->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
+    // Remove view objects
+    this->GetObjectsByType(objects, FrDocumentObj::ViewObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
     // delete data store
     if(m_DataStore) delete m_DataStore;
 }

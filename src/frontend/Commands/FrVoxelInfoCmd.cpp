@@ -138,6 +138,10 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     VoxelData vd;
     vd.name = "test";   // get layer (image?) name
     vd.timepoint = 44;  // get timepoint
+    
+    vd.Index[0] = ptMapped[0];
+    vd.Index[1] = ptMapped[1];
+    vd.Index[2] = ptMapped[2];
 
     // TODO: fix for side values
     GetRealImagePosition(viewDO, pImageData, vd.Index, imgNumber);
@@ -220,7 +224,7 @@ int FrVoxelInfoCmd::GetVisibleLayer(FrMainDocument* doc){
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
 
             if (layerDO->GetVisibility()){
-                return layerDO->GetID();
+                return i;
             }
         }
 //        layerDO = (FrLayerDocObj*)layers[0];

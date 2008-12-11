@@ -59,7 +59,7 @@ bool FrSaveTabSettingsCmd::SaveNewTab(){
         // Create default doc object and set params
         // NOTE: Assume we never create two default tabs
         FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj(true);
-        docObj->SetIsCurrent(false);
+        docObj->SetIsCurrent(true);
         docObj->SetName(QString("Deafult"));
         docObj->SetDescription(QString("Default tab"));
 
@@ -104,7 +104,7 @@ void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
                 docObj->GetImageLayer());
         }
         else {
-            FrLayerSettings* dst = FrLayerSettings::Create((FrLayerSettings::LTypes)(*it)->GetType());
+            FrLayerSettings* dst = FrLayerSettings::Create(layer->GetSettings()->GetType());
             FrLayerSettings::CopySettings(layer->GetSettings(), dst);
             docObj->GetLayers().push_back(dst);
         }

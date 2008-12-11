@@ -74,12 +74,12 @@ bool FrLayerCmd::AddLayer(){
 
     bool result = false;
     if(m_DocObj->IsImage()){
-        // NOTE: do nothing here for a while
         // set id to image layer
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
             // Do we need to copy values ???
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Image);
         }
+        result = true;
     }
     else if(m_DocObj->IsRoi()){
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
@@ -297,7 +297,7 @@ bool FrLayerCmd::ChangeLayerParams(){
 
     int opacity = mw->GetLayerListWidget()->GetOpacity();
     FrLayerSettings* params = layerDO->GetSettings();           // probably we should use the old code below
-    params->Opacity = opacity;
+    params->Opacity = opacity/100.0;
     
     bool visibility = mw->GetLayerListWidget()->GetLayerVisibility(m_ID);
     params->Visibility = visibility;

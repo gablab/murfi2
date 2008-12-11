@@ -169,6 +169,7 @@ void FrMainController::Notify(int notifyCode){
 
 void FrMainController::SaveCurrentViewToTab(){
     FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+    cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);
     cmd->Execute();
     delete cmd;
 }
@@ -224,11 +225,14 @@ void FrMainController::AddLayer(){
     //cmd1->SetAction(FrLayerCmd::Add);
     //cmd1->SetDocObj(layerDO);
 
+//    FrSaveTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+//    cmd1->SetAction(FrSaveTabSettingsCmd::SaveCurrent);
+
     FrRefreshLayerInfoCmd* cmd = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
 
-    //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    //cmd->AddCommand(cmd1);
-    //cmd->AddCommand(cmd2);
+//    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+//    cmd->AddCommand(cmd1);
+//    cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;
 }
@@ -286,20 +290,25 @@ void FrMainController::ChangeLayer(int action){
 
 void FrMainController::ChangeBookmark(int id){
     // Create complex command and execute it
-    FrUpdateTabsCmd* cmd1 = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
-    cmd1->SetAction(FrUpdateTabsCmd::SetCurrentTab);
-    cmd1->SetTabSettingsDocObj(0L);
-    cmd1->SetTabID( id );
+    // save current tab before switching 
+    FrSaveTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+    cmd1->SetAction(FrSaveTabSettingsCmd::SaveCurrent);
 
-    FrChangeViewCmd* cmd2 = FrCommandController::CreateCmd<FrChangeViewCmd>();
-    cmd2->SetTargetView(FrChangeViewCmd::Synchronize);
+    FrUpdateTabsCmd* cmd2 = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
+    cmd2->SetAction(FrUpdateTabsCmd::SetCurrentTab);
+    cmd2->SetTabSettingsDocObj(0L);
+    cmd2->SetTabID( id );
 
-    FrRefreshLayerInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    FrChangeViewCmd* cmd3 = FrCommandController::CreateCmd<FrChangeViewCmd>();
+    cmd3->SetTargetView(FrChangeViewCmd::Synchronize);
+
+    FrRefreshLayerInfoCmd* cmd4 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
     cmd->AddCommand(cmd3);
+    cmd->AddCommand(cmd4);
     cmd->Execute();
 
     delete cmd;
@@ -345,7 +354,13 @@ void FrMainController::ResetImage(){
 }
 
 void FrMainController::CreatNewROI(){
-    FrCreateROICmd* cmd = FrCommandController::CreateCmd<FrCreateROICmd>();
+    FrCreateROICmd* cmd1 = FrCommandController::CreateCmd<FrCreateROICmd>();
+    
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;
 }

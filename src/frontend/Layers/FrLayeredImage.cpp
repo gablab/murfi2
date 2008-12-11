@@ -17,6 +17,8 @@
 #include "vtkTextProperty.h"
 #include "vtkImageActor.h"
 
+#include <algorithm>
+
 #define START_LAYER_ID 1
 
 
@@ -69,6 +71,15 @@ vtkImageData* FrLayeredImage::GetImageInput(){
 }
 
 void FrLayeredImage::SetRoiInput(vtkImageData* data, unsigned int id){
+    // find appropriate roi layer and set input to it
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if((*it)->GetType() == FrBaseLayer::LtRoi &&
+            (*it)->GetID() == id){
+            (*it)->SetInput(data);
+            break;
+        }
+    }
 }
 
 vtkImageData* FrLayeredImage::GetRoiInput(unsigned int id){
@@ -180,7 +191,7 @@ void FrLayeredImage::SetVisibility(bool value, unsigned int id){
     else{
         FrBaseLayer* layer = this->GetLayerByID(id);
         if(layer){
-            layer->SetOpacity(value);
+            layer->SetVisibility(value);
         }
     }
 }
@@ -308,7 +319,6 @@ bool FrLayeredImage::RemoveLayer(unsigned int id){
 }
 
 void FrLayeredImage::RemoveLayers(){
-    
     while(m_Layers.size() > 0){
         FrBaseLayer* layer = (FrBaseLayer*)(*(m_Layers.begin()));
         layer->Delete();
@@ -322,6 +332,35 @@ void FrLayeredImage::RemoveLayers(){
         m_ImageLayer->GetRenderer()->SetLayer(1);
         m_SpecialLayer->GetRenderer()->SetLayer(1);
         rw->SetNumberOfLayers(2);
+    }
+}
+
+void FrLayeredImage::RemoveColormapLayers(){
+    std::vector<FrBaseLayer*>::iterator it, itEnd(m_Layers.end());
+    for(int i = 0; i < m_Layers.size(); i++){
+        if (m_Layers[i]->GetType() == FrBaseLayer::LtColormap){
+            //FrColormapLayer* layer = (FrColormapLayer*)(*it);
+            it = std::find(m_Layers.begin(), m_Layers.end(), m_Layers[i]);
+            
+            //if(it != itEnd){
+                FrBaseLayer* layer = (*it);
+                m_Layers.erase(it);
+                layer->Delete();
+                int k = 5;
+            //}
+        }
+    }   
+
+    vtkRenderWindow* rw = m_SpecialLayer->
+        GetRenderer()->GetRenderWindow();
+    
+    int count = m_Layers.size();
+
+    if(rw){
+        // NOTE: we have 2 layers : default and special
+        m_ImageLayer->GetRenderer()->SetLayer(1);
+        m_SpecialLayer->GetRenderer()->SetLayer(1);
+        rw->SetNumberOfLayers(2+count);
     }
 }
 

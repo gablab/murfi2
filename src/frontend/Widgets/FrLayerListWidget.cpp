@@ -152,6 +152,7 @@ void FrLayerListWidget::AddLayer(FrLayerDocObj* layerDO){
 void FrLayerListWidget::RemoveLayers(){
     while(m_layerTable->rowCount() > 0){
         m_layerTable->removeRow(0);
+        //m_layerTable->clear();
     }
 }
 
@@ -322,27 +323,27 @@ void FrLayerListWidget::OnRoiToolChanged(){
 // Utility methods
 void FrLayerListWidget::UpdateCurrentLayerParams(){
     // Sync params stored in current layer widget
-    int row = m_layerTable->currentRow();
-    FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
-            m_layerTable->cellWidget(row, TAB_LAYER_IDX));
+    //int row = m_layerTable->currentRow();
+    //FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
+    //        m_layerTable->cellWidget(row, TAB_LAYER_IDX));
 
-    if(wgt){
-        // Save block signal flag
-        bool oldSB = m_signalsBlocked;
-        m_signalsBlocked = true;
+    //if(wgt){
+    //    // Save block signal flag
+    //    bool oldSB = m_signalsBlocked;
+    //    m_signalsBlocked = true;
 
-        int id = wgt->GetID();
-        FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
-                
-        layerDO->GetSettings()->Opacity = double(m_opacityWidget->GetValue()) / 
-                         double(m_opacityWidget->GetMaximum());
+    //    int id = wgt->GetID();
+    //    FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
+    //            
+    //    layerDO->GetSettings()->Opacity = double(m_opacityWidget->GetValue()) / 
+    //                     double(m_opacityWidget->GetMaximum());
 
-        FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
-        m_colormapWidget->GetColormapParams(*cmlParams);
-        wgt->SetLayerParams(layerDO);
+    //    FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+    //    m_colormapWidget->GetColormapParams(*cmlParams);
+    //    wgt->SetLayerParams(layerDO);
 
-        m_signalsBlocked = oldSB;
-    }
+    //    m_signalsBlocked = oldSB;
+    //}
 }
 
 

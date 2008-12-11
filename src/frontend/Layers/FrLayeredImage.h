@@ -55,6 +55,7 @@ public:
     bool AddLayer(unsigned int id, LayerType type);
     bool RemoveLayer(unsigned int id);
     void RemoveLayers();
+    void RemoveColormapLayers();
 
     // Returns layer by ID
     FrBaseLayer* GetLayerByID(unsigned int id);

@@ -321,6 +321,7 @@ bool FrLayeredImage::RemoveLayer(unsigned int id){
 void FrLayeredImage::RemoveLayers(){
     while(m_Layers.size() > 0){
         FrBaseLayer* layer = (FrBaseLayer*)(*(m_Layers.begin()));
+        m_Layers.erase(m_Layers.begin());
         layer->Delete();
     }
 

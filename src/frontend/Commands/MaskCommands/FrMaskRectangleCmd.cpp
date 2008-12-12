@@ -57,6 +57,9 @@ bool FrMaskRectangleCmd::DrawMask(bool show){
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrSpecialLayer* sl = this->GetSpecialLayer();
 
+    if (!sl)
+        return false;
+
     if(show){
         // set params
         SelectionParams params;

@@ -16,7 +16,7 @@ vtkStandardNewMacro(FrSpecialLayer);
 
 FrSpecialLayer::FrSpecialLayer() 
 : m_TextMapper(0),	m_TextActor(0),
-  m_BorderPts(0), m_BorderMapper(0), m_BorderActor(0){
+  m_BorderPts(0), m_BorderMapper(0), m_BorderActor(0), m_Selection(0){
     this->InitializeText();
     this->InitializeBorder();
 }

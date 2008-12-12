@@ -41,6 +41,20 @@ FrMainDocument::~FrMainDocument(){
         this->Remove( (*it) );
     }
 
+    // Remove image objects
+    this->GetObjectsByType(objects, FrDocumentObj::ImageObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
+    // Remove roi objects
+    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
     // delete data store
     if(m_DataStore) delete m_DataStore;
 }

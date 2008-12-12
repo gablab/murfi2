@@ -192,7 +192,7 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
                 yDim = image->getDim(1);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
-                m_Slice = ClampValue(m_Slice, 0, image->getDim(2));
+                m_Slice = ClampValue(m_Slice, 0, image->getDim(2) - 1);
                 pImageData = this->GetSliceDataXY<short>(image, m_Slice);
                 break;
             case YZ:
@@ -200,7 +200,7 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
                 yDim = image->getDim(2);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
-                m_Slice = ClampValue(m_Slice, 0, image->getDim(0));
+                m_Slice = ClampValue(m_Slice, 0, image->getDim(0) - 1);
                 pImageData = this->GetSliceDataYZ<short>(image, m_Slice);
                 break;
             case XZ:
@@ -208,7 +208,7 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
                 yDim = image->getDim(2);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
-                m_Slice = ClampValue(m_Slice, 0, image->getDim(1));
+                m_Slice = ClampValue(m_Slice, 0, image->getDim(1) - 1);
                 pImageData = this->GetSliceDataXZ<short>(image, m_Slice);
                 break;
         }

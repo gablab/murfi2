@@ -51,6 +51,9 @@ bool FrMaskFreeShapeCmd::DrawMask(bool show){
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrSpecialLayer* sl = this->GetSpecialLayer();
     
+    if (!sl)
+        return false;
+
     // set params
     if(show){
         SelectionParams params;

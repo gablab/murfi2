@@ -190,7 +190,7 @@ FrSpecialLayer* FrMaskBaseCmd::GetSpecialLayer(){
                     sl = ov->GetImage(m_ImageNumber)->GetSpecialLayer();
                 }
                 else{
-                    return false;
+                    return 0L;
                 }
                 break;
             }

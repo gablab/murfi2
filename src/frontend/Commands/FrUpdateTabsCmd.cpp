@@ -122,7 +122,7 @@ void FrUpdateTabsCmd::SetupTabObjects(){
     FrTabSettingsDocObj::LayersCollection& layers = tabSets->GetLayers();
     std::vector<FrLayerSettings*>::iterator itr, itrEnd(layers.end());
     for(itr = layers.begin(); itr != itrEnd; ++itr){
-        // TODO: do not add roi(image) layers, just copy settings  ??
+        // TODO: do not add roi(image) layers, may be just copy settings  ??
         if ((*itr)->GetType() != FrLayerSettings::LRoi){
             FrLayerDocObj* layer = new FrLayerDocObj((*itr)->GetType());
             layer->CopySettings((*itr));

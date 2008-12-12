@@ -16,7 +16,7 @@ public:
 	virtual bool OnMouseMove(FrInteractorStyle* is, FrMouseParams& params);
 	virtual bool OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params);
 
-    FrSetPropMacro(int, ImageNumber);
+//    FrSetPropMacro(int, ImageNumber);
 
 	virtual bool OnKeyPress(FrInteractorStyle* is, FrKeyParams& params);
 

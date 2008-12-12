@@ -97,7 +97,8 @@ void FrSelection::DrawCircle(){
 	circle->GeneratePolygonOff();
 	circle->SetNumberOfSides(360);
     circle->SetRadius(m_params.radius);
-    circle->SetCenter(m_params.center.x, m_params.center.y, m_params.center.z);
+    circle->SetCenter(m_params.center.x, m_params.center.y, 0);
+    circle->Update();
 
 	m_mapper->SetInputConnection(circle->GetOutputPort());
 //    m_mapper->Modified();

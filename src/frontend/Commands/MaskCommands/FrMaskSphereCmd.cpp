@@ -54,6 +54,9 @@ bool FrMaskSphereCmd::DrawMask(bool show){
     // get special layer and set selection params
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrSpecialLayer* sl = this->GetSpecialLayer();
+    
+    if (!sl)
+        return false;
 
     if(show){
         // set params

@@ -13,6 +13,7 @@
 #include "QVTKWidget.h"
 #include "FrLayerDialog.h"
 #include "FrLayerDocObj.h"
+#include "FrBookmarkWidget.h"
 
 // VTK stuff
 #include "vtkRenderWindowInteractor.h"
@@ -156,8 +157,16 @@ void FrMainController::IoTabSettings(QString& fileName, bool isInput){
         delete cmd;
     }
     else{
-        FrSaveTabsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabsCmd>();
-        cmd->SetFileName(fileName);
+        // first save current view to tab
+        FrSaveTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+        cmd1->SetAction(FrSaveTabSettingsCmd::SaveCurrent);
+
+        FrSaveTabsCmd* cmd2 = FrCommandController::CreateCmd<FrSaveTabsCmd>();
+        cmd2->SetFileName(fileName);
+
+        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        cmd->AddCommand(cmd1);
+        cmd->AddCommand(cmd2);
         cmd->Execute();
         delete cmd;
     }
@@ -220,37 +229,25 @@ void FrMainController::AddLayer(){
     // finally add new doc to MainDocument
     FrMainDocument* doc = this->GetMainDocument();
     doc->Add(layerDO);    
-
-    //FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    //cmd1->SetAction(FrLayerCmd::Add);
-    //cmd1->SetDocObj(layerDO);
-
-//    FrSaveTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
-//    cmd1->SetAction(FrSaveTabSettingsCmd::SaveCurrent);
-
-    FrRefreshLayerInfoCmd* cmd = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-
-//    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-//    cmd->AddCommand(cmd1);
-//    cmd->AddCommand(cmd2);
-    cmd->Execute();
-    delete cmd;
 }
 
 void FrMainController::DeleteLayer(){
     // Deletes currently selected layer
-    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd1->SetAction(FrLayerCmd::Delete);
+            
+    
+    
+//    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+//    cmd1->SetAction(FrLayerCmd::Delete);
     // NOTE: If not set ID it is the same as current layer ID
     // cmd1->SetID(CUR_LAYER_ID);
 
-    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+//    FrRefreshLayerInfoCmd* cmd = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
 
-    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    cmd->AddCommand(cmd1);
-    cmd->AddCommand(cmd2);
-    cmd->Execute();
-    delete cmd;
+//    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+//    cmd->AddCommand(cmd1);
+//    cmd->AddCommand(cmd2);
+//    cmd->Execute();
+//    delete cmd;
 }
 
 void FrMainController::ChangeLayer(int action){
@@ -290,9 +287,15 @@ void FrMainController::ChangeLayer(int action){
 
 void FrMainController::ChangeBookmark(int id){
     // Create complex command and execute it
-    // save current tab before switching 
-    FrSaveTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
-    cmd1->SetAction(FrSaveTabSettingsCmd::SaveCurrent);
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+
+    // save current tab before switching (only if we have more than 1 bookmarks
+    // HACK: check if we have more than 1 tabs
+    if (this->GetMainView()->GetBookmarkWidget()->GetBookmarkCount() > 1){
+        FrSaveTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+        cmd1->SetAction(FrSaveTabSettingsCmd::SaveCurrent);
+        cmd->AddCommand(cmd1);
+    }
 
     FrUpdateTabsCmd* cmd2 = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
     cmd2->SetAction(FrUpdateTabsCmd::SetCurrentTab);
@@ -304,8 +307,8 @@ void FrMainController::ChangeBookmark(int id){
 
     FrRefreshLayerInfoCmd* cmd4 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
 
-    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    cmd->AddCommand(cmd1);
+//    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+//    cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
     cmd->AddCommand(cmd3);
     cmd->AddCommand(cmd4);

@@ -1859,6 +1859,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrUserActionCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrUserActionCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrVoxelInfoCmd.cpp"
 				>
 			</File>

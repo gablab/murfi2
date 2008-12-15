@@ -89,7 +89,6 @@ bool FrSaveTabsCmd::SaveTabSettings(QDomElement& root, FrTabSettingsDocObj* tabs
     
     // save layered image settings
     QDomElement imagesElem = m_Document->createElement(FR_XML_LIS_ELEM);
-    imagesElem.setAttribute(FR_XML_COUNT_ATTR, 1);
     SaveLayeredImageSettings(imagesElem, 0, tabs->GetImageLayer(), tabs->GetLayers());
     tabSetsElem.appendChild(imagesElem);
 

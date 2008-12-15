@@ -88,3 +88,7 @@ void FrBookmarkWidget::OnCurrentChanged(QWidget* page){
         emit CurrentChanged( currentTab->GetID() );
     }
 }
+
+int FrBookmarkWidget::GetBookmarkCount(){
+    return m_tabWidget->count();
+}

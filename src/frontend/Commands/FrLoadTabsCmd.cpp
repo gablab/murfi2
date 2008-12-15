@@ -93,6 +93,17 @@ bool FrLoadTabsCmd::Execute(){
                 (*it)->SetIsCurrent((it == m_tabSets.begin()));
                 mainDoc->Add(*it);
             }
+
+            // copy settings from current tab to view doc object
+            FrViewDocObj* viewDO = 0L;
+            FrDocument::DocObjCollection views;
+            mainDoc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+            if(views.size() > 0){
+                viewDO = (FrViewDocObj*)views[0];
+            }
+            
+            viewDO->CopySettingsFrom(mainDoc->GetCurrentTabSettings());
+            int h = 54;
         }
         else {
             return false;
@@ -134,8 +145,8 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
     }
 
     // Read view settings
-    bool hasSlice, hasMosaic, hasOrtho;
-    hasSlice = hasMosaic = hasOrtho = false;
+    bool hasSlice, hasMosaic, hasOrtho, hasLayeredImage;
+    hasSlice = hasMosaic = hasOrtho = hasLayeredImage = false;
 
     QDomElement viewElem = elem.firstChildElement();
     while(!viewElem.isNull()){
@@ -151,23 +162,12 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
             hasOrtho = LoadOrthoViewSettings(viewElem, tabs->GetOrthoViewSettings());
             if(!hasOrtho) return false;
         }
+        else if(viewElem.tagName() == FR_XML_LIS_ELEM){
+            hasLayeredImage = LoadLayeredImageSettings(viewElem, 
+                              tabs->GetImageLayer(), tabs->GetLayers());
+            if(!hasLayeredImage) return false;       
+        }
         viewElem = viewElem.nextSiblingElement();
-    }
-
-    // Read layered image settings
-    bool hasLayeredImage = false;
-
-    QDomElement layersElem = elem.nextSiblingElement();
-    if(layersElem.tagName() == FR_XML_LIS_ELEM){
-        if(!layersElem.hasAttribute(FR_XML_COUNT_ATTR)) return false;
-        int count = layersElem.attribute(FR_XML_COUNT_ATTR).toInt(&hasLayeredImage);
-        if(!hasLayeredImage || count != 1) return false;
-
-        QDomElement imgElem = layersElem.firstChildElement();
-        hasLayeredImage = LoadLayeredImageSettings(imgElem, 
-                          tabs->GetImageLayer(), tabs->GetLayers());
-
-        if(!hasLayeredImage) return false;
     }
 
     bool result = (hasSlice && hasMosaic && hasOrtho && hasLayeredImage);
@@ -214,7 +214,7 @@ bool FrLoadTabsCmd::LoadSliceViewSettings(QDomElement& elem,  FrSliceViewSetting
         }
         childElem = childElem.nextSiblingElement();
     }
-    return (hasSliceNum && hasActiveLayer && hasCamera && hasLayeredImage);
+    return (hasSliceNum && hasActiveLayer && hasCamera);
 }
 
 bool FrLoadTabsCmd::LoadMosaicViewSettings(QDomElement& elem, FrMosaicViewSettings* vs){
@@ -248,7 +248,7 @@ bool FrLoadTabsCmd::LoadMosaicViewSettings(QDomElement& elem, FrMosaicViewSettin
         }
         childElem = childElem.nextSiblingElement();
     }
-    return (hasActiveLayer && hasCamera && hasLayeredImage);
+    return (hasActiveLayer && hasCamera);
 }
 
 bool FrLoadTabsCmd::LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSettings* vs){
@@ -303,7 +303,7 @@ bool FrLoadTabsCmd::LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSetting
         }
         childElem = childElem.nextSiblingElement();
     }
-    return (hasSliceNum && hasActiveLayer && hasCamera && hasLayeredImage);
+    return (hasSliceNum && hasActiveLayer && hasCamera);
 }
 
 bool FrLoadTabsCmd::LoadCameraSettings(QDomElement& elem, FrCameraSettings* cs){
@@ -341,7 +341,9 @@ bool FrLoadTabsCmd::LoadCameraSettings(QDomElement& elem, FrCameraSettings* cs){
 bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem, 
                                              FrImageLayerSettings* mlSets, 
                                              std::vector<FrLayerSettings*>& olSets){
-    if(elem.tagName() != FR_XML_IMG_ELEM) return false;
+    
+    QDomElement imageElem = elem.firstChildElement();
+    if(imageElem.tagName() != FR_XML_IMG_ELEM) return false;
 
     //Load main settings
     bool isValid = false;
@@ -352,24 +354,24 @@ bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem,
     // NOTE: ID is always 0 for main layer of the image
 //    mlSets->ID = DEFAULT_LAYER_ID;
 
-    if(!elem.hasAttribute(FR_XML_NAME_ATTR)) return false;
-    mlSets->Name = elem.attribute(FR_XML_NAME_ATTR);
+    if(!imageElem.hasAttribute(FR_XML_NAME_ATTR)) return false;
+    mlSets->Name = imageElem.attribute(FR_XML_NAME_ATTR);
     if(mlSets->Name != QString(DEF_LAYER_NAME)) return false;
 
     // Opacity    
-    if(!elem.hasAttribute(FR_XML_OPACITY_ATTR)) return false;
-    mlSets->Opacity = elem.attribute(FR_XML_OPACITY_ATTR).toDouble(&isValid);
+    if(!imageElem.hasAttribute(FR_XML_OPACITY_ATTR)) return false;
+    mlSets->Opacity = imageElem.attribute(FR_XML_OPACITY_ATTR).toDouble(&isValid);
     if(isValid) mlSets->Opacity = ClampValue(mlSets->Opacity, 0.0, 1.0);
     else return false;
     // Visibility
-    if(!elem.hasAttribute(FR_XML_VISIBLE_ATTR)) return false;
-    int intValue = elem.attribute(FR_XML_VISIBLE_ATTR).toInt(&isValid);
+    if(!imageElem.hasAttribute(FR_XML_VISIBLE_ATTR)) return false;
+    int intValue = imageElem.attribute(FR_XML_VISIBLE_ATTR).toInt(&isValid);
     if(!isValid || (intValue != 0 && intValue != 1)) return false;
     mlSets->Visibility = (intValue != 0);
 
     bool hasTbc, hasLayers;
     hasTbc = hasLayers = false;
-    QDomElement childElem = elem.firstChildElement();
+    QDomElement childElem = imageElem.firstChildElement();
     while(!childElem.isNull()){
         if(childElem.tagName() == FR_XML_TBCSETS_ELEM){
             // Load TBC settings

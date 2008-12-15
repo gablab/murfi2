@@ -77,6 +77,8 @@ bool FrLayerCmd::AddLayer(){
         // set id to image layer
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
             // Do we need to copy values ???
+            // set default layer id (we have only 1 image layer)
+            m_DocObj->SetID(DEF_LAYER_ID);
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Image);
         }
         result = true;
@@ -164,7 +166,8 @@ bool FrLayerCmd::DeleteLayer(){
         for (int i = 0; i < layers.size(); i++){
             FrLayerDocObj* layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
             if (layerDO->GetID() == m_ID){
-                delete layerDO;
+                doc->Remove(layerDO);
+                //delete layerDO;
                 isFound = true;
                 break;
             }

@@ -337,20 +337,45 @@ void FrLayeredImage::RemoveLayers(){
 }
 
 void FrLayeredImage::RemoveColormapLayers(){
-    std::vector<FrBaseLayer*>::iterator it, itEnd(m_Layers.end());
-    for(int i = 0; i < m_Layers.size(); i++){
-        if (m_Layers[i]->GetType() == FrBaseLayer::LtColormap){
-            //FrColormapLayer* layer = (FrColormapLayer*)(*it);
-            it = std::find(m_Layers.begin(), m_Layers.end(), m_Layers[i]);
-            
-            //if(it != itEnd){
-                FrBaseLayer* layer = (*it);
-                m_Layers.erase(it);
-                layer->Delete();
-                int k = 5;
-            //}
+//    std::vector<FrBaseLayer*>::iterator it, itEnd(m_Layers.end());
+    //int size = m_Layers.size();
+    // create new vector for non colormap layers
+    LayersCollection tmpLayers;
+
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if ((*it)->GetType() != FrBaseLayer::LtColormap){
+            tmpLayers.push_back(*it);        
         }
-    }   
+    }
+    
+    // clear main layers vector
+    this->RemoveLayers();
+
+    // copy back all layers from temp layer
+    LayersCollection::iterator itr, itrEnd(tmpLayers.end());
+    for(itr = tmpLayers.begin(); itr != itrEnd; ++itr){
+        if ((*itr)->GetType() != FrBaseLayer::LtColormap){
+            m_Layers.push_back(*itr);        
+        }
+    }
+
+    // clear temp vector
+    tmpLayers.clear();
+
+    //for(int i = 0; i < size; i++){
+    //    if (m_Layers[i]->GetType() == FrBaseLayer::LtColormap){
+    //        //FrColormapLayer* layer = (FrColormapLayer*)(*it);
+    //        it = std::find(m_Layers.begin(), m_Layers.end(), m_Layers[i]);
+    //        
+    //        //if(it != itEnd){
+    //            FrBaseLayer* layer = (*it);
+    //            m_Layers.erase(it);
+    //            layer->Delete();
+    //            int k = 5;
+    //        //}
+    //    }
+    //}   
 
     vtkRenderWindow* rw = m_SpecialLayer->
         GetRenderer()->GetRenderWindow();

@@ -132,6 +132,15 @@ void FrSliceView::UpdatePipeline(int point){
         break;
     }
 
+    // Draw border
+	char text[20] = "";
+	char tmp[5];
+
+	strcat(text, "Slice ");
+    itoa(params.ViewSettings->SliceNumber, tmp, 10);
+	strcat(text, tmp);
+    m_LayeredImage->SetText(text);
+
     // redraw scene
 	GetRenderWindow()->Render();
 }
@@ -172,6 +181,7 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
     m_docReader->SetOrientation(FrDocumentReader::XY);
     m_docReader->SetSlice(params.ViewSettings->SliceNumber);
 
+    // update 
     FrUpdateParams0::LayerCollection::iterator it,
         itEnd(params.Layers.end());
 
@@ -194,6 +204,23 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
         }
         // .. Add other layers
     }
+
+    // get slice number from doc reader
+    int Slice = m_docReader->GetSlice();
+    
+    // Get view settings
+    FrDocument::DocObjCollection objects;
+    params.Document->GetObjectsByType(objects, FrDocumentObj::ViewObject);
+    
+    FrViewDocObj* viewDO = 0L;
+    FrDocument::DocObjCollection views;
+    params.Document->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+    if(views.size() > 0){
+        viewDO = (FrViewDocObj*)views[0];
+    }
+    // update slice number in View
+    viewDO->GetSliceViewSettings()->SliceNumber = Slice;
+    params.ViewSettings->SliceNumber = Slice;
 }
 
 void FrSliceView::UpdateColormap(FrUpdateParams0& params){

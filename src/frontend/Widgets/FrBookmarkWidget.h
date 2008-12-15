@@ -24,6 +24,8 @@ public:
     bool AddBookmark(FrTabSettingsDocObj* ts);
     bool RemoveBookmark(FrTabSettingsDocObj* ts);
 
+    int GetBookmarkCount();
+
 public slots:
     // Add slots here
     void OnCloseButtonClicked();

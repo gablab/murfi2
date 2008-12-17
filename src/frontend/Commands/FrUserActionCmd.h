@@ -29,6 +29,10 @@ public:
     FrSetPropMacro(Actions, Action);    
 
 private:
+    // helpers
+    bool AddLayer();
+    bool DeleteLayer();
+
     int GetActiveLayerID();
     bool IsRoiLayer(int id);
 

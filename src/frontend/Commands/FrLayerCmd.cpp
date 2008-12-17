@@ -77,7 +77,7 @@ bool FrLayerCmd::AddLayer(){
         // set id to image layer
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
             // Do we need to copy values ???
-            // set default layer id (we have only 1 image layer)
+            // HACK: set default layer id (we have only 1 image layer)
             m_DocObj->SetID(DEF_LAYER_ID);
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Image);
         }
@@ -119,18 +119,7 @@ bool FrLayerCmd::AddLayer(){
 }
 
 bool FrLayerCmd::DeleteLayer(){
-    // Get proper ID
-    if(!m_isID){
-        m_ID = GetActiveLayerID();
-    }
-    // if wrong ID is specified return
-    // Default layer cannot be deleted
-    if(m_ID < DEF_LAYER_ID) return false;
-    if(m_ID == DEF_LAYER_ID){
-        QMessageBox::critical(this->GetMainController()->GetMainView(), 
-            "Delete Layer Command", "Can't delete default layer...");
-        return false;
-    }
+    if(m_DocObj == 0) return false;
 
     // Init data
     FrMainWindow* mv = this->GetMainController()->GetMainView();
@@ -150,38 +139,18 @@ bool FrLayerCmd::DeleteLayer(){
         viewDO = (FrViewDocObj*)views[0];
     }
 
-    // Delete layer doc obj
-    FrDocument::DocObjCollection layers;
-    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
-    
-    bool isFound = false;
-
     // delete layer from LayeredImage
     for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-        layeredImage[i]->RemoveLayer(m_ID);
+        layeredImage[i]->RemoveLayer(m_DocObj->GetID());
     }
 
-    if(layers.size() > 0){
-        // delete appropriate LayerDocObj
-        for (int i = 0; i < layers.size(); i++){
-            FrLayerDocObj* layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-            if (layerDO->GetID() == m_ID){
-                doc->Remove(layerDO);
-                //delete layerDO;
-                isFound = true;
-                break;
-            }
-        }
-    }    
+    // Assume that there is good sync between layers 
+    viewDO->GetSliceViewSettings()->ActiveLayerID = DEF_LAYER_ID;
+    viewDO->GetMosaicViewSettings()->ActiveLayerID = DEF_LAYER_ID;
+    viewDO->GetOrthoViewSettings()->ActiveLayerID = DEF_LAYER_ID;
 
-    if(isFound){
-        // Assume that there is good sync between layers 
-        viewDO->GetSliceViewSettings()->ActiveLayerID = DEF_LAYER_ID;
-        viewDO->GetMosaicViewSettings()->ActiveLayerID = DEF_LAYER_ID;
-        viewDO->GetOrthoViewSettings()->ActiveLayerID = DEF_LAYER_ID;
+    FrBaseCmd::UpdatePipelineForID(DEF_LAYER_ID, FRP_COLORMAP);
 
-        FrBaseCmd::UpdatePipelineForID(DEF_LAYER_ID, FRP_COLORMAP);
-    }
     return true;
 }
 

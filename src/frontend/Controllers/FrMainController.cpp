@@ -215,39 +215,19 @@ void FrMainController::SelectLayer(int id){
 }
 
 void FrMainController::AddLayer(){
-    // create new layer doc object and get settings from dialog
-    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LColormap);
-
-    FrMainWindow* mv = this->GetMainView();
-    FrLayerDialog dlg(mv, true);
-    if(!dlg.SimpleExec()) return;
-    FrColormapLayerSettings* cmlSets = new FrColormapLayerSettings();
-    dlg.GetLayerParams(*cmlSets);
-
-    layerDO->SetSettings(cmlSets);
-
-    // finally add new doc to MainDocument
-    FrMainDocument* doc = this->GetMainDocument();
-    doc->Add(layerDO);    
+    // add layer with dialog
+    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+    cmd->SetAction(FrUserActionCmd::Add);
+    cmd->Execute();
+    delete cmd;
 }
 
 void FrMainController::DeleteLayer(){
     // Deletes currently selected layer
-            
-    
-    
-//    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
-//    cmd1->SetAction(FrLayerCmd::Delete);
-    // NOTE: If not set ID it is the same as current layer ID
-    // cmd1->SetID(CUR_LAYER_ID);
-
-//    FrRefreshLayerInfoCmd* cmd = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
-
-//    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-//    cmd->AddCommand(cmd1);
-//    cmd->AddCommand(cmd2);
-//    cmd->Execute();
-//    delete cmd;
+    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+    cmd->SetAction(FrUserActionCmd::Delete);
+    cmd->Execute();
+    delete cmd;            
 }
 
 void FrMainController::ChangeLayer(int action){

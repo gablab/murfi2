@@ -337,8 +337,6 @@ void FrLayeredImage::RemoveLayers(){
 }
 
 void FrLayeredImage::RemoveColormapLayers(){
-//    std::vector<FrBaseLayer*>::iterator it, itEnd(m_Layers.end());
-    //int size = m_Layers.size();
     // create new vector for non colormap layers
     LayersCollection tmpLayers;
 
@@ -349,33 +347,26 @@ void FrLayeredImage::RemoveColormapLayers(){
         }
     }
     
-    // clear main layers vector
-    this->RemoveLayers();
+    // clear main layers vector (except roi layers, just erase them from list not delete objects)
+    //this->RemoveLayers();
+    while(m_Layers.size() > 0){
+        FrBaseLayer* layer = (FrBaseLayer*)(*(m_Layers.begin()));
+        //m_Layers.erase(m_Layers.begin());
+        if (layer->GetType() == FrBaseLayer::LtColormap)
+            this->RemoveLayer(layer->GetID());
+        else
+            m_Layers.erase(m_Layers.begin());
+            //layer->Delete();
+    }
 
     // copy back all layers from temp layer
     LayersCollection::iterator itr, itrEnd(tmpLayers.end());
     for(itr = tmpLayers.begin(); itr != itrEnd; ++itr){
-        if ((*itr)->GetType() != FrBaseLayer::LtColormap){
-            m_Layers.push_back(*itr);        
-        }
+        m_Layers.push_back(*itr);        
     }
 
     // clear temp vector
     tmpLayers.clear();
-
-    //for(int i = 0; i < size; i++){
-    //    if (m_Layers[i]->GetType() == FrBaseLayer::LtColormap){
-    //        //FrColormapLayer* layer = (FrColormapLayer*)(*it);
-    //        it = std::find(m_Layers.begin(), m_Layers.end(), m_Layers[i]);
-    //        
-    //        //if(it != itEnd){
-    //            FrBaseLayer* layer = (*it);
-    //            m_Layers.erase(it);
-    //            layer->Delete();
-    //            int k = 5;
-    //        //}
-    //    }
-    //}   
 
     vtkRenderWindow* rw = m_SpecialLayer->
         GetRenderer()->GetRenderWindow();

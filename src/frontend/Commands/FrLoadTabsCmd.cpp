@@ -437,7 +437,7 @@ bool FrLoadTabsCmd::LoadLayersSettings(QDomElement& elem,
         if(childElem.tagName() == FR_XML_LAYER_ELEM){
             // read layer type first
             // TODO: implement
-            FrLayerSettings::LTypes ltype = (FrLayerSettings::LTypes)elem.attribute(FR_XML_TYPE_ATTR).toInt(&isValid);
+            FrLayerSettings::LTypes ltype = (FrLayerSettings::LTypes)childElem.attribute(FR_XML_TYPE_ATTR).toInt(&isValid);
             if(!isValid) return false;
 
             if(ltype == FrLayerSettings::LRoi){

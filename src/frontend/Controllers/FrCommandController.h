@@ -30,6 +30,7 @@ class FrMainController;
 #include "FrLoadImageCmd.h"
 #include "FrCreateROICmd.h"
 #include "FrSetCursorCmd.h"
+#include "FrUserActionCmd.h"
 
 // Mask commands
 #include "FrMaskPenCmd.h"

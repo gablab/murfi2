@@ -38,11 +38,9 @@ void FrLayerDocObj::OnAdd(FrDocument* doc){
 }
 
 void FrLayerDocObj::OnRemove(FrDocument* doc){
-    // TODO: implement
     FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
     cmd1->SetAction(FrLayerCmd::Delete);
     cmd1->SetDocObj(this);
-    //cmd1->SetLayer(this);
 
     FrRefreshLayerInfoCmd* cmd2 = 
         FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();

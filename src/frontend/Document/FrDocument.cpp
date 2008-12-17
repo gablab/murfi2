@@ -40,7 +40,9 @@ bool FrDocument::Remove(FrDocumentObj* obj){
         if(itr != it->second.end()){
             it->second.erase(itr);
             obj->OnRemove(this);
-            delete obj;
+            if (obj->GetType() != FrDocumentObj::ImageObject 
+                && obj->GetType() != FrDocumentObj::RoiObject)
+                delete obj;
 
             // If no more objects of given type
             // remove slot from map

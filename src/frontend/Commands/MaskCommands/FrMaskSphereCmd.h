@@ -30,7 +30,7 @@ public:
     FrSetPropMacro(Action, Action);
     FrSetPropMacro(Pos, Center);
     FrSetPropMacro(int, Radius);
-    FrSetPropMacro(int, ImageNumber);
+//    FrSetPropMacro(int, ImageNumber);
 
 private:
     // Helpers

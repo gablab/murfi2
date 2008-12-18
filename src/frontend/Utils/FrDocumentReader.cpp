@@ -179,7 +179,7 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
         
         xDim = image->getDim(0);
         yDim = image->getDim(1);
-        dataSize = xDim * yDim;//image->getImgDataLen();
+        dataSize = image->getNumPix();
         pImageData = image->getDataCopy();
     }
     else {
@@ -262,7 +262,7 @@ vtkImageData* FrDocumentReader::GetRoiSlice(RtMaskImage* roi){
         
         xDim = mask->getDim(0);
         yDim = mask->getDim(1);
-        dataSize = mask->getImgDataLen();
+        dataSize = mask->getNumPix();
         pMaskData = mask->getDataCopy();
     }
     else {

@@ -167,14 +167,17 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
 
     for(it = params.Layers.begin(); it != itEnd; ++it){
         if((*it)->IsRoi()){
+            m_docReader->SetTarget(FrDocumentReader::Roi);
             m_docReader->SetDataID((*it)->GetID());
             m_docReader->Update();
             m_LayeredImage->SetRoiInput(m_docReader->GetOutput(),
                                         (*it)->GetID());
+            
         }
         else if((*it)->IsImage()){  
             // ID is current Timepoint since we have 
             // just one time series 
+            m_docReader->SetTarget(FrDocumentReader::Mri);
             m_docReader->SetDataID(0);
             m_docReader->Update();
 

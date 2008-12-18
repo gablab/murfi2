@@ -132,14 +132,12 @@ void FrSliceView::UpdatePipeline(int point){
         break;
     }
 
-    // Draw border
-	char text[20] = "";
-	char tmp[5];
+    // Write text for slice number
+	char sliceNumText[32] = "";
+    sprintf(sliceNumText, "Slice %d", 
+        params.ViewSettings->SliceNumber);
 
-	strcat(text, "Slice ");
-    itoa(params.ViewSettings->SliceNumber, tmp, 10);
-	strcat(text, tmp);
-    m_LayeredImage->SetText(text);
+    m_LayeredImage->SetText(sliceNumText);
 
     // redraw scene
 	GetRenderWindow()->Render();

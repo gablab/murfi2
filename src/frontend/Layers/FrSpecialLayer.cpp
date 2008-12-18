@@ -78,17 +78,18 @@ void FrSpecialLayer::InitializeBorder(){
     selectRect->SetPoints(m_BorderPts);
     selectRect->SetLines(rect);
 
-    m_BorderMapper = vtkPolyDataMapper2D::New();
-    m_BorderMapper->SetInput(selectRect);
+    vtkPolyDataMapper2D* borderMapper = vtkPolyDataMapper2D::New();
+    borderMapper->SetInput(selectRect);
         
     m_BorderActor = vtkActor2D::New();
     m_BorderActor->PickableOff();
-    m_BorderActor->SetMapper(m_BorderMapper);
+    m_BorderActor->SetMapper(borderMapper);
     m_Renderer->AddActor2D(m_BorderActor);
 
     // Free this stuff
     rect->Delete();
     selectRect->Delete();
+    borderMapper->Delete();
 
 	m_Selection = FrSelection::New();
 	m_Selection->PickableOff();

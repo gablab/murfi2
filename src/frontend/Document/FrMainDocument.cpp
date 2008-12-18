@@ -45,14 +45,20 @@ FrMainDocument::~FrMainDocument(){
     this->GetObjectsByType(objects, FrDocumentObj::ImageObject);
     itEnd = objects.end();
     for(it = objects.begin(); it != itEnd; ++it){
-        this->Remove( (*it) );
+        // NOTE: Since this type of objects is not deleted do it manually
+        FrDocumentObj* obj = (*it);
+        this->Remove(obj);
+        delete obj;
     }
 
     // Remove roi objects
     this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
     itEnd = objects.end();
     for(it = objects.begin(); it != itEnd; ++it){
-        this->Remove( (*it) );
+        // NOTE: Since this type of objects is not deleted do it manually
+        FrDocumentObj* obj = (*it);
+        this->Remove(obj);
+        delete obj;
     }
 
     // delete data store

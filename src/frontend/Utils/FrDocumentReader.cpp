@@ -95,6 +95,7 @@ void FrDocumentReader::SetSlice(int slice){
 void FrDocumentReader::SetOutput(vtkImageData* data){
     if(data){
         data->Register(this);
+        data->Delete();
     }
     if(m_Output){
         m_Output->UnRegister(this);

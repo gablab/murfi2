@@ -72,12 +72,9 @@ bool FrCreateROICmd::Execute(){
             break;
     }
 
-    //// if result create new roi layer
-    //// create new layer doc object and add it to main doc
-    //if (result){
-    //    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LRoi);
-    //    doc->Add(layerDO);    
-    //}
+    if(result) {
+        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);
+    }
 
     return result;
 }
@@ -86,20 +83,20 @@ bool FrCreateROICmd::CreateEmptyMask(FrImageDocObj* imgDO){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
     RtMaskImage* m_MaskImage = new RtMaskImage();
-    RtDataID id;
-    //id.setDataName("mask-img");
-    id.setModuleID("mask");
-    m_MaskImage->setDataID(id);
+    // Setup id
+    m_MaskImage->getDataID().setModuleID("mask");
+    m_MaskImage->getDataID().setSeriesNum(0);
 
-    m_MaskImage->setInfo( *(imgDO->GetTimePointData(0)) );      // 0 timepoint??
+    // NOTE: use timepoint 0 for now
+    // May be better to use current timepoint...
+    m_MaskImage->setInfo( *(imgDO->GetTimePointData(0)) );
         
     // init all values to default (not a ROI)    
     // DEF_MASK_VALUE == 0
     m_MaskImage->initToZeros();
 
     doc->AddDataToStore(m_MaskImage); 
-    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);        // ?
-
+    
     return true;
 }
 
@@ -107,7 +104,12 @@ bool FrCreateROICmd::ThresholdToMask(FrImageDocObj* imgDO, double threshold){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
     RtMaskImage* m_MaskImage = new RtMaskImage();
-    m_MaskImage = new RtMaskImage(*(imgDO->GetTimePointData(0)), threshold);      // 0 timepoint??
+    // NOTE: use timepoint 0 for now
+    // May be better to use current timepoint...
+    m_MaskImage = new RtMaskImage(*(imgDO->GetTimePointData(0)), threshold);
+    // Setup id
+    m_MaskImage->getDataID().setModuleID("mask");
+    m_MaskImage->getDataID().setSeriesNum(0);
 
     doc->AddDataToStore(m_MaskImage);    
 
@@ -143,6 +145,10 @@ bool FrCreateROICmd::LoadFromFile(FrImageDocObj* imgDO, QString filename){
 
                 // if OK set loaded image as current
                 if(hasSameDim && hasSamePDim){
+                    // Setup id
+                    m_MaskImage->getDataID().setModuleID("mask");
+                    m_MaskImage->getDataID().setSeriesNum(0);
+
                     doc->AddDataToStore(m_MaskImage);
                     result = true;
                 }

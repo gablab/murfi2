@@ -71,10 +71,10 @@ RtMRIImage* FrImageDocObj::GetTimePointData(unsigned int timePoint){
     ImageCollection::iterator it, itEnd(m_Images.end());
     for(it = m_Images.begin(); it != itEnd; ++it){
         RtMRIImage* img = (RtMRIImage*)(*it);
-  //      if(img->getDataID().getTimePoint() == timePoint){
+        if(img->getDataID().getTimePoint() == timePoint){
             result = img;
             break;
-  //      }
+        }
     }
 
     return result;
@@ -98,13 +98,20 @@ bool FrImageDocObj::AddTimePointData(RtMRIImage* mriImage){
     ImageCollection::iterator it, itEnd(m_Images.end());
     for(it = m_Images.begin(); (it != itEnd) && !hasTP; ++it){
         RtMRIImage* img = (RtMRIImage*)(*it);
-        hasTP = (img->getDataID().getTimePoint() == timePoint);
+
+        if(img->getDataID().getTimePoint() == timePoint){
+            hasTP = true;
+            break;
+        }
     }
 
     if(hasTP) return false;
     m_Images.push_back(mriImage);
 
-    return false;
+    // notify about new timepoint data has come
+    this->NotifyAboutNewTimePointData();
+
+    return true;
 }
 
 void FrImageDocObj::ClearAll(){
@@ -114,4 +121,8 @@ void FrImageDocObj::ClearAll(){
     }
     m_Images.clear();
     m_SeriesNumber = BAD_SERIES_NUM;
+}
+
+void FrImageDocObj::NotifyAboutNewTimePointData(){
+    // TODO: notification code
 }

@@ -1,7 +1,6 @@
 #ifndef FR_MAIN_CONTROLLER
 #define FR_MAIN_CONTROLLER
 
-#include "FrController.h"
 
 // Forward declaration
 class FrTool;
@@ -11,6 +10,10 @@ class FrToolController;
 class FrInteractorStyle;
 
 class QString;
+
+// Come includes
+#include "FrController.h"
+#include <vector>
 
 class FrMainController : public FrController {
 public:
@@ -29,7 +32,7 @@ public:
     void Test();
 
     // Interface for MainWindow
-    void LoadImageFromFile(QString& fileName);
+    void LoadImageFromFile(std::vector<QString>& fileNames);
     void IoTabSettings(QString& fileName, bool isInput);
     
     void SaveCurrentViewToTab();

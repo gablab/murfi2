@@ -156,12 +156,20 @@ void FrActionSignalManager::Deinitialize(){
 
  // File 
 void FrActionSignalManager::OnOpenImageAction(){
-    QString fileName = QFileDialog::getOpenFileName(
-        m_mainWindow, tr("Open MRI Data"), tr(""), 
-        tr("NIfTI Image (*.nii)"));
-
-    if(!fileName.isNull() && !fileName.isEmpty()){
-        m_mainWindow->GetMainController()->LoadImageFromFile(fileName);
+    QStringList fileNames = QFileDialog::getOpenFileNames(
+        m_mainWindow, tr("Open MRI Data"), 
+        tr(""), tr("NIfTI Image (*.nii)"));
+        
+    std::vector<QString> fileNamesToLoad;
+    fileNamesToLoad.reserve(fileNames.size());
+    fileNamesToLoad.insert(fileNamesToLoad.begin(), 
+        fileNames.begin(), fileNames.end());
+    
+    // .. load if any
+    if(!fileNamesToLoad.empty()){
+        m_mainWindow->
+            GetMainController()->
+            LoadImageFromFile(fileNamesToLoad);
     }
 }
 

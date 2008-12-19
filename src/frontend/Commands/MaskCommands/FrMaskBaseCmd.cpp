@@ -147,7 +147,7 @@ int FrMaskBaseCmd::GetCurrentRoiSliceNumber(){
                 sliceNumber = viewDO->GetSliceViewSettings()->SliceNumber;
                 break;
             case Views::MosaicView:
-                // NOTE: always 0 fo mosaic view
+                // NOTE: always 0 for mosaic view
                 sliceNumber = 0;
                 break;
             case Views::OrthoView:

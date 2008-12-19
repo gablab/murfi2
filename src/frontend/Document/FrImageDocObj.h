@@ -22,9 +22,7 @@ public:
     virtual void OnAdd(FrDocument* doc);
     virtual void OnRemove(FrDocument* doc);
     virtual ObjTypes GetType();
-
-    //bool LoadFromFile(QString& fileName);
-    //bool LoadFromMRIImage(RtMRIImage* img);
+    
     unsigned int GetMatrixSize();
 
     // Series identifiers
@@ -34,6 +32,9 @@ public:
 
     void ClearAll();
     
+private:
+    void NotifyAboutNewTimePointData();
+
 private:
     typedef std::vector<RtMRIImage*> ImageCollection; 
     ImageCollection m_Images;

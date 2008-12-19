@@ -50,10 +50,34 @@ void FrDataStore::AddImageToDocument(RtData* data){
             img->unmosaic();
         }
 
-        // TODO: invalid image data may come
-        // so we need to add checking... ???
-        FrImageDocObj* imgDO = new FrImageDocObj(img);
-        m_Document->Add(imgDO);
+        // We have to add every RtMRIImage as a new timepoint
+        // into existing Image Document Object
+        std::vector<FrDocumentObj*> objects;
+        m_Document->GetObjectsByType(objects, FrDocumentObj::ImageObject);
+        
+        FrImageDocObj* imgDO = 0;
+        std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+        for(it = objects.begin(); it != itEnd; ++it) {
+            FrImageDocObj* ido = (FrImageDocObj*)(*it);
+            if(ido->GetSeriesNumber() == 
+               img->getDataID().getSeriesNum()){
+                   // Found!
+                   imgDO = ido;
+                   break;
+            }
+        }
+
+        if(imgDO != 0){
+            // TODO: invalid image data may come
+            // so we need to add checking... ???
+            imgDO->AddTimePointData(img);
+        }
+        else {
+            imgDO = new FrImageDocObj();
+            m_Document->Add(imgDO);
+            imgDO->AddTimePointData(img);
+        }
+        
     }
 }
 

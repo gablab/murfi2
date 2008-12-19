@@ -9,6 +9,7 @@ class RtMRIImage;
 #include "FrMacro.h"
 
 #include "Qt/qstring.h"
+#include <vector>
 
 // This command allows user to load new images
 class FrLoadImageCmd : public FrBaseCmd
@@ -24,15 +25,17 @@ public:
 	virtual bool Undo();
 	virtual bool Redo();
 	
-    // Properties
-    FrSetPropMacro(QString, FileName);
+    // Init Method
+    void AddFileToOpen(QString& fileName){
+        m_FilesToOpen.push_back(fileName);
+    }
 
 private:
     // helpers
     RtMRIImage* LoadMRIImageFromFile(QString& fileName);
 
 private:
-
+    std::vector<QString> m_FilesToOpen;
 };
 
 #endif

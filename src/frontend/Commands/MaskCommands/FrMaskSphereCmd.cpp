@@ -10,6 +10,7 @@
 #include "FrUtils.h"
 #include "FrRoiDocObj.h"
 #include "FrViewDocObj.h"
+#include "FrDocumentReader.h"
 
 // VTK stuff
 #include "vtkImageData.h"
@@ -80,42 +81,95 @@ bool FrMaskSphereCmd::DrawMask(bool show){
 }
 
 bool FrMaskSphereCmd::WriteMask(){
-    bool result = false;
+    // Nothing to draw
+    if(m_Radius <= 0) return false;
 
+    bool result = false;
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
     if(roiDO){
-        vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
 
-        if(imageData){
-            int midSlice = this->GetCurrentRoiSliceNumber(); 
-            for (int slice = midSlice-m_Radius; slice < midSlice+m_Radius; slice++){
-                int radius = GetCircleRadiusForSlice(slice);
-                DrawCircle(imageData, radius);
-                ApplyDataToRoi(imageData, roiDO, slice);
+        FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+        FrViewDocObj* viewDO = 0L;
+        FrDocument::DocObjCollection views;
+        doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
+        if(views.size() > 0){
+            viewDO = (FrViewDocObj*)views[0];
+        }
+        
+        // Create doc reader
+        FrDocumentReader* docReader = FrDocumentReader::New();
+        docReader->SetDocument(doc);
+        docReader->SetTarget(FrDocumentReader::Roi);
+        docReader->SetDataID(roiDO->GetID());
+
+        // setup doc reader and other params
+        int midSlice = this->GetCurrentRoiSliceNumber();
+        int startSlice = midSlice - m_Radius;
+        int endSlice = midSlice + m_Radius;
+        
+        switch(viewDO->GetActiveView()){
+            case SliceView:
+                docReader->SetMosaic(false);
+                docReader->SetOrientation(FrDocumentReader::XY);
+                break;
+            case MosaicView:
+                // have to draw just one slice
+                startSlice = midSlice;
+                endSlice = midSlice + 1;
+                docReader->SetMosaic(true);
+                docReader->SetOrientation(FrDocumentReader::XY);
+                break;
+            case OrthoView:
+                docReader->SetMosaic(false);
+                switch(m_ImageNumber)
+                {
+                    case DEF_CORONAL: docReader->SetOrientation(FrDocumentReader::XZ); break;
+                    case DEF_SAGITAL: docReader->SetOrientation(FrDocumentReader::YZ); break;
+                    case DEF_AXIAL: docReader->SetOrientation(FrDocumentReader::XY); break;
+                }
+                break;
+            default:
+                docReader->Delete();
+                return false;
+        }       
+        
+        // Draw circles 
+        for (int slice = startSlice; slice < endSlice; slice++){
+            // do not allow to process negative slices
+            if(slice < 0) continue;
+
+            docReader->SetSlice(slice);
+            docReader->Update();
+
+            // Since doc reader may truncate slice numbers 
+            // which are out of range check it and stop
+            if(slice > docReader->GetSlice()){
+                break;
             }
 
-            FrMainWindow* mv = this->GetMainController()->GetMainView();
-            mv->GetCurrentView()->UpdatePipeline(FRP_READ);
+            vtkImageData* data = docReader->GetOutput();
+            int radius = GetCircleRadiusForSlice(slice);
 
+            this->DrawCircle(data, radius);
+            this->ApplyDataToRoi(data, roiDO, slice);
             result = true;
         }
+
+        // Delete doc reader
+        docReader->Delete();
+
+        FrMainWindow* mv = this->GetMainController()->GetMainView();
+        mv->GetCurrentView()->UpdatePipeline(FRP_READ);
     }   
 
     return result;
 }
 
 void FrMaskSphereCmd::DrawCircle(vtkImageData* imageData, int radius){
+    if(radius <= 0) return;
+    
     int pixelValue = 0;
-
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-
     switch (m_Action){
         case FrMaskSphereCmd::Erase:
             pixelValue = 0;
@@ -124,31 +178,27 @@ void FrMaskSphereCmd::DrawCircle(vtkImageData* imageData, int radius){
             pixelValue = 255;
             break;
     }
-
-    // get data dimensions 
-    int dims[3];
-    imageData->GetDimensions(dims);
-
-    int xmin, xmax, ymin, ymax;
-    xmin = ymin = 0; 
-    xmax = dims[0];
-    ymax = dims[1];
-
-    int center[3];
+    
+    int center[2];
     center[0] = m_Center.x;
     center[1] = m_Center.y;
-
-    GetRealImagePosition(viewDO, imageData, center, m_ImageNumber);    
+    this->TransformCoordinatesToIndices(center, imageData, m_ImageNumber);
 
     Pos new_center;
     new_center.x = center[0];
     new_center.y = center[1];
     new_center.z = 0;
 
+    int xmin, xmax, ymin, ymax;
+    xmin = new_center.x - radius;
+    ymin = new_center.y - radius; 
+    xmax = new_center.x + radius;
+    ymax = new_center.y + radius;
+
     unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
 
-    for (int x = xmin; x<xmax; x++)
-        for (int y = ymin; y<ymax; y++){
+    for (int x = xmin; x < xmax; x++)
+        for (int y = ymin; y < ymax; y++){
             // check if point is inside of circle and if yes then write it
             Pos p;
             p.x = x;    p.y = y;    p.z = 0;
@@ -162,14 +212,11 @@ void FrMaskSphereCmd::DrawCircle(vtkImageData* imageData, int radius){
         }
 }
 
-int FrMaskSphereCmd::GetCircleRadiusForSlice(int slice){
-    int radius;
+int FrMaskSphereCmd::GetCircleRadiusForSlice(int slice){    
     int midSlice = this->GetCurrentRoiSliceNumber();
-    int d = abs(midSlice - abs(slice));
-
-    radius = (int)sqrt(pow((double)m_Radius, 2) - pow((double)slice, 2));
-
-    return radius;
+    int delta = abs(midSlice - slice);
+    
+    return int(sqrt(double(m_Radius * m_Radius - delta * delta)));
 }
 
 ///////////////////////////////////////////////////////////////

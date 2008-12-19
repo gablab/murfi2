@@ -7,18 +7,19 @@
 #include "FrCommandController.h"
 #include "FrUtils.h"
 
+#include <algorithm>
 #include "Qt/qmessagebox.h"
-
 #include "RtDataId.h"
 
 #define DEF_MRI_ID "mri"
 
 FrLoadImageCmd::FrLoadImageCmd(){
-
+    m_FilesToOpen.clear();
 }
 
 bool FrLoadImageCmd::Execute(){    
-    if(!this->GetMainController()) return false;
+    if(!this->GetMainController() ||
+        this->m_FilesToOpen.empty()) return false;
 
 	FrMainDocument* md = this->GetMainController()->GetMainDocument();
 	FrMainWindow* mw = this->GetMainController()->GetMainView();
@@ -40,6 +41,8 @@ bool FrLoadImageCmd::Execute(){
 
         if(result == QMessageBox::Yes){
             // Delete all images and allow opening
+            // TODO: also delete rois!
+            // TODO: also delete Data from datastore!!!
             for(it = images.begin(); it != itEnd; ++it){
                 md->Remove( (*it) );
             }
@@ -50,22 +53,41 @@ bool FrLoadImageCmd::Execute(){
 	// open image
     bool result = true;
     if(openImage){
-        RtMRIImage* img = LoadMRIImageFromFile(m_FileName);
-    
-        if (img){
-            //// create appropriate data id
-            //RtDataID id;
-            //id.setModuleID(DEF_MRI_ID);
-            //
-            //img->setDataID(id);
-            md->AddDataToStore(img);
-            FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);        // ?
+        // Open files
+        std::sort(m_FilesToOpen.begin(), m_FilesToOpen.end());
+        std::vector<QString>::iterator itr, itrEnd(m_FilesToOpen.end());
+
+        int timePoint = 0;
+        for(itr = m_FilesToOpen.begin(); itr != itrEnd; ++itr){
+            RtMRIImage* img = LoadMRIImageFromFile((*itr));
+        
+            if (img){
+                // create appropriate data id
+                // NOTE: for now only one series unmber is supported
+                img->getDataID().setSeriesNum(0);
+                img->getDataID().setTimePoint(timePoint);
+                timePoint++;
+                                
+                //img->setDataID(id);
+                md->AddDataToStore(img);
+            }
+            else {
+
+                delete img;
+                QString message("Can't load image file: \n %1");
+                message.arg(*itr);
+
+                QMessageBox::critical(mw, "Front: Load image", message);
+                result = false;
+
+                // Do not continue loading
+                // NOTE: may be have to ask user ???
+                break;
+            }
         }
-        else{
-            delete img;
-            QMessageBox::critical(mw, "Front: Load image", "Can't load image...");
-            result = false;
-        }
+        
+        m_FilesToOpen.clear();
+        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);
     }
 	return result;
 }

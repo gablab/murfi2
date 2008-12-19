@@ -59,11 +59,18 @@ void FrDocument::DeleteAll(){
     DocObjMap::iterator it, itEnd(m_Objects.end());
 
     for(it = m_Objects.begin(); it != itEnd; ++it){
-        while(it->second.size()){
-            Remove( *(it->second.begin()) );
+
+        DocObjCollection& objects = it->second;
+        DocObjCollection::iterator itr, itrEnd(objects.end());
+        
+        for(itr = objects.begin(); itr != itrEnd; ++itr){
+            FrDocumentObj* obj = (*itr);
+            obj->OnRemove(this);
+            delete obj;
         }
+        objects.clear();
     }
-   m_Objects.clear();
+    m_Objects.clear();
 }
     
 void FrDocument::GetObjectsByType(std::vector<FrDocumentObj*>& objects, 

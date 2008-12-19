@@ -21,7 +21,7 @@ bool FrDeleteTabSettingsCmd::Execute(){
         std::vector<FrDocumentObj*> objects;
         doc->GetObjectsByType(objects, FrDocumentObj::TabSettings);
 
-        // iterate throuh tab settings looking forappropriate tab
+        // iterate throuh tab settings looking for appropriate tab
         std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
         for(it = objects.begin(); it != itEnd; ++it){
             FrTabSettingsDocObj* ts = (FrTabSettingsDocObj*)(*it);

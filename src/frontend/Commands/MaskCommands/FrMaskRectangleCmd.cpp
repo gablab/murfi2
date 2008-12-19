@@ -105,36 +105,19 @@ bool FrMaskRectangleCmd::WriteMask(){
 
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
-            FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-            FrViewDocObj* viewDO = 0L;
-            FrDocument::DocObjCollection views;
-            doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-            if(views.size() > 0){
-                viewDO = (FrViewDocObj*)views[0];
-            }
-
-            // get data dimensions
-            int dims[3];
-            imageData->GetDimensions(dims);
-
-            int firstPoint[3];
+            int firstPoint[2];
             firstPoint[0] = m_Rect.firstPoint.x;
             firstPoint[1] = m_Rect.firstPoint.y;
 
-            int secondPoint[3];
+            int secondPoint[2];
             secondPoint[0] = m_Rect.secondPoint.x;
             secondPoint[1] = m_Rect.secondPoint.y;
-
-            GetRealImagePosition(viewDO, imageData, firstPoint, m_ImageNumber);
-            GetRealImagePosition(viewDO, imageData, secondPoint, m_ImageNumber);
-
+            
+            this->TransformCoordinatesToIndices(firstPoint, imageData, m_ImageNumber);
+            this->TransformCoordinatesToIndices(secondPoint, imageData, m_ImageNumber);
+            
             int xmin, xmax, ymin, ymax;
-            //xmin = Min(m_Rect.firstPoint.x, m_Rect.secondPoint.x);
-            //xmax = Max(m_Rect.firstPoint.x, m_Rect.secondPoint.x);
-            //ymin = Min(m_Rect.firstPoint.y, m_Rect.secondPoint.y);
-            //ymax = Max(m_Rect.firstPoint.y, m_Rect.secondPoint.y);
-
             xmin = std::min(firstPoint[0], secondPoint[0]);
             xmax = std::max(firstPoint[0], secondPoint[0]);
             ymin = std::min(firstPoint[1], secondPoint[1]);
@@ -142,14 +125,18 @@ bool FrMaskRectangleCmd::WriteMask(){
 
             unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
 
-            for (int x = xmin; x<xmax; x++)
+            for (int x = xmin; x<xmax; x++) {
+
                 for (int y = ymin; y<ymax; y++){
                     int pos[3];
-                    pos[0] = x;     pos[1] = y;     pos[2] = 0;
+                    pos[0] = x; pos[1] = y; pos[2] = 0;
+                    
                     int id = imageData->ComputePointId(pos); 
-                    if (id>=0)      // point found
+                    if (id >= 0){
                         imgPtr[id] = pixelValue;
                     }
+                }
+            }
 
             this->ApplyDataToRoi(imageData, roiDO);
 

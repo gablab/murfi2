@@ -177,7 +177,7 @@ void FrOrthoView::UpdatePipeline(int point){
     }
 
     // Draw border
-    const char* text[] = { "Coronal", "Sagital", "Axial" };
+    const char* text[] = { "Coronal XZ", "Sagital YZ", "Axial XY" };
     for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
         m_LayeredImage[i]->UpdateBorder();
         m_LayeredImage[i]->SetText(text[i]);

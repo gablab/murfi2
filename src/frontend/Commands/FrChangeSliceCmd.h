@@ -1,6 +1,10 @@
 #ifndef FR_CHANGESLICE_CMD
 #define FR_CHANGESLICE_CMD
 
+// Forward declarations
+class FrViewDocObj;
+
+// Includes
 #include "FrBaseCmd.h"
 
 // This command changes current slice number
@@ -26,9 +30,9 @@ public:
 
 private:
     bool ChangeOrthoViewSliceNums();
-    int GetCoronalSlice(int x, int y, int imgNum);
-	int GetSagitalSlice(int x, int y, int imgNum);
-	int GetAxialSlice(int x, int y, int imgNum);
+    int GetCoronalSlice(double x, double y, int imgNum, FrViewDocObj* viewDO);
+	int GetSagitalSlice(double x, double y, int imgNum, FrViewDocObj* viewDO);
+	int GetAxialSlice(double x, double y, int imgNum, FrViewDocObj* viewDO);
 
 private:
     // Params for simple views 

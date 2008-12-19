@@ -76,7 +76,7 @@ bool FrLayerCmd::AddLayer(){
     if(m_DocObj->IsImage()){
         // set id to image layer
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-            // Do we need to copy values ???
+            // Do we need to copy values
             // HACK: set default layer id (we have only 1 image layer)
             m_DocObj->SetID(DEF_LAYER_ID);
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Image);

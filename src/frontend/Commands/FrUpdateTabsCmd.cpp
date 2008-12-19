@@ -132,21 +132,21 @@ void FrUpdateTabsCmd::SetupTabObjects(){
 }
 
 void FrUpdateTabsCmd::SetupLayeredImage(){
-    // Init data
-    FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    //// Init data
+    //FrMainWindow* mv = this->GetMainController()->GetMainView();
+    //FrMainDocument* doc = this->GetMainController()->GetMainDocument();
  
-    FrLayeredImage* layeredImage[ITEMS_NUM];
-    layeredImage[0] = mv->GetSliceView()->GetImage();
-    layeredImage[1] = mv->GetMosaicView()->GetImage();
-    layeredImage[2] = mv->GetOrthoView()->GetImage(DEF_CORONAL);
-    layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
-    layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);    
+    //FrLayeredImage* layeredImage[ITEMS_NUM];
+    //layeredImage[0] = mv->GetSliceView()->GetImage();
+    //layeredImage[1] = mv->GetMosaicView()->GetImage();
+    //layeredImage[2] = mv->GetOrthoView()->GetImage(DEF_CORONAL);
+    //layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
+    //layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);    
 
-    // remove all colormap layers from layered image in all views
-     for(int i = 0; i < ITEMS_NUM; i++){
-        layeredImage[i]->RemoveColormapLayers();
-    }
+    //// remove all colormap layers from layered image in all views
+    // for(int i = 0; i < ITEMS_NUM; i++){
+    //    layeredImage[i]->RemoveColormapLayers();
+    //}
 
     //FrDocument::DocObjCollection layers;
     //doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);

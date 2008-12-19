@@ -393,23 +393,37 @@ FrBaseLayer* FrLayeredImage::GetLayerByID(unsigned int id){
 }
 
 void FrLayeredImage::GetRenderers(std::vector<vtkRenderer*>& renderers){
-    // First add default
+    // Add renderer of each layer and udate layer number
     renderers.clear();
     int layerNumber = 0;
 
+    // First add default image layer
     vtkRenderer* ren = m_ImageLayer->GetRenderer();
     renderers.push_back(ren);
     ren->SetLayer(layerNumber);
     ++layerNumber;
-
-    // Add renderer of each layer and udate layer number
+ 
+    // Add renderers for Colormap and Roi layers
     LayersCollection::iterator it, itEnd(m_Layers.end());
     for(it = m_Layers.begin(); it != itEnd; ++it){
-        ren = (*it)->GetRenderer();
-        ren->SetLayer(layerNumber);
-        renderers.push_back(ren);
+        if((*it)->GetType() == FrBaseLayer::LtColormap){
+            ren = (*it)->GetRenderer();
+            ren->SetLayer(layerNumber);
+            renderers.push_back(ren);
 
-        ++layerNumber;
+            ++layerNumber;
+        }
+    }
+    
+    // Rois
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if((*it)->GetType() == FrBaseLayer::LtRoi){
+            ren = (*it)->GetRenderer();
+            ren->SetLayer(layerNumber);
+            renderers.push_back(ren);
+
+            ++layerNumber;
+        }
     }
 
     // Last add renderer from special layer

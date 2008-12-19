@@ -47,10 +47,9 @@ bool FrMaskPenCmd::Execute(){
 }
 
 bool FrMaskPenCmd::DrawMask(){
-    bool result = false;
-
+    if(m_Radius <= 0) return false;
+    
     int pixelValue = 0;
-
     switch (m_Action){
         case FrMaskPenCmd::Erase:
             pixelValue = 0;
@@ -60,60 +59,53 @@ bool FrMaskPenCmd::DrawMask(){
             pixelValue = 255;
             break;
     }
-
+    
+    bool result = false;
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
     if(roiDO){
         vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());
 
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
-            FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+            
+            int point[2];
+            point[0] = m_Center.x;
+            point[1] = m_Center.y;
+            this->TransformCoordinatesToIndices(point, imageData, m_ImageNumber);
 
-            FrViewDocObj* viewDO = 0L;
-            FrDocument::DocObjCollection views;
-            doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-            if(views.size() > 0){
-                viewDO = (FrViewDocObj*)views[0];
-            }
-
-            // get data dimensions
-            int dims[3];
-            imageData->GetDimensions(dims);
-
-            int center[3];
-            center[0] = m_Center.x;
-            center[1] = m_Center.y;
-
-            GetRealImagePosition(viewDO, imageData, center, m_ImageNumber);    
-
-            Pos new_center;
-            new_center.x = center[0];
-            new_center.y = center[1];
-            new_center.z = 0;
+            Pos center;
+            center.x = point[0];
+            center.y = point[1];
+            center.z = 0;
 
             int xmin, xmax, ymin, ymax;
-            xmin = new_center.x - m_Radius;  
-            ymin = new_center.y - m_Radius; 
-            xmax = new_center.x + m_Radius;  
-            ymax = new_center.y + m_Radius; 
+            xmin = center.x - m_Radius;  
+            ymin = center.y - m_Radius; 
+            xmax = center.x + m_Radius;  
+            ymax = center.y + m_Radius; 
 
             unsigned char* imgPtr = (unsigned char*)imageData->GetScalarPointer();
 
-            for (int x = xmin; x<xmax; x++)
-                for (int y = ymin; y<ymax; y++){
-                    // check if point is inside of circle and if yes then write it
+            for (int x = xmin; x < xmax; x++){
+                for (int y = ymin; y < ymax; y++){
+                    // check if point is inside of circle and if so then write it
                     Pos pos;
                     pos.x = x;  pos.y = y; pos.z = 0;
 
-                    if (IsPointInsideOfSphere(new_center, m_Radius, pos)){
+                    if (IsPointInsideOfSphere(center, m_Radius, pos)){
                         int point[3];
-                        point[0] = x;     point[1] = y;     point[2] = 0;
+                        point[0] = x; point[1] = y; point[2] = 0;
+                        
                         int id = imageData->ComputePointId(point);
-                        if (id>=0)      // point found
+                        if (id >= 0)
+                        {
                             imgPtr[id] = pixelValue;
+                        }
                     }
-                }
 
+                }
+            }
+             
             this->ApplyDataToRoi(imageData, roiDO);
             mv->GetCurrentView()->UpdatePipeline(FRP_READ);
 
@@ -127,6 +119,7 @@ bool FrMaskPenCmd::DrawMask(){
 bool FrMaskPenCmd::WriteMask(){
     bool result = false;
 
+    // NOTE: do nothing here
     //FrRoiDocObj* roiDO = this->GetCurrentRoi();
     //if(roiDO){
     //    vtkImageData* imageData = this->GetRoiImageData(roiDO->GetID());

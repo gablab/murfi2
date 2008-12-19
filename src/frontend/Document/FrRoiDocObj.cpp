@@ -43,6 +43,20 @@ void FrRoiDocObj::OnAdd(FrDocument* doc){
 
 void FrRoiDocObj::OnRemove(FrDocument* doc){
     // remove ROI layer doc object
+    std::vector<FrDocumentObj*> objects;
+    
+    doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+    std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+
+    for(it = objects.begin(); it != itEnd; ++it){
+        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+
+        if(layerDO->GetID() == this->GetID())
+        {
+            doc->Remove( (*it) );
+            break;
+        }
+    }
 }
 
 FrDocumentObj::ObjTypes FrRoiDocObj::GetType(){

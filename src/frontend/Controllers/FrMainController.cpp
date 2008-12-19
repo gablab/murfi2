@@ -92,19 +92,19 @@ void FrMainController::Initialize(){
     delete cmd;
 
     // NOTE for ROI testing 
-    //FrLoadImageCmd* cmd1 = FrCommandController::CreateCmd<FrLoadImageCmd>();
-    //cmd1->SetFileName("../example_data/img/f-00001-00000.nii");
-    ////cmd1->SetFileName("../example_data/img/MNI_T1_1mm.nii");
-    //FrCreateROICmd* cmd2 = FrCommandController::CreateCmd<FrCreateROICmd>();
-    //cmd2->SetCreateTest(true);
-    //FrResetImageCmd* cmd3 = FrCommandController::CreateCmd<FrResetImageCmd>();
-    //cmd3->SetTargetView(FrResetImageCmd::Current);
-    //FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
-    //multiCmd->AddCommand(cmd1);
-    //multiCmd->AddCommand(cmd2);
-    //multiCmd->AddCommand(cmd3);
-    //multiCmd->Execute();
-    //delete multiCmd;
+    FrLoadImageCmd* cmd1 = FrCommandController::CreateCmd<FrLoadImageCmd>();
+    cmd1->SetFileName("../example_data/img/f-00001-00000.nii");
+    //cmd1->SetFileName("../example_data/img/MNI_T1_1mm.nii");
+    FrCreateROICmd* cmd2 = FrCommandController::CreateCmd<FrCreateROICmd>();
+    cmd2->SetCreateTest(true);
+    FrResetImageCmd* cmd3 = FrCommandController::CreateCmd<FrResetImageCmd>();
+    cmd3->SetTargetView(FrResetImageCmd::Current);
+    FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    multiCmd->AddCommand(cmd1);
+    multiCmd->AddCommand(cmd2);
+    multiCmd->AddCommand(cmd3);
+    multiCmd->Execute();
+    delete multiCmd;
 }
 
 bool FrMainController::HasActiveTool(){

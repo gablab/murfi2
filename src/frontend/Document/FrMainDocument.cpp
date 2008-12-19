@@ -12,13 +12,7 @@ FrMainDocument::FrMainDocument()
 
 FrMainDocument::~FrMainDocument(){
     std::vector<FrDocumentObj*> objects;
-
-    // Remove ROI objects
-    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
-    std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
-    for(it = objects.begin(); it != itEnd; ++it){
-        this->Remove( (*it) );
-    }
+    std::vector<FrDocumentObj*>::iterator it, itEnd;
 
     // Remove tab objects
     this->GetObjectsByType(objects, FrDocumentObj::TabSettings);
@@ -27,22 +21,8 @@ FrMainDocument::~FrMainDocument(){
         this->Remove( (*it) );
     }
 
-    // Remove layer objects
-    this->GetObjectsByType(objects, FrDocumentObj::LayerObject);
-    itEnd = objects.end();
-    for(it = objects.begin(); it != itEnd; ++it){
-        this->Remove( (*it) );
-    }
-
-    // Remove view objects
-    this->GetObjectsByType(objects, FrDocumentObj::ViewObject);
-    itEnd = objects.end();
-    for(it = objects.begin(); it != itEnd; ++it){
-        this->Remove( (*it) );
-    }
-
-    // Remove image objects
-    this->GetObjectsByType(objects, FrDocumentObj::ImageObject);
+    // Remove roi objects
+    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
     itEnd = objects.end();
     for(it = objects.begin(); it != itEnd; ++it){
         // NOTE: Since this type of objects is not deleted do it manually
@@ -51,8 +31,8 @@ FrMainDocument::~FrMainDocument(){
         delete obj;
     }
 
-    // Remove roi objects
-    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+    // Remove image objects
+    this->GetObjectsByType(objects, FrDocumentObj::ImageObject);
     itEnd = objects.end();
     for(it = objects.begin(); it != itEnd; ++it){
         // NOTE: Since this type of objects is not deleted do it manually

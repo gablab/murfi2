@@ -81,7 +81,6 @@ bool FrChangeSliceCmd::Execute(){
     m_isSlice = false;
     if(result){
         FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
-    //        mv->GetCurrentView()->UpdatePipeline(FRP_READ);     // FRP_READ??
     }
     return result;
 }
@@ -106,26 +105,20 @@ bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
     if(imgIndex != INVALIDE_IMAGE_NUM){        
         // Get local renderer point
         double* point;
-        int localPoint[3];
+        double localPoint[3];
         vtkCoordinate* coordinate = vtkCoordinate::New();
 	    coordinate->SetCoordinateSystemToDisplay();
 	    coordinate->SetValue(m_X, m_Y, 0.0);
 
         std::vector<vtkRenderer*> renderers;
         ov->GetImage(imgIndex)->GetRenderers(renderers);
-
         point = coordinate->GetComputedWorldValue(renderers[0]);
 
-        localPoint[0] = int(point[0]);
-        localPoint[1] = int(point[1]);
-        localPoint[2] = int(point[2]);
+        localPoint[0] = point[0];
+        localPoint[1] = point[1];
+        localPoint[2] = point[2];
         coordinate->Delete();
-
-        //for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
-        //    double bounds[6];
-        //    ov->GetImage(i)->GetActor()->GetBounds(bounds);
-        //}
-
+       
         FrViewDocObj* viewDO = 0L;
         FrDocument::DocObjCollection views;
         doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
@@ -134,84 +127,69 @@ bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
         }
 
         viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL] = 
-            GetCoronalSlice(localPoint[0], localPoint[1], imgIndex);
+            GetCoronalSlice(localPoint[0], localPoint[1], imgIndex, viewDO);
         viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL] = 
-            GetSagitalSlice(localPoint[0], localPoint[1], imgIndex);
+            GetSagitalSlice(localPoint[0], localPoint[1], imgIndex, viewDO);
         viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL]   = 
-            GetAxialSlice(localPoint[0], localPoint[1], imgIndex);
+            GetAxialSlice(localPoint[0], localPoint[1], imgIndex, viewDO);
 
         result = true;
     }
     return result;
 }
 
-int FrChangeSliceCmd::GetCoronalSlice(int x, int y, int imgNum){
+int FrChangeSliceCmd::GetCoronalSlice(double x, double y, int imgNum, FrViewDocObj* viewDO){
     FrOrthoView* ov = this->GetMainController()->GetMainView()->GetOrthoView();
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+        
+    double spacing[3];
+    ov->GetImage(imgNum)->GetImageInput()->GetSpacing(spacing);
 
     double* bounds = ov->GetImage(imgNum)->GetActorBounds();
-    int result = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL];
+    double result = double(viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL]);
     switch(imgNum)
 	{
-        case DEF_SAGITAL: result = ClampValue(x, 0, int(bounds[1]));
+        case DEF_SAGITAL: result = ClampValue(x, 0.0, bounds[1]) / spacing[0];
 			break;
-		case DEF_AXIAL:  result = ClampValue(y, 0, int(bounds[3]));
+		case DEF_AXIAL:  result = ClampValue(y, 0.0, bounds[3]) / spacing[1];
 			break;
 	}
-    return result;
+    return int(result);
 }
 
-int FrChangeSliceCmd::GetSagitalSlice(int x, int y, int imgNum){
+int FrChangeSliceCmd::GetSagitalSlice(double x, double y, int imgNum, FrViewDocObj* viewDO){
     FrOrthoView* ov = this->GetMainController()->GetMainView()->GetOrthoView();
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-     
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+   
+    double spacing[3];
+    ov->GetImage(imgNum)->GetImageInput()->GetSpacing(spacing);
 
     double* bounds = ov->GetImage(imgNum)->GetActorBounds();
-    int result = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL];
+    double result = double(viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL]);
     switch(imgNum)
 	{
-        case DEF_CORONAL: result = ClampValue(x, 0, int(bounds[1]));
+        case DEF_CORONAL: result = ClampValue(x, 0.0, bounds[1]) / spacing[0];
 			break;
-		case DEF_AXIAL: result = ClampValue(x, 0, int(bounds[1]));
+		case DEF_AXIAL: result = ClampValue(x, 0.0, bounds[1]) / spacing[0];
 			break;
 	}
-    return result;
+    return int(result);
 }
 
-int FrChangeSliceCmd::GetAxialSlice(int x, int y, int imgNum){
+int FrChangeSliceCmd::GetAxialSlice(double x, double y, int imgNum, FrViewDocObj* viewDO){
     FrOrthoView* ov = this->GetMainController()->GetMainView()->GetOrthoView();
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+   
+    double spacing[3];
+    ov->GetImage(imgNum)->GetImageInput()->GetSpacing(spacing);
 
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
- 
     double* bounds = ov->GetImage(imgNum)->GetActorBounds();
-    int result = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL];
+    double result = double(viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL]);
     switch(imgNum)
 	{	
-	    case DEF_CORONAL: result = ClampValue(y, 0, int(bounds[3]));
+	    case DEF_CORONAL: result = ClampValue(y, 0.0, bounds[3]) / spacing[1];
 			break;
-		case DEF_SAGITAL: result = ClampValue(y, 0, int(bounds[3]));
+		case DEF_SAGITAL: result = ClampValue(y, 0.0, bounds[3]) / spacing[1];
 			break;
 	}
-    return result;
+    return int(result);
 }
 
 ///////////////////////////////////////////////////////////////

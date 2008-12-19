@@ -18,8 +18,6 @@ public:
 
     virtual bool OnKeyPress(FrInteractorStyle* is, FrKeyParams& params);
 
-    FrSetPropMacro(int, ImageNumber);
-
 public:
 	/// Default constructor
 	FrPenTool();

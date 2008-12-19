@@ -89,7 +89,8 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
             break;
         case OrthoView:
             {
-                switch(imgNumber){				// должен быть номер рендерера в орто вью 
+                // Renderer number in ortho view
+                switch(imgNumber){				
                     case DEF_CORONAL: // coronal 
                     {
                         // get slice number
@@ -174,10 +175,13 @@ bool IsPointInsideOfPolygon(std::vector<Pos> Points, Pos point){
 }
 
 bool IsPointInsideOfSphere(Pos center, int radius, Pos point){
-    bool inside = false;
+    bool isInside = false;
 
-    if ( (pow(double(center.x - point.x), 2) + pow(double(center.y - point.y), 2) + pow(double(center.z - point.z), 2))<pow((double)radius, 2) )
-        inside = true;
+    if ( (pow(double(center.x - point.x), 2) + 
+          pow(double(center.y - point.y), 2) + 
+          pow(double(center.z - point.z), 2)) < pow((double)radius, 2) ){
+        isInside = true;
+    }
     
-    return inside;
+    return isInside;
 }

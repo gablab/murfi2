@@ -52,10 +52,32 @@ bool FrRefreshLayerInfoCmd::Execute(){
         widget->RemoveLayers();
         
         // Add all layers
+        // First Image layers
         std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
         for(it = layers.begin(); it != itEnd; ++it){
             FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
-            widget->AddLayer(layerDO);
+            if(layerDO->IsImage())
+            {
+                widget->AddLayer(layerDO);
+            }
+        }
+                
+        // Then colormap
+        for(it = layers.begin(); it != itEnd; ++it){
+            FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
+            if(layerDO->IsColormap())
+            {
+                widget->AddLayer(layerDO);
+            }
+        }
+
+        // Then ROI
+        for(it = layers.begin(); it != itEnd; ++it){
+            FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
+            if(layerDO->IsRoi())
+            {
+                widget->AddLayer(layerDO);
+            }
         }
 
         widget->SetMainDoc(doc);

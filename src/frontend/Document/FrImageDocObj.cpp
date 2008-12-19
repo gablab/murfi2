@@ -1,6 +1,6 @@
 #include "FrImageDocObj.h"
 #include "FrDocument.h"
-
+#include "FrLayerDocObj.h"
 
 // VTK includes
 #include "vtkImageData.h"
@@ -31,11 +31,34 @@ FrImageDocObj::~FrImageDocObj(){
 }
 
 void FrImageDocObj::OnAdd(FrDocument* doc){
-    // NOTE : Add here Image layer
+    //NOTE: Since there may be th only one instance of image layer
+    //image layer creation and deletetion in TabSettingsDocObj
+
+    //// Add here Image layer
+    //FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage);
+    //layerDO->SetID(DEF_LAYER_ID);
+    //doc->Add(layerDO);  
 }
 
 void FrImageDocObj::OnRemove(FrDocument* doc){
-    // NOTE : Remove here image layer
+    //NOTE: Since there may be th only one instance of image layer
+    //image layer creation and deletetion in TabSettingsDocObj
+
+    //// Remove here image layer
+    //std::vector<FrDocumentObj*> objects;
+    //
+    //doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+    //std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+
+    //for(it = objects.begin(); it != itEnd; ++it){
+    //    FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+
+    //    // Image layer is the only one and has predefined ID
+    //    if(layerDO->GetID() == DEF_LAYER_ID){
+    //        doc->Remove( (*it) );
+    //        break;
+    //    }
+    //}
 }
 
 FrDocumentObj::ObjTypes FrImageDocObj::GetType(){
@@ -92,34 +115,3 @@ void FrImageDocObj::ClearAll(){
     m_Images.clear();
     m_SeriesNumber = BAD_SERIES_NUM;
 }
-
-//bool FrImageDocObj::LoadFromFile(QString& fileName){
-//    bool result = false;
-//
-//    if(QFile::exists(fileName)){
-//        std::string stdFileName(fileName.toAscii());
-//        RtMRIImage* img = new RtMRIImage();
-//
-//        if(img->readNifti(stdFileName)){
-//            // unmosaic
-//            if(img->seemsMosaic()){
-//                img->unmosaic();
-//            }
-//
-//            if(m_Image) delete m_Image;
-//            m_Image = img;
-//            result = true;
-//        }
-//    }
-//    return result;
-//}
-
-//bool FrImageDocObj::LoadFromMRIImage(RtMRIImage* img){
-//    // unmosaic!
-//    if(img->seemsMosaic()){
-//        img->unmosaic();
-//    }
-//	m_Image = img;
-//
-//	return true;
-//}

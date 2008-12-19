@@ -2,6 +2,7 @@
 #include "FrViewSettings.h"
 #include "FrDocument.h"
 #include "FrCommandController.h"
+#include "FrLayerDocObj.h"
 
 // Implementation
 FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
@@ -44,6 +45,25 @@ void FrTabSettingsDocObj::OnRemove(FrDocument* doc){
     cmd->SetTabSettingsDocObj(this);
     cmd->Execute();
     delete cmd;
+    
+    // If no more tabs delete layers also
+    // (except of ROI layers...)
+    std::vector<FrDocumentObj*> objects;
+        
+    doc->GetObjectsByType(objects, FrDocumentObj::TabSettings);
+    if(objects.size() <= 0)
+    {
+        doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+
+        std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+        for(it = objects.begin(); it != itEnd; ++it){
+            FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
+            if(!layerDO->IsRoi())
+            {
+                doc->Remove(layerDO);
+            }
+        }
+    }
 }
 
 FrDocumentObj::ObjTypes FrTabSettingsDocObj::GetType(){

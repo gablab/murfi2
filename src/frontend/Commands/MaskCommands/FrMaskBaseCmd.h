@@ -32,6 +32,9 @@ protected:
     virtual void ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int sliceNumber = -1);
     // Returns Special Layer
     FrSpecialLayer* GetSpecialLayer();
+    // Transforms values in point[2] param to proper indices
+    // imgID is number of image in ortho view...
+    void TransformCoordinatesToIndices(int point[2], vtkImageData* img, int imgID);
 
 protected:
     int m_ImageNumber;

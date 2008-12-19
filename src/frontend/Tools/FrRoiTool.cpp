@@ -192,7 +192,6 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     }    
               
     FrLayeredImage* lim = 0;
-    //std::vector<FrLayerSettings*> layers;
     std::vector<vtkRenderer*> renCollection;
 
     Views view = viewDO->GetActiveView();
@@ -200,13 +199,11 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
         case Views::SliceView:
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
-            //GetLayerSettings(viewDO->GetSliceViewSettings(), layers);       // TODO: get layer settings from layerDocObj
             m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
         case Views::MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
-            //GetLayerSettings(ts->GetMosaicViewSettings(), layers);
             m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
         case Views::OrthoView:
@@ -220,10 +217,10 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
                         break;
                     }
                 }
+
                 if (m_ImageNumber != -1){
                     ov->GetImage(m_ImageNumber)->GetRenderers(renCollection);
                     lim = ov->GetImage(m_ImageNumber);
-                    //GetLayerSettings(ts->GetOrthoViewSettings(), layers, m_ImageNumber);
                 }
                 else{
                     // do something
@@ -239,20 +236,8 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
 
     bool isInside = true;
     if (!m_PointPicker->Pick(params.X, params.Y, 0, renderer)){
-        // point is not inside of image actor
         isInside = false;
     }
-//
-//    // Get the mapped position of the mouse using the picker.
-//    double ptMapped[3];
-//    m_PointPicker->GetMapperPosition(ptMapped);
-//
-//    //if (notInside){
-//    //    ptMapped[0] = ptMapped[1] = ptMapped[2] = -1;
-//    //}
-//
-////    params.X = ptMapped[0];
-////    params.Y = ptMapped[1];
 
     // test
     vtkCoordinate* coordinate = vtkCoordinate::New();
@@ -273,20 +258,17 @@ int FrRoiTool::GetVisibleLayer(FrMainDocument* doc){
     FrLayerDocObj* layerDO = 0L;
     FrDocument::DocObjCollection layers;
     doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
-    
-    //std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
+        
     if(layers.size() > 0){
         for (int i = 0; i < layers.size(); i++){
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-
             if (layerDO->GetVisibility()){
                 return i;
             }
         }
-//        layerDO = (FrLayerDocObj*)layers[0];
-    }    
-
-    return 0;   // there are no visible actors atm
+    }
+    // there are no visible actors atm
+    return -1;
 }
 
 void FrRoiTool::StartCurrentTool(){

@@ -97,13 +97,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
             FrMainDocument* doc = this->GetMainController()->GetMainDocument();
             
-            FrViewDocObj* viewDO = 0L;
-            FrDocument::DocObjCollection views;
-            doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-            if(views.size() > 0){
-                viewDO = (FrViewDocObj*)views[0];
-            }
-
+            // NOTE: may be calc BB of polygon?
             // get data dimensions
             int dims[3];
             imageData->GetDimensions(dims);
@@ -116,8 +110,8 @@ bool FrMaskFreeShapeCmd::WriteMask(){
             // translate all points to local image coordinates
             for (int i = 0; i<m_Points.size(); i++){
                 int p[3];
-                p[0] = m_Points[i].x;   p[1] = m_Points[i].y;   
-                GetRealImagePosition(viewDO, imageData, p, m_ImageNumber);    
+                p[0] = m_Points[i].x; p[1] = m_Points[i].y;   
+                this->TransformCoordinatesToIndices(p, imageData, m_ImageNumber);    
 
                 m_Points[i].x = p[0];   m_Points[i].y = p[1];   
             }
@@ -139,8 +133,6 @@ bool FrMaskFreeShapeCmd::WriteMask(){
                 }
 
             this->ApplyDataToRoi(imageData, roiDO);
-
-            //FrMainWindow* mv = this->GetMainController()->GetMainView();
             mv->GetCurrentView()->UpdatePipeline(FRP_READ);
 
             result = true;

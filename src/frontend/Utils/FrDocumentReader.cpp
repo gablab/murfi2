@@ -165,6 +165,8 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
     
     int xDim = 0;
     int yDim = 0;
+    double pixDim0 = 1.0;
+    double pixDim1 = 1.0;
     unsigned int dataSize = 0;
     short* pImageData = 0;
     
@@ -180,6 +182,8 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
         
         xDim = image->getDim(0);
         yDim = image->getDim(1);
+        pixDim0 = image->getPixDim(0);
+        pixDim1 = image->getPixDim(1);
         dataSize = image->getNumPix();
         pImageData = image->getDataCopy();
     }
@@ -191,6 +195,8 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
             case XY:
                 xDim = image->getDim(0);
                 yDim = image->getDim(1);
+                pixDim0 = image->getPixDim(0);
+                pixDim1 = image->getPixDim(1);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
                 m_Slice = ClampValue(m_Slice, 0, image->getDim(2) - 1);
@@ -199,6 +205,8 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
             case YZ:
                 xDim = image->getDim(1);
                 yDim = image->getDim(2);
+                pixDim0 = image->getPixDim(1);
+                pixDim1 = image->getPixDim(2);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
                 m_Slice = ClampValue(m_Slice, 0, image->getDim(0) - 1);
@@ -207,6 +215,8 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
             case XZ:
                 xDim = image->getDim(0);
                 yDim = image->getDim(2);
+                pixDim0 = image->getPixDim(0);
+                pixDim1 = image->getPixDim(2);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
                 m_Slice = ClampValue(m_Slice, 0, image->getDim(1) - 1);
@@ -218,6 +228,7 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
     vtkImageData* result = vtkImageData::New();
     result->SetScalarTypeToUnsignedChar();
     result->SetDimensions(xDim, yDim, 1);
+    result->SetSpacing(pixDim0, pixDim1, 1.0);
     result->SetNumberOfScalarComponents(1);
     result->AllocateScalars();
     
@@ -248,6 +259,9 @@ vtkImageData* FrDocumentReader::GetRoiSlice(RtMaskImage* roi){
     
     int xDim = 0;
     int yDim = 0;
+    double pixDim0 = 1.0;
+    double pixDim1 = 1.0;
+
     unsigned int dataSize = 0;
     short* pMaskData = 0;
     
@@ -263,6 +277,8 @@ vtkImageData* FrDocumentReader::GetRoiSlice(RtMaskImage* roi){
         
         xDim = mask->getDim(0);
         yDim = mask->getDim(1);
+        pixDim0 = mask->getPixDim(0);
+        pixDim1 = mask->getPixDim(1);
         dataSize = mask->getNumPix();
         pMaskData = mask->getDataCopy();
     }
@@ -274,25 +290,31 @@ vtkImageData* FrDocumentReader::GetRoiSlice(RtMaskImage* roi){
             case XY:
                 xDim = mask->getDim(0);
                 yDim = mask->getDim(1);
+                pixDim0 = mask->getPixDim(0);
+                pixDim1 = mask->getPixDim(1);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
-                m_Slice = ClampValue(m_Slice, 0, mask->getDim(1));
+                m_Slice = ClampValue(m_Slice, 0, mask->getDim(2)-1);
                 pMaskData = this->GetSliceDataXY<short>(mask, m_Slice);
                 break;
             case YZ:
                 xDim = mask->getDim(1);
                 yDim = mask->getDim(2);
+                pixDim0 = mask->getPixDim(1);
+                pixDim1 = mask->getPixDim(2);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
-                m_Slice = ClampValue(m_Slice, 0, mask->getDim(1));
+                m_Slice = ClampValue(m_Slice, 0, mask->getDim(0)-1);
                 pMaskData = this->GetSliceDataYZ<short>(mask, m_Slice);
                 break;
             case XZ:
                 xDim = mask->getDim(0);
                 yDim = mask->getDim(2);
+                pixDim0 = mask->getPixDim(0);
+                pixDim1 = mask->getPixDim(2);
                 dataSize = xDim * yDim;
                 // NOTE: here we clamp slice values
-                m_Slice = ClampValue(m_Slice, 0, mask->getDim(1));
+                m_Slice = ClampValue(m_Slice, 0, mask->getDim(1)-1);
                 pMaskData = this->GetSliceDataXZ<short>(mask, m_Slice);
                 break;
         }
@@ -301,6 +323,7 @@ vtkImageData* FrDocumentReader::GetRoiSlice(RtMaskImage* roi){
     vtkImageData* result = vtkImageData::New();
     result->SetScalarTypeToUnsignedChar();
     result->SetDimensions(xDim, yDim, 1);
+    result->SetSpacing(pixDim0, pixDim1, 1.0);
     result->SetNumberOfScalarComponents(1);
     result->AllocateScalars();
     

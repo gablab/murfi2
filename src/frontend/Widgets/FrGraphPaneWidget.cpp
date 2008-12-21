@@ -11,6 +11,7 @@
 
 FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent) 
 : QWidget(parent){
+
     // Create left layout
     m_GraphListWidget = new FrGraphListWidget(this);
     QPushButton* btnAddGraph = new QPushButton(QString("Add Graph..."), this);
@@ -29,4 +30,8 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent)
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
+}
+
+void FrGraphPaneWidget::UpdateTimePoint(){
+    // TODO: implement timepoint updating...
 }

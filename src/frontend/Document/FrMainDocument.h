@@ -4,7 +4,9 @@
 // Forward declarations
 class FrDataStore;
 class FrDocumentObj;
+class FrViewDocObj;
 class FrTabSettingsDocObj;
+class FrAppSettingsDocObj;
 class RtData;
 
 // Some includes
@@ -18,13 +20,17 @@ public:
     virtual ~FrMainDocument();
 
     // Some helper methods
-    void GetAllImages(std::vector<FrDocumentObj*>& images);
     FrTabSettingsDocObj* GetCurrentTabSettings();
+    
+    FrViewDocObj* GetCurrentViewObject();
+
+    FrAppSettingsDocObj* GetAppSettings();
+
     void AddDataToStore(RtData *data);
 
     // Properties
     friend class FrDataStore;
-    FrPropMacro(FrDataStore*, DataStore);
+    FrGetPropMacro(FrDataStore*, DataStore);
 };
 
 #endif

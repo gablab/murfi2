@@ -102,13 +102,7 @@ bool FrLayerCmd::AddLayer(){
     
     // set new layer as active
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-   
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }    
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     
     int id = m_DocObj->GetID();
     viewDO->GetSliceViewSettings()->ActiveLayerID = id;
@@ -131,13 +125,7 @@ bool FrLayerCmd::DeleteLayer(){
     layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
 
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     // delete layer from LayeredImage
     for(int i=0; i < ALL_ITEMS_COUNT; ++i){
@@ -157,13 +145,7 @@ bool FrLayerCmd::DeleteLayer(){
 bool FrLayerCmd::UpdateSelectedLayerID(){
     if(!m_isID || m_ID < DEF_LAYER_ID) return false;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     // update selected layer settings on LayerListWidget's right panel
     viewDO->GetSliceViewSettings()->ActiveLayerID = m_ID;
@@ -190,14 +172,8 @@ bool FrLayerCmd::ChangeLayerOld(){
     layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
     layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
 
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();    
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     // find layer settings
     // NOTE: assume that layers in different views 
@@ -363,27 +339,8 @@ bool FrLayerCmd::ChangeLayerColormap(){
 // delete active layer
 int FrLayerCmd::GetActiveLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-
-    int result = BAD_LAYER_ID;
-    switch(viewDO->GetActiveView()){
-        case Views::SliceView: 
-            result = viewDO->GetSliceViewSettings()->ActiveLayerID;
-            break;
-        case Views::MosaicView: 
-            result = viewDO->GetMosaicViewSettings()->ActiveLayerID;
-            break;
-        case Views::OrthoView: 
-            result = viewDO->GetOrthoViewSettings()->ActiveLayerID;
-            break;
-    }
-    return result;
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    return viewDO->GetActiveLayerID();
 }
 
 bool FrLayerCmd::IsRoiLayer(int id){

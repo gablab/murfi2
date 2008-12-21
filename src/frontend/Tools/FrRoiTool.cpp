@@ -183,30 +183,23 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     FrMainController* mc = this->GetMainController();
     FrMainWindow* mv = mc->GetMainView();
     FrMainDocument* doc = mc->GetMainDocument();
-
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }    
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject(); 
               
     FrLayeredImage* lim = 0;
     std::vector<vtkRenderer*> renCollection;
-
-    Views view = viewDO->GetActiveView();
-    switch(view){
-        case Views::SliceView:
+    
+    switch(viewDO->GetActiveView()){
+        case SliceView:
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
             m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
-        case Views::MosaicView:
+        case MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
             m_ImageNumber = DEF_IMAGE_NUMBER;
             break;
-        case Views::OrthoView:
+        case OrthoView:
             {
                 FrOrthoView* ov =  mv->GetOrthoView();
                 

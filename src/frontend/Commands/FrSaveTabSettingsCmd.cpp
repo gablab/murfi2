@@ -81,9 +81,8 @@ void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
     
     FrDocument::DocObjCollection views;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        FrViewDocObj* viewDO = (FrViewDocObj*)views[0];
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    if(viewDO != 0){
         viewDO->SaveSettingsTo(docObj);
     }    
 

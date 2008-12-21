@@ -25,14 +25,8 @@ bool FrChangeViewCmd::Execute(){
         
         FrMainWindow* mv = this->GetMainController()->GetMainView();
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-        //FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
-        
-        FrViewDocObj* viewDO = 0L;
-        FrDocument::DocObjCollection views;
-        doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-        if(views.size() > 0){
-            viewDO = (FrViewDocObj*)views[0];
-        }
+                
+        FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
         // Change active view
         viewDO->SetActiveView(viewType);
@@ -55,25 +49,20 @@ int FrChangeViewCmd::GetActiveViewType(){
         
     switch(m_TargetView){
         case FrChangeViewCmd::Slice:  
-            viewType = Views::SliceView;
+            viewType = SliceView;
             break;
         case FrChangeViewCmd::Mosaic: 
-            viewType = Views::MosaicView;
+            viewType = MosaicView;
             break;
         case FrChangeViewCmd::Ortho:  
-            viewType = Views::OrthoView;
+            viewType = OrthoView;
             break;
         case FrChangeViewCmd::Synchronize:
             {
                 // Get active view type from document
                 FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-                FrViewDocObj* viewDO = 0L;
-                FrDocument::DocObjCollection views;
-                doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-                if(views.size() > 0){
-                    viewDO = (FrViewDocObj*)views[0];
-                }
+                FrViewDocObj* viewDO = doc->GetCurrentViewObject();
                 viewType = viewDO->GetActiveView();
                 break;
             }

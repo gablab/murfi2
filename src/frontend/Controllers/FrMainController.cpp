@@ -14,6 +14,8 @@
 #include "FrLayerDialog.h"
 #include "FrLayerDocObj.h"
 #include "FrBookmarkWidget.h"
+#include "FrAppSettingsDocObj.h"
+#include "FrDataStoreDialog.h"
 
 // VTK stuff
 #include "vtkRenderWindowInteractor.h"
@@ -77,6 +79,10 @@ void FrMainController::Initialize(){
     
     // Initialize document
     if(m_MainDocument){
+        // Create app settings and save them to document
+        FrAppSettingsDocObj* appSettings = new FrAppSettingsDocObj();
+        m_MainDocument->Add(appSettings);
+
         FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
         cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);      
         cmd->SetIsDefault(true);
@@ -145,7 +151,16 @@ void FrMainController::LoadImageFromFile(std::vector<QString>& fileNames){
     delete cmd;
 }
 
+void FrMainController::OpenDataStore(){
+
+    FrDataStoreDialog dlg(this->GetMainView(), true);
+    dlg.SetCaption(QString("Data Store Viewer"));
+    dlg.Initialize(this->GetMainDocument());
+    dlg.SimpleExec();
+}
+
 void FrMainController::IoTabSettings(QString& fileName, bool isInput){
+
     if(isInput){
         FrLoadTabsCmd* cmd1 = FrCommandController::CreateCmd<FrLoadTabsCmd>();
         cmd1->SetFileName(fileName);
@@ -337,6 +352,7 @@ void FrMainController::SetCurrentTool(int tool){
 }
 
 void FrMainController::ResetImage(){
+
     FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
     cmd->SetTargetView(FrResetImageCmd::Current);
     cmd->Execute();
@@ -344,6 +360,7 @@ void FrMainController::ResetImage(){
 }
 
 void FrMainController::CreatNewROI(){
+
     FrCreateROICmd* cmd1 = FrCommandController::CreateCmd<FrCreateROICmd>();
     
     FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
@@ -355,7 +372,8 @@ void FrMainController::CreatNewROI(){
     delete cmd;
 }
 
-void FrMainController::UpdateRoiTool(){    
+void FrMainController::UpdateRoiTool(){  
+
     FrRoiTool* tool = dynamic_cast<FrRoiTool*>(m_ToolController->GetCurrentTool());
     if(tool != 0L){
         tool->StartCurrentTool();
@@ -363,51 +381,57 @@ void FrMainController::UpdateRoiTool(){
 }
 
 void FrMainController::Test(){    
-    // run test input server
-	RtInputScannerImages* input =  new RtInputScannerImages();
-//	RtInputScannerImages input;
-	
-//	RtConfig config;
-	char *path[3];
-	path[0] = "test";
-	path[1] = "-f";
-	path[2] = "sensorymotor_singleimage.xml";
-//	bool result = config.parseArgs(3, path);
-	
-	//input->activate();
-	//input->init(3, path);
-//	result = input.open(config);
-//	input.svc();
-//	RtMRIImage img;
-//	if (result){
-//		input.saveImage(img);
-//		int g = 55;
-//	}
-//	else
-//		return;
-    
-    RtDataStore* ds = new RtDataStore();
 
-    RtConductor con(3, path);
-    con.init();
-    //con.addInput(input);
-    //con.addOutput(ds);
-    con.run();
-    
-    //input.close();
+    FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
+    cmd->SetAction(FrTimePointCmd::SetPrevious);
+    cmd->Execute();
+    delete cmd;
 
-    //FrImageDocObj* imgObj = new FrImageDocObj();
-
-        //if(imgObj->LoadFromMRIImage(&img)){// we should process all received images in future
- //       m_MainDocument->Add(imgObj);
- //       m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
- //       
- //       FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
- //       cmd->SetTargetView(FrResetImageCmd::Current);
- //       cmd->Execute();
- //       delete cmd;
- //   }
- //   else{
- //       // TODO: process error
- //   }
+//    // run test input server
+//	RtInputScannerImages* input =  new RtInputScannerImages();
+////	RtInputScannerImages input;
+//	
+////	RtConfig config;
+//	char *path[3];
+//	path[0] = "test";
+//	path[1] = "-f";
+//	path[2] = "sensorymotor_singleimage.xml";
+////	bool result = config.parseArgs(3, path);
+//	
+//	//input->activate();
+//	//input->init(3, path);
+////	result = input.open(config);
+////	input.svc();
+////	RtMRIImage img;
+////	if (result){
+////		input.saveImage(img);
+////		int g = 55;
+////	}
+////	else
+////		return;
+//    
+//    RtDataStore* ds = new RtDataStore();
+//
+//    RtConductor con(3, path);
+//    con.init();
+//    //con.addInput(input);
+//    //con.addOutput(ds);
+//    con.run();
+//    
+//    //input.close();
+//
+//    //FrImageDocObj* imgObj = new FrImageDocObj();
+//
+//        //if(imgObj->LoadFromMRIImage(&img)){// we should process all received images in future
+// //       m_MainDocument->Add(imgObj);
+// //       m_MainView->GetCurrentView()->UpdatePipeline(FRP_FULL);
+// //       
+// //       FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
+// //       cmd->SetTargetView(FrResetImageCmd::Current);
+// //       cmd->Execute();
+// //       delete cmd;
+// //   }
+// //   else{
+// //       // TODO: process error
+// //   }
 }

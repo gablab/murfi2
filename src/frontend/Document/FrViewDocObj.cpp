@@ -11,9 +11,12 @@
 #include <Qt/qstring.h>
 #include <Qt/qfile.h>
 
+#define DEFAULT_TP 0
+#define DEFAULT_TS 0
 
 FrViewDocObj::FrViewDocObj()
-: m_TimePoint(0), m_ActiveView(SliceView){          // TODO: add constant for default view
+: m_TimePoint(DEFAULT_TP), m_ActiveView(SliceView),
+  m_TimeSeries(DEFAULT_TS){
     // Create view settings
     m_SliceViewSettings = new FrSliceViewSettings();
     m_MosaicViewSettings = new FrMosaicViewSettings();
@@ -69,4 +72,21 @@ void FrViewDocObj::SaveSettingsTo(FrTabSettingsDocObj* dst){
     *(dst->GetSliceViewSettings()) = *(m_SliceViewSettings);
     *(dst->GetMosaicViewSettings()) = *(m_MosaicViewSettings);
     *(dst->GetOrthoViewSettings()) = *(m_OrthoViewSettings);
+}
+
+int FrViewDocObj::GetActiveLayerID(){
+    int result = BAD_LAYER_ID;
+
+    switch(this->GetActiveView()){
+        case SliceView:
+            result = this->GetSliceViewSettings()->ActiveLayerID;
+            break;
+        case MosaicView:
+            result = this->GetMosaicViewSettings()->ActiveLayerID;
+            break;
+        case OrthoView:
+            result = this->GetOrthoViewSettings()->ActiveLayerID;
+            break;
+    }
+    return result;
 }

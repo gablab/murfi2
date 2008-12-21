@@ -90,12 +90,7 @@ bool FrMaskSphereCmd::WriteMask(){
 
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-        FrViewDocObj* viewDO = 0L;
-        FrDocument::DocObjCollection views;
-        doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-        if(views.size() > 0){
-            viewDO = (FrViewDocObj*)views[0];
-        }
+        FrViewDocObj* viewDO = doc->GetCurrentViewObject();
         
         // Create doc reader
         FrDocumentReader* docReader = FrDocumentReader::New();

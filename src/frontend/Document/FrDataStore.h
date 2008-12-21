@@ -9,6 +9,7 @@ class FrMainDocument;
 
 #include "FrMacro.h"
 #include "RtOutput.h"
+#include <vector>
 
 
 class FrDataStore : public RtOutput {
@@ -24,6 +25,8 @@ public:
     FrPropMacro(FrMainDocument*, Document);
 
     void AddData(RtData *data);
+    
+    void GetStuff(std::vector<RtDataID>& data);
 
 private:
     // helpers

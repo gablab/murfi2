@@ -34,26 +34,12 @@ FrRoiDocObj* FrMaskBaseCmd::GetCurrentRoi(){
         doc->GetObjectsByType(rois, FrDocumentObj::RoiObject);
 
         if(rois.size() > 0){
-            int layerID = -1;
+            
 
-            FrViewDocObj* viewDO = 0L;
-            FrDocument::DocObjCollection views;
-            doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-            if(views.size() > 0){
-                viewDO = (FrViewDocObj*)views[0];
-            }
+            FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+            if(viewDO == 0) return 0;
 
-            switch(viewDO->GetActiveView()){
-                case Views::SliceView:
-                    layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
-                    break;
-                case Views::MosaicView:
-                    layerID = viewDO->GetMosaicViewSettings()->ActiveLayerID;
-                    break;
-                case Views::OrthoView:
-                    layerID = viewDO->GetOrthoViewSettings()->ActiveLayerID;
-                    break;
-            }
+            int layerID = viewDO->GetActiveLayerID();
 
             std::vector<FrDocumentObj*>::iterator it, itEnd(rois.end());
             for(it = rois.begin(); it != itEnd; ++it){
@@ -96,12 +82,7 @@ void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int s
 
     // Setup proper view
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     me->SetView(viewDO->GetActiveView());
 
     // Set orientation
@@ -133,26 +114,22 @@ void FrMaskBaseCmd::ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int s
 int FrMaskBaseCmd::GetCurrentRoiSliceNumber(){
     int sliceNumber = -1;
     if(this->GetMainController()){
-        FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-        FrViewDocObj* viewDO = 0L;
-        FrDocument::DocObjCollection views;
-        doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-        if(views.size() > 0){
-            viewDO = (FrViewDocObj*)views[0];
-        }
+        FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+        FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
         switch(viewDO->GetActiveView()){
-            case Views::SliceView:
+            case SliceView:
                 sliceNumber = viewDO->GetSliceViewSettings()->SliceNumber;
                 break;
-            case Views::MosaicView:
+            case MosaicView:
                 // NOTE: always 0 for mosaic view
                 sliceNumber = 0;
                 break;
-            case Views::OrthoView:
+            case OrthoView:
                 // Setup proper slice for ortho view
-                sliceNumber = viewDO->GetOrthoViewSettings()->SliceNumber[m_ImageNumber];   // TODO: check for correct imgNumber
+                // TODO: check for correct imgNumber
+                sliceNumber = viewDO->GetOrthoViewSettings()->SliceNumber[m_ImageNumber];
                 break;
             default: ;
                 // NOTE: do nothing
@@ -167,22 +144,15 @@ FrSpecialLayer* FrMaskBaseCmd::GetSpecialLayer(){
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-
-    Views view = viewDO->GetActiveView();
-    switch(view){
-        case Views::SliceView:
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    switch(viewDO->GetActiveView()){
+        case SliceView:
             sl = mv->GetSliceView()->GetImage()->GetSpecialLayer();
             break;
-        case Views::MosaicView:
+        case MosaicView:
             sl = mv->GetMosaicView()->GetImage()->GetSpecialLayer();
             break;
-        case Views::OrthoView:
+        case OrthoView:
             {
                 FrOrthoView* ov =  mv->GetOrthoView();
 
@@ -203,13 +173,7 @@ void FrMaskBaseCmd::TransformCoordinatesToIndices(int point[2], vtkImageData* im
 
     if(!img) return;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     double dSpacing[3];	
     img->GetSpacing(dSpacing);

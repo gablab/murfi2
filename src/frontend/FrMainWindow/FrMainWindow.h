@@ -33,7 +33,8 @@ public:
     FrMainWindow();
     virtual ~FrMainWindow();
 
-    FrPropMacro(FrMainDocument*,MainDocument);
+    FrGetPropMacro(FrMainDocument*,MainDocument);
+    void SetMainDocument(FrMainDocument* document);
     FrPropMacro(FrMainController*,MainController);
     
     void Initialize();

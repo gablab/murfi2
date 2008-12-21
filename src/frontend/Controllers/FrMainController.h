@@ -33,6 +33,7 @@ public:
 
     // Interface for MainWindow
     void LoadImageFromFile(std::vector<QString>& fileNames);
+    void OpenDataStore();
     void IoTabSettings(QString& fileName, bool isInput);
     
     void SaveCurrentViewToTab();

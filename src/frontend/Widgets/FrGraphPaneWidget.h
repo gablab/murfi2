@@ -25,6 +25,9 @@ public:
     FrGetPropMacro(FrGraphListWidget*, GraphListWidget);
     FrGetPropMacro(FrPlayControlWidget*, PlayControlWidget);
     
+    // Methods
+    void UpdateTimePoint();
+
     // Here all signals
 Q_SIGNALS:
 

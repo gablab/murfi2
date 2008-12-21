@@ -43,17 +43,9 @@ bool FrChangeSliceCmd::Execute(){
 
     bool result = false;
    
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-        
-    Views view = viewDO->GetActiveView();
-
-    switch(view){
-        case Views::SliceView:
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    switch(viewDO->GetActiveView()){
+        case SliceView:
         {
             if(m_isSlice){
                 viewDO->GetSliceViewSettings()->SliceNumber += (int)m_Slice;
@@ -61,13 +53,13 @@ bool FrChangeSliceCmd::Execute(){
             }
             break;
         }
-        case Views::MosaicView:
+        case MosaicView:
         {
             // NOTE: do nothing here
             result = true;
             break;
         }
-        case Views::OrthoView:
+        case OrthoView:
         {
             result = ChangeOrthoViewSliceNums();
             break;
@@ -119,12 +111,7 @@ bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
         localPoint[2] = point[2];
         coordinate->Delete();
        
-        FrViewDocObj* viewDO = 0L;
-        FrDocument::DocObjCollection views;
-        doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-        if(views.size() > 0){
-            viewDO = (FrViewDocObj*)views[0];
-        }
+        FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
         viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL] = 
             GetCoronalSlice(localPoint[0], localPoint[1], imgIndex, viewDO);

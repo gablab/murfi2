@@ -45,6 +45,13 @@ FrMainWindow::~FrMainWindow(){
     if(m_OrthoView) delete m_OrthoView;
 }
 
+void FrMainWindow::SetMainDocument(FrMainDocument* document){
+    if(document != m_MainDocument){
+        m_MainDocument = document;
+        m_LayerListWidget->SetMainDoc(document);
+        m_LayerListWidget->Update();
+    }
+}
 void FrMainWindow::SetupUi(QMainWindow* mainWindow){
     // Main window
     mainWindow->setWindowState(Qt::WindowMaximized);
@@ -127,7 +134,7 @@ void FrMainWindow::InitializeWidgets(){
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
     dock = new QDockWidget(tr("Layer List"), this);
-    m_LayerListWidget = new FrLayerListWidget(dock);
+    m_LayerListWidget = new FrLayerListWidget(dock, m_MainDocument);
 
     dock->setWidget(m_LayerListWidget);
     addDockWidget(Qt::BottomDockWidgetArea, dock);

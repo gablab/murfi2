@@ -37,27 +37,17 @@ bool FrChangeTbcCmd::Execute(){
     int layerID = BAD_LAYER_ID;
     std::vector<FrLayerSettings*> layers;
 
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-        
-    Views view = viewDO->GetActiveView();
-
-    switch(view){
-    case Views::SliceView:
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    switch(viewDO->GetActiveView()){
+    case SliceView:
     {
         layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
-        //GetLayerSettings(sets->GetSliceViewSettings(), layers);
         ChangeTbcByLayerID(layers, layerID);
         break;
     }
-    case Views::MosaicView:
+    case MosaicView:
     {
         layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
-        //GetLayerSettings(sets->GetMosaicViewSettings(), layers);
         ChangeTbcByLayerID(layers, layerID);
         break;
     }
@@ -65,7 +55,6 @@ bool FrChangeTbcCmd::Execute(){
         // change for all 3 views
         layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
         for(int viewID=0; viewID < ORTHO_VIEWS_CNT; ++viewID){
-            //GetLayerSettings(sets->GetOrthoViewSettings(), layers, viewID);
             ChangeTbcByLayerID(layers, layerID);
         }
         break;

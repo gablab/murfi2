@@ -192,14 +192,13 @@ bool FrOrthoView::InitUpdateParams(FrUpdateParams2& params){
     params.Document = this->GetMainWindow()->GetMainDocument();
 
     // Get view settings
-    FrDocument::DocObjCollection objects;
-    params.Document->GetObjectsByType(objects, FrDocumentObj::ViewObject);
-    
-    if(objects.size() <= 0) return false;
-    params.ViewSettings = ((FrViewDocObj*)objects[0])->GetOrthoViewSettings();
+    if(!params.Document->GetCurrentViewObject()) return false;
+    params.ViewSettings = params.Document->
+        GetCurrentViewObject()->GetOrthoViewSettings();
 
     // Get layers for update
     unsigned int activeLayerID = params.ViewSettings->ActiveLayerID;
+    FrDocument::DocObjCollection objects;
     params.Document->GetObjectsByType(objects, FrDocumentObj::LayerObject);
 
     params.Layers.clear();
@@ -218,8 +217,11 @@ bool FrOrthoView::InitUpdateParams(FrUpdateParams2& params){
 }
 
 void FrOrthoView::ReadDocument(FrUpdateParams2& params){
+    FrViewDocObj* vdo = params.Document->GetCurrentViewObject();
+
     m_docReader->SetDocument(params.Document);
     m_docReader->SetMosaic(false);
+    m_docReader->SetTimeSeries(vdo->GetTimeSeries());
     
     FrUpdateParams2::LayerCollection::iterator it,
         itEnd(params.Layers.end());
@@ -240,7 +242,7 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
                 // ID is current Timepoint since we have 
                 // just one time series 
                 m_docReader->SetTarget(FrDocumentReader::Mri);
-                m_docReader->SetDataID(0);
+                m_docReader->SetDataID(vdo->GetTimePoint());
                 m_docReader->Update();
 
                 m_LayeredImage[i]->SetImageInput(m_docReader->GetOutput());

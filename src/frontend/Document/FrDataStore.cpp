@@ -98,3 +98,19 @@ void FrDataStore::AddRoiToDocument(RtData* data){
 void FrDataStore::AddData(RtData *data){
     m_Store->setData(data);
 }
+
+void FrDataStore::GetStuff(std::vector<RtDataID>& data){
+    data.clear();
+
+    if(m_Store != 0){
+
+        std::map<RtDataID,RtData*,RtDataIDCompare>::iterator it, itEnd;
+        it = m_Store->store.begin();
+        itEnd = m_Store->store.end();
+
+        while(it != itEnd){
+            data.push_back(it->first);
+            ++it;
+        }
+    }
+}

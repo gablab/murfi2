@@ -26,7 +26,7 @@ bool FrLoadImageCmd::Execute(){
 	
 	// detect if any image's opened
     std::vector<FrDocumentObj*> images;
-    md->GetAllImages(images);
+    md->GetObjectsByType(images, FrDocumentObj::ImageObject);
 
     std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
     bool hasOpenedImages = (images.begin() != itEnd);
@@ -66,6 +66,7 @@ bool FrLoadImageCmd::Execute(){
                 // NOTE: for now only one series unmber is supported
                 img->getDataID().setSeriesNum(0);
                 img->getDataID().setTimePoint(timePoint);
+                img->getDataID().getInstantiationTime();
                 timePoint++;
                                 
                 //img->setDataID(id);

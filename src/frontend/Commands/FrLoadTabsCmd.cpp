@@ -95,13 +95,7 @@ bool FrLoadTabsCmd::Execute(){
             }
 
             // copy settings from current tab to view doc object
-            FrViewDocObj* viewDO = 0L;
-            FrDocument::DocObjCollection views;
-            mainDoc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-            if(views.size() > 0){
-                viewDO = (FrViewDocObj*)views[0];
-            }
-            
+            FrViewDocObj* viewDO = mainDoc->GetCurrentViewObject();
             viewDO->CopySettingsFrom(mainDoc->GetCurrentTabSettings());
             int h = 54;
         }

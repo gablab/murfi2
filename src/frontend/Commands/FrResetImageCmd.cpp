@@ -34,28 +34,23 @@ bool FrResetImageCmd::Execute(){
     this->ResetTBC();
 
     // Get camera settings
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     std::vector<vtkImageActor*> actors;
     std::vector<FrCameraSettings*> camSettings;
     switch(viewDO->GetActiveView()){
-        case Views::SliceView:
+        case SliceView:
             actors.push_back(mv->GetSliceView()->GetImage()->GetActor());
             camSettings.push_back(&viewDO->GetSliceViewSettings()->CamSettings);
         break;
-        case Views::MosaicView:
+        case MosaicView:
             actors.push_back(mv->GetMosaicView()->GetImage()->GetActor());
             camSettings.push_back(&viewDO->GetMosaicViewSettings()->CamSettings);
         break;
-        case Views::OrthoView:
+        case OrthoView:
             for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
-            actors.push_back(mv->GetOrthoView()->GetImage(i)->GetActor());
-            camSettings.push_back(&viewDO->GetOrthoViewSettings()->CamSettings[i]);
+                actors.push_back(mv->GetOrthoView()->GetImage(i)->GetActor());
+                camSettings.push_back(&viewDO->GetOrthoViewSettings()->CamSettings[i]);
             }
         break;
         default:

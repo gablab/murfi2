@@ -132,14 +132,13 @@ bool FrMosaicView::InitUpdateParams(FrUpdateParams1& params){
     params.Document = this->GetMainWindow()->GetMainDocument();
 
     // Get view settings
-    FrDocument::DocObjCollection objects;
-    params.Document->GetObjectsByType(objects, FrDocumentObj::ViewObject);
-    
-    if(objects.size() <= 0) return false;
-    params.ViewSettings = ((FrViewDocObj*)objects[0])->GetMosaicViewSettings();
+    if(!params.Document->GetCurrentViewObject()) return false;
+    params.ViewSettings = params.Document->
+        GetCurrentViewObject()->GetMosaicViewSettings();
 
     // Get layers for update
     unsigned int activeLayerID = params.ViewSettings->ActiveLayerID;
+    FrDocument::DocObjCollection objects;
     params.Document->GetObjectsByType(objects, FrDocumentObj::LayerObject);
 
     params.Layers.clear();
@@ -158,9 +157,11 @@ bool FrMosaicView::InitUpdateParams(FrUpdateParams1& params){
 }
 
 void FrMosaicView::ReadDocument(FrUpdateParams1& params){
+    FrViewDocObj* vdo = params.Document->GetCurrentViewObject();
     m_docReader->SetDocument(params.Document);
     m_docReader->SetMosaic(true);
     m_docReader->SetOrientation(FrDocumentReader::XY);    
+    m_docReader->SetTimeSeries(vdo->GetTimeSeries());
 
     FrUpdateParams1::LayerCollection::iterator it,
         itEnd(params.Layers.end());
@@ -178,7 +179,7 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
             // ID is current Timepoint since we have 
             // just one time series 
             m_docReader->SetTarget(FrDocumentReader::Mri);
-            m_docReader->SetDataID(0);
+            m_docReader->SetDataID(vdo->GetTimePoint());
             m_docReader->Update();
 
             m_LayeredImage->SetImageInput(m_docReader->GetOutput());

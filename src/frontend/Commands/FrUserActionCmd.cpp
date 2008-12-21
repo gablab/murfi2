@@ -104,27 +104,8 @@ bool FrUserActionCmd::DeleteLayer(){
 // delete active layer
 int FrUserActionCmd::GetActiveLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-
-    int result = BAD_LAYER_ID;
-    switch(viewDO->GetActiveView()){
-        case Views::SliceView: 
-            result = viewDO->GetSliceViewSettings()->ActiveLayerID;
-            break;
-        case Views::MosaicView: 
-            result = viewDO->GetMosaicViewSettings()->ActiveLayerID;
-            break;
-        case Views::OrthoView: 
-            result = viewDO->GetOrthoViewSettings()->ActiveLayerID;
-            break;
-    }
-    return result;
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    return viewDO->GetActiveLayerID();
 }
 
 //bool FrUserActionCmd::IsRoiLayer(int id){

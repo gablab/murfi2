@@ -277,6 +277,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\moc\FrDataStoreDialog_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrDrawingPanelWidget_moc.cpp"
 				>
 			</File>
@@ -512,6 +516,14 @@
 		<Filter
 			Name="Document"
 			>
+			<File
+				RelativePath=".\frontend\Document\FrAppSettingsDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrAppSettingsDocObj.h"
+				>
+			</File>
 			<File
 				RelativePath=".\frontend\Document\FrDataStore.cpp"
 				>
@@ -1040,6 +1052,34 @@
 						Name="VCCustomBuildTool"
 						Description="Mocing $(InputPath)"
 						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrDataStoreDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrDataStoreDialog.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
@@ -1840,6 +1880,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrSetCursorCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrTimePointCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrTimePointCmd.h"
 				>
 			</File>
 			<File

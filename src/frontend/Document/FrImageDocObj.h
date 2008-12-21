@@ -29,6 +29,7 @@ public:
     FrGetPropMacro(unsigned int, SeriesNumber);
     RtMRIImage* GetTimePointData(unsigned int timePoint);
     bool AddTimePointData(RtMRIImage* mriImage);
+    unsigned int GetLastTimePoint();
 
     void ClearAll();
     

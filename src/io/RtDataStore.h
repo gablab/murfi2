@@ -18,6 +18,9 @@ using namespace std;
 
 // class declaration
 class RtDataStore : public RtOutput  {
+#if USE_FRONTEND // Need to access stuff from frontend
+    friend class FrDataStore;
+#endif
 
 public:
 

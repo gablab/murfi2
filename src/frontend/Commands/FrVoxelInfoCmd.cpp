@@ -61,26 +61,17 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     int imgNumber = -1;
     FrLayeredImage* lim = 0;
 
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-
-    Views view = viewDO->GetActiveView();
-    switch(view){
-        case Views::SliceView:
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    switch(viewDO->GetActiveView()){
+        case SliceView:
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
-            //GetLayerSettings(ts->GetSliceViewSettings(), layers);
             break;
-        case Views::MosaicView:
+        case MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
-            //GetLayerSettings(ts->GetMosaicViewSettings(), layers);
             break;
-        case Views::OrthoView:
+        case OrthoView:
             {
                 FrOrthoView* ov =  mv->GetOrthoView();
 
@@ -94,7 +85,6 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
                 if (imgNumber != -1){
                     ov->GetImage(imgNumber)->GetRenderers(renCollection);
                     lim = ov->GetImage(imgNumber);
-                    //GetLayerSettings(ts->GetOrthoViewSettings(), layers, imgNumber);
                 }
                 else{
                     ResetVoxelInfo();

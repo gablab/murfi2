@@ -8,15 +8,11 @@
 
 
 void FrBaseCmd::UpdatePipelineForID(int id, int point){
+
     if(id == BAD_LAYER_ID) return;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
         
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     
     // Set id for update
     int sliceID = viewDO->GetSliceViewSettings()->ActiveLayerID;

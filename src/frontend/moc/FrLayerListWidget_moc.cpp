@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrLayerListWidget.h'
 **
-** Created: Wed 10. Dec 12:19:48 2008
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
+** Created: Sat 20. Dec 23:45:16 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,11 +11,12 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrLayerListWidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.3.3. It"
+#error "This file was generated using the moc from 4.4.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
+QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_FrLayerListWidget[] = {
 
  // content:
@@ -76,7 +77,7 @@ void *FrLayerListWidget::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrLayerListWidget))
-	return static_cast<void*>(const_cast< FrLayerListWidget*>(this));
+        return static_cast<void*>(const_cast< FrLayerListWidget*>(this));
     return QWidget::qt_metacast(_clname);
 }
 
@@ -151,3 +152,4 @@ void FrLayerListWidget::RoiToolChanged()
 {
     QMetaObject::activate(this, &staticMetaObject, 6, 0);
 }
+QT_END_MOC_NAMESPACE

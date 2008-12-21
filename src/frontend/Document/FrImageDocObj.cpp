@@ -1,6 +1,8 @@
 #include "FrImageDocObj.h"
 #include "FrDocument.h"
+#include "FrMainDocument.h"
 #include "FrLayerDocObj.h"
+#include "FrCommandController.h"
 
 // VTK includes
 #include "vtkImageData.h"
@@ -114,6 +116,19 @@ bool FrImageDocObj::AddTimePointData(RtMRIImage* mriImage){
     return true;
 }
 
+unsigned int FrImageDocObj::GetLastTimePoint(){
+    int result = -1;
+
+    ImageCollection::iterator it, itEnd(m_Images.end());
+    for(it = m_Images.begin(); it != itEnd; ++it){
+        int tp = int((*it)->getDataID().getTimePoint());
+        if(tp > result){
+            result = tp;
+        }
+    }
+    return result;
+}
+
 void FrImageDocObj::ClearAll(){
     ImageCollection::iterator it, itEnd(m_Images.end());
     for(it = m_Images.begin(); it != itEnd; ++it){
@@ -124,5 +139,10 @@ void FrImageDocObj::ClearAll(){
 }
 
 void FrImageDocObj::NotifyAboutNewTimePointData(){
-    // TODO: notification code
+
+    FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
+    cmd->SetAction(FrTimePointCmd::SetLast);
+    cmd->SetCheckLifeMode(true);
+    cmd->Execute();
+    delete cmd;
 }

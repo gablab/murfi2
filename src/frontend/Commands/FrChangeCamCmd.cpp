@@ -81,27 +81,19 @@ bool FrChangeCamCmd::Execute(){
     // bad in case of unknown active view or if ortho view has some problems
     bool result = true;
     
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
-        
-    Views view = viewDO->GetActiveView();
-
-    switch(view){
-    case Views::SliceView:
-        SetupCameraSettings(viewDO->GetSliceViewSettings()->CamSettings);
-        break;
-    case Views::MosaicView:
-        SetupCameraSettings(viewDO->GetMosaicViewSettings()->CamSettings);
-        break;
-    case Views::OrthoView:
-        result = SetupOrthoViewCamSettings();
-        break;
-    default:
-        result = false;
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    switch(viewDO->GetActiveView()){
+        case SliceView:
+            SetupCameraSettings(viewDO->GetSliceViewSettings()->CamSettings);
+            break;
+        case MosaicView:
+            SetupCameraSettings(viewDO->GetMosaicViewSettings()->CamSettings);
+            break;
+        case OrthoView:
+            result = SetupOrthoViewCamSettings();
+            break;
+        default:
+            result = false;
     }
     m_isFocalPoint = m_isPosition = m_isViewUp = m_isScale = m_isXY = false;
     mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
@@ -130,13 +122,7 @@ bool FrChangeCamCmd::SetupOrthoViewCamSettings(){
     if(imgIndex != INVALIDE_IMAGE_NUM){
         // Change info in document
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-
-        FrViewDocObj* viewDO = 0L;
-        FrDocument::DocObjCollection views;
-        doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-        if(views.size() > 0){
-            viewDO = (FrViewDocObj*)views[0];
-        }
+        FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
         FrOrthoViewSettings* settings = viewDO->GetOrthoViewSettings();
         SetupCameraSettings(settings->CamSettings[imgIndex]);

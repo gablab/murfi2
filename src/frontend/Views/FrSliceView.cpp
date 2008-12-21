@@ -133,9 +133,16 @@ void FrSliceView::UpdatePipeline(int point){
     }
 
     // Write text for slice number
+    int timePoint = this->GetMainWindow()->
+        GetMainDocument()->
+        GetCurrentViewObject()->
+        GetTimePoint();
+    if(timePoint < 0) 
+        timePoint = -1;
+
 	char sliceNumText[32] = "";
-    sprintf(sliceNumText, "Slice %d", 
-        params.ViewSettings->SliceNumber);
+    sprintf(sliceNumText, "Slice %d, TP %d", 
+        params.ViewSettings->SliceNumber, timePoint);
 
     m_LayeredImage->SetText(sliceNumText);
 
@@ -148,14 +155,13 @@ bool FrSliceView::InitUpdateParams(FrUpdateParams0& params){
     params.Document = this->GetMainWindow()->GetMainDocument();
 
     // Get view settings
-    FrDocument::DocObjCollection objects;
-    params.Document->GetObjectsByType(objects, FrDocumentObj::ViewObject);
-    
-    if(objects.size() <= 0) return false;
-    params.ViewSettings = ((FrViewDocObj*)objects[0])->GetSliceViewSettings();
+    if(!params.Document->GetCurrentViewObject()) return false;
+    params.ViewSettings = params.Document->
+        GetCurrentViewObject()->GetSliceViewSettings();
 
     // Get layers for update
     unsigned int activeLayerID = params.ViewSettings->ActiveLayerID;
+    FrDocument::DocObjCollection objects;
     params.Document->GetObjectsByType(objects, FrDocumentObj::LayerObject);
 
     params.Layers.clear();
@@ -174,14 +180,16 @@ bool FrSliceView::InitUpdateParams(FrUpdateParams0& params){
 }
 
 void FrSliceView::ReadDocument(FrUpdateParams0& params){
+    FrViewDocObj* vdo = params.Document->GetCurrentViewObject();
+
     m_docReader->SetDocument(params.Document);
     m_docReader->SetMosaic(false);
     m_docReader->SetOrientation(FrDocumentReader::XY);
     m_docReader->SetSlice(params.ViewSettings->SliceNumber);
+    m_docReader->SetTimeSeries(vdo->GetTimeSeries());
 
-    // update 
-    FrUpdateParams0::LayerCollection::iterator it,
-        itEnd(params.Layers.end());
+    // update layers
+    FrUpdateParams0::LayerCollection::iterator it, itEnd(params.Layers.end());
 
     for(it = params.Layers.begin(); it != itEnd; ++it){
         if((*it)->IsRoi()){
@@ -195,7 +203,7 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
             // ID is current Timepoint since we have 
             // just one time series 
             m_docReader->SetTarget(FrDocumentReader::Mri);
-            m_docReader->SetDataID(0);
+            m_docReader->SetDataID(vdo->GetTimePoint());
             m_docReader->Update();
 
             m_LayeredImage->SetImageInput(m_docReader->GetOutput());
@@ -205,18 +213,9 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
 
     // get slice number from doc reader
     int Slice = m_docReader->GetSlice();
-    
-    // Get view settings
-    FrDocument::DocObjCollection objects;
-    params.Document->GetObjectsByType(objects, FrDocumentObj::ViewObject);
-    
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    params.Document->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+      
     // update slice number in View
+    FrViewDocObj* viewDO = params.Document->GetCurrentViewObject(); 
     viewDO->GetSliceViewSettings()->SliceNumber = Slice;
     params.ViewSettings->SliceNumber = Slice;
 }

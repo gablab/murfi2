@@ -54,6 +54,9 @@ public:
     void SetTarget(Targets target);
 
     // Slice management
+    FrGetPropMacro(unsigned int, TimeSeries);
+    void SetTimeSeries(unsigned int ID);
+
     FrGetPropMacro(unsigned int, DataID);
     void SetDataID(unsigned int ID);
 

@@ -26,9 +26,10 @@ class QModelIndex;
 class FrLayerListWidget: public QWidget {
 	Q_OBJECT
 public:
-	FrLayerListWidget(QWidget *parent = 0);
+	FrLayerListWidget(QWidget *parent = 0, FrMainDocument* doc = 0);
 
     // Common actions
+    void Update();
     void AddLayer(FrLayerDocObj* layerDO);
     void RemoveLayers();
     void UpdateRoiList();
@@ -94,7 +95,6 @@ private:
     FrColormapWidget*   m_colormapWidget;
     FrSpinSliderWidget* m_opacityWidget;
     FrROIToolWidget* m_roiToolWidget;
-    FrMainDocument* m_mainDoc;
 
     bool m_signalsBlocked;
 };

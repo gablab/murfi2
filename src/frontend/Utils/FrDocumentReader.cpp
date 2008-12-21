@@ -71,6 +71,13 @@ void FrDocumentReader::SetTarget(Targets target){
     }
 }
 
+void FrDocumentReader::SetTimeSeries(unsigned int ID){
+    if(m_TimeSeries != ID){
+        m_TimeSeries = ID;
+        this->SetOutput(0);
+    }
+}
+
 void FrDocumentReader::SetDataID(unsigned int ID){
     if(m_DataID != ID){
         m_DataID = ID;

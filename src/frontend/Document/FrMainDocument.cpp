@@ -1,8 +1,9 @@
 #include "FrMainDocument.h"
 #include "FrTBCFilter.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrTabSettingsDocObj.h"
+#include "FrAppSettingsDocObj.h"
 #include "FrDataStore.h"
+#include "FrViewDocObj.h"
 
 
 FrMainDocument::FrMainDocument() 
@@ -45,10 +46,6 @@ FrMainDocument::~FrMainDocument(){
     if(m_DataStore) delete m_DataStore;
 }
 
-void FrMainDocument::GetAllImages(std::vector<FrDocumentObj*>& images){
-    this->GetObjectsByType(images, FrDocumentObj::ImageObject);
-}
-
 FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
     // get all tab settings in document
     DocObjCollection tabSets;
@@ -75,4 +72,28 @@ FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
 
 void FrMainDocument::AddDataToStore(RtData *data){
     m_DataStore->AddData(data);
+}
+
+FrViewDocObj* FrMainDocument::GetCurrentViewObject(){
+    // get all view objects
+    DocObjCollection viewObjects;
+    this->GetObjectsByType(viewObjects, FrDocumentObj::ViewObject);
+
+    FrViewDocObj* result = 0;
+    if(viewObjects.size() > 0){
+        result = (FrViewDocObj*)viewObjects[0];
+    }
+    return result;
+}
+
+FrAppSettingsDocObj* FrMainDocument::GetAppSettings(){
+    DocObjCollection settings;
+    this->GetObjectsByType(settings, FrDocumentObj::AppSettings);
+
+    FrAppSettingsDocObj* result = 0;
+    if(settings.size() > 0){
+
+        result = (FrAppSettingsDocObj*)settings[0];
+    }
+    return result;
 }

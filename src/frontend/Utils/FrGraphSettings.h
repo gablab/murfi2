@@ -73,6 +73,17 @@ public:
     virtual GraphTypes GetType(){ return GT_RoiStd; }
 };
 
+// class for points for voxel selection tool
+class FrPoint{
+public:
+    FrPoint(int px, int py, int pz, QColor pcolor){
+        x = px; y = py; z = pz;
+        color = pcolor;
+    }
+public:
+    int x, y, z;
+    QColor color;
+};
 
 // Implementaion of factory method
 inline FrGraphSettings* FrGraphSettings::Create(GraphTypes type){

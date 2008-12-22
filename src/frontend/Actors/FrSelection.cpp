@@ -14,7 +14,11 @@
 #include "vtkPolyDataMapper2D.h"
 #include "vtkSphereSource.h"
 #include "vtkRegularPolygonSource.h"
-
+#include "vtkPixel.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkDataSetMapper.h"
+#include "vtkImageActor.h"
+#include "vtkPNGReader.h"
 
 vtkStandardNewMacro(FrSelection);
 
@@ -22,9 +26,12 @@ vtkStandardNewMacro(FrSelection);
 FrSelection::FrSelection(){
     m_mapper = vtkPolyDataMapper::New();
 	m_actor = vtkActor::New();
+    m_testActor = vtkImageActor::New();
+    m_testActor->SetVisibility(true);
 
+    this->AddPart(m_testActor);
 	this->AddPart(m_actor);
-	this->PickableOff();
+	//this->PickableOff();
 }
 
 FrSelection::~FrSelection(){
@@ -47,6 +54,11 @@ void FrSelection::SetSelectionParams(SelectionParams params){
             break;
         case 3:         // polygon
             DrawPolygon();
+            break;
+        case 4:         // points
+            DrawPoints();
+            break;
+        default:
             break;
     }
 }
@@ -145,6 +157,24 @@ void FrSelection::DrawPolygon(){
     rect->Delete();
     selectRect->Delete();
     m_BorderPts->Delete();
+}
+
+void FrSelection::DrawPoints(){
+    m_actor->SetVisibility(false);
+    double* center = m_actor->GetCenter();
+
+ //   vtkPNGReader* reader = vtkPNGReader::New();
+	//reader->SetFileName("test.PNG");
+ //   reader->SetNumberOfScalarComponents(3);
+	//reader->SetDataScalarTypeToUnsignedChar();
+	//reader->Update();
+
+//    m_testActor->SetInput(reader->GetOutput());
+    m_testActor->SetInput(m_Data);  
+    m_testActor->SetVisibility(true);
+    m_testActor->SetDisplayExtent(m_Data->GetExtent());
+//    m_testActor->SetPosition(0, 0, 0);
+    m_testActor->Modified();    
 }
 
 void FrSelection::HideAll(){

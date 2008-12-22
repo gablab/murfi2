@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrLayerWidget.h'
 **
-** Created: Thu 4. Dec 19:48:14 2008
+** Created: Fri 19. Dec 16:12:14 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -31,6 +31,7 @@ class FrMainController;
 #include "FrCreateROICmd.h"
 #include "FrSetCursorCmd.h"
 #include "FrUserActionCmd.h"
+#include "FrVoxelSelectionCmd.h"
 #include "FrTimePointCmd.h"
 
 // Mask commands

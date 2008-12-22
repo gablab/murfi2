@@ -4,6 +4,7 @@
 #include "FrImageDocObj.h"
 #include "FrRoiDocObj.h"
 #include "FrUtils.h"
+#include "FrPointsDocObj.h"
 
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"

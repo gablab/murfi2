@@ -86,6 +86,7 @@ void FrMainMenu::SetupActions(){
     m_menuTools->addAction(m_actManager->GetManipulatorToolAction());
     m_menuTools->addAction(m_actManager->GetVoxelToolAction());
     m_menuTools->addAction(m_actManager->GetRoiToolAction());
+    m_menuTools->addAction(m_actManager->GetVoxelSelectionToolAction());
 
     // Help
     m_menuHelp->addAction(m_actManager->GetShowHelpAction());

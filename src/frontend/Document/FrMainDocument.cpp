@@ -1,9 +1,8 @@
 #include "FrMainDocument.h"
 #include "FrTBCFilter.h"
 #include "FrTabSettingsDocObj.h"
-#include "FrAppSettingsDocObj.h"
+#include "FrTabSettingsDocObj.h"
 #include "FrDataStore.h"
-#include "FrViewDocObj.h"
 
 
 FrMainDocument::FrMainDocument() 
@@ -13,7 +12,13 @@ FrMainDocument::FrMainDocument()
 
 FrMainDocument::~FrMainDocument(){
     std::vector<FrDocumentObj*> objects;
-    std::vector<FrDocumentObj*>::iterator it, itEnd;
+
+    // Remove ROI objects
+    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+    std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
 
     // Remove tab objects
     this->GetObjectsByType(objects, FrDocumentObj::TabSettings);
@@ -22,14 +27,25 @@ FrMainDocument::~FrMainDocument(){
         this->Remove( (*it) );
     }
 
-    // Remove roi objects
-    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+    // Remove layer objects
+    this->GetObjectsByType(objects, FrDocumentObj::LayerObject);
     itEnd = objects.end();
     for(it = objects.begin(); it != itEnd; ++it){
-        // NOTE: Since this type of objects is not deleted do it manually
-        FrDocumentObj* obj = (*it);
-        this->Remove(obj);
-        delete obj;
+        this->Remove( (*it) );
+    }
+
+    // Remove view objects
+    this->GetObjectsByType(objects, FrDocumentObj::ViewObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
+    // Remove points objects
+    this->GetObjectsByType(objects, FrDocumentObj::PointsObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
     }
 
     // Remove image objects
@@ -42,8 +58,22 @@ FrMainDocument::~FrMainDocument(){
         delete obj;
     }
 
+    // Remove roi objects
+    this->GetObjectsByType(objects, FrDocumentObj::RoiObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        // NOTE: Since this type of objects is not deleted do it manually
+        FrDocumentObj* obj = (*it);
+        this->Remove(obj);
+        delete obj;
+    }
+
     // delete data store
     if(m_DataStore) delete m_DataStore;
+}
+
+void FrMainDocument::GetAllImages(std::vector<FrDocumentObj*>& images){
+    this->GetObjectsByType(images, FrDocumentObj::ImageObject);
 }
 
 FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
@@ -72,28 +102,4 @@ FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
 
 void FrMainDocument::AddDataToStore(RtData *data){
     m_DataStore->AddData(data);
-}
-
-FrViewDocObj* FrMainDocument::GetCurrentViewObject(){
-    // get all view objects
-    DocObjCollection viewObjects;
-    this->GetObjectsByType(viewObjects, FrDocumentObj::ViewObject);
-
-    FrViewDocObj* result = 0;
-    if(viewObjects.size() > 0){
-        result = (FrViewDocObj*)viewObjects[0];
-    }
-    return result;
-}
-
-FrAppSettingsDocObj* FrMainDocument::GetAppSettings(){
-    DocObjCollection settings;
-    this->GetObjectsByType(settings, FrDocumentObj::AppSettings);
-
-    FrAppSettingsDocObj* result = 0;
-    if(settings.size() > 0){
-
-        result = (FrAppSettingsDocObj*)settings[0];
-    }
-    return result;
 }

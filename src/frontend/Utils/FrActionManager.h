@@ -39,6 +39,7 @@ public:
     FrGetPropMacro(QAction*, ManipulatorToolAction);
     FrGetPropMacro(QAction*, VoxelToolAction);
     FrGetPropMacro(QAction*, RoiToolAction);
+    FrGetPropMacro(QAction*, VoxelSelectionToolAction);
     // Help
     FrGetPropMacro(QAction*, ShowHelpAction);
     FrGetPropMacro(QAction*, ShowAboutAction);

@@ -13,7 +13,7 @@
 class FrManageToolCmd : public FrBaseCmd
 {
 public:
-    enum ToolType{ UnknownTool, ManipulationTool, VoxelTool, RoiTool };
+    enum ToolType{ UnknownTool, ManipulationTool, VoxelTool, RoiTool, VoxelSelectionTool };
     enum ToolAction { UnknownAct, NewToolAct, AddToolAct, RemoveToolAct, UpdateAct };
 public:
     // Constructor/destructor

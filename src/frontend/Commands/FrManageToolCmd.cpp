@@ -4,6 +4,7 @@
 #include "FrManipulationTool.h"
 #include "FrVoxelTool.h"
 #include "FrRoiTool.h"
+#include "FrVoxelSelectionTool.h"
 #include "FrActionManager.h"
 
 // Qt stuff
@@ -84,6 +85,9 @@ bool FrManageToolCmd::UpdateCurrentToolAction(){
         case FrManageToolCmd::RoiTool:
             action = am->GetRoiToolAction();
             break;
+        case FrManageToolCmd::VoxelSelectionTool:
+            action = am->GetVoxelSelectionToolAction();
+            break;
         default:
             // do nothing here
             break;
@@ -109,6 +113,9 @@ FrTool* FrManageToolCmd::CreateToolByType(FrManageToolCmd::ToolType toolType){
             break;
         case FrManageToolCmd::RoiTool:
             result = new FrRoiTool();
+            break;
+        case FrManageToolCmd::VoxelSelectionTool:
+            result = new FrVoxelSelectionTool();
             break;
         default:
             // do nothing here

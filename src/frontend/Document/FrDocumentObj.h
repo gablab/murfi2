@@ -12,8 +12,9 @@ public:
     typedef enum _ObjTypes { BaseObject, ImageObject,
                              TabSettings, RoiObject, 
                              GraphObject, GraphTab,
-                             LayerObject, ViewObject, 
-                             AppSettings } ObjTypes;
+                             LayerObject, ViewObject,
+                             PointsObject, AppSettings} ObjTypes;
+
 
 public:
     FrDocumentObj();

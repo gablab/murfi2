@@ -22,6 +22,7 @@ public:
     void UpdateBorder(int winWidth, int winHeight);
     void SetSelection(SelectionParams params);
     void SetSelectionVisibility(bool visible);
+    void SetSelectionData(vtkImageData* data);
 
 private:
 	// Text support

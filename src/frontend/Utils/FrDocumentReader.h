@@ -78,6 +78,7 @@ private:
 
     vtkImageData* GetMriSlice(RtMRIImage* mri); 
     vtkImageData* GetRoiSlice(RtMaskImage* mask);
+    vtkImageData* GetPointsSlice(vtkImageData* data);
     ////vtkImageData* GetActivationSlice();
     template <class T>
     T* GetSliceDataXY(RtDataImage<T>* img, int slice);

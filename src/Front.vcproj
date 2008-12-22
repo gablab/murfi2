@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib qwt.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib qwt.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -497,6 +497,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Tools\FrVoxelSelectionTool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Tools\FrVoxelSelectionTool.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Tools\FrVoxelTool.cpp"
 				>
 			</File>
@@ -586,6 +594,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Document\FrMainDocument.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrPointsDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrPointsDocObj.h"
 				>
 			</File>
 			<File
@@ -1920,6 +1936,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrVoxelInfoCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrVoxelSelectionCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrVoxelSelectionCmd.h"
 				>
 			</File>
 			<Filter

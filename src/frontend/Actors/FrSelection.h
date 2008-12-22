@@ -17,6 +17,9 @@
 
 #include <vector>
 
+class vtkImageData;
+class vtkImageActor;
+
 typedef struct _pos{
     int x, y, z;
 }Pos;
@@ -44,6 +47,7 @@ public:
     //FrSetPropMacro(Type, CurrentType);
     void SetSelectionParams(SelectionParams params);
     FrGetPropMacro(SelectionParams, params);
+    FrSetPropMacro(vtkImageData*, Data);
 
 protected:
 	FrSelection();
@@ -58,11 +62,14 @@ private:
     void DrawRectangle();
     void DrawCircle();
     void DrawPolygon();
+    void DrawPoints();
     void HideAll();
 
 private:
 	vtkActor* m_actor;
+    vtkImageActor* m_testActor;
     vtkPolyDataMapper* m_mapper;
+
 };
 
 #endif

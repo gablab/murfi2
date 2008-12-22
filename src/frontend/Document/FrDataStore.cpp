@@ -2,6 +2,7 @@
 #include "FrMainDocument.h"
 #include "FrImageDocObj.h"
 #include "FrRoiDocObj.h"
+#include "FrPointsDocObj.h"
 
 // Backend includes
 #include "RtDataID.h"
@@ -78,6 +79,19 @@ void FrDataStore::AddImageToDocument(RtData* data){
             imgDO->AddTimePointData(img);
         }
         
+
+        // test
+        // Remove points objects
+        std::vector<FrDocumentObj*> objects;
+        m_Document->GetObjectsByType(objects, FrDocumentObj::PointsObject);
+        std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+        for(it = objects.begin(); it != itEnd; ++it){
+            m_Document->Remove( (*it) );
+        }        
+        
+        // initialize points doc object with new image
+        FrPointsDocObj* pointsDO = new FrPointsDocObj(img);
+        m_Document->Add(pointsDO);
     }
 }
 

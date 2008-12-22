@@ -59,6 +59,7 @@ void FrActionSignalManager::Initialize(){
     CONNECT_ACTION_TRIGGERED(am->GetManipulatorToolAction(), OnManipulatorToolAction());
     CONNECT_ACTION_TRIGGERED(am->GetVoxelToolAction(), OnVoxelToolAction());
     CONNECT_ACTION_TRIGGERED(am->GetRoiToolAction(), OnRoiToolAction());
+    CONNECT_ACTION_TRIGGERED(am->GetVoxelSelectionToolAction(), OnVoxelSelectionToolAction());
     
     // Help
     CONNECT_ACTION_TRIGGERED(am->GetShowHelpAction(), OnShowHelpAction());
@@ -124,6 +125,7 @@ void FrActionSignalManager::Deinitialize(){
     DISCONNECT_ACTION_TRIGGERED(am->GetManipulatorToolAction(), OnManipulatorToolAction());
     DISCONNECT_ACTION_TRIGGERED(am->GetVoxelToolAction(), OnVoxelToolAction());
     DISCONNECT_ACTION_TRIGGERED(am->GetRoiToolAction(), OnRoiToolAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetVoxelSelectionToolAction(), OnVoxelSelectionToolAction());
     
     // Help
     DISCONNECT_ACTION_TRIGGERED(am->GetShowHelpAction(), OnShowHelpAction());
@@ -251,6 +253,10 @@ void FrActionSignalManager::OnVoxelToolAction(){
 
 void FrActionSignalManager::OnRoiToolAction(){
     m_mainWindow->GetMainController()->SetCurrentTool(2);
+}
+
+void FrActionSignalManager::OnVoxelSelectionToolAction(){
+    m_mainWindow->GetMainController()->SetCurrentTool(3);
 }
 
 // Help

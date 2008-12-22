@@ -38,6 +38,7 @@ public slots:
     void OnManipulatorToolAction();
     void OnVoxelToolAction();
     void OnRoiToolAction();
+    void OnVoxelSelectionToolAction();
     // Help
     void OnShowHelpAction();
     void OnShowAboutAction();

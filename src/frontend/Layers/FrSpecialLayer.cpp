@@ -117,6 +117,12 @@ void FrSpecialLayer::SetSelection(SelectionParams params){
     m_Selection->SetSelectionParams(params);
 }
 
+void FrSpecialLayer::SetSelectionData(vtkImageData* data){
+    if (m_Selection && data){
+        m_Selection->SetData(data);
+    }
+}
+
 void FrSpecialLayer::SetSelectionVisibility(bool visible){
     if(m_Selection){
         m_Selection->SetVisibility(visible);

@@ -37,6 +37,7 @@ FrActionManager::~FrActionManager(){
     delete m_ManipulatorToolAction;
     delete m_VoxelToolAction;
     delete m_RoiToolAction;
+    delete m_VoxelSelectionToolAction;
     // Help
     delete m_ShowHelpAction;
     delete m_ShowAboutAction;
@@ -89,6 +90,9 @@ void FrActionManager::Initialize(QObject* parent){
     m_RoiToolAction = new QAction(parent);
     m_RoiToolAction->setObjectName(QString::fromUtf8("m_RoiToolAction"));
     m_RoiToolAction->setCheckable(true);
+    m_VoxelSelectionToolAction = new QAction(parent);
+    m_VoxelSelectionToolAction->setObjectName(QString::fromUtf8("m_VoxelSelectionToolAction"));
+    m_VoxelSelectionToolAction->setCheckable(true);
     // Help
     m_ShowHelpAction = new QAction(parent);
     m_ShowHelpAction->setObjectName(QString::fromUtf8("m_ShowHelpAction"));
@@ -138,6 +142,8 @@ void FrActionManager::Retranslate(){
     m_VoxelToolAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Voxel Tool"));
     m_RoiToolAction->setText(DO_TRANSLATE(TR_CONTEXT, "ROI Tool"));
     m_RoiToolAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "ROI Tool"));
+    m_VoxelSelectionToolAction->setText(DO_TRANSLATE(TR_CONTEXT, "Voxel Selection Tool"));
+    m_VoxelSelectionToolAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Voxel Selection Tool"));
     // Help
     m_ShowHelpAction->setText(DO_TRANSLATE(TR_CONTEXT, "Help"));
     m_ShowHelpAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Help"));

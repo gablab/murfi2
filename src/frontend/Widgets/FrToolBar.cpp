@@ -31,6 +31,7 @@ void FrToolBar::SetupActions(){
     this->addAction(m_actManager->GetManipulatorToolAction());
     this->addAction(m_actManager->GetVoxelToolAction());
     this->addAction(m_actManager->GetRoiToolAction());
+    this->addAction(m_actManager->GetVoxelSelectionToolAction());
     this->addSeparator();
 
     // Help 

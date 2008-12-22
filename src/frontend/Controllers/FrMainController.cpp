@@ -14,6 +14,7 @@
 #include "FrLayerDialog.h"
 #include "FrLayerDocObj.h"
 #include "FrBookmarkWidget.h"
+#include "FrPointsDocObj.h"
 #include "FrAppSettingsDocObj.h"
 #include "FrDataStoreDialog.h"
 
@@ -341,6 +342,8 @@ void FrMainController::SetCurrentTool(int tool){
     case 1: cmd->SetToolType(FrManageToolCmd::VoxelTool);
         break;
     case 2: cmd->SetToolType(FrManageToolCmd::RoiTool);
+        break;
+    case 3: cmd->SetToolType(FrManageToolCmd::VoxelSelectionTool);
         break;
     default:
         // do nothing

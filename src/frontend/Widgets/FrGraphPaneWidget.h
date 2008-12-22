@@ -39,10 +39,17 @@ public:
     // Here all signals
 Q_SIGNALS:
     void TimePointChanged(int timePoint);
+    void LifeModeChanged(bool value);
 
 private Q_SLOTS:
-    void OnPlayTimePoint(int timePoint);
     void OnGraphMarkerPositionChanged(int position);
+
+    // Player processing
+    void OnLifeModeChanged(bool);
+    void OnPlayClicked();
+    void OnPauseClicked();
+    void OnResetClicked();
+    void OnPlayFinished();
 
 private:
     FrPlayThread* m_PlayThread;

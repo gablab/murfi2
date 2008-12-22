@@ -16,7 +16,9 @@
 
 
 FrPlayControlWidget::FrPlayControlWidget(QWidget *parent)
-: QWidget(parent), m_tpPerSecond(DEFAULT_TP_PER_SEC){ 
+    : QWidget(parent), 
+      m_TimePointPerSecond(DEFAULT_TP_PER_SEC),
+      m_State(FrPlayControlWidget::LifeMode){ 
 
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
@@ -50,15 +52,17 @@ FrPlayControlWidget::FrPlayControlWidget(QWidget *parent)
     m_Slower = m_tbPlayback->addAction("Slower");
     m_Faster = m_tbPlayback->addAction("Faster");
 
-    m_lblInfo = new QLabel(QString("%1 TP / sec").arg(m_tpPerSecond), m_tbPlayback);
+    m_lblInfo = new QLabel(QString("%1 TP / sec").
+        arg(m_TimePointPerSecond), 
+        m_tbPlayback);
+
     m_lblInfo->setFrameShape(QFrame::Box);
     m_tbPlayback->addWidget(m_lblInfo);
     
     this->setFixedHeight(this->sizeHint().height());
 
-    // Emulate click 
-    m_LifeMode->setChecked(true);
-    this->OnLifeModeChanged();
+    // HACK: this sets up buttons
+    this->UpdateButtons();
 
     // connect signals
     CONNECT_ACTION_TRIGGERED(m_LifeMode, OnLifeModeChanged());
@@ -69,65 +73,118 @@ FrPlayControlWidget::FrPlayControlWidget(QWidget *parent)
     CONNECT_ACTION_TRIGGERED(m_Faster, OnFasterPressed());
 }
 
-void FrPlayControlWidget::OnLifeModeChanged(){
-    bool notPressed = !m_LifeMode->isChecked();
-    m_Play->setEnabled(notPressed);
-    m_Pause->setEnabled(notPressed);
-    m_Reset->setEnabled(notPressed);
-    m_Faster->setEnabled(notPressed && (m_tpPerSecond < MAX_TP_PER_SEC));
-    m_Slower->setEnabled(notPressed && (m_tpPerSecond > MIN_TP_PER_SEC));
-    m_lblInfo->setEnabled(notPressed);
+void FrPlayControlWidget::SetState(States state){
 
-    if(notPressed){
-        m_Play->setChecked(false);
-        m_Pause->setChecked(false);
+    if(m_State != state){
+
+        m_State = state;
+        this->UpdateButtons();
     }
-    emit LifeModeChanged(!notPressed);
+}
+
+void FrPlayControlWidget::OnLifeModeChanged(){
+    
+    States state = (m_State == LifeMode) ? Normal : LifeMode;
+    this->SetState(state);
+
+    emit LifeModeChanged(state == LifeMode);
 }
     
 void FrPlayControlWidget::OnPlayPressed(){
-    if(m_Pause->isChecked()){
-        m_Pause->setChecked(false);
 
-        emit Play();
-    }
-    else{
-        m_Play->setChecked(true);
-    }
+    this->SetState(Playing);
+    emit Play();
 }
 
 void FrPlayControlWidget::OnPausePressed(){
-    if(m_Play->isChecked()){
-        m_Play->setChecked(false);
-        emit Pause();
-    }
-    else{
-        m_Pause->setChecked(true);
-    }
+
+    this->SetState(Paused);
+    emit Pause();
 }
 
 void FrPlayControlWidget::OnResetPressed(){
-    m_Play->setChecked(false);
-    m_Pause->setChecked(false);
+
+    this->SetState(Normal);
     emit Reset();
 }
 
 void FrPlayControlWidget::OnSlowerPressed(){
 
-    if(m_tpPerSecond > MIN_TP_PER_SEC){
-        m_tpPerSecond--;
+    if(m_TimePointPerSecond > MIN_TP_PER_SEC){
+        
+        m_TimePointPerSecond--;
+        m_lblInfo->setText(QString("%1 TP / sec").arg(m_TimePointPerSecond));
+        m_Slower->setEnabled(m_TimePointPerSecond > MIN_TP_PER_SEC);
+        m_Faster->setEnabled(m_TimePointPerSecond < MAX_TP_PER_SEC);
+
         emit Slowdown();
     }
-    m_Slower->setEnabled(m_tpPerSecond > MIN_TP_PER_SEC);
-    m_Faster->setEnabled(m_tpPerSecond < MAX_TP_PER_SEC);
 }
 
 void FrPlayControlWidget::OnFasterPressed(){
 
-    if(m_tpPerSecond < MAX_TP_PER_SEC){
-        m_tpPerSecond++;
+    if(m_TimePointPerSecond < MAX_TP_PER_SEC){
+        
+        m_TimePointPerSecond++;
+        m_lblInfo->setText(QString("%1 TP / sec").arg(m_TimePointPerSecond));
+        m_Faster->setEnabled(m_TimePointPerSecond < MAX_TP_PER_SEC);
+        m_Slower->setEnabled(m_TimePointPerSecond > MIN_TP_PER_SEC);
+
         emit Speedup();
     }
-    m_Faster->setEnabled(m_tpPerSecond < MAX_TP_PER_SEC);
-    m_Slower->setEnabled(m_tpPerSecond > MIN_TP_PER_SEC);
+}
+
+void FrPlayControlWidget::UpdateButtons(){
+    
+    switch(m_State) {
+        case LifeMode:
+            {
+                // For life mode everithing is off
+                m_Play->setEnabled(false);
+                m_Play->setChecked(false);
+                m_Pause->setEnabled(false);
+                m_Pause->setChecked(false);
+                m_Reset->setEnabled(false);
+                m_Faster->setEnabled(false);
+                m_Slower->setEnabled(false);
+                m_lblInfo->setEnabled(false);
+            }
+            break;
+        case Normal:
+            {   
+                m_Play->setEnabled(true);
+                m_Play->setChecked(false);
+                m_Pause->setEnabled(false);
+                m_Pause->setChecked(false);
+                m_Reset->setEnabled(true);
+                m_Faster->setEnabled(m_TimePointPerSecond < MAX_TP_PER_SEC);
+                m_Slower->setEnabled(m_TimePointPerSecond > MIN_TP_PER_SEC);
+                m_lblInfo->setEnabled(true);
+            }
+            break;
+        case Playing:
+            {
+                m_Play->setEnabled(false);
+                m_Play->setChecked(true);
+                m_Pause->setEnabled(true);
+                m_Pause->setChecked(false);
+                m_Reset->setEnabled(false);
+                m_Faster->setEnabled(false);
+                m_Slower->setEnabled(false);
+                m_lblInfo->setEnabled(true);
+            }
+            break;
+        case Paused:
+            {
+                m_Play->setEnabled(true);
+                m_Play->setChecked(false);
+                m_Pause->setEnabled(false);
+                m_Pause->setChecked(true);
+                m_Reset->setEnabled(true);
+                m_Faster->setEnabled(m_TimePointPerSecond < MAX_TP_PER_SEC);
+                m_Slower->setEnabled(m_TimePointPerSecond > MIN_TP_PER_SEC);
+                m_lblInfo->setEnabled(false);
+            }
+            break;
+    }
 }

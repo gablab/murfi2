@@ -15,30 +15,36 @@ class FrPlayThread : public QThread {
 
 public:
     FrPlayThread(FrQwtPlotWidget* plotWidget)
-        : QThread(), m_PlotWidget(plotWidget){
+        : QThread(), m_PlotWidget(plotWidget),
+          m_MaxTimePoint(1), m_tpPerSecond(1){
     }
     
-    void SetParams(int a){
+    void SetParams(int maxTimePoint, int timePointPerSec){
+        m_MaxTimePoint = maxTimePoint;
+        m_tpPerSecond = timePointPerSec;
     }
 
 protected: 
     virtual void run(){
         if(m_PlotWidget == 0) return;
 
-        unsigned long interval = 0;
+        // In milliseconds
+        unsigned long interval = 1000 / m_tpPerSecond;
 
-        for(int timePoint = 0; timePoint < m_MaxTimePoint; ++timePoint){
+        for(int timePoint = 0; 
+            timePoint < m_MaxTimePoint; 
+            ++timePoint){
 
                 // Setup current time point
                 m_PlotWidget->SetMarkerPosition(timePoint);
-                this->sleep(interval);
-
+                this->msleep(interval);
         }
     }
 
 private:
     FrQwtPlotWidget* m_PlotWidget;
     int m_MaxTimePoint;
+    int m_tpPerSecond;
 };
 
 // Implementation of FrGraphPaneWidget
@@ -70,6 +76,14 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
     // Connect signals
     connect(m_QwtPlotWidget, SIGNAL(markerPositionChange(int)),
         this, SLOT(OnGraphMarkerPositionChanged(int)));
+
+    // bind player widget
+    connect(m_PlayControlWidget, SIGNAL(LifeModeChanged(bool)), 
+            this, SLOT(OnLifeModeChanged(bool)));
+    connect(m_PlayControlWidget, SIGNAL(Play()), this, SLOT(OnPlayClicked()));
+    connect(m_PlayControlWidget, SIGNAL(Pause()), this, SLOT(OnPauseClicked()));
+    connect(m_PlayControlWidget, SIGNAL(Reset()), this, SLOT(OnResetClicked()));
+    connect(m_PlayThread, SIGNAL(finished()), this, SLOT(OnPlayFinished()));
 }
 
 void FrGraphPaneWidget::SetDocument(FrMainDocument* doc){
@@ -106,12 +120,28 @@ void FrGraphPaneWidget::UpdateTimePoint(){
 }
 
 // Slots
-void FrGraphPaneWidget::OnPlayTimePoint(int timePoint){
-
-    m_QwtPlotWidget->SetMarkerPosition(timePoint);
-}
-
 void FrGraphPaneWidget::OnGraphMarkerPositionChanged(int position){
 
     emit TimePointChanged(position);
+}
+
+void FrGraphPaneWidget::OnLifeModeChanged(bool value){
+
+}
+
+void FrGraphPaneWidget::OnPlayClicked(){
+
+}
+
+void FrGraphPaneWidget::OnPauseClicked(){
+
+}
+
+void FrGraphPaneWidget::OnResetClicked(){
+    
+}
+
+void FrGraphPaneWidget::OnPlayFinished(){
+    // TODO: reset player controls
+    m_PlayControlWidget->SetState(FrPlayControlWidget::Normal);
 }

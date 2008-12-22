@@ -1,13 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrPlayControlWidget.h'
 **
-<<<<<<< .mine
-** Created: Mon 22. Dec 18:05:03 2008
+** Created: Mon 22. Dec 19:49:34 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
-=======
-** Created: Fri 19. Dec 16:12:14 2008
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
->>>>>>> .r361
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -28,7 +23,7 @@ static const uint qt_meta_data_FrPlayControlWidget[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   10, // methods
+      14,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -48,6 +43,7 @@ static const uint qt_meta_data_FrPlayControlWidget[] = {
      160,   20,   20,   20, 0x08,
      177,   20,   20,   20, 0x08,
      195,   20,   20,   20, 0x08,
+     213,   20,   20,   20, 0x08,
 
        0        // eod
 };
@@ -59,7 +55,7 @@ static const char qt_meta_stringdata_FrPlayControlWidget[] = {
     "GotoNextStep()\0OnLifeModeChanged()\0"
     "OnPlayPressed()\0OnPausePressed()\0"
     "OnResetPressed()\0OnSlowerPressed()\0"
-    "OnFasterPressed()\0"
+    "OnFasterPressed()\0UpdateButtons()\0"
 };
 
 const QMetaObject FrPlayControlWidget::staticMetaObject = {
@@ -100,8 +96,9 @@ int FrPlayControlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 10: OnResetPressed(); break;
         case 11: OnSlowerPressed(); break;
         case 12: OnFasterPressed(); break;
+        case 13: UpdateButtons(); break;
         }
-        _id -= 13;
+        _id -= 14;
     }
     return _id;
 }

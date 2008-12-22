@@ -16,7 +16,15 @@ class QLabel;
 class FrPlayControlWidget : public QWidget {
 	Q_OBJECT
 public:
+    typedef enum _States { LifeMode, Normal, Playing, Paused } States;
+
+public:
 	FrPlayControlWidget(QWidget *parent = 0);
+
+    // Properties
+    FrGetPropMacro(int, TimePointPerSecond);
+    FrGetPropMacro(States, State);
+    void SetState(States state);
 
 Q_SIGNALS:    
     // add signals here
@@ -36,10 +44,10 @@ private Q_SLOTS:
     void OnResetPressed();
     void OnSlowerPressed();
     void OnFasterPressed();
-    
+     
+    void UpdateButtons();
+        
 private:
-    int m_tpPerSecond;
-
     // Toolbars
     QToolBar* m_tbAddition;
     QToolBar* m_tbPlayback;

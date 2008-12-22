@@ -82,9 +82,8 @@ void FrDataStore::AddImageToDocument(RtData* data){
 
         // test
         // Remove points objects
-        std::vector<FrDocumentObj*> objects;
         m_Document->GetObjectsByType(objects, FrDocumentObj::PointsObject);
-        std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+        itEnd = objects.end();
         for(it = objects.begin(); it != itEnd; ++it){
             m_Document->Remove( (*it) );
         }        

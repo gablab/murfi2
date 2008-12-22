@@ -19,7 +19,7 @@ public:
 public slots:
     // File 
     void OnOpenImageAction();
-    void OnOpenDataStore();
+    void OnOpenDataStoreAction();
     void OnSaveTabsAction();
     void OnLoadTabsAction();
     void OnExitAction();

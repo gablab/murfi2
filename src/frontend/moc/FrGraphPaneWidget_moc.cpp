@@ -80,7 +80,6 @@ int FrGraphPaneWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     }
     return _id;
 }
-<<<<<<< .mine
 
 // SIGNAL 0
 void FrGraphPaneWidget::TimePointChanged(int _t1)
@@ -89,5 +88,3 @@ void FrGraphPaneWidget::TimePointChanged(int _t1)
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_END_MOC_NAMESPACE
-=======
->>>>>>> .r361

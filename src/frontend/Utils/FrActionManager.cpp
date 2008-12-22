@@ -50,7 +50,7 @@ void FrActionManager::Initialize(QObject* parent){
     m_OpenImageAction = new QAction(parent);
     m_OpenImageAction->setObjectName(QString::fromUtf8("m_OpenImageAction"));
     m_OpenDataStoreAction = new QAction(parent);
-    m_OpenDataStoreAction->setObjectName(QString::fromUtf8("m_OpenDataStore"));
+    m_OpenDataStoreAction->setObjectName(QString::fromUtf8("m_OpenDataStoreAction"));
     m_SaveTabsAction = new QAction(parent);
     m_SaveTabsAction->setObjectName(QString::fromUtf8("m_SaveTabsAction"));
     m_LoadTabsAction = new QAction(parent);

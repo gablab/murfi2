@@ -37,7 +37,7 @@ void FrActionSignalManager::Initialize(){
 
     // File 
     CONNECT_ACTION_TRIGGERED(am->GetOpenImageAction(), OnOpenImageAction());
-    CONNECT_ACTION_TRIGGERED(am->GetOpenDataStoreAction(), OnOpenDataStore());
+    CONNECT_ACTION_TRIGGERED(am->GetOpenDataStoreAction(), OnOpenDataStoreAction());
     CONNECT_ACTION_TRIGGERED(am->GetSaveTabsAction(), OnSaveTabsAction());
     CONNECT_ACTION_TRIGGERED(am->GetLoadTabsAction(), OnLoadTabsAction());
     CONNECT_ACTION_TRIGGERED(am->GetExitAction(), OnExitAction());
@@ -103,7 +103,7 @@ void FrActionSignalManager::Deinitialize(){
     
     // File 
     DISCONNECT_ACTION_TRIGGERED(am->GetOpenImageAction(), OnOpenImageAction());
-    DISCONNECT_ACTION_TRIGGERED(am->GetOpenDataStoreAction(), OnOpenDataStore());
+    DISCONNECT_ACTION_TRIGGERED(am->GetOpenDataStoreAction(), OnOpenDataStoreAction());
     DISCONNECT_ACTION_TRIGGERED(am->GetSaveTabsAction(), OnSaveTabsAction());
     DISCONNECT_ACTION_TRIGGERED(am->GetLoadTabsAction(), OnLoadTabsAction());
     DISCONNECT_ACTION_TRIGGERED(am->GetExitAction(), OnExitAction());
@@ -177,7 +177,7 @@ void FrActionSignalManager::OnOpenImageAction(){
     }
 }
 
-void FrActionSignalManager::OnOpenDataStore(){
+void FrActionSignalManager::OnOpenDataStoreAction(){
     m_mainWindow->GetMainController()->OpenDataStore();
 }
 

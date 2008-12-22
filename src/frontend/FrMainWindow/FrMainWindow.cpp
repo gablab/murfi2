@@ -48,8 +48,11 @@ FrMainWindow::~FrMainWindow(){
 void FrMainWindow::SetMainDocument(FrMainDocument* document){
     if(document != m_MainDocument){
         m_MainDocument = document;
-        m_LayerListWidget->SetMainDoc(document);
+        m_LayerListWidget->SetDocument(document);
         m_LayerListWidget->Update();
+
+        m_GraphPaneWidget->SetDocument(document);
+        m_GraphPaneWidget->Update();
     }
 }
 void FrMainWindow::SetupUi(QMainWindow* mainWindow){

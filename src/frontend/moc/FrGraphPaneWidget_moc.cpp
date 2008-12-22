@@ -1,8 +1,13 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphPaneWidget.h'
 **
+<<<<<<< .mine
+** Created: Mon 22. Dec 17:50:11 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
+=======
 ** Created: Fri 19. Dec 16:12:14 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
+>>>>>>> .r361
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -22,15 +27,24 @@ static const uint qt_meta_data_FrGraphPaneWidget[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       3,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
+
+ // signals: signature, parameters, type, tag, flags
+      29,   19,   18,   18, 0x05,
+
+ // slots: signature, parameters, type, tag, flags
+      51,   19,   18,   18, 0x08,
+      81,   72,   18,   18, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrGraphPaneWidget[] = {
-    "FrGraphPaneWidget\0"
+    "FrGraphPaneWidget\0\0timePoint\0"
+    "TimePointChanged(int)\0OnPlayTimePoint(int)\0"
+    "position\0OnGraphMarkerPositionChanged(int)\0"
 };
 
 const QMetaObject FrGraphPaneWidget::staticMetaObject = {
@@ -56,5 +70,24 @@ int FrGraphPaneWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: TimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 1: OnPlayTimePoint((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 2: OnGraphMarkerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        }
+        _id -= 3;
+    }
     return _id;
 }
+<<<<<<< .mine
+
+// SIGNAL 0
+void FrGraphPaneWidget::TimePointChanged(int _t1)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+QT_END_MOC_NAMESPACE
+=======
+>>>>>>> .r361

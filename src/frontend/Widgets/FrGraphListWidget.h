@@ -29,9 +29,10 @@ public:
     
     bool RemoveGraphWidget(int id, bool doDelete = false);
     bool RemoveGraphWidget(FrGraphWidget* widget, bool doDelete = false);
+    void RemoveAll();
 
     FrGraphWidget* GetGraphWidget(int id);
-    
+        
     // Here all signals
 Q_SIGNALS:
     void GraphVisibilityChanged(int id);

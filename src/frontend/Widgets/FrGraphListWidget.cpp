@@ -32,12 +32,6 @@ FrGraphListWidget::FrGraphListWidget(QWidget* parent)
 #else
     m_layout->setMargin(0);
 #endif
-
-    // NOTE: for testing 
-    QColor colors[] = { QColor(255, 0, 0), QColor(0, 255, 0), QColor(0, 0, 255) };
-    for(int i=0; i < 3; ++i){
-        this->AddGraphWidget(i, QString("Graph %1").arg(i), colors[i]);
-    }
 }
 
 void FrGraphListWidget::AddGraphWidget(FrGraphWidget* widget){
@@ -70,7 +64,7 @@ bool FrGraphListWidget::RemoveGraphWidget(FrGraphWidget* widget, bool doDelete){
 
     if(widget->parent() == m_centralWidget){
         m_layout->removeWidget(widget);
-        m_centralWidget->setParent(0);
+        widget->setParent(0);
         disconnect(widget, SIGNAL(VisibilityChanged(int)), 
                    this, SLOT(OnGraphVisibilityChanged(int)));
 
@@ -81,6 +75,22 @@ bool FrGraphListWidget::RemoveGraphWidget(FrGraphWidget* widget, bool doDelete){
     }
 
     return result;
+}
+
+void FrGraphListWidget::RemoveAll(){
+    
+    QObjectList& widgets = 
+        const_cast<QObjectList&>(
+        m_centralWidget->children());
+
+    QObjectList::iterator it, itEnd(widgets.end());
+    for(it = widgets.begin(); it != itEnd; ++it){
+
+        FrGraphWidget* wgt = qobject_cast<FrGraphWidget*>((*it));
+        if (wgt == 0) continue;
+
+        this->RemoveGraphWidget(wgt, true);
+    }
 }
 
 FrGraphWidget* FrGraphListWidget::GetGraphWidget(int id){

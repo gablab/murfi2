@@ -7,11 +7,17 @@
 #include "Qt/qlabel.h"
 
 // defines
+#define DEFAULT_TP_PER_SEC 1
+#define MAX_TP_PER_SEC 25
+#define MIN_TP_PER_SEC 1
+
 #define CONNECT_ACTION_TRIGGERED(action, slot)\
     connect(action,SIGNAL(triggered()),this,SLOT(slot))
 
+
 FrPlayControlWidget::FrPlayControlWidget(QWidget *parent)
-: QWidget(parent){    
+: QWidget(parent), m_tpPerSecond(DEFAULT_TP_PER_SEC){ 
+
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     // Create toolbars
@@ -44,7 +50,7 @@ FrPlayControlWidget::FrPlayControlWidget(QWidget *parent)
     m_Slower = m_tbPlayback->addAction("Slower");
     m_Faster = m_tbPlayback->addAction("Faster");
 
-    m_lblInfo = new QLabel(QString("1 TP in 2 sec"), m_tbPlayback);
+    m_lblInfo = new QLabel(QString("%1 TP / sec").arg(m_tpPerSecond), m_tbPlayback);
     m_lblInfo->setFrameShape(QFrame::Box);
     m_tbPlayback->addWidget(m_lblInfo);
     
@@ -68,8 +74,8 @@ void FrPlayControlWidget::OnLifeModeChanged(){
     m_Play->setEnabled(notPressed);
     m_Pause->setEnabled(notPressed);
     m_Reset->setEnabled(notPressed);
-    m_Faster->setEnabled(notPressed);
-    m_Slower->setEnabled(notPressed);
+    m_Faster->setEnabled(notPressed && (m_tpPerSecond < MAX_TP_PER_SEC));
+    m_Slower->setEnabled(notPressed && (m_tpPerSecond > MIN_TP_PER_SEC));
     m_lblInfo->setEnabled(notPressed);
 
     if(notPressed){
@@ -82,6 +88,7 @@ void FrPlayControlWidget::OnLifeModeChanged(){
 void FrPlayControlWidget::OnPlayPressed(){
     if(m_Pause->isChecked()){
         m_Pause->setChecked(false);
+
         emit Play();
     }
     else{
@@ -106,9 +113,21 @@ void FrPlayControlWidget::OnResetPressed(){
 }
 
 void FrPlayControlWidget::OnSlowerPressed(){
-    emit Slowdown();
+
+    if(m_tpPerSecond > MIN_TP_PER_SEC){
+        m_tpPerSecond--;
+        emit Slowdown();
+    }
+    m_Slower->setEnabled(m_tpPerSecond > MIN_TP_PER_SEC);
+    m_Faster->setEnabled(m_tpPerSecond < MAX_TP_PER_SEC);
 }
 
 void FrPlayControlWidget::OnFasterPressed(){
-    emit Speedup();
+
+    if(m_tpPerSecond < MAX_TP_PER_SEC){
+        m_tpPerSecond++;
+        emit Speedup();
+    }
+    m_Faster->setEnabled(m_tpPerSecond < MAX_TP_PER_SEC);
+    m_Slower->setEnabled(m_tpPerSecond > MIN_TP_PER_SEC);
 }

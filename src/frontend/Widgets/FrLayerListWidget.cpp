@@ -27,7 +27,7 @@
 #define INSERT_ROW_NUM 0
 
 FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
-: QWidget(parent), m_MainDoc(doc), m_signalsBlocked(false) {    
+: QWidget(parent), m_Document(doc), m_signalsBlocked(false) {    
 
     // Create table widget
     m_layerTable = new QTableWidget(this);
@@ -338,7 +338,7 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
 FrLayerDocObj* FrLayerListWidget::GetLayerDocObjByID(int id){
     FrLayerDocObj* layerDO = 0L;
     FrDocument::DocObjCollection layers;
-    m_MainDoc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+    m_Document->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
 
     if(layers.size() > 0){
         for (int i = 0; i < layers.size(); i++){
@@ -373,17 +373,17 @@ int FrLayerListWidget::GetOpacity(){
 void FrLayerListWidget::Update(){
     // Clear
     this->RemoveLayers();
-    if(!m_MainDoc) return;
+    if(!m_Document) return;
 
     // Get selected layer ID 
-    FrViewDocObj* viewDO = m_MainDoc->GetCurrentViewObject();
+    FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
     if(viewDO == 0) return;
 
     int layerID = viewDO->GetActiveLayerID();
     
     // Get all layers
     std::vector<FrDocumentObj*> layers;
-    m_MainDoc->GetObjectsByType(layers, FrDocumentObj::LayerObject);
+    m_Document->GetObjectsByType(layers, FrDocumentObj::LayerObject);
     if(layers.size() <= 0) return;
 
     this->BlockSignals(true);

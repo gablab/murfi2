@@ -27,6 +27,8 @@ Q_SIGNALS:
     void Speedup();
     void Slowdown();
 
+    void GotoNextStep();
+
 private Q_SLOTS:
     void OnLifeModeChanged();
     void OnPlayPressed();
@@ -34,8 +36,10 @@ private Q_SLOTS:
     void OnResetPressed();
     void OnSlowerPressed();
     void OnFasterPressed();
-
+    
 private:
+    int m_tpPerSecond;
+
     // Toolbars
     QToolBar* m_tbAddition;
     QToolBar* m_tbPlayback;
@@ -49,7 +53,7 @@ private:
     QAction* m_Faster;
     QAction* m_Slower;
 
-    // Additional toolbar Actions
+    // Additional toolbar Actions...
 
 };
 

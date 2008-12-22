@@ -4,12 +4,8 @@
 #define FR_QWTPLOT_WIDGET
 
 // Forward declarations
-class FrSpinSliderWidget;
-class QComboBox;
-class QHBoxLayout;
-class QGridLayout;
-class QGroupBox;
-class QToolBox;
+class QString;
+class QColor;
 
 // Includes 
 #include "FrMacro.h"
@@ -19,10 +15,11 @@ class QToolBox;
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
 
-#include <vector>
+#include <map>
 
 // forward declarations
 class QwtPlotMarker;
+class QwtPlotGrid;
 
 
 class FrQwtPlotWidget : public QwtPlot {
@@ -30,31 +27,32 @@ class FrQwtPlotWidget : public QwtPlot {
 public:
 	FrQwtPlotWidget(QWidget *parent = 0);
     ~FrQwtPlotWidget();
-
-    void AddGraph();                // FrGraph
+    
+    void AddGraph(int id, QString& name, QColor& color);
     void RemoveGraph(int id);
-    void SetData(int id);
-    void SetVisibility(int id, bool visible);
-
     void RemoveAll();
 
-    // Properties
-    
-    
+    void SetData(int id, double data[], int dataSize);
+    void SetVisibility(int id, bool visible);
+    bool SetMarkerPosition(int timePoint);
+        
     // Here all signals
 signals:
     void pointClicked(QPointF p);
+    void markerPositionChange(int position);
         
 private:
 
 private Q_SLOTS:
-    void test(const QwtDoublePoint& point);
-    void test2(double x, double y);
+    void onPointClicked(const QwtDoublePoint& point);
 
 private:
-    std::vector<QwtPlotCurve*> m_Curves;    
-    QwtPlotMarker* m_PlotMarker;
+    typedef std::map<int, QwtPlotCurve*> CurvesMap;
+    CurvesMap m_Curves;
 
+    QwtPlotGrid* m_Grid;
+    QwtPlotMarker* m_PlotMarker;
+    
 };
 
 #endif

@@ -53,7 +53,7 @@ public:
         return m_roiToolWidget;
     }
 
-    FrSetPropMacro(FrMainDocument*, MainDoc);
+    FrSetPropMacro(FrMainDocument*, Document);
 
 signals:
     void NewLayer();

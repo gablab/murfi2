@@ -1,4 +1,5 @@
 #include "FrQwtPlotWidget.h"
+#include "FrMainDocument.h"
 
 // Qt stuff
 #include "Qt/qtoolbox.h"
@@ -14,27 +15,21 @@
 
 
 FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent) 
-: QwtPlot(parent){
+: QwtPlot(parent){  
+    // Setup this properties
     //this->setCanvasBackground(Qt::black);
-
-    m_Curves.clear();
-
-    // add curves
-    QwtPlotCurve *curve1 = new QwtPlotCurve("Curve 1");
-    QwtPlotCurve *curve2 = new QwtPlotCurve("Curve 2");
-    
+    //this->setAxisTitle(QwtPlot::xBottom, QString("Time Points"));
+    QFont font= this->axisFont(QwtPlot::xBottom);
+    font.setPointSize(8);
+    this->setAxisFont(QwtPlot::xBottom, font);
+    this->setAxisScale(QwtPlot::xBottom, 0.0, 0.0, 1.0);
+        
     // create grid lines for plot
-    QwtPlotGrid* grid = new QwtPlotGrid();
-    //QwtScaleDiv xdiv;
-    //xdiv.setInterval(0, 1000);
-    //QwtScaleDiv ydiv;
-    //ydiv.setInterval(0, 1000);
+    m_Grid = new QwtPlotGrid();
+    m_Grid->enableY(false);
+    m_Grid->setPen(QPen(Qt::gray));
+    m_Grid->attach(this);
     
-    //grid->setXDiv(xdiv);
-    //grid->setYDiv(ydiv);
-    grid->setPen(QPen(Qt::gray));
-    grid->attach(this);
-
     // marker
     m_PlotMarker = new QwtPlotMarker();
     m_PlotMarker->setValue(0.0, 0.0);
@@ -43,67 +38,42 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     m_PlotMarker->setLinePen(QPen(Qt::black, 0, Qt::SolidLine));
     m_PlotMarker->attach(this);
 
-    double x[100], y1[100], y2[100];        // x and y values
-    for (int i = 0; i<100; i++){
-        x[i] = i;
-        y1[i] = x[i]*2;
-        y2[i] = -x[i]*3;
-    }
-
-    // copy the data into the curves
-    curve1->setData(x, y1, 100);
-    curve2->setData(x, y2, 100);
-
-    curve1->setPen(QColor(Qt::red));
-    curve2->setPen(QColor(Qt::green));
-
-    curve1->attach(this);
-    curve2->attach(this);
-
-    // finally, refresh the plot
-    this->replot();
-
-    // test
     QwtPlotPicker *plotPicker = new QwtPlotPicker(this->canvas());
     plotPicker->setTrackerMode(QwtPicker::AlwaysOn);
-    //plotPicker->setRubberBand(QwtPicker::VLineRubberBand);
-    //plotPicker->setRubberBandPen(QPen(Qt::red));
+    plotPicker->setSelectionFlags(
+        QwtPicker::PointSelection | 
+        QwtPicker::ClickSelection);
 
     // connect signals and slots
-    //connect(picker, SIGNAL(selected(const QwtPolygon &)), this, SLOT(test(const QwtPolygon &)));
-    connect(plotPicker, SIGNAL(selected(const QwtDoublePoint& )), this, SLOT(test(const QwtDoublePoint& )));
-
-    // emit the position of clicks on widget
-//    plotPicker->setSelectionFlags(QwtPicker::VLineRubberBand & QwtPicker::PointSelection | QwtPicker::ClickSelection);
-    plotPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::ClickSelection);
-
-//    ScalePicker* scalePicker = new ScalePicker(this);
-  //  connect(scalePicker, SIGNAL(clicked(double, double)), this, SLOT(test2(double, double)));
+    connect(plotPicker, 
+        SIGNAL(selected(const QwtDoublePoint& )), 
+        this, SLOT(onPointClicked(const QwtDoublePoint& )));
 }
 
 FrQwtPlotWidget::~FrQwtPlotWidget(){
     
 }
 
-void FrQwtPlotWidget::AddGraph(){
-    // QString name = graph.getName();
-    // graph.getData(double* x, double* y);
-    // QColor color = graph.getColor();
-    QString name = "Curve 1";
-    QColor color = QColor(100, 100, 0);
-
-    QwtPlotCurve *curve = new QwtPlotCurve(name);
-    m_Curves.push_back(curve);
+void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
+    // Check if already added
+    if(m_Curves.find(id) != m_Curves.end()) return;
     
+    QwtPlotCurve *curve = new QwtPlotCurve(name);
+    m_Curves[id] = curve;
+    
+    // TODO: delete after testing
     // test -----------------------------
-    double x[100], y[100];        // x and y values
-    for (int i = 0; i<100; i++){
-        x[i] = i;
-        y[i] = x[i]*2;
+    int dataSize = 9;
+    double* data = new double[dataSize];
+    srand(31415 + id);
+    for (int i = 0; i < dataSize; i++){
+
+        data[i] = 1.0 * (rand() % 255);
     }
+    this->SetData(id, data, dataSize);
+    delete[] data;
     // ---- test ------------------
 
-    curve->setData(x, y, 100);
     curve->setPen(color);
     curve->attach(this);    
     
@@ -112,64 +82,112 @@ void FrQwtPlotWidget::AddGraph(){
 }
 
 void FrQwtPlotWidget::RemoveGraph(int id){
-    QwtPlotCurve* curve = m_Curves[id];
-    curve->detach();
+    // Check if exists
+    CurvesMap::iterator it = m_Curves.find(id);
+    if(it == m_Curves.end()) return;
 
-    // find appropriate object and remove it
-//    std::vector<QwtPlotCurve*>::iterator it;
-//    it = std::find(m_Curves.begin(), m_Curves.end(), curve);
+    it->second->detach();
+    delete it->second;
+    m_Curves.erase(it);
 
-//    m_Curves.erase(it);
+    this->setAxisScale(
+        QwtPlot::xBottom, 
+        0.0, 0.0, 1.0);
 
     // refresh the plot
     this->replot();
 }
 
-void FrQwtPlotWidget::SetData(int id){
-    // graph.getData(double* x, double* y);
-    // get specified curve
-    QwtPlotCurve *curve = m_Curves[id];
+void FrQwtPlotWidget::RemoveAll(){
+    // clear all curves
+    CurvesMap::iterator it, itEnd(m_Curves.end());
+    for(it = m_Curves.begin(); it != itEnd; ++it){
 
-    // test -----------------------------
-    double x[100], y[100];        // x and y values
-    for (int i = 0; i<100; i++){
-        x[i] = i;
-        y[i] = x[i]*2;
+        it->second->detach();
+        delete it->second;
     }
-    // ---- test ------------------
+    
+    // Clear all curves and update scale of x axis
+    m_Curves.clear();
+    this->setAxisScale(
+        QwtPlot::xBottom, 
+        0.0, 0.0, 1.0);
 
-    curve->setData(x, y, 100);
+    // refresh the plot
+    this->replot();
+}
 
+
+void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
+    // check
+    CurvesMap::iterator it = m_Curves.find(id);
+    if(it == m_Curves.end()) return;
+
+    // Init x values
+    double* xValues = new double[dataSize];
+    for (int i = 0; i < dataSize; i++){
+
+        xValues[i] = double(i);
+    }
+    it->second->setData(xValues, data, dataSize);
+    delete[] xValues;
+
+    // Update axis
+    double maxTimePoint = double(dataSize - 1);
+    if(!this->axisScaleDiv(QwtPlot::xBottom)->contains(maxTimePoint)){
+        this->setAxisScale(QwtPlot::xBottom, 0.0, maxTimePoint, 1.0);
+    }
+    
     // refresh the plot
     this->replot();
 }
 
 void FrQwtPlotWidget::SetVisibility(int id, bool visible){
     // get specified curve
-    QwtPlotCurve *curve = m_Curves[id];
-    curve->setVisible(visible);
+    CurvesMap::iterator it = m_Curves.find(id);
+    if(it == m_Curves.end()) return;
 
-    // refresh the plot
-    this->replot();             // not sure we need this
+    it->second->setVisible(visible);
+
+    // not sure we need this
+    this->replot();
 }
 
-void FrQwtPlotWidget::test(const QwtDoublePoint& point){
-//    QString s;
-//    s = QString::number(point.x()) + ", " + QString::number(point.y());
+void FrQwtPlotWidget::onPointClicked(const QwtDoublePoint& point){
+    // Check
+    if (!this->axisScaleDiv(
+        QwtPlot::xBottom)->
+        contains(point.x())) return;
 
-//    QToolTip::showText(QPoint(0, 0), "test", this);
-    m_PlotMarker->setValue(point);
+    // have to move current time point marker
+    double x = point.x();
+    double floorValue = floor(x);
+    double ceilValue = floorValue + 1.0;
+    x = (abs(x - floorValue) < 0.5) ? floorValue : ceilValue;
+
+    if(m_PlotMarker->value().x() == x){
+
+        x = ((abs(point.x()) - abs(x)) > 0) ? ceilValue : floorValue;
+    }
+    this->SetMarkerPosition(int(x));
     
     // refresh the plot
     this->replot();
-
     emit pointClicked(point);
 }
 
-void FrQwtPlotWidget::test2(double x, double y){
-    int g = 5;
-}
+bool FrQwtPlotWidget::SetMarkerPosition(int timePoint){
 
-void FrQwtPlotWidget::RemoveAll(){
-    // TODO: clear all curves
+    double x = double(timePoint);
+    double y = 0.0;
+
+    // Check
+    if (!this->axisScaleDiv(
+        QwtPlot::xBottom)->
+        contains(x)) return false;
+
+    m_PlotMarker->setValue(x, y);
+    emit markerPositionChange(int(x));
+
+    return true;
 }

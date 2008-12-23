@@ -26,7 +26,7 @@ class RtMaskImage;
 class FrDocumentReader : public vtkObject {
 public:
     typedef enum _Targets {
-        Mri, Roi, Activation
+        Mri, Roi, Activation, Points
     } Targets;
 
     typedef enum _Orientaion { 
@@ -75,6 +75,7 @@ private:
     vtkImageData* ReadMri(); 
     vtkImageData* ReadRoi();
     vtkImageData* ReadActivation();
+    vtkImageData* ReadPoints();
 
     vtkImageData* GetMriSlice(RtMRIImage* mri); 
     vtkImageData* GetRoiSlice(RtMaskImage* mask);

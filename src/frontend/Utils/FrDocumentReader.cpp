@@ -46,6 +46,9 @@ void FrDocumentReader::Update(){
         case Activation:
             result = this->ReadActivation();
             break;
+        case Points:
+            result = this->ReadPoints();
+            break;
     }
 
     this->SetOutput(result);
@@ -163,6 +166,35 @@ vtkImageData* FrDocumentReader::ReadRoi(){
 vtkImageData* FrDocumentReader::ReadActivation(){
     // TODO: implement
     // Not supported for a while
+    return 0L;
+}
+
+vtkImageData* FrDocumentReader::ReadPoints(){
+    vtkImageData* result = 0L;
+
+    FrPointsDocObj* pointsDO = 0L;
+    FrDocument::DocObjCollection pointObjects;
+    m_Document->GetObjectsByType(pointObjects, FrDocumentObj::PointsObject);    
+    
+    if(pointObjects.size() > 0){
+        pointsDO = (FrPointsDocObj*)pointObjects[0];
+    
+        // TODO: add support for mosaic view
+        switch(m_Orientation){
+            case XY:
+                result = pointsDO->GetPointsXY(m_Slice);
+                break;
+            case XZ:
+                result = pointsDO->GetPointsXZ(m_Slice);
+                break;
+            case YZ:
+                result = pointsDO->GetPointsYZ(m_Slice);
+                break;
+        }
+
+        return result;
+    }
+    
     return 0L;
 }
 

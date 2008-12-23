@@ -31,12 +31,13 @@ FrSelection::FrSelection(){
 
     this->AddPart(m_testActor);
 	this->AddPart(m_actor);
-	//this->PickableOff();
+	this->PickableOff();
 }
 
 FrSelection::~FrSelection(){
 	if (m_actor) m_actor->Delete();
     if (m_mapper) m_mapper->Delete();
+    if (m_testActor) m_testActor->Delete();
 }
 
 void FrSelection::SetSelectionParams(SelectionParams params){
@@ -160,21 +161,15 @@ void FrSelection::DrawPolygon(){
 }
 
 void FrSelection::DrawPoints(){
-    m_actor->SetVisibility(false);
-    double* center = m_actor->GetCenter();
+    if (m_Data){
+        m_actor->SetVisibility(false);
+        double* center = m_actor->GetCenter();
 
- //   vtkPNGReader* reader = vtkPNGReader::New();
-	//reader->SetFileName("test.PNG");
- //   reader->SetNumberOfScalarComponents(3);
-	//reader->SetDataScalarTypeToUnsignedChar();
-	//reader->Update();
-
-//    m_testActor->SetInput(reader->GetOutput());
-    m_testActor->SetInput(m_Data);  
-    m_testActor->SetVisibility(true);
-    m_testActor->SetDisplayExtent(m_Data->GetExtent());
-//    m_testActor->SetPosition(0, 0, 0);
-    m_testActor->Modified();    
+        m_testActor->SetInput(m_Data);  
+        m_testActor->SetVisibility(true);
+        m_testActor->SetDisplayExtent(m_Data->GetExtent());
+        m_testActor->Modified();    
+    }
 }
 
 void FrSelection::HideAll(){

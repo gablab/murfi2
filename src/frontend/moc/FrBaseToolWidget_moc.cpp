@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrBaseToolWidget.h'
 **
-** Created: Fri 19. Dec 16:12:15 2008
+** Created: Mon 22. Dec 18:52:45 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

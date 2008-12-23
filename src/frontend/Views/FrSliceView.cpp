@@ -213,11 +213,24 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
 
     // get slice number from doc reader
     int Slice = m_docReader->GetSlice();
-      
+    
     // update slice number in View
     FrViewDocObj* viewDO = params.Document->GetCurrentViewObject(); 
     viewDO->GetSliceViewSettings()->SliceNumber = Slice;
     params.ViewSettings->SliceNumber = Slice;
+
+    // set input to special layer here
+    m_docReader->SetTarget(FrDocumentReader::Points);
+    m_docReader->Update();
+
+    // set params
+    SelectionParams Params;
+    Params.type = 4;
+
+    FrSpecialLayer* sl = m_LayeredImage->GetSpecialLayer();
+    sl->SetSelectionData(m_docReader->GetOutput());
+    sl->SetSelection(Params);
+    sl->SetSelectionVisibility(true);
 }
 
 void FrSliceView::UpdateColormap(FrUpdateParams0& params){

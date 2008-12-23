@@ -19,9 +19,9 @@
 #include "vtkCoordinate.h"
 #include "vtkRenderer.h"
 
-
 //Some defines
 #define INVALIDE_RENDERER_NUM -1
+#define ALL_ITEMS_COUNT 5
 
 
 FrVoxelSelectionCmd::FrVoxelSelectionCmd()
@@ -132,29 +132,17 @@ bool FrVoxelSelectionCmd::AddPoint(){
 
     GetRealImagePosition(viewDO, pImageData, Index, imgNumber);
 
-    // get Points doc obj and insert point then update view
+    // get points doc obj, insert point and update view
     FrPointsDocObj* pointsDO = 0L;
     FrDocument::DocObjCollection pointObjects;
     doc->GetObjectsByType(pointObjects, FrDocumentObj::PointsObject);    
+    
     if(pointObjects.size() > 0){
         pointsDO = (FrPointsDocObj*)pointObjects[0];
         FrPoint* point = new FrPoint(Index[0], Index[1], Index[2], QColor(0, 255, 0));
         pointsDO->AddPoint(point);
 
-        vtkImageData* result = 0;
-        result = pointsDO->GetPointsXY(0);      // test!!
-
-        // set params
-        SelectionParams params;
-        params.type = 4;
-
-        lim->GetSpecialLayer()->SetSelectionData(result);
-        lim->GetSpecialLayer()->SetSelection(params);
-        lim->GetSpecialLayer()->SetSelectionVisibility(true);
-    
-        FrMainWindow* mv = this->GetMainController()->GetMainView();
-        mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
-        //FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_SETCAM);
+        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
     }
     else
         return false;

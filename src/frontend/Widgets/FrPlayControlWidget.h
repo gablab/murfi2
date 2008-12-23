@@ -16,19 +16,21 @@ class QLabel;
 class FrPlayControlWidget : public QWidget {
 	Q_OBJECT
 public:
-    typedef enum _States { LifeMode, Normal, Playing, Paused } States;
+    typedef enum _States { LiveMode, Normal, Playing, Paused } States;
 
 public:
 	FrPlayControlWidget(QWidget *parent = 0);
 
+    void SetAdditionalInfo(QString& text);
+
     // Properties
     FrGetPropMacro(int, TimePointPerSecond);
     FrGetPropMacro(States, State);
-    void SetState(States state);
+    bool SetState(States state);
 
 Q_SIGNALS:    
     // add signals here
-    void LifeModeChanged(bool isOn);
+    void LiveModeChanged(bool isOn);
     void Play();
     void Pause();
     void Reset();
@@ -38,7 +40,7 @@ Q_SIGNALS:
     void GotoNextStep();
 
 private Q_SLOTS:
-    void OnLifeModeChanged();
+    void OnLiveModeChanged();
     void OnPlayPressed();
     void OnPausePressed();
     void OnResetPressed();
@@ -52,9 +54,10 @@ private:
     QToolBar* m_tbAddition;
     QToolBar* m_tbPlayback;
     QLabel* m_lblInfo;
+    QLabel* m_lblAdditional;
 
     // Play toolbar actions
-    QAction* m_LifeMode;
+    QAction* m_LiveMode;
     QAction* m_Play;
     QAction* m_Pause;
     QAction* m_Reset;

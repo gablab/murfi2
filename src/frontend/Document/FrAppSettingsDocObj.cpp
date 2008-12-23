@@ -1,9 +1,9 @@
 #include "FrAppSettingsDocObj.h"
 
-#define DEFAULT_LIFE_MODE true
+#define DEFAULT_LIVE_MODE true
 
 FrAppSettingsDocObj::FrAppSettingsDocObj()
-: m_LifeMode(DEFAULT_LIFE_MODE){
+: m_LiveMode(DEFAULT_LIVE_MODE){
 
 }
 

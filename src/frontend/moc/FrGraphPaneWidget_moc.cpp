@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphPaneWidget.h'
 **
-** Created: Mon 22. Dec 19:12:43 2008
+** Created: Tue 23. Dec 02:19:40 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -45,9 +45,9 @@ static const uint qt_meta_data_FrGraphPaneWidget[] = {
 static const char qt_meta_stringdata_FrGraphPaneWidget[] = {
     "FrGraphPaneWidget\0\0timePoint\0"
     "TimePointChanged(int)\0value\0"
-    "LifeModeChanged(bool)\0position\0"
+    "LiveModeChanged(bool)\0position\0"
     "OnGraphMarkerPositionChanged(int)\0"
-    "OnLifeModeChanged(bool)\0OnPlayClicked()\0"
+    "OnLiveModeChanged(bool)\0OnPlayClicked()\0"
     "OnPauseClicked()\0OnResetClicked()\0"
     "OnPlayFinished()\0"
 };
@@ -78,9 +78,9 @@ int FrGraphPaneWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: TimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 1: LifeModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 1: LiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 2: OnGraphMarkerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 3: OnLifeModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 3: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 4: OnPlayClicked(); break;
         case 5: OnPauseClicked(); break;
         case 6: OnResetClicked(); break;
@@ -99,7 +99,7 @@ void FrGraphPaneWidget::TimePointChanged(int _t1)
 }
 
 // SIGNAL 1
-void FrGraphPaneWidget::LifeModeChanged(bool _t1)
+void FrGraphPaneWidget::LiveModeChanged(bool _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);

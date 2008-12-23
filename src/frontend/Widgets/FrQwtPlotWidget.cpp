@@ -13,6 +13,9 @@
 #include "qwt_plot_marker.h"
 //#include "scalepicker.h"
 
+#define DUMMY_GRAPH_ID -1
+#define PLOT_GRID_COLOR Qt::gray
+
 
 FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent) 
 : QwtPlot(parent){  
@@ -23,11 +26,11 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     font.setPointSize(8);
     this->setAxisFont(QwtPlot::xBottom, font);
     this->setAxisScale(QwtPlot::xBottom, 0.0, 0.0, 1.0);
-        
+            
     // create grid lines for plot
     m_Grid = new QwtPlotGrid();
     m_Grid->enableY(false);
-    m_Grid->setPen(QPen(Qt::gray));
+    m_Grid->setPen(QPen(PLOT_GRID_COLOR));
     m_Grid->attach(this);
     
     // marker
@@ -43,7 +46,7 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     plotPicker->setSelectionFlags(
         QwtPicker::PointSelection | 
         QwtPicker::ClickSelection);
-
+    
     // connect signals and slots
     connect(plotPicker, 
         SIGNAL(selected(const QwtDoublePoint& )), 
@@ -61,18 +64,18 @@ void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
     QwtPlotCurve *curve = new QwtPlotCurve(name);
     m_Curves[id] = curve;
     
-    // TODO: delete after testing
-    // test -----------------------------
-    int dataSize = 9;
-    double* data = new double[dataSize];
-    srand(31415 + id);
-    for (int i = 0; i < dataSize; i++){
+    //// TODO: delete after testing
+    //// test -----------------------------
+    //int dataSize = 9;
+    //double* data = new double[dataSize];
+    //srand(31415 + id);
+    //for (int i = 0; i < dataSize; i++){
 
-        data[i] = 1.0 * (rand() % 255);
-    }
-    this->SetData(id, data, dataSize);
-    delete[] data;
-    // ---- test ------------------
+    //    data[i] = 1.0 * (rand() % 255);
+    //}
+    //this->SetData(id, data, dataSize);
+    //delete[] data;
+    //// ---- test ------------------
 
     curve->setPen(color);
     curve->attach(this);    
@@ -176,7 +179,7 @@ void FrQwtPlotWidget::onPointClicked(const QwtDoublePoint& point){
     emit pointClicked(point);
 }
 
-bool FrQwtPlotWidget::SetMarkerPosition(int timePoint){
+bool FrQwtPlotWidget::SetMarkerPosition(int timePoint, bool blockSignals){
 
     double x = double(timePoint);
     double y = 0.0;
@@ -187,7 +190,45 @@ bool FrQwtPlotWidget::SetMarkerPosition(int timePoint){
         contains(x)) return false;
 
     m_PlotMarker->setValue(x, y);
-    emit markerPositionChange(int(x));
+    
+    this->replot();
+
+    if(!blockSignals){
+
+        emit markerPositionChange(int(x));
+    }
 
     return true;
+}
+
+void FrQwtPlotWidget::SetNumberOfTimePoints(int num){
+
+    // Add dummy graph if needed
+    if(m_Curves.find(DUMMY_GRAPH_ID) == m_Curves.end()){
+        this->AddGraph(
+            DUMMY_GRAPH_ID, 
+            QString("Dummy"), 
+            QColor(PLOT_GRID_COLOR)); 
+    }
+
+    double maxTimePoint = double(num - 1);
+    if(!this->axisScaleDiv(QwtPlot::xBottom)->contains(maxTimePoint)){
+        // we have to setup dummy data
+        //double* xData = new double[num];
+        double* yData = new double[num];
+        for(int i=0; i < num; ++i){
+        
+            //xData[i] = double(i);
+            yData[i] = 0.0;
+        }
+        this->SetData(DUMMY_GRAPH_ID, yData, num);
+    }
+}
+
+int FrQwtPlotWidget::GetMaxTimePoint(){
+
+    double result = this->axisScaleDiv(
+        QwtPlot::xBottom)->hBound();
+
+    return int(result);
 }

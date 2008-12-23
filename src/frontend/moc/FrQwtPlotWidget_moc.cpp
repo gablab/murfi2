@@ -1,13 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrQwtPlotWidget.h'
 **
-<<<<<<< .mine
-** Created: Mon 22. Dec 17:38:43 2008
+** Created: Tue 23. Dec 02:15:14 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
-=======
-** Created: Fri 19. Dec 16:12:14 2008
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
->>>>>>> .r361
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/

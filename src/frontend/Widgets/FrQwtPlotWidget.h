@@ -34,7 +34,10 @@ public:
 
     void SetData(int id, double data[], int dataSize);
     void SetVisibility(int id, bool visible);
-    bool SetMarkerPosition(int timePoint);
+    bool SetMarkerPosition(int timePoint, bool blockSignals = false);
+    
+    int GetMaxTimePoint();
+    void SetNumberOfTimePoints(int num);
         
     // Here all signals
 signals:

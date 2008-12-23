@@ -35,24 +35,31 @@ public:
     // Methods
     void Update();
     void UpdateTimePoint();
+    void UpdateLiveMode();
 
     // Here all signals
 Q_SIGNALS:
     void TimePointChanged(int timePoint);
-    void LifeModeChanged(bool value);
+    void LiveModeChanged(bool value);
+
+protected:
+    virtual void timerEvent(QTimerEvent *event);
 
 private Q_SLOTS:
     void OnGraphMarkerPositionChanged(int position);
 
     // Player processing
-    void OnLifeModeChanged(bool);
+    void OnLiveModeChanged(bool);
     void OnPlayClicked();
     void OnPauseClicked();
     void OnResetClicked();
     void OnPlayFinished();
 
 private:
-    FrPlayThread* m_PlayThread;
+    // Video playback
+    int m_TimerID;
+    int m_PlayingTimePoint;
+    bool m_IsPaused;
 };
 
 #endif

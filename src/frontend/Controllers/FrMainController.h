@@ -53,6 +53,9 @@ public:
     void CreatNewROI();
     void UpdateRoiTool();
 
+    void SetLiveMode(bool newLiveMode);
+    void SetCurrentTimePoint(int newTimePoint);
+
 	// Override from base class
     virtual void Notify(int notifyCode);
    

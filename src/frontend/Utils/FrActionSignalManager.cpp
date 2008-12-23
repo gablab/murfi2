@@ -4,6 +4,7 @@
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
 #include "FrLayerListWidget.h"
+#include "FrGraphPaneWidget.h"
 #include "FrSettings.h"
 
 // Qt
@@ -90,6 +91,13 @@ void FrActionSignalManager::Initialize(){
     connect( m_mainWindow->m_LayerListWidget, SIGNAL(RoiToolChanged()),
              this, SLOT(OnRoiToolChanged()) );
 
+    // Connect graph pane
+    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(LiveModeChanged(bool)),
+             this, SLOT(OnLiveModeChanged(bool)) );
+    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(TimePointChanged(int)),
+             this, SLOT(OnTimePointChanged(int)) );
+
+
     // Connect test action
     CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
     m_isInit = true;
@@ -153,6 +161,16 @@ void FrActionSignalManager::Deinitialize(){
     disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerColormap()),
              this, SLOT(OnLayerColormapChanged()) );
 
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(RoiToolChanged()),
+             this, SLOT(OnRoiToolChanged()) );
+
+    // Graph pane
+    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(LiveModeChanged(bool)),
+             this, SLOT(OnLiveModeChanged(bool)) );
+
+    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(TimePointChanged(int)),
+             this, SLOT(OnTimePointChanged(int)) );
+
     // Connect test action
     DISCONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
     m_isInit = false;
@@ -183,20 +201,25 @@ void FrActionSignalManager::OnOpenDataStoreAction(){
 
 void FrActionSignalManager::OnSaveTabsAction(){
     QString fileName = QFileDialog::getSaveFileName(
-        m_mainWindow, tr("Save Tabs Data"), tr(""), 
-        tr("Tabs Settings (*.tbs)"));
+        m_mainWindow, tr("Save Tabs Data"), 
+        tr(""), tr("Tabs Settings (*.tbs)"));
 
     if(!fileName.isNull() && !fileName.isEmpty()){
-        m_mainWindow->GetMainController()->IoTabSettings(fileName, false);
+        m_mainWindow->
+            GetMainController()->
+            IoTabSettings(fileName, false);
     }
 }
 
 void FrActionSignalManager::OnLoadTabsAction(){
     QString fileName = QFileDialog::getOpenFileName(
-        m_mainWindow, tr("Load Tabs Data"), tr(""), tr("Tabs Settings (*.tbs)"));
+        m_mainWindow, tr("Load Tabs Data"), 
+        tr(""), tr("Tabs Settings (*.tbs)"));
 
     if(!fileName.isNull() && !fileName.isEmpty()){
-        m_mainWindow->GetMainController()->IoTabSettings(fileName, true);
+        m_mainWindow->
+            GetMainController()->
+            IoTabSettings(fileName, true);
     }
 }
 
@@ -206,7 +229,9 @@ void FrActionSignalManager::OnExitAction(){
 
 //Edit 
 void FrActionSignalManager::OnSaveToTabAction(){
-    m_mainWindow->GetMainController()->SaveCurrentViewToTab();
+    m_mainWindow->
+        GetMainController()->
+        SaveCurrentViewToTab();
 }
 
 void FrActionSignalManager::OnNewLayerAction(){
@@ -244,19 +269,27 @@ void FrActionSignalManager::OnResetImageAction(){
 
 // Tools 
 void FrActionSignalManager::OnManipulatorToolAction(){
-    m_mainWindow->GetMainController()->SetCurrentTool(0);
+    m_mainWindow->
+        GetMainController()->
+        SetCurrentTool(0);
 }
 
 void FrActionSignalManager::OnVoxelToolAction(){
-    m_mainWindow->GetMainController()->SetCurrentTool(1);
+    m_mainWindow->
+        GetMainController()->
+        SetCurrentTool(1);
 }
 
 void FrActionSignalManager::OnRoiToolAction(){
-    m_mainWindow->GetMainController()->SetCurrentTool(2);
+    m_mainWindow->
+        GetMainController()->
+        SetCurrentTool(2);
 }
 
 void FrActionSignalManager::OnVoxelSelectionToolAction(){
-    m_mainWindow->GetMainController()->SetCurrentTool(3);
+    m_mainWindow->
+        GetMainController()->
+        SetCurrentTool(3);
 }
 
 // Help
@@ -284,5 +317,20 @@ void FrActionSignalManager::OnLayerColormapChanged(){
 }
 
 void FrActionSignalManager::OnRoiToolChanged(){
-    m_mainWindow->GetMainController()->UpdateRoiTool();
+    m_mainWindow->
+        GetMainController()->
+        UpdateRoiTool();
+}
+
+// Graph pane events
+void FrActionSignalManager::OnLiveModeChanged(bool newValue){
+    m_mainWindow->
+        GetMainController()->
+        SetLiveMode(newValue);
+}
+
+void FrActionSignalManager::OnTimePointChanged(int newValue){
+    m_mainWindow->
+        GetMainController()->
+        SetCurrentTimePoint(newValue);
 }

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrPlayControlWidget.h'
 **
-** Created: Mon 22. Dec 19:49:34 2008
+** Created: Tue 23. Dec 02:27:52 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -50,9 +50,9 @@ static const uint qt_meta_data_FrPlayControlWidget[] = {
 
 static const char qt_meta_stringdata_FrPlayControlWidget[] = {
     "FrPlayControlWidget\0\0isOn\0"
-    "LifeModeChanged(bool)\0Play()\0Pause()\0"
+    "LiveModeChanged(bool)\0Play()\0Pause()\0"
     "Reset()\0Speedup()\0Slowdown()\0"
-    "GotoNextStep()\0OnLifeModeChanged()\0"
+    "GotoNextStep()\0OnLiveModeChanged()\0"
     "OnPlayPressed()\0OnPausePressed()\0"
     "OnResetPressed()\0OnSlowerPressed()\0"
     "OnFasterPressed()\0UpdateButtons()\0"
@@ -83,14 +83,14 @@ int FrPlayControlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: LifeModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 0: LiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 1: Play(); break;
         case 2: Pause(); break;
         case 3: Reset(); break;
         case 4: Speedup(); break;
         case 5: Slowdown(); break;
         case 6: GotoNextStep(); break;
-        case 7: OnLifeModeChanged(); break;
+        case 7: OnLiveModeChanged(); break;
         case 8: OnPlayPressed(); break;
         case 9: OnPausePressed(); break;
         case 10: OnResetPressed(); break;
@@ -104,7 +104,7 @@ int FrPlayControlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void FrPlayControlWidget::LifeModeChanged(bool _t1)
+void FrPlayControlWidget::LiveModeChanged(bool _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

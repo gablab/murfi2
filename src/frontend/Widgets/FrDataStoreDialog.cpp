@@ -70,18 +70,6 @@ QTreeWidget* FrDataStoreDialog::CreateTreeViewWidget(){
     headerLabels.push_back(QString("Data ID"));
     treeView->setHeaderLabels(headerLabels);
 
-    /*QStringList itemValues;
-    QList<QTreeWidgetItem *> items;
-    for (int i = 0; i < 10; ++i){
-
-        itemValues.clear();
-        itemValues.push_back(QString("item: %1").arg(i));
-        itemValues.push_back(QString("itemType"));
-
-        items.append(new QTreeWidgetItem((QTreeWidget*)0, itemValues));
-    }
-    treeView->insertTopLevelItems(0, items);*/
-
     return treeView;
 }
 

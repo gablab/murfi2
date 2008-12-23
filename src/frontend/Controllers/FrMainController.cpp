@@ -61,6 +61,14 @@ void FrMainController::Initialize(){
     // Initialize FrCommandController
     FrCommandController::Instance()->SetOwner(this);
 
+    // NOTE: Appsettings have to be created befor all
+    if(m_MainDocument){
+
+        FrAppSettingsDocObj* appSettings = new FrAppSettingsDocObj();
+        m_MainDocument->Add(appSettings);
+    }
+
+
     // Initialize view
     if(m_MainView){        
         m_MainView->SetMainController(this);
@@ -80,9 +88,6 @@ void FrMainController::Initialize(){
     
     // Initialize document
     if(m_MainDocument){
-        // Create app settings and save them to document
-        FrAppSettingsDocObj* appSettings = new FrAppSettingsDocObj();
-        m_MainDocument->Add(appSettings);
 
         FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
         cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);      
@@ -381,6 +386,20 @@ void FrMainController::UpdateRoiTool(){
     if(tool != 0L){
         tool->StartCurrentTool();
     }
+}
+
+void FrMainController::SetLiveMode(bool newLiveMode){
+    // NOTE: can do it here no need to delegate
+    m_MainDocument->GetAppSettings()->SetLiveMode(newLiveMode);
+}
+
+void FrMainController::SetCurrentTimePoint(int newTimePoint){
+    FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
+    cmd->SetAction(FrTimePointCmd::SetUserDefined);
+    cmd->SetTimePoint(newTimePoint);
+    cmd->SetCheckLifeMode(false);
+    cmd->Execute();
+    delete cmd;
 }
 
 void FrMainController::Test(){    

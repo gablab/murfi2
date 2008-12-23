@@ -129,6 +129,21 @@ unsigned int FrImageDocObj::GetLastTimePoint(){
     return result;
 }
 
+int FrImageDocObj::GetNumberOfTimePoints(){
+
+    return m_Images.size();
+}
+
+void FrImageDocObj::GetTimePointStuff(std::vector<RtDataID*>& data){
+
+    data.clear();
+
+    ImageCollection::iterator it, itEnd(m_Images.end());
+    for(it = m_Images.begin(); it != itEnd; ++it){
+        data.push_back(&((*it)->getDataID()));
+    }
+}
+
 void FrImageDocObj::ClearAll(){
     ImageCollection::iterator it, itEnd(m_Images.end());
     for(it = m_Images.begin(); it != itEnd; ++it){

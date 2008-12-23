@@ -50,7 +50,7 @@ bool FrTimePointCmd::SetLastTimePoint(){
     if(m_CheckLifeMode){
 
         FrAppSettingsDocObj* appSettings = doc->GetAppSettings();
-        if(appSettings == 0 && !appSettings->GetLifeMode()){
+        if(appSettings == 0 && !appSettings->GetLiveMode()){
             
             return false;
         }

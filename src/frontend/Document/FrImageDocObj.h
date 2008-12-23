@@ -4,6 +4,7 @@
 // Forward declarations
 class RtMRIImage;
 class QString;
+class RtDataID;
 
 // Includes
 #include "FrMacro.h"
@@ -27,9 +28,15 @@ public:
 
     // Series identifiers
     FrGetPropMacro(unsigned int, SeriesNumber);
+
     RtMRIImage* GetTimePointData(unsigned int timePoint);
+
     bool AddTimePointData(RtMRIImage* mriImage);
+
     unsigned int GetLastTimePoint();
+    int GetNumberOfTimePoints();
+
+    void GetTimePointStuff(std::vector<RtDataID*>& data);
 
     void ClearAll();
     

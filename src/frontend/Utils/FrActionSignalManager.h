@@ -48,6 +48,9 @@ public slots:
     void OnLayerParamsChanged();
     void OnLayerColormapChanged();
     void OnRoiToolChanged();
+    // Graph pane
+    void OnLiveModeChanged(bool currentValue);
+    void OnTimePointChanged(int currentTimePoint);
 
 public:
     void Initialize();

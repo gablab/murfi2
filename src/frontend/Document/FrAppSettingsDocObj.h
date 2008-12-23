@@ -17,7 +17,7 @@ public:
 
 public:
     // Properties
-    FrPropMacro(bool, LifeMode);
+    FrPropMacro(bool, LiveMode);
 };
 
 #endif

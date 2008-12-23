@@ -249,6 +249,19 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
             }
             // .. Add other layers
         }
+
+        // set input to special layer here
+        m_docReader->SetTarget(FrDocumentReader::Points);
+        m_docReader->Update();
+
+        // set params
+        SelectionParams Params;
+        Params.type = 4;
+
+        FrSpecialLayer* sl = m_LayeredImage[i]->GetSpecialLayer();
+        sl->SetSelectionData(m_docReader->GetOutput());
+        sl->SetSelection(Params);
+        sl->SetSelectionVisibility(true);
     }
 }
 

@@ -64,30 +64,34 @@ vtkImageData* FrPointsDocObj::GetPointsXY(int z){
 	data->SetScalarTypeToUnsignedChar();
 	data->SetNumberOfScalarComponents(4); // ARGB
     data->SetDimensions(m_dimensions[0], m_dimensions[1], 1);
-    data->SetExtent(0, m_dimensions[0]-1, 0, m_dimensions[1]-1, 0, 0);
+    //data->SetExtent(0, m_dimensions[0]-1, 0, m_dimensions[1]-1, 0, 0);
+    data->SetSpacing(m_spacing[0], m_spacing[1], 1.0);
     data->AllocateScalars(); 
 
     //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
     vtkDataArray* inArray = data->GetPointData()->GetScalars();
     unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
-
+    
     // init data with transparent values
-    for(int i=0; i < inArray->GetSize()/4; ++i){
-        pointsPtr[0] = 255;
-        pointsPtr[1] = 255;
-        pointsPtr[2] = 255; 
-        pointsPtr[3] = 0;
-        pointsPtr += 4;
-    }
+    memset(inArray->GetVoidPointer(0), 0, inArray->GetSize());
+
+    //// init data with transparent values
+    //for(int i=0; i < inArray->GetSize()/4; ++i){
+    //    pointsPtr[0] = 255;
+    //    pointsPtr[1] = 255;
+    //    pointsPtr[2] = 255; 
+    //    pointsPtr[3] = 0;
+    //    pointsPtr += 4;
+    //}
   
     unsigned char* dataPtr = (unsigned char*)inArray->GetVoidPointer(0);
     PointCollection::iterator it, itEnd(m_Points.end());
     for(it = m_Points.begin(); it != itEnd; ++it){
         if ((*it)->z == z){
-            double pos[3];
+            int pos[3];
             pos[0] = (*it)->x; pos[1] = (*it)->y; pos[2] = 0;        
 
-            int id = data->FindPoint(pos); 
+            int id = data->ComputePointId(pos); 
 
             if (id >= 0){      // point found
                 dataPtr[id*4] = (unsigned char)(*it)->color.red();
@@ -105,24 +109,32 @@ vtkImageData* FrPointsDocObj::GetPointsXZ(int y){
     vtkImageData* data = vtkImageData::New();
 	data->SetScalarTypeToUnsignedChar();
 	data->SetNumberOfScalarComponents(4); // ARGB
-    data->SetDimensions(m_dimensions[0], 1, m_dimensions[2]);
-	data->SetSpacing(m_spacing);
+    data->SetDimensions(m_dimensions[0], m_dimensions[2], 1);
+    //data->SetExtent(0, m_dimensions[0]-1, 0, m_dimensions[1]-1, 0, 0);
+    data->SetSpacing(m_spacing[0], m_spacing[2], 1.0);
+    data->AllocateScalars(); 
 
-    unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
-
+    //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
+    vtkDataArray* inArray = data->GetPointData()->GetScalars();
+    unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
+    
+    // init data with transparent values
+    memset(inArray->GetVoidPointer(0), 0, inArray->GetSize());
+  
+    unsigned char* dataPtr = (unsigned char*)inArray->GetVoidPointer(0);
     PointCollection::iterator it, itEnd(m_Points.end());
     for(it = m_Points.begin(); it != itEnd; ++it){
         if ((*it)->y == y){
             int pos[3];
-            pos[0] = (*it)->x; pos[1] = 0; pos[2] = (*it)->z;        
+            pos[0] = (*it)->x; pos[1] = (*it)->z; pos[2] = 0;        
 
             int id = data->ComputePointId(pos); 
 
             if (id >= 0){      // point found
-                pointsPtr[id] = (unsigned char)(*it)->color.red();
-                pointsPtr[id+1] = (unsigned char)(*it)->color.green();
-                pointsPtr[id+2] = (unsigned char)(*it)->color.blue();
-                pointsPtr[id+3] = 0;                  // alpha
+                dataPtr[id*4] = (unsigned char)(*it)->color.red();
+                dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
+                dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
+                dataPtr[id*4+3] = 255;                  // alpha
             }
         }
     }
@@ -134,24 +146,32 @@ vtkImageData* FrPointsDocObj::GetPointsYZ(int x){
     vtkImageData* data = vtkImageData::New();
 	data->SetScalarTypeToUnsignedChar();
 	data->SetNumberOfScalarComponents(4); // ARGB
-    data->SetDimensions(1, m_dimensions[1], m_dimensions[2]);
-	data->SetSpacing(m_spacing);
+    data->SetDimensions(m_dimensions[1], m_dimensions[2], 1);
+    //data->SetExtent(0, m_dimensions[0]-1, 0, m_dimensions[1]-1, 0, 0);
+    data->SetSpacing(m_spacing[1], m_spacing[2], 1.0);
+    data->AllocateScalars(); 
 
-    unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
-
+    //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
+    vtkDataArray* inArray = data->GetPointData()->GetScalars();
+    unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
+    
+    // init data with transparent values
+    memset(inArray->GetVoidPointer(0), 0, inArray->GetSize());
+  
+    unsigned char* dataPtr = (unsigned char*)inArray->GetVoidPointer(0);
     PointCollection::iterator it, itEnd(m_Points.end());
     for(it = m_Points.begin(); it != itEnd; ++it){
         if ((*it)->x == x){
             int pos[3];
-            pos[0] = 0; pos[1] = (*it)->y; pos[2] = (*it)->z;        
+            pos[0] = (*it)->y; pos[1] = (*it)->z; pos[2] = 0;        
 
             int id = data->ComputePointId(pos); 
 
             if (id >= 0){      // point found
-                pointsPtr[id] = (unsigned char)(*it)->color.red();
-                pointsPtr[id+1] = (unsigned char)(*it)->color.green();
-                pointsPtr[id+2] = (unsigned char)(*it)->color.blue();
-                pointsPtr[id+3] = 0;                  // alpha
+                dataPtr[id*4] = (unsigned char)(*it)->color.red();
+                dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
+                dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
+                dataPtr[id*4+3] = 255;                  // alpha
             }
         }
     }

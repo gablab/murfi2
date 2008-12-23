@@ -178,7 +178,7 @@ vtkImageData* FrDocumentReader::ReadPoints(){
     
     if(pointObjects.size() > 0){
         pointsDO = (FrPointsDocObj*)pointObjects[0];
-    
+
         // TODO: add support for mosaic view
         switch(m_Orientation){
             case XY:

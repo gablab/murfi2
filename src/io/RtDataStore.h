@@ -50,7 +50,7 @@ public:
 
   // get a list of the available data in the data store
   // note: this returns a list of the unique data ids excepting timepoint. 
-  set<RtDataId>::const_iterator getAvailableData();
+  set<RtDataID>::const_iterator getAvailableData();
 
   protected:
 
@@ -63,6 +63,9 @@ public:
   // list of the data ids we currently have in the data 
   // store (excepting timepoiint)
   set<RtDataID> availableData;
+
+  // set data ids to availableData
+  void setAvailableData(RtDataID);
 
   // create mutex for datastore lockdown
   ACE_Mutex mut;

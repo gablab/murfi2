@@ -34,14 +34,32 @@ void RtDataStore::setData(RtData *data) {
 
   // put data into datastore with its dataID as the key
   store[data->getDataID()] = data;
-
+  
   mut.release();
+  
+  // add to availableData (needs a hard copy of the dataID)
+  setAvailableData(data->getDataID());
+  
+  //debug
+//  set<RtDataID>::const_iterator it = getAvailableData();
+  //endebug
   
   // notify listeners
   for(vector<RtOutput*>::iterator i = outputNotifyList.begin();
       i != outputNotifyList.end(); i++) {
     (*i)->setData(data);
   }
+}
+
+void RtDataStore::setAvailableData(RtDataID dataID) {
+  
+  // remove timepoint
+  dataID.setTimePoint(DATAID_UNSET_VALUE);
+  
+  // put data id into available data (insert will only add a unique value)
+  // TODO will a position iterator add any efficiency here?
+  availableData.insert(dataID);
+  
 }
 
 // get data by id
@@ -61,6 +79,22 @@ RtData *RtDataStore::getData(RtDataID &dataID) {
   mut.release();
 
   return (*it).second;
+}
+
+// get available data
+set<RtDataID>::const_iterator RtDataStore::getAvailableData() {
+  
+  set<RtDataID>::const_iterator it = availableData.begin();
+
+//debug
+//  cout << "availableData contains:";
+//  for ( it=availableData.begin() ; it != availableData.end(); it++ )
+//    cout << " " << *it;
+//
+//  cout << endl;
+//endebug
+
+  return it;
 }
 
 // get the version

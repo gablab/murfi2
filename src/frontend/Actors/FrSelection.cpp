@@ -158,7 +158,7 @@ void FrSelection::DrawPolygon(){
     rect->Delete();
     selectRect->Delete();
     m_BorderPts->Delete();
-}
+} 
 
 void FrSelection::DrawPoints(){
     if (m_Data){

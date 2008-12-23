@@ -52,7 +52,7 @@ void FrPointsDocObj::AddPoint(FrPoint* point){
         m_Points.push_back(point);
     }
 }
-
+ 
 void FrPointsDocObj::RemovePoint(FrPoint *point){
     // TODO: implement 
     if (point){
@@ -65,7 +65,7 @@ vtkImageData* FrPointsDocObj::GetPointsXY(int z){
 	data->SetNumberOfScalarComponents(4); // ARGB
     data->SetDimensions(m_dimensions[0], m_dimensions[1], 1);
     data->SetExtent(0, m_dimensions[0]-1, 0, m_dimensions[1]-1, 0, 0);
-    data->AllocateScalars();
+    data->AllocateScalars(); 
 
     //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
     vtkDataArray* inArray = data->GetPointData()->GetScalars();
@@ -75,7 +75,7 @@ vtkImageData* FrPointsDocObj::GetPointsXY(int z){
     for(int i=0; i < inArray->GetSize()/4; ++i){
         pointsPtr[0] = 255;
         pointsPtr[1] = 255;
-        pointsPtr[2] = 255;
+        pointsPtr[2] = 255; 
         pointsPtr[3] = 0;
         pointsPtr += 4;
     }

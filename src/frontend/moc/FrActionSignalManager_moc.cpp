@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Mon 22. Dec 23:29:11 2008
+** Created: Tue 23. Dec 15:04:40 2008
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      24,   10, // methods
+      26,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -51,6 +51,8 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
      449,   22,   22,   22, 0x0a,
      472,   22,   22,   22, 0x0a,
      497,   22,   22,   22, 0x0a,
+     529,  516,   22,   22, 0x0a,
+     570,  553,   22,   22, 0x0a,
 
        0        // eod
 };
@@ -69,6 +71,8 @@ static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "OnShowHelpAction()\0OnShowAboutAction()\0"
     "OnTestAction()\0OnLayerParamsChanged()\0"
     "OnLayerColormapChanged()\0OnRoiToolChanged()\0"
+    "currentValue\0OnLiveModeChanged(bool)\0"
+    "currentTimePoint\0OnTimePointChanged(int)\0"
 };
 
 const QMetaObject FrActionSignalManager::staticMetaObject = {
@@ -120,8 +124,10 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 21: OnLayerParamsChanged(); break;
         case 22: OnLayerColormapChanged(); break;
         case 23: OnRoiToolChanged(); break;
+        case 24: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 25: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         }
-        _id -= 24;
+        _id -= 26;
     }
     return _id;
 }

@@ -32,6 +32,9 @@ bool FrSetCursorCmd::Execute(){
         case FrSetCursorCmd::Pan:
             cursor.setShape(Qt::OpenHandCursor);
             break;
+        case FrSetCursorCmd::Arrow:
+            cursor.setShape(Qt::ArrowCursor);
+            break;
         default:
             // do nothing here
             break;

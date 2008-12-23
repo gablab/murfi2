@@ -28,12 +28,21 @@ FrVoxelSelectionTool::~FrVoxelSelectionTool(){
 
 void FrVoxelSelectionTool::Start(){
     // Update interface to ensure tool is checked
-    FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
-    cmd->SetToolType(FrManageToolCmd::VoxelSelectionTool);
-    cmd->SetToolAction(FrManageToolCmd::UpdateAct);
-    cmd->SetIsChecked(true);
-    cmd->Execute();
-    delete cmd;
+    FrManageToolCmd* cmd1 = FrCommandController::CreateCmd<FrManageToolCmd>();
+    cmd1->SetToolType(FrManageToolCmd::VoxelSelectionTool);
+    cmd1->SetToolAction(FrManageToolCmd::UpdateAct);
+    cmd1->SetIsChecked(true);
+    //cmd1->Execute();
+    //delete cmd;
+
+    FrSetCursorCmd* cmd2 = FrCommandController::CreateCmd<FrSetCursorCmd>();
+    cmd2->SetCursorType(FrSetCursorCmd::Arrow);
+
+    FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    multiCmd->AddCommand(cmd1);
+    multiCmd->AddCommand(cmd2);
+    multiCmd->Execute();
+    delete multiCmd;
 }
 
 void FrVoxelSelectionTool::Stop(){
@@ -54,6 +63,14 @@ bool FrVoxelSelectionTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& par
     if(params.Button == FrMouseParams::LeftButton){
         FrVoxelSelectionCmd* cmd = FrCommandController::CreateCmd<FrVoxelSelectionCmd>();
         cmd->SetAction(FrVoxelSelectionCmd::Add);
+        cmd->SetPointPicker(m_pointPicker);
+        cmd->SetMouseXY(params.X, params.Y);
+        cmd->Execute();
+        delete cmd;
+    }
+    else if (params.Button == FrMouseParams::RightButton){
+        FrVoxelSelectionCmd* cmd = FrCommandController::CreateCmd<FrVoxelSelectionCmd>();
+        cmd->SetAction(FrVoxelSelectionCmd::Remove);
         cmd->SetPointPicker(m_pointPicker);
         cmd->SetMouseXY(params.X, params.Y);
         cmd->Execute();

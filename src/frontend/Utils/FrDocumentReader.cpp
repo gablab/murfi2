@@ -179,19 +179,45 @@ vtkImageData* FrDocumentReader::ReadPoints(){
     if(pointObjects.size() > 0){
         pointsDO = (FrPointsDocObj*)pointObjects[0];
 
-        // TODO: add support for mosaic view
-        switch(m_Orientation){
-            case XY:
-                result = pointsDO->GetPointsXY(m_Slice);
-                break;
-            case XZ:
-                result = pointsDO->GetPointsXZ(m_Slice);
-                break;
-            case YZ:
-                result = pointsDO->GetPointsYZ(m_Slice);
-                break;
-        }
+        if (m_Mosaic){
+            // Find appropriate image volume
+            RtMRIImage* mri = 0;
+            FrDocument::DocObjCollection images;
+            m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
 
+            // NOTE Since we support the only one series 
+            // Time point is a unique data ID.
+            int timePoint = m_DataID;
+            if(images.size() > 0){
+                FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+                mri = imgDO->GetTimePointData(timePoint);
+            }
+
+            RtMRIImage* image = new RtMRIImage(*mri);
+                    
+            if(!image->mosaic()){
+                delete image;
+                return 0L;
+            }
+            
+            int xDim = image->getDim(0);
+            int yDim = image->getDim(1);
+
+            result = pointsDO->GetMosaicData(xDim, yDim);
+        }
+        else{
+            switch(m_Orientation){
+                case XY:
+                    result = pointsDO->GetPointsXY(m_Slice);
+                    break;
+                case XZ:
+                    result = pointsDO->GetPointsXZ(m_Slice);
+                    break;
+                case YZ:
+                    result = pointsDO->GetPointsYZ(m_Slice);
+                    break;
+            }
+        }
         return result;
     }
     

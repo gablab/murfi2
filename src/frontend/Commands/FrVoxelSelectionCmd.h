@@ -35,7 +35,6 @@ public:
 
 private:
     bool AddPoint();
-    bool RemovePoint();
 
     double* GetMappedPoint();
     int GetVisibleLayer(FrMainDocument* doc);

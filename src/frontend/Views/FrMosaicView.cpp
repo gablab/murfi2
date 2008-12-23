@@ -185,6 +185,19 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
             m_LayeredImage->SetImageInput(m_docReader->GetOutput());
         }
     }
+
+    // set input to special layer here
+    m_docReader->SetTarget(FrDocumentReader::Points);
+    m_docReader->Update();
+
+    // set params
+    SelectionParams Params;
+    Params.type = 4;
+
+    FrSpecialLayer* sl = m_LayeredImage->GetSpecialLayer();
+    sl->SetSelectionData(m_docReader->GetOutput());
+    sl->SetSelection(Params);
+    sl->SetSelectionVisibility(true);
 }
 
 void FrMosaicView::UpdateColormap(FrUpdateParams1& params){

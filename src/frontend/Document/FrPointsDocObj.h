@@ -34,6 +34,7 @@ public:
     vtkImageData* GetPointsXY(int z);
     vtkImageData* GetPointsXZ(int y);
     vtkImageData* GetPointsYZ(int x);
+    vtkImageData* GetMosaicData(int dimx, int dimy);
 
 private:
     void ClearAll();

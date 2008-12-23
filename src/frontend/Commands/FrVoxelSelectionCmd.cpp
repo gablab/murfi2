@@ -40,17 +40,9 @@ bool FrVoxelSelectionCmd::Execute(){
         !m_isMouseXY) return false;
 
     bool result = false;
-    switch(m_Action){
-        case Add:
-            result = AddPoint();
-            break;
-        case Remove:
-            result = RemovePoint();
-            break;
-        default:
-            // Do nothing
-            break;
-    }
+
+    result = AddPoint();
+
     return result;
 }
 
@@ -119,8 +111,8 @@ bool FrVoxelSelectionCmd::AddPoint(){
     m_PointPicker->GetMapperPosition(ptMapped);
     ptMapped[2] = 0;
 
-    double dSpacing[3];	
-    pImageData->GetSpacing(dSpacing);		
+/*    double dSpacing[3];	
+    pImageData->GetSpacing(dSpacing);	*/	
 
     // Get the volume index within the entire volume now.
     int nPointIdx = pImageData->FindPoint(ptMapped);
@@ -132,6 +124,27 @@ bool FrVoxelSelectionCmd::AddPoint(){
 
     GetRealImagePosition(viewDO, pImageData, Index, imgNumber);
 
+    // convert coordinates if we have mosaic view selected
+    if (view = Views::MosaicView){
+        // we need to now number of slices in a row, or width/height of one slice
+        int sliceDims[3];
+        mv->GetSliceView()->GetImage()->GetImageInput()->GetDimensions(sliceDims);
+        
+        int mosaicDims[3];
+        pImageData->GetDimensions(mosaicDims);
+
+        int num = mosaicDims[0]/sliceDims[0];
+        int col, row;
+        col = Index[0]/sliceDims[0];
+        row = Index[1]/sliceDims[1];
+        int x, y, z;
+        x = Index[0] - col*sliceDims[0];
+        y = Index[1] - row*sliceDims[1];
+        z = row*num + col;
+
+        Index[0] = x; Index[1] = y; Index[2] = z;
+    }
+
     // get points doc obj, insert point and update view
     FrPointsDocObj* pointsDO = 0L;
     FrDocument::DocObjCollection pointObjects;
@@ -139,8 +152,17 @@ bool FrVoxelSelectionCmd::AddPoint(){
     
     if(pointObjects.size() > 0){
         pointsDO = (FrPointsDocObj*)pointObjects[0];
+        // TODO: get color from any widget/dialog/settings
         FrPoint* point = new FrPoint(Index[0], Index[1], Index[2], QColor(0, 255, 0));
-        pointsDO->AddPoint(point);
+        
+        switch (m_Action){
+            case Action::Add:
+                pointsDO->AddPoint(point);
+                break;
+            case Action::Remove:
+                pointsDO->RemovePoint(point);
+                break;
+        }
 
         FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
     }
@@ -148,12 +170,6 @@ bool FrVoxelSelectionCmd::AddPoint(){
         return false;
         
     return true;
-}
-
-bool FrVoxelSelectionCmd::RemovePoint(){
-    // TODO: implement
-
-    return false;
 }
 
 int FrVoxelSelectionCmd::GetVisibleLayer(FrMainDocument* doc){

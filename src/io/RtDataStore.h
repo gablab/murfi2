@@ -14,49 +14,58 @@
 #include"RtOutput.h"
 #include<vector>
 #include<map>
+#include<set>
 using namespace std;
 
 // class declaration
 class RtDataStore : public RtOutput  {
 #if USE_FRONTEND // Need to access stuff from frontend
-    friend class FrDataStore;
+  friend class FrDataStore;
 #endif
 
 public:
 
-    //*** constructors/destructors  ***//
+  //*** constructors/destructors  ***//
 
-    // default constructor
-    RtDataStore();
+  // default constructor
+  RtDataStore();
 
-    // destructor
-    virtual ~RtDataStore();
+  // destructor
+  virtual ~RtDataStore();
 
-    // add an output to be notified when new data arrives
-    virtual void addOutputForNotify(RtOutput *out);
+  // add an output to be notified when new data arrives
+  virtual void addOutputForNotify(RtOutput *out);
 
-    //*** data methods ***//
+  //*** data methods ***//
 
-    // hand off some data to be output
-    virtual void setData(RtData *data);
+  // hand off some data to be output
+  virtual void setData(RtData *data);
 
-    // get data by id
-    virtual RtData *getData(RtDataID &id);
+  // get data by id
+  virtual RtData *getData(RtDataID &id);
 
-    // get the version
-    //  out: char array that represents the cvs version
-    virtual char *getVersionString();
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
-protected:
+  // get a list of the available data in the data store
+  // note: this returns a list of the unique data ids excepting timepoint. 
+  set<RtDataId>::const_iterator getAvailableData();
 
-    // list of outputs to be notified when new data arrives
-    vector<RtOutput*> outputNotifyList;
+  protected:
 
-    // hash map to store pointers to acquired data
-    map<RtDataID,RtData*,RtDataIDCompare> store;
+  // list of outputs to be notified when new data arrives
+  vector<RtOutput*> outputNotifyList;
 
-    // create mutex for datastore lockdown
-    ACE_Mutex mut;
+  // hash map to store pointers to acquired data
+  map<RtDataID,RtData*,RtDataIDCompare> store;
+
+  // list of the data ids we currently have in the data 
+  // store (excepting timepoiint)
+  set<RtDataID> availableData;
+
+  // create mutex for datastore lockdown
+  ACE_Mutex mut;
 
 };
 

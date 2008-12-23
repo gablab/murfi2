@@ -34,11 +34,11 @@ void RtDataStore::setData(RtData *data) {
 
   // put data into datastore with its dataID as the key
   store[data->getDataID()] = data;
-  
-  mut.release();
-  
+
   // add to availableData (needs a hard copy of the dataID)
   setAvailableData(data->getDataID());
+
+  mut.release();
   
   //debug
 //  set<RtDataID>::const_iterator it = getAvailableData();

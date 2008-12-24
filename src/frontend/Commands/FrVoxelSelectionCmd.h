@@ -15,7 +15,7 @@ class vtkPointPicker;
 // This command updates voxel information.
 class FrVoxelSelectionCmd : public FrBaseCmd {
 public:
-    enum Action { Undefined, Add, Remove };
+    typedef enum _Actions { Undefined, Add, Remove } Actions;
 
 public:
     // Constructor/destructor
@@ -30,7 +30,7 @@ public:
 
     // Properties
     void SetMouseXY(int x, int y);
-    FrSetPropMacro(Action, Action);
+    FrSetPropMacro(Actions, Action);
     FrSetPropMacro(vtkPointPicker*, PointPicker);
 
 private:

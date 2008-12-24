@@ -23,10 +23,10 @@ class QwtPlotGrid;
 
 
 class FrQwtPlotWidget : public QwtPlot {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	FrQwtPlotWidget(QWidget *parent = 0);
-    ~FrQwtPlotWidget();
+    FrQwtPlotWidget(QWidget *parent = 0);
+    virtual ~FrQwtPlotWidget();
     
     void AddGraph(int id, QString& name, QColor& color);
     void RemoveGraph(int id);

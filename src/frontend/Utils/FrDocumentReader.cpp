@@ -417,7 +417,6 @@ void FrDocumentReader::CreateMriLUT(short* data, unsigned int dataSize,
 
     // find max and min values
     short* ptr = data;
-    short* pEnd = data + dataSize;
 
     for(int i=0; i < dataSize; ++i){
         if(ptr[i] > max) max = ptr[i];
@@ -429,6 +428,6 @@ void FrDocumentReader::CreateMriLUT(short* data, unsigned int dataSize,
 
     float mult = 255.0f / float(max - min);
     for(int i=min; i < max; ++i){
-        (*outLUT)[i] = unsigned char((i - min) * mult);
+        (*outLUT)[i] = static_cast<unsigned char>((i - min) * mult);
     }
 }

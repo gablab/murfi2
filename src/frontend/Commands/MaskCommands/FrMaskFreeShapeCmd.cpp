@@ -87,6 +87,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
         case FrMaskFreeShapeCmd::Write:
             pixelValue = 255;
             break;
+        default:break;
     }
 
     FrRoiDocObj* roiDO = this->GetCurrentRoi();
@@ -95,8 +96,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
 
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
-            FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-            
+
             // NOTE: may be calc BB of polygon?
             // get data dimensions
             int dims[3];
@@ -108,7 +108,7 @@ bool FrMaskFreeShapeCmd::WriteMask(){
             ymax = dims[1];
 
             // translate all points to local image coordinates
-            for (int i = 0; i<m_Points.size(); i++){
+            for (int i = 0; i < m_Points.size(); i++){
                 int p[3];
                 p[0] = m_Points[i].x; p[1] = m_Points[i].y;   
                 this->TransformCoordinatesToIndices(p, imageData, m_ImageNumber);    

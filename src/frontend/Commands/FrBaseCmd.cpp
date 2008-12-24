@@ -11,9 +11,9 @@ void FrBaseCmd::UpdatePipelineForID(int id, int point){
 
     if(id == BAD_LAYER_ID) return;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-        
+
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
-    
+
     // Set id for update
     int sliceID = viewDO->GetSliceViewSettings()->ActiveLayerID;
     int mosaicID = viewDO->GetMosaicViewSettings()->ActiveLayerID;

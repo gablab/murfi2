@@ -95,7 +95,7 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrPanTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
-    vtkCamera *camera = is->CurrentRenderer->GetActiveCamera();
+    //vtkCamera *camera = is->CurrentRenderer->GetActiveCamera();
 
     // TODO: implement
 

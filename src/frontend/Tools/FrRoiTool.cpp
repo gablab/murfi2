@@ -202,7 +202,6 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
         case OrthoView:
             {
                 FrOrthoView* ov =  mv->GetOrthoView();
-                
                 // Find Image where click's occured
                 for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
                     if (ov->GetImage(i)->IsInViewport(params.X, params.Y)){
@@ -221,6 +220,7 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
                 }
                 break;
             }
+        default:break;
     } // end switch(view)
 
     // we should get any layer with visible actor
@@ -242,7 +242,7 @@ bool FrRoiTool::GetMappedCoords(FrInteractorStyle* is, FrMouseParams& params){
     params.Y = int(point[1]);
 
     coordinate->Delete();
-    
+
     return isInside;
 }
 
@@ -251,11 +251,14 @@ int FrRoiTool::GetVisibleLayer(FrMainDocument* doc){
     FrLayerDocObj* layerDO = 0L;
     FrDocument::DocObjCollection layers;
     doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
-        
+
     if(layers.size() > 0){
+
         for (int i = 0; i < layers.size(); i++){
+
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
             if (layerDO->GetVisibility()){
+
                 return i;
             }
         }
@@ -270,7 +273,7 @@ void FrRoiTool::StartCurrentTool(){
         m_curTool->Stop();
         m_curTool->SetController(0);
     }
-    
+
     FrMainWindow* mv = this->GetMainController()->GetMainView();
 
     // select current roi tool

@@ -17,20 +17,20 @@ bool FrChangeViewCmd::Execute(){
     // check params
     if(this->GetMainController() == 0 ||
         m_TargetView == FrChangeViewCmd::Unknown) return false;
-    
+
     bool result = false;
     Views viewType = (Views)GetActiveViewType();
 
-    if(viewType != Views::Undefined){
-        
+    if(viewType != Undefined){
+
         FrMainWindow* mv = this->GetMainController()->GetMainView();
         FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-                
+
         FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
         // Change active view
         viewDO->SetActiveView(viewType);
-        
+
         mv->GetCurrentView()->RemoveRenderers();
         mv->SetCurrentView( GetTargetView(viewType) );
         mv->GetCurrentView()->SetupRenderers();
@@ -45,8 +45,8 @@ bool FrChangeViewCmd::Execute(){
 
 int FrChangeViewCmd::GetActiveViewType(){
     // preset
-    Views viewType = Views::Undefined;
-        
+    Views viewType = Undefined;
+
     switch(m_TargetView){
         case FrChangeViewCmd::Slice:  
             viewType = SliceView;
@@ -81,13 +81,13 @@ FrBaseView* FrChangeViewCmd::GetTargetView(int view){
 
     // Determine wich view to return
     switch(viewType){
-        case Views::SliceView: 
+        case SliceView:
             targetView = (FrBaseView*)mv->GetSliceView();
             break;
-        case Views::MosaicView: 
+        case MosaicView: 
             targetView = (FrBaseView*)mv->GetMosaicView();
             break;
-        case Views::OrthoView:
+        case OrthoView:
             targetView = (FrBaseView*)mv->GetOrthoView();
             break;
         default:
@@ -104,15 +104,16 @@ void FrChangeViewCmd::UpdateViewUI(){
     actions[0] = am->GetViewSliceAction();
     actions[1] = am->GetViewMosaicAction();
     actions[2] = am->GetViewOrthoAction();
-    
+
     QAction* action = 0L;
     Views viewType = (Views)GetActiveViewType();
     switch(viewType){
-        case Views::SliceView: action = actions[0];
+
+        case SliceView: action = actions[0];
             break;
-        case Views::MosaicView: action = actions[1];
+        case MosaicView: action = actions[1];
             break;
-        case Views::OrthoView:  action = actions[2];
+        case OrthoView:  action = actions[2];
             break;
         default:
             break;

@@ -70,6 +70,7 @@ bool FrCreateROICmd::Execute(){
         case FrCreateRoiDialog::LoadFromFile:
             result = LoadFromFile(imgDO, fileName);
             break;
+        default:break;
     }
 
     if(result) {
@@ -137,9 +138,13 @@ bool FrCreateROICmd::LoadFromFile(FrImageDocObj* imgDO, QString filename){
             bool hasSamePDim = (m_MaskImage->getPixDims().size() 
                 == imgDO->GetTimePointData(0)->getPixDims().size());
             if(hasSameDim && hasSamePDim){
+
                 for(int i=0; i < m_MaskImage->getDims().size(); ++i){
-                    hasSameDim = (m_MaskImage->getDim(i) == imgDO->GetTimePointData(0)->getDim(i));
-                    hasSamePDim = (m_MaskImage->getPixDim(i) == imgDO->GetTimePointData(0)->getPixDim(i));
+
+                    hasSameDim = (m_MaskImage->getDim(i) == 
+                                  imgDO->GetTimePointData(0)->getDim(i));
+                    hasSamePDim = (m_MaskImage->getPixDim(i) ==
+                                   imgDO->GetTimePointData(0)->getPixDim(i));
                     if(!hasSameDim || !hasSamePDim) break;
                 }
 
@@ -153,6 +158,7 @@ bool FrCreateROICmd::LoadFromFile(FrImageDocObj* imgDO, QString filename){
                     result = true;
                 }
                 else{
+
                     delete m_MaskImage;
                     result = false;
                 }

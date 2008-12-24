@@ -87,8 +87,10 @@ bool FrRoiDocObj::LoadFromFile(FrImageDocObj* imgDO, QString& fileName){
             }
 
             // check params
-            bool hasSameDim = (img->getDims().size() == imgDO->GetTimePointData(0)->getDims().size());
-            bool hasSamePDim = (img->getPixDims().size() == imgDO->GetTimePointData(0)->getPixDims().size());
+            bool hasSameDim = (img->getDims().size() ==
+                                imgDO->GetTimePointData(0)->getDims().size());
+            bool hasSamePDim = (img->getPixDims().size() ==
+                                imgDO->GetTimePointData(0)->getPixDims().size());
             if(hasSameDim && hasSamePDim){
                 for(int i=0; i < img->getDims().size(); ++i){
                     hasSameDim = (img->getDim(i) == imgDO->GetTimePointData(0)->getDim(i));

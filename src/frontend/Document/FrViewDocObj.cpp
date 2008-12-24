@@ -87,6 +87,7 @@ int FrViewDocObj::GetActiveLayerID(){
         case OrthoView:
             result = this->GetOrthoViewSettings()->ActiveLayerID;
             break;
+        default:break;
     }
     return result;
 }

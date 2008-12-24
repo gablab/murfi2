@@ -28,7 +28,7 @@ class FrActionSignalManager;
 
 // This is main window of application
 class FrMainWindow: public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 public:
     FrMainWindow();
     virtual ~FrMainWindow();
@@ -36,7 +36,7 @@ public:
     FrGetPropMacro(FrMainDocument*,MainDocument);
     void SetMainDocument(FrMainDocument* document);
     FrPropMacro(FrMainController*,MainController);
-    
+
     void Initialize();
     void DisconnectActions();
 

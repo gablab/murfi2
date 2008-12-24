@@ -9,7 +9,7 @@
 
 #include <algorithm>
 #include "Qt/qmessagebox.h"
-#include "RtDataId.h"
+#include "RtDataID.h"
 
 #define DEF_MRI_ID "mri"
 

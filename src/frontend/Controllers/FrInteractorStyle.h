@@ -35,11 +35,11 @@ protected:
     friend class FrTool;
     friend class FrPanTool;
     friend class FrZoomTool;
-	friend class FrSliceScrollTool;
+    friend class FrSliceScrollTool;
     friend class FrTBCTool;
-	friend class FrManipulationTool;
+    friend class FrManipulationTool;
     friend class FrRoiTool; // test
-	friend class FrView2D;	// test
+    friend class FrView2D;	// test
 
 protected:
     FrInteractorStyle();

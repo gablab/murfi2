@@ -26,9 +26,6 @@ T ClampValue(T value, T min, T max){
     return value;
 }
 
-float Frange(float a, float minv, float maxv);
-int  Irange(int a, int minv, int maxv);
-
 //// This functions helps to get layer settings
 //void GetLayerSettings(FrSliceViewSettings*  sets, LayerCollection& layers);
 //void GetLayerSettings(FrMosaicViewSettings* sets, LayerCollection& layers);

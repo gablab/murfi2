@@ -11,7 +11,9 @@
 #include "qwt_plot_grid.h"
 #include "qwt_plot_picker.h"
 #include "qwt_plot_marker.h"
-//#include "scalepicker.h"
+
+// For GCC. Helps him find abs(double)
+#include <cmath>
 
 #define DUMMY_GRAPH_ID -1
 #define PLOT_GRID_COLOR Qt::gray
@@ -26,13 +28,13 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     font.setPointSize(8);
     this->setAxisFont(QwtPlot::xBottom, font);
     this->setAxisScale(QwtPlot::xBottom, 0.0, 0.0, 1.0);
-            
+
     // create grid lines for plot
     m_Grid = new QwtPlotGrid();
     m_Grid->enableY(false);
     m_Grid->setPen(QPen(PLOT_GRID_COLOR));
     m_Grid->attach(this);
-    
+
     // marker
     m_PlotMarker = new QwtPlotMarker();
     m_PlotMarker->setValue(0.0, 0.0);
@@ -54,7 +56,7 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
 }
 
 FrQwtPlotWidget::~FrQwtPlotWidget(){
-    
+    this->RemoveAll();
 }
 
 void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
@@ -166,14 +168,14 @@ void FrQwtPlotWidget::onPointClicked(const QwtDoublePoint& point){
     double x = point.x();
     double floorValue = floor(x);
     double ceilValue = floorValue + 1.0;
-    x = (abs(x - floorValue) < 0.5) ? floorValue : ceilValue;
+    x = (std::abs(x - floorValue) < 0.5) ? floorValue : ceilValue;
 
     if(m_PlotMarker->value().x() == x){
 
-        x = ((abs(point.x()) - abs(x)) > 0) ? ceilValue : floorValue;
+        x = ((std::abs(point.x()) - std::abs(x)) > 0) ? ceilValue : floorValue;
     }
     this->SetMarkerPosition(int(x));
-    
+
     // refresh the plot
     this->replot();
     emit pointClicked(point);
@@ -205,10 +207,12 @@ void FrQwtPlotWidget::SetNumberOfTimePoints(int num){
 
     // Add dummy graph if needed
     if(m_Curves.find(DUMMY_GRAPH_ID) == m_Curves.end()){
+        QString dummyGraphName("Dummy");
+        QColor dummyGraphColor(PLOT_GRID_COLOR);
         this->AddGraph(
             DUMMY_GRAPH_ID, 
-            QString("Dummy"), 
-            QColor(PLOT_GRID_COLOR)); 
+            dummyGraphName, 
+            dummyGraphColor); 
     }
 
     double maxTimePoint = double(num - 1);
@@ -217,7 +221,7 @@ void FrQwtPlotWidget::SetNumberOfTimePoints(int num){
         //double* xData = new double[num];
         double* yData = new double[num];
         for(int i=0; i < num; ++i){
-        
+
             //xData[i] = double(i);
             yData[i] = 0.0;
         }

@@ -124,7 +124,7 @@ void FrOrthoSliceActor::SetInterpolation(int on){
 }
 
 void FrOrthoSliceActor::SetOpacity(float opacity){
-	this->Opacity=Frange(opacity,0.0,1.0);
+	this->Opacity = ClampValue(double(opacity), 0.0, 1.0);
 	if (this->ImageSlice)
 		this->ImageSlice->GetProperty()->SetOpacity(this->Opacity);
 }
@@ -231,19 +231,22 @@ void FrOrthoSliceActor::UpdateSlice(){
 	}
 
 	vtkImageData* img = this->CurrentImage;
+	
 	int dim[3];  
 	img->GetDimensions(dim);
+	
 	double sp[3];   
 	img->GetSpacing(sp);
+	
 	double ori[3];  
 	img->GetOrigin(ori);
 
-	this->CurrentPlane = Irange(this->CurrentPlane, 0,2);
+	this->CurrentPlane = ClampValue(this->CurrentPlane, 0, 2);
 
 	if (this->Level==-1)
 		this->Level = dim[this->CurrentPlane]/2;
 
-	this->Level = Irange(this->Level, 0, dim[this->CurrentPlane]-1);
+	this->Level = ClampValue(this->Level, 0, dim[this->CurrentPlane]-1);
 
 	double d1[3];
 	double d0[3];
@@ -294,7 +297,7 @@ void FrOrthoSliceActor::UpdateSlicePolar(){
 	double ori[3];
 	img->GetOrigin(ori);
 
-	this->CurrentPlane = Irange(this->CurrentPlane,0,2);
+	this->CurrentPlane = ClampValue(this->CurrentPlane,0,2);
 
 	if (this->Level<0){
 		if (this->CurrentPlane == 0)
@@ -342,14 +345,14 @@ void FrOrthoSliceActor::AutoUpdateColormapRange(vtkLookupTable* cmap, vtkImageDa
 
 void FrOrthoSliceActor::SetStepColorMap(vtkLookupTable *cmap, float min, float max, float min_value, float max_value,
 				      int num_colors, int vol){
-	double gap = fabs(min_value-max_value)*0.1;
+	float gap = fabs(min_value-max_value)*0.1;
 	if (gap<1e-7){
 		max=min+1e-7;
 		gap=(min_value-max_value)*0.1;
 	}
 
-	min = Frange(min,min_value,max_value-gap);
-	max = Frange(max,min_value+gap,max_value);
+	min = ClampValue(min,min_value,max_value-gap);
+	max = ClampValue(max,min_value+gap,max_value);
 
 	if (max_value<(min_value+gap))
 		max_value+=gap;

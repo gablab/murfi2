@@ -1,23 +1,6 @@
 #include "FrUtils.h"
 #include "math.h"
 
-
-float Frange(float a, float minv, float maxv){
-	if (a<minv) 
-		a=minv;
-	if (a>maxv) 
-		a=maxv;
-	return a;
-}
-
-int  Irange(int a, int minv, int maxv){
-	if (a<minv) 
-		a=minv;
-	if (a>maxv)
-		a=maxv;
-	return a;
-}
-
 //void GetLayerSettings(FrSliceViewSettings*  sets, LayerCollection& layers){
 //    layers.clear();
 //    layers.push_back(&sets->MainLayer);

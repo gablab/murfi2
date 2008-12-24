@@ -17,8 +17,8 @@ FrPointsDocObj::FrPointsDocObj(RtMRIImage* img){
     m_Points.clear();
  
     if (img){
-        m_dimensions[0] = img->getDim(0);   
-        m_dimensions[1] = img->getDim(1);   
+        m_dimensions[0] = img->getDim(0);
+        m_dimensions[1] = img->getDim(1);
         m_dimensions[2] = img->getDim(2);
         m_spacing[0] = img->getPixDim(0);
         m_spacing[1] = img->getPixDim(1);
@@ -81,12 +81,11 @@ vtkImageData* FrPointsDocObj::GetPointsXY(int z){
 
     //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
     vtkDataArray* inArray = data->GetPointData()->GetScalars();
-    unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
-    
     // init data with transparent values
     memset(inArray->GetVoidPointer(0), 0, inArray->GetSize());
 
     //// init data with transparent values
+    //unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
     //for(int i=0; i < inArray->GetSize()/4; ++i){
     //    pointsPtr[0] = 255;
     //    pointsPtr[1] = 255;
@@ -126,11 +125,9 @@ vtkImageData* FrPointsDocObj::GetPointsXZ(int y){
 
     //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
     vtkDataArray* inArray = data->GetPointData()->GetScalars();
-    unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
-    
     // init data with transparent values
     memset(inArray->GetVoidPointer(0), 0, inArray->GetSize());
-  
+
     unsigned char* dataPtr = (unsigned char*)inArray->GetVoidPointer(0);
     PointCollection::iterator it, itEnd(m_Points.end());
     for(it = m_Points.begin(); it != itEnd; ++it){
@@ -162,11 +159,9 @@ vtkImageData* FrPointsDocObj::GetPointsYZ(int x){
 
     //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
     vtkDataArray* inArray = data->GetPointData()->GetScalars();
-    unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
-    
     // init data with transparent values
     memset(inArray->GetVoidPointer(0), 0, inArray->GetSize());
-  
+
     unsigned char* dataPtr = (unsigned char*)inArray->GetVoidPointer(0);
     PointCollection::iterator it, itEnd(m_Points.end());
     for(it = m_Points.begin(); it != itEnd; ++it){
@@ -190,22 +185,21 @@ vtkImageData* FrPointsDocObj::GetPointsYZ(int x){
 
 vtkImageData* FrPointsDocObj::GetMosaicData(int dimx, int dimy){
     vtkImageData* data = vtkImageData::New();
-	data->SetScalarTypeToUnsignedChar();
-	data->SetNumberOfScalarComponents(4); // ARGB
+    data->SetScalarTypeToUnsignedChar();
+    data->SetNumberOfScalarComponents(4); // ARGB
     data->SetDimensions(dimx, dimy, 1);
     data->SetSpacing(m_spacing[0], m_spacing[1], 1.0);
     data->AllocateScalars();     
-    
+
     //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
     vtkDataArray* inArray = data->GetPointData()->GetScalars();
-    unsigned char* pointsPtr = (unsigned char*)inArray->GetVoidPointer(0);
-    
+
     // init data with transparent values
     memset(inArray->GetVoidPointer(0), 0, inArray->GetSize());
   
     int row, col, num;
     num = dimx/m_dimensions[0];
-    
+
     unsigned char* dataPtr = (unsigned char*)inArray->GetVoidPointer(0);
     PointCollection::iterator it, itEnd(m_Points.end());
     for(it = m_Points.begin(); it != itEnd; ++it){

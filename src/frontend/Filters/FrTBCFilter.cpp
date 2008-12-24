@@ -1,4 +1,4 @@
-#include "FrTbcFilter.h"
+#include "FrTBCFilter.h"
 #include "FrUtils.h"
 
 
@@ -102,8 +102,8 @@ void FrTbcFilter::SimpleExecute(vtkImageData *inData,
 
 void FrTbcFilter::InitLookupTable(unsigned char* luTable, int brightness, int contrast){
     // Declare vars
-    int iMin = MIN_BYTE_VALUE;
-    int iMax = MAX_BYTE_VALUE;
+    int iMin = int(MIN_BYTE_VALUE);
+    int iMax = int(MAX_BYTE_VALUE);
     int iOffsetX = 0;
 
     // Init vars
@@ -116,9 +116,9 @@ void FrTbcFilter::InitLookupTable(unsigned char* luTable, int brightness, int co
     else{
         float div = (256.0f - float(contrast));
         fContrast = (div != 0.0) ? 256.0f / div : 1.0;
-	    iOffsetX = int(((255.0f - (255.0f * fContrast)) / 2.0f) + 0.5f);
+        iOffsetX = int(((255.0f - (255.0f * fContrast)) / 2.0f) + 0.5f);
     }
-        
+
     int iValue;
     int iOffset = brightness + iMin + iOffsetX;
     for (int i = 0; i < 256; i++) {

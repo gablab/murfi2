@@ -58,6 +58,7 @@ bool FrMaskPenCmd::DrawMask(){
         case FrMaskPenCmd::Write:
             pixelValue = 255;
             break;
+        default:break;
     }
     
     bool result = false;
@@ -67,7 +68,7 @@ bool FrMaskPenCmd::DrawMask(){
 
         if(imageData){
             FrMainWindow* mv = this->GetMainController()->GetMainView();
-            
+
             int point[2];
             point[0] = m_Center.x;
             point[1] = m_Center.y;

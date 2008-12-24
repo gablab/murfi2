@@ -31,17 +31,17 @@ bool FrMaskSphereCmd::Execute(){
     bool result = false;
 
     switch (m_Action){
-        case Action::DrawSelection:
+        case FrMaskSphereCmd::DrawSelection:
             result = this->DrawMask(true);
             break;
-        case Action::HideSelection:
+        case FrMaskSphereCmd::HideSelection:
             result = this->DrawMask(false);
             break;
-        case Action::Erase:
-        case Action::Write:
+        case FrMaskSphereCmd::Erase:
+        case FrMaskSphereCmd::Write:
             result = this->WriteMask() && this->DrawMask(false);
             break;
-        case Action::Undefined:
+        case FrMaskSphereCmd::Undefined:
             result = false;
             break;
     }
@@ -55,7 +55,7 @@ bool FrMaskSphereCmd::DrawMask(bool show){
     // get special layer and set selection params
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrSpecialLayer* sl = this->GetSpecialLayer();
-    
+
     if (!sl)
         return false;
 
@@ -72,6 +72,7 @@ bool FrMaskSphereCmd::DrawMask(bool show){
         result = true;
     }
     else {
+
         sl->SetSelectionVisibility(false);
         mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
         result = true;
@@ -172,6 +173,7 @@ void FrMaskSphereCmd::DrawCircle(vtkImageData* imageData, int radius){
         case FrMaskSphereCmd::Write:
             pixelValue = 255;
             break;
+        default: break;
     }
     
     int center[2];

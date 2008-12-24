@@ -147,7 +147,7 @@ void FrMainController::LoadImageFromFile(std::vector<QString>& fileNames){
         }
     }
     
-	FrResetImageCmd* cmd2 = FrCommandController::CreateCmd<FrResetImageCmd>();
+    FrResetImageCmd* cmd2 = FrCommandController::CreateCmd<FrResetImageCmd>();
     cmd2->SetTargetView(FrResetImageCmd::Current);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
@@ -160,7 +160,10 @@ void FrMainController::LoadImageFromFile(std::vector<QString>& fileNames){
 void FrMainController::OpenDataStore(){
 
     FrDataStoreDialog dlg(this->GetMainView(), true);
-    dlg.SetCaption(QString("Data Store Viewer"));
+    
+    // make gcc satisfied
+    QString title("Data Store Viewer");
+    dlg.SetCaption(title);
     dlg.Initialize(this->GetMainDocument());
     dlg.SimpleExec();
 }

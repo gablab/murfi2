@@ -55,24 +55,19 @@ bool FrVoxelSelectionCmd::AddPoint(){
     int imgNumber = -1;
     FrLayeredImage* lim = 0;
 
-    FrViewDocObj* viewDO = 0L;
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);    
-    if(views.size() > 0){
-        viewDO = (FrViewDocObj*)views[0];
-    }
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     Views view = viewDO->GetActiveView();
     switch(view){
-        case Views::SliceView:
+        case SliceView:
             mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetSliceView()->GetImage();
             break;
-        case Views::MosaicView:
+        case MosaicView:
             mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
             lim = mv->GetMosaicView()->GetImage();
             break;
-        case Views::OrthoView:
+        case OrthoView:
             {
                 FrOrthoView* ov =  mv->GetOrthoView();
 
@@ -118,18 +113,18 @@ bool FrVoxelSelectionCmd::AddPoint(){
     int nPointIdx = pImageData->FindPoint(ptMapped);
 
     int Index[3];
-    Index[0] = ptMapped[0];
-    Index[1] = ptMapped[1];
-    Index[2] = ptMapped[2];
+    Index[0] = int(ptMapped[0]);
+    Index[1] = int(ptMapped[1]);
+    Index[2] = int(ptMapped[2]);
 
     GetRealImagePosition(viewDO, pImageData, Index, imgNumber);
 
     // convert coordinates if we have mosaic view selected
-    if (view = Views::MosaicView){
+    if (view = MosaicView){
         // we need to now number of slices in a row, or width/height of one slice
         int sliceDims[3];
         mv->GetSliceView()->GetImage()->GetImageInput()->GetDimensions(sliceDims);
-        
+
         int mosaicDims[3];
         pImageData->GetDimensions(mosaicDims);
 
@@ -156,10 +151,10 @@ bool FrVoxelSelectionCmd::AddPoint(){
         FrPoint* point = new FrPoint(Index[0], Index[1], Index[2], QColor(0, 255, 0));
         
         switch (m_Action){
-            case Action::Add:
+            case FrVoxelSelectionCmd::Add:
                 pointsDO->AddPoint(point);
                 break;
-            case Action::Remove:
+            case FrVoxelSelectionCmd::Remove:
                 pointsDO->RemovePoint(point);
                 break;
         }

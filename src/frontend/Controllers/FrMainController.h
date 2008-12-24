@@ -18,7 +18,7 @@ class QString;
 class FrMainController : public FrController {
 public:
     FrMainController(FrMainWindow* view = 0, FrMainDocument* doc = 0);
-    ~FrMainController();
+    virtual ~FrMainController();
     
     void Initialize();
 

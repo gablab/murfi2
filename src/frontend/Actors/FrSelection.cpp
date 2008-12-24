@@ -23,19 +23,21 @@
 vtkStandardNewMacro(FrSelection);
 
 // Construct object with no children.
-FrSelection::FrSelection(){
+FrSelection::FrSelection() 
+: m_Data(0) {
+
     m_mapper = vtkPolyDataMapper::New();
-	m_actor = vtkActor::New();
+    m_actor = vtkActor::New();
     m_testActor = vtkImageActor::New();
     m_testActor->SetVisibility(true);
 
     this->AddPart(m_testActor);
-	this->AddPart(m_actor);
-	this->PickableOff();
+    this->AddPart(m_actor);
+    this->PickableOff();
 }
 
 FrSelection::~FrSelection(){
-	if (m_actor) m_actor->Delete();
+    if (m_actor) m_actor->Delete();
     if (m_mapper) m_mapper->Delete();
     if (m_testActor) m_testActor->Delete();
 }
@@ -85,13 +87,13 @@ void FrSelection::DrawRectangle(){
     rect->InsertCellPoint(3);
     rect->InsertCellPoint(0);
 
-	vtkPolyData* selectRect = vtkPolyData::New();
-	selectRect->SetPoints(m_BorderPts);
+    vtkPolyData* selectRect = vtkPolyData::New();
+    selectRect->SetPoints(m_BorderPts);
     selectRect->SetLines(rect);
 
     m_mapper->SetInput(selectRect);
 //    m_mapper->Modified();
-    
+
     m_actor->SetVisibility(true);   
     m_actor->SetMapper(m_mapper);
     m_actor->Modified();
@@ -106,18 +108,18 @@ void FrSelection::DrawRectangle(){
 }
 
 void FrSelection::DrawCircle(){
-	vtkRegularPolygonSource *circle = vtkRegularPolygonSource::New();
-	circle->GeneratePolygonOff();
-	circle->SetNumberOfSides(360);
+    vtkRegularPolygonSource *circle = vtkRegularPolygonSource::New();
+    circle->GeneratePolygonOff();
+    circle->SetNumberOfSides(360);
     circle->SetRadius(m_params.radius);
     circle->SetCenter(m_params.center.x, m_params.center.y, 0);
     circle->Update();
 
-	m_mapper->SetInputConnection(circle->GetOutputPort());
+    m_mapper->SetInputConnection(circle->GetOutputPort());
 //    m_mapper->Modified();
     
     m_actor->SetVisibility(true);
-	m_actor->SetMapper(m_mapper);
+    m_actor->SetMapper(m_mapper);
     m_actor->Modified();
 
     // cleanup
@@ -143,8 +145,8 @@ void FrSelection::DrawPolygon(){
 
     //rect->InsertCellPoint(0);
 
-	vtkPolyData* selectRect = vtkPolyData::New();
-	selectRect->SetPoints(m_BorderPts);
+    vtkPolyData* selectRect = vtkPolyData::New();
+    selectRect->SetPoints(m_BorderPts);
     selectRect->SetLines(rect);
 
     m_mapper->SetInput(selectRect);
@@ -163,12 +165,11 @@ void FrSelection::DrawPolygon(){
 void FrSelection::DrawPoints(){
     if (m_Data){
         m_actor->SetVisibility(false);
-        double* center = m_actor->GetCenter();
 
         m_testActor->SetInput(m_Data);  
         m_testActor->SetVisibility(true);
         m_testActor->SetDisplayExtent(m_Data->GetExtent());
-        m_testActor->Modified();    
+        m_testActor->Modified();
     }
 }
 

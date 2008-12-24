@@ -39,10 +39,9 @@ bool FrChangeSliceCmd::Execute(){
     if(!this->GetMainController()) return false;
 
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrMainWindow* mv = this->GetMainController()->GetMainView(); 
 
     bool result = false;
-   
+
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     switch(viewDO->GetActiveView()){
         case SliceView:

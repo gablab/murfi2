@@ -90,7 +90,7 @@ bool FrSliceScrollTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
     FrChangeSliceCmd* cmd = FrCommandController::CreateCmd<FrChangeSliceCmd>();
     cmd->SetSliceDelta(sliceDelta);
     cmd->Execute();
-    delete cmd;   
+    delete cmd;
 
     return true;
 }

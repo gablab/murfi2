@@ -94,12 +94,12 @@ void FrZoomTool::ZoomByScaling(double factor, FrInteractorStyle* is){
 }
 
 bool FrZoomTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
-    vtkCamera *camera = is->CurrentRenderer->GetActiveCamera();
+    //vtkCamera *camera = is->CurrentRenderer->GetActiveCamera();
     // TODO: implement
 
-	//double curScale = camera->GetParallelScale() / factor;
-	//if (curScale > MAX_ZOOM) curScale = MAX_ZOOM;
-	//if (curScale < MIN_ZOOM) curScale = MIN_ZOOM;
+    //double curScale = camera->GetParallelScale() / factor;
+    //if (curScale > MAX_ZOOM) curScale = MAX_ZOOM;
+    //if (curScale < MIN_ZOOM) curScale = MIN_ZOOM;
 
  //   if (camera->GetParallelProjection()) {
  //       FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();

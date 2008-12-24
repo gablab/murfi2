@@ -13,7 +13,7 @@ class FrActionManager : public QObject {
     Q_OBJECT
 public:
     FrActionManager(QObject* parent);
-    ~FrActionManager();
+    virtual ~FrActionManager();
     
     void Retranslate();
 

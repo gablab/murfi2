@@ -170,13 +170,13 @@ void FrGraphPaneWidget::timerEvent(QTimerEvent *event){
         //m_PlayingTimePoint = 0;
     }
     m_QwtPlotWidget->SetMarkerPosition(m_PlayingTimePoint);
-    m_PlayControlWidget->SetAdditionalInfo(
-        QString("Current Time Point: %1")
-        .arg(m_PlayingTimePoint));
+
+    QString info = QString("Current Time Point: %1").arg(m_PlayingTimePoint);
+    m_PlayControlWidget->SetAdditionalInfo(info);
 }
 
 void FrGraphPaneWidget::OnLiveModeChanged(bool value){
-    
+
     emit LiveModeChanged(value);
 }
 
@@ -188,13 +188,12 @@ void FrGraphPaneWidget::OnPlayClicked(){
 
     int tpPerSecond = m_PlayControlWidget->GetTimePointPerSecond();
     int interval = 1000 / tpPerSecond;
-    
+
     m_TimerID = this->startTimer(interval);
     m_IsPaused = false;
-
-    m_PlayControlWidget->SetAdditionalInfo(
-        QString("Current Time Point: %1")
-        .arg(m_PlayingTimePoint));
+    
+    QString info = QString("Current Time Point: %1").arg(m_PlayingTimePoint);
+    m_PlayControlWidget->SetAdditionalInfo(info);
 }
 
 void FrGraphPaneWidget::OnPauseClicked(){

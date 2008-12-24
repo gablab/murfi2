@@ -13,7 +13,7 @@
 // dilation and erosion for ROI mask data.
 class FrMaskFreeShapeCmd : public FrMaskBaseCmd {
 public:
-    enum Action { Undefined, Draw, Write, Erase };
+    typedef enum _Actions { Undefined, Draw, Write, Erase } Actions;
     typedef std::vector<Pos> Points;
 
 public:
@@ -29,7 +29,7 @@ public:
     virtual bool Redo();
 
     // Properties
-    FrSetPropMacro(Action, Action);
+    FrSetPropMacro(Actions, Action);
     FrSetPropMacro(Points, Points);
 
 private:

@@ -1,5 +1,5 @@
 #include "FrLayeredImage.h"
-#include "FrRoiLayer.h"
+#include "FrROILayer.h"
 #include "FrImageLayer.h"
 #include "FrColormapLayer.h"
 #include "FrSpecialLayer.h"

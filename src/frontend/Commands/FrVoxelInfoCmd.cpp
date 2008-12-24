@@ -129,9 +129,9 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     vd.name = "test";   // get layer (image?) name
     vd.timepoint = 44;  // get timepoint
     
-    vd.Index[0] = ptMapped[0];
-    vd.Index[1] = ptMapped[1];
-    vd.Index[2] = ptMapped[2];
+    vd.Index[0] = int(ptMapped[0]);
+    vd.Index[1] = int(ptMapped[1]);
+    vd.Index[2] = int(ptMapped[2]);
 
     // TODO: fix for side values
     GetRealImagePosition(viewDO, pImageData, vd.Index, imgNumber);

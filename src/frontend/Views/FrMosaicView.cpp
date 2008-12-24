@@ -160,7 +160,7 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
     FrViewDocObj* vdo = params.Document->GetCurrentViewObject();
     m_docReader->SetDocument(params.Document);
     m_docReader->SetMosaic(true);
-    m_docReader->SetOrientation(FrDocumentReader::XY);    
+    m_docReader->SetOrientation(FrDocumentReader::XY);
     m_docReader->SetTimeSeries(vdo->GetTimeSeries());
 
     FrUpdateParams1::LayerCollection::iterator it,

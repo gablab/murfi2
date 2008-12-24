@@ -51,7 +51,7 @@ bool FrChangeTbcCmd::Execute(){
         ChangeTbcByLayerID(layers, layerID);
         break;
     }
-    case Views::OrthoView:
+    case OrthoView:
         // change for all 3 views
         layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
         for(int viewID=0; viewID < ORTHO_VIEWS_CNT; ++viewID){
@@ -84,12 +84,7 @@ void FrChangeTbcCmd::ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, i
                 FrImageLayerSettings* imgLS = (FrImageLayerSettings*)layerDO->GetSettings();
                 SetupTbcSettings(imgLS->TbcSettings);
             }
-        }    
-
-        //std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
-        //for(it = layers.begin(); it != itEnd; ++it){
-        //    SetupTbcSettings((*it)->TbcSettings);
-        //}
+        }
     }
     else if(ID != BAD_LAYER_ID){
         // get all layer settings
@@ -99,35 +94,33 @@ void FrChangeTbcCmd::ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, i
 
         // find laye by ID and change settings
         if(layers.size() > 0){
+
             for (int i = 0; i < layers.size(); i++){
+
                 layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-                
                 if (layerDO->GetID() == ID){
+
                     FrImageLayerSettings* imgLS = (FrImageLayerSettings*)layerDO->GetSettings();
                     SetupTbcSettings(imgLS->TbcSettings);
                 }
             }
-        }    
+        }
 
-        //std::vector<FrLayerSettings*>::iterator it, itEnd(layers.end());
-        //for(it = layers.begin(); it != itEnd; ++it){
-        //    if((*it)->ID == ID){
-        //        SetupTbcSettings((*it)->TbcSettings);
-        //        break;
-        //    }
-        //}
     }
 }
 
 void FrChangeTbcCmd::SetupTbcSettings(FrTbcSettings& settings){ 
 
     if(m_isThreshold)  {
+
         settings.Threshold  += m_Threshold;
     }
     if(m_isBrightness) {
+
         settings.Brightness += m_Brightness;
     }
     if(m_isContrast) {
+
         settings.Contrast += m_Contrast;
     }
 }

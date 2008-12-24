@@ -18,10 +18,11 @@ default:
 	cd ./FrMainWindow  &&	$(MAKE)
 	cd ./Layers	&&	$(MAKE)
 	cd ./Tools	&&	$(MAKE)
-	cd ./Views	&&	$(MAKE)
-	cd ./Widgets	&&	$(MAKE)
+	cd ./Views	&&	$(MAKE)	
 	cd ./Utils	&&	$(MAKE)
-	cd ./moc	&&	$(MAKE) -f ./makefile.mocing	&& $(MAKE) 	
+	cd ./moc	&&	$(MAKE) -f ./makefile.mocing
+	cd ./moc	&&	$(MAKE)
+	cd ./Widgets	&&	$(MAKE)
 
 clean:
 	@$(ECHO) 'make: removing object and autosave files'

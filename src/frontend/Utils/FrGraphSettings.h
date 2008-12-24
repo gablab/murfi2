@@ -36,40 +36,52 @@ public:
     DrawMethods DrawMethod;
 
     // Methods
+    FrGraphSettings(){}
+    virtual ~FrGraphSettings(){}
     virtual GraphTypes GetType()=0;
 };
 
 // Concreate class represent settings for voxel intencity
 class FrIntencityGraphSettings : public FrGraphSettings {
-public:    
+public:
     // Voxel coordinates
     int I, J, K;
 
     // Methods
+    FrIntencityGraphSettings(){}
+    virtual ~FrIntencityGraphSettings(){}
     virtual GraphTypes GetType(){ return GT_Intencity; }
 };
 
 class FrMovementsGraphSettings : public FrGraphSettings {
 public:
     // Methods
+    FrMovementsGraphSettings(){}
+    virtual ~FrMovementsGraphSettings(){}
     virtual GraphTypes GetType(){ return GT_Movements; }
 };
 
 class FrStimulusGraphSettings : public FrGraphSettings {
 public:
     // Methods
+    FrStimulusGraphSettings(){}
+    virtual ~FrStimulusGraphSettings(){}
     virtual GraphTypes GetType(){ return GT_Stimulus; }
 };
 
 class FrRoiMeanGraphSettings : public FrGraphSettings {
 public:
     // Methods
+    FrRoiMeanGraphSettings(){}
+    virtual ~FrRoiMeanGraphSettings(){}
     virtual GraphTypes GetType(){ return GT_RoiMean; }
 };
 
 class FrRoiStdGraphSettings : public FrGraphSettings {
 public:
     // Methods
+    FrRoiStdGraphSettings(){}
+    virtual ~FrRoiStdGraphSettings(){}
     virtual GraphTypes GetType(){ return GT_RoiStd; }
 };
 

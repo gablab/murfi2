@@ -85,7 +85,7 @@ private:
 
 private:
     FrCommandController();
-    ~FrCommandController();
+    virtual ~FrCommandController();
 
     static FrCommandController* m_controller;
 };

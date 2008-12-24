@@ -128,9 +128,9 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
     if(!isActiveViewOk) return false;
     switch(activeView){
         // NOTE: Fall throuhg first 3 cases 
-        case Views::SliceView:
-        case Views::MosaicView:
-        case Views::OrthoView:
+        case SliceView:
+        case MosaicView:
+        case OrthoView:
             tabs->SetActiveView((Views)activeView);
             break;
         default: 
@@ -496,7 +496,7 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
             break;
         case FrLayerSettings::LColormap:
             FrColormapLayerSettings* cmlSets = (FrColormapLayerSettings*)ls;
-            
+
             // Load other
             hasRange = hasCm = hasTbc = false;
 
@@ -513,7 +513,7 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
                     cmlSets->ColormapSettings.MaxValue = 
                         childElem.attribute(FR_XML_MAXVAL_ATTR).toInt(&hasRange);
                     if(!hasRange) return false;
-                    
+
                 }
                 else if(childElem.tagName() == FR_XML_CMAP_ELEM){
                     if(!childElem.hasAttribute(FR_XML_MIDVALUE_ATTR) ||
@@ -545,11 +545,11 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
                     cmlSets->ColormapSettings.Color.setRgb(r, g, b);
 
                     // Get mid value
-			        cmlSets->ColormapSettings.MidValue = 
-                        childElem.attribute(FR_XML_MIDVALUE_ATTR).toInt(&hasCm);
+                    cmlSets->ColormapSettings.MidValue = 
+                    childElem.attribute(FR_XML_MIDVALUE_ATTR).toInt(&hasCm);
                     // Get threshold	(range of non significant values)
-			        cmlSets->ColormapSettings.Threshold = 
-                        childElem.attribute(FR_XML_THRESH_ATTR).toInt(&hasCm);
+                    cmlSets->ColormapSettings.Threshold = 
+                    childElem.attribute(FR_XML_THRESH_ATTR).toInt(&hasCm);
                     if(!hasCm) return false;
                 }
                 else if(childElem.tagName() == FR_XML_TBCSETS_ELEM){
@@ -570,7 +570,7 @@ bool FrLoadTabsCmd::LoadAttrValuesXYZ(QDomElement& elem, double* vec){
                                  elem.hasAttribute(FR_XML_Y_ATTR) && 
                                  elem.hasAttribute(FR_XML_Z_ATTR);
     if(!hasRequiredAttributes) return false;
-    
+
     // load values
     bool isOk = false;
     vec[0] = elem.attribute(FR_XML_X_ATTR).toDouble(&isOk);

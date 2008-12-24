@@ -39,6 +39,7 @@ void FrInteractorStyle::OnMouseMove(){
             case Right: 
                 params.Button = FrMouseParams::RightButton; 
                 break;
+            default:break;
         }
 
         bool result = false;

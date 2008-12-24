@@ -26,6 +26,7 @@ public:
         this->Opacity = DEF_LAYER_OPACITY;
         this->Visibility = DEF_LAYER_VISIBILITY;
     }
+    virtual ~FrLayerSettings(){}
 
     typedef enum _Types { LImage, LColormap, LRoi } LTypes;
     virtual LTypes GetType() = 0;
@@ -43,7 +44,8 @@ public:
 // Settings for MRI layer
 class FrImageLayerSettings : public FrLayerSettings {
 public:
-    FrImageLayerSettings(){ }
+    FrImageLayerSettings(){}
+    virtual ~FrImageLayerSettings(){}
     virtual LTypes GetType() {
         return LImage;
     }
@@ -55,7 +57,8 @@ public:
 // Settings for colormap layer
 class FrColormapLayerSettings : public FrLayerSettings {
 public:
-    FrColormapLayerSettings(){ }
+    FrColormapLayerSettings(){}
+    virtual ~FrColormapLayerSettings(){}
     virtual LTypes GetType() {
         return LColormap;
     }
@@ -68,7 +71,8 @@ public:
 // Settings for ROI layer
 class FrRoiLayerSettings : public FrLayerSettings {
 public:
-    FrRoiLayerSettings(){ }
+    FrRoiLayerSettings(){}
+    virtual ~FrRoiLayerSettings(){}
     virtual LTypes GetType() {
         return LRoi;
     }

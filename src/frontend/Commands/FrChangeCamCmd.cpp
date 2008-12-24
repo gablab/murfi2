@@ -97,17 +97,17 @@ bool FrChangeCamCmd::Execute(){
     }
     m_isFocalPoint = m_isPosition = m_isViewUp = m_isScale = m_isXY = false;
     mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
-    
+
     return result;
 }
 
 bool FrChangeCamCmd::SetupOrthoViewCamSettings(){
-    
+
     if( !m_isXY ) return false;
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrOrthoView* ov = mv->GetOrthoView();
-    
+
     // Find working renderer
     // Find Image where click's occured
     int imgIndex = INVALIDE_IMAGE_NUM;
@@ -117,7 +117,7 @@ bool FrChangeCamCmd::SetupOrthoViewCamSettings(){
             break;
         }
     }
-    
+
     bool result = false;
     if(imgIndex != INVALIDE_IMAGE_NUM){
         // Change info in document

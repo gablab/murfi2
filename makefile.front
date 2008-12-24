@@ -148,19 +148,24 @@ VTK_LIBS = -lvtkGraphics -lvtkRendering -lvtkftgl -lvtkImaging -lvtkFiltering -l
 
 #####################################################################
 #qt includes, flags and libs
-QT_INCS=-I/usr/share/qt4/include
-export QT_LIBS=-lQtCore -lQtGui -lQtXml
+QT_INCS =-I/usr/share/qt4/include
+export QT_LIBS =-lQtCore -lQtGui -lQtXml
+
+#####################################################################
+#qwt includes (add QtGui also to fix some troubles), flags and libs
+QWT_INCS = -I$(PKG_DIR)/qwt/include -I/usr/share/qt4/include/QtCore -I/usr/share/qt4/include/QtGui
+QWT_LIBS = -lqwt -L$(PKG_DIR)/qwt/lib
 
 #####################################################################
 # build compiler flags
 #compiler includes
-export C_INCS = -I$(SRC_DIR) -I$(FSRC_DIR) $(BK_SUB_DIRS) $(FR_SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(VXL_INCS) $(GNUPLOT_INCS) $(NIFTI_INCS) $(VTK_INCS) $(QT_INCS)
+export C_INCS = -I$(SRC_DIR) -I$(FSRC_DIR) $(BK_SUB_DIRS) $(FR_SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(VXL_INCS) $(GNUPLOT_INCS) $(NIFTI_INCS) $(VTK_INCS) $(QT_INCS) $(QWT_INCS)
 
 #compiler flags
 export C_FLAGS = -Wall $(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) $(BACKEND_FLAGS) $(C_INCS) -Wno-deprecated
 
 #all libs
-export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS) $(GNUPLOT_LIBS) $(NIFTI_LIBS) $(VTK_LIBS) $(QT_LIBS) $(PROF_FLAG)
+export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS) $(GNUPLOT_LIBS) $(NIFTI_LIBS) $(VTK_LIBS) $(QT_LIBS) $(QWT_LIBS) $(PROF_FLAG)
 
 #pkgconfig
 export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0

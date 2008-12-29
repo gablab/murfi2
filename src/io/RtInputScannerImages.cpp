@@ -204,7 +204,6 @@ int RtInputScannerImages::svc() {
     rti->setNumSlices(numSlices);
 
 
-
 //    rti->setPixDim(0,voxDim[0]);
 //    rti->setPixDim(1,voxDim[1]);
 //    rti->setPixDim(2,voxDim[2]);
@@ -213,11 +212,23 @@ int RtInputScannerImages::svc() {
       rti->unmosaic();
     }
 
+    // if there is motion info add it
+    if(ei->bIsMoCo) {
+      RtMotion *mot = new RtMotion(ei->dMoCoTransX,
+				   ei->dMoCoTransY,
+				   ei->dMoCoTransZ,
+				   ei->dMoCoRotX,
+				   ei->dMoCoRotY,
+				   ei->dMoCoRotZ);
+      RtExperiment::getDataStore()->setData(mot);
+    }
+
     // set the image id for handling
     //rti->addToID("scanner");
 
     // append this to a vector of gathered images
     received.push_back(rti);
+    RtExperiment::getDataStore()->setData(rti);
 
     // signal that we got an image
     //cout << "sending event with code number " << codeNum << endl;

@@ -86,6 +86,15 @@ RtConfig *RtExperiment::getConfig() {
   return config;
 }
 
+// get the data store for this experiment
+RtDataStore *RtExperiment::getDataStore() {
+  if(config == NULL || config->getConductor() == NULL) {
+    return NULL;
+  }
+
+  return config->getConductor()->getDataStore();
+}
+
   
 // set studyID and set studyDir
 // SHOULD ONLY BE CALLED FROM THE CONSTRUCTOR FOR THIS CLASS AND FROM

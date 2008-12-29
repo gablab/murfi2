@@ -9,6 +9,7 @@
 #define RT_EXPERIMENT_H
 
 #include"RtConductor.h"
+#include"RtDataStore.h"
 
 // set the paths relative to the subject directory for kinds of data
 #define VOLUME_DIR    "img/"
@@ -48,6 +49,9 @@ public:
 
   // get the configuration for this experiment
   static RtConfig *getConfig();
+
+  // get the data store for this experiment
+  static RtDataStore *getDataStore();
 
   //* static methods for getting info about registrations *//
 

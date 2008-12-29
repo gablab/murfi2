@@ -13,23 +13,12 @@
 #include"ace/Date_Time.h"
 
 #include"RtDataImage.h"
+#include"RtMotion.h"
 #include"RtExternalSenderImageInfo.h"
 
 #include"debug_levels.h"
 
 using namespace std;
-
-// MOTION STUFF
-// TODO: make this its own data class
-#define NUM_MOTION_DIMENSIONS 6
-typedef enum {
-  MOTION_TRANSLATION_X = 0,
-  MOTION_TRANSLATION_Y,
-  MOTION_TRANSLATION_Z,
-  MOTION_ROTATION_X,  
-  MOTION_ROTATION_Y,  
-  MOTION_ROTATION_Z  
-} MotionDimension; 
 
 // class declaration
 class RtMRIImage : public RtDataImage<short> {
@@ -114,11 +103,11 @@ public:
 //  // get the series number
 //  unsigned int getSeriesNum();
 
-  // get a motion parameter
-  double getMotionParameter(MotionDimension d) const;
-
-  // set a motion parameter
-  void setMotionParameter(MotionDimension d, double m);
+//  // get a motion parameter
+//  double getMotionParameter(MotionDimension d) const;
+//
+//  // set a motion parameter
+//  void setMotionParameter(MotionDimension d, double m);
 
   // get a smart contrast level
   float getAutoContrast();
@@ -146,8 +135,8 @@ protected:
   double ti;                  // inversion time (ms)
   double triggerTime;         // trigger time (ms)
 
-  // motion parameters
-  double motionParameters[NUM_MOTION_DIMENSIONS];
+//  // motion parameters
+//  double motionParameters[NUM_MOTION_DIMENSIONS];
 
   // actual acquision info parms
   ACE_Date_Time time;                // acquisition time

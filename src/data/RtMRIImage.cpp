@@ -23,10 +23,10 @@ RtMRIImage::RtMRIImage() : RtDataImage<short>() {
 
   magicNumber = MAGIC_NUMBER;
 
-  // init motion parms
-  for(int i = 0; i < 6; i++) {
-    motionParameters[i] = 0.0;
-  }
+//  // init motion parms
+//  for(int i = 0; i < 6; i++) {
+//    motionParameters[i] = 0.0;
+//  }
 }
 
 // constructor that accepts a filename to read an image from
@@ -310,23 +310,23 @@ RtMRIImage::~RtMRIImage() {
 //  return getDataID().getSeriesNum();
 //}
 
-// get a motion parameter
-double RtMRIImage::getMotionParameter(MotionDimension d) const {
-  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
-    return 0.0;
-  }
-  
-  return motionParameters[d];
-}
-
-// set a motion parameter
-void RtMRIImage::setMotionParameter(MotionDimension d, double m) {
-  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
-    return;
-  }
-  
-  motionParameters[d] = m;
-}
+//// get a motion parameter
+//double RtMRIImage::getMotionParameter(MotionDimension d) const {
+//  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
+//    return 0.0;
+//  }
+//  
+//  return motionParameters[d];
+//}
+//
+//// set a motion parameter
+//void RtMRIImage::setMotionParameter(MotionDimension d, double m) {
+//  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
+//    return;
+//  }
+//  
+//  motionParameters[d] = m;
+//}
 
 // DEBUGGGING
 #include"printVnl44Mat.cpp"
@@ -416,14 +416,6 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   ti = info.dTI;
   triggerTime = info.dTriggerTime;
 
-  // set the motion parameters
-  setMotionParameter(MOTION_TRANSLATION_X, info.dMoCoTransX);
-  setMotionParameter(MOTION_TRANSLATION_Y, info.dMoCoTransY);
-  setMotionParameter(MOTION_TRANSLATION_Z, info.dMoCoTransZ);
-  setMotionParameter(MOTION_ROTATION_X, info.dMoCoRotX);
-  setMotionParameter(MOTION_ROTATION_Y, info.dMoCoRotY);
-  setMotionParameter(MOTION_ROTATION_Z, info.dMoCoRotZ);
-
 
 
   // actual acquision info parms
@@ -435,7 +427,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   // scanner online post-processing parms
   distCorrect2D = false;
   moco = info.bIsMoCo;  
-
+  
   // received data parms
   fromScanner = info.iDataSource == 0;
 }

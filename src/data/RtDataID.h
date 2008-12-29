@@ -40,6 +40,8 @@ public:
     RtDataID(RtDataID &prevModuleData,
              const RtStreamComponent &thisModule);
 
+    // copy constructor
+    RtDataID(const RtDataID &other);
 
     virtual ~RtDataID();
 
@@ -62,6 +64,9 @@ public:
     // set info from input data
     void setFromInputData(RtData &prevModuleData,
                           const RtStreamComponent &thisModule);
+
+    // copy from other data
+    void copyFromOtherDataID(const RtDataID &otherDataID);
 
     // set the ID from a string
     string setFromString(const string &id);

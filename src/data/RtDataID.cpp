@@ -48,6 +48,12 @@ RtDataID::RtDataID(unsigned int _studyNum,
     instantiationTime = RtExperiment::getExperimentElapsedTime();
 }
 
+// copy constructor
+RtDataID::RtDataID(const RtDataID &other) {
+  copyFromOtherDataID(other);
+}
+
+
 // constructor from a data id from a previous module
 RtDataID::RtDataID(RtDataID &prevModuleData,
                    const RtStreamComponent &thisModule) {
@@ -201,12 +207,17 @@ void RtDataID::setFromInputData(RtData &prevModuleData,
 // set from input data
 void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
                                   const RtStreamComponent &thisModule) {
-    (*this) = prevModuleDataID;
-    siteIDNum = SITE_ID_NUMBER;
-    history = history + moduleID;
-    moduleID = thisModule.getID();
+  copyFromOtherDataID(prevModuleDataID);
+  history = history + moduleID;
+  moduleID = thisModule.getID();
+  
+  instantiationTime = RtExperiment::getExperimentElapsedTime();
+}
 
-    instantiationTime = RtExperiment::getExperimentElapsedTime();
+// copy from other data
+void RtDataID::copyFromOtherDataID(const RtDataID &otherDataID) {
+    (*this) = otherDataID;
+    siteIDNum = SITE_ID_NUMBER;
 }
 
 // output to stream

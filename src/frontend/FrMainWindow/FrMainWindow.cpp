@@ -14,6 +14,7 @@
 #include "FrActionManager.h"
 #include "FrActionSignalManager.h"
 #include "FrGraphPaneWidget.h"
+#include "FrImageSettingsWidget.h"
 
 #include "Qt/qgroupbox.h"
 #include "Qt/qboxlayout.h"
@@ -53,6 +54,9 @@ void FrMainWindow::SetMainDocument(FrMainDocument* document){
 
         m_GraphPaneWidget->SetDocument(document);
         m_GraphPaneWidget->Update();
+
+        m_ImageSettingsWidget->SetDocument(document);
+        m_ImageSettingsWidget->Update();
     }
 }
 void FrMainWindow::SetupUi(QMainWindow* mainWindow){
@@ -147,6 +151,13 @@ void FrMainWindow::InitializeWidgets(){
     m_VoxelInfoWidget = new FrVoxelInfoWidget(dock);
 
     dock->setWidget(m_VoxelInfoWidget);
+    addDockWidget(Qt::LeftDockWidgetArea, dock);
+    m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
+
+    dock = new QDockWidget(tr("Image Settings"), this);
+    m_ImageSettingsWidget = new FrImageSettingsWidget(dock, m_MainDocument);
+
+    dock->setWidget(m_ImageSettingsWidget);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 

@@ -39,7 +39,7 @@ public:
         m_signalsBlocked = value;
     }
 
-    FrLayerDocObj* GetLayerDocObjByID(int id);
+    //FrLayerDocObj* GetLayerDocObjByID(int id);
     //bool GetLayerParams(int id, FrLayerSettings& params);
     
     int GetOpacity();

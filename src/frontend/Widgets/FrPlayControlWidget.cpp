@@ -53,6 +53,10 @@ FrPlayControlWidget::FrPlayControlWidget(QWidget *parent)
     m_Reset = m_tbPlayback->addAction("Reset");
     m_tbPlayback->addSeparator();
 
+    m_Previous = m_tbPlayback->addAction("Previous");
+    m_Next = m_tbPlayback->addAction("Next");
+    m_tbPlayback->addSeparator();
+
     m_Slower = m_tbPlayback->addAction("Slower");
     m_Faster = m_tbPlayback->addAction("Faster");
 
@@ -73,6 +77,8 @@ FrPlayControlWidget::FrPlayControlWidget(QWidget *parent)
     CONNECT_ACTION_TRIGGERED(m_Play, OnPlayPressed());
     CONNECT_ACTION_TRIGGERED(m_Pause, OnPausePressed());
     CONNECT_ACTION_TRIGGERED(m_Reset, OnResetPressed());
+    CONNECT_ACTION_TRIGGERED(m_Previous, OnPreviousPressed());
+    CONNECT_ACTION_TRIGGERED(m_Next, OnNextPressed());
     CONNECT_ACTION_TRIGGERED(m_Slower, OnSlowerPressed());
     CONNECT_ACTION_TRIGGERED(m_Faster, OnFasterPressed());
 }
@@ -123,6 +129,14 @@ void FrPlayControlWidget::OnResetPressed(){
     emit Reset();
 }
 
+void FrPlayControlWidget::OnPreviousPressed(){
+    emit Previous();
+}
+
+void FrPlayControlWidget::OnNextPressed(){
+    emit Next();
+}
+
 void FrPlayControlWidget::OnSlowerPressed(){
 
     if(m_TimePointPerSecond > MIN_TP_PER_SEC){
@@ -157,6 +171,8 @@ void FrPlayControlWidget::UpdateButtons(){
                 // For life mode everithing is off
                 m_LiveMode->setEnabled(true);
                 m_LiveMode->setChecked(true);
+                m_Previous->setEnabled(true);
+                m_Next->setEnabled(true);
                 m_Play->setEnabled(false);
                 m_Play->setChecked(false);
                 m_Pause->setEnabled(false);
@@ -171,6 +187,8 @@ void FrPlayControlWidget::UpdateButtons(){
             {   
                 m_LiveMode->setEnabled(true);
                 m_LiveMode->setChecked(false);
+                m_Previous->setEnabled(false);
+                m_Next->setEnabled(false);
                 m_Play->setEnabled(true);
                 m_Play->setChecked(false);
                 m_Pause->setEnabled(false);
@@ -185,6 +203,8 @@ void FrPlayControlWidget::UpdateButtons(){
             {
                 m_LiveMode->setEnabled(false);
                 m_LiveMode->setChecked(false);
+                m_Previous->setEnabled(false);
+                m_Next->setEnabled(false);
                 m_Play->setEnabled(true);
                 m_Play->setChecked(true);
                 m_Pause->setEnabled(true);
@@ -199,6 +219,8 @@ void FrPlayControlWidget::UpdateButtons(){
             {
                 m_LiveMode->setEnabled(false);
                 m_LiveMode->setChecked(false);
+                m_Previous->setEnabled(true);
+                m_Next->setEnabled(true);
                 m_Play->setEnabled(true);
                 m_Play->setChecked(false);
                 m_Pause->setEnabled(true);

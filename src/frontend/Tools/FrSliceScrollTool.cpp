@@ -35,9 +35,15 @@ bool FrSliceScrollTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params
         m_oldX = params.X;
         m_oldY = params.Y;
         
-        FrChangeSliceCmd* cmd = FrCommandController::CreateCmd<FrChangeSliceCmd>();
-        cmd->SetMouseXY(params.X, params.Y);
-        cmd->SetSliceDelta(0);
+        FrChangeSliceCmd* cmd1 = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+        cmd1->SetMouseXY(params.X, params.Y);
+        cmd1->SetSliceDelta(0);
+        
+        FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        cmd->AddCommand(cmd1);
+        cmd->AddCommand(cmd2);
         cmd->Execute();
         delete cmd;
     }
@@ -59,9 +65,15 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
         m_oldY = params.Y;
     }
 
-    FrChangeSliceCmd* cmd = FrCommandController::CreateCmd<FrChangeSliceCmd>();
-    cmd->SetMouseXY(params.X, params.Y);
-    cmd->SetSliceDelta(sliceDelta);
+    FrChangeSliceCmd* cmd1 = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+    cmd1->SetMouseXY(params.X, params.Y);
+    cmd1->SetSliceDelta(sliceDelta);
+
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;
 	
@@ -87,8 +99,14 @@ bool FrSliceScrollTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
             break;
     }
     
-    FrChangeSliceCmd* cmd = FrCommandController::CreateCmd<FrChangeSliceCmd>();
-    cmd->SetSliceDelta(sliceDelta);
+    FrChangeSliceCmd* cmd1 = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+    cmd1->SetSliceDelta(sliceDelta);
+
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     cmd->Execute();
     delete cmd;
 

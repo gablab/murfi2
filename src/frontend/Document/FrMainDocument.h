@@ -7,6 +7,7 @@ class FrDocumentObj;
 class FrViewDocObj;
 class FrTabSettingsDocObj;
 class FrAppSettingsDocObj;
+class FrLayerDocObj;
 class RtData;
 
 // Some includes
@@ -25,6 +26,8 @@ public:
     FrViewDocObj* GetCurrentViewObject();
 
     FrAppSettingsDocObj* GetAppSettings();
+
+    FrLayerDocObj* GetLayerDocObjByID(int id);
 
     void AddDataToStore(RtData *data);
 

@@ -43,6 +43,7 @@ public:
 	void AddLayer();
     void DeleteLayer();
     void ChangeLayer(int action);
+    void ChangeImageSettings();
 
     void ChangeBookmark(int id);
     void DeleteBookmark(int id);
@@ -55,6 +56,8 @@ public:
 
     void SetLiveMode(bool newLiveMode);
     void SetCurrentTimePoint(int newTimePoint);
+    void SetPreviousTimePoint();
+    void SetNextTimePoint();
 
 	// Override from base class
     virtual void Notify(int notifyCode);

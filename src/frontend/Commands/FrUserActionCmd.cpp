@@ -11,6 +11,7 @@
 #include "FrLayerDocObj.h"
 #include "FrViewDocObj.h"
 #include "FrColormapWidget.h"
+#include "FrImageSettingsWidget.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -37,6 +38,8 @@ bool FrUserActionCmd::Execute(){
         case FrUserActionCmd::Add: result = AddLayer();
             break;
         case FrUserActionCmd::Delete: result = DeleteLayer();
+            break;
+        case FrUserActionCmd::ChangeSettings: result = ChangeImageSettings();
             break;
         case FrUserActionCmd::Undefined:
         default:
@@ -101,12 +104,127 @@ bool FrUserActionCmd::DeleteLayer(){
     return true;
 }
 
+bool FrUserActionCmd::ChangeImageSettings(){
+    // check what should be changed TBC values or slice number
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrMainWindow* mw = this->GetMainController()->GetMainView();
+
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    // get current slice number
+    int old_slice[3];
+    int new_slice[3];
+    FrLayerSettings* ls;
+    FrTbcSettings old_tbc;
+    FrTbcSettings new_tbc;
+    bool roi = true;
+
+    // get tbc settings from current layer
+    int id = GetActiveLayerID();
+    FrLayerDocObj* layerDO = doc->GetLayerDocObjByID(id);
+
+    if (!layerDO)
+        return false;
+
+    if (!layerDO->IsRoi()){
+        roi = false;
+        ls = layerDO->GetSettings();
+
+        if (layerDO->IsColormap()){
+            old_tbc = ((FrColormapLayerSettings*)ls)->TbcSettings;
+        }
+        else if (layerDO->IsImage()){
+            old_tbc = ((FrImageLayerSettings*)ls)->TbcSettings;
+        }
+
+        // get tbc settings from widget
+        new_tbc = mw->GetImageSettingsWidget()->GetTbcSettings();
+
+        // check if tbc settings changed
+        if (old_tbc.Brightness != new_tbc.Brightness || old_tbc.Contrast != new_tbc.Contrast ||
+            old_tbc.Threshold != new_tbc.Threshold){
+            // set new tbc settings
+            old_tbc.Brightness = new_tbc.Brightness;
+            old_tbc.Contrast = new_tbc.Contrast;
+            old_tbc.Threshold = new_tbc.Threshold;
+            
+            if (layerDO->IsColormap()){
+                ((FrColormapLayerSettings*)ls)->TbcSettings.Brightness = new_tbc.Brightness;
+                ((FrColormapLayerSettings*)ls)->TbcSettings.Contrast = new_tbc.Contrast;
+                ((FrColormapLayerSettings*)ls)->TbcSettings.Threshold = new_tbc.Threshold;
+            }
+            else if (layerDO->IsImage()){
+                ((FrImageLayerSettings*)ls)->TbcSettings.Brightness = new_tbc.Brightness;
+                ((FrImageLayerSettings*)ls)->TbcSettings.Contrast = new_tbc.Contrast;
+                ((FrImageLayerSettings*)ls)->TbcSettings.Threshold = new_tbc.Threshold;
+            }
+
+            layerDO->SetSettings(ls);
+
+            FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_TBC);
+        }
+    }
+
+    Views view = viewDO->GetActiveView();
+    switch(view){
+        case SliceView:
+            old_slice[0] = viewDO->GetSliceViewSettings()->SliceNumber;
+            new_slice[0] = mw->GetImageSettingsWidget()->GetSliceNumber(3);
+
+            // check if slice number changed
+            if (old_slice[0] != new_slice[0]){
+                // set new slice number
+                viewDO->GetSliceViewSettings()->SliceNumber = new_slice[0];
+
+                FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+            }
+            break;
+        case MosaicView:
+            // do nothing here
+            break;
+        case OrthoView:
+            for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
+                old_slice[i] = viewDO->GetOrthoViewSettings()->SliceNumber[i];
+                new_slice[i] = mw->GetImageSettingsWidget()->GetSliceNumber(i);
+            }
+            if (old_slice[0] != new_slice[0] || old_slice[1] != new_slice[1] || old_slice[2] != new_slice[2]){
+                // set new slice number
+                viewDO->GetOrthoViewSettings()->SliceNumber[0] = new_slice[0];
+                viewDO->GetOrthoViewSettings()->SliceNumber[1] = new_slice[1];
+                viewDO->GetOrthoViewSettings()->SliceNumber[2] = new_slice[2];
+    
+                FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+            }
+            break;
+    }
+    
+    return true;
+}
+
+
 // delete active layer
 int FrUserActionCmd::GetActiveLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     return viewDO->GetActiveLayerID();
 }
+
+//FrLayerDocObj* FrUserActionCmd::GetLayerDocObjByID(int id){
+//    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+//
+//    FrLayerDocObj* layerDO = 0L;
+//    FrDocument::DocObjCollection layers;
+//    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+//
+//    if(layers.size() > 0){
+//        for (int i = 0; i < layers.size(); i++){
+//            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
+//            if (layerDO->GetID() == id)
+//                return layerDO;
+//        }
+//    }
+//
+//    return 0L;
+//}
 
 //bool FrUserActionCmd::IsRoiLayer(int id){
 //    FrMainDocument* doc = this->GetMainController()->GetMainDocument();

@@ -3,6 +3,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrTabSettingsDocObj.h"
 #include "FrDataStore.h"
+#include "FrLayerDocObj.h"
 
 
 FrMainDocument::FrMainDocument() 
@@ -120,5 +121,23 @@ FrAppSettingsDocObj* FrMainDocument::GetAppSettings(){
 
         result = (FrAppSettingsDocObj*)settings[0];
     }
+    return result;
+}
+
+FrLayerDocObj* FrMainDocument::GetLayerDocObjByID(int id){
+    DocObjCollection layers;
+    this->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+
+    FrLayerDocObj* result = 0;
+    if(layers.size() > 0){
+        for (int i = 0; i < layers.size(); i++){
+            result = dynamic_cast<FrLayerDocObj*>(layers[i]);
+            if (result->GetID() == id)
+                break;
+            else
+                result = 0;
+        }
+    }
+
     return result;
 }

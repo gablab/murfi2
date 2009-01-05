@@ -7,6 +7,8 @@
 #include "FrRoiDocObj.h"
 #include "FrViewDocObj.h"
 #include "FrLayerDocObj.h"
+#include "FrImageSettingsWidget.h"
+
 
 FrRefreshLayerInfoCmd::FrRefreshLayerInfoCmd(){
 }
@@ -21,6 +23,9 @@ bool FrRefreshLayerInfoCmd::Execute(){
         
     FrLayerListWidget* widget = mv->GetLayerListWidget();
     widget->Update();
+
+    FrImageSettingsWidget* widget2 = mv->GetImageSettingsWidget();
+    widget2->Update();
 
     return true;
 }

@@ -11,7 +11,7 @@ class FrLayerDocObj;
 class FrUserActionCmd : public FrBaseCmd {
 public:
     typedef enum _Action { 
-        Undefined, Add, Delete
+        Undefined, Add, Delete, ChangeSettings
     } Actions;
 
 public:
@@ -32,8 +32,10 @@ private:
     // helpers
     bool AddLayer();
     bool DeleteLayer();
+    bool ChangeImageSettings();
 
     int GetActiveLayerID();
+    //FrLayerDocObj* GetLayerDocObjByID(int id);
     bool IsRoiLayer(int id);
 
 private:

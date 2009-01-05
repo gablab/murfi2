@@ -34,6 +34,8 @@ Q_SIGNALS:
     void Play();
     void Pause();
     void Reset();
+    void Previous();
+    void Next();
     void Speedup();
     void Slowdown();
 
@@ -44,6 +46,8 @@ private Q_SLOTS:
     void OnPlayPressed();
     void OnPausePressed();
     void OnResetPressed();
+    void OnPreviousPressed();
+    void OnNextPressed();
     void OnSlowerPressed();
     void OnFasterPressed();
      
@@ -61,6 +65,8 @@ private:
     QAction* m_Play;
     QAction* m_Pause;
     QAction* m_Reset;
+    QAction* m_Previous;
+    QAction* m_Next;
     QAction* m_Faster;
     QAction* m_Slower;
 

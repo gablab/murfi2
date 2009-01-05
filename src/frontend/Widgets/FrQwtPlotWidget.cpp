@@ -1,5 +1,6 @@
 #include "FrQwtPlotWidget.h"
 #include "FrMainDocument.h"
+#include "FrUtils.h"
 
 // Qt stuff
 #include "Qt/qtoolbox.h"
@@ -27,7 +28,7 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     QFont font= this->axisFont(QwtPlot::xBottom);
     font.setPointSize(8);
     this->setAxisFont(QwtPlot::xBottom, font);
-    this->setAxisScale(QwtPlot::xBottom, 0.0, 0.0, 1.0);
+    this->setAxisScale(QwtPlot::xBottom, 0.0, 0.0, 10.0);
 
     // create grid lines for plot
     m_Grid = new QwtPlotGrid();
@@ -140,7 +141,11 @@ void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
     // Update axis
     double maxTimePoint = double(dataSize - 1);
     if(!this->axisScaleDiv(QwtPlot::xBottom)->contains(maxTimePoint)){
-        this->setAxisScale(QwtPlot::xBottom, 0.0, maxTimePoint, 1.0);
+        //int step = maxTimePoint/10;
+        int step = maxTimePoint/10;
+        if (step == 0)
+            step = 1;
+        this->setAxisScale(QwtPlot::xBottom, 0.0, maxTimePoint, step);
     }
     
     // refresh the plot

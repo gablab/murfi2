@@ -18,6 +18,7 @@ class FrLayerListWidget;
 class FrVoxelInfoWidget;
 class FrROIInfoWidget;
 class FrGraphPaneWidget;
+class FrImageSettingsWidget;
 class QVTKWidget;
 class FrActionManager;
 class FrActionSignalManager;
@@ -53,6 +54,7 @@ public:
 	FrGetPropMacro(FrVoxelInfoWidget*, VoxelInfoWidget);
 	FrGetPropMacro(FrROIInfoWidget*, ROIInfoWidget);
 	FrGetPropMacro(FrGraphPaneWidget*, GraphPaneWidget);
+    FrGetPropMacro(FrImageSettingsWidget*, ImageSettingsWidget);
 
     // Some others
 private: friend class FrActionSignalManager;

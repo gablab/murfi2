@@ -43,14 +43,14 @@ bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     // create and init command
     int inc;
     int deltaX = params.X - m_oldX;
-    FrChangeTbcCmd* cmd = FrCommandController::CreateCmd<FrChangeTbcCmd>();
+    FrChangeTbcCmd* cmd1 = FrCommandController::CreateCmd<FrChangeTbcCmd>();
 
     if(!params.IsControl){
         if ((abs(deltaX / 20)) > MOUSE_MOVE_THRESHOLD){
             // set brightness
 		    m_oldX = params.X;		
 		    inc = (deltaX < 0) ? -1 : 1;
-            cmd->SetBrightnessDelta( inc / 100.0 );
+            cmd1->SetBrightnessDelta( inc / 100.0 );
 	    }
 
         int deltaY = params.Y - m_oldY;
@@ -58,7 +58,7 @@ bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
             // set contrast
 		    m_oldY = params.Y;
             inc = (deltaY < 0) ? -1 : 1;
-            cmd->SetContrastDelta( inc / 100.0 );
+            cmd1->SetContrastDelta( inc / 100.0 );
 	    }
     }
     else {
@@ -68,11 +68,15 @@ bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
             // set threshold
 		    m_oldY = params.Y;
             inc = (deltaY < 0) ? -1 : 1;
-            cmd->SetThresholdDelta( inc / 100.0 );
+            cmd1->SetThresholdDelta( inc / 100.0 );
 	    }
     }
 	
-    // Execute command
+    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     bool result = cmd->Execute();
     delete cmd;
 

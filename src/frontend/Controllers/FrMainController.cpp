@@ -150,9 +150,12 @@ void FrMainController::LoadImageFromFile(std::vector<QString>& fileNames){
     FrResetImageCmd* cmd2 = FrCommandController::CreateCmd<FrResetImageCmd>();
     cmd2->SetTargetView(FrResetImageCmd::Current);
 
+    FrRefreshLayerInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
+    cmd->AddCommand(cmd3);
     cmd->Execute();
     delete cmd;
 }
@@ -296,6 +299,13 @@ void FrMainController::ChangeLayer(int action){
     delete cmd;
 }
 
+void FrMainController::ChangeImageSettings(){
+    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+    cmd->SetAction(FrUserActionCmd::ChangeSettings);
+    cmd->Execute();
+    delete cmd;
+}
+
 void FrMainController::ChangeBookmark(int id){
     // Create complex command and execute it
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
@@ -401,6 +411,20 @@ void FrMainController::SetCurrentTimePoint(int newTimePoint){
     cmd->SetAction(FrTimePointCmd::SetUserDefined);
     cmd->SetTimePoint(newTimePoint);
     cmd->SetCheckLifeMode(false);
+    cmd->Execute();
+    delete cmd;
+}
+
+void FrMainController::SetPreviousTimePoint(){
+    FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
+    cmd->SetAction(FrTimePointCmd::SetPrevious);
+    cmd->Execute();
+    delete cmd;
+}
+
+void FrMainController::SetNextTimePoint(){
+    FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
+    cmd->SetAction(FrTimePointCmd::SetNext);
     cmd->Execute();
     delete cmd;
 }

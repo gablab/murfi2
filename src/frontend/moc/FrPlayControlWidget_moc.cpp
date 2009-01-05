@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrPlayControlWidget.h'
 **
-** Created: Wed Dec 24 17:47:44 2008
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.2.3)
+** Created: Sat 27. Dec 00:09:57 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,7 +11,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrPlayControlWidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.2.3. It"
+#error "This file was generated using the moc from 4.3.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrPlayControlWidget[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   10, // methods
+      18,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -32,17 +32,21 @@ static const uint qt_meta_data_FrPlayControlWidget[] = {
       55,   20,   20,   20, 0x05,
       63,   20,   20,   20, 0x05,
       71,   20,   20,   20, 0x05,
-      81,   20,   20,   20, 0x05,
-      92,   20,   20,   20, 0x05,
+      82,   20,   20,   20, 0x05,
+      89,   20,   20,   20, 0x05,
+      99,   20,   20,   20, 0x05,
+     110,   20,   20,   20, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     107,   20,   20,   20, 0x08,
-     127,   20,   20,   20, 0x08,
-     143,   20,   20,   20, 0x08,
-     160,   20,   20,   20, 0x08,
-     177,   20,   20,   20, 0x08,
+     125,   20,   20,   20, 0x08,
+     145,   20,   20,   20, 0x08,
+     161,   20,   20,   20, 0x08,
+     178,   20,   20,   20, 0x08,
      195,   20,   20,   20, 0x08,
-     213,   20,   20,   20, 0x08,
+     215,   20,   20,   20, 0x08,
+     231,   20,   20,   20, 0x08,
+     249,   20,   20,   20, 0x08,
+     267,   20,   20,   20, 0x08,
 
        0        // eod
 };
@@ -50,10 +54,11 @@ static const uint qt_meta_data_FrPlayControlWidget[] = {
 static const char qt_meta_stringdata_FrPlayControlWidget[] = {
     "FrPlayControlWidget\0\0isOn\0"
     "LiveModeChanged(bool)\0Play()\0Pause()\0"
-    "Reset()\0Speedup()\0Slowdown()\0"
-    "GotoNextStep()\0OnLiveModeChanged()\0"
+    "Reset()\0Previous()\0Next()\0Speedup()\0"
+    "Slowdown()\0GotoNextStep()\0OnLiveModeChanged()\0"
     "OnPlayPressed()\0OnPausePressed()\0"
-    "OnResetPressed()\0OnSlowerPressed()\0"
+    "OnResetPressed()\0OnPreviousPressed()\0"
+    "OnNextPressed()\0OnSlowerPressed()\0"
     "OnFasterPressed()\0UpdateButtons()\0"
 };
 
@@ -86,18 +91,22 @@ int FrPlayControlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 1: Play(); break;
         case 2: Pause(); break;
         case 3: Reset(); break;
-        case 4: Speedup(); break;
-        case 5: Slowdown(); break;
-        case 6: GotoNextStep(); break;
-        case 7: OnLiveModeChanged(); break;
-        case 8: OnPlayPressed(); break;
-        case 9: OnPausePressed(); break;
-        case 10: OnResetPressed(); break;
-        case 11: OnSlowerPressed(); break;
-        case 12: OnFasterPressed(); break;
-        case 13: UpdateButtons(); break;
+        case 4: Previous(); break;
+        case 5: Next(); break;
+        case 6: Speedup(); break;
+        case 7: Slowdown(); break;
+        case 8: GotoNextStep(); break;
+        case 9: OnLiveModeChanged(); break;
+        case 10: OnPlayPressed(); break;
+        case 11: OnPausePressed(); break;
+        case 12: OnResetPressed(); break;
+        case 13: OnPreviousPressed(); break;
+        case 14: OnNextPressed(); break;
+        case 15: OnSlowerPressed(); break;
+        case 16: OnFasterPressed(); break;
+        case 17: UpdateButtons(); break;
         }
-        _id -= 14;
+        _id -= 18;
     }
     return _id;
 }
@@ -128,19 +137,31 @@ void FrPlayControlWidget::Reset()
 }
 
 // SIGNAL 4
-void FrPlayControlWidget::Speedup()
+void FrPlayControlWidget::Previous()
 {
     QMetaObject::activate(this, &staticMetaObject, 4, 0);
 }
 
 // SIGNAL 5
-void FrPlayControlWidget::Slowdown()
+void FrPlayControlWidget::Next()
 {
     QMetaObject::activate(this, &staticMetaObject, 5, 0);
 }
 
 // SIGNAL 6
-void FrPlayControlWidget::GotoNextStep()
+void FrPlayControlWidget::Speedup()
 {
     QMetaObject::activate(this, &staticMetaObject, 6, 0);
+}
+
+// SIGNAL 7
+void FrPlayControlWidget::Slowdown()
+{
+    QMetaObject::activate(this, &staticMetaObject, 7, 0);
+}
+
+// SIGNAL 8
+void FrPlayControlWidget::GotoNextStep()
+{
+    QMetaObject::activate(this, &staticMetaObject, 8, 0);
 }

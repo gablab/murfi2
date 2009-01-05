@@ -41,6 +41,8 @@ public:
 Q_SIGNALS:
     void TimePointChanged(int timePoint);
     void LiveModeChanged(bool value);
+    void PreviousTimePoint();
+    void NextTimePoint();
 
 protected:
     virtual void timerEvent(QTimerEvent *event);
@@ -54,6 +56,8 @@ private Q_SLOTS:
     void OnPauseClicked();
     void OnResetClicked();
     void OnPlayFinished();
+    void OnPreviousClicked();
+    void OnNextClicked();
 
 private:
     // Video playback

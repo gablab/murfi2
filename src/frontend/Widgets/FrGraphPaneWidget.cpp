@@ -55,7 +55,8 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
     connect(m_PlayControlWidget, SIGNAL(Play()), this, SLOT(OnPlayClicked()));
     connect(m_PlayControlWidget, SIGNAL(Pause()), this, SLOT(OnPauseClicked()));
     connect(m_PlayControlWidget, SIGNAL(Reset()), this, SLOT(OnResetClicked()));
-    
+    connect(m_PlayControlWidget, SIGNAL(Previous()), this, SLOT(OnPreviousClicked()));
+    connect(m_PlayControlWidget, SIGNAL(Next()), this, SLOT(OnNextClicked()));
 }
 
 void FrGraphPaneWidget::SetDocument(FrMainDocument* doc){
@@ -224,4 +225,12 @@ void FrGraphPaneWidget::OnPlayFinished(){
     //m_PlayingTimePoint = 0;
     
     m_PlayControlWidget->SetState(FrPlayControlWidget::Normal);
+}
+
+void FrGraphPaneWidget::OnPreviousClicked(){
+    emit PreviousTimePoint();
+}
+
+void FrGraphPaneWidget::OnNextClicked(){
+    emit NextTimePoint();
 }

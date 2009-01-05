@@ -5,6 +5,7 @@
 #include "FrBookmarkWidget.h"
 #include "FrLayerListWidget.h"
 #include "FrGraphPaneWidget.h"
+#include "FrImageSettingsWidget.h"
 #include "FrSettings.h"
 
 // Qt
@@ -18,7 +19,7 @@
 #define CONNECT_ACTION_TRIGGERED(action, slot)\
     connect(action,SIGNAL(triggered()),this,SLOT(slot))
 #define DISCONNECT_ACTION_TRIGGERED(action, slot)\
-    disconnect(action,SIGNAL(triggered()),this,SLOT(slot))
+    disconnect(action,SIGNAL(triggered()),this,SLOT(slot)) 
     
 
 FrActionSignalManager::FrActionSignalManager(FrMainWindow* mainWindow)
@@ -96,7 +97,14 @@ void FrActionSignalManager::Initialize(){
              this, SLOT(OnLiveModeChanged(bool)) );
     connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(TimePointChanged(int)),
              this, SLOT(OnTimePointChanged(int)) );
-
+    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(PreviousTimePoint()),
+             this, SLOT(OnPreviousTimePointPressed()) );
+    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
+             this, SLOT(OnNextTimePointPressed()) );
+  
+    // Connect image settings widget
+    connect( m_mainWindow->m_ImageSettingsWidget, SIGNAL(ImageParamsChanged()),
+        this, SLOT(OnImageParamsChanged()) );
 
     // Connect test action
     CONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
@@ -170,6 +178,15 @@ void FrActionSignalManager::Deinitialize(){
 
     disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(TimePointChanged(int)),
              this, SLOT(OnTimePointChanged(int)) );
+
+    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(PreviousTimePoint()),
+             this, SLOT(OnPreviousTimePointPressed()) );
+    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
+             this, SLOT(OnNextTimePointPressed()) );
+
+    // image settings widget
+    disconnect( m_mainWindow->m_ImageSettingsWidget, SIGNAL(ImageParamsChanged()),
+        this, SLOT(OnImageParamsChanged()) );
 
     // Connect test action
     DISCONNECT_ACTION_TRIGGERED(am->GetTestAction(), OnTestAction());
@@ -316,6 +333,10 @@ void FrActionSignalManager::OnLayerColormapChanged(){
     m_mainWindow->GetMainController()->ChangeLayer(2);
 }
 
+void FrActionSignalManager::OnImageParamsChanged(){
+    m_mainWindow->GetMainController()->ChangeImageSettings();
+}
+
 void FrActionSignalManager::OnRoiToolChanged(){
     m_mainWindow->
         GetMainController()->
@@ -333,4 +354,16 @@ void FrActionSignalManager::OnTimePointChanged(int newValue){
     m_mainWindow->
         GetMainController()->
         SetCurrentTimePoint(newValue);
+}
+
+void FrActionSignalManager::OnPreviousTimePointPressed(){
+    m_mainWindow->
+        GetMainController()->
+        SetPreviousTimePoint();
+}
+
+void FrActionSignalManager::OnNextTimePointPressed(){
+    m_mainWindow->
+        GetMainController()->
+        SetNextTimePoint();
 }

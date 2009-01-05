@@ -167,7 +167,7 @@ void FrLayerListWidget::UpdateRoiList(){
     if (curWgt)
         id = curWgt->GetID();
     
-    FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
+    FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(id);
     if (!layerDO)
         return;
 
@@ -186,7 +186,7 @@ void FrLayerListWidget::UpdateRoiList(){
             if (wgt)
                 wid = wgt->GetID();
             
-            FrLayerDocObj* layerDoc = GetLayerDocObjByID(wid);
+            FrLayerDocObj* layerDoc = m_Document->GetLayerDocObjByID(wid);
 
             if(layerDoc->IsRoi()){
                 FrROIToolWidget::RoiInfo info;
@@ -226,7 +226,7 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
         int id = wgt->GetID();
         
         // TODO: get layer DO with specified ID
-        FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
+        FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(id);
 
         if(layerDO->IsRoi()){
             m_colormapWidget->setVisible(false);
@@ -335,21 +335,21 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
 }
 
 
-FrLayerDocObj* FrLayerListWidget::GetLayerDocObjByID(int id){
-    FrLayerDocObj* layerDO = 0L;
-    FrDocument::DocObjCollection layers;
-    m_Document->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
-
-    if(layers.size() > 0){
-        for (int i = 0; i < layers.size(); i++){
-            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-            if (layerDO->GetID() == id)
-                return layerDO;
-        }
-    }
-
-    return 0L;
-}
+//FrLayerDocObj* FrLayerListWidget::GetLayerDocObjByID(int id){
+//    FrLayerDocObj* layerDO = 0L;
+//    FrDocument::DocObjCollection layers;
+//    m_Document->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
+//
+//    if(layers.size() > 0){
+//        for (int i = 0; i < layers.size(); i++){
+//            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
+//            if (layerDO->GetID() == id)
+//                return layerDO;
+//        }
+//    }
+//
+//    return 0L;
+//}
 
 bool FrLayerListWidget::GetLayerVisibility(int id){
     // find widget with given id

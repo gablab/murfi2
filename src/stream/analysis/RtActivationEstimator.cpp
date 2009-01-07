@@ -614,7 +614,6 @@ void RtActivationEstimator::buildNuisance() {
     }
   }
 
-
   if(modelEvents) {
     buildEventRegressor(eventRegressorLength);
   }
@@ -655,6 +654,10 @@ unsigned int RtActivationEstimator::getNuisanceColumn(Nuisance type, unsigned in
 // in
 //  first acquired image to use as a template for parameter inits
 void RtActivationEstimator::initEstimation(RtMRIImage &image) {
+
+  // store the data id as a template
+  templateDataID = image.getDataID();
+  templateDataID.setTimePoint(DATAID_UNSET_VALUE);
 
   // mask from intensity threshold
   if(maskSource == NO_MASK) {
@@ -726,6 +729,41 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
 
 
   needsInit = false;
+}
+
+// build a row of the GLM deign matrix 
+// in
+//  current image
+double *RtActivationEstimator::getDesignMatrixRow(unsigned int timepoint) {
+
+  // build a design matrix xrow (init to zeros)
+  double *Xrow = new double[getNumNuisanceRegressors() + numConditions]();
+
+  unsigned int curCol = 0;
+  for(; curCol < numTrends; curCol++) {
+    Xrow[curCol] = nuisance.get(timepoint-1,curCol);
+  }
+
+
+  // copy the motion parameters
+  if(modelMotionParameters) {
+    RtDataID motID(templateDataID);
+    motID.setModuleID("motion");
+
+    RtMotion *mot = static_cast<RtMotion*>
+      (RtExperiment::getDataStore()->getData(motID));
+
+    if(mot != NULL) {
+      Xrow[curCol++] = mot->getMotionDimension(TRANSLATION_X);
+      Xrow[curCol++] = mot->getMotionDimension(TRANSLATION_Y);
+      Xrow[curCol++] = mot->getMotionDimension(TRANSLATION_Z);
+      Xrow[curCol++] = mot->getMotionDimension(ROTATION_X);
+      Xrow[curCol++] = mot->getMotionDimension(ROTATION_Y);
+      Xrow[curCol++] = mot->getMotionDimension(ROTATION_Z);  
+    }
+  } 
+
+  return Xrow;
 }
 
 // sets the latest result of processing

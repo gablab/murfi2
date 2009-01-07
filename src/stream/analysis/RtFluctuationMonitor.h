@@ -57,10 +57,12 @@ protected:
   // start a logfile 
   virtual void startDumpAlgoVarsFile();
 
-  //// parameters of the activation estimation algorithm
+  // build a row of the design matrix
+  // in
+  //  timepoint to build the row from 
+  virtual double *getDesignMatrixRow(unsigned int timepoint);
 
-  // if we should reinit
-  bool needsInit;
+  //// parameters of the activation estimation algorithm
 
   // number of data points to process
   unsigned int numData;

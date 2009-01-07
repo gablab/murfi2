@@ -66,6 +66,24 @@ void RtFluctuationMonitor::receiveStimTriggered() {
   isTriggered = true;
 }
 
+// build a row of the GLM deign matrix 
+// in
+//  current image
+double *RtFluctuationMonitor::getDesignMatrixRow(unsigned int timepoint) {
+  double *Xrow = getDesignMatrixRow(timepoint);
+  
+  // copy the event regressor
+  if(modelEvents && isTriggered) {
+    Xrow[getNuisanceColumn(EVENT,numEvents)] 
+      = eventRegressor.get(numImagesSinceTrigger-1);
+    cout << "!!!! event column " << Xrow[getNuisanceColumn(EVENT,numEvents)] << endl;
+  }
+  else {
+    cout << "!!!! not event column " << Xrow[getNuisanceColumn(EVENT,numEvents)] << endl;
+  }
+    
+}
+
 // process a configuration option
 //  in
 //   name of the option to process
@@ -198,41 +216,8 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     numEvents++;
   }
 
+  double *Xrow = getDesignMatrixRow(dat->getDataID().getTimePoint());
 
-  // build a design matrix xrow
-  double *Xrow = new double[getNumNuisanceRegressors() + numConditions];
-  for(unsigned int i = 0; i < getNumNuisanceRegressors() + numConditions; i++) {
-    Xrow[i] = 0.0;
-  }
-
-  unsigned int curCol = 0;
-  for(; curCol < numTrends; curCol++) {
-    Xrow[curCol] = nuisance.get(numTimepoints-1,curCol);
-  }
-
-
-  // copy the motion parameters
-  if(modelMotionParameters) {
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_X);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Y);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Z);
-
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_X);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Y);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Z);  
-  }  
-
-  // copy the event regressor
-  if(modelEvents && isTriggered) {
-    Xrow[getNuisanceColumn(EVENT,numEvents)] 
-      = eventRegressor.get(numImagesSinceTrigger-1);
-    cout << "!!!! event column " << Xrow[getNuisanceColumn(EVENT,numEvents)] << endl;
-  }
-  else {
-    cout << "!!!! not event column " << Xrow[getNuisanceColumn(EVENT,numEvents)] << endl;
-  }
-  
-  
   //// compute t map for each element
   //double sum = 0.;
   for(unsigned int i = 0; i < dat->getNumEl(); i++) {

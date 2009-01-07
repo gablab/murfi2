@@ -206,24 +206,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
   //// element independent setup
 
   /// build a design matrix row
-  int curCol = 0;
-
-  // copy the trends
-  double *Xrow = new double[numConditions+getNumNuisanceRegressors()];
-  for(unsigned int i = 0; i < numTrends; i++, curCol++) {
-    Xrow[curCol] = nuisance.get(numTimepoints-1,i);
-  }
-
-  // copy the motion parameters
-  if(modelMotionParameters) {
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_X);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Y);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_TRANSLATION_Z);
-
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_X);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Y);
-    Xrow[curCol++] = dat->getMotionParameter(MOTION_ROTATION_Z);  
-  }  
+  double *Xrow = getDesignMatrixRow(dat->getDataID().getTimePoint());
 
   // copy the conditions
   // also: search for the maximum magnitude condition regressor 
@@ -231,7 +214,8 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
 //  unsigned int maxMagnitudeCondInd = 0;
   bool anyOverZero = false;
-  for(unsigned int i = 0; i < numConditions; i++, curCol++) {
+  for(unsigned int i = 0, curCol = getNumNuisanceRegressors(); 
+      i < numConditions; i++, curCol++) {
     Xrow[curCol] = conditions.get(numTimepoints-1,i);
 
 //    // check for max amplitude condition
@@ -247,7 +231,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
     }
   }
 
-  if(DEBUG_LEVEL & TEMP) {
+  if(DEBUG_LEVEL & MODERATE) {
     cout << " xrow " << numTimepoints << ":";
     for(int i = 0; i < getNumNuisanceRegressors()+numConditions; i++) {
       cout << Xrow[i] << " ";

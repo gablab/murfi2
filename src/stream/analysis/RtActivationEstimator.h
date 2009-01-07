@@ -128,6 +128,11 @@ protected:
   //  first acquired image to use as a template for parameter inits
   virtual void initEstimation(RtMRIImage &image);
 
+  // common processing for a single acquisition
+  // in
+  //  current image
+  virtual double *getDesignMatrixRow(unsigned int timepoint);
+
   // start a logfile
   virtual void startDumpAlgoVarsFile();
 
@@ -138,6 +143,10 @@ protected:
 
   bool needsInit;
 
+  // template data id of the data volumes 
+  RtDataID templateDataID;
+
+  // repetition time of the MR acquisitions
   double tr;
 
   // number of timepoints

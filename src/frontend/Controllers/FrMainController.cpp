@@ -150,7 +150,7 @@ void FrMainController::LoadImageFromFile(std::vector<QString>& fileNames){
     FrResetImageCmd* cmd2 = FrCommandController::CreateCmd<FrResetImageCmd>();
     cmd2->SetTargetView(FrResetImageCmd::Current);
 
-    FrRefreshLayerInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -181,7 +181,7 @@ void FrMainController::IoTabSettings(QString& fileName, bool isInput){
         cmd2->SetAction(FrUpdateTabsCmd::SetCurrentTab);
         cmd2->SetTabID(CURRENT_TAB_ID);
 
-        FrRefreshLayerInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+        FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
 
         FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
         cmd->AddCommand(cmd1);
@@ -231,7 +231,7 @@ void FrMainController::ChangeView(int view){
     FrChangeViewCmd* cmd1 = FrCommandController::CreateCmd<FrChangeViewCmd>();
     cmd1->SetTargetView(targetView);
 
-    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -251,7 +251,7 @@ void FrMainController::SelectLayer(int id){
 void FrMainController::AddLayer(){
     // add layer with dialog
     FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
-    cmd->SetAction(FrUserActionCmd::Add);
+    cmd->SetAction(FrUserActionCmd::AddLayer);
     cmd->Execute();
     delete cmd;
 }
@@ -259,7 +259,7 @@ void FrMainController::AddLayer(){
 void FrMainController::DeleteLayer(){
     // Deletes currently selected layer
     FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
-    cmd->SetAction(FrUserActionCmd::Delete);
+    cmd->SetAction(FrUserActionCmd::DeleteLayer);
     cmd->Execute();
     delete cmd;            
 }
@@ -275,8 +275,8 @@ void FrMainController::ChangeLayer(int action){
         //cmd1->SetID(CUR_LAYER_ID);
         cmd->AddCommand(cmd1);
 
-        FrRefreshLayerInfoCmd* cmd2 = 
-            FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+        FrRefreshWidgetsInfoCmd* cmd2 = 
+            FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
         cmd->AddCommand(cmd2);
     }
     // Changing Name, visibility, opacity
@@ -326,7 +326,7 @@ void FrMainController::ChangeBookmark(int id){
     FrChangeViewCmd* cmd3 = FrCommandController::CreateCmd<FrChangeViewCmd>();
     cmd3->SetTargetView(FrChangeViewCmd::Synchronize);
 
-    FrRefreshLayerInfoCmd* cmd4 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    FrRefreshWidgetsInfoCmd* cmd4 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
 
 //    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
 //    cmd->AddCommand(cmd1);
@@ -373,18 +373,22 @@ void FrMainController::SetCurrentTool(int tool){
 }
 
 void FrMainController::ResetImage(){
+    FrResetImageCmd* cmd1 = FrCommandController::CreateCmd<FrResetImageCmd>();
+    cmd1->SetTargetView(FrResetImageCmd::Current);
+    
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
 
-    FrResetImageCmd* cmd = FrCommandController::CreateCmd<FrResetImageCmd>();
-    cmd->SetTargetView(FrResetImageCmd::Current);
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);    
     cmd->Execute();
     delete cmd;
 }
 
 void FrMainController::CreatNewROI(){
-
     FrCreateROICmd* cmd1 = FrCommandController::CreateCmd<FrCreateROICmd>();
     
-    FrRefreshLayerInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshLayerInfoCmd>();
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -394,7 +398,6 @@ void FrMainController::CreatNewROI(){
 }
 
 void FrMainController::UpdateRoiTool(){  
-
     FrRoiTool* tool = dynamic_cast<FrRoiTool*>(m_ToolController->GetCurrentTool());
     if(tool != 0L){
         tool->StartCurrentTool();
@@ -425,6 +428,19 @@ void FrMainController::SetPreviousTimePoint(){
 void FrMainController::SetNextTimePoint(){
     FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
     cmd->SetAction(FrTimePointCmd::SetNext);
+    cmd->Execute();
+    delete cmd;
+}
+
+void FrMainController::ChangeGraph(int id, bool add){
+    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+    if (add){
+        cmd->SetAction(FrUserActionCmd::AddGraph);
+    }
+    else{
+        cmd->SetAction(FrUserActionCmd::DeleteGraph);
+    }
+    cmd->SetGraphID(id);
     cmd->Execute();
     delete cmd;
 }

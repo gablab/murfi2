@@ -82,6 +82,7 @@ double *RtFluctuationMonitor::getDesignMatrixRow(unsigned int timepoint) {
     cout << "!!!! not event column " << Xrow[getNuisanceColumn(EVENT,numEvents)] << endl;
   }
     
+    return Xrow;       // funtction should return a value
 }
 
 // process a configuration option

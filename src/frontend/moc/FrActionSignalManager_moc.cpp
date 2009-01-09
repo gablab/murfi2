@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Tue 30. Dec 18:17:43 2008
+** Created: Thu 8. Jan 10:54:05 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      29,   10, // methods
+      30,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -56,6 +56,7 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
      593,  576,   22,   22, 0x0a,
      617,   22,   22,   22, 0x0a,
      646,   22,   22,   22, 0x0a,
+     678,  671,   22,   22, 0x0a,
 
        0        // eod
 };
@@ -78,7 +79,8 @@ static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "OnLiveModeChanged(bool)\0currentTimePoint\0"
     "OnTimePointChanged(int)\0"
     "OnPreviousTimePointPressed()\0"
-    "OnNextTimePointPressed()\0"
+    "OnNextTimePointPressed()\0id,add\0"
+    "OnGraphChanged(int,bool)\0"
 };
 
 const QMetaObject FrActionSignalManager::staticMetaObject = {
@@ -135,8 +137,9 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 26: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 27: OnPreviousTimePointPressed(); break;
         case 28: OnNextTimePointPressed(); break;
+        case 29: OnGraphChanged((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         }
-        _id -= 29;
+        _id -= 30;
     }
     return _id;
 }

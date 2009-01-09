@@ -99,8 +99,8 @@ void FrActionSignalManager::Initialize(){
              this, SLOT(OnTimePointChanged(int)) );
     connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(PreviousTimePoint()),
              this, SLOT(OnPreviousTimePointPressed()) );
-    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
-             this, SLOT(OnNextTimePointPressed()) );
+    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(GraphChanged(int, bool)),
+             this, SLOT(OnGraphChanged(int, bool)) );
   
     // Connect image settings widget
     connect( m_mainWindow->m_ImageSettingsWidget, SIGNAL(ImageParamsChanged()),
@@ -366,4 +366,10 @@ void FrActionSignalManager::OnNextTimePointPressed(){
     m_mainWindow->
         GetMainController()->
         SetNextTimePoint();
+}
+
+void FrActionSignalManager::OnGraphChanged(int id, bool add){
+    m_mainWindow->
+        GetMainController()->
+        ChangeGraph(id, add);
 }

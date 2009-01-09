@@ -228,6 +228,18 @@ vtkImageData* FrPointsDocObj::GetMosaicData(int dimx, int dimy){
     return data;
 }
 
+int* FrPointsDocObj::GetPoint(){
+    if (m_Points.size() == 0)
+        return 0;
+
+    int point[3];
+
+    point[0] = m_Points[0]->x;
+    point[1] = m_Points[0]->y;
+    point[2] = m_Points[0]->z;
+
+    return point;
+}
 
 void FrPointsDocObj::InitTransparentData(){
 }

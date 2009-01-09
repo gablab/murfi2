@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphPaneWidget.h'
 **
-** Created: Sat 27. Dec 00:09:58 2008
+** Created: Thu 8. Jan 22:33:42 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrGraphPaneWidget[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   10, // methods
+      16,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -31,16 +31,20 @@ static const uint qt_meta_data_FrGraphPaneWidget[] = {
       57,   51,   18,   18, 0x05,
       79,   18,   18,   18, 0x05,
       99,   18,   18,   18, 0x05,
+     122,  115,   18,   18, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     124,  115,   18,   18, 0x08,
-     158,   18,   18,   18, 0x08,
-     182,   18,   18,   18, 0x08,
-     198,   18,   18,   18, 0x08,
-     215,   18,   18,   18, 0x08,
-     232,   18,   18,   18, 0x08,
-     249,   18,   18,   18, 0x08,
-     269,   18,   18,   18, 0x08,
+     154,  145,   18,   18, 0x08,
+     188,   18,   18,   18, 0x08,
+     212,   18,   18,   18, 0x08,
+     228,   18,   18,   18, 0x08,
+     245,   18,   18,   18, 0x08,
+     262,   18,   18,   18, 0x08,
+     279,   18,   18,   18, 0x08,
+     299,   18,   18,   18, 0x08,
+     323,  315,   18,   18, 0x08,
+     341,  315,   18,   18, 0x08,
+     359,  315,   18,   18, 0x08,
 
        0        // eod
 };
@@ -49,12 +53,13 @@ static const char qt_meta_stringdata_FrGraphPaneWidget[] = {
     "FrGraphPaneWidget\0\0timePoint\0"
     "TimePointChanged(int)\0value\0"
     "LiveModeChanged(bool)\0PreviousTimePoint()\0"
-    "NextTimePoint()\0position\0"
-    "OnGraphMarkerPositionChanged(int)\0"
+    "NextTimePoint()\0id,add\0GraphChanged(int,bool)\0"
+    "position\0OnGraphMarkerPositionChanged(int)\0"
     "OnLiveModeChanged(bool)\0OnPlayClicked()\0"
     "OnPauseClicked()\0OnResetClicked()\0"
     "OnPlayFinished()\0OnPreviousClicked()\0"
-    "OnNextClicked()\0"
+    "OnNextClicked()\0checked\0itemChecked(bool)\0"
+    "ShowRoiMean(bool)\0ShowRoiSTD(bool)\0"
 };
 
 const QMetaObject FrGraphPaneWidget::staticMetaObject = {
@@ -86,16 +91,20 @@ int FrGraphPaneWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 1: LiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 2: PreviousTimePoint(); break;
         case 3: NextTimePoint(); break;
-        case 4: OnGraphMarkerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 5: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 6: OnPlayClicked(); break;
-        case 7: OnPauseClicked(); break;
-        case 8: OnResetClicked(); break;
-        case 9: OnPlayFinished(); break;
-        case 10: OnPreviousClicked(); break;
-        case 11: OnNextClicked(); break;
+        case 4: GraphChanged((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 5: OnGraphMarkerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 6: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 7: OnPlayClicked(); break;
+        case 8: OnPauseClicked(); break;
+        case 9: OnResetClicked(); break;
+        case 10: OnPlayFinished(); break;
+        case 11: OnPreviousClicked(); break;
+        case 12: OnNextClicked(); break;
+        case 13: itemChecked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 14: ShowRoiMean((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 15: ShowRoiSTD((*reinterpret_cast< bool(*)>(_a[1]))); break;
         }
-        _id -= 12;
+        _id -= 16;
     }
     return _id;
 }
@@ -124,4 +133,11 @@ void FrGraphPaneWidget::PreviousTimePoint()
 void FrGraphPaneWidget::NextTimePoint()
 {
     QMetaObject::activate(this, &staticMetaObject, 3, 0);
+}
+
+// SIGNAL 4
+void FrGraphPaneWidget::GraphChanged(int _t1, bool _t2)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }

@@ -58,6 +58,7 @@ public:
     void SetCurrentTimePoint(int newTimePoint);
     void SetPreviousTimePoint();
     void SetNextTimePoint();
+    void ChangeGraph(int id, bool add);
 
 	// Override from base class
     virtual void Notify(int notifyCode);

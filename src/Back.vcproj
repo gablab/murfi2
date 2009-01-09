@@ -445,6 +445,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\data\RtMotion.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\data\RtMRIImage.cpp"
 				>
 			</File>

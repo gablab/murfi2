@@ -20,6 +20,7 @@ public:
 
     // Properties
     FrPropMacro(FrGraphSettings*, Settings);
+    FrPropMacro(int, ID);
 
     // Methods
     void SetGraphData();

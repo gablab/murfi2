@@ -148,8 +148,11 @@ bool FrVoxelSelectionCmd::AddPoint(){
     if(pointObjects.size() > 0){
         pointsDO = (FrPointsDocObj*)pointObjects[0];
         // TODO: get color from any widget/dialog/settings
+        // due to requirements we have only 1 point at the same time
+        pointsDO->ClearAll();
+    
         FrPoint* point = new FrPoint(Index[0], Index[1], Index[2], QColor(0, 255, 0));
-        
+            
         switch (m_Action){
             case FrVoxelSelectionCmd::Add:
                 pointsDO->AddPoint(point);

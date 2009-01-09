@@ -1,5 +1,6 @@
 #include "FrGraphDocObj.h"
 #include "FrDocument.h"
+#include "FrCommandController.h"
 
 // VTK includes
 #include "vtkImageData.h"
@@ -20,11 +21,35 @@ FrGraphDocObj::~FrGraphDocObj(){
 }
 
 void FrGraphDocObj::OnAdd(FrDocument* doc){
-    // TODO: implement
+    //FrGraphCmd* cmd1 = FrCommandController::CreateCmd<FrGraphCmd>();
+    //cmd1->SetAction(FrGraphCmd::Add);
+    //cmd1->SetDocObj(this);
+
+    FrRefreshWidgetsInfoCmd* cmd = 
+        FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+
+    //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    //cmd->AddCommand(cmd1);
+    //cmd->AddCommand(cmd2);
+    cmd->Execute();
+
+    delete cmd;
 }
 
 void FrGraphDocObj::OnRemove(FrDocument* doc){
-    // TODO: implement
+    //FrGraphCmd* cmd1 = FrCommandController::CreateCmd<FrGraphCmd>();
+    //cmd1->SetAction(FrGraphCmd::Delete);
+    //cmd1->SetDocObj(this);
+
+    FrRefreshWidgetsInfoCmd* cmd = 
+        FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+
+    //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    //cmd->AddCommand(cmd1);
+    //cmd->AddCommand(cmd2);
+    cmd->Execute();
+
+    delete cmd;
 }
 
 FrDocumentObj::ObjTypes FrGraphDocObj::GetType(){

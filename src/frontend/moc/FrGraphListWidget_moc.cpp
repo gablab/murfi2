@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphListWidget.h'
 **
-** Created: Sat 27. Dec 00:09:58 2008
+** Created: Thu 8. Jan 09:19:30 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

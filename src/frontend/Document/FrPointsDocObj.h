@@ -27,6 +27,7 @@ public:
     
     void AddPoint(FrPoint* point);
     void RemovePoint(FrPoint* point);
+    void ClearAll();
 
     // Properties
 //    FrGetPropMacro(vtkImageData*, PointsData);      
@@ -36,8 +37,10 @@ public:
     vtkImageData* GetPointsYZ(int x);
     vtkImageData* GetMosaicData(int dimx, int dimy);
 
+    // method to obtain one point (since we have only 1 point at the same time)
+    int* GetPoint();
+
 private:
-    void ClearAll();
     void InitTransparentData();
 
 private:

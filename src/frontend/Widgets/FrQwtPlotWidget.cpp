@@ -132,7 +132,6 @@ void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
     // Init x values
     double* xValues = new double[dataSize];
     for (int i = 0; i < dataSize; i++){
-
         xValues[i] = double(i);
     }
     it->second->setData(xValues, data, dataSize);

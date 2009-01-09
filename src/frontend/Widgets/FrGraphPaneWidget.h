@@ -9,6 +9,8 @@ class FrQwtPlotWidget;
 class FrGraphListWidget;
 class FrPlayControlWidget;
 class FrMainDocument;
+class FrGraphContextMenu;
+class FrGraphDocObj;
 
 class FrPlayThread;
 
@@ -29,13 +31,16 @@ public:
     void SetDocument(FrMainDocument* doc);
 
     FrGetPropMacro(FrQwtPlotWidget*, QwtPlotWidget);
-    FrGetPropMacro(FrGraphListWidget*, GraphListWidget);
+    //FrGetPropMacro(FrGraphListWidget*, GraphListWidget);
     FrGetPropMacro(FrPlayControlWidget*, PlayControlWidget);
+    FrGetPropMacro(FrGraphContextMenu*, GraphContextMenu);
     
     // Methods
     void Update();
     void UpdateTimePoint();
     void UpdateLiveMode();
+    
+    void SetData(FrGraphDocObj* graphDO);
 
     // Here all signals
 Q_SIGNALS:
@@ -43,9 +48,11 @@ Q_SIGNALS:
     void LiveModeChanged(bool value);
     void PreviousTimePoint();
     void NextTimePoint();
+    void GraphChanged(int id, bool add);
 
 protected:
     virtual void timerEvent(QTimerEvent *event);
+    virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private Q_SLOTS:
     void OnGraphMarkerPositionChanged(int position);
@@ -58,6 +65,11 @@ private Q_SLOTS:
     void OnPlayFinished();
     void OnPreviousClicked();
     void OnNextClicked();
+
+    // context menu 
+    void itemChecked(bool checked);
+    void ShowRoiMean(bool checked);
+    void ShowRoiSTD(bool checked);
 
 private:
     // Video playback

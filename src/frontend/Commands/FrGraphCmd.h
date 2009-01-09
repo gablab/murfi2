@@ -1,22 +1,22 @@
-#ifndef FR_USERACTION_CMD
-#define FR_USERACTION_CMD
+#ifndef FR_GRAPH_CMD
+#define FR_GRAPH_CMD
 
-class FrLayerDocObj;
+class FrGraphDocObj;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
 
 // This command allows user to add, remove 
 // and modify settings of the layer
-class FrUserActionCmd : public FrBaseCmd {
+class FrGraphCmd : public FrBaseCmd {
 public:
     typedef enum _Action { 
-        Undefined, AddLayer, DeleteLayer, AddGraph, DeleteGraph, ChangeSettings
+        Undefined, Add, Delete 
     } Actions;
 
 public:
     // Constructor/destructor
-    FrUserActionCmd();
+    FrGraphCmd();
 
     virtual bool Execute();
 
@@ -26,25 +26,21 @@ public:
     virtual bool Redo();
 
     // Properties
-    FrSetPropMacro(Actions, Action);
-    FrSetPropMacro(int, GraphID);
+    FrSetPropMacro(Actions, Action);    
+    FrSetPropMacro(FrGraphDocObj*, DocObj);
+    void SetID(int id);
 
 private:
-    // helpers
-    bool addLayer();
-    bool deleteLayer();
-    bool addGraph();
-    bool deleteGraph();
-    bool ChangeImageSettings();
+    // Helper methods here
+    bool AddGraph();
+    bool DeleteGraph();
 
     int GetActiveLayerID();
-    //FrLayerDocObj* GetLayerDocObjByID(int id);
     bool IsRoiLayer(int id);
 
 private:
     bool m_isID;
     int m_ID;
-
 };
 
 #endif

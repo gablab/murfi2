@@ -61,21 +61,32 @@ bool FrVoxelSelectionTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& param
 
 bool FrVoxelSelectionTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
     if(params.Button == FrMouseParams::LeftButton){
-        FrVoxelSelectionCmd* cmd = FrCommandController::CreateCmd<FrVoxelSelectionCmd>();
-        cmd->SetAction(FrVoxelSelectionCmd::Add);
-        cmd->SetPointPicker(m_pointPicker);
-        cmd->SetMouseXY(params.X, params.Y);
-        cmd->Execute();
-        delete cmd;
+        FrVoxelSelectionCmd* cmd1 = FrCommandController::CreateCmd<FrVoxelSelectionCmd>();
+        cmd1->SetAction(FrVoxelSelectionCmd::Add);
+        cmd1->SetPointPicker(m_pointPicker);
+        cmd1->SetMouseXY(params.X, params.Y);
+        
+        //cmd->Execute();
+        //delete cmd;
+
+        FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+
+        FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        multiCmd->AddCommand(cmd1);
+        multiCmd->AddCommand(cmd2);
+        multiCmd->Execute();
+        delete multiCmd;
     }
-    else if (params.Button == FrMouseParams::RightButton){
-        FrVoxelSelectionCmd* cmd = FrCommandController::CreateCmd<FrVoxelSelectionCmd>();
-        cmd->SetAction(FrVoxelSelectionCmd::Remove);
-        cmd->SetPointPicker(m_pointPicker);
-        cmd->SetMouseXY(params.X, params.Y);
-        cmd->Execute();
-        delete cmd;
-    }
+    //else if (params.Button == FrMouseParams::RightButton){
+    //    FrVoxelSelectionCmd* cmd = FrCommandController::CreateCmd<FrVoxelSelectionCmd>();
+    //    cmd->SetAction(FrVoxelSelectionCmd::Remove);
+    //    cmd->SetPointPicker(m_pointPicker);
+    //    cmd->SetMouseXY(params.X, params.Y);
+    //    cmd->Execute();
+    //    delete cmd;
+    //}
+
+
 	return false;
 }
 

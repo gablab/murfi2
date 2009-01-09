@@ -10,6 +10,7 @@
 #include "FrLayerSettings.h"
 #include "FrLayerDocObj.h"
 #include "FrViewDocObj.h"
+#include "FrGraphDocObj.h"
 #include "FrColormapWidget.h"
 #include "FrImageSettingsWidget.h"
 
@@ -35,9 +36,13 @@ bool FrUserActionCmd::Execute(){
 
     bool result = false;
     switch(m_Action){
-        case FrUserActionCmd::Add: result = AddLayer();
+        case FrUserActionCmd::AddLayer: result = addLayer();
             break;
-        case FrUserActionCmd::Delete: result = DeleteLayer();
+        case FrUserActionCmd::DeleteLayer: result = deleteLayer();
+            break;
+        case FrUserActionCmd::AddGraph: result = addGraph();
+            break;
+        case FrUserActionCmd::DeleteGraph: result = deleteGraph();
             break;
         case FrUserActionCmd::ChangeSettings: result = ChangeImageSettings();
             break;
@@ -49,7 +54,7 @@ bool FrUserActionCmd::Execute(){
     return result;
 }
 
-bool FrUserActionCmd::AddLayer(){
+bool FrUserActionCmd::addLayer(){
     bool result = false;
     
     // create new layer doc object and get settings from dialog
@@ -71,7 +76,7 @@ bool FrUserActionCmd::AddLayer(){
     return result;
 }
 
-bool FrUserActionCmd::DeleteLayer(){
+bool FrUserActionCmd::deleteLayer(){
     // Get proper ID
     if(!m_isID){
         m_ID = GetActiveLayerID();
@@ -200,6 +205,42 @@ bool FrUserActionCmd::ChangeImageSettings(){
     return true;
 }
 
+bool FrUserActionCmd::addGraph(){
+    bool result = false;
+    
+    // TODO: get graph type by id
+
+
+    // create new layer doc object and get settings from dialog
+    FrGraphDocObj* graphDO = new FrGraphDocObj(FrGraphSettings::GT_Intencity);  // set correct graph type
+    graphDO->SetID(m_GraphID);
+
+    // finally add new doc to MainDocument
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    doc->Add(graphDO);
+    result = true;
+
+    return result;
+}
+
+bool FrUserActionCmd::deleteGraph(){
+    // find appropriate graph doc obj and remove it from main doc
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrDocument::DocObjCollection graphs;
+    doc->GetObjectsByType(graphs, FrDocumentObj::GraphObject);    
+
+    if(graphs.size() > 0){
+        for (int i = 0; i < graphs.size(); i++){
+            FrGraphDocObj* graphDO = dynamic_cast<FrGraphDocObj*>(graphs[i]);
+            if (graphDO->GetID() == m_GraphID){
+                doc->Remove(graphDO);
+                break;
+            }
+        }
+    }  
+    
+    return true;
+}
 
 // delete active layer
 int FrUserActionCmd::GetActiveLayerID(){

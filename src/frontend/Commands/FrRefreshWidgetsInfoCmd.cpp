@@ -21,15 +21,30 @@ bool FrRefreshWidgetsInfoCmd::Execute(){
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     if(mv == 0) return false;
-        
+
     FrLayerListWidget* widget = mv->GetLayerListWidget();
-    widget->Update();
-
     FrImageSettingsWidget* widget2 = mv->GetImageSettingsWidget();
-    widget2->Update();
-
     FrGraphPaneWidget* widget3 = mv->GetGraphPaneWidget();
-    widget3->Update();
+
+
+    if (m_Target == All){
+        widget->Update();
+        widget2->Update();
+        widget3->Update();
+    }
+    else{
+        switch(m_Target){
+            case GraphPane:
+                widget3->Update();
+                break;
+            case ImageSettings:
+                widget2->Update();
+                break;
+            case LayerList:
+                widget->Update();
+                break;
+        }
+    }
 
     return true;
 }

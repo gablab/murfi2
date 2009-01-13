@@ -3,6 +3,7 @@
 #include "FrGraphListWidget.h"
 #include "FrPlayControlWidget.h"
 #include "FrGraphContextMenu.h"
+#include "FrGraphBookmarkWidget.h"
 
 #include "FrMainDocument.h"
 #include "FrImageDocObj.h"
@@ -32,7 +33,6 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
     // test, create popup menu
     m_GraphContextMenu = new FrGraphContextMenu(this);
     
-
     // Create left layout
     //m_GraphListWidget = new FrGraphListWidget(this);
     //QPushButton* btnAddGraph = new QPushButton(QString("Add Graph..."), this);
@@ -41,9 +41,12 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
     //leftLayout->addWidget(btnAddGraph);
 
     // Create main layout
+    m_GraphBookmarkWidget = new FrGraphBookmarkWidget(this);
     m_QwtPlotWidget = new FrQwtPlotWidget(this);
     m_PlayControlWidget = new FrPlayControlWidget(this);
+    
     QVBoxLayout* rightLayout = new QVBoxLayout(this);
+    rightLayout->addWidget(m_GraphBookmarkWidget);
     rightLayout->addWidget(m_QwtPlotWidget);
     rightLayout->addWidget(m_PlayControlWidget);
 
@@ -257,29 +260,33 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
     // remove all items 
     m_GraphContextMenu->clear();
 
-    // at this moment we add only one action for graph as we have only 1 timeseria at once
-    QAction* test = new QAction("mri timeseria", this);
-    test->setCheckable(true);
-    test->setChecked(false);                // TODO: check if we have this graph
-    m_GraphContextMenu->addAction(test);
+    // get all graphs
+    std::vector<FrDocumentObj*> graphs;
+    m_Document->GetObjectsByType(graphs, FrDocumentObj::GraphObject);
+    // test
+    bool checked = false;
+    if (graphs.size() > 0)
+        checked = true;
 
-    connect(test, SIGNAL(toggled(bool)), this, SLOT(itemChecked(bool)));
-
-    //// get all graphs
-    //std::vector<FrDocumentObj*> graphs;
-    //m_Document->GetObjectsByType(graphs, FrDocumentObj::GraphObject);
     //std::vector<FrDocumentObj*>::iterator it, itEnd(graphs.end());
     //int id = 0;
     //for(it = graphs.begin(); it != itEnd; ++it){
     //    FrGraphDocObj* gr = (FrGraphDocObj*)(*it); 
 
     //    int graphID = id++;
-    //    //QString& name = gr->GetSettings()->Name;
-    //    //QColor& color = gr->GetSettings()->Color;
-    //    //bool visibility = gr->GetSettings()->Visibility;
+    //    QString& name = gr->GetSettings()->Name;
+    //    QColor& color = gr->GetSettings()->Color;
+    //    bool visibility = gr->GetSettings()->Visibility;
     //}
 
-    // get all timeseries, check if every timeseria has graph or no
+    // TODO: get all timeseries, check if every timeseria has graphs or no
+    // at this moment we add only one action for graph as we have only 1 timeseria at once
+    QAction* test = new QAction("mri timeseria", this);
+    test->setCheckable(true);
+    test->setChecked(checked);                // TODO: check if we have this graph
+    m_GraphContextMenu->addAction(test);
+
+    connect(test, SIGNAL(toggled(bool)), this, SLOT(itemChecked(bool)));
     
     // check if current layer is roi, if yes add items : ROI Mean, ROI STD
     // Get selected layer ID 
@@ -394,20 +401,24 @@ void FrGraphPaneWidget::SetData(FrGraphDocObj* graphDO){
 
     short* pImageData = 0;
     std::vector<RtDataID>::iterator it, itEnd(dataIDs.end());
+    // TODO: do it for all points in PointsDocObj
     for(it = dataIDs.begin(); it != itEnd; ++it){
         RtDataID& dataID = (*it);
         
         RtData* data = dataStore2->getData(dataID);
-        // we need not roi data
-        RtMRIImage* img = dynamic_cast<RtMRIImage*>(data);
-        pImageData = img->getDataCopy();
-        
-        // get specified i,j,k value
-        int width = img->getDim(0);
-        int height = img->getDim(1);
-        int index = K * width*height +  J * width + I;
-        idata[i] = (double)pImageData[index]; 
-        i++;
+        string type = dataID.getModuleID();
+        if (type == "mri"){
+            RtMRIImage* img = dynamic_cast<RtMRIImage*>(data);
+            pImageData = img->getDataCopy();
+            
+            // get specified i,j,k value
+            int width = img->getDim(0);
+            int height = img->getDim(1);
+            int index = K * width*height +  J * width + I;
+            idata[i] = (double)pImageData[index]; 
+            i++;
+        }
+        // NOTE: another types can be supported
     }    
     m_QwtPlotWidget->SetData(graphDO->GetID(), idata, size);
 

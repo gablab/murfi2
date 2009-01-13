@@ -40,6 +40,7 @@ bool FrSliceScrollTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params
         cmd1->SetSliceDelta(0);
         
         FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+        cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
 
         FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
         cmd->AddCommand(cmd1);
@@ -70,6 +71,7 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
     cmd1->SetSliceDelta(sliceDelta);
 
     FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -103,6 +105,7 @@ bool FrSliceScrollTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
     cmd1->SetSliceDelta(sliceDelta);
 
     FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);

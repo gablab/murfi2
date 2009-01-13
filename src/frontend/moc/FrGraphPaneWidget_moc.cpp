@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphPaneWidget.h'
 **
-** Created: Thu 8. Jan 22:33:42 2009
+** Created: Mon 12. Jan 22:24:34 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

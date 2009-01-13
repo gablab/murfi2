@@ -7,6 +7,8 @@
 
 class FrRefreshWidgetsInfoCmd : public FrBaseCmd {
 public:
+    enum Target { None, GraphPane, ImageSettings, LayerList, All };
+public:
     // Constructor/destructor
     FrRefreshWidgetsInfoCmd();
 
@@ -19,6 +21,7 @@ public:
 
     // Properties
     FrPropMacro(FrMainController*, MainController);
+    FrSetPropMacro(Target, Target);
 
 protected:
     void UpdatePipelineForID(int id, int point);

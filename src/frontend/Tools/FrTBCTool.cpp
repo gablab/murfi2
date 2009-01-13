@@ -73,6 +73,7 @@ bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     }
 	
     FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);

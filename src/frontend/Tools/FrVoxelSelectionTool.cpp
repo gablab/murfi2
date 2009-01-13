@@ -70,6 +70,7 @@ bool FrVoxelSelectionTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& par
         //delete cmd;
 
         FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+        cmd2->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
 
         FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
         multiCmd->AddCommand(cmd1);

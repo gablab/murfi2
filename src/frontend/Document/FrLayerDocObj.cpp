@@ -28,6 +28,7 @@ void FrLayerDocObj::OnAdd(FrDocument* doc){
 
     FrRefreshWidgetsInfoCmd* cmd2 = 
         FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::LayerList);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -44,6 +45,7 @@ void FrLayerDocObj::OnRemove(FrDocument* doc){
 
     FrRefreshWidgetsInfoCmd* cmd2 = 
         FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::LayerList);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);

@@ -1,13 +1,13 @@
 #ifndef FR_MAIN_CONTROLLER
 #define FR_MAIN_CONTROLLER
 
-
 // Forward declaration
 class FrTool;
 class FrMainWindow;
 class FrMainDocument;
 class FrToolController;
 class FrInteractorStyle;
+class RtConductor;
 
 class QString;
 
@@ -68,6 +68,7 @@ public:
     FrGetPropMacro(FrMainWindow*, MainView);
     FrGetPropMacro(FrMainDocument*, MainDocument);
     FrGetPropMacro(FrToolController*, ToolController);
+    FrGetPropMacro(RtConductor*, Conductor);
 
 private:
     friend class FrInteractorStyle;

@@ -3,6 +3,12 @@
 #include "FrMainDocument.h"
 #include "FrMainController.h"
 
+
+#include"ace/SOCK_Stream.h"
+#include"ace/SOCK_Acceptor.h"
+#include"ace/SOCK_Stream.h"
+
+
 // Control block for leak detection
 #ifdef WIN32
     //#define MEM_LEAK_TEST 
@@ -18,7 +24,7 @@
 //
 // ------- MAIN ENTRY ---------
 //
-int main(int argc, char **argv){
+int ACE_TMAIN(int argc, char **argv){
 #ifdef MEM_LEAK_TEST
     char* b = new char[111];
     strcpy(b, "TEST MEMORY LEAK");

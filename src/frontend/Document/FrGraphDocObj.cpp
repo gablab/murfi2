@@ -27,6 +27,7 @@ void FrGraphDocObj::OnAdd(FrDocument* doc){
 
     FrRefreshWidgetsInfoCmd* cmd = 
         FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
 
     //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     //cmd->AddCommand(cmd1);
@@ -43,6 +44,7 @@ void FrGraphDocObj::OnRemove(FrDocument* doc){
 
     FrRefreshWidgetsInfoCmd* cmd = 
         FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
 
     //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     //cmd->AddCommand(cmd1);

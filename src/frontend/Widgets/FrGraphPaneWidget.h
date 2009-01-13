@@ -11,6 +11,7 @@ class FrPlayControlWidget;
 class FrMainDocument;
 class FrGraphContextMenu;
 class FrGraphDocObj;
+class FrGraphBookmarkWidget;
 
 class FrPlayThread;
 
@@ -34,6 +35,7 @@ public:
     //FrGetPropMacro(FrGraphListWidget*, GraphListWidget);
     FrGetPropMacro(FrPlayControlWidget*, PlayControlWidget);
     FrGetPropMacro(FrGraphContextMenu*, GraphContextMenu);
+    FrGetPropMacro(FrGraphBookmarkWidget*, GraphBookmarkWidget);
     
     // Methods
     void Update();

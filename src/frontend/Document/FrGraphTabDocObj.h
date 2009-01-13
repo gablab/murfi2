@@ -22,7 +22,13 @@ public:
 
     // Properties
     FrPropMacro(int, ID);
-    FrGetRefPropMacro(std::vector<FrGraphDocObj*>, Graphs);
+    //FrGetRefPropMacro(std::vector<FrGraphDocObj*>, Graphs);
+
+    FrPropMacro(QString, Name);
+    FrPropMacro(QString, Description);
+    FrPropMacro(bool, IsCurrent);
+    FrGetPropMacro(bool, IsDefault)    
+
 };
 
 #endif

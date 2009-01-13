@@ -126,8 +126,8 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     usPix = usPixR = usPixG = usPixB = 0;
 
     VoxelData vd;
-    vd.name = "test";   // get layer (image?) name
-    vd.timepoint = 44;  // get timepoint
+    vd.name = "Timeseria 1";   // get timeseria
+    vd.timepoint = viewDO->GetTimePoint();  // get timepoint
     
     vd.Index[0] = int(ptMapped[0]);
     vd.Index[1] = int(ptMapped[1]);

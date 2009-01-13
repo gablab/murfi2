@@ -17,6 +17,7 @@
 #include "FrPointsDocObj.h"
 #include "FrAppSettingsDocObj.h"
 #include "FrDataStoreDialog.h"
+#include "FrDataStore.h"
 
 // VTK stuff
 #include "vtkRenderWindowInteractor.h"
@@ -31,13 +32,38 @@
 #include "RtServerSocket.h"
 #include "RtConductor.h"
 #include "RtDataStore.h"
-
+#include "RtInput.h"
 
 // Implementation of FrMainController
 FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 : m_MainView(view), m_MainDocument(doc), m_ToolController(0){
 
     m_ToolController = new FrToolController(this);    
+
+    // testing data receiving
+	char *path[3];
+	path[0] = "test";
+	path[1] = "-f";
+	path[2] = "test_config.xml";
+
+    //m_Conductor = new RtConductor(3, path);
+    //m_Conductor->addOutput(m_MainDocument->GetDataStore());
+
+    //m_Conductor->init();
+    //m_Conductor->run();
+    
+    //ACE::init();
+
+    ACE_SOCK_Acceptor acceptor;
+
+    ACE_INET_Addr address(15000,(ACE_UINT32)INADDR_ANY);
+    int result = acceptor.open(address,1);
+    int err = errno;
+    perror(NULL);
+
+    const ACE_TCHAR* e = ACE::sock_error(10093);
+    //int ACE_OS::socket_init (int 1, int 1);
+
 }
 
 FrMainController::~FrMainController(){    
@@ -151,6 +177,7 @@ void FrMainController::LoadImageFromFile(std::vector<QString>& fileNames){
     cmd2->SetTargetView(FrResetImageCmd::Current);
 
     FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd3->SetTarget(FrRefreshWidgetsInfoCmd::All);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -182,6 +209,7 @@ void FrMainController::IoTabSettings(QString& fileName, bool isInput){
         cmd2->SetTabID(CURRENT_TAB_ID);
 
         FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+        cmd3->SetTarget(FrRefreshWidgetsInfoCmd::All);
 
         FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
         cmd->AddCommand(cmd1);
@@ -232,6 +260,7 @@ void FrMainController::ChangeView(int view){
     cmd1->SetTargetView(targetView);
 
     FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -277,6 +306,8 @@ void FrMainController::ChangeLayer(int action){
 
         FrRefreshWidgetsInfoCmd* cmd2 = 
             FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+        cmd2->SetTarget(FrRefreshWidgetsInfoCmd::LayerList);
+
         cmd->AddCommand(cmd2);
     }
     // Changing Name, visibility, opacity
@@ -327,6 +358,7 @@ void FrMainController::ChangeBookmark(int id){
     cmd3->SetTargetView(FrChangeViewCmd::Synchronize);
 
     FrRefreshWidgetsInfoCmd* cmd4 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd4->SetTarget(FrRefreshWidgetsInfoCmd::All);
 
 //    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
 //    cmd->AddCommand(cmd1);
@@ -377,6 +409,7 @@ void FrMainController::ResetImage(){
     cmd1->SetTargetView(FrResetImageCmd::Current);
     
     FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -389,6 +422,7 @@ void FrMainController::CreatNewROI(){
     FrCreateROICmd* cmd1 = FrCommandController::CreateCmd<FrCreateROICmd>();
     
     FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::All);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
@@ -447,10 +481,17 @@ void FrMainController::ChangeGraph(int id, bool add){
 
 void FrMainController::Test(){    
 
-    FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
-    cmd->SetAction(FrTimePointCmd::SetPrevious);
-    cmd->Execute();
-    delete cmd;
+    //FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
+    //cmd->SetAction(FrTimePointCmd::SetPrevious);
+    //cmd->Execute();
+    //delete cmd;
+    ACE_SOCK_Stream stream;
+    ACE_SOCK_Acceptor acceptor;
+
+    ACE_INET_Addr address(15000,(ACE_UINT32)INADDR_ANY);
+    int result = acceptor.open(address,1);
+
+    int g = 5;
 
 //    // run test input server
 //	RtInputScannerImages* input =  new RtInputScannerImages();

@@ -14,6 +14,7 @@
 #include "FrLayerDocObj.h"
 #include "FrPointsDocObj.h"
 #include "FrGraphSettings.h"
+#include "FrGraphPaneWidget.h"
 
 #include "vtkPointPicker.h"
 #include "vtkCoordinate.h"
@@ -120,7 +121,7 @@ bool FrVoxelSelectionCmd::AddPoint(){
     GetRealImagePosition(viewDO, pImageData, Index, imgNumber);
 
     // convert coordinates if we have mosaic view selected
-    if (view = MosaicView){
+    if (view == MosaicView){
         // we need to now number of slices in a row, or width/height of one slice
         int sliceDims[3];
         mv->GetSliceView()->GetImage()->GetImageInput()->GetDimensions(sliceDims);

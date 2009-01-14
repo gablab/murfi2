@@ -45,14 +45,14 @@ RtConductor::RtConductor(int argc, char **argv) {
     }
   }
 
-  if(config.get("receiveTriggers")==true) {
+ /* if(config.get("receiveTriggers")==true) {
     RtInputUSBKb *scantrig;
     ACE_NEW_NORETURN(scantrig, RtInputUSBKb);
 
     if(!addInput(scantrig)) {
       cerr << "ERROR: could not add scanner trigger listener" << endl;
     }
-  }
+  }*/
 
   // attach code numbers to inputs
   curCodeNum = START_CODE_INPUTS;
@@ -76,15 +76,15 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 #endif
 
-  // open output socket
-  if(config.get("infoserver:port")==true) {
-    RtInfoServer *infoserver;
-    ACE_NEW_NORETURN(infoserver, RtInfoServer);    
+  //// open output socket
+  //if(config.get("infoserver:port")==true) {
+  //  RtInfoServer *infoserver;
+  //  ACE_NEW_NORETURN(infoserver, RtInfoServer);    
 
-    if(!addOutput(infoserver)) {
-      cerr << "ERROR: could not initialize info server" << endl;
-    }
-  }
+  //  if(!addOutput(infoserver)) {
+  //    cerr << "ERROR: could not initialize info server" << endl;
+  //  }
+  //}
 
   if(config.get("info:log:disabled")==false) {
     if(!outputLog.open(config)) {
@@ -246,9 +246,9 @@ bool RtConductor::run() {
   outputLog << "\n";
 
   // start the info server
-  if(config.isSet("infoserver:port")) {  
-    getInfoServer()->activate();
-  }
+  //if(config.isSet("infoserver:port")) {  
+  //  getInfoServer()->activate();
+  //}
 
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
@@ -257,10 +257,11 @@ bool RtConductor::run() {
 
   // start the display
   // DIRTY HACK TO LET DISPLAY RUN IN MAIN THREAD
-  if(config.get("display:image")==true) {  
-    getDisplay()->svc();
-    //getDisplay()->activate();
-  }
+  //if(config.get("display:image")==true) {  
+    RtDisplay* out = getDisplay();
+    out->svc();
+  //  //getDisplay()->activate();
+  //}
   //else {
     // wait for threads to complete
 
@@ -323,13 +324,13 @@ void RtConductor::log(stringstream &s) {
 // get the display output
 //  out 
 //   pointer to the display output object
-RtDisplayImage *RtConductor::getDisplay() {
-  if(config.get("display:image")==true) {
-     return (RtDisplayImage*) (*outputs.begin());
-  }
-  else {
-    return NULL;
-  }
+RtDisplay *RtConductor::getDisplay() {
+//  if(config.get("display:image")==true) {
+     return (RtDisplay*) (*outputs.begin());
+//  }
+//  else {
+//    return NULL;
+//  }
 }
 
 // get the info server

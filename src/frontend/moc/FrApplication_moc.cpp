@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrApplication.h'
 **
-** Created: Thu 8. Jan 09:19:40 2009
+** Created: Wed 14. Jan 14:19:59 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -48,6 +48,8 @@ void *FrApplication::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrApplication))
 	return static_cast<void*>(const_cast< FrApplication*>(this));
+    if (!strcmp(_clname, "RtDisplay"))
+	return static_cast< RtDisplay*>(const_cast< FrApplication*>(this));
     return QApplication::qt_metacast(_clname);
 }
 

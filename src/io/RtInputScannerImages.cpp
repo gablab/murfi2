@@ -251,22 +251,22 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    // if its the first image in a series save it no matter what
-    if(isFirstInSeries(*ei)
-       && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
+ //   // if its the first image in a series save it no matter what
+ //   if(isFirstInSeries(*ei)
+ //      && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
 
-      rti->write(RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
+ //     rti->write(RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
 
-      // register with reference
-      if(alignSeries) {
-        RtFSLInterface::registerSameSubjEPI(
-            RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()),
-            RtExperiment::getExperimentRefVolFilename(),
-            RtExperiment::getSeriesXfmFilename(rti->getDataID().getSeriesNum()), true
-  					  );
-      }
+ //     // register with reference
+ //     if(alignSeries) {
+ //       RtFSLInterface::registerSameSubjEPI(
+ //           RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()),
+ //           RtExperiment::getExperimentRefVolFilename(),
+ //           RtExperiment::getSeriesXfmFilename(rti->getDataID().getSeriesNum()), true
+ // 					  );
+ //     }
 
-    }
+ //   }
 
     sendCode(rti);
 

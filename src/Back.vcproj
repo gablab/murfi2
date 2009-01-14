@@ -633,6 +633,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\executive\RtDisplay.h"
+				>
+			</File>
+			<File
 				RelativePath=".\executive\RtExperiment.cpp"
 				>
 			</File>

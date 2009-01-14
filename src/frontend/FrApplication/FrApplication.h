@@ -3,11 +3,15 @@
 
 // includes
 #include <Qt/qapplication.h>
+#include "RtDisplay.h"
 
-class FrApplication : public QApplication {
+class FrApplication : public QApplication, public RtDisplay {
 Q_OBJECT
 public:
     FrApplication(int& argc, char **argv, bool useInterface = true);
+
+  // sets the window running
+  virtual int svc();
 
 protected:
 };

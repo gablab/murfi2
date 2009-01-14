@@ -2,12 +2,12 @@
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 #include "FrMainController.h"
+#include "FrDataStore.h"
 
-
-#include"ace/SOCK_Stream.h"
-#include"ace/SOCK_Acceptor.h"
-#include"ace/SOCK_Stream.h"
-
+#include "ace/SOCK_Stream.h"
+#include "ace/SOCK_Acceptor.h"
+#include "ace/SOCK_Stream.h"
+#include "RtConductor.h"
 
 // Control block for leak detection
 #ifdef WIN32
@@ -56,10 +56,23 @@ int ACE_TMAIN(int argc, char **argv){
     FrMainController controller(mainWindow, document);
     controller.Initialize();
 
+    // testing data receiving
+	char *path[3];
+	path[0] = "test";
+	path[1] = "-f";
+	path[2] = "test_config.xml";
+
+    RtConductor* m_Conductor = new RtConductor(3, path);
+    m_Conductor->addOutput(&application);
+    m_Conductor->addOutput(document->GetDataStore()->GetStore());
+
+    m_Conductor->init();
+    m_Conductor->run();
+
     int result = 0;
-    if(!application.exec()){
-        result = 1;
-    }
+    //if(!application.exec()){
+    //    result = 1;
+    //}
 
     return result;
 }

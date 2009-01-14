@@ -23,6 +23,8 @@ class QVTKWidget;
 class FrActionManager;
 class FrActionSignalManager;
 
+class RtOutput;
+
 // Includes
 #include "FrMacro.h"
 #include "Qt/qmainwindow.h"

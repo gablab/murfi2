@@ -24,6 +24,7 @@
 #include"RtOutputFile.h"
 #include"RtStream.h"
 #include"RtCode.h"
+#include"RtDisplay.h"
 
 using namespace std;
 
@@ -101,7 +102,8 @@ public:
   // get the display output
   //  out 
   //   pointer to the display output object
-  RtDisplayImage *getDisplay();
+//  RtDisplayImage *getDisplay();
+  RtDisplay *getDisplay();
 
   // get the info server
   //  out 

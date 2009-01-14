@@ -40,28 +40,29 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 
     m_ToolController = new FrToolController(this);    
 
-    // testing data receiving
-	char *path[3];
-	path[0] = "test";
-	path[1] = "-f";
-	path[2] = "test_config.xml";
+ ////    testing data receiving
+	//char *path[3];
+	//path[0] = "test";
+	//path[1] = "-f";
+	//path[2] = "test_config.xml";
 
-    //m_Conductor = new RtConductor(3, path);
-    //m_Conductor->addOutput(m_MainDocument->GetDataStore());
+ //   m_Conductor = new RtConductor(3, path);
+ //   m_Conductor->addOutput(m_MainView);
+ //   m_Conductor->addOutput(m_MainDocument->GetDataStore());
 
-    //m_Conductor->init();
-    //m_Conductor->run();
+ //   m_Conductor->init();
+ //   m_Conductor->run();
     
     //ACE::init();
 
-    ACE_SOCK_Acceptor acceptor;
+    //ACE_SOCK_Acceptor acceptor;
 
-    ACE_INET_Addr address(15000,(ACE_UINT32)INADDR_ANY);
-    int result = acceptor.open(address,1);
-    int err = errno;
-    perror(NULL);
+    //ACE_INET_Addr address(15000,(ACE_UINT32)INADDR_ANY);
+    //int result = acceptor.open(address,1);
+    //int err = errno;
+    //perror(NULL);
 
-    const ACE_TCHAR* e = ACE::sock_error(10093);
+    //const ACE_TCHAR* e = ACE::sock_error(10093);
     //int ACE_OS::socket_init (int 1, int 1);
 
 }
@@ -485,13 +486,8 @@ void FrMainController::Test(){
     //cmd->SetAction(FrTimePointCmd::SetPrevious);
     //cmd->Execute();
     //delete cmd;
-    ACE_SOCK_Stream stream;
-    ACE_SOCK_Acceptor acceptor;
 
-    ACE_INET_Addr address(15000,(ACE_UINT32)INADDR_ANY);
-    int result = acceptor.open(address,1);
-
-    int g = 5;
+    //m_Conductor->run();
 
 //    // run test input server
 //	RtInputScannerImages* input =  new RtInputScannerImages();

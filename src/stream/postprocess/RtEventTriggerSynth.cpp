@@ -1,7 +1,7 @@
 /******************************************************************************
- * RtEventTriggerActivationSumDiff.cpp triggers an event based on activation sums
+ * RtEventTriggerSynth.cpp synthesizes event triggers
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-04-14
+ * Oliver Hinds <ohinds@mit.edu> 2009-01-14
  *
  *****************************************************************************/
 
@@ -48,110 +48,54 @@ int RtEventTriggerSynth::process(ACE_Message_Block *mb) {
 
   static normal_distribution rnd(meanISI, sdISI);
   static int nextTrigger = rnd();
+  static int tr = 0;
   
   //debug
 //    cout << "event trigger started at ";
 //    printNow(cout);
 //    cout << endl;
 
-  // check if we need to skip triggers
-  if(trsSinceTrigger < afterTriggerSkipTRs) {
-    trsSinceTrigger++;
+  tr++;
+
+  // check if now is not yet a trigger time
+  nextTrigger--;
+  if(nextTrigger > 0) {
     return 0;
   }
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
-  // find the positive activation sum with the right roiID
-  RtActivation *posact 
-    = (RtActivation*) msg->getData(posActivationSumModuleID,
-				   posActivationSumDataName,
-				   posRoiID);
-  RtActivation *negact 
-    = (RtActivation*) msg->getData(negActivationSumModuleID,
-				   negActivationSumDataName,
-				   negRoiID);
+  // trigger
+  RtEvent *event = new RtEvent();
+  event->getDataID().setTimePoint(tr);
 
-  if(posact == NULL) {
-    cout << "couldn't find positive roi " << posroiID << endl;
-
-    ACE_DEBUG((LM_INFO, "RtEventTriggerSynth:process: no positive ROI found\n"));
-    return 0;
-  }
-
-  if(negact == NULL) {
-    cout << "couldn't find negative roi " << negroiID << endl;
-
-    ACE_DEBUG((LM_INFO, "RtEventTriggerSynth:process: no negative ROI found\n"));
-    return 0;
-  }
-
-  int tr = posact->getDataID().getTimePoint();
-  if(tr < initialSkipTRs) {
-    return 0;
-  }
-
-  cout << "checking for even trigger: " 
-       << posact->getPixel(0) << " - " 
-       <<  negact->getPixel(0) << " >= " 
-       << diffThresh 
-       << endl;
-
-  // check for goodrigger
-  if(posact->getPixel(0) - negact->getPixel(0) >= diffThresh) {
-    // trigger
-    RtEvent *event = new RtEvent();
-   
-    event->getDataID().setFromInputData(*posact,*this);
+  // generate whether its good or bad randomly
+  if(rnd() < meaanISI) {
     event->getDataID().setDataName(NAME_EVENTTRIGGER_GOOD);
-    event->getDataID().setTimePoint(tr);
-
-//    event->setTR(tr);
-//    event->addToID("trigger.good");
-    setResult(msg,event);
 
     // log the trigger
     stringstream logs("");
-    logs << "trigger event good at tr " << tr << ": " 
-	 << posact->getPixel(0) - negact->getPixel(0) << " >= " 
-	 << diffThresh << endl;
+    logs << "trigger event good at tr " << tr << endl;
     log(logs);
 
     // debug
     cout << "GOOD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-    cout << posact->getPixel(0) - negact->getPixel(0) << " " 
-	 << diffThresh << endl;
-
-    trsSinceTrigger = 0;
   }
-  
-  // check for bad trigger
-  if(posact->getPixel(0) - negact->getPixel(0) <= -diffThresh) {
-    // trigger
-    RtEvent *event = new RtEvent();
-   
-    event->getDataID().setFromInputData(*posact,*this);
+  else {
     event->getDataID().setDataName(NAME_EVENTTRIGGER_BAD);
-    event->getDataID().setTimePoint(tr);
-
-    //event->addToID("trigger.bad");
-    //event->setTR(tr);
-    setResult(msg,event);
 
     // log the trigger
     stringstream logs("");
-    logs << "trigger event bad at tr " << tr << ": " 
-	 << posact->getPixel(0) - negact->getPixel(0) << " <= " 
-	 << -diffThresh << endl;
+    logs << "trigger event bad at tr " << tr << endl;
     log(logs);
-    
+
     // debug
     cout << "BAD EVENT TRIGGERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-    cout << posact->getPixel(0) - negact->getPixel(0) 
-	 << " " << diffThresh << endl;
-
-    trsSinceTrigger = 0;
   }
+
+  setResult(msg,event);
+
+  nextTrigger = rnd();
 
   //debug
 //    cout << "event trigger finished at ";
@@ -162,11 +106,6 @@ int RtEventTriggerSynth::process(ACE_Message_Block *mb) {
   return 0;
 }
 
-// generate an isi
-int RtEventTriggerSynth::process(ACE_Message_Block *mb) {  
-  ACE_TRACE(("RtEventTriggerSynth::process"));
-
-}
 
 /*****************************************************************************
  * $Source$

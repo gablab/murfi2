@@ -120,8 +120,7 @@ VXL_INCS=-I$(PKG_DIR)/vxl/include/vxl/core -I$(PKG_DIR)/vxl/include/vxl/vcl
 VXL_LIBS=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/vxl/lib
 
 GNUPLOT_INCS=-I$(PKG_DIR)/gnuplot_i_vxl/include
-GNUPLOT_LIBS=
-#-lgnuplot_i_vxl l -L$(PKG_DIR)/gnuplot_i_vxl/lib
+GNUPLOT_LIBS=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
 
 NIFTI_INCS=-I/usr/include/nifti
 NIFTI_LIBS=-lniftiio -lznz -lz

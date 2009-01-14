@@ -6,6 +6,7 @@
  *****************************************************************************/
 
 #include"RtInfoServer.h"
+#include"RtExperiment.h"
 #include"RtEvent.h"
 
 #include"RtDataIDs.h"
@@ -40,8 +41,13 @@ RtInfoServer::~RtInfoServer() {
 void RtInfoServer::setData(RtData *data) {  
 
   //cout << "EVENT TRIGGER SETDATA " << data->getDataID() << endl;
-  if(data->getDataID().getDataName() == NAME_ROIWEIGHTEDAVE) {
-    database.push_back(data);
+  if(data->getDataID().getDataName() 
+     == RtExperiment::getConfig()->get("infoserver:posActivationDataID").str()) {
+    posAct[data->getDataID().getTimePoint()] = data;
+  }
+  else if(data->getDataID().getDataName() 
+	  == RtExperiment::getConfig()->get("infoserver:negActivationDataID").str()) {
+    negAct[data->getDataID().getTimePoint()] = data;
   }
   //else if(data->getDataID().getModuleID() == ID_EVENTTRIGGER) {
 
@@ -137,6 +143,9 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
       TiXmlElement *roiResponse = new TiXmlElement("roi");
       infoResponse->LinkEndChild(roiResponse);
       
+      // check if its pos or neg (MAKE THIS MORE GENERAL: DIRTY HACK)
+      bool pos = (roi->Attribute("id") == "pos");
+
       // set the id
       if(roi->Attribute("id")) {
 	roiResponse->SetAttribute("id", roi->Attribute("id"));
@@ -161,7 +170,7 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	if(get->Attribute("tr")) {
 	  // check for proper format and get tr
 	  if(!strcmp(get->Attribute("tr"),"last")) {
-	    trStart = database.size();
+	    trStart = posAct.size();
 	  }
 	  else if(!RtConfigVal::convert<unsigned int>(trStart,
 						 get->Attribute("tr"))) {
@@ -193,7 +202,7 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 
 	  // check for proper format and get trEnd
 	  if(!strcmp(get->Attribute("trEnd"),"last")) {
-	    trEnd = database.size();
+	    trEnd = posAct.size();
 	  }
 	  else if(!RtConfigVal::convert<unsigned int>(trEnd,
 						 get->Attribute("trEnd"))) {
@@ -210,7 +219,7 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	//cout << trStart << " trend=" << trEnd << " database size=" << database.size() << endl; 
 
 	// check range (fix this when database is better)
-	if(trStart < 1 || trEnd > database.size()) {
+	if(trStart < 1 || trEnd > posAct.size()) {
 	  string errString = "tr range requested is invalid";
 	  cerr << errString << endl;
 	  TiXmlElement *errEl = createErrorElement(errString);
@@ -221,7 +230,9 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	  
 	// get the data as xml (zero vs one based)
 	for(unsigned int tr=trStart; tr <= trEnd; tr++) {
-	  TiXmlElement *trel = database[tr-1]->serializeAsXML();
+	  TiXmlElement *trel = (pos ? 
+				posAct[tr-1]->serializeAsXML()
+				: negAct[tr-1]->serializeAsXML());
 	  trel->SetAttribute("tr",tr);
 	  roiResponse->LinkEndChild(trel);
 	  // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS

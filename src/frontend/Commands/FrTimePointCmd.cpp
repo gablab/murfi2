@@ -38,6 +38,9 @@ bool FrTimePointCmd::Execute(){
             // Do nothing here
             break;
     }
+
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+
     return result;
 }
 
@@ -99,7 +102,7 @@ bool FrTimePointCmd::SetUserDefinedTimePoint(){
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     mv->GetGraphPaneWidget()->UpdateTimePoint();
 
-    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+//    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
 
     return true;
 }

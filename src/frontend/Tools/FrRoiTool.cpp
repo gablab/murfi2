@@ -96,7 +96,7 @@ void FrRoiTool::Start(){
     cmd->SetToolType(FrManageToolCmd::RoiTool);
     cmd->SetToolAction(FrManageToolCmd::UpdateAct);
     cmd->SetIsChecked(true);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -121,7 +121,7 @@ void FrRoiTool::Stop(){
     cmd->SetToolType(FrManageToolCmd::RoiTool);
     cmd->SetToolAction(FrManageToolCmd::UpdateAct);
     cmd->SetIsChecked(false);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 

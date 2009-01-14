@@ -33,7 +33,7 @@ void FrViewDocObj::OnAdd(FrDocument* doc){
     // Probably need the command updating current view
     FrChangeViewCmd* cmd = FrCommandController::CreateCmd<FrChangeViewCmd>();
     cmd->SetTargetView(FrChangeViewCmd::Synchronize);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 

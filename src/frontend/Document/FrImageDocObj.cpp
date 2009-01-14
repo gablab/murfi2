@@ -155,9 +155,20 @@ void FrImageDocObj::ClearAll(){
 
 void FrImageDocObj::NotifyAboutNewTimePointData(){
 
-    FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
-    cmd->SetAction(FrTimePointCmd::SetLast);
-    cmd->SetCheckLifeMode(true);
-    cmd->Execute();
+    FrTimePointCmd* cmd1 = FrCommandController::CreateCmd<FrTimePointCmd>();
+    cmd1->SetAction(FrTimePointCmd::SetLast);
+    cmd1->SetCheckLifeMode(true);
+    
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::All);
+
+    FrResetImageCmd* cmd3 = FrCommandController::CreateCmd<FrResetImageCmd>();
+    cmd3->SetTargetView(FrResetImageCmd::Current);
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
+    cmd->AddCommand(cmd3);
+    FrCommandController::Execute(cmd);
     delete cmd;
 }

@@ -49,7 +49,7 @@ bool FrFreeShapeTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 
             cmd->SetPoints(Points);
             cmd->SetImageNumber(m_ImageNumber);
-            cmd->Execute();
+            FrCommandController::Execute(cmd);
             delete cmd;
 
             Points.clear();
@@ -77,7 +77,7 @@ bool FrFreeShapeTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 
         cmd->SetPoints(Points);
         cmd->SetImageNumber(m_ImageNumber);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
 
         Points.pop_back();

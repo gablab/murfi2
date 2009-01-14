@@ -116,7 +116,7 @@ void FrMosaicView::UpdatePipeline(int point){
                 params.ViewSettings->CamSettings, 
                 ALL_LAYER_ID);
 
-            m_LayeredImage->UpdateCamera();
+            //m_LayeredImage->UpdateCamera();
         }
     default:
         // do nothing
@@ -125,6 +125,7 @@ void FrMosaicView::UpdatePipeline(int point){
 
     // redraw scene
 	GetRenderWindow()->Render();
+    wglMakeCurrent(NULL, NULL);
 }
 
 bool FrMosaicView::InitUpdateParams(FrUpdateParams1& params){

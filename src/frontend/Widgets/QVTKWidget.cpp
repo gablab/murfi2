@@ -44,6 +44,8 @@
 #include "vtkToolkits.h"
 #include "vtkUnsignedCharArray.h"
 
+#include "FrUtils.h"
+
 
 // VTK 4.5 added some major functionality, so we'll make a short define to use
 #if (VTK_MAJOR_VERSION > 4) || (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION >=5)
@@ -461,6 +463,7 @@ void QVTKWidget::paintEvent(QPaintEvent* )
 
 
   iren->Render();
+  wglMakeCurrent(NULL, NULL);
 }
 
 /*! handle mouse press event

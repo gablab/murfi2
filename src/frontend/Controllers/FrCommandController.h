@@ -44,6 +44,8 @@ class FrMainController;
 #include "FrMaskMaskOperationCmd.h"
 #include "FrMaskCopyAdjacentCmd.h"
 
+#include"ace/Mutex.h"
+
 // This class allow user to create 
 // and manage commands. Organised like singletone;
 class FrCommandController : public FrController {
@@ -72,6 +74,8 @@ public:
         cmd->SetMainController(mc);
         return cmd; 
     }
+    
+    static bool Execute(FrBaseCmd* cmd);
 protected:
     friend class FrMainController;
 
@@ -83,12 +87,17 @@ protected:
 private:
     // Helpers
     FrMainController* GetMainController();
+    static void lock();
+    static void unlock();
 
 private:
     FrCommandController();
     virtual ~FrCommandController();
 
     static FrCommandController* m_controller;
+private:
+    static ACE_Mutex m_Mutex;
+
 };
 
 #endif // FR_CMD_CONTROLLER

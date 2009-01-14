@@ -125,7 +125,7 @@ void FrSliceView::UpdatePipeline(int point){
                 params.ViewSettings->CamSettings, 
                 ALL_LAYER_ID);
 
-            m_LayeredImage->UpdateCamera();
+            //m_LayeredImage->UpdateCamera();
         }
     default:
         // do nothing
@@ -147,7 +147,8 @@ void FrSliceView::UpdatePipeline(int point){
     m_LayeredImage->SetText(sliceNumText);
 
     // redraw scene
-	GetRenderWindow()->Render();
+    GetRenderWindow()->Render();
+    wglMakeCurrent(NULL, NULL);
 }
 
 bool FrSliceView::InitUpdateParams(FrUpdateParams0& params){

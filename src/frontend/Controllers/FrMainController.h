@@ -72,6 +72,11 @@ public:
 
 private:
     friend class FrInteractorStyle;
+
+private:
+    static void* ConductorThread(void *arg);
+    int ThrID;
+
 };
 
 #endif

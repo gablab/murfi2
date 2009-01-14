@@ -168,7 +168,7 @@ void FrOrthoView::UpdatePipeline(int point){
                     params.ViewSettings->CamSettings[i], 
                     ALL_LAYER_ID);
 
-                m_LayeredImage[i]->UpdateCamera();
+                //m_LayeredImage[i]->UpdateCamera();
             }
         }
     default:
@@ -185,6 +185,7 @@ void FrOrthoView::UpdatePipeline(int point){
 
     // redraw scene
 	GetRenderWindow()->Render();
+    wglMakeCurrent(NULL, NULL);
 }
 
 bool FrOrthoView::InitUpdateParams(FrUpdateParams2& params){

@@ -33,7 +33,7 @@ void FrLayerDocObj::OnAdd(FrDocument* doc){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
 
     delete cmd;
 }
@@ -50,7 +50,7 @@ void FrLayerDocObj::OnRemove(FrDocument* doc){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
 
     delete cmd;
 }

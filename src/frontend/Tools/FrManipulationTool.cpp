@@ -54,7 +54,7 @@ void FrManipulationTool::Start(){
     cmd->SetToolType(FrManageToolCmd::ManipulationTool);
     cmd->SetToolAction(FrManageToolCmd::UpdateAct);
     cmd->SetIsChecked(true);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -75,7 +75,7 @@ void FrManipulationTool::Stop(){
     cmd->SetToolType(FrManageToolCmd::ManipulationTool);
     cmd->SetToolAction(FrManageToolCmd::UpdateAct);
     cmd->SetIsChecked(false);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -148,7 +148,7 @@ bool FrManipulationTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& param
     else
         cmd->SetCursorType(FrSetCursorCmd::Pan);
 
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 
     return false;

@@ -237,7 +237,7 @@ int RtInputScannerImages::svc() {
     //rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
-    if(!haveRefVol 
+/*    if(!haveRefVol 
        && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI
        ) {
       
@@ -249,7 +249,7 @@ int RtInputScannerImages::svc() {
       else {
 	haveRefVol = true;
       }
-    }
+    }*/
 
  //   // if its the first image in a series save it no matter what
  //   if(isFirstInSeries(*ei)
@@ -268,7 +268,7 @@ int RtInputScannerImages::svc() {
 
  //   }
 
-    sendCode(rti);
+/*    sendCode(rti);
 
 
     if(saveImagesToFile) {
@@ -284,7 +284,7 @@ int RtInputScannerImages::svc() {
 //    cout << "started processing image at ";
 //    printNow(cout);
 //    cout << endl;
-
+*/
     // clean up
     delete ei;
     delete [] img;

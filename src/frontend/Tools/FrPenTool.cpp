@@ -32,7 +32,7 @@ bool FrPenTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
         else 
             cmd->SetAction(FrMaskPenCmd::Erase);
 
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
 
@@ -62,7 +62,7 @@ bool FrPenTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 
         cmd->SetRadius(rad);    // test
         cmd->SetImageNumber(m_ImageNumber);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
 
@@ -95,7 +95,7 @@ bool FrPenTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
         int rad = mv->GetLayerListWidget()->GetRoiToolWidget()->GetPenWidget()->GetValue();
         cmd->SetRadius(rad);    // test
         cmd->SetImageNumber(m_ImageNumber);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
 

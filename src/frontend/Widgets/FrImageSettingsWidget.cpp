@@ -194,7 +194,7 @@ void FrImageSettingsWidget::Update(){
     if (images.size() == 0) return;
 
     FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
-    mri = imgDO->GetTimePointData(0);   // any timepoint is good
+    mri = imgDO->GetTimePointData(imgDO->GetLastTimePoint());   // any timepoint is good
     
     int xDim = mri->getDim(0)-1;
     int yDim = mri->getDim(1)-1;

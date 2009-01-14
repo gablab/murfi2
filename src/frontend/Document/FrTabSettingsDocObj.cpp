@@ -34,7 +34,7 @@ void FrTabSettingsDocObj::OnAdd(FrDocument* doc){
     FrUpdateTabsCmd* cmd = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
     cmd->SetAction(FrUpdateTabsCmd::Add);
     cmd->SetTabSettingsDocObj(this);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -43,7 +43,7 @@ void FrTabSettingsDocObj::OnRemove(FrDocument* doc){
     FrUpdateTabsCmd* cmd = FrCommandController::CreateCmd<FrUpdateTabsCmd>();
     cmd->SetAction(FrUpdateTabsCmd::Remove);
     cmd->SetTabSettingsDocObj(this);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
     
     // If no more tabs delete layers also

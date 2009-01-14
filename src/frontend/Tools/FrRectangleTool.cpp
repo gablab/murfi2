@@ -51,7 +51,7 @@ bool FrRectangleTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
             rect.secondPoint.y = y;
             cmd->SetRect(rect);
             cmd->SetImageNumber(m_ImageNumber);
-            cmd->Execute();
+            FrCommandController::Execute(cmd);
             delete cmd;
         }
     }
@@ -93,7 +93,7 @@ bool FrRectangleTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
             rect.secondPoint.y = y;
             cmd->SetRect(rect);
             cmd->SetImageNumber(m_ImageNumber);
-            cmd->Execute();
+            FrCommandController::Execute(cmd);
             delete cmd;
         }
     }

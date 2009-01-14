@@ -81,7 +81,7 @@ void FrZoomTool::ZoomByScaling(double factor, FrInteractorStyle* is){
         FrChangeCamCmd* cmd = FrCommandController::CreateCmd<FrChangeCamCmd>();
         cmd->SetMouseXY(m_oldX, m_oldY);
         cmd->SetScale(curScale);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
     else{

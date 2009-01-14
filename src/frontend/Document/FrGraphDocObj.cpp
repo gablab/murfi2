@@ -32,7 +32,7 @@ void FrGraphDocObj::OnAdd(FrDocument* doc){
     //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     //cmd->AddCommand(cmd1);
     //cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
 
     delete cmd;
 }
@@ -49,7 +49,7 @@ void FrGraphDocObj::OnRemove(FrDocument* doc){
     //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     //cmd->AddCommand(cmd1);
     //cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
 
     delete cmd;
 }

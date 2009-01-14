@@ -78,7 +78,7 @@ bool FrTBCTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
-    bool result = cmd->Execute();
+    bool result = FrCommandController::Execute(cmd);
     delete cmd;
 
     return result;

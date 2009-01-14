@@ -45,7 +45,7 @@ bool FrSliceScrollTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params
         FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
         cmd->AddCommand(cmd1);
         cmd->AddCommand(cmd2);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
     return false;
@@ -76,7 +76,7 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 	
     return true;
@@ -110,7 +110,7 @@ bool FrSliceScrollTool::OnKeyPress(FrInteractorStyle* is, FrKeyParams& params){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 
     return true;

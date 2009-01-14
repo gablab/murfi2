@@ -41,7 +41,7 @@ void FrVoxelSelectionTool::Start(){
     FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
     multiCmd->AddCommand(cmd1);
     multiCmd->AddCommand(cmd2);
-    multiCmd->Execute();
+    FrCommandController::Execute(multiCmd);
     delete multiCmd;
 }
 
@@ -51,7 +51,7 @@ void FrVoxelSelectionTool::Stop(){
     cmd->SetToolType(FrManageToolCmd::VoxelSelectionTool);
     cmd->SetToolAction(FrManageToolCmd::UpdateAct);
     cmd->SetIsChecked(false);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -75,7 +75,7 @@ bool FrVoxelSelectionTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& par
         FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
         multiCmd->AddCommand(cmd1);
         multiCmd->AddCommand(cmd2);
-        multiCmd->Execute();
+        FrCommandController::Execute(multiCmd);
         delete multiCmd;
     }
     //else if (params.Button == FrMouseParams::RightButton){

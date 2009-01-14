@@ -24,7 +24,6 @@
 #include"RtOutputFile.h"
 #include"RtStream.h"
 #include"RtCode.h"
-#include"RtDisplay.h"
 
 using namespace std;
 
@@ -97,13 +96,14 @@ public:
   // write to the log file
   void log(stringstream &s);
 
+    void SetDataStore(RtDataStore* ds);
+
   //** gets **//
 
   // get the display output
   //  out 
   //   pointer to the display output object
-//  RtDisplayImage *getDisplay();
-  RtDisplay *getDisplay();
+  RtDisplayImage *getDisplay();
 
   // get the info server
   //  out 
@@ -174,7 +174,7 @@ protected:
   vector<RtOutput*> outputs;
   
   // data store object
-  RtDataStore dataStore;
+  RtDataStore* dataStore;
 
 };
 

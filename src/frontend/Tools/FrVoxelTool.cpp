@@ -45,7 +45,7 @@ void FrVoxelTool::Start(){
     cmd->SetToolType(FrManageToolCmd::VoxelTool);
     cmd->SetToolAction(FrManageToolCmd::UpdateAct);
     cmd->SetIsChecked(true);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -61,7 +61,7 @@ void FrVoxelTool::Stop(){
     cmd->SetToolType(FrManageToolCmd::VoxelTool);
     cmd->SetToolAction(FrManageToolCmd::UpdateAct);
     cmd->SetIsChecked(false);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -84,7 +84,7 @@ bool FrVoxelTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         cmd->SetAction(FrVoxelInfoCmd::Update);
         cmd->SetPointPicker(m_pointPicker);
         cmd->SetMouseXY(params.X, params.Y);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
     else if(params.Button == FrMouseParams::MidButton){
@@ -108,7 +108,7 @@ bool FrVoxelTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
         cmd->SetAction(FrVoxelInfoCmd::Update);
         cmd->SetPointPicker(m_pointPicker);
         cmd->SetMouseXY(params.X, params.Y);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
     else if(params.Button == FrMouseParams::MidButton){

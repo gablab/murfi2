@@ -3,6 +3,7 @@
 #include "FrImageDocObj.h"
 #include "FrRoiDocObj.h"
 #include "FrPointsDocObj.h"
+#include "FrViewDocObj.h"
 
 // Backend includes
 #include "RtDataID.h"
@@ -75,6 +76,11 @@ void FrDataStore::AddImageToDocument(RtData* data){
         }
         else {
             imgDO = new FrImageDocObj();
+            
+            // get view doc obj and set current timeseria
+            FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
+            viewDO->SetTimeSeries(img->getDataID().getSeriesNum());
+
             m_Document->Add(imgDO);
             imgDO->AddTimePointData(img);
         }

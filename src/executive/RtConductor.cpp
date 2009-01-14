@@ -258,8 +258,8 @@ bool RtConductor::run() {
   // start the display
   // DIRTY HACK TO LET DISPLAY RUN IN MAIN THREAD
   //if(config.get("display:image")==true) {  
-    RtDisplay* out = getDisplay();
-    out->svc();
+    //RtDisplayImage* out = getDisplay();
+    //out->svc();
   //  //getDisplay()->activate();
   //}
   //else {
@@ -324,13 +324,13 @@ void RtConductor::log(stringstream &s) {
 // get the display output
 //  out 
 //   pointer to the display output object
-RtDisplay *RtConductor::getDisplay() {
-//  if(config.get("display:image")==true) {
-     return (RtDisplay*) (*outputs.begin());
-//  }
-//  else {
-//    return NULL;
-//  }
+RtDisplayImage *RtConductor::getDisplay() {
+  if(config.get("display:image")==true) {
+     return (RtDisplayImage*) (*outputs.begin());
+  }
+  else {
+    return NULL;
+  }
 }
 
 // get the info server
@@ -393,7 +393,7 @@ vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
 //   pointer to data store map
 RtDataStore *RtConductor::getDataStore() {
   //TODO put in checks?
-  return &dataStore;
+  return dataStore;
 }
 
 // gets the version
@@ -401,6 +401,10 @@ RtDataStore *RtConductor::getDataStore() {
 //   cvs version string for this class
 char *RtConductor::getVersionString() {
   return VERSION;
+}
+
+void RtConductor::SetDataStore(RtDataStore* ds){
+    dataStore = ds;
 }
 
 // NOTE: when we build app using front end 

@@ -20,7 +20,7 @@ bool FrInvertTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     FrMaskMaskOperationCmd* cmd = FrCommandController::CreateCmd<FrMaskMaskOperationCmd>();
     cmd->SetAction(FrMaskMaskOperationCmd::Invert);
     cmd->SetImageNumber(m_ImageNumber);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 
     return false;

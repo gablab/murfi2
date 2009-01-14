@@ -105,6 +105,9 @@ void FrQwtPlotWidget::RemoveGraph(int id){
 }
 
 void FrQwtPlotWidget::RemoveAll(){
+    if (m_Curves.size() == 0)
+        return;
+
     // clear all curves
     CurvesMap::iterator it, itEnd(m_Curves.end());
     for(it = m_Curves.begin(); it != itEnd; ++it){
@@ -210,6 +213,9 @@ bool FrQwtPlotWidget::SetMarkerPosition(int timePoint, bool blockSignals){
 void FrQwtPlotWidget::SetNumberOfTimePoints(int num){
 
     // Add dummy graph if needed
+    if (m_Curves.size() == 0)
+        return;
+
     if(m_Curves.find(DUMMY_GRAPH_ID) == m_Curves.end()){
         QString dummyGraphName("Dummy");
         QColor dummyGraphColor(PLOT_GRID_COLOR);

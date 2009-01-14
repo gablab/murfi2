@@ -24,7 +24,7 @@ bool FrMaskMaskTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
        // Create command and performe action
         FrMaskCopyAdjacentCmd* cmd = FrCommandController::CreateCmd<FrMaskCopyAdjacentCmd>();
         cmd->SetImageNumber(m_ImageNumber);
-        result = cmd->Execute();
+        result = FrCommandController::Execute(cmd);
         delete cmd;
     }
     else {
@@ -45,7 +45,7 @@ bool FrMaskMaskTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
                 break;
         }
         cmd->SetImageNumber(m_ImageNumber);    
-        result = cmd->Execute();
+        result = FrCommandController::Execute(cmd);
         delete cmd;
     }
     return false;

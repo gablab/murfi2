@@ -21,6 +21,8 @@
 
 // VTK stuff
 #include "vtkRenderWindowInteractor.h"
+#include "vtkOutputWindow.h"
+#include "vtkFileOutputWindow.h"
 
 // Qt stuff
 #include "Qt/qmessagebox.h"
@@ -29,7 +31,7 @@
 // test
 #include "RtInputScannerImages.h"
 #include "RtConfig.h"
-#include "RtServerSocket.h"
+
 #include "RtConductor.h"
 #include "RtDataStore.h"
 #include "RtInput.h"
@@ -40,19 +42,22 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 
     m_ToolController = new FrToolController(this);    
 
- ////    testing data receiving
-	//char *path[3];
-	//path[0] = "test";
-	//path[1] = "-f";
-	//path[2] = "test_config.xml";
+ //    testing data receiving
+	char *path[3];
+	path[0] = "test";
+	path[1] = "-f";
+	path[2] = "test_config.xml";
 
- //   m_Conductor = new RtConductor(3, path);
- //   m_Conductor->addOutput(m_MainView);
- //   m_Conductor->addOutput(m_MainDocument->GetDataStore());
+    m_Conductor = new RtConductor(3, path);
+    //    m_Conductor->addOutput(m_MainDocument->GetDataStore()->GetStore());
+    m_Conductor->SetDataStore(m_MainDocument->GetDataStore()->GetStore());
 
- //   m_Conductor->init();
- //   m_Conductor->run();
+    m_Conductor->init();
+    //m_Conductor->run();
     
+    // TODO: run conductor in another thread
+    ThrID = ACE_Thread_Manager::instance()->spawn((ACE_THR_FUNC)ConductorThread, m_Conductor);
+
     //ACE::init();
 
     //ACE_SOCK_Acceptor acceptor;
@@ -68,6 +73,12 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 }
 
 FrMainController::~FrMainController(){    
+    //// TODO: stop thread?
+    if (m_Conductor){ 
+        ACE_Thread_Manager::instance()->cancel(ThrID);
+        delete m_Conductor;
+    }
+
     // delete tool controller
     if(m_ToolController) {
         delete m_ToolController;
@@ -113,13 +124,22 @@ void FrMainController::Initialize(){
         m_MainView->show();
     }
     
+    // test vtk log
+    vtkOutputWindow* ow = vtkOutputWindow::GetInstance();
+    vtkFileOutputWindow* fow = vtkFileOutputWindow::New();
+    fow->SetFileName("my_debug.txt");
+    if (ow){
+        ow->SetInstance( fow );
+    }
+    fow->Delete(); 
+
     // Initialize document
     if(m_MainDocument){
 
         FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
         cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);      
         cmd->SetIsDefault(true);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
     
@@ -127,7 +147,7 @@ void FrMainController::Initialize(){
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
     cmd->SetToolType(FrManageToolCmd::ManipulationTool);
     cmd->SetToolAction(FrManageToolCmd::NewToolAct);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 
     //// NOTE for ROI testing 
@@ -216,7 +236,7 @@ void FrMainController::IoTabSettings(QString& fileName, bool isInput){
         cmd->AddCommand(cmd1);
         cmd->AddCommand(cmd2);
         cmd->AddCommand(cmd3);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
     else{
@@ -230,7 +250,7 @@ void FrMainController::IoTabSettings(QString& fileName, bool isInput){
         FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
         cmd->AddCommand(cmd1);
         cmd->AddCommand(cmd2);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
 }
@@ -242,7 +262,7 @@ void FrMainController::Notify(int notifyCode){
 void FrMainController::SaveCurrentViewToTab(){
     FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
     cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -266,7 +286,7 @@ void FrMainController::ChangeView(int view){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -274,7 +294,7 @@ void FrMainController::SelectLayer(int id){
     FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
     cmd->SetAction(FrLayerCmd::UpdateSelectedID);
     cmd->SetID(id);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -282,7 +302,7 @@ void FrMainController::AddLayer(){
     // add layer with dialog
     FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
     cmd->SetAction(FrUserActionCmd::AddLayer);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -290,7 +310,7 @@ void FrMainController::DeleteLayer(){
     // Deletes currently selected layer
     FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
     cmd->SetAction(FrUserActionCmd::DeleteLayer);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;            
 }
 
@@ -327,14 +347,14 @@ void FrMainController::ChangeLayer(int action){
         cmd->AddCommand(cmd1);
     }
 
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
 void FrMainController::ChangeImageSettings(){
     FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
     cmd->SetAction(FrUserActionCmd::ChangeSettings);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -366,7 +386,7 @@ void FrMainController::ChangeBookmark(int id){
     cmd->AddCommand(cmd2);
     cmd->AddCommand(cmd3);
     cmd->AddCommand(cmd4);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
 
     delete cmd;
 }
@@ -401,7 +421,7 @@ void FrMainController::SetCurrentTool(int tool){
         break;
     }
 
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -415,7 +435,7 @@ void FrMainController::ResetImage(){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);    
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -428,7 +448,7 @@ void FrMainController::CreatNewROI(){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -449,21 +469,21 @@ void FrMainController::SetCurrentTimePoint(int newTimePoint){
     cmd->SetAction(FrTimePointCmd::SetUserDefined);
     cmd->SetTimePoint(newTimePoint);
     cmd->SetCheckLifeMode(false);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
 void FrMainController::SetPreviousTimePoint(){
     FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
     cmd->SetAction(FrTimePointCmd::SetPrevious);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
 void FrMainController::SetNextTimePoint(){
     FrTimePointCmd* cmd = FrCommandController::CreateCmd<FrTimePointCmd>();
     cmd->SetAction(FrTimePointCmd::SetNext);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -476,7 +496,7 @@ void FrMainController::ChangeGraph(int id, bool add){
         cmd->SetAction(FrUserActionCmd::DeleteGraph);
     }
     cmd->SetGraphID(id);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 }
 
@@ -488,6 +508,7 @@ void FrMainController::Test(){
     //delete cmd;
 
     //m_Conductor->run();
+    //ACE_Thread_Manager::instance()->suspend(ThrID);
 
 //    // run test input server
 //	RtInputScannerImages* input =  new RtInputScannerImages();
@@ -536,4 +557,12 @@ void FrMainController::Test(){
 // //   else{
 // //       // TODO: process error
 // //   }
+}
+
+
+void* FrMainController::ConductorThread(void *arg){
+    RtConductor* con = (RtConductor*)arg;
+    con->run();
+
+    return 0;
 }

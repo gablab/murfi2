@@ -88,7 +88,7 @@ bool FrPanTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
     cmd->SetFocalPoint( motionVector[0] + viewFocus[0],
                         motionVector[1] + viewFocus[1],
                         motionVector[2] + viewFocus[2] );
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
   
     return true;

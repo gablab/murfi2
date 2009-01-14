@@ -8,8 +8,3 @@ FrApplication::FrApplication(int& argc, char **argv, bool useInterface)
 	
 }
 
-int FrApplication::svc(){
-    this->exec();
-
-    return 0;
-}

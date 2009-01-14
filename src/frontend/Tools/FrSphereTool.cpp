@@ -48,7 +48,7 @@ bool FrSphereTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
 
         cmd->SetRadius(rad);
         cmd->SetImageNumber(m_ImageNumber);
-        cmd->Execute();
+        FrCommandController::Execute(cmd);
         delete cmd;
     }
     
@@ -71,7 +71,7 @@ bool FrSphereTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 
     cmd->SetRadius(rad);
     cmd->SetImageNumber(m_ImageNumber);
-    cmd->Execute();
+    FrCommandController::Execute(cmd);
     delete cmd;
 
     return true;

@@ -7,19 +7,19 @@
  *****************************************************************************/
 
 #include"RtRoiDifference.h"
-#include"RtRoi2Feedback.h"
+#include "RtDataIDs.h"
 
 string RtRoiDifference::moduleString(ID_ROIDIFFERENCE);
 
 // default constructor
 RtRoiDifference::RtRoiDifference() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = NAME_ROIDIFFERENCE;
+  dataName = NAME_ROIVAL;
 
   posRoiModuleID = ID_ROIMEAN2FEEDBACK;
   negRoiModuleID = ID_ROIMEAN2FEEDBACK;
-  posRoiDataName = NAME_ROIMEAN;
-  negRoiDataName = NAME_ROIMEAN;
+  posRoiDataName = NAME_ROIVAL;
+  negRoiDataName = NAME_ROIVAL;
   posRoiRoiID = "active";
   negRoiRoiID = "deactive";
 }

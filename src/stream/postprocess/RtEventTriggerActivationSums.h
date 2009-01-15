@@ -43,8 +43,6 @@ protected:
   string negActivationSumModuleID;
   string posActivationSumDataName;
   string negActivationSumDataName;
-  string posRoiID;
-  string negRoiID;
 
   // flags or whether to monitor rois
   bool monitorPos;

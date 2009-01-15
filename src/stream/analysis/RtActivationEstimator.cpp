@@ -331,18 +331,26 @@ bool RtActivationEstimator::processOption(const string &name,
 // process gloabl config info or config from other modules
 bool RtActivationEstimator::processConfig(RtConfig &config) {
 
-  if(config.isSet("scanner:measurements")) {
-    numMeas = config.get("scanner:measurements");
-  }
-  if(config.isSet("scanner:tr")) {
-    tr= config.get("scanner:tr");
+  bool ret = true;
+  if(config.get("scanner:disabled")==false 
+     && !config.isSet("scanner:tr")) {
+    cerr << "ERROR: tr has not been set" << endl;
+    ret = false;
   }
   else {
-    cerr << "error: number of measurements has not been set" << endl;
-    return false;
+    tr = config.get("scanner:tr");
   }
 
-  return true;
+  if(config.get("scanner:disabled")==false 
+     && !config.isSet("scanner:measurements")) {
+    cerr << "ERROR: number of measurements has not been set" << endl;
+    ret = false;
+  }
+  else {
+    numMeas = config.get("scanner:measurements");
+  }
+
+  return ret;
 }
 
 
@@ -438,10 +446,14 @@ bool RtActivationEstimator::finishInit() {
 #include"printVnlVector.cpp"
 
 // divide by range
-#define unitDeviation(v) v/=(v.max_value()-v.min_value())
+#define unitDeviation(v) (v/=(v.max_value()-v.min_value()))
 
 // build the condition regressors
 void RtActivationEstimator::buildConditions() {
+  if(numConditions <= 0) {
+    return;
+  }
+
   vnl_vector<double> hrf = getHrf();
 
   //printVnlVector(hrf);

@@ -6,16 +6,17 @@
  *****************************************************************************/
 
 #include "RtRoiSum2Feedback.h"
+#include "RtDataIDs.h"
 
 string RtRoiSum2Feedback::moduleString(ID_ROISUM2FEEDBACK);
 
 // default constructor
 RtRoiSum2Feedback::RtRoiSum2Feedback() : RtRoi2Feedback() {
   componentID = moduleString;
-  dataName = NAME_ROISUM;
+  dataName = NAME_ROIVAL;
 
   activationModuleID = ID_SINGLEIMCOR;
-  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION) + "_0";
+  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION);
   activationRoiID = "unset";
 }
 

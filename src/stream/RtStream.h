@@ -84,13 +84,18 @@ public:
   //   elmt: xml element
   void addModulesFromNode(TiXmlElement *elmt, RtConfig *config);
 
-  // add a single module to the module stack
+  // build a stream component
   //  in
   //   type: name of the module type to add
   //   out: optional output to pass the result of this module to
   //   text: optional text to be associated with the module
-  RtStreamComponent *addSingleModule(const string &type,
-				     const string &text = "");
+  RtStreamComponent *buildStreamComponent(const string &type,
+					  const string &text = "");
+
+  // add a single module to the stack
+  //  in
+  //   stream component to be added
+  void addSingleModule(RtStreamComponent *sc);
 
   // adds all the modules on the stack to the processing stream
   // the module stack is emtpty after this executes

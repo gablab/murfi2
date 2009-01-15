@@ -15,7 +15,7 @@ RtRoi2Feedback::RtRoi2Feedback() : RtActivationEstimator() {
   componentID = moduleString;
 
   activationModuleID = ID_SINGLEIMCOR;
-  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION) + "_0";
+  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION);
   activationRoiID = "unset";
 }
 

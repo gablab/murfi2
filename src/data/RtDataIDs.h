@@ -63,7 +63,6 @@
   #define NAME_INCREMENTALGLM_BETA            	"beta-img"
   #define NAME_INCREMENTALGLM_RESIDUAL         	"res-img"
 
-// note: the names here will be appended with <_conditionName>
 #define ID_SINGLEIMCOR                		"singleimcor"
   #define NAME_SINGLEIMCOR_ACTIVATION          	"activation-img"
   #define NAME_SINGLEIMCOR_BETA            	"beta-img"
@@ -85,23 +84,17 @@
   #define NAME_CONTRAST_TSTAT            	"tstat-img"
 
 #define ID_ROI2FEEDBACK             		"roi2feedback"
-
+#define ID_ROIFEEDBACKSYNTH            		"roi-feedbacksynth"
 #define ID_ROISUM2FEEDBACK             		"roi-sum2feedback"
-  #define NAME_ROISUM            		"roi-sum"
-
 #define ID_ROIMEAN2FEEDBACK             	"roi-mean2feedback"
-  #define NAME_ROIMEAN         	                "roi-mean"
-
 #define ID_ROIWEIGHTEDAVE2FEEDBACK             	"roi-weightedave2feedback"
-  #define NAME_ROIWEIGHTEDAVE            	"roi-weightedave"
-
 #define ID_ROIMEDIAN2FEEDBACK             	"roi-median2feedback"
-  #define NAME_ROIMEDIAN                 	"roi-median"
-
 #define ID_ROIDIFFERENCE             	        "roi-activation-difference"
-  #define NAME_ROIDIFFERENCE                 	"activation-difference"
+  #define NAME_ROIVAL            		"roi-val"
+
 
 #define ID_EVENTTRIGGER               		"event-trigger"
+#define ID_EVENTTRIGGER_SYNTH 		        "event-trigger-synth"
 #define ID_EVENTTRIGGER_ACTIVATIONSUMS 		"event-trigger-activation-sums"
 #define ID_EVENTTRIGGER_ACTIVATIONDIFF 		"event-trigger-activation-diff"
   #define NAME_EVENTTRIGGER_SIGNAL             	"signal"

@@ -43,8 +43,8 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
     << monitorNeg << " "
     << posThresh << " "
     << negThresh << " "
-    << posroiID << " "
-    << negroiID << endl;
+    << posRoiID << " "
+    << negRoiID << endl;
 
   if(!monitorPos && !monitorNeg) {
     return 0;
@@ -69,13 +69,13 @@ int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {
 				   negRoiID);
 
   if(monitorPos && posact == NULL) {
-    cout << "couldn't find positive roi " << posroiID << endl;
+    cout << "couldn't find positive roi " << posRoiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtEventTriggerActivationSums:process: no positive ROI found\n"));
     return 0;
   }
   if(monitorNeg && negact == NULL) {
-    cout << "couldn't find negative roi " << negroiID << endl;
+    cout << "couldn't find negative roi " << negRoiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtEventTriggerActivationSums:process: no negative ROI found\n"));
     return 0;

@@ -39,8 +39,8 @@ protected:
   virtual int process(ACE_Message_Block *mb) = 0;
 
   // roiIDs for the activation sums
-  string posroiID;
-  string negroiID;
+  string posRoiID;
+  string negRoiID;
 
   // flags or whether to monitor rois
   bool monitorPos;

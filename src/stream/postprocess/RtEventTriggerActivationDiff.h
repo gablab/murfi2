@@ -45,9 +45,6 @@ protected:
   string negActivationSumModuleID;
   string posActivationSumDataName;
   string negActivationSumDataName;
-  string posRoiID;
-  string negRoiID;
-  
 };
 
 #endif

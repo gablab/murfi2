@@ -63,22 +63,23 @@ int RtStream::configure(RtConfig &config) {
 #include"RtIncrementalGLM.h"
 #include"RtSingleImageCor.h"
 #include"RtFluctuationMonitor.h"
+#include"RtRoiFeedbackSynth.h"
 #include"RtRoiSum2Feedback.h"
 #include"RtRoiMean2Feedback.h"
 #include"RtRoiWeightedAve2Feedback.h"
 #include"RtRoiMedian2Feedback.h"
 #include"RtRoiDifference.h"
+#include"RtEventTriggerSynth.h"
 #include"RtEventTriggerActivationSums.h"
 #include"RtEventTriggerActivationDiff.h"
 
-// add a single module to the module stack
+// build a single module
 //  in
 //   type: name of the module type to add
 //   out: optional output to pass the result of this module to
 //   text: optional text to be associated with the module
-RtStreamComponent *RtStream::addSingleModule(const string &type, 
-					     const string &text) {
-  Module *mod;
+RtStreamComponent *RtStream::buildStreamComponent(const string &type, 
+						  const string &text) {
   RtStreamComponent *sc = NULL;
 
   // switch amongst module types
@@ -126,6 +127,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   else if(type == RtRoiSum2Feedback::moduleString) { // sum image activation
     ACE_NEW_NORETURN(sc, RtRoiSum2Feedback());
   }
+  else if(type == RtRoiFeedbackSynth::moduleString) { // activation synth
+    ACE_NEW_NORETURN(sc, RtRoiFeedbackSynth());
+  }
   else if(type == RtRoiMean2Feedback::moduleString) { // ave image activation
     ACE_NEW_NORETURN(sc, RtRoiMean2Feedback());
   }
@@ -137,6 +141,9 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   }
   else if(type == RtRoiDifference::moduleString) { // activation roi diff
     ACE_NEW_NORETURN(sc, RtRoiDifference());
+  }
+  else if(type == RtEventTriggerSynth::moduleString) { // trigger synth
+    ACE_NEW_NORETURN(sc, RtEventTriggerSynth());
   }
   else if(type == RtEventTriggerActivationSums::moduleString) { // trigger acts
     ACE_NEW_NORETURN(sc, RtEventTriggerActivationSums());
@@ -153,11 +160,16 @@ RtStreamComponent *RtStream::addSingleModule(const string &type,
   // set the conductor
   sc->setConductor(streamConductor);
 
-  // create and add the module
-  ACE_NEW_NORETURN(mod, Module(ACE_TEXT(text.c_str()),sc));
-  addMod.push(mod);
-
   return sc;
+}
+
+// adds a single module to the stack
+//  in
+//   stream component for this module
+void  RtStream::addSingleModule(RtStreamComponent *sc) {
+  Module *mod;
+  ACE_NEW_NORETURN(mod, Module(ACE_TEXT(sc->getID().c_str()),sc));
+  addMod.push(mod);
 }
 
 // adds modules to the stream
@@ -194,8 +206,10 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
   vector<string> topLevelOutNames;
   buildOutputNames(elmt,topLevelOutNames);
   if(!topLevelOutNames.empty()) {
-    sc = addSingleModule(RtPasser::moduleString);
+    sc = buildStreamComponent(RtPasser::moduleString);
     addOutputsToComponent(sc,topLevelOutNames);
+    addSingleModule(sc);
+    cout << "added stream " << sc->getID() << endl;
   }
 
   TiXmlNode *child = 0;
@@ -207,21 +221,26 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
     // send
     if(TIXML_SUCCESS == childElmt->QueryValueAttribute("name", &name)) {
       // add the component
-      sc = addSingleModule(name);
+      sc = buildStreamComponent(name);
       if(sc == NULL) {
-	cout << "failed to add module " << name << endl;
+	cout << "failed to build stream: " << name << endl;
 	continue;
       }
 
-      cout << "added module " << sc->getID() << endl;
-
       // allow the stream component to configure itself
-      sc->init(childElmt, config);
+      if(!sc->init(childElmt, config)) {
+	cout << "failed to configure stream: " << name << endl;
+	continue;	
+      }
 
       // build the outputs
       vector<string> outNames;
       buildOutputNames(childElmt,outNames);
       addOutputsToComponent(sc,outNames);
+
+      // create and add the module to the stack
+      addSingleModule(sc);
+      cout << "added stream " << sc->getID() << endl;
     }
   }
 
@@ -272,9 +291,6 @@ void RtStream::setInput(unsigned int code, RtData *data) {
     // if this code is from a new scanner image, start the processing
     ACE_Message_Block *mb;
     ACE_NEW_NORETURN(mb, ACE_Message_Block(sizeof(RtStreamMessage)));
-
-    // time processsing
-    int startTime = time(NULL);
 
     RtStreamMessage *msg;
     ACE_NEW_NORETURN(msg, RtStreamMessage());

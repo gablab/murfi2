@@ -50,9 +50,11 @@ int RtProcessor::addModules(RtConfig &config) {
 
   // if no preprocessing was specified, just pass the data
   if(procNode == NULL || procNode->Type() != TiXmlNode::ELEMENT) {    
-    if(config.getConductor()->getDisplay() != NULL) {
-      addSingleModule(RtPasser::moduleString, "original data passer")
-	->addOutput(config.getConductor()->getDisplay());
+    if(config.getConductor()->getDisplayImage() != NULL) {
+      RtStreamComponent *sc 
+       = buildStreamComponent(RtPasser::moduleString, "original data passer");
+      sc->addOutput(config.getConductor()->getDisplayImage());
+      addSingleModule(sc);
     }
   }
   else { // find modules in the node and add each

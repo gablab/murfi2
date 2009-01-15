@@ -15,16 +15,13 @@ string RtEventTriggerActivationDiff::moduleString(ID_EVENTTRIGGER_ACTIVATIONDIFF
 
 // default constructor
 RtEventTriggerActivationDiff::RtEventTriggerActivationDiff() : RtEventTrigger() {
-  componentID = moduleString;
-  dataName = "";
 
   posActivationSumModuleID = ID_ROIMEAN2FEEDBACK;
   negActivationSumModuleID = ID_ROIMEAN2FEEDBACK;
-  posActivationSumDataName = NAME_ROIMEAN;
-  negActivationSumDataName = NAME_ROIMEAN;
-  posRoiID = "active";
-  negRoiID = "deactive";
+  posActivationSumDataName = NAME_ROIVAL;
+  negActivationSumDataName = NAME_ROIVAL;
 
+  componentID = moduleString;
   diffThresh = 1.0;
 }
 
@@ -57,14 +54,6 @@ bool RtEventTriggerActivationDiff::processOption(const string &name,
     negActivationSumDataName = text;
     return true;
   }
-  else if(name == "posRoiID") {
-    posRoiID = text;
-    return true;
-  }
-  else if(name == "negRoiID") {
-    negRoiID = text;
-    return true;
-  }
 
   return RtEventTrigger::processOption(name, text, attrMap);
 }  
@@ -75,10 +64,10 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
 
   static int trsSinceTrigger = afterTriggerSkipTRs;
   
-  //debug
-    cout << "event trigger started at ";
-    printNow(cout);
-    cout << endl;
+//  //debug
+//    cout << "event trigger started at ";
+//    printNow(cout);
+//    cout << endl;
 
   // check if we need to skip triggers
   if(trsSinceTrigger < afterTriggerSkipTRs) {
@@ -99,20 +88,22 @@ int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {
 				   negRoiID);
 
   if(posact == NULL) {
-    cout << "couldn't find positive roi " << posroiID << endl;
+    cout << "couldn't find positive roi " << posRoiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtEventTriggerActivationDiff:process: no positive ROI found\n"));
     return 0;
   }
 
   if(negact == NULL) {
-    cout << "couldn't find negative roi " << negroiID << endl;
+    cout << "couldn't find negative roi " << negRoiID << endl;
 
     ACE_DEBUG((LM_INFO, "RtEventTriggerActivationDiff:process: no negative ROI found\n"));
     return 0;
   }
 
   int tr = posact->getDataID().getTimePoint();
+  cout << "checking for even trigger: " << tr << endl;
+
   if(tr < initialSkipTRs) {
     return 0;
   }

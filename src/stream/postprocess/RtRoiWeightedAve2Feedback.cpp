@@ -7,16 +7,17 @@
  *****************************************************************************/
 
 #include "RtRoiWeightedAve2Feedback.h"
+#include "RtDataIDs.h"
 
 string RtRoiWeightedAve2Feedback::moduleString(ID_ROIWEIGHTEDAVE2FEEDBACK);
 
 // default constructor
 RtRoiWeightedAve2Feedback::RtRoiWeightedAve2Feedback() : RtRoi2Feedback() {
   componentID = moduleString;
-  dataName = NAME_ROIWEIGHTEDAVE;
+  dataName = NAME_ROIVAL;
 
   activationModuleID = ID_SINGLEIMCOR;
-  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION) + "_0";
+  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION);
   activationRoiID = "unset";
 
   weightModuleID = ID_SINGLEIMCOR;

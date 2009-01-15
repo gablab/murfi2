@@ -71,7 +71,8 @@ bool RtInputScannerImages::open(RtConfig &config) {
   ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
 
   if(acceptor.open(address,1) == -1) {
-    ACE_DEBUG((LM_INFO, ACE_TEXT("failed to open acceptor for scanner images\n")));
+    cerr << "failed to open acceptor for scanner images on port " 
+	 << port << endl;
     isOpen = false;
     return false;
   }
@@ -174,9 +175,11 @@ int RtInputScannerImages::svc() {
 
   int imageNum = 0;
 
+  cout << "listening for images on port " << port << endl;
+
   // continuously try to accept connections
   for(; isOpen && acceptor.accept(stream) != -1; imageNum++) {
-    //cout << "connection accepted" << endl;
+    cout << "connection accepted" << endl;
 
     // get the info
     ei = receiveImageInfo(stream);

@@ -18,8 +18,8 @@ RtEventTrigger::RtEventTrigger() : RtStreamComponent() {
   componentID = moduleString;
   dataName =  NAME_EVENTTRIGGER_SIGNAL;
 
-  posroiID = "active";
-  negroiID = "deactive";
+  posRoiID = "active";
+  negRoiID = "deactive";
   posThresh = 3.0;
   negThresh = 3.0;
 
@@ -37,12 +37,12 @@ RtEventTrigger::~RtEventTrigger() {}
 //   val  text of the option node
 bool RtEventTrigger::processOption(const string &name, const string &text,
 				   const map<string,string> &attrMap) {
-  if(name == "posroiID") {
-    posroiID = text;
+  if(name == "posRoiID") {
+    posRoiID = text;
     return true;
   }
-  if(name == "negroiID") {
-    negroiID = text;
+  if(name == "negRoiID") {
+    negRoiID = text;
     return true;
   }
   if(name == "monitorPos") {

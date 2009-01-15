@@ -6,16 +6,17 @@
  *****************************************************************************/
 
 #include "RtRoiMedian2Feedback.h"
+#include "RtDataIDs.h"
 
 string RtRoiMedian2Feedback::moduleString(ID_ROIMEDIAN2FEEDBACK);
 
 // default constructor
 RtRoiMedian2Feedback::RtRoiMedian2Feedback() : RtRoi2Feedback() {
   componentID = moduleString;
-  dataName = NAME_ROIMEDIAN;
+  dataName = NAME_ROIVAL;
 
   activationModuleID = ID_SINGLEIMCOR;
-  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION) + "_0";
+  activationDataName = string(NAME_SINGLEIMCOR_ACTIVATION);
   activationRoiID = "unset";
 }
 

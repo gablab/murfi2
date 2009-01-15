@@ -10,13 +10,13 @@
 #include"RtEvent.h"
 
 #include"boost/random/normal_distribution.hpp"
+#include"boost/random/lagged_fibonacci.hpp"
 
 string RtEventTriggerSynth::moduleString(ID_EVENTTRIGGER_SYNTH);
 
 // default constructor
 RtEventTriggerSynth::RtEventTriggerSynth() : RtEventTrigger() {
   componentID = moduleString;
-  dataName = "";
 
   meanISI = 4;
   sdISI = 1;
@@ -46,8 +46,14 @@ bool RtEventTriggerSynth::processOption(const string &name,
 int RtEventTriggerSynth::process(ACE_Message_Block *mb) {  
   ACE_TRACE(("RtEventTriggerSynth::process"));
 
-  static normal_distribution rnd(meanISI, sdISI);
-  static int nextTrigger = rnd();
+  if(disabled) {
+    return 0;
+  }
+
+  static boost::normal_distribution<float> rnd(meanISI, sdISI);
+  static boost::lagged_fibonacci19937 engine;
+
+  static float nextTrigger = rnd.operator()<boost::lagged_fibonacci19937>((engine));
   static int tr = 0;
   
   //debug
@@ -68,9 +74,10 @@ int RtEventTriggerSynth::process(ACE_Message_Block *mb) {
   // trigger
   RtEvent *event = new RtEvent();
   event->getDataID().setTimePoint(tr);
+  event->getDataID().setModuleID(componentID);
 
   // generate whether its good or bad randomly
-  if(rnd() < meaanISI) {
+  if(rnd.operator()<boost::lagged_fibonacci19937>((engine)) < meanISI) {
     event->getDataID().setDataName(NAME_EVENTTRIGGER_GOOD);
 
     // log the trigger
@@ -95,7 +102,7 @@ int RtEventTriggerSynth::process(ACE_Message_Block *mb) {
 
   setResult(msg,event);
 
-  nextTrigger = rnd();
+  nextTrigger = rnd.operator()<boost::lagged_fibonacci19937>((engine));
 
   //debug
 //    cout << "event trigger finished at ";

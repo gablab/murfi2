@@ -10,6 +10,7 @@ static char *VERSION = "$Id$";
 
 #include"RtConductor.h"
 #include"RtInfoServer.h"
+#include"RtInputSynth.h"
 #include<iostream>
 
 //*** constructors/destructors  ***//
@@ -36,12 +37,27 @@ RtConductor::RtConductor(int argc, char **argv) {
 
   // prepare inputs
 
-  if(config.get("scanner:receiveImages")==true) {
+  if(config.isSet("scanner:disabled") && config.get("scanner:disabled")==false) {
     RtInputScannerImages *scanimg;
     ACE_NEW_NORETURN(scanimg, RtInputScannerImages);
 
     if(!addInput(scanimg)) {
       cerr << "ERROR: could not add scanner input" << endl;
+    }
+    else {
+      cout << "added scanner image input" << endl;
+    }
+  }
+
+  if(config.isSet("inputsynth:disabled") && config.get("inputsynth:disabled")==false) {
+    RtInputSynth *synth;
+    ACE_NEW_NORETURN(synth, RtInputSynth);
+
+    if(!addInput(synth)) {
+      cerr << "ERROR: could not add input synthesizer" << endl;
+    }
+    else {
+      cout << "added input synthesizer" << endl;
     }
   }
 
@@ -257,11 +273,11 @@ bool RtConductor::run() {
 
   // start the display
   // DIRTY HACK TO LET DISPLAY RUN IN MAIN THREAD
-  //if(config.get("display:image")==true) {  
+  if(config.get("display:image")==true) {  
     //RtDisplayImage* out = getDisplay();
     //out->svc();
   //  //getDisplay()->activate();
-  //}
+  }
   //else {
     // wait for threads to complete
 
@@ -324,7 +340,7 @@ void RtConductor::log(stringstream &s) {
 // get the display output
 //  out 
 //   pointer to the display output object
-RtDisplayImage *RtConductor::getDisplay() {
+RtDisplayImage *RtConductor::getDisplayImage() {
   if(config.get("display:image")==true) {
      return (RtDisplayImage*) (*outputs.begin());
   }
@@ -393,7 +409,7 @@ vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
 //   pointer to data store map
 RtDataStore *RtConductor::getDataStore() {
   //TODO put in checks?
-  return dataStore;
+  return &dataStore;
 }
 
 // gets the version
@@ -401,10 +417,6 @@ RtDataStore *RtConductor::getDataStore() {
 //   cvs version string for this class
 char *RtConductor::getVersionString() {
   return VERSION;
-}
-
-void RtConductor::SetDataStore(RtDataStore* ds){
-    dataStore = ds;
 }
 
 // NOTE: when we build app using front end 

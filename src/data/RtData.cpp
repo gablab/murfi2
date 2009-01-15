@@ -9,11 +9,7 @@
 
   
 // default constructor
-RtData::RtData() {
-  //dataID = "data";
-  //roiID = "unset";
-  persistent = false;
-}
+RtData::RtData() : numEl(0), persistent(false) {}
 
 // destructor
 RtData::~RtData() {

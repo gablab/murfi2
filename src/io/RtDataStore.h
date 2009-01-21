@@ -44,6 +44,9 @@ public:
   // get data by id
   virtual RtData *getData(RtDataID &id);
 
+  // get data by indexing
+  virtual RtData *getDataFast(RtDataID &id);
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();

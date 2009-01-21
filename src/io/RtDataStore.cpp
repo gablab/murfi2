@@ -30,6 +30,9 @@ void RtDataStore::addOutputForNotify(RtOutput *out) {
 // hand off some data to be output
 void RtDataStore::setData(RtData *data) {
   
+  // set valid data flag to true
+  data->getDataID().setValidDataFlag(true);
+
   mut.acquire();
 
   // put data into datastore with its dataID as the key
@@ -79,6 +82,23 @@ RtData *RtDataStore::getData(RtDataID &dataID) {
   mut.release();
 
   return (*it).second;
+}
+
+// get data by direct indexing
+RtData *RtDataStore::getDataFast(RtDataID &dataID) {
+  
+  // get data from store directly
+  mut.acquire();
+  RtData *data = store[dataID];
+  mut.release();
+  
+  // if data is valid, return it
+  if (data->getDataID().getValidDataFlag()) {
+    return data;
+  }
+  else {
+    return NULL;
+  }
 }
 
 // get available data

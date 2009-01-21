@@ -24,6 +24,7 @@ RtDataID::RtDataID() {
     moduleID = "";
     dataName = "";
     roiID = "";
+    validDataFlag = false;
 
     instantiationTime = RtExperiment::getExperimentElapsedTime();
 }
@@ -35,7 +36,8 @@ RtDataID::RtDataID(unsigned int _studyNum,
                    const string &_history,
                    const string &_moduleID,
                    const string &_dataName,
-                   const string &_roiID) {
+                   const string &_roiID,
+                   bool _validDataFlag) {
     siteIDNum = SITE_ID_NUMBER;
     studyNum = _studyNum;
     seriesNum = _seriesNum;
@@ -44,6 +46,7 @@ RtDataID::RtDataID(unsigned int _studyNum,
     moduleID = _moduleID;
     dataName = _dataName;
     roiID = _roiID;
+    validDataFlag = _validDataFlag;
 
     instantiationTime = RtExperiment::getExperimentElapsedTime();
 }

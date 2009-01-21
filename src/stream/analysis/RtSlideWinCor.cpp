@@ -94,8 +94,8 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
     // get DataStore from conductor
     RtDataStore *dataStore = conductor->getDataStore();
 
-    // set current acquisition into data (requires RtData cast)
-    dataStore->setData(static_cast<RtData*>(dat));
+//    // set current acquisition into data (requires RtData cast) NOTE: now done via RtExperiment
+//    dataStore->setData(static_cast<RtData*>(dat));
 
     // increment number of time points
     numTimepoints++;
@@ -238,7 +238,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
                 tempDataID.setTimePoint(timePoint-N+winInd); // this index mimics having a window of data
 
                 // get data for current window index
-                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getData(tempDataID));
+                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getDataFast(tempDataID));
 
                 // validate sizes
                 if(dataWindowElement==NULL) {
@@ -266,7 +266,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
                 tempDataID.setTimePoint(timePoint-N+winInd); // this index mimics having a window of data
 
                 // get data for current window index
-                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getData(tempDataID));
+                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getDataFast(tempDataID));
 
                 // validate sizes
                 if(dataWindowElement==NULL) {
@@ -359,7 +359,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
                 tempDataID.setTimePoint(timePoint-windowLen+winInd+1); //
 
                 // get data for current window index
-                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getData(tempDataID));
+                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getDataFast(tempDataID));
 
                 // validate sizes
                 if(dataWindowElement==NULL) {
@@ -389,7 +389,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
                 tempDataID.setTimePoint(timePoint-windowLen+winInd+1);
 
                 // get data for current window index
-                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getData(tempDataID));
+                dataWindowElement = static_cast<RtMRIImage*>(dataStore->getDataFast(tempDataID));
 
                 // validate sizes
                 if(dataWindowElement==NULL) {

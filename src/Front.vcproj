@@ -241,6 +241,10 @@
 			Name="moc"
 			>
 			<File
+				RelativePath=".\frontend\moc\FrAction_moc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\moc\FrActionManager_moc.cpp"
 				>
 			</File>
@@ -795,6 +799,34 @@
 			Name="Utils"
 			>
 			<File
+				RelativePath=".\frontend\Utils\FrAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrAction.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Utils\FrActionManager.cpp"
 				>
 			</File>
@@ -851,11 +883,23 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Utils\FrBackground.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrBackground.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Utils\FrDocumentReader.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\frontend\Utils\FrDocumentReader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Utils\FrGraphSettings.cpp"
 				>
 			</File>
 			<File
@@ -1891,6 +1935,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrDeleteGraphTabCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrDeleteGraphTabCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrDeleteTabSettingsCmd.cpp"
 				>
 			</File>
@@ -1912,6 +1964,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrLayerCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrLoadGraphTabSettingsCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrLoadGraphTabSettingsCmd.h"
 				>
 			</File>
 			<File
@@ -1971,6 +2031,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrSaveGraphTabCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveGraphTabCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveGraphTabSettingsCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSaveGraphTabSettingsCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrSaveImageCmd.cpp"
 				>
 			</File>
@@ -2008,6 +2084,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Commands\FrTimePointCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrUpdateGraphTabsCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrUpdateGraphTabsCmd.h"
 				>
 			</File>
 			<File

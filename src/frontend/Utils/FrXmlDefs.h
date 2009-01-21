@@ -62,4 +62,23 @@
 #define FR_XML_COLOR_ATTR "color"
 #define FR_XML_TYPE_ATTR "type"
 
+
+// graph tabs
+#define FR_GRAPH_TAB_SET_VERSION 1.0
+
+#define FR_XML_GRAPHTABSETTINGS_ELEM "graphTabs"
+#define FR_XML_POINTS_ELEM "points"
+#define FR_XML_POINT_ELEM "point"
+#define FR_XML_GRAPHS_ELEM "graphs"
+#define FR_XML_GRAPH_ELEM "graph"
+#define FR_XML_GRAPH_VOXEL_ELEM "voxel"
+#define FR_XML_GRAPH_SETTINGS_ELEM "graphSettings"
+#define FR_XML_DIMENSIONS_ELEM "dimensions"
+#define FR_XML_SPACING_ELEM "spacing"
+
+#define FR_XML_TIMESERIA_ATTR "timeseria"
+#define FR_XML_GRAPHTYPE_ATTR "type"
+#define FR_XML_DRAWMETHOD_ATTR "drawMethod"
+
+
 #endif

@@ -13,6 +13,7 @@
 #include "FrPointsDocObj.h"
 #include "FrAppSettingsDocObj.h"
 #include "FrDataStore.h"
+#include "FrAction.h"
 
 // backend
 #include "RtDataStore.h"
@@ -72,6 +73,11 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
     connect(m_PlayControlWidget, SIGNAL(Reset()), this, SLOT(OnResetClicked()));
     connect(m_PlayControlWidget, SIGNAL(Previous()), this, SLOT(OnPreviousClicked()));
     connect(m_PlayControlWidget, SIGNAL(Next()), this, SLOT(OnNextClicked()));
+
+    connect(this, SIGNAL(UpdateSignal()), this, SLOT(OnUpdate()));
+
+    this->setMinimumHeight(350);//this->sizeHint().height());
+    //this->setFixedWidth(this->sizeHint().width());
 }
 
 void FrGraphPaneWidget::SetDocument(FrMainDocument* doc){
@@ -82,7 +88,12 @@ void FrGraphPaneWidget::SetDocument(FrMainDocument* doc){
     }
 }
 
+// HACK: signal will be emited to main thread
 void FrGraphPaneWidget::Update(){
+    emit UpdateSignal();
+}
+
+void FrGraphPaneWidget::OnUpdate(){
     // Clear all
     //m_GraphListWidget->RemoveAll();
     m_QwtPlotWidget->RemoveAll();
@@ -96,11 +107,11 @@ void FrGraphPaneWidget::Update(){
 
     int numberOfTimePoints = -1;
 
+    // TODO: we need to get timepoints only from current timeseria
     std::vector<FrDocumentObj*> images;
     m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
     std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
     for(it = images.begin(); it != itEnd; ++it){
-
         FrImageDocObj* img = (FrImageDocObj*)(*it);    
         if(img->GetSeriesNumber() == viewDO->GetTimeSeries()){
 
@@ -116,24 +127,53 @@ void FrGraphPaneWidget::Update(){
 
     std::vector<FrDocumentObj*> graphs;
     m_Document->GetObjectsByType(graphs, FrDocumentObj::GraphObject);
+
+    mutex.lock();
+
     itEnd = graphs.end();
     int id = 0;
     for(it = graphs.begin(); it != itEnd; ++it){
         FrGraphDocObj* graphDO = (FrGraphDocObj*)(*it); 
 
-        int graphID = id++;
+        //int graphID = id++;
         QString& name = graphDO->GetSettings()->Name;
         QColor& color = graphDO->GetSettings()->Color;
         bool visibility = graphDO->GetSettings()->Visibility;
 
         //m_GraphListWidget->AddGraphWidget(graphID, name, color, visibility);
-        m_QwtPlotWidget->AddGraph(graphID, name, color);
+        m_QwtPlotWidget->AddGraph(graphDO->GetID(), name, color);
         
         // TODO: get and set graph data here
-        SetData(graphDO);
+        FrGraphSettings::GraphTypes type = graphDO->GetSettings()->GetType();
+
+        switch(type){
+            case FrGraphSettings::GT_Intencity:
+                SetIntencityData(graphDO);            
+                break;
+            case FrGraphSettings::GT_Movements:
+                // not supported yet
+                return; 
+                break;
+            case FrGraphSettings::GT_RoiMean:
+                // not supported yet
+                return; 
+                break;
+            case FrGraphSettings::GT_RoiStd:
+                // not supported yet
+                return; 
+                break;
+            case FrGraphSettings::GT_Stimulus:
+                // not supported yet
+                return; 
+                break;
+        }
 
         //m_QwtPlotWidget->SetVisibility(graphID, visibility);
     }
+
+    m_QwtPlotWidget->replot();
+
+    mutex.unlock();
 }
 
 
@@ -260,34 +300,29 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
     // remove all items 
     m_GraphContextMenu->clear();
 
-    // get all graphs
-    std::vector<FrDocumentObj*> graphs;
-    m_Document->GetObjectsByType(graphs, FrDocumentObj::GraphObject);
-    // test
-    bool checked = false;
-    if (graphs.size() > 0)
-        checked = true;
-
-    //std::vector<FrDocumentObj*>::iterator it, itEnd(graphs.end());
-    //int id = 0;
-    //for(it = graphs.begin(); it != itEnd; ++it){
-    //    FrGraphDocObj* gr = (FrGraphDocObj*)(*it); 
-
-    //    int graphID = id++;
-    //    QString& name = gr->GetSettings()->Name;
-    //    QColor& color = gr->GetSettings()->Color;
-    //    bool visibility = gr->GetSettings()->Visibility;
-    //}
-
-    // TODO: get all timeseries, check if every timeseria has graphs or no
-    // at this moment we add only one action for graph as we have only 1 timeseria at once
-    QAction* test = new QAction("mri timeseria", this);
-    test->setCheckable(true);
-    test->setChecked(checked);                // TODO: check if we have this graph
-    m_GraphContextMenu->addAction(test);
-
-    connect(test, SIGNAL(toggled(bool)), this, SLOT(itemChecked(bool)));
+    // get all images (each image = timeseria)
+    std::vector<FrDocumentObj*> images;
+    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
     
+    // get all timeseries, check if every timeseria has graphs or no
+    std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
+    for(it = images.begin(); it != itEnd; ++it){
+        FrImageDocObj* img = (FrImageDocObj*)(*it); 
+        
+        FrAction* action = new FrAction("mri timeseria", this);
+        action->SetID(img->GetSeriesNumber());
+        // TODO: check if we have graph with this timeseria ID
+        FrGraphDocObj* graph = m_Document->GetGraphDocObjByID(img->GetSeriesNumber());
+        
+        if (graph)
+            action->setChecked(true);
+        else
+            action->setChecked(false);
+
+        m_GraphContextMenu->addAction(action);
+        connect(action, SIGNAL(actionChecked(int, bool)), this, SLOT(itemChecked(int, bool)));
+    }
+
     // check if current layer is roi, if yes add items : ROI Mean, ROI STD
     // Get selected layer ID 
     FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
@@ -317,73 +352,22 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
     m_GraphContextMenu->exec(event->globalPos());
 }
 
-void FrGraphPaneWidget::itemChecked(bool checked){
-    emit GraphChanged(0, checked);
+void FrGraphPaneWidget::itemChecked(int id, bool checked){
+    emit GraphChanged(id, checked);
 }
 
 void FrGraphPaneWidget::ShowRoiMean(bool checked){
+    // TODO: set unique ID for RoiMean
     emit GraphChanged(1, checked);
 }
 
 void FrGraphPaneWidget::ShowRoiSTD(bool checked){
+    // TODO: set unique ID for RoiSTD
     emit GraphChanged(2, checked);
 }
 
-void FrGraphPaneWidget::SetData(FrGraphDocObj* graphDO){
-    // TODO: not finished
-    // get point from points doc obj
-    FrPointsDocObj* pointsDO = 0L;
-    FrDocument::DocObjCollection pointObjects;
-    m_Document->GetObjectsByType(pointObjects, FrDocumentObj::PointsObject);    
-
-    int I, J, K;
-
-    if(pointObjects.size() > 0){
-        pointsDO = (FrPointsDocObj*)pointObjects[0];
-        
-        int *point;
-        point = pointsDO->GetPoint();
-
-        if (point){
-            I = point[0];
-            J = point[1];
-            K = point[2];
-        }
-        else
-            return; 
-    }
-    else return;    // point not found
-
-
-    FrGraphSettings::GraphTypes type = graphDO->GetSettings()->GetType();
-    
-    // TODO: for all graph types separate methods?
-    FrGraphSettings* gs;
-
-    switch(type){
-        case FrGraphSettings::GT_Intencity:
-            gs = (FrIntencityGraphSettings*)graphDO->GetSettings();
-            //I = 10;//((FrIntencityGraphSettings*)gs)->I;
-            //J = 10;//((FrIntencityGraphSettings*)gs)->J;
-            //K = 0;//((FrIntencityGraphSettings*)gs)->K;
-            break;
-        case FrGraphSettings::GT_Movements:
-            // not supported yet
-            return; 
-            break;
-        case FrGraphSettings::GT_RoiMean:
-            // not supported yet
-            return; 
-            break;
-        case FrGraphSettings::GT_RoiStd:
-            // not supported yet
-            return; 
-            break;
-        case FrGraphSettings::GT_Stimulus:
-            // not supported yet
-            return; 
-            break;
-    }
+void FrGraphPaneWidget::SetIntencityData(FrGraphDocObj* graphDO){
+    FrIntencityGraphSettings* gs = (FrIntencityGraphSettings*)graphDO->GetSettings();
 
     // get data
     double* idata;
@@ -414,13 +398,13 @@ void FrGraphPaneWidget::SetData(FrGraphDocObj* graphDO){
             // get specified i,j,k value
             int width = img->getDim(0);
             int height = img->getDim(1);
-            int index = K * width*height +  J * width + I;
+            int index = gs->K * width*height +  gs->J * width + gs->I;
             idata[i] = (double)pImageData[index]; 
             i++;
         }
         // NOTE: another types can be supported
     }    
-    m_QwtPlotWidget->SetData(graphDO->GetID(), idata, size);
+    m_QwtPlotWidget->SetData(graphDO->GetID(), idata, i);
 
     delete[] pImageData;
     delete idata;

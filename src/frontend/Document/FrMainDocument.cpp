@@ -4,6 +4,9 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrDataStore.h"
 #include "FrLayerDocObj.h"
+#include "FrGraphTabDocObj.h"
+#include "FrPointsDocObj.h"
+#include "FrGraphDocObj.h"
 
 
 FrMainDocument::FrMainDocument() 
@@ -97,9 +100,33 @@ FrTabSettingsDocObj* FrMainDocument::GetCurrentTabSettings(){
     return result;
 }
 
+FrGraphTabDocObj* FrMainDocument::GetCurrentGraphTab(){
+    // get all graph tab settings in document
+    DocObjCollection tabSets;
+    this->GetObjectsByType(tabSets, FrDocumentObj::GraphTab);
+
+    FrGraphTabDocObj* result = 0L;
+    if(tabSets.size() > 0){
+        DocObjCollection::iterator it, itEnd(tabSets.end());
+        for(it = tabSets.begin(); it != itEnd; ++it){
+
+            if((*it)->GetType() != FrDocumentObj::GraphTab) continue;
+
+            // returns first current
+            FrGraphTabDocObj* ts = (FrGraphTabDocObj*)(*it);
+            if(ts->GetIsCurrent()){
+                result = ts;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
 void FrMainDocument::AddDataToStore(RtData *data){
     m_DataStore->AddData(data);
 }
+
 FrViewDocObj* FrMainDocument::GetCurrentViewObject(){
     // get all view objects
     DocObjCollection viewObjects;
@@ -111,6 +138,20 @@ FrViewDocObj* FrMainDocument::GetCurrentViewObject(){
     }
     return result;
 }
+
+FrPointsDocObj* FrMainDocument::GetCurrentPointsObject(){
+    // get all view objects
+    DocObjCollection pointsObjects;
+    this->GetObjectsByType(pointsObjects, FrDocumentObj::PointsObject);
+
+    FrPointsDocObj* result = 0;
+    if(pointsObjects.size() > 0){
+        result = (FrPointsDocObj*)pointsObjects[0];
+    }
+    return result;
+}
+
+
 
 FrAppSettingsDocObj* FrMainDocument::GetAppSettings(){
     DocObjCollection settings;
@@ -133,6 +174,25 @@ FrLayerDocObj* FrMainDocument::GetLayerDocObjByID(int id){
         for (int i = 0; i < layers.size(); i++){
             result = dynamic_cast<FrLayerDocObj*>(layers[i]);
             if (result->GetID() == id)
+                break;
+            else
+                result = 0;
+        }
+    }
+
+    return result;
+}
+
+FrGraphDocObj* FrMainDocument::GetGraphDocObjByID(int id){
+    DocObjCollection graphs;
+    this->GetObjectsByType(graphs, FrDocumentObj::GraphObject);    
+
+    FrGraphDocObj* result = 0;
+    if(graphs.size() > 0){
+        for (int i = 0; i < graphs.size(); i++){
+            result = dynamic_cast<FrGraphDocObj*>(graphs[i]);
+            // NOTE: we use timeseria number as id for graph
+            if (result->GetTimeSeria() == id)
                 break;
             else
                 result = 0;

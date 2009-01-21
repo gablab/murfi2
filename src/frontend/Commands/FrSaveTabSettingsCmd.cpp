@@ -60,7 +60,7 @@ bool FrSaveTabSettingsCmd::SaveNewTab(){
         // NOTE: Assume we never create two default tabs
         FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj(true);
         docObj->SetIsCurrent(true);
-        docObj->SetName(QString("Deafult"));
+        docObj->SetName(QString("Default"));
         docObj->SetDescription(QString("Default tab"));
 
         // add to main document
@@ -78,7 +78,6 @@ bool FrSaveTabSettingsCmd::SaveCurrentTab(){
 }
 
 void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
-    
     FrDocument::DocObjCollection views;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();

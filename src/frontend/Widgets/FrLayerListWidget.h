@@ -60,6 +60,7 @@ signals:
     void DeleteLayer();
     void ChangeLayer();
     void LayerSelected(int id);
+    void UpdateSignal();
 
     // Emmited when Name, Visibility 
     // or Opacity are changed
@@ -84,6 +85,7 @@ private Q_SLOTS:
 
     // Utility methods
     void UpdateCurrentLayerParams();
+    void OnUpdate();
 
 private:
     QTableWidget*   m_layerTable;

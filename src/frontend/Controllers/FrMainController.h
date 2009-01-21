@@ -11,8 +11,10 @@ class RtConductor;
 
 class QString;
 
+
 // Come includes
 #include "FrController.h"
+#include "FrBackground.h"
 #include <vector>
 
 class FrMainController : public FrController {
@@ -35,8 +37,11 @@ public:
     void LoadImageFromFile(std::vector<QString>& fileNames);
     void OpenDataStore();
     void IoTabSettings(QString& fileName, bool isInput);
+    void IoGraphTabSettings(QString& fileName, bool isInput);
     
     void SaveCurrentViewToTab();
+    void SaveCurrentGraphToTab();
+
     void ChangeView(int view);
 
     void SelectLayer(int id);
@@ -47,6 +52,8 @@ public:
 
     void ChangeBookmark(int id);
     void DeleteBookmark(int id);
+    void ChangeGraphBookmark(int id);
+    void DeleteGraphBookmark(int id);
 
     void SetCurrentTool(int tool);
 
@@ -69,6 +76,7 @@ public:
     FrGetPropMacro(FrMainDocument*, MainDocument);
     FrGetPropMacro(FrToolController*, ToolController);
     FrGetPropMacro(RtConductor*, Conductor);
+    //FrGetPropMacro(FrBackground, ConductorThr);
 
 private:
     friend class FrInteractorStyle;
@@ -76,6 +84,7 @@ private:
 private:
     static void* ConductorThread(void *arg);
     int ThrID;
+    FrBackground ConductorThr;
 
 };
 

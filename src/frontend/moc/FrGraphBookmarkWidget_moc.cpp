@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphBookmarkWidget.h'
 **
-** Created: Mon 12. Jan 23:30:00 2009
+** Created: Wed 21. Jan 14:28:38 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

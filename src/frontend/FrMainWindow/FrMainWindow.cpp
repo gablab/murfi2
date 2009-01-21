@@ -198,6 +198,14 @@ void FrMainWindow::OnBookmarkDelete(int id){
     this->GetMainController()->DeleteBookmark(id);
 }
 
+void FrMainWindow::OnGraphBookmarkChanged(int id){
+    this->GetMainController()->ChangeGraphBookmark(id);
+}
+
+void FrMainWindow::OnGraphBookmarkDelete(int id){
+    this->GetMainController()->DeleteGraphBookmark(id);
+}
+
 void FrMainWindow::OnLayerSelected(int id){
     this->GetMainController()->SelectLayer(id);
 }

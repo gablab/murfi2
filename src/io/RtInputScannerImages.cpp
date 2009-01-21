@@ -51,12 +51,11 @@ RtInputScannerImages::RtInputScannerImages()
 
 // destructor
 RtInputScannerImages::~RtInputScannerImages() {
-
-  // delete all remaining received images
+#ifndef USE_FRONTEND
   for(; toBeDeleted != received.end(); toBeDeleted++) {
     delete *toBeDeleted;
   }
-
+#endif
 }
 
 // configure and open
@@ -162,6 +161,11 @@ bool RtInputScannerImages::close() {
 
   RtInput::close();
 
+  // we should close acceptor also, Alan <scopic>
+  #ifdef USE_FRONTEND 
+    acceptor.close();
+  #endif
+
   return true;
 }
 
@@ -190,7 +194,9 @@ int RtInputScannerImages::svc() {
 
     // DEBUGGING
     //ei->displayImageInfo();
-    //ei->iAcquisitionNumber = imageNum++;
+    #ifdef USE_FRONTEND
+        ei->iAcquisitionNumber = imageNum;
+    #endif
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -202,6 +208,11 @@ int RtInputScannerImages::svc() {
 
     // build data class
     rti = new RtMRIImage(*ei,img);
+
+    // test, Alan <scopic>
+    #ifdef USE_FRONTEND
+        rti->getDataID().setSeriesNum(0);
+    #endif
 
     //rti->setSeriesNum(seriesNum);
     rti->setMatrixSize(matrixSize);
@@ -231,7 +242,7 @@ int RtInputScannerImages::svc() {
     //rti->addToID("scanner");
 
     // append this to a vector of gathered images
-    received.push_back(rti);
+    //received.push_back(rti);
     RtExperiment::getDataStore()->setData(rti);
 
     // signal that we got an image
@@ -240,7 +251,7 @@ int RtInputScannerImages::svc() {
     //rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
-/*    if(!haveRefVol 
+    if(!haveRefVol 
        && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI
        ) {
       
@@ -252,7 +263,7 @@ int RtInputScannerImages::svc() {
       else {
 	haveRefVol = true;
       }
-    }*/
+    }
 
  //   // if its the first image in a series save it no matter what
  //   if(isFirstInSeries(*ei)
@@ -271,7 +282,7 @@ int RtInputScannerImages::svc() {
 
  //   }
 
-/*    sendCode(rti);
+    sendCode(rti);
 
 
     if(saveImagesToFile) {
@@ -287,7 +298,7 @@ int RtInputScannerImages::svc() {
 //    cout << "started processing image at ";
 //    printNow(cout);
 //    cout << endl;
-*/
+
     // clean up
     delete ei;
     delete [] img;

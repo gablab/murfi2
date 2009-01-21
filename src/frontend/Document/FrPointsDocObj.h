@@ -18,7 +18,8 @@ class FrPointsDocObj : public FrDocumentObj {
 public:
    typedef std::vector<FrPoint*> PointCollection; 
 public:
-    FrPointsDocObj(RtMRIImage* img);
+    FrPointsDocObj();
+    //FrPointsDocObj(FrPointsDocObj* src);
     virtual ~FrPointsDocObj();
 
     virtual void OnAdd(FrDocument* doc);
@@ -27,10 +28,13 @@ public:
     
     void AddPoint(FrPoint* point);
     void RemovePoint(FrPoint* point);
+    void GetDimsFromImg(RtMRIImage* img);
+    void CopySettings(FrPointsDocObj* src);
     void ClearAll();
 
     // Properties
-//    FrGetPropMacro(vtkImageData*, PointsData);      
+//    FrGetPropMacro(vtkImageData*, PointsData);
+    FrGetPropMacro(PointCollection, Points);
 
     vtkImageData* GetPointsXY(int z);
     vtkImageData* GetPointsXZ(int y);
@@ -38,13 +42,13 @@ public:
     vtkImageData* GetMosaicData(int dimx, int dimy);
 
     // method to obtain one point (since we have only 1 point at the same time)
-    int* GetPoint();
+    void GetPoint(int* point);
 
 private:
     void InitTransparentData();
 
 private:
-    PointCollection m_Points;
+    //PointCollection m_Points;
     double m_spacing[3];
     int m_dimensions[3];
 

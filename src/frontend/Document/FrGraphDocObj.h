@@ -11,6 +11,7 @@
 class FrGraphDocObj : public FrDocumentObj {
 public:
     FrGraphDocObj(FrGraphSettings::GraphTypes type);
+    FrGraphDocObj(FrGraphDocObj* src);
     virtual ~FrGraphDocObj();
 
     // Overrides
@@ -20,11 +21,13 @@ public:
 
     // Properties
     FrPropMacro(FrGraphSettings*, Settings);
-    FrPropMacro(int, ID);
+    FrGetPropMacro(int, ID);
+    FrPropMacro(int, TimeSeria);
 
     // Methods
     void SetGraphData();
     void GetGraphData();
+
 };
 
 #endif // FR_GRAPHDOC_OBJ

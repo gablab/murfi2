@@ -4,6 +4,7 @@
 #define FR_IMAGESETTINGS_WIDGET
 
 #include "Qt/qwidget.h"
+#include "Qt/qmutex.h"
 #include "FrLayerSettings.h"
 #include "FrMacro.h"
 
@@ -29,9 +30,11 @@ public:
 
 Q_SIGNALS:
     void ImageParamsChanged();
+    void UpdateSignal();
 
 private Q_SLOTS:
     void OnSpinSliderValueChanged(int value);
+    void OnUpdate();
 
 private:
     FrSpinSliderWidget* m_sliceWidget;
@@ -49,6 +52,8 @@ private:
     FrSpinSliderWidget* m_threshWidget;
     FrSpinSliderWidget* m_brightWidget;
     FrSpinSliderWidget* m_contWidget;
+
+    QMutex mutex;
     
 };
 

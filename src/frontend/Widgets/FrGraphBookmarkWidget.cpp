@@ -20,6 +20,7 @@ FrGraphBookmarkWidget::FrGraphBookmarkWidget(QWidget *parent)
     m_tabWidget->setTabPosition(QTabWidget::South);
 	m_tabWidget->setTabShape(QTabWidget::Rounded);
 	m_tabWidget->setMaximumHeight(50);
+
     connect( m_tabWidget, SIGNAL(currentChanged(QWidget*)), 
              this, SLOT(OnCurrentChanged(QWidget*)) );
 	
@@ -34,13 +35,6 @@ FrGraphBookmarkWidget::FrGraphBookmarkWidget(QWidget *parent)
     m_layout->addWidget(m_tabWidget);
     m_layout->addWidget(m_btnCloseTab);
     this->setLayout(m_layout);
-
-    // test
-    FrBookmark* bookmark = new FrBookmark(0, this);
-    bookmark->SetIsDefault(true);
-
-    m_tabWidget->addTab(bookmark, "Default");
-    m_tabWidget->setCurrentWidget(bookmark);
 }
 
 bool FrGraphBookmarkWidget::AddBookmark(FrGraphTabDocObj* gts){

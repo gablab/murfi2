@@ -179,22 +179,24 @@ vtkImageData* FrDocumentReader::ReadPoints(){
     if(pointObjects.size() > 0){
         pointsDO = (FrPointsDocObj*)pointObjects[0];
 
+        // Find appropriate image volume
+        RtMRIImage* mri = 0;
+        FrDocument::DocObjCollection images;
+        m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+
+        // NOTE Since we support the only one series 
+        // Time point is a unique data ID.
+        int timePoint = m_DataID;
+
+        if(images.size() > 0){
+            FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+            mri = imgDO->GetTimePointData(timePoint);
+        }
+        pointsDO->GetDimsFromImg(mri);
+
         if (m_Mosaic){
-            // Find appropriate image volume
-            RtMRIImage* mri = 0;
-            FrDocument::DocObjCollection images;
-            m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
-
-            // NOTE Since we support the only one series 
-            // Time point is a unique data ID.
-            int timePoint = m_DataID;
-            if(images.size() > 0){
-                FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
-                mri = imgDO->GetTimePointData(timePoint);
-            }
-
             RtMRIImage* image = new RtMRIImage(*mri);
-                    
+        
             if(!image->mosaic()){
                 delete image;
                 return 0L;

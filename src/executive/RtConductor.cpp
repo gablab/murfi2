@@ -129,6 +129,7 @@ RtConductor::~RtConductor() {
   stream.close();
   //delete stream;
 
+#ifndef USE_FRONTEND
   // tell everyone that we're done and delete them
   for(vector<RtInput*>::iterator i=inputs.begin(); i != inputs.end(); i++) {
     (*i)->close();
@@ -139,7 +140,7 @@ RtConductor::~RtConductor() {
     (*k)->close();
     delete (*k);
   }
-
+#endif
 }
 
 //*** initialization routines  ***//
@@ -271,6 +272,7 @@ bool RtConductor::run() {
     (*i)->activate();
   }
 
+#ifndef USE_FRONTEND
   // start the display
   // DIRTY HACK TO LET DISPLAY RUN IN MAIN THREAD
   if(config.get("display:image")==true) {  
@@ -280,6 +282,7 @@ bool RtConductor::run() {
   }
   //else {
     // wait for threads to complete
+#endif
 
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
@@ -292,6 +295,24 @@ bool RtConductor::run() {
   outputLog << "\n";
 
   return true;
+}
+
+void RtConductor::stop(){
+  //stream.close();
+  //delete stream;
+
+  // tell everyone that we're done and delete them
+   while(inputs.size() > 0){
+        RtInput* input = inputs[0];//(RtInput*)(*(inputs.begin()));
+        inputs.erase(inputs.begin());
+        input->close();
+        delete input;
+    }
+
+  //for(vector<RtOutput*>::iterator k=outputs.begin(); k != outputs.end(); k++){
+  //  (*k)->close();
+  //  delete (*k);
+  //}
 }
 
 // receive a code signaling completetion of data input or processing

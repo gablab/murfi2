@@ -64,10 +64,14 @@ void FrMainMenu::SetupActions(){
     m_menuFile->addAction(m_actManager->GetSaveTabsAction());
     m_menuFile->addAction(m_actManager->GetLoadTabsAction());
     m_menuFile->addSeparator();
+    m_menuFile->addAction(m_actManager->GetSaveGraphTabsAction());
+    m_menuFile->addAction(m_actManager->GetLoadGraphTabsAction());
+    m_menuFile->addSeparator();
     m_menuFile->addAction(m_actManager->GetExitAction());
     
     // Edit
     m_menuEdit->addAction(m_actManager->GetSaveToTabAction());
+    m_menuEdit->addAction(m_actManager->GetSaveGraphToTabAction());
     m_menuEdit->addSeparator();
 	m_menuEdit->addAction(m_actManager->GetNewLayerAction());
 	m_menuEdit->addAction(m_actManager->GetDeleteLayerAction());

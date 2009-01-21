@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrTabInfoDialog.h'
 **
-** Created: Thu 8. Jan 09:19:14 2009
+** Created: Wed 21. Jan 14:28:36 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -18,6 +18,8 @@
 #include "FrAppSettingsDocObj.h"
 #include "FrDataStoreDialog.h"
 #include "FrDataStore.h"
+#include "FrGraphPaneWidget.h"
+#include "FrGraphBookmarkWidget.h"
 
 // VTK stuff
 #include "vtkRenderWindowInteractor.h"
@@ -35,6 +37,8 @@
 #include "RtConductor.h"
 #include "RtDataStore.h"
 #include "RtInput.h"
+
+static int thr;
 
 // Implementation of FrMainController
 FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
@@ -56,14 +60,12 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
     //m_Conductor->run();
     
     // TODO: run conductor in another thread
-    ThrID = ACE_Thread_Manager::instance()->spawn((ACE_THR_FUNC)ConductorThread, m_Conductor);
-
-    //ACE::init();
-
-    //ACE_SOCK_Acceptor acceptor;
-
-    //ACE_INET_Addr address(15000,(ACE_UINT32)INADDR_ANY);
-    //int result = acceptor.open(address,1);
+    //ThrID = ACE_Thread_Manager::instance()->spawn((ACE_THR_FUNC)ConductorThread, m_Conductor);
+ 
+    //conductor = new FrBackground();
+    ConductorThr.SetConductor(m_Conductor);
+    ConductorThr.start();
+    
     //int err = errno;
     //perror(NULL);
 
@@ -74,8 +76,15 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 
 FrMainController::~FrMainController(){    
     //// TODO: stop thread?
-    if (m_Conductor){ 
-        ACE_Thread_Manager::instance()->cancel(ThrID);
+    if (m_Conductor){
+        //bool thrStopped = conductor->wait();
+
+        //ACE_Thread_Manager::instance()->cancel(ThrID);
+        m_Conductor->stop();
+
+        //ConductorThr.exit();
+        //ConductorThr.wait();
+
         delete m_Conductor;
     }
 
@@ -136,9 +145,17 @@ void FrMainController::Initialize(){
     // Initialize document
     if(m_MainDocument){
 
-        FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
-        cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);      
-        cmd->SetIsDefault(true);
+        FrSaveTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
+        cmd1->SetAction(FrSaveTabSettingsCmd::SaveNew);      
+        cmd1->SetIsDefault(true);
+
+        FrSaveGraphTabCmd* cmd2 = FrCommandController::CreateCmd<FrSaveGraphTabCmd>();
+        cmd2->SetAction(FrSaveGraphTabCmd::SaveNew);      
+        cmd2->SetIsDefault(true);
+
+        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        cmd->AddCommand(cmd1);
+        cmd->AddCommand(cmd2);
         FrCommandController::Execute(cmd);
         delete cmd;
     }
@@ -220,7 +237,6 @@ void FrMainController::OpenDataStore(){
 }
 
 void FrMainController::IoTabSettings(QString& fileName, bool isInput){
-
     if(isInput){
         FrLoadTabsCmd* cmd1 = FrCommandController::CreateCmd<FrLoadTabsCmd>();
         cmd1->SetFileName(fileName);
@@ -255,6 +271,43 @@ void FrMainController::IoTabSettings(QString& fileName, bool isInput){
     }
 }
 
+void FrMainController::IoGraphTabSettings(QString& fileName, bool isInput){
+
+    if(isInput){
+        FrLoadGraphTabSettingsCmd* cmd1 = FrCommandController::CreateCmd<FrLoadGraphTabSettingsCmd>();
+        cmd1->SetFileName(fileName);
+
+        FrUpdateGraphTabsCmd* cmd2 = FrCommandController::CreateCmd<FrUpdateGraphTabsCmd>();
+        cmd2->SetAction(FrUpdateGraphTabsCmd::SetCurrentTab);
+        cmd2->SetTabID(CURRENT_TAB_ID);
+
+        FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+        cmd3->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
+
+        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        cmd->AddCommand(cmd1);
+        cmd->AddCommand(cmd2);
+        cmd->AddCommand(cmd3);
+        FrCommandController::Execute(cmd);
+        delete cmd;
+    }
+    else{
+        // first save current view to tab
+        FrSaveGraphTabCmd* cmd1 = FrCommandController::CreateCmd<FrSaveGraphTabCmd>();
+        cmd1->SetAction(FrSaveGraphTabCmd::SaveCurrent);
+
+        FrSaveGraphTabSettingsCmd* cmd2 = FrCommandController::CreateCmd<FrSaveGraphTabSettingsCmd>();
+        cmd2->SetFileName(fileName);
+
+        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        cmd->AddCommand(cmd1);
+        cmd->AddCommand(cmd2);
+        FrCommandController::Execute(cmd);
+        delete cmd;
+    }
+}
+
+
 void FrMainController::Notify(int notifyCode){
 	// Do nothing here
 }
@@ -262,6 +315,13 @@ void FrMainController::Notify(int notifyCode){
 void FrMainController::SaveCurrentViewToTab(){
     FrSaveTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrSaveTabSettingsCmd>();
     cmd->SetAction(FrSaveTabSettingsCmd::SaveNew);
+    FrCommandController::Execute(cmd);
+    delete cmd;
+}
+
+void FrMainController::SaveCurrentGraphToTab(){
+    FrSaveGraphTabCmd* cmd = FrCommandController::CreateCmd<FrSaveGraphTabCmd>();
+    cmd->SetAction(FrSaveGraphTabCmd::SaveNew);
     FrCommandController::Execute(cmd);
     delete cmd;
 }
@@ -393,6 +453,46 @@ void FrMainController::ChangeBookmark(int id){
 
 void FrMainController::DeleteBookmark(int id){
     FrDeleteTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrDeleteTabSettingsCmd>();
+    cmd->SetTabID(id);
+    if(!cmd->Execute()){
+        QMessageBox::critical(this->GetMainView(),
+                              "Error Closing Tab",
+                              "Can't close this tab...");
+    }
+    delete cmd;
+}
+
+void FrMainController::ChangeGraphBookmark(int id){
+    // Create complex command and execute it
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+
+    // save current tab before switching (only if we have more than 1 bookmarks
+    // HACK: check if we have more than 1 tabs
+    if (this->GetMainView()->GetGraphPaneWidget()->
+        GetGraphBookmarkWidget()->GetBookmarkCount() > 1){
+
+        FrSaveGraphTabCmd* cmd1 = FrCommandController::CreateCmd<FrSaveGraphTabCmd>();
+        cmd1->SetAction(FrSaveGraphTabCmd::SaveCurrent);
+        cmd->AddCommand(cmd1);
+    }
+
+    FrUpdateGraphTabsCmd* cmd2 = FrCommandController::CreateCmd<FrUpdateGraphTabsCmd>();
+    cmd2->SetAction(FrUpdateGraphTabsCmd::SetCurrentTab);
+    cmd2->SetGraphTabDocObj(0L);
+    cmd2->SetTabID( id );
+
+    FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd3->SetTarget(FrRefreshWidgetsInfoCmd::All);
+
+    cmd->AddCommand(cmd2);
+    cmd->AddCommand(cmd3);
+    FrCommandController::Execute(cmd);
+
+    delete cmd;
+}
+
+void FrMainController::DeleteGraphBookmark(int id){
+    FrDeleteGraphTabCmd* cmd = FrCommandController::CreateCmd<FrDeleteGraphTabCmd>();
     cmd->SetTabID(id);
     if(!cmd->Execute()){
         QMessageBox::critical(this->GetMainView(),

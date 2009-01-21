@@ -66,6 +66,8 @@ private: friend class FrActionSignalManager;
 public slots:
     void OnBookmarkChanged(int id);
     void OnBookmarkDelete(int id);
+    void OnGraphBookmarkChanged(int id);
+    void OnGraphBookmarkDelete(int id);
 
     void OnLayerSelected(int id);
     

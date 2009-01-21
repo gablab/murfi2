@@ -54,6 +54,11 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     connect(plotPicker, 
         SIGNAL(selected(const QwtDoublePoint& )), 
         this, SLOT(onPointClicked(const QwtDoublePoint& )));
+
+    this->setMinimumHeight(this->sizeHint().height());
+    //this->setFixedWidth(this->sizeHint().width());
+    //this->setFixedHeight(this->sizeHint().height());
+
 }
 
 FrQwtPlotWidget::~FrQwtPlotWidget(){
@@ -84,7 +89,7 @@ void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
     curve->attach(this);    
     
     // refresh the plot
-    this->replot();
+    //this->replot();
 }
 
 void FrQwtPlotWidget::RemoveGraph(int id){
@@ -101,7 +106,7 @@ void FrQwtPlotWidget::RemoveGraph(int id){
         0.0, 0.0, 1.0);
 
     // refresh the plot
-    this->replot();
+    //this->replot();
 }
 
 void FrQwtPlotWidget::RemoveAll(){
@@ -123,7 +128,7 @@ void FrQwtPlotWidget::RemoveAll(){
         0.0, 0.0, 1.0);
 
     // refresh the plot
-    this->replot();
+    //this->replot();
 }
 
 
@@ -151,7 +156,7 @@ void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
     }
     
     // refresh the plot
-    this->replot();
+//    this->replot();
 }
 
 void FrQwtPlotWidget::SetVisibility(int id, bool visible){
@@ -213,8 +218,8 @@ bool FrQwtPlotWidget::SetMarkerPosition(int timePoint, bool blockSignals){
 void FrQwtPlotWidget::SetNumberOfTimePoints(int num){
 
     // Add dummy graph if needed
-    if (m_Curves.size() == 0)
-        return;
+//    if (m_Curves.size() == 0)
+//        return;
 
     if(m_Curves.find(DUMMY_GRAPH_ID) == m_Curves.end()){
         QString dummyGraphName("Dummy");

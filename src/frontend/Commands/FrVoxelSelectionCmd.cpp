@@ -13,6 +13,7 @@
 #include "FrViewDocObj.h"
 #include "FrLayerDocObj.h"
 #include "FrPointsDocObj.h"
+#include "FrGraphDocObj.h"
 #include "FrGraphSettings.h"
 #include "FrGraphPaneWidget.h"
 
@@ -168,6 +169,22 @@ bool FrVoxelSelectionCmd::AddPoint(){
     else
         return false;
         
+    // update all graphs that depends on point position (that is Intencity graphs only for now)
+    FrGraphDocObj* graphDO = 0L;
+    FrDocument::DocObjCollection graphObjects;
+    doc->GetObjectsByType(graphObjects, FrDocumentObj::GraphObject);    
+    
+    for (int i = 0; i < graphObjects.size(); i++){
+        graphDO = (FrGraphDocObj*)graphObjects[i];
+
+        if (graphDO->GetSettings()->GetType() == FrGraphSettings::GT_Intencity){
+            // update point
+            ((FrIntencityGraphSettings*)graphDO->GetSettings())->I = Index[0];
+            ((FrIntencityGraphSettings*)graphDO->GetSettings())->J = Index[1];
+            ((FrIntencityGraphSettings*)graphDO->GetSettings())->K = Index[2];
+        }
+    }
+
     return true;
 }
 

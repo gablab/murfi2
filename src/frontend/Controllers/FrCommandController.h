@@ -34,6 +34,11 @@ class FrMainController;
 #include "FrVoxelSelectionCmd.h"
 #include "FrTimePointCmd.h"
 #include "FrGraphCmd.h"
+#include "FrSaveGraphTabCmd.h"
+#include "FrUpdateGraphTabsCmd.h"
+#include "FrDeleteGraphTabCmd.h"
+#include "FrSaveGraphTabSettingsCmd.h"
+#include "FrLoadGraphTabSettingsCmd.h"
 
 // Mask commands
 #include "FrMaskPenCmd.h"

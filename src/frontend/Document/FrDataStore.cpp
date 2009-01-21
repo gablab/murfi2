@@ -4,6 +4,7 @@
 #include "FrRoiDocObj.h"
 #include "FrPointsDocObj.h"
 #include "FrViewDocObj.h"
+#include "FrCommandController.h"
 
 // Backend includes
 #include "RtDataID.h"
@@ -83,20 +84,25 @@ void FrDataStore::AddImageToDocument(RtData* data){
 
             m_Document->Add(imgDO);
             imgDO->AddTimePointData(img);
+
+            // initialize points doc object with new image
+            FrPointsDocObj* pointsDO = new FrPointsDocObj();
+            pointsDO->GetDimsFromImg(img);
+            m_Document->Add(pointsDO);
         }
         
-
-        // test
-        // Remove points objects
-        m_Document->GetObjectsByType(objects, FrDocumentObj::PointsObject);
-        itEnd = objects.end();
-        for(it = objects.begin(); it != itEnd; ++it){
-            m_Document->Remove( (*it) );
-        }        
-        
-        // initialize points doc object with new image
-        FrPointsDocObj* pointsDO = new FrPointsDocObj(img);
-        m_Document->Add(pointsDO);
+        //// test
+        //// Remove points objects
+        //m_Document->GetObjectsByType(objects, FrDocumentObj::PointsObject);
+        //itEnd = objects.end();
+        //for(it = objects.begin(); it != itEnd; ++it){
+        //    m_Document->Remove( (*it) );
+        //}        
+        //
+        //// initialize points doc object with new image
+        //FrPointsDocObj* pointsDO = new FrPointsDocObj();
+        //pointsDO->GetDimsFromImg(img);
+        //m_Document->Add(pointsDO);
     }
 }
 

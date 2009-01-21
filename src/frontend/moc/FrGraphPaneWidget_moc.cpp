@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphPaneWidget.h'
 **
-** Created: Mon 12. Jan 22:24:34 2009
+** Created: Wed 21. Jan 14:44:30 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrGraphPaneWidget[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      16,   10, // methods
+      18,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -32,19 +32,21 @@ static const uint qt_meta_data_FrGraphPaneWidget[] = {
       79,   18,   18,   18, 0x05,
       99,   18,   18,   18, 0x05,
      122,  115,   18,   18, 0x05,
+     145,   18,   18,   18, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     154,  145,   18,   18, 0x08,
-     188,   18,   18,   18, 0x08,
-     212,   18,   18,   18, 0x08,
-     228,   18,   18,   18, 0x08,
-     245,   18,   18,   18, 0x08,
-     262,   18,   18,   18, 0x08,
-     279,   18,   18,   18, 0x08,
-     299,   18,   18,   18, 0x08,
-     323,  315,   18,   18, 0x08,
-     341,  315,   18,   18, 0x08,
-     359,  315,   18,   18, 0x08,
+     169,  160,   18,   18, 0x08,
+     203,   18,   18,   18, 0x08,
+     227,   18,   18,   18, 0x08,
+     243,   18,   18,   18, 0x08,
+     260,   18,   18,   18, 0x08,
+     277,   18,   18,   18, 0x08,
+     294,   18,   18,   18, 0x08,
+     314,   18,   18,   18, 0x08,
+     330,   18,   18,   18, 0x08,
+     352,  341,   18,   18, 0x08,
+     382,  374,   18,   18, 0x08,
+     400,  374,   18,   18, 0x08,
 
        0        // eod
 };
@@ -54,11 +56,13 @@ static const char qt_meta_stringdata_FrGraphPaneWidget[] = {
     "TimePointChanged(int)\0value\0"
     "LiveModeChanged(bool)\0PreviousTimePoint()\0"
     "NextTimePoint()\0id,add\0GraphChanged(int,bool)\0"
-    "position\0OnGraphMarkerPositionChanged(int)\0"
+    "UpdateSignal()\0position\0"
+    "OnGraphMarkerPositionChanged(int)\0"
     "OnLiveModeChanged(bool)\0OnPlayClicked()\0"
     "OnPauseClicked()\0OnResetClicked()\0"
     "OnPlayFinished()\0OnPreviousClicked()\0"
-    "OnNextClicked()\0checked\0itemChecked(bool)\0"
+    "OnNextClicked()\0OnUpdate()\0id,checked\0"
+    "itemChecked(int,bool)\0checked\0"
     "ShowRoiMean(bool)\0ShowRoiSTD(bool)\0"
 };
 
@@ -92,19 +96,21 @@ int FrGraphPaneWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 2: PreviousTimePoint(); break;
         case 3: NextTimePoint(); break;
         case 4: GraphChanged((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
-        case 5: OnGraphMarkerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 7: OnPlayClicked(); break;
-        case 8: OnPauseClicked(); break;
-        case 9: OnResetClicked(); break;
-        case 10: OnPlayFinished(); break;
-        case 11: OnPreviousClicked(); break;
-        case 12: OnNextClicked(); break;
-        case 13: itemChecked((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 14: ShowRoiMean((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 15: ShowRoiSTD((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 5: UpdateSignal(); break;
+        case 6: OnGraphMarkerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 8: OnPlayClicked(); break;
+        case 9: OnPauseClicked(); break;
+        case 10: OnResetClicked(); break;
+        case 11: OnPlayFinished(); break;
+        case 12: OnPreviousClicked(); break;
+        case 13: OnNextClicked(); break;
+        case 14: OnUpdate(); break;
+        case 15: itemChecked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 16: ShowRoiMean((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 17: ShowRoiSTD((*reinterpret_cast< bool(*)>(_a[1]))); break;
         }
-        _id -= 16;
+        _id -= 18;
     }
     return _id;
 }
@@ -140,4 +146,10 @@ void FrGraphPaneWidget::GraphChanged(int _t1, bool _t2)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 4, _a);
+}
+
+// SIGNAL 5
+void FrGraphPaneWidget::UpdateSignal()
+{
+    QMetaObject::activate(this, &staticMetaObject, 5, 0);
 }

@@ -14,6 +14,14 @@
 FrGraphDocObj::FrGraphDocObj(FrGraphSettings::GraphTypes type)
 : m_Settings(0){
     m_Settings = FrGraphSettings::Create(type);
+    m_ID = (unsigned int)((void*)this);
+}
+
+FrGraphDocObj::FrGraphDocObj(FrGraphDocObj* src){
+    m_Settings = FrGraphSettings::Create(src->GetSettings()->GetType());
+    FrGraphSettings::CopySettings(src->GetSettings(), m_Settings);
+    m_ID = src->GetID();
+    m_TimeSeria = src->GetTimeSeria();
 }
 
 FrGraphDocObj::~FrGraphDocObj(){

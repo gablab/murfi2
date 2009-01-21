@@ -13,6 +13,7 @@
 #include "FrGraphDocObj.h"
 #include "FrColormapWidget.h"
 #include "FrImageSettingsWidget.h"
+#include "FrPointsDocObj.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -207,16 +208,41 @@ bool FrUserActionCmd::ChangeImageSettings(){
 
 bool FrUserActionCmd::addGraph(){
     bool result = false;
-    
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
     // TODO: get graph type by id
 
 
-    // create new layer doc object and get settings from dialog
+    // do not add graph if don't have a point
+    // get point from points doc obj
+    FrPointsDocObj* pointsDO = 0L;
+    FrDocument::DocObjCollection pointObjects;
+    doc->GetObjectsByType(pointObjects, FrDocumentObj::PointsObject);    
+
+    if(pointObjects.size() == 0)
+        return false;
+
+    pointsDO = (FrPointsDocObj*)pointObjects[0];
+    int point[3];
+    
+    pointsDO->GetPoint(point);
+    if (point[0] == -1)
+        return false;
+
+    // create new graph doc object and get settings from anywhere (widget, dialog)
     FrGraphDocObj* graphDO = new FrGraphDocObj(FrGraphSettings::GT_Intencity);  // set correct graph type
-    graphDO->SetID(m_GraphID);
+    graphDO->SetTimeSeria(m_GraphID);
+    
+    // prepare settings (NOTE: different settings for different types of graphs)
+    FrIntencityGraphSettings* gs = new FrIntencityGraphSettings();
+
+    gs->I = point[0];
+    gs->J = point[1];
+    gs->K = point[2];
+    
+    graphDO->SetSettings(gs);
 
     // finally add new doc to MainDocument
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     doc->Add(graphDO);
     result = true;
 

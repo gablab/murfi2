@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrMainWindow.h'
 **
-** Created: Wed 14. Jan 14:19:59 2009
+** Created: Wed 21. Jan 14:28:37 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrMainWindow[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   10, // methods
+       5,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -30,13 +30,17 @@ static const uint qt_meta_data_FrMainWindow[] = {
       17,   14,   13,   13, 0x0a,
       40,   14,   13,   13, 0x0a,
       62,   14,   13,   13, 0x0a,
+      90,   14,   13,   13, 0x0a,
+     117,   14,   13,   13, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrMainWindow[] = {
     "FrMainWindow\0\0id\0OnBookmarkChanged(int)\0"
-    "OnBookmarkDelete(int)\0OnLayerSelected(int)\0"
+    "OnBookmarkDelete(int)\0OnGraphBookmarkChanged(int)\0"
+    "OnGraphBookmarkDelete(int)\0"
+    "OnLayerSelected(int)\0"
 };
 
 const QMetaObject FrMainWindow::staticMetaObject = {
@@ -66,9 +70,11 @@ int FrMainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: OnBookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 1: OnBookmarkDelete((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 2: OnLayerSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 2: OnGraphBookmarkChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 3: OnGraphBookmarkDelete((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 4: OnLayerSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
         }
-        _id -= 3;
+        _id -= 5;
     }
     return _id;
 }

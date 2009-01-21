@@ -22,9 +22,12 @@ public slots:
     void OnOpenDataStoreAction();
     void OnSaveTabsAction();
     void OnLoadTabsAction();
+    void OnSaveGraphTabsAction();
+    void OnLoadGraphTabsAction();
     void OnExitAction();
     //Edit 
     void OnSaveToTabAction();
+    void OnSaveGraphToTabAction();
 	void OnNewLayerAction();
 	void OnDeleteLayerAction();
     void OnChangeLayerAction();

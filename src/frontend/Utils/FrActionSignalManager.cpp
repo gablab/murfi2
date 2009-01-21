@@ -3,6 +3,7 @@
 #include "FrMainWindow.h"
 #include "FrMainController.h"
 #include "FrBookmarkWidget.h"
+#include "FrGraphBookmarkWidget.h"
 #include "FrLayerListWidget.h"
 #include "FrGraphPaneWidget.h"
 #include "FrImageSettingsWidget.h"
@@ -42,10 +43,13 @@ void FrActionSignalManager::Initialize(){
     CONNECT_ACTION_TRIGGERED(am->GetOpenDataStoreAction(), OnOpenDataStoreAction());
     CONNECT_ACTION_TRIGGERED(am->GetSaveTabsAction(), OnSaveTabsAction());
     CONNECT_ACTION_TRIGGERED(am->GetLoadTabsAction(), OnLoadTabsAction());
+    CONNECT_ACTION_TRIGGERED(am->GetSaveGraphTabsAction(), OnSaveGraphTabsAction());
+    CONNECT_ACTION_TRIGGERED(am->GetLoadGraphTabsAction(), OnLoadGraphTabsAction());
     CONNECT_ACTION_TRIGGERED(am->GetExitAction(), OnExitAction());
      
     //Edit 
     CONNECT_ACTION_TRIGGERED(am->GetSaveToTabAction(), OnSaveToTabAction());
+    CONNECT_ACTION_TRIGGERED(am->GetSaveGraphToTabAction(), OnSaveGraphToTabAction());
 	CONNECT_ACTION_TRIGGERED(am->GetNewLayerAction(),  OnNewLayerAction());
 	CONNECT_ACTION_TRIGGERED(am->GetDeleteLayerAction(), OnDeleteLayerAction());
     CONNECT_ACTION_TRIGGERED(am->GetChangeLayerAction(), OnChangeLayerAction());
@@ -99,9 +103,17 @@ void FrActionSignalManager::Initialize(){
              this, SLOT(OnTimePointChanged(int)) );
     connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(PreviousTimePoint()),
              this, SLOT(OnPreviousTimePointPressed()) );
+    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
+             this, SLOT(OnNextTimePointPressed()) );
     connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(GraphChanged(int, bool)),
              this, SLOT(OnGraphChanged(int, bool)) );
-  
+
+    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(int)),
+             m_mainWindow, SLOT(OnGraphBookmarkChanged(int)) );
+    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(int)),
+             m_mainWindow, SLOT(OnGraphBookmarkDelete(int)) );
+
+
     // Connect image settings widget
     connect( m_mainWindow->m_ImageSettingsWidget, SIGNAL(ImageParamsChanged()),
         this, SLOT(OnImageParamsChanged()) );
@@ -126,6 +138,7 @@ void FrActionSignalManager::Deinitialize(){
      
     //Edit 
     DISCONNECT_ACTION_TRIGGERED(am->GetSaveToTabAction(), OnSaveToTabAction());
+    DISCONNECT_ACTION_TRIGGERED(am->GetSaveGraphToTabAction(), OnSaveGraphToTabAction());
 	DISCONNECT_ACTION_TRIGGERED(am->GetNewLayerAction(),  OnNewLayerAction());
 	DISCONNECT_ACTION_TRIGGERED(am->GetDeleteLayerAction(), OnDeleteLayerAction());
     DISCONNECT_ACTION_TRIGGERED(am->GetChangeLayerAction(), OnChangeLayerAction());
@@ -183,6 +196,13 @@ void FrActionSignalManager::Deinitialize(){
              this, SLOT(OnPreviousTimePointPressed()) );
     disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
              this, SLOT(OnNextTimePointPressed()) );
+    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
+             this, SLOT(OnNextTimePointPressed()) );
+
+    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(int)),
+             m_mainWindow, SLOT(OnGraphBookmarkChanged(int)) );
+    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(int)),
+             m_mainWindow, SLOT(OnGraphBookmarkDelete(int)) );
 
     // image settings widget
     disconnect( m_mainWindow->m_ImageSettingsWidget, SIGNAL(ImageParamsChanged()),
@@ -240,6 +260,31 @@ void FrActionSignalManager::OnLoadTabsAction(){
     }
 }
 
+void FrActionSignalManager::OnSaveGraphTabsAction(){
+    QString fileName = QFileDialog::getSaveFileName(
+        m_mainWindow, tr("Save Graph Tabs Data"), 
+        tr(""), tr("Graph Tabs Settings (*.tbs)"));
+
+    if(!fileName.isNull() && !fileName.isEmpty()){
+        m_mainWindow->
+            GetMainController()->
+            IoGraphTabSettings(fileName, false);
+    }
+}
+
+void FrActionSignalManager::OnLoadGraphTabsAction(){
+    QString fileName = QFileDialog::getOpenFileName(
+        m_mainWindow, tr("Load Graph Tabs Data"), 
+        tr(""), tr("Graph Tabs Settings (*.tbs)"));
+
+    if(!fileName.isNull() && !fileName.isEmpty()){
+        m_mainWindow->
+            GetMainController()->
+            IoGraphTabSettings(fileName, true);
+    }
+}
+
+
 void FrActionSignalManager::OnExitAction(){
     QApplication::quit();
 }
@@ -249,6 +294,12 @@ void FrActionSignalManager::OnSaveToTabAction(){
     m_mainWindow->
         GetMainController()->
         SaveCurrentViewToTab();
+}
+
+void FrActionSignalManager::OnSaveGraphToTabAction(){
+    m_mainWindow->
+        GetMainController()->
+        SaveCurrentGraphToTab();
 }
 
 void FrActionSignalManager::OnNewLayerAction(){

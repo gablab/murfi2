@@ -21,9 +21,12 @@ FrActionManager::~FrActionManager(){
     delete m_OpenDataStoreAction;
     delete m_SaveTabsAction;
     delete m_LoadTabsAction;
+    delete m_SaveGraphTabsAction;
+    delete m_LoadGraphTabsAction;
     delete m_ExitAction;
     // Edit
     delete m_SaveToTabAction;
+    delete m_SaveGraphToTabAction;
     delete m_NewLayerAction;
     delete m_DeleteLayerAction;
     delete m_ChangeLayerAction;
@@ -55,11 +58,17 @@ void FrActionManager::Initialize(QObject* parent){
     m_SaveTabsAction->setObjectName(QString::fromUtf8("m_SaveTabsAction"));
     m_LoadTabsAction = new QAction(parent);
     m_LoadTabsAction->setObjectName(QString::fromUtf8("m_LoadTabsAction"));
+    m_SaveGraphTabsAction = new QAction(parent);
+    m_SaveGraphTabsAction->setObjectName(QString::fromUtf8("m_SaveGraphTabsAction"));
+    m_LoadGraphTabsAction = new QAction(parent);
+    m_LoadGraphTabsAction->setObjectName(QString::fromUtf8("m_LoadGraphTabsAction"));
     m_ExitAction = new QAction(parent);
     m_ExitAction->setObjectName(QString::fromUtf8("m_ExitAction"));
     // Edit
     m_SaveToTabAction = new QAction(parent);
     m_SaveToTabAction->setObjectName(QString::fromUtf8("m_SaveToTabAction"));
+    m_SaveGraphToTabAction = new QAction(parent);
+    m_SaveGraphToTabAction->setObjectName(QString::fromUtf8("m_SaveGraphToTabAction"));
     m_NewLayerAction = new QAction(parent);
     m_NewLayerAction->setObjectName(QString::fromUtf8("m_NewLayerAction"));
     m_DeleteLayerAction = new QAction(parent);
@@ -113,11 +122,17 @@ void FrActionManager::Retranslate(){
     m_SaveTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save Tabset"));
     m_LoadTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Load Tabset"));
     m_LoadTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Load Tabset"));
+    m_SaveGraphTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save Graph Tabset"));
+    m_SaveGraphTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save Graph Tabset"));
+    m_LoadGraphTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Load Graph Tabset"));
+    m_LoadGraphTabsAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Load Graph Tabset"));
     m_ExitAction->setText(DO_TRANSLATE(TR_CONTEXT, "Exit"));
     m_ExitAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Exit"));
     // Edit
     m_SaveToTabAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save Tab"));
     m_SaveToTabAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save Tab"));
+    m_SaveGraphToTabAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save Graph Tab"));
+    m_SaveGraphToTabAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Save Graph Tab"));
     m_NewLayerAction->setText(DO_TRANSLATE(TR_CONTEXT, "New Layer"));
     m_NewLayerAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "New Layer"));
     m_DeleteLayerAction->setText(DO_TRANSLATE(TR_CONTEXT, "Delete Layer"));

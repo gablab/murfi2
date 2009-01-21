@@ -20,6 +20,7 @@ class FrPlayThread;
 #include "FrSettings.h"
 
 #include "Qt/qwidget.h"
+#include "Qt/qmutex.h"
 
 class FrGraphPaneWidget : public QWidget {
 	Q_OBJECT
@@ -42,7 +43,7 @@ public:
     void UpdateTimePoint();
     void UpdateLiveMode();
     
-    void SetData(FrGraphDocObj* graphDO);
+    void SetIntencityData(FrGraphDocObj* graphDO);
 
     // Here all signals
 Q_SIGNALS:
@@ -51,6 +52,7 @@ Q_SIGNALS:
     void PreviousTimePoint();
     void NextTimePoint();
     void GraphChanged(int id, bool add);
+    void UpdateSignal();
 
 protected:
     virtual void timerEvent(QTimerEvent *event);
@@ -68,8 +70,10 @@ private Q_SLOTS:
     void OnPreviousClicked();
     void OnNextClicked();
 
+    void OnUpdate();
+
     // context menu 
-    void itemChecked(bool checked);
+    void itemChecked(int id, bool checked);
     void ShowRoiMean(bool checked);
     void ShowRoiSTD(bool checked);
 
@@ -78,6 +82,7 @@ private:
     int m_TimerID;
     int m_PlayingTimePoint;
     bool m_IsPaused;
+    QMutex mutex;
 };
 
 #endif

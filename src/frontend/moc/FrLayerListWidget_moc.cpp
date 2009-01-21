@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrLayerListWidget.h'
 **
-** Created: Thu 8. Jan 09:19:26 2009
+** Created: Wed 21. Jan 14:28:37 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrLayerListWidget[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      16,   10, // methods
+      18,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -32,19 +32,21 @@ static const uint qt_meta_data_FrLayerListWidget[] = {
       44,   18,   18,   18, 0x05,
       61,   58,   18,   18, 0x05,
       80,   18,   18,   18, 0x05,
-     100,   18,   18,   18, 0x05,
-     122,   18,   18,   18, 0x05,
+      95,   18,   18,   18, 0x05,
+     115,   18,   18,   18, 0x05,
+     137,   18,   18,   18, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     147,  139,   18,   18, 0x08,
-     170,   18,   18,   18, 0x08,
+     162,  154,   18,   18, 0x08,
      185,   18,   18,   18, 0x08,
-     203,   18,   18,   18, 0x08,
-     221,   58,   18,   18, 0x08,
-     252,  246,   18,   18, 0x08,
-     274,   18,   18,   18, 0x08,
-     300,   18,   18,   18, 0x08,
-     319,   18,   18,   18, 0x08,
+     200,   18,   18,   18, 0x08,
+     218,   18,   18,   18, 0x08,
+     236,   58,   18,   18, 0x08,
+     267,  261,   18,   18, 0x08,
+     289,   18,   18,   18, 0x08,
+     315,   18,   18,   18, 0x08,
+     334,   18,   18,   18, 0x08,
+     361,   18,   18,   18, 0x08,
 
        0        // eod
 };
@@ -52,14 +54,15 @@ static const uint qt_meta_data_FrLayerListWidget[] = {
 static const char qt_meta_stringdata_FrLayerListWidget[] = {
     "FrLayerListWidget\0\0NewLayer()\0"
     "DeleteLayer()\0ChangeLayer()\0id\0"
-    "LayerSelected(int)\0ChangeLayerParams()\0"
-    "ChangeLayerColormap()\0RoiToolChanged()\0"
-    "row,col\0OnCellClicked(int,int)\0"
-    "OnAddClicked()\0OnDeleteClicked()\0"
-    "OnChangeClicked()\0OnVisibilityChanged(int)\0"
-    "value\0OnOpacityChanged(int)\0"
-    "OnColormapParamsChanged()\0OnRoiToolChanged()\0"
-    "UpdateCurrentLayerParams()\0"
+    "LayerSelected(int)\0UpdateSignal()\0"
+    "ChangeLayerParams()\0ChangeLayerColormap()\0"
+    "RoiToolChanged()\0row,col\0"
+    "OnCellClicked(int,int)\0OnAddClicked()\0"
+    "OnDeleteClicked()\0OnChangeClicked()\0"
+    "OnVisibilityChanged(int)\0value\0"
+    "OnOpacityChanged(int)\0OnColormapParamsChanged()\0"
+    "OnRoiToolChanged()\0UpdateCurrentLayerParams()\0"
+    "OnUpdate()\0"
 };
 
 const QMetaObject FrLayerListWidget::staticMetaObject = {
@@ -91,20 +94,22 @@ int FrLayerListWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 1: DeleteLayer(); break;
         case 2: ChangeLayer(); break;
         case 3: LayerSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 4: ChangeLayerParams(); break;
-        case 5: ChangeLayerColormap(); break;
-        case 6: RoiToolChanged(); break;
-        case 7: OnCellClicked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 8: OnAddClicked(); break;
-        case 9: OnDeleteClicked(); break;
-        case 10: OnChangeClicked(); break;
-        case 11: OnVisibilityChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 12: OnOpacityChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 13: OnColormapParamsChanged(); break;
-        case 14: OnRoiToolChanged(); break;
-        case 15: UpdateCurrentLayerParams(); break;
+        case 4: UpdateSignal(); break;
+        case 5: ChangeLayerParams(); break;
+        case 6: ChangeLayerColormap(); break;
+        case 7: RoiToolChanged(); break;
+        case 8: OnCellClicked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 9: OnAddClicked(); break;
+        case 10: OnDeleteClicked(); break;
+        case 11: OnChangeClicked(); break;
+        case 12: OnVisibilityChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 13: OnOpacityChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 14: OnColormapParamsChanged(); break;
+        case 15: OnRoiToolChanged(); break;
+        case 16: UpdateCurrentLayerParams(); break;
+        case 17: OnUpdate(); break;
         }
-        _id -= 16;
+        _id -= 18;
     }
     return _id;
 }
@@ -135,19 +140,25 @@ void FrLayerListWidget::LayerSelected(int _t1)
 }
 
 // SIGNAL 4
-void FrLayerListWidget::ChangeLayerParams()
+void FrLayerListWidget::UpdateSignal()
 {
     QMetaObject::activate(this, &staticMetaObject, 4, 0);
 }
 
 // SIGNAL 5
-void FrLayerListWidget::ChangeLayerColormap()
+void FrLayerListWidget::ChangeLayerParams()
 {
     QMetaObject::activate(this, &staticMetaObject, 5, 0);
 }
 
 // SIGNAL 6
-void FrLayerListWidget::RoiToolChanged()
+void FrLayerListWidget::ChangeLayerColormap()
 {
     QMetaObject::activate(this, &staticMetaObject, 6, 0);
+}
+
+// SIGNAL 7
+void FrLayerListWidget::RoiToolChanged()
+{
+    QMetaObject::activate(this, &staticMetaObject, 7, 0);
 }

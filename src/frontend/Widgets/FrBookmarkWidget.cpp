@@ -20,6 +20,7 @@ FrBookmarkWidget::FrBookmarkWidget(QWidget *parent)
     m_tabWidget->setTabPosition(QTabWidget::East);
 	m_tabWidget->setTabShape(QTabWidget::Rounded);
 	m_tabWidget->setMaximumWidth(50);
+
     connect( m_tabWidget, SIGNAL(currentChanged(QWidget*)), 
              this, SLOT(OnCurrentChanged(QWidget*)) );
 	

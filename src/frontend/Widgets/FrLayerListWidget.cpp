@@ -119,6 +119,8 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
        
     connect( m_roiToolWidget, SIGNAL(CurrentToolChanged()), this, SLOT(OnRoiToolChanged()) );
 
+    connect(this, SIGNAL(UpdateSignal()), this, SLOT(OnUpdate()));
+
     this->setMinimumHeight(this->sizeHint().height());
     this->setFixedWidth(this->sizeHint().width());
 }
@@ -369,8 +371,13 @@ int FrLayerListWidget::GetOpacity(){
     return m_opacityWidget->GetValue();    
 }
 
-// Update info displayed by widget
+// HACK: signal will be emited to main thread
 void FrLayerListWidget::Update(){
+    emit UpdateSignal();
+}
+
+// Update info displayed by widget
+void FrLayerListWidget::OnUpdate(){
     // Clear
     this->RemoveLayers();
     if(!m_Document) return;

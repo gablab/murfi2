@@ -13,9 +13,18 @@
 
 #include <algorithm>
 
-FrPointsDocObj::FrPointsDocObj(RtMRIImage* img){
+FrPointsDocObj::FrPointsDocObj(){
     m_Points.clear();
  
+    m_dimensions[0] = 0; 
+    m_dimensions[1] = 0; 
+    m_dimensions[2] = 0;
+    m_spacing[0] = 0; 
+    m_spacing[1] = 0; 
+    m_spacing[2] = 0;
+}
+
+void FrPointsDocObj::GetDimsFromImg(RtMRIImage* img){
     if (img){
         m_dimensions[0] = img->getDim(0);
         m_dimensions[1] = img->getDim(1);
@@ -25,6 +34,21 @@ FrPointsDocObj::FrPointsDocObj(RtMRIImage* img){
         m_spacing[2] = img->getPixDim(2);
     }
 }
+
+//FrPointsDocObj::FrPointsDocObj(FrPointsDocObj* src){
+//    if (src){
+//        // copy points
+//        this->CopyPoints(src);
+//
+//        // copy dimensions and spacing
+//        m_dimensions[0] = src->m_dimensions[0];
+//        m_dimensions[1] = src->m_dimensions[1];
+//        m_dimensions[2] = src->m_dimensions[2];
+//        m_spacing[0] = src->m_spacing[0];
+//        m_spacing[1] = src->m_spacing[1];
+//        m_spacing[2] = src->m_spacing[2];
+//    }
+//}
 
 FrPointsDocObj::~FrPointsDocObj(){
     this->ClearAll();
@@ -39,6 +63,27 @@ void FrPointsDocObj::OnRemove(FrDocument* doc){
 
 FrDocumentObj::ObjTypes FrPointsDocObj::GetType(){
     return FrDocumentObj::PointsObject;
+}
+
+void FrPointsDocObj::CopySettings(FrPointsDocObj* src){
+    if (src){
+        m_Points.clear();
+
+        // copy points 
+        for (int i = 0; i < src->m_Points.size(); i++){
+            FrPoint* tmp = src->m_Points[i];
+            FrPoint* point = new FrPoint(tmp->x, tmp->y, tmp->z, tmp->color);
+            m_Points.push_back(point);
+        }
+
+        // copy dimensions and spacing
+        m_dimensions[0] = src->m_dimensions[0];
+        m_dimensions[1] = src->m_dimensions[1];
+        m_dimensions[2] = src->m_dimensions[2];
+        m_spacing[0] = src->m_spacing[0];
+        m_spacing[1] = src->m_spacing[1];
+        m_spacing[2] = src->m_spacing[2];
+    }
 }
 
 void FrPointsDocObj::ClearAll(){
@@ -71,6 +116,9 @@ void FrPointsDocObj::RemovePoint(FrPoint *point){
 }
 
 vtkImageData* FrPointsDocObj::GetPointsXY(int z){
+    if (m_Points.size() == 0)
+        return 0L;
+
     vtkImageData* data = vtkImageData::New();
 	data->SetScalarTypeToUnsignedChar();
 	data->SetNumberOfScalarComponents(4); // ARGB
@@ -116,6 +164,9 @@ vtkImageData* FrPointsDocObj::GetPointsXY(int z){
 }
 
 vtkImageData* FrPointsDocObj::GetPointsXZ(int y){
+    if (m_Points.size() == 0)
+        return 0L;
+
     vtkImageData* data = vtkImageData::New();
 	data->SetScalarTypeToUnsignedChar();
 	data->SetNumberOfScalarComponents(4); // ARGB
@@ -150,6 +201,9 @@ vtkImageData* FrPointsDocObj::GetPointsXZ(int y){
 }
 
 vtkImageData* FrPointsDocObj::GetPointsYZ(int x){
+    if (m_Points.size() == 0)
+        return 0L;
+
     vtkImageData* data = vtkImageData::New();
 	data->SetScalarTypeToUnsignedChar();
 	data->SetNumberOfScalarComponents(4); // ARGB
@@ -184,6 +238,9 @@ vtkImageData* FrPointsDocObj::GetPointsYZ(int x){
 }
 
 vtkImageData* FrPointsDocObj::GetMosaicData(int dimx, int dimy){
+    if (m_Points.size() == 0)
+        return 0L;
+
     vtkImageData* data = vtkImageData::New();
     data->SetScalarTypeToUnsignedChar();
     data->SetNumberOfScalarComponents(4); // ARGB
@@ -228,17 +285,15 @@ vtkImageData* FrPointsDocObj::GetMosaicData(int dimx, int dimy){
     return data;
 }
 
-int* FrPointsDocObj::GetPoint(){
-    if (m_Points.size() == 0)
-        return 0;
-
-    int point[3];
+void FrPointsDocObj::GetPoint(int* point){
+    if (m_Points.size() == 0){
+       point[0] = -1;
+       return;
+    }
 
     point[0] = m_Points[0]->x;
     point[1] = m_Points[0]->y;
     point[2] = m_Points[0]->z;
-
-    return point;
 }
 
 void FrPointsDocObj::InitTransparentData(){

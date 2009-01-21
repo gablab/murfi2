@@ -86,6 +86,9 @@ public:
   //   true (for success) or false
   bool run();
 
+  // stop all threads
+  void stop();
+
   //*** callback entries for threads ***//
 
   // receive a code signaling completetion of data input or processing

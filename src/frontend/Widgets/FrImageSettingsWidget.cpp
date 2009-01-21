@@ -116,6 +116,12 @@ FrImageSettingsWidget::FrImageSettingsWidget(QWidget* parent, FrMainDocument* do
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(sliceGroupBox);
     mainLayout->addWidget(groupBox);
+
+    connect(this, SIGNAL(UpdateSignal()), this, SLOT(OnUpdate()));
+
+    //this->setMinimumHeight(this->sizeHint().height());
+//    this->setFixedWidth(this->sizeHint().width());
+//    this->setFixedHeight(this->sizeHint().height());
 }
 
 void FrImageSettingsWidget::OnSpinSliderValueChanged(int value){
@@ -175,8 +181,13 @@ void FrImageSettingsWidget::SetSliceNumber(int widget, int slice){
     }
 }
 
-// Update info displayed by widget
+// HACK: signal will be emited to main thread
 void FrImageSettingsWidget::Update(){
+    emit UpdateSignal();
+}
+
+// Update info displayed by widget
+void FrImageSettingsWidget::OnUpdate(){
     if(!m_Document) return;
 
     // TODO: set TBC settings from current layer
@@ -199,6 +210,8 @@ void FrImageSettingsWidget::Update(){
     int xDim = mri->getDim(0)-1;
     int yDim = mri->getDim(1)-1;
     int zDim = mri->getDim(2)-1;
+
+    mutex.lock();
 
     m_sliceWidget->SetMinMax(0, zDim);
     m_coronalSliceWidget->SetMinMax(0, yDim);
@@ -249,6 +262,8 @@ void FrImageSettingsWidget::Update(){
 
     int layerID = viewDO->GetActiveLayerID();
     
+    mutex.unlock();
+
     FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(layerID);
     if (!layerDO) return;
 

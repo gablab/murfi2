@@ -8,6 +8,9 @@ class FrViewDocObj;
 class FrTabSettingsDocObj;
 class FrAppSettingsDocObj;
 class FrLayerDocObj;
+class FrGraphTabDocObj;
+class FrGraphDocObj;
+class FrPointsDocObj;
 class RtData;
 
 // Some includes
@@ -22,12 +25,15 @@ public:
 
     // Some helper methods
     FrTabSettingsDocObj* GetCurrentTabSettings();
+    FrGraphTabDocObj* GetCurrentGraphTab();
     
     FrViewDocObj* GetCurrentViewObject();
+    FrPointsDocObj* GetCurrentPointsObject();
 
     FrAppSettingsDocObj* GetAppSettings();
 
     FrLayerDocObj* GetLayerDocObjByID(int id);
+    FrGraphDocObj* GetGraphDocObjByID(int id);
 
     void AddDataToStore(RtData *data);
 

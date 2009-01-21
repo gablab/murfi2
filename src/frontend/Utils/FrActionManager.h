@@ -23,9 +23,12 @@ public:
     FrGetPropMacro(QAction*, OpenDataStoreAction);
     FrGetPropMacro(QAction*, SaveTabsAction);
     FrGetPropMacro(QAction*, LoadTabsAction);
+    FrGetPropMacro(QAction*, SaveGraphTabsAction);
+    FrGetPropMacro(QAction*, LoadGraphTabsAction);
     FrGetPropMacro(QAction*, ExitAction);    
     // Edit
     FrGetPropMacro(QAction*, SaveToTabAction);
+    FrGetPropMacro(QAction*, SaveGraphToTabAction);
     FrGetPropMacro(QAction*, NewLayerAction);
     FrGetPropMacro(QAction*, DeleteLayerAction);
     FrGetPropMacro(QAction*, ChangeLayerAction);

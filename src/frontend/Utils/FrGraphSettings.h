@@ -28,6 +28,7 @@ public:
 public:
     // Factory method
     static FrGraphSettings* Create(GraphTypes type);
+    static bool CopySettings(FrGraphSettings* src, FrGraphSettings* dst);
 
 public:
     QString Name;

@@ -3,6 +3,7 @@
 #include "FrMainDocument.h"
 #include "FrMainController.h"
 #include "FrDataStore.h"
+#include "RtConductor.h"
 
 // Control block for leak detection
 #ifdef WIN32
@@ -42,19 +43,30 @@ int ACE_TMAIN(int argc, char **argv){
 
     FrApplication application(argc, argv);
 
+    // testing data receiving
+	char *path[3];
+	path[0] = "test";
+	path[1] = "-f";
+	path[2] = "test_config.xml";
+    
+    // Create backend stuff
+    RtConductor* conductor = new RtConductor(3, path);
+
     // Create main view and document of app
     FrMainWindow* mainWindow = new FrMainWindow();
     FrMainDocument* document = new FrMainDocument();
 
     // Create main controller.
     // It takes care about all the stuff (i.e. init, manage and delete).
-    FrMainController controller(mainWindow, document);
+    FrMainController controller(mainWindow, document, conductor);
     controller.Initialize();
 
     int result = 0;
     if(!application.exec()){
         result = 1;
     }
+    
+    conductor->stop();
 
     return result;
 }

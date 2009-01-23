@@ -41,30 +41,30 @@
 static int thr;
 
 // Implementation of FrMainController
-FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
+FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc, RtConductor* con)
 : m_MainView(view), m_MainDocument(doc), m_ToolController(0){
 
     m_ToolController = new FrToolController(this);    
 
  //    testing data receiving
-	char *path[3];
-	path[0] = "test";
-	path[1] = "-f";
-	path[2] = "test_config.xml";
+	//char *path[3];
+	//path[0] = "test";
+	//path[1] = "-f";
+	//path[2] = "test_config.xml";
 
-    m_Conductor = new RtConductor(3, path);
+ //   m_Conductor = new RtConductor(3, path);
     //    m_Conductor->addOutput(m_MainDocument->GetDataStore()->GetStore());
-    m_MainDocument->GetDataStore()->SetStore(m_Conductor->getDataStore());
+    m_MainDocument->GetDataStore()->SetStore(con->getDataStore());
     //m_Conductor->SetDataStore(m_MainDocument->GetDataStore()->GetStore());
 
-    m_Conductor->init();
+    con->init();
     //m_Conductor->run();
     
     // TODO: run conductor in another thread
     //ThrID = ACE_Thread_Manager::instance()->spawn((ACE_THR_FUNC)ConductorThread, m_Conductor);
  
     //conductor = new FrBackground();
-    ConductorThr.SetConductor(m_Conductor);
+    ConductorThr.SetConductor(con);
     ConductorThr.start();
     
     //int err = errno;
@@ -77,16 +77,16 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 
 FrMainController::~FrMainController(){    
     //// TODO: stop thread?
-    if (m_Conductor){
+/*    if (m_Conductor){
         //bool thrStopped = conductor->wait();
 
         //ACE_Thread_Manager::instance()->cancel(ThrID);
         m_Conductor->stop();
-        delete m_Conductor;
+//        delete m_Conductor;
 
         ConductorThr.quit();
         ConductorThr.wait();
-    }
+    }*/
 
     // delete tool controller
     if(m_ToolController) {

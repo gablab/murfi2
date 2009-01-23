@@ -44,14 +44,14 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     m_PlotMarker->setLinePen(QPen(Qt::black, 0, Qt::SolidLine));
     m_PlotMarker->attach(this);
 
-    QwtPlotPicker *plotPicker = new QwtPlotPicker(this->canvas());
-    plotPicker->setTrackerMode(QwtPicker::AlwaysOn);
-    plotPicker->setSelectionFlags(
+    m_PlotPicker = new QwtPlotPicker(this->canvas());
+    m_PlotPicker->setTrackerMode(QwtPicker::AlwaysOn);
+    m_PlotPicker->setSelectionFlags(
         QwtPicker::PointSelection | 
         QwtPicker::ClickSelection);
     
     // connect signals and slots
-    connect(plotPicker, 
+    connect(m_PlotPicker, 
         SIGNAL(selected(const QwtDoublePoint& )), 
         this, SLOT(onPointClicked(const QwtDoublePoint& )));
 
@@ -63,6 +63,16 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
 
 FrQwtPlotWidget::~FrQwtPlotWidget(){
     this->RemoveAll();
+
+    if (m_Grid){
+        m_Grid->detach();
+        delete m_Grid;
+    }
+    if (m_PlotMarker){
+        m_PlotMarker->detach();
+        delete m_PlotMarker;
+    }
+    if (m_PlotPicker) delete m_PlotPicker;
 }
 
 void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){

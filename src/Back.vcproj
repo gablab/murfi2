@@ -284,6 +284,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\stream\postprocess\RtEventTriggerSynth.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtEventTriggerSynth.h"
+					>
+				</File>
+				<File
 					RelativePath=".\stream\postprocess\RtRoi2Feedback.cpp"
 					>
 				</File>
@@ -297,6 +305,14 @@
 				</File>
 				<File
 					RelativePath=".\stream\postprocess\RtRoiDifference.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiFeedbackSynth.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\postprocess\RtRoiFeedbackSynth.h"
 					>
 				</File>
 				<File
@@ -506,6 +522,14 @@
 			</File>
 			<File
 				RelativePath=".\io\RtInputScannerImages.h"
+				>
+			</File>
+			<File
+				RelativePath=".\io\RtInputSynth.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\io\RtInputSynth.h"
 				>
 			</File>
 			<File

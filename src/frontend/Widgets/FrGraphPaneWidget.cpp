@@ -80,6 +80,10 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
     //this->setFixedWidth(this->sizeHint().width());
 }
 
+FrGraphPaneWidget::~FrGraphPaneWidget(){
+    if (m_QwtPlotWidget) delete m_QwtPlotWidget;
+}
+
 void FrGraphPaneWidget::SetDocument(FrMainDocument* doc){
 
     if(m_Document != doc){

@@ -31,6 +31,20 @@ FrMainDocument::~FrMainDocument(){
         this->Remove( (*it) );
     }
 
+    // Remove graph tab objects
+    this->GetObjectsByType(objects, FrDocumentObj::GraphTab);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
+    // Remove graph objects
+    this->GetObjectsByType(objects, FrDocumentObj::GraphObject);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
+    }
+
     // Remove layer objects
     this->GetObjectsByType(objects, FrDocumentObj::LayerObject);
     itEnd = objects.end();
@@ -70,6 +84,13 @@ FrMainDocument::~FrMainDocument(){
         FrDocumentObj* obj = (*it);
         this->Remove(obj);
         delete obj;
+    }
+
+    // Remove app sets objects
+    this->GetObjectsByType(objects, FrDocumentObj::AppSettings);
+    itEnd = objects.end();
+    for(it = objects.begin(); it != itEnd; ++it){
+        this->Remove( (*it) );
     }
 
     // delete data store

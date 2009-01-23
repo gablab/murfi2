@@ -36,7 +36,7 @@ int ACE_TMAIN(int argc, char **argv){
     _CrtSetDbgFlag(tmpDbgFlag);
 
 #ifdef BREAK_ON_LEAK
-    _CrtSetBreakAlloc(BREAK_LEAK_ID);
+    //_CrtSetBreakAlloc(3282);
 #endif
 #endif
 

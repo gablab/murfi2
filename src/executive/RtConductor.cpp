@@ -308,7 +308,7 @@ void RtConductor::stop(){
         input->close();
         delete input;
     }
-
+    
   //for(vector<RtOutput*>::iterator k=outputs.begin(); k != outputs.end(); k++){
   //  (*k)->close();
   //  delete (*k);

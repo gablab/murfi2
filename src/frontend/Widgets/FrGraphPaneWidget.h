@@ -27,6 +27,7 @@ class FrGraphPaneWidget : public QWidget {
 
 public:
 	FrGraphPaneWidget(QWidget *parent = 0, FrMainDocument* doc = 0);
+    ~FrGraphPaneWidget();
 
     // Properties
     FrGetPropMacro(FrMainDocument*, Document);

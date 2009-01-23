@@ -21,11 +21,12 @@ public:
     virtual void setData(RtData *data);
 
     // Properties
-    FrPropMacro(RtDataStore*, Store);
+    FrGetPropMacro(RtDataStore*, Store);
     FrPropMacro(FrMainDocument*, Document);
 
     void AddData(RtData *data);
-    
+    void SetStore(RtDataStore* store);
+
     void GetStuff(std::vector<RtDataID>& data);
 
 private:

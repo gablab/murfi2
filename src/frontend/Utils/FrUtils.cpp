@@ -81,7 +81,7 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
 
                         point[0] = int((oldPoint[0]+1) / dSpacing[0]);
                         point[1] = slice;
-                        point[2] = int((oldPoint[1]+1) / dSpacing[2]);
+                        point[2] = int((oldPoint[1]+1) / dSpacing[1]);
                         break;
                         }
                     case DEF_SAGITAL: // sagital
@@ -90,8 +90,8 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
                         int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL];
 
                         point[0] = slice;
-                        point[1] = int((oldPoint[0]+1) / dSpacing[1]);
-                        point[2] = int((oldPoint[1]+1) / dSpacing[2]);
+                        point[1] = int((oldPoint[0]+1) / dSpacing[0]);
+                        point[2] = int((oldPoint[1]+1) / dSpacing[1]);
 			            break;
                     }
                     case DEF_AXIAL:

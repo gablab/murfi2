@@ -20,12 +20,17 @@
 
 FrDataStore::FrDataStore(FrMainDocument* document) 
 : m_Document(document), m_Store(0){
-    m_Store = new RtDataStore();
-    m_Store->addOutputForNotify(this);
+    //m_Store = new RtDataStore();
+    //m_Store->addOutputForNotify(this);
 }
 
 FrDataStore::~FrDataStore(){
-    if(m_Store) delete m_Store;
+    //if(m_Store) delete m_Store;
+}
+
+void FrDataStore::SetStore(RtDataStore *store){
+    m_Store = store;
+    m_Store->addOutputForNotify(this);
 }
 
 void FrDataStore::setData(RtData *data){

@@ -20,7 +20,7 @@ class QColor;
 // forward declarations
 class QwtPlotMarker;
 class QwtPlotGrid;
-
+class QwtPlotPicker;
 
 class FrQwtPlotWidget : public QwtPlot {
     Q_OBJECT
@@ -55,6 +55,7 @@ private:
 
     QwtPlotGrid* m_Grid;
     QwtPlotMarker* m_PlotMarker;
+    QwtPlotPicker *m_PlotPicker;
     
 };
 

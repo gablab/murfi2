@@ -54,7 +54,8 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 
     m_Conductor = new RtConductor(3, path);
     //    m_Conductor->addOutput(m_MainDocument->GetDataStore()->GetStore());
-    m_Conductor->SetDataStore(m_MainDocument->GetDataStore()->GetStore());
+    m_MainDocument->GetDataStore()->SetStore(m_Conductor->getDataStore());
+    //m_Conductor->SetDataStore(m_MainDocument->GetDataStore()->GetStore());
 
     m_Conductor->init();
     //m_Conductor->run();
@@ -81,11 +82,10 @@ FrMainController::~FrMainController(){
 
         //ACE_Thread_Manager::instance()->cancel(ThrID);
         m_Conductor->stop();
-
-        //ConductorThr.exit();
-        //ConductorThr.wait();
-
         delete m_Conductor;
+
+        ConductorThr.quit();
+        ConductorThr.wait();
     }
 
     // delete tool controller

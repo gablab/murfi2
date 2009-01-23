@@ -262,8 +262,8 @@ vtkImageData* FrPointsDocObj::GetMosaicData(int dimx, int dimy){
     for(it = m_Points.begin(); it != itEnd; ++it){
         // calculate point position in mosaic
         int pos[3];
-        int tmp = ((*it)->z+1)/num;
-        col = (*it)->z - num*tmp;
+        int tmp = (*it)->z/num;
+        col = (*it)->z%num;//(*it)->z - num*tmp;
         row = tmp;
         
         pos[0] = col*m_dimensions[0] + (*it)->x; 

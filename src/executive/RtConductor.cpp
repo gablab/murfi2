@@ -282,12 +282,12 @@ bool RtConductor::run() {
   }
   //else {
     // wait for threads to complete
-#endif
 
-  // start up the threads that listen for input
+  // wait for threads to complete
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     (*i)->wait();
   }
+#endif
 
   // print end time to log file
   outputLog << "done running at ";
@@ -306,6 +306,7 @@ void RtConductor::stop(){
         RtInput* input = inputs[0];//(RtInput*)(*(inputs.begin()));
         inputs.erase(inputs.begin());
         input->close();
+        input->wait();
         delete input;
     }
     

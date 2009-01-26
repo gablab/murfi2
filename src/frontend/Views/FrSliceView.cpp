@@ -147,7 +147,9 @@ void FrSliceView::UpdatePipeline(int point){
     m_LayeredImage->SetText(sliceNumText);
 
     // redraw scene
-    GetRenderWindow()->Render();
+    vtkRenderWindow* renWin = GetRenderWindow();
+    if (renWin)
+        renWin->Render();
     wglMakeCurrent(NULL, NULL);
 }
 

@@ -48,22 +48,22 @@ void FrTabSettingsDocObj::OnRemove(FrDocument* doc){
     
     // If no more tabs delete layers also
     // (except of ROI layers...)
-    std::vector<FrDocumentObj*> objects;
-        
-    doc->GetObjectsByType(objects, FrDocumentObj::TabSettings);
-    if(objects.size() <= 0)
-    {
-        doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+    //std::vector<FrDocumentObj*> objects;
+    //    
+    //doc->GetObjectsByType(objects, FrDocumentObj::TabSettings);
+    //if(objects.size() <= 0)
+    //{
+    //    doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
 
-        std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
-        for(it = objects.begin(); it != itEnd; ++it){
-            FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
-            if(!layerDO->IsRoi())
-            {
-                doc->Remove(layerDO);
-            }
-        }
-    }
+    //    std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
+    //    for(it = objects.begin(); it != itEnd; ++it){
+    //        FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
+    //        if(!layerDO->IsRoi())
+    //        {
+    //            doc->Remove(layerDO);
+    //        }
+    //    }
+    //}
 }
 
 FrDocumentObj::ObjTypes FrTabSettingsDocObj::GetType(){

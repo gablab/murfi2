@@ -17,35 +17,35 @@ FrActionManager::FrActionManager(QObject* parent){
 }
 
 FrActionManager::~FrActionManager(){
-    delete m_OpenImageAction;
-    delete m_OpenDataStoreAction;
-    delete m_SaveTabsAction;
-    delete m_LoadTabsAction;
-    delete m_SaveGraphTabsAction;
-    delete m_LoadGraphTabsAction;
-    delete m_ExitAction;
+    if (m_OpenImageAction) delete m_OpenImageAction;
+    if (m_OpenDataStoreAction) delete m_OpenDataStoreAction;
+    if (m_SaveTabsAction) delete m_SaveTabsAction;
+    if (m_LoadTabsAction) delete m_LoadTabsAction;
+    if (m_SaveGraphTabsAction) delete m_SaveGraphTabsAction;
+    if (m_LoadGraphTabsAction) delete m_LoadGraphTabsAction;
+    if (m_ExitAction) delete m_ExitAction;
     // Edit
-    delete m_SaveToTabAction;
-    delete m_SaveGraphToTabAction;
-    delete m_NewLayerAction;
-    delete m_DeleteLayerAction;
-    delete m_ChangeLayerAction;
-    delete m_NewROIAction;
+    if (m_SaveToTabAction) delete m_SaveToTabAction;
+    if (m_SaveGraphToTabAction) delete m_SaveGraphToTabAction;
+    if (m_NewLayerAction) delete m_NewLayerAction;
+    if (m_DeleteLayerAction) delete m_DeleteLayerAction;
+    if (m_ChangeLayerAction) delete m_ChangeLayerAction;
+    if (m_NewROIAction) delete m_NewROIAction;
     // View
-    delete m_ViewSliceAction;
-    delete m_ViewMosaicAction;
-    delete m_ViewOrthoAction;
-    delete m_ResetImageAction;
+    if (m_ViewSliceAction) delete m_ViewSliceAction;
+    if (m_ViewMosaicAction) delete m_ViewMosaicAction;
+    if (m_ViewOrthoAction) delete m_ViewOrthoAction;
+    if (m_ResetImageAction) delete m_ResetImageAction;
     // Tool
-    delete m_ManipulatorToolAction;
-    delete m_VoxelToolAction;
-    delete m_RoiToolAction;
-    delete m_VoxelSelectionToolAction;
+    if (m_ManipulatorToolAction) delete m_ManipulatorToolAction;
+    if (m_VoxelToolAction) delete m_VoxelToolAction;
+    if (m_RoiToolAction) delete m_RoiToolAction;
+    if (m_VoxelSelectionToolAction) delete m_VoxelSelectionToolAction;
     // Help
-    delete m_ShowHelpAction;
-    delete m_ShowAboutAction;
+    if (m_ShowHelpAction) delete m_ShowHelpAction;
+    if (m_ShowAboutAction) delete m_ShowAboutAction;
     // Test
-    delete m_TestAction;
+    if (m_TestAction) delete m_TestAction;
 }
 
 void FrActionManager::Initialize(QObject* parent){

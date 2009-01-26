@@ -137,7 +137,8 @@ bool FrLayerCmd::DeleteLayer(){
     viewDO->GetMosaicViewSettings()->ActiveLayerID = DEF_LAYER_ID;
     viewDO->GetOrthoViewSettings()->ActiveLayerID = DEF_LAYER_ID;
 
-    FrBaseCmd::UpdatePipelineForID(DEF_LAYER_ID, FRP_COLORMAP);
+    if (m_DocObj->GetID() != DEF_LAYER_ID)
+        FrBaseCmd::UpdatePipelineForID(DEF_LAYER_ID, FRP_COLORMAP);
 
     return true;
 }

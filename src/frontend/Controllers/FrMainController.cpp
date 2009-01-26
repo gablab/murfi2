@@ -94,7 +94,7 @@ FrMainController::~FrMainController(){
     }
 
     // delete all other stuff
-    m_MainView->hide();
+    //m_MainView->hide();
     m_MainView->DisconnectActions();
     if(m_MainDocument) delete m_MainDocument;
     if(m_MainView) delete m_MainView;

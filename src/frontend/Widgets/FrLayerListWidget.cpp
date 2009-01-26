@@ -153,6 +153,7 @@ void FrLayerListWidget::AddLayer(FrLayerDocObj* layerDO){
 }
 
 void FrLayerListWidget::RemoveLayers(){
+    int g = 5;
     while(m_layerTable->rowCount() > 0){
         m_layerTable->removeRow(0);
         //m_layerTable->clear();
@@ -378,21 +379,21 @@ void FrLayerListWidget::Update(){
 
 // Update info displayed by widget
 void FrLayerListWidget::OnUpdate(){
+    if(!m_Document) return;
+    // Get all layers
+    std::vector<FrDocumentObj*> layers;
+    m_Document->GetObjectsByType(layers, FrDocumentObj::LayerObject);
+    if(layers.size() <= 0) return;
+
     // Clear
     this->RemoveLayers();
-    if(!m_Document) return;
-
+    
     // Get selected layer ID 
     FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
     if(viewDO == 0) return;
 
     int layerID = viewDO->GetActiveLayerID();
     
-    // Get all layers
-    std::vector<FrDocumentObj*> layers;
-    m_Document->GetObjectsByType(layers, FrDocumentObj::LayerObject);
-    if(layers.size() <= 0) return;
-
     this->BlockSignals(true);
 
     // First add Image layers

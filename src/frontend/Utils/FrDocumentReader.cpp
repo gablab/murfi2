@@ -172,6 +172,12 @@ vtkImageData* FrDocumentReader::ReadActivation(){
 vtkImageData* FrDocumentReader::ReadPoints(){
     vtkImageData* result = 0L;
 
+    // don't show points if we have no any image opened
+    FrDocument::DocObjCollection imageObjects;
+    m_Document->GetObjectsByType(imageObjects, FrDocumentObj::ImageObject);
+    if ( imageObjects.size() == 0)
+        return 0L;
+
     FrPointsDocObj* pointsDO = 0L;
     FrDocument::DocObjCollection pointObjects;
     m_Document->GetObjectsByType(pointObjects, FrDocumentObj::PointsObject);    

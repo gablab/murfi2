@@ -125,7 +125,9 @@ vtkImageData* FrPointsDocObj::GetPointsXY(int z){
     data->SetDimensions(m_dimensions[0], m_dimensions[1], 1);
     //data->SetExtent(0, m_dimensions[0]-1, 0, m_dimensions[1]-1, 0, 0);
     data->SetSpacing(m_spacing[0], m_spacing[1], 1.0);
-    data->AllocateScalars(); 
+    data->AllocateScalars();
+    //data->UpdateInformation();
+ 
 
     //unsigned char* pointsPtr = (unsigned char*)data->GetScalarPointer();
     vtkDataArray* inArray = data->GetPointData()->GetScalars();
@@ -148,14 +150,18 @@ vtkImageData* FrPointsDocObj::GetPointsXY(int z){
         if ((*it)->z == z){
             int pos[3];
             pos[0] = (*it)->x; pos[1] = (*it)->y; pos[2] = 0;        
+            
+            // check if point is inside of data
+            int pid = data->FindPoint((double)pos[0], (double)pos[1], (double)pos[2]);
+            if (pid >= 0){
+                int id = data->ComputePointId(pos); 
 
-            int id = data->ComputePointId(pos); 
-
-            if (id >= 0){      // point found
-                dataPtr[id*4] = (unsigned char)(*it)->color.red();
-                dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
-                dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
-                dataPtr[id*4+3] = 255;                  // alpha
+                if (id >= 0){      // point found
+                    dataPtr[id*4] = (unsigned char)(*it)->color.red();
+                    dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
+                    dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
+                    dataPtr[id*4+3] = 255;                  // alpha
+                }
             }
         }
     }
@@ -186,13 +192,16 @@ vtkImageData* FrPointsDocObj::GetPointsXZ(int y){
             int pos[3];
             pos[0] = (*it)->x; pos[1] = (*it)->z; pos[2] = 0;        
 
-            int id = data->ComputePointId(pos); 
+            int pid = data->FindPoint((double)pos[0], (double)pos[1], (double)pos[2]);
+            if (pid >= 0){
+                int id = data->ComputePointId(pos); 
 
-            if (id >= 0){      // point found
-                dataPtr[id*4] = (unsigned char)(*it)->color.red();
-                dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
-                dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
-                dataPtr[id*4+3] = 255;                  // alpha
+                if (id >= 0){      // point found
+                    dataPtr[id*4] = (unsigned char)(*it)->color.red();
+                    dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
+                    dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
+                    dataPtr[id*4+3] = 255;                  // alpha
+                }
             }
         }
     }
@@ -223,13 +232,16 @@ vtkImageData* FrPointsDocObj::GetPointsYZ(int x){
             int pos[3];
             pos[0] = (*it)->y; pos[1] = (*it)->z; pos[2] = 0;        
 
-            int id = data->ComputePointId(pos); 
+            int pid = data->FindPoint((double)pos[0], (double)pos[1], (double)pos[2]);
+            if (pid >= 0){
+                int id = data->ComputePointId(pos); 
 
-            if (id >= 0){      // point found
-                dataPtr[id*4] = (unsigned char)(*it)->color.red();
-                dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
-                dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
-                dataPtr[id*4+3] = 255;                  // alpha
+                if (id >= 0){      // point found
+                    dataPtr[id*4] = (unsigned char)(*it)->color.red();
+                    dataPtr[id*4+1] = (unsigned char)(*it)->color.green();
+                    dataPtr[id*4+2] = (unsigned char)(*it)->color.blue();
+                    dataPtr[id*4+3] = 255;                  // alpha
+                }
             }
         }
     }
@@ -270,7 +282,8 @@ vtkImageData* FrPointsDocObj::GetMosaicData(int dimx, int dimy){
         pos[1] = row*m_dimensions[1] + (*it)->y; 
         pos[2] = 0;        
 
-        if (data->FindPoint((double)pos[0], (double)pos[1], (double)pos[2])){
+        int pid = data->FindPoint((double)pos[0], (double)pos[1], (double)pos[2]);
+        if (pid >= 0){
             int id = data->ComputePointId(pos); 
 
             if (id >= 0){      // point found

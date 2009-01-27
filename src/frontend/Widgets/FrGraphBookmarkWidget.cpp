@@ -17,7 +17,7 @@ FrGraphBookmarkWidget::FrGraphBookmarkWidget(QWidget *parent)
 : QWidget(parent){
 
     m_tabWidget = new QTabWidget(this);
-    m_tabWidget->setTabPosition(QTabWidget::South);
+    m_tabWidget->setTabPosition(QTabWidget::North);
 	m_tabWidget->setTabShape(QTabWidget::Rounded);
 	m_tabWidget->setMaximumHeight(50);
 

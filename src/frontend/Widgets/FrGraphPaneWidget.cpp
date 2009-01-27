@@ -43,7 +43,10 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
 
     // Create main layout
     m_GraphBookmarkWidget = new FrGraphBookmarkWidget(this);
+    m_GraphBookmarkWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
     m_QwtPlotWidget = new FrQwtPlotWidget(this);
+    m_QwtPlotWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_PlayControlWidget = new FrPlayControlWidget(this);
     
     QVBoxLayout* rightLayout = new QVBoxLayout(this);
@@ -76,7 +79,7 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
 
     connect(this, SIGNAL(UpdateSignal()), this, SLOT(OnUpdate()));
 
-    this->setMinimumHeight(350);//this->sizeHint().height());
+    this->setMinimumHeight(this->sizeHint().height());
     //this->setFixedWidth(this->sizeHint().width());
 }
 

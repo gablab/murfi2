@@ -124,8 +124,10 @@ void FrMosaicView::UpdatePipeline(int point){
     }
 
     // redraw scene
-	GetRenderWindow()->Render();
-    wglMakeCurrent(NULL, NULL);
+    vtkRenderWindow* renWin = GetRenderWindow();
+    if (renWin) renWin->Render();
+
+    this->ResetCurrentContext(renWin);
 }
 
 bool FrMosaicView::InitUpdateParams(FrUpdateParams1& params){

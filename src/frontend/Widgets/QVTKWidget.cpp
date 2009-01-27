@@ -463,7 +463,10 @@ void QVTKWidget::paintEvent(QPaintEvent* )
 
 
   iren->Render();
+
+#ifdef _WIN32
   wglMakeCurrent(NULL, NULL);
+#endif
 }
 
 /*! handle mouse press event

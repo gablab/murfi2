@@ -63,3 +63,39 @@ void FrBaseView::GetRoiIDs(FrMainDocument* document, std::vector<int>& ids){
 //    }
 //    return false;
 //}
+
+#if defined Q_WS_X11
+#if defined(VTK_USE_OPENGL_LIBRARY) || (!defined(QVTK_HAVE_VTK_4_5) && defined(OPENGL_LIBRARY))
+#include "vtkXOpenGLRenderWindow.h"
+#endif
+#ifdef VTK_USE_MANGLED_MESA
+#include "vtkXMesaRenderWindow.h"
+#endif
+#endif
+
+void FrBaseView::ResetCurrentContext(vtkRenderWindow* renWin)
+{
+    if(!renWin) return;
+
+#ifdef WIN32
+    // Windows
+    wglMakeCurrent(NULL, NULL);
+#else
+    // LINUX
+    #if defined(VTK_USE_OPENGL_LIBRARY) || (!defined(QVTK_HAVE_VTK_4_5) && defined(OPENGL_LIBRARY))
+    vtkXOpenGLRenderWindow* oglWin = vtkXOpenGLRenderWindow::SafeDownCast(renWin);
+    if(oglWin)
+    {
+        glXMakeCurrent(oglWin->GetDisplayId(), NULL, NULL);
+    }
+    #endif
+    #ifdef VTK_USE_MANGLED_MESA
+    vtkXMesaRenderWindow* mglWin = vtkXMesaRenderWindow::SafeDownCast(renWin);
+    if(mgl_win)
+    {
+        // NOTE: not implemented yet
+        // OsMesaMakeCurrent...
+    }
+    #endif
+#endif
+}

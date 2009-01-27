@@ -160,7 +160,7 @@ void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
     double maxTimePoint = double(dataSize - 1);
     if(!this->axisScaleDiv(QwtPlot::xBottom)->contains(maxTimePoint)){
         //int step = maxTimePoint/10;
-        int step = maxTimePoint/10;
+        int step = int(maxTimePoint/10);
         if (step == 0)
             step = 1;
         this->setAxisScale(QwtPlot::xBottom, 0.0, maxTimePoint, step);

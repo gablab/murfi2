@@ -51,6 +51,7 @@ class FrMainController;
 
 #include"ace/Mutex.h"
 
+
 // This class allow user to create 
 // and manage commands. Organised like singletone;
 class FrCommandController : public FrController {

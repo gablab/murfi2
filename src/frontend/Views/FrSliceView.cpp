@@ -21,6 +21,9 @@
 #include "vtkRenderWindow.h"
 #include "vtkActorCollection.h"
 #include "vtkRendererCollection.h"
+#include "vtkConfigure.h"
+#include "vtkToolkits.h"
+
 
 // FrUpdateParams represents params 
 class FrUpdateParams0 {
@@ -148,9 +151,9 @@ void FrSliceView::UpdatePipeline(int point){
 
     // redraw scene
     vtkRenderWindow* renWin = GetRenderWindow();
-    if (renWin)
-        renWin->Render();
-    wglMakeCurrent(NULL, NULL);
+    if (renWin) renWin->Render();
+
+    this->ResetCurrentContext(renWin);
 }
 
 bool FrSliceView::InitUpdateParams(FrUpdateParams0& params){

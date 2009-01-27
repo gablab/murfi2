@@ -1,7 +1,7 @@
 #include "FrCommandController.h"
 #include "FrMainController.h"
 
-ACE_Mutex  FrCommandController::m_Mutex = 0;
+ACE_Mutex  FrCommandController::m_Mutex;
 
 FrCommandController* FrCommandController::m_controller = 0L;
 

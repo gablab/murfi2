@@ -184,8 +184,10 @@ void FrOrthoView::UpdatePipeline(int point){
     }
 
     // redraw scene
-	GetRenderWindow()->Render();
-    wglMakeCurrent(NULL, NULL);
+    vtkRenderWindow* renWin = GetRenderWindow();
+    if (renWin) renWin->Render();
+
+    this->ResetCurrentContext(renWin);
 }
 
 bool FrOrthoView::InitUpdateParams(FrUpdateParams2& params){

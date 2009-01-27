@@ -229,13 +229,13 @@ int RtInputScannerImages::svc() {
 
     // if there is motion info add it
     if(ei->bIsMoCo) {
-      RtMotion *mot = new RtMotion(ei->dMoCoTransX,
+      /*RtMotion *mot = new RtMotion(ei->dMoCoTransX,
 				   ei->dMoCoTransY,
 				   ei->dMoCoTransZ,
 				   ei->dMoCoRotX,
 				   ei->dMoCoRotY,
 				   ei->dMoCoRotZ);
-      RtExperiment::getDataStore()->setData(mot);
+      RtExperiment::getDataStore()->setData(mot);*/
     }
 
     // set the image id for handling

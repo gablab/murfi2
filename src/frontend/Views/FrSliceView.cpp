@@ -152,7 +152,7 @@ void FrSliceView::UpdatePipeline(int point){
     // redraw scene
     vtkRenderWindow* renWin = GetRenderWindow();
     if (renWin) renWin->Render();
-
+    
     this->ResetCurrentContext(renWin);
 }
 

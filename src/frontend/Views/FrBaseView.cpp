@@ -6,6 +6,7 @@
 #include "QVTKWidget.h"
 
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 
 FrBaseView::FrBaseView(FrMainWindow* mainWindow){
     m_MainWindow = mainWindow;    
@@ -63,6 +64,9 @@ void FrBaseView::GetRoiIDs(FrMainDocument* document, std::vector<int>& ids){
 //    }
 //    return false;
 //}
+
+#include "vtkToolkits.h"
+#include "vtkOpenGL.h"
 
 #if defined Q_WS_X11
 #if defined(VTK_USE_OPENGL_LIBRARY) || (!defined(QVTK_HAVE_VTK_4_5) && defined(OPENGL_LIBRARY))

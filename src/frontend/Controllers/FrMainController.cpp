@@ -41,7 +41,7 @@
 static int thr;
 
 // Implementation of FrMainController
-FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc, RtConductor* con)
+FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc, RtConductor* conductor)
 : m_MainView(view), m_MainDocument(doc), m_ToolController(0){
 
     m_ToolController = new FrToolController(this);    
@@ -54,17 +54,17 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc, RtCo
 
  //   m_Conductor = new RtConductor(3, path);
     //    m_Conductor->addOutput(m_MainDocument->GetDataStore()->GetStore());
-    m_MainDocument->GetDataStore()->SetStore(con->getDataStore());
+    m_MainDocument->GetDataStore()->SetStore(conductor->getDataStore());
     //m_Conductor->SetDataStore(m_MainDocument->GetDataStore()->GetStore());
 
-    con->init();
+    conductor->init();
     //m_Conductor->run();
     
     // TODO: run conductor in another thread
     //ThrID = ACE_Thread_Manager::instance()->spawn((ACE_THR_FUNC)ConductorThread, m_Conductor);
  
     //conductor = new FrBackground();
-    ConductorThr.SetConductor(con);
+    ConductorThr.SetConductor(conductor);
     ConductorThr.start();
     
     //int err = errno;
@@ -88,6 +88,9 @@ FrMainController::~FrMainController(){
         ConductorThr.wait();
     }*/
 
+    // Need to stop it
+    ConductorThr.terminate();
+    
     // delete tool controller
     if(m_ToolController) {
         delete m_ToolController;

@@ -34,6 +34,8 @@ void FrDataStore::SetStore(RtDataStore *store){
 }
 
 void FrDataStore::setData(RtData *data){
+    if(m_Store == 0) return;
+
     // Process incoming data here
     std::string id = data->getDataID().getModuleID();
         

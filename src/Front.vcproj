@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib qwt.lib ACEd.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib vtksys.lib vtkzlib.lib vtkfreetype.lib vtktiff.lib vtkjpeg.lib vtklibxml2.lib vtkexpat.lib vtkftgl.lib qwt.lib ACE.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -131,7 +131,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib qwt.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib vtksys.lib vtkzlib.lib vtkfreetype.lib vtktiff.lib vtkjpeg.lib vtklibxml2.lib vtkexpat.lib vtkftgl.lib qwt.lib ACE.lib"
 				IgnoreDefaultLibraryNames="msvcp80d.lib;msvcr80d.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -971,6 +971,16 @@
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\frontend\Widgets\FrBookmark.cpp"
@@ -1081,6 +1091,16 @@
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\frontend\Widgets\FrColormapWidget.cpp"
@@ -1127,6 +1147,16 @@
 						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\frontend\Widgets\FrDataStoreDialog.cpp"
@@ -1165,6 +1195,16 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"

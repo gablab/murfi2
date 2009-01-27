@@ -48,6 +48,7 @@ void FrLayerWidget::SetLayerParams(FrLayerDocObj* layerDO){
     // Update controls
     layerNameLabel->setText(layerDO->GetSettings()->Name);
     visibilityCheckBox->setChecked(layerDO->GetSettings()->Visibility);
+    m_Visibility = layerDO->GetSettings()->Visibility;
 
     if(layerDO->IsRoi()){
         picLabel->setPixmap(QPixmap(CMTYPE_ROI_ICON));

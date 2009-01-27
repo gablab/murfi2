@@ -73,8 +73,10 @@ bool FrSaveGraphTabCmd::SaveNewTab(){
 bool FrSaveGraphTabCmd::SaveCurrentTab(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrGraphTabDocObj* gTabDO = doc->GetCurrentGraphTab();
-
-    this->InitDocObjFromActive(gTabDO);
+    
+    if (gTabDO)
+        this->InitDocObjFromActive(gTabDO);
+    
     return true;
 }
 

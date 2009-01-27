@@ -79,23 +79,23 @@ FrImageSettingsWidget::FrImageSettingsWidget(QWidget* parent, FrMainDocument* do
 
     m_threshWidget = new FrSpinSliderWidget(groupBox);
     m_threshWidget->SetMinMax(0, 100);
-    m_threshWidget->SetValue(0);
+    m_threshWidget->SetValue(DEF_TBC_THRESHOLD);
     connect(m_threshWidget, SIGNAL(ValueChanged(int)),
             this, SLOT(OnSpinSliderValueChanged(int)));
     
     QLabel* label2 = new QLabel(QString("Brightness: "), groupBox); 
 
     m_brightWidget = new FrSpinSliderWidget(groupBox);
-    m_brightWidget->SetMinMax(0, 100);
-    m_brightWidget->SetValue(0);
+    m_brightWidget->SetMinMax(-100, 100);
+    m_brightWidget->SetValue(DEF_TBC_BRIGHTNESS);
     connect(m_brightWidget, SIGNAL(ValueChanged(int)),
             this, SLOT(OnSpinSliderValueChanged(int)));
 
     QLabel* label3 = new QLabel(QString("Contrast: "), groupBox); 
 
     m_contWidget = new FrSpinSliderWidget(groupBox);
-    m_contWidget->SetMinMax(0, 100);
-    m_contWidget->SetValue(0);
+    m_contWidget->SetMinMax(-100, 100);
+    m_contWidget->SetValue(DEF_TBC_CONTRAST);
     connect(m_contWidget, SIGNAL(ValueChanged(int)),
             this, SLOT(OnSpinSliderValueChanged(int)));
     

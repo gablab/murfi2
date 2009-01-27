@@ -25,11 +25,11 @@ FrVoxelInfoWidget::FrVoxelInfoWidget(QWidget *parent)
 	vl1->addWidget(label2);
 
 	// name and timepoint values
-	labelName = new QLabel("layer 1", groupBox);
-	labelName->setFrameShape(QFrame::Box);
+	labelName = new QLabel("", groupBox);
+	//labelName->setFrameShape(QFrame::Box);
 	labelName->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	labelTimepoint = new QLabel("123", groupBox);
-	labelTimepoint->setFrameShape(QFrame::Box);
+	labelTimepoint = new QLabel("", groupBox);
+	//labelTimepoint->setFrameShape(QFrame::Box);
 	labelTimepoint->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	QVBoxLayout* vl2 = new QVBoxLayout();

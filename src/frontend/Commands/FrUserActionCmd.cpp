@@ -236,6 +236,7 @@ bool FrUserActionCmd::addGraph(){
     // prepare settings (NOTE: different settings for different types of graphs)
     FrIntencityGraphSettings* gs = new FrIntencityGraphSettings();
 
+    gs->Color = QColor(0, 0, 0);
     gs->I = point[0];
     gs->J = point[1];
     gs->K = point[2];

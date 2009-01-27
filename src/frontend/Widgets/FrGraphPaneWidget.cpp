@@ -176,6 +176,11 @@ void FrGraphPaneWidget::OnUpdate(){
     }
 
     m_QwtPlotWidget->replot();
+    // NOTE: marker position will not be changed before replot
+    m_QwtPlotWidget->SetMarkerPosition(viewDO->GetTimePoint());
+
+    QString info = QString("Current Time Point: %1").arg(viewDO->GetTimePoint());
+    m_PlayControlWidget->SetAdditionalInfo(info);
 
     mutex.unlock();
 }
@@ -217,6 +222,8 @@ void FrGraphPaneWidget::UpdateLiveMode(){
 
 // Slots
 void FrGraphPaneWidget::OnGraphMarkerPositionChanged(int position){
+    QString info = QString("Current Time Point: %1").arg(position);
+    m_PlayControlWidget->SetAdditionalInfo(info);
 
     emit TimePointChanged(position);
 }
@@ -232,6 +239,7 @@ void FrGraphPaneWidget::timerEvent(QTimerEvent *event){
 
         this->OnPlayFinished();
         //m_PlayingTimePoint = 0;
+        return;
     }
     m_QwtPlotWidget->SetMarkerPosition(m_PlayingTimePoint);
 

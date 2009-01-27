@@ -81,6 +81,7 @@ void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
     
     QwtPlotCurve *curve = new QwtPlotCurve(name);
     m_Curves[id] = curve;
+    m_Curves[id]->setVisible(true);     // NOTE: always true at this moment
     
     //// TODO: delete after testing
     //// test -----------------------------
@@ -252,6 +253,8 @@ void FrQwtPlotWidget::SetNumberOfTimePoints(int num){
         }
         this->SetData(DUMMY_GRAPH_ID, yData, num);
     }
+
+    //this->SetMarkerPosition(num-1);
 }
 
 int FrQwtPlotWidget::GetMaxTimePoint(){

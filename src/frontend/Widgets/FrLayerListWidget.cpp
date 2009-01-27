@@ -54,14 +54,14 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
     m_btnDelete = new QToolButton(btnBlock);
     m_btnDelete->setText("x");
     m_btnDelete->setToolTip("Delete selected layer");
-    m_btnChange = new QToolButton(btnBlock);
-    m_btnChange->setText("C");
-    m_btnChange->setToolTip("Change selected layer");
+//    m_btnChange = new QToolButton(btnBlock);
+//    m_btnChange->setText("C");
+//    m_btnChange->setToolTip("Change selected layer");
 
     QHBoxLayout* btnLayout = new QHBoxLayout(btnBlock);
     btnLayout->addWidget(m_btnAdd);
     btnLayout->addWidget(m_btnDelete);
-    btnLayout->addWidget(m_btnChange);
+    //btnLayout->addWidget(m_btnChange);
     btnLayout->addStretch();
     btnBlock->setLayout(btnLayout);
 
@@ -109,7 +109,7 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
 
     connect( m_btnAdd, SIGNAL(clicked()), this, SLOT(OnAddClicked()) );
     connect( m_btnDelete, SIGNAL(clicked()), this, SLOT(OnDeleteClicked()) );
-    connect( m_btnChange, SIGNAL(clicked()), this, SLOT(OnChangeClicked()) );
+    //connect( m_btnChange, SIGNAL(clicked()), this, SLOT(OnChangeClicked()) );
 
     connect( m_opacityWidget, SIGNAL(ValueChanged(int)), 
              this, SLOT(OnOpacityChanged(int)) );
@@ -257,11 +257,16 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
 
         // Update opacity
         int opacity = int(layerDO->GetSettings()->Opacity * m_opacityWidget->GetMaximum());
+
+        // Update visibility
+        bool visibility = layerDO->GetSettings()->Visibility;
+        
         bool old = m_signalsBlocked;
         m_signalsBlocked = true;
         m_opacityWidget->SetValue(opacity);
+        //wgt->SetVisibility(visibility);
         m_signalsBlocked = old;
-
+        
         if(m_signalsBlocked) return;
         emit LayerSelected(id);
     }
@@ -314,27 +319,27 @@ void FrLayerListWidget::OnRoiToolChanged(){
 // Utility methods
 void FrLayerListWidget::UpdateCurrentLayerParams(){
     // Sync params stored in current layer widget
-    //int row = m_layerTable->currentRow();
-    //FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
-    //        m_layerTable->cellWidget(row, TAB_LAYER_IDX));
+    int row = m_layerTable->currentRow();
+    FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
+            m_layerTable->cellWidget(row, TAB_LAYER_IDX));
 
-    //if(wgt){
-    //    // Save block signal flag
-    //    bool oldSB = m_signalsBlocked;
-    //    m_signalsBlocked = true;
+    if(wgt){
+        // Save block signal flag
+        bool oldSB = m_signalsBlocked;
+        m_signalsBlocked = true;
 
-    //    int id = wgt->GetID();
-    //    FrLayerDocObj* layerDO = GetLayerDocObjByID(id);
-    //            
-    //    layerDO->GetSettings()->Opacity = double(m_opacityWidget->GetValue()) / 
-    //                     double(m_opacityWidget->GetMaximum());
+        int id = wgt->GetID();
+        FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(id);
+                
+        layerDO->GetSettings()->Opacity = double(m_opacityWidget->GetValue()) / 
+                         double(m_opacityWidget->GetMaximum());
 
-    //    FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
-    //    m_colormapWidget->GetColormapParams(*cmlParams);
-    //    wgt->SetLayerParams(layerDO);
+        FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+        m_colormapWidget->GetColormapParams(*cmlParams);
+        wgt->SetLayerParams(layerDO);
 
-    //    m_signalsBlocked = oldSB;
-    //}
+        m_signalsBlocked = oldSB;
+    }
 }
 
 

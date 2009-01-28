@@ -48,7 +48,7 @@ bool FrSaveTabSettingsCmd::SaveNewTab(){
         FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj();
         docObj->SetIsCurrent(false);
         docObj->SetName(dlg.GetName());
-        docObj->SetDescription(dlg.GetDescription());
+        //docObj->SetDescription(dlg.GetDescription());
         // Use new instead
         this->InitDocObjFromActive(docObj);
 
@@ -61,7 +61,7 @@ bool FrSaveTabSettingsCmd::SaveNewTab(){
         FrTabSettingsDocObj* docObj = new FrTabSettingsDocObj(true);
         docObj->SetIsCurrent(true);
         docObj->SetName(QString("Default"));
-        docObj->SetDescription(QString("Default tab"));
+        //docObj->SetDescription(QString("Default tab"));
 
         // add to main document
         result = doc->Add(docObj);

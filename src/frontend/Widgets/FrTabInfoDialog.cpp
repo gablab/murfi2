@@ -16,14 +16,14 @@ FrTabInfoDialog::FrTabInfoDialog(QWidget* parent, bool isModal)
     // create lables and text edits
     m_lblName = new QLabel(tr("Tab Name:"), this);
     m_txtName = new QLineEdit(tr(""), this);
-    m_lblDescription = new QLabel(tr("Tab Description:"), this); 
-    m_txtDescription = new QLineEdit(tr(""), this);
+//    m_lblDescription = new QLabel(tr("Tab Description:"), this); 
+//    m_txtDescription = new QLineEdit(tr(""), this);
 
     m_vLayout = new QVBoxLayout(this);
     m_vLayout->addWidget(m_lblName);
     m_vLayout->addWidget(m_txtName);
-    m_vLayout->addWidget(m_lblDescription);
-    m_vLayout->addWidget(m_txtDescription);
+//    m_vLayout->addWidget(m_lblDescription);
+//    m_vLayout->addWidget(m_txtDescription);
 
     // create buttons
     m_btnOk = new QPushButton(tr("OK"), this);
@@ -53,13 +53,13 @@ void FrTabInfoDialog::SetName(QString& value){
     m_txtName->setText(value);
 }
 
-QString FrTabInfoDialog::GetDescription(){
-    return m_txtDescription->text();
-}
+//QString FrTabInfoDialog::GetDescription(){
+//    return m_txtDescription->text();
+//}
 
-void FrTabInfoDialog::SetDescription(QString& value){
-    m_txtDescription->setText(value);
-}
+//void FrTabInfoDialog::SetDescription(QString& value){
+//    m_txtDescription->setText(value);
+//}
 
 bool FrTabInfoDialog::SimpleExec(){
     bool result = (this->exec() == QDialog::Accepted);

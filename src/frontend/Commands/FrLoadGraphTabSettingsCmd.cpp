@@ -121,8 +121,8 @@ bool FrLoadGraphTabSettingsCmd::LoadTabSettings(QDomElement& elem, FrGraphTabDoc
     if(!elem.hasAttribute(FR_XML_NAME_ATTR)) return false;
     tabs->SetName(elem.attribute(FR_XML_NAME_ATTR));
 
-    if(!elem.hasAttribute(FR_XML_DESCRIPTION_ATTR)) return false;
-    tabs->SetDescription(elem.attribute(FR_XML_DESCRIPTION_ATTR));
+    //if(!elem.hasAttribute(FR_XML_DESCRIPTION_ATTR)) return false;
+    //tabs->SetDescription(elem.attribute(FR_XML_DESCRIPTION_ATTR));
 
     bool hasPoints, hasGraphs;
     hasPoints = hasGraphs = false;

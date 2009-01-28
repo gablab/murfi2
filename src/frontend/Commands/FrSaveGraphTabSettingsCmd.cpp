@@ -71,7 +71,7 @@ bool FrSaveGraphTabSettingsCmd::SaveTabSettings(QDomElement& root, FrGraphTabDoc
     
     QDomElement tabSetsElem = m_Document->createElement(FR_XML_GRAPHTABSETTINGS_ELEM);
     tabSetsElem.setAttribute(FR_XML_NAME_ATTR, tabs->GetName());
-    tabSetsElem.setAttribute(FR_XML_DESCRIPTION_ATTR, tabs->GetDescription());
+    //tabSetsElem.setAttribute(FR_XML_DESCRIPTION_ATTR, tabs->GetDescription());
     root.appendChild(tabSetsElem);
     
     // save points doc obj

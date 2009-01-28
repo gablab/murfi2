@@ -37,7 +37,7 @@ public:
     FrGetRefPropMacro(GraphsCollection, Graphs);
 
     FrPropMacro(QString, Name);
-    FrPropMacro(QString, Description);
+    //FrPropMacro(QString, Description);
     FrPropMacro(bool, IsCurrent);
     FrGetPropMacro(bool, IsDefault)    
 

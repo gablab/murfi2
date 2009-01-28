@@ -75,7 +75,7 @@ void FrMainMenu::SetupActions(){
     m_menuEdit->addSeparator();
 	m_menuEdit->addAction(m_actManager->GetNewLayerAction());
 	m_menuEdit->addAction(m_actManager->GetDeleteLayerAction());
-    m_menuEdit->addAction(m_actManager->GetChangeLayerAction());
+    //m_menuEdit->addAction(m_actManager->GetChangeLayerAction());
     m_menuEdit->addSeparator();
     m_menuEdit->addAction(m_actManager->GetNewROIAction());
 

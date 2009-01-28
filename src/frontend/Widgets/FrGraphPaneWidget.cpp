@@ -206,6 +206,9 @@ void FrGraphPaneWidget::UpdateTimePoint(){
     m_QwtPlotWidget->
         SetMarkerPosition(
         timePoint, true);
+
+    QString info = QString("Current Time Point: %1").arg(timePoint);
+    m_PlayControlWidget->SetAdditionalInfo(info);
 }
 
 void FrGraphPaneWidget::UpdateLiveMode(){

@@ -23,8 +23,8 @@ public:
     QString GetName();
     void SetName(QString& value);
 
-    QString GetDescription();
-    void SetDescription(QString& value);
+    //QString GetDescription();
+    //void SetDescription(QString& value);
 
     bool SimpleExec();
     
@@ -34,8 +34,8 @@ private:
 
     QLabel* m_lblName;
     QLineEdit* m_txtName;
-    QLabel* m_lblDescription;
-    QLineEdit* m_txtDescription;
+    //QLabel* m_lblDescription;
+    //QLineEdit* m_txtDescription;
 
     QPushButton* m_btnOk;
     QPushButton* m_btnCancel;

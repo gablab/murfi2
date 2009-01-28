@@ -354,25 +354,46 @@ void FrMainController::ChangeView(int view){
 }
 
 void FrMainController::SelectLayer(int id){
-    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd->SetAction(FrLayerCmd::UpdateSelectedID);
-    cmd->SetID(id);
+    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd1->SetAction(FrLayerCmd::UpdateSelectedID);
+    cmd1->SetID(id);
+
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     FrCommandController::Execute(cmd);
     delete cmd;
 }
 
 void FrMainController::AddLayer(){
     // add layer with dialog
-    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
-    cmd->SetAction(FrUserActionCmd::AddLayer);
+    FrUserActionCmd* cmd1 = FrCommandController::CreateCmd<FrUserActionCmd>();
+    cmd1->SetAction(FrUserActionCmd::AddLayer);
+
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     FrCommandController::Execute(cmd);
     delete cmd;
 }
 
 void FrMainController::DeleteLayer(){
     // Deletes currently selected layer
-    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
-    cmd->SetAction(FrUserActionCmd::DeleteLayer);
+    FrUserActionCmd* cmd1 = FrCommandController::CreateCmd<FrUserActionCmd>();
+    cmd1->SetAction(FrUserActionCmd::DeleteLayer);
+
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     FrCommandController::Execute(cmd);
     delete cmd;            
 }

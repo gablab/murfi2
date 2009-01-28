@@ -259,7 +259,7 @@ bool FrUserActionCmd::deleteGraph(){
     if(graphs.size() > 0){
         for (int i = 0; i < graphs.size(); i++){
             FrGraphDocObj* graphDO = dynamic_cast<FrGraphDocObj*>(graphs[i]);
-            if (graphDO->GetID() == m_GraphID){
+            if (graphDO->GetTimeSeria() == m_GraphID){
                 doc->Remove(graphDO);
                 break;
             }

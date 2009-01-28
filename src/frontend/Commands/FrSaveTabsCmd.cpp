@@ -70,7 +70,7 @@ bool FrSaveTabsCmd::SaveTabSettings(QDomElement& root, FrTabSettingsDocObj* tabs
     
     QDomElement tabSetsElem = m_Document->createElement(FR_XML_TABSETTINGS_ELEM);
     tabSetsElem.setAttribute(FR_XML_NAME_ATTR, tabs->GetName());
-    tabSetsElem.setAttribute(FR_XML_DESCRIPTION_ATTR, tabs->GetDescription());
+    //tabSetsElem.setAttribute(FR_XML_DESCRIPTION_ATTR, tabs->GetDescription());
     tabSetsElem.setAttribute(FR_XML_ACTIVEVIEW_ATTR, int(tabs->GetActiveView()));
     root.appendChild(tabSetsElem);
     

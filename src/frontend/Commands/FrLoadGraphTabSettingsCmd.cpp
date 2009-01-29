@@ -131,16 +131,18 @@ bool FrLoadGraphTabSettingsCmd::LoadTabSettings(QDomElement& elem, FrGraphTabDoc
     while(!viewElem.isNull()){
         if(viewElem.tagName() == FR_XML_POINTS_ELEM){
             hasPoints = LoadPoints(viewElem, tabs->GetPoints());
-            if(!hasPoints) return false;
+            //if(!hasPoints) return false;
         }
         else if(viewElem.tagName() == FR_XML_GRAPHS_ELEM){
             hasGraphs = LoadGraphs(viewElem, tabs->GetGraphs());
-            if(!hasGraphs) return false;
+            //if(!hasGraphs) return false;
         }
         viewElem = viewElem.nextSiblingElement();
     }
 
-    bool result = (hasPoints && hasGraphs);
+    bool result = true; 
+    if (!hasPoints && hasGraphs)
+        result = false;             // graphs can't exist w/o point selected
 
     return result;
 }

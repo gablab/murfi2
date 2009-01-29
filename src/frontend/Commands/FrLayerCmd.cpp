@@ -166,15 +166,7 @@ bool FrLayerCmd::ChangeLayerOld(){
 
     // Init data
     FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
-    layeredImage[0] = mv->GetSliceView()->GetImage();
-    layeredImage[1] = mv->GetMosaicView()->GetImage();
-    layeredImage[2] = mv->GetOrthoView()->GetImage(DEF_CORONAL);
-    layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
-    layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
-
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();    
-    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     // find layer settings
     // NOTE: assume that layers in different views 
@@ -182,24 +174,21 @@ bool FrLayerCmd::ChangeLayerOld(){
     FrDocument::DocObjCollection layers;
     doc->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
 
-    // delete layer from LayeredImage
-    for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-        layeredImage[i]->RemoveLayer(m_ID);
-    }
-
     FrLayerDocObj* layerDO = 0L;
     if(layers.size() > 0){
-        // delete appropriate LayerDocObj
+        // get appropriate LayerDocObj
         for (int i = 0; i < layers.size(); i++){
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-            if (layerDO->GetID() == m_ID) break;
+            if (layerDO->GetID() == m_ID) 
+                break;
+            else 
+                layerDO = 0L;
         }
     }    
 
     // Update layer params
     bool result = false;
-    if(layerDO != 0L){
-        FrMainWindow* mv = this->GetMainController()->GetMainView();
+    if(layerDO != 0L && !layerDO->IsImage()){
         FrLayerDialog dlg(mv, true);
         dlg.SetLayerParams(*((FrColormapLayerSettings*)layerDO->GetSettings()));
 
@@ -213,8 +202,9 @@ bool FrLayerCmd::ChangeLayerOld(){
 
             result = true;
         }
-        this->UpdateSelectedLayerID();
-        mv->GetCurrentView()->UpdatePipeline(FRP_COLORMAP);
+        //this->UpdateSelectedLayerID();
+    
+        FrBaseCmd::UpdatePipelineForID(m_ID, FRP_COLORMAP);
     }
     return result;
 }

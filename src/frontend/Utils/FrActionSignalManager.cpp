@@ -263,7 +263,7 @@ void FrActionSignalManager::OnLoadTabsAction(){
 void FrActionSignalManager::OnSaveGraphTabsAction(){
     QString fileName = QFileDialog::getSaveFileName(
         m_mainWindow, tr("Save Graph Tabs Data"), 
-        tr(""), tr("Graph Tabs Settings (*.tbs)"));
+        tr(""), tr("Graph Tabs Settings (*.gtbs)"));
 
     if(!fileName.isNull() && !fileName.isEmpty()){
         m_mainWindow->
@@ -275,7 +275,7 @@ void FrActionSignalManager::OnSaveGraphTabsAction(){
 void FrActionSignalManager::OnLoadGraphTabsAction(){
     QString fileName = QFileDialog::getOpenFileName(
         m_mainWindow, tr("Load Graph Tabs Data"), 
-        tr(""), tr("Graph Tabs Settings (*.tbs)"));
+        tr(""), tr("Graph Tabs Settings (*.gtbs)"));
 
     if(!fileName.isNull() && !fileName.isEmpty()){
         m_mainWindow->

@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib vtksys.lib vtkzlib.lib vtkfreetype.lib vtktiff.lib vtkjpeg.lib vtklibxml2.lib vtkexpat.lib vtkftgl.lib qwt.lib ACE.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib vtksys.lib vtkzlib.lib vtkfreetype.lib vtktiff.lib vtkjpeg.lib vtklibxml2.lib vtkexpat.lib vtkftgl.lib qwt.lib ACEd.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>

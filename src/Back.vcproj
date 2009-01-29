@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ACE.lib niftiio.lib znz.lib opengl32.lib glut32.lib vnl.lib ACEXML.lib vcl.lib ACEXML_Parser.lib gsl.lib vnl_algo.lib vul.lib netlib.lib v3p_netlib.lib"
+				AdditionalDependencies="ACEd.lib niftiio.lib znz.lib opengl32.lib glut32.lib vnl.lib ACEXML.lib vcl.lib ACEXML_Parser.lib gsl.lib vnl_algo.lib vul.lib netlib.lib v3p_netlib.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

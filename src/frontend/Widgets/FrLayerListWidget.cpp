@@ -54,14 +54,14 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
     m_btnDelete = new QToolButton(btnBlock);
     m_btnDelete->setText("x");
     m_btnDelete->setToolTip("Delete selected layer");
-//    m_btnChange = new QToolButton(btnBlock);
-//    m_btnChange->setText("C");
-//    m_btnChange->setToolTip("Change selected layer");
+    m_btnChange = new QToolButton(btnBlock);
+    m_btnChange->setText("C");
+    m_btnChange->setToolTip("Change selected layer");
 
     QHBoxLayout* btnLayout = new QHBoxLayout(btnBlock);
     btnLayout->addWidget(m_btnAdd);
     btnLayout->addWidget(m_btnDelete);
-    //btnLayout->addWidget(m_btnChange);
+    btnLayout->addWidget(m_btnChange);
     btnLayout->addStretch();
     btnBlock->setLayout(btnLayout);
 
@@ -109,7 +109,7 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
 
     connect( m_btnAdd, SIGNAL(clicked()), this, SLOT(OnAddClicked()) );
     connect( m_btnDelete, SIGNAL(clicked()), this, SLOT(OnDeleteClicked()) );
-    //connect( m_btnChange, SIGNAL(clicked()), this, SLOT(OnChangeClicked()) );
+    connect( m_btnChange, SIGNAL(clicked()), this, SLOT(OnChangeClicked()) );
 
     connect( m_opacityWidget, SIGNAL(ValueChanged(int)), 
              this, SLOT(OnOpacityChanged(int)) );

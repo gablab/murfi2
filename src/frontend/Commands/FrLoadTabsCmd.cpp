@@ -119,12 +119,17 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
 
     //if(!elem.hasAttribute(FR_XML_DESCRIPTION_ATTR)) return false;
     //tabs->SetDescription(elem.attribute(FR_XML_DESCRIPTION_ATTR));
+    
+    bool result = false;
+    if(!elem.hasAttribute(FR_XML_TIMEPOINT)) return false;
+    int timepoint = elem.attribute(FR_XML_TIMEPOINT).toInt(&result);
+    if (!result) return false;
+    tabs->SetTimePoint(timepoint);
 
-    bool isActiveViewOk = false;
     if(!elem.hasAttribute(FR_XML_ACTIVEVIEW_ATTR)) return false;
-    int activeView = elem.attribute(FR_XML_ACTIVEVIEW_ATTR).toInt(&isActiveViewOk);
+    int activeView = elem.attribute(FR_XML_ACTIVEVIEW_ATTR).toInt(&result);
 
-    if(!isActiveViewOk) return false;
+    if(!result) return false;
     switch(activeView){
         // NOTE: Fall throuhg first 3 cases 
         case SliceView:
@@ -163,7 +168,7 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
         viewElem = viewElem.nextSiblingElement();
     }
 
-    bool result = (hasSlice && hasMosaic && hasOrtho && hasLayeredImage);
+    result = (hasSlice && hasMosaic && hasOrtho && hasLayeredImage);
 //    if(result){
 //        result = ValidateTabSettings(tabs);
 //    }

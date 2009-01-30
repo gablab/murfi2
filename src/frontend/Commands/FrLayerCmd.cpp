@@ -226,7 +226,8 @@ bool FrLayerCmd::ChangeLayerParams(){
     if(layers.size() > 0){
         // get appropriate LayerDocObj
         for (int i = 0; i < layers.size(); i++){
-            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
+            layerDO = (FrLayerDocObj*)layers[i];
+            //layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
             if (layerDO->GetID() == m_ID) 
                 break;
             else 
@@ -235,50 +236,13 @@ bool FrLayerCmd::ChangeLayerParams(){
     }    
 
     int opacity = mw->GetLayerListWidget()->GetOpacity();
-    FrLayerSettings* params = layerDO->GetSettings();           // probably we should use the old code below
+    FrLayerSettings* params = layerDO->GetSettings();           
     params->Opacity = opacity/100.0;
     
     bool visibility = mw->GetLayerListWidget()->GetLayerVisibility(m_ID);
     params->Visibility = visibility;
 
     layerDO->SetSettings(params);
-
-    //// TODO: visibility, name??
-    //if (layerDO->IsRoi()){
-    //    // get opacity
-    //    int opacity = mw->GetLayerListWidget()->GetOpacity();
-    //    FrRoiLayerSettings* roiParams = (FrRoiLayerSettings*)layerDO->GetSettings();
-    //    roiParams->Opacity = opacity;
-    //    
-    //    bool visibillity = mw->GetLayerListWidget()->GetLayerVisibility(m_ID);
-    //    roiParams->Visibility = visibility;
-
-    //    layerDO->SetSettings(roiParams);
-    //}
-    //else if (layerDO->IsImage()){
-    //    // get opacity
-    //    int opacity = mw->GetLayerListWidget()->GetOpacity();
-    //    FrImageLayerSettings* imageParams = (FrImageLayerSettings*)layerDO->GetSettings();
-    //    imageParams->Opacity = opacity;
-
-    //    bool visibility = mw->GetLayerListWidget()->GetLayerVisibility(m_ID);
-    //    imageParams->Visibility = visibility;
-
-    //    layerDO->SetSettings(imageParams);
-    //}
-    //else if (layerDO->IsColormap()){
-    //    // get colormap params and opacity
-    //    int opacity = mw->GetLayerListWidget()->GetOpacity();
-    //    FrColormapLayerSettings* colormapParams = (FrColormapLayerSettings*)layerDO->GetSettings();
-    //    colormapParams->Opacity = opacity;
-
-    //    bool visibility = mw->GetLayerListWidget()->GetLayerVisibility(m_ID);
-    //    colormapParams->Visibility = visibility;
-
-    //    mw->GetLayerListWidget()->GetColormapWidget()->GetColormapParams(*colormapParams);
-    //    
-    //    layerDO->SetSettings(colormapParams);
-    //}
 
     FrBaseCmd::UpdatePipelineForID(m_ID, FRP_OPACITY_VISIBILITY);    
     return true;

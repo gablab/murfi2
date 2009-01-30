@@ -72,6 +72,7 @@ bool FrSaveTabsCmd::SaveTabSettings(QDomElement& root, FrTabSettingsDocObj* tabs
     tabSetsElem.setAttribute(FR_XML_NAME_ATTR, tabs->GetName());
     //tabSetsElem.setAttribute(FR_XML_DESCRIPTION_ATTR, tabs->GetDescription());
     tabSetsElem.setAttribute(FR_XML_ACTIVEVIEW_ATTR, int(tabs->GetActiveView()));
+    tabSetsElem.setAttribute(FR_XML_TIMEPOINT, int(tabs->GetTimePoint()));
     root.appendChild(tabSetsElem);
     
     // save view settings
@@ -271,17 +272,17 @@ void FrSaveTabsCmd::SaveTbcSettings(QDomElement& parent, FrTbcSettings* tbcSets)
 
     // threshold
     QDomElement tElem = m_Document->createElement(FR_XML_THRESH_ELEM);
-    tElem.setAttribute(FR_XML_VALUE_ATTR, 0.0);
+    tElem.setAttribute(FR_XML_VALUE_ATTR, tbcSets->Threshold);
     tbcElem.appendChild(tElem);
 
     // brightness
     QDomElement bElem = m_Document->createElement(FR_XML_BRIGHT_ELEM);
-    bElem.setAttribute(FR_XML_VALUE_ATTR, 0.0);
+    bElem.setAttribute(FR_XML_VALUE_ATTR, tbcSets->Brightness);
     tbcElem.appendChild(bElem);
 
     // contrast
     QDomElement cElem = m_Document->createElement(FR_XML_CONTRAST_ELEM);
-    cElem.setAttribute(FR_XML_VALUE_ATTR, 0.0);
+    cElem.setAttribute(FR_XML_VALUE_ATTR, tbcSets->Contrast);
     tbcElem.appendChild(cElem);
 
     parent.appendChild(tbcElem);

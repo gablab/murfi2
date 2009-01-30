@@ -39,7 +39,7 @@ bool FrSaveGraphTabSettingsCmd::Execute(){
         QDomProcessingInstruction declaration = 
             m_Document->createProcessingInstruction("xml", FR_XML_DECLARATION);
 
-        QDomElement root = m_Document->createElement(FR_XML_ROOT_ELEM);
+        QDomElement root = m_Document->createElement(FR_XML_GRAPH_ROOT_ELEM);
         root.setAttribute(FR_XML_VERSION_ATTR, FR_GRAPH_TAB_SET_VERSION);
 
         m_Document->appendChild(declaration);

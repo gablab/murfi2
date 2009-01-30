@@ -5,6 +5,7 @@
 class FrLayerSettings;
 class FrMainDocument;
 class vtkPointPicker;
+class vtkImageData;
 
 // Some headers
 #include "FrBaseCmd.h"
@@ -15,7 +16,7 @@ class vtkPointPicker;
 // This command updates voxel information.
 class FrVoxelInfoCmd : public FrBaseCmd {
 public:
-    enum Action { Undefined, Update, Reset };
+    enum Action { Undefined, Update, Reset, Add };
 
 public:
     // Constructor/destructor
@@ -34,8 +35,9 @@ public:
     FrSetPropMacro(vtkPointPicker*, PointPicker);
 
 private:
-    bool UpdateVoxelInfo();
+    bool UpdateVoxelInfo(bool addPoint);
     bool ResetVoxelInfo();
+    bool AddPoint(int* Index, vtkImageData* pImageData);
 
     void GetVoxelInfo();
     double* GetMappedPoint();

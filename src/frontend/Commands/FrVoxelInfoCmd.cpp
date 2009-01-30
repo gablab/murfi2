@@ -12,7 +12,12 @@
 #include "FrLayeredImage.h"
 #include "FrViewDocObj.h"
 #include "FrLayerDocObj.h"
+#include "FrImageDocObj.h"
+#include "FrPointsDocObj.h"
+#include "FrGraphSettings.h"
+#include "FrGraphDocObj.h"
 
+// VTK stuff
 #include "vtkPointPicker.h"
 #include "vtkCoordinate.h"
 #include "vtkRenderer.h"
@@ -40,7 +45,10 @@ bool FrVoxelInfoCmd::Execute(){
     bool result = false;
     switch(m_Action){
         case Update:
-            result = UpdateVoxelInfo();
+            result = UpdateVoxelInfo(false);
+            break;
+        case Add:
+            result = UpdateVoxelInfo(true);
             break;
         case Reset:
             result = ResetVoxelInfo();
@@ -52,7 +60,7 @@ bool FrVoxelInfoCmd::Execute(){
     return result;
 }
 
-bool FrVoxelInfoCmd::UpdateVoxelInfo(){
+bool FrVoxelInfoCmd::UpdateVoxelInfo(bool addPoint){
     // get renderer    
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
@@ -188,7 +196,115 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(){
     }    
 
     mv->GetVoxelInfoWidget()->SetVoxelData(vd);
-    return false;
+
+    bool result = false;
+    if (addPoint){
+        result = AddPoint(vd.Index, pImageData);   
+    }
+
+    return result;
+}
+
+bool FrVoxelInfoCmd::AddPoint(int* Index, vtkImageData* pImageData){
+    if(!pImageData) return false;
+
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+
+    Views view = viewDO->GetActiveView();
+
+    FrImageDocObj* imgDO = 0;
+    std::vector<FrDocumentObj*> images;
+    doc->GetObjectsByType(images, FrDocumentObj::ImageObject);
+
+    int timeSeries = doc->GetCurrentViewObject()->GetTimeSeries();
+    int dimensions[3];
+
+    std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
+    for(it = images.begin(); it != itEnd; ++it){
+        FrImageDocObj* imgDO = (FrImageDocObj*)(*it);
+        if(imgDO->GetSeriesNumber() == timeSeries){
+            RtMRIImage* img = imgDO->GetTimePointData(imgDO->GetLastTimePoint());
+            dimensions[0] = img->getDim(0);
+            dimensions[1] = img->getDim(1);
+            dimensions[2] = img->getDim(2);
+        }
+    }
+
+    // convert coordinates if we have mosaic view selected
+    if (view == MosaicView){
+        // we need to know number of slices in a row, or width/height of one slice
+        int mosaicDims[3];
+        pImageData->GetDimensions(mosaicDims);
+
+        int num = mosaicDims[0]/dimensions[0];
+        int col, row;
+        col = Index[0]/dimensions[0];
+        row = Index[1]/dimensions[1];
+        int x, y, z;
+        x = Index[0] - col*dimensions[0];
+        y = Index[1] - row*dimensions[1];
+        z = row*num + col;
+
+        Index[0] = x; Index[1] = y; Index[2] = z;
+    }
+
+    // get points doc obj, insert point and update view
+    FrPointsDocObj* pointsDO = 0L;
+    FrDocument::DocObjCollection pointObjects;
+    doc->GetObjectsByType(pointObjects, FrDocumentObj::PointsObject);    
+
+    bool result = false;    
+
+    if(pointObjects.size() > 0){
+        pointsDO = (FrPointsDocObj*)pointObjects[0];
+        // TODO: get color from any widget/dialog/settings
+        // due to requirements we have only 1 point at the same time
+        pointsDO->ClearAll();
+
+        // check if point has correct coordinates
+        if (Index[0] < dimensions[0] && Index[1] < dimensions[1] &&
+            Index[2] < dimensions[2]){
+            result = true;
+
+            FrPoint* point = new FrPoint(Index[0], Index[1], Index[2], QColor(0, 255, 0));
+
+            switch (m_Action){
+                case FrVoxelInfoCmd::Add:
+                    pointsDO->AddPoint(point);
+                    break;
+           //     case FrVoxelInfoCmd::Remove:
+                    //pointsDO->RemovePoint(point);
+           //         break;
+            }
+
+            FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+        }
+    }
+    else
+        return false;
+        
+    if (result){ // point was succesfully added
+
+        // update all graphs that depends on point position (that is Intencity graphs only for now)
+        FrGraphDocObj* graphDO = 0L;
+        FrDocument::DocObjCollection graphObjects;
+        doc->GetObjectsByType(graphObjects, FrDocumentObj::GraphObject);    
+        
+        for (int i = 0; i < graphObjects.size(); i++){
+            graphDO = (FrGraphDocObj*)graphObjects[i];
+
+            if (graphDO->GetSettings()->GetType() == FrGraphSettings::GT_Intencity){
+                // update point
+                ((FrIntencityGraphSettings*)graphDO->GetSettings())->I = Index[0];
+                ((FrIntencityGraphSettings*)graphDO->GetSettings())->J = Index[1];
+                ((FrIntencityGraphSettings*)graphDO->GetSettings())->K = Index[2];
+            }
+        }
+    }    
+    
+    
+    return result;
 }
 
 bool FrVoxelInfoCmd::ResetVoxelInfo(){

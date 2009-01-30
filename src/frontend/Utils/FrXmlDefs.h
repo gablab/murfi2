@@ -61,10 +61,12 @@
 #define FR_XML_THRESH_ATTR "threshold"
 #define FR_XML_COLOR_ATTR "color"
 #define FR_XML_TYPE_ATTR "type"
+#define FR_XML_TIMEPOINT "timepoint"
 
 
 // graph tabs
 #define FR_GRAPH_TAB_SET_VERSION 1.0
+#define FR_XML_GRAPH_ROOT_ELEM "tabSet"
 
 #define FR_XML_GRAPHTABSETTINGS_ELEM "graphTabs"
 #define FR_XML_POINTS_ELEM "points"

@@ -19,7 +19,7 @@ RtMosaic::RtMosaic() : RtStreamComponent() {
 
 // destructor
 RtMosaic::~RtMosaic() {
-  cout << "destroyed" << endl;
+  //cout << "destroyed" << endl;
 }
 
 // process a single acquisition

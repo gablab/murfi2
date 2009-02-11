@@ -12,10 +12,13 @@
 
 #define fTol 0.00000000001f
 
+#include "boost/filesystem.hpp"
+
 #include<sstream>
 #include<string>
 
 using namespace std;
+using namespace boost::filesystem;
 
 // a single configuration value
 class RtConfigVal {
@@ -26,16 +29,18 @@ public:
 
   // leave blank
   RtConfigVal() : _set(false) { 
-    val = "";
   }
 
   // assign it straight off
-  inline RtConfigVal(string s) : _set(true) {
-    val=s;
+  RtConfigVal(string s) : val(s), _set(true) {
   }
 
   string str() {
     return val;
+  }
+
+  path filepath() {
+    return path(val);
   }
 
   string getVal() {
@@ -95,31 +100,31 @@ public:
   const bool operator==(const double d) {
     double dval;
     return convert<double>(dval,val) 
-      & fabs(d - dval) < dTol;
+      && fabs(d - dval) < dTol;
   }
 
   const bool operator==(const float f) {
     float fval;
     return convert<float>(fval,val) 
-      & fabsf(f - fval) < fTol;
+      && fabsf(f - fval) < fTol;
   }
 
   const bool operator==(const long l) {
     long lval;
     return convert<long>(lval,val) 
-      & l == lval;
+      && l == lval;
   }
 
   const bool operator==(const int i) {
     int ival;
     return convert<int>(ival,val) 
-      & i == ival;
+      && i == ival;
   }
 
   const bool operator==(const bool b) {
     bool bval;
     bool ret = convert(bval,val) 
-      & bval == b;
+      && bval == b;
     return ret;
   }
 

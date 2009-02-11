@@ -13,7 +13,7 @@
 class FrSetCursorCmd : public FrBaseCmd
 {
 public:
-    enum CursorType{ Unknown, Arrow, Zoom, Pan };
+  enum CursorType{ Unknown, Arrow, Zoom, Pan, Crosshair };
 public:
     // Constructor/destructor
     FrSetCursorCmd();

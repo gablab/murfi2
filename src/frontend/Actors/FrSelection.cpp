@@ -31,6 +31,8 @@ FrSelection::FrSelection()
     m_testActor = vtkImageActor::New();
     m_testActor->SetVisibility(true);
 
+    m_testActor->InterpolateOff();
+
     this->AddPart(m_testActor);
     this->AddPart(m_actor);
     this->PickableOff();

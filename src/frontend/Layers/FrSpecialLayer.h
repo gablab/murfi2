@@ -10,6 +10,7 @@ class vtkActor2D;
 // Includes
 #include "FrBaseLayer.h"
 #include "FrSelection.h"
+#include "FrCrosshair.h"
 
 
 class FrSpecialLayer : public FrBaseLayer {
@@ -24,15 +25,19 @@ public:
     void SetSelectionVisibility(bool visible);
     void SetSelectionData(vtkImageData* data);
 
+    void SetCrosshairParams(CrosshairParams params);
+    void SetCrosshairVisibility(bool visible);
+
 private:
-	// Text support
-	vtkTextMapper*  m_TextMapper;
-	vtkActor2D*     m_TextActor;
+    // Text support
+    vtkTextMapper*  m_TextMapper;
+    vtkActor2D*     m_TextActor;
     // Border support
     vtkPoints*           m_BorderPts;
     vtkPolyDataMapper2D* m_BorderMapper;
     vtkActor2D*          m_BorderActor;
-	FrSelection*		 m_Selection;
+    FrSelection*		 m_Selection;
+    FrCrosshair*		 m_Crosshair;
 	
 private:
     FrSpecialLayer(const FrSpecialLayer&); // Not implemented

@@ -27,6 +27,7 @@ public:
 private:
     int m_oldX;
     int m_oldY;
+    int m_changingSlice;
 };
 
 #endif

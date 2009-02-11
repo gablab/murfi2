@@ -7,8 +7,11 @@
 #
 ##########################################################################
 
-default:
+default: front
+front: sub_dirs
 	$(CC) $(C_FLAGS) -c main.cpp -o $(OBJ_DIR)/main.o
+
+sub_dirs:
 	cd ./Actors	&&	$(MAKE)
 	cd ./Commands	&&	$(MAKE)
 	cd ./Controllers &&	$(MAKE)
@@ -20,7 +23,10 @@ default:
 	cd ./Tools	&&	$(MAKE)
 	cd ./Views	&&	$(MAKE)	
 	cd ./Utils	&&	$(MAKE)
-	cd ./moc	&&	$(MAKE) -f ./makefile.mocing
+	cd ./moc	&&	$(MAKE) TYPE=main -f ./makefile.util_moc
+	cd ./moc	&&	$(MAKE) TYPE=util -f ./makefile.util_moc
+	cd ./moc	&&	$(MAKE) TYPE=app -f ./makefile.util_moc
+	cd ./moc	&&	$(MAKE) TYPE=widget -f ./makefile.util_moc
 	cd ./moc	&&	$(MAKE)
 	cd ./Widgets	&&	$(MAKE)
 

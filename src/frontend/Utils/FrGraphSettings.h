@@ -49,7 +49,9 @@ public:
     int I, J, K;
 
     // Methods
-    FrIntencityGraphSettings(){}
+    FrIntencityGraphSettings(){
+      Color = Qt::red;
+    }
     virtual ~FrIntencityGraphSettings(){}
     virtual GraphTypes GetType(){ return GT_Intencity; }
 };

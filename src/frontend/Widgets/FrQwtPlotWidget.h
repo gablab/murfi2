@@ -42,12 +42,14 @@ public:
     // Here all signals
 signals:
     void pointClicked(QPointF p);
+    void pointMoved(QPointF p);
     void markerPositionChange(int position);
         
 private:
 
 private Q_SLOTS:
     void onPointClicked(const QwtDoublePoint& point);
+    void onPointMoved(const QwtDoublePoint& point);
 
 private:
     typedef std::map<int, QwtPlotCurve*> CurvesMap;

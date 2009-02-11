@@ -36,24 +36,33 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     m_Grid->setPen(QPen(PLOT_GRID_COLOR));
     m_Grid->attach(this);
 
+    // canvas
+    setCanvasBackground(Qt::black);
+
     // marker
     m_PlotMarker = new QwtPlotMarker();
     m_PlotMarker->setValue(0.0, 0.0);
     m_PlotMarker->setLineStyle(QwtPlotMarker::VLine);
     m_PlotMarker->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
-    m_PlotMarker->setLinePen(QPen(Qt::black, 0, Qt::SolidLine));
+    m_PlotMarker->setLinePen(QPen(Qt::green, 1, Qt::SolidLine));
     m_PlotMarker->attach(this);
 
     m_PlotPicker = new QwtPlotPicker(this->canvas());
     m_PlotPicker->setTrackerMode(QwtPicker::AlwaysOn);
     m_PlotPicker->setSelectionFlags(
         QwtPicker::PointSelection | 
-        QwtPicker::ClickSelection);
+	//QwtPicker::ClickSelection |
+        //QwtPicker::RectSelection | 
+        QwtPicker::DragSelection);
     
     // connect signals and slots
     connect(m_PlotPicker, 
         SIGNAL(selected(const QwtDoublePoint& )), 
         this, SLOT(onPointClicked(const QwtDoublePoint& )));
+
+    connect(m_PlotPicker, 
+        SIGNAL(moved(const QwtDoublePoint& )), 
+        this, SLOT(onPointMoved(const QwtDoublePoint& )));
 
     this->setMinimumHeight(this->sizeHint().height());
     //this->setFixedWidth(this->sizeHint().width());
@@ -96,7 +105,7 @@ void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
     //delete[] data;
     //// ---- test ------------------
 
-    curve->setPen(color);
+    curve->setPen(QPen(color,2,Qt::SolidLine));
     curve->attach(this);    
     
     // refresh the plot
@@ -148,13 +157,27 @@ void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
     CurvesMap::iterator it = m_Curves.find(id);
     if(it == m_Curves.end()) return;
 
-    // Init x values
+    // Init x values and find min and max
+    double minY = data[0];
+    double maxY = data[0];
     double* xValues = new double[dataSize];
     for (int i = 0; i < dataSize; i++){
         xValues[i] = double(i);
+	if(minY > data[i]) {
+	  minY = data[i];
+	}
+	if(maxY < data[i]) {
+	  maxY = data[i];
+	}
     }
     it->second->setData(xValues, data, dataSize);
     delete[] xValues;
+
+//    cout << "drawing with pen color: " 
+//	 << it->second->pen().color().red() << " "
+//	 << it->second->pen().color().green() << " "
+//	 << it->second->pen().color().blue() << " "
+//	 << endl;
 
     // Update axis
     double maxTimePoint = double(dataSize - 1);
@@ -165,7 +188,10 @@ void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
             step = 1;
         this->setAxisScale(QwtPlot::xBottom, 0.0, maxTimePoint, step);
     }
-    
+ 
+    this->setAxisScale(QwtPlot::yLeft, minY, maxY);
+
+   
     // refresh the plot
 //    this->replot();
 }
@@ -202,6 +228,23 @@ void FrQwtPlotWidget::onPointClicked(const QwtDoublePoint& point){
     // refresh the plot
     this->replot();
     emit pointClicked(point);
+}
+
+// added by ohinds 2009-02-06
+void FrQwtPlotWidget::onPointMoved(const QwtDoublePoint& point){
+    // Check
+    if (!this->axisScaleDiv(
+        QwtPlot::xBottom)->
+        contains(point.x())) return;
+
+    // have to move current time point marker
+    int ix = (int) rint(point.x());
+
+    this->SetMarkerPosition(ix);
+
+    // refresh the plot
+    this->replot();
+    emit pointMoved(point);
 }
 
 bool FrQwtPlotWidget::SetMarkerPosition(int timePoint, bool blockSignals){
@@ -264,3 +307,4 @@ int FrQwtPlotWidget::GetMaxTimePoint(){
 
     return int(result);
 }
+

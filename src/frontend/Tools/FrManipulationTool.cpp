@@ -1,6 +1,7 @@
 #include "FrManipulationTool.h"
 #include "FrMainDocument.h"
 #include "FrMainWindow.h"
+#include "FrVoxelTool.h"
 #include "FrPanTool.h"
 #include "FrZoomTool.h"
 #include "FrTBCTool.h"
@@ -21,16 +22,18 @@
 
 
 FrManipulationTool::FrManipulationTool() {
+    m_voxelTool = new FrVoxelTool();        
     m_panTool = new FrPanTool();        
     m_zoomTool = new FrZoomTool();
     m_tbcTool = new FrTBCTool();
     m_ssTool = new FrSliceScrollTool();
 
-    isZoom = false;
     ZoomActivated = false;
+    PanZoomActivated = false;
 }
 
 FrManipulationTool::~FrManipulationTool(){
+    delete m_voxelTool;
     delete m_panTool;
     delete m_zoomTool;
     delete m_tbcTool;
@@ -39,8 +42,10 @@ FrManipulationTool::~FrManipulationTool(){
 
 void FrManipulationTool::Start(){
     // Setup controller and start tools
+    m_voxelTool->SetController(this->GetController());
     m_panTool->SetController(this->GetController());
     m_zoomTool->SetController(this->GetController());
+    m_voxelTool->Start();
     m_panTool->Start();
     m_zoomTool->Start();
 
@@ -60,6 +65,7 @@ void FrManipulationTool::Start(){
 
 void FrManipulationTool::Stop(){
     // Stop tools and unregister controller
+    m_voxelTool->Stop();
     m_panTool->Stop();
     m_zoomTool->Stop();
     m_panTool->SetController(0);
@@ -82,10 +88,19 @@ void FrManipulationTool::Stop(){
 bool FrManipulationTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
     // Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
-        if (isZoom)
+      if (PanZoomActivated) {
+        if (ZoomActivated) {
             m_zoomTool->OnMouseUp(is, params);
-        else
+	    ZoomActivated = false;
+	}
+        else {
             m_panTool->OnMouseUp(is, params);
+	}
+	PanZoomActivated = false;
+      }
+      else {
+	m_voxelTool->OnMouseUp(is, params);
+      }
     }
     else if(params.Button == FrMouseParams::MidButton){
         params.Button = FrMouseParams::LeftButton;
@@ -103,16 +118,21 @@ bool FrManipulationTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params)
 
 bool FrManipulationTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){    
     // here we should check what tool to use: pan or zoom, it depends on mouse coords
-    isZoom = CheckMouseParams(is, params);
-
     // Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
-        if (isZoom){
+      if(params.IsControl) {
+	PanZoomActivated = true;
+	
+        if (CheckMouseParams(is, params)) { // is zoom?
             m_zoomTool->OnMouseDown(is, params);
             ZoomActivated = true;
         }
         else
             m_panTool->OnMouseDown(is, params);
+      }
+      else { // change cursor
+	m_voxelTool->OnMouseDown(is, params);
+      }
     }
     else if(params.Button == FrMouseParams::MidButton){
         params.Button = FrMouseParams::LeftButton;
@@ -127,7 +147,8 @@ bool FrManipulationTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& param
 
 bool FrManipulationTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
     // here we should check what tool to use: pan or zoom, it depends on mouse coords
-    isZoom = CheckMouseParams(is, params);
+    bool isPanZoom = params.IsControl;
+    bool isZoom = CheckMouseParams(is, params);
     //bool isInViewport = IsInViewPort(is, params);
 
     //if (!isInViewport){
@@ -143,10 +164,15 @@ bool FrManipulationTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& param
     //QVTKWidget* qvtkWidget = mw->GetQVTKWidget();
 
     FrSetCursorCmd* cmd = FrCommandController::CreateCmd<FrSetCursorCmd>();
-    if (isZoom)
-        cmd->SetCursorType(FrSetCursorCmd::Zoom);
-    else
-        cmd->SetCursorType(FrSetCursorCmd::Pan);
+    if(isPanZoom) {
+      if (isZoom)
+	cmd->SetCursorType(FrSetCursorCmd::Zoom);
+      else
+	cmd->SetCursorType(FrSetCursorCmd::Pan);
+    }
+    else {
+      cmd->SetCursorType(FrSetCursorCmd::Crosshair);
+    }
 
     FrCommandController::Execute(cmd);
     delete cmd;
@@ -159,10 +185,15 @@ bool FrManipulationTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& param
 
     // Delegate events to appropriate tool
     if(params.Button == FrMouseParams::LeftButton){
-        if (isZoom)
+      if(PanZoomActivated) {
+        if (ZoomActivated)
             result = m_zoomTool->OnMouseDrag(is, params);
         else
             result = m_panTool->OnMouseDrag(is, params);
+      }
+      else {
+	result = m_voxelTool->OnMouseDrag(is, params); 
+      }
     }
     else if(params.Button == FrMouseParams::MidButton){
         params.Button = FrMouseParams::LeftButton;

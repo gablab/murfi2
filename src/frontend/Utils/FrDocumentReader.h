@@ -7,6 +7,7 @@ class vtkImageData;
 class FrImageDocObj;
 class FrRoiDocObj;
 
+
 template <class T>
 class RtDataImage;
 class RtMRIImage;
@@ -14,6 +15,7 @@ class RtMaskImage;
 
 // Some includes
 #include "FrMacro.h"
+#include "FrCrosshair.h"
 #include "vtkObject.h"
 
 #include <vector>
@@ -30,7 +32,7 @@ public:
     } Targets;
 
     typedef enum _Orientaion { 
-        XY, YZ, XZ 
+      XY, YZ, XZ
     } Orientations;
 
 public:
@@ -43,22 +45,15 @@ public:
     virtual void Update();
 
     // Properties
+    FrGetPropMacro(FrDocument*,Document);
+    void SetDocument(FrDocument* document);
+    
     // Turns ON mosaic mode.
     FrGetPropMacro(bool, Mosaic);
     void SetMosaic(bool value);
     
-    FrGetPropMacro(FrDocument*,Document);
-    void SetDocument(FrDocument* document);
-    
     FrGetPropMacro(Targets, Target)
     void SetTarget(Targets target);
-
-    // Slice management
-    FrGetPropMacro(unsigned int, TimeSeries);
-    void SetTimeSeries(unsigned int ID);
-
-    FrGetPropMacro(unsigned int, DataID);
-    void SetDataID(unsigned int ID);
 
     FrGetPropMacro(Orientations, Orientation);
     void SetOrientation(Orientations value);
@@ -66,8 +61,17 @@ public:
     FrGetPropMacro(int, Slice);
     void SetSlice(int slice);
     
+    FrGetPropMacro(unsigned int, DataID);
+    void SetDataID(unsigned int ID);
+
     // Output management
     FrGetPropMacro(vtkImageData*, Output);
+
+    // Slice management
+    FrGetPropMacro(unsigned int, TimeSeries);
+    void SetTimeSeries(unsigned int ID);
+
+    CrosshairParams ReadCrosshair();
 
 private:
     void SetOutput(vtkImageData* data);

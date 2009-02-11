@@ -32,7 +32,7 @@ public:
   // adds all modules to the stream
   //  in
   //   config: configuration info
-  int addModules(RtConfig &config);
+  bool addModules(RtConfig &config);
 
   // get the version
   //  out: char array that represents the cvs version

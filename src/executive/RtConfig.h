@@ -1,6 +1,7 @@
 /******************************************************************************
- * RtConfig.h is the header for a class that controls configuration of
- * a a real-time fMRI session.
+ * RtConfig.h is the header for a virtual base class that controls xml
+ * configuration reading. this class must be extended for particular types
+ * of configuration (setDefaults() and validateConfig() must be implemented). 
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
  * 
@@ -26,6 +27,9 @@
 
 using namespace std;
 
+// for defaults
+
+
 // class to wrap string for a single parm value
 class RtConductor;
 
@@ -37,22 +41,21 @@ public:
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtConfig(); 
+  RtConfig() {}; 
 
-  // constructor with conductor reference
-  RtConfig(RtConductor &_conductor); 
+  // copy constructor (called often)
+  RtConfig(const RtConfig &other); 
 
   // destructor
   virtual ~RtConfig();
 
-
   //*** config loading routines ***//
 
-  // parse sommand line args
-  bool parseArgs(int argc, char **args);
+  // parse xml config file
+  bool parseConfigFile(const string &filename);
 
-  // parse config file
-  bool parseConfigFile();
+  // parse xml config string
+  bool parseConfigStr(const string &xml);
 
   //*** config get/set parms ***/
 
@@ -89,17 +92,23 @@ public:
   //   true if the var has been set
   bool isSet(const string &name);
 
-  // get a parm value
-  //string get(const char *name);
-
-  // set parm
+  // set a parm value
   template<class T>
-  bool set(const char *name, T tval);
+  bool set(const string &name, T tval) {
+    string val;
+    if(!RtConfigVal::convertToString<T>(val,tval)) {
+      return false;
+    }
+
+    return set(name, val, &parms);
+  }
 
   // set a parm value
   template<class T>
-  bool set(const string name, T tval);
-
+  bool set(const char *name, T tval) {
+    string s(name);
+    return set(s,tval);
+  }
 
   // sets a parm value starting from a specified xml node
   // children are created appropritately
@@ -115,51 +124,36 @@ public:
 
   //*** general ***//
 
-  // set the conductor
-  //  in: _conductor is a pointer to a conductor
-  void setConductor(RtConductor *_conductor);
-
-  // get the conductor
-  //  out: pointer to the conductor
-  RtConductor *getConductor();
-
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-  // get the version string for the conductor reference
-  //  out: char array that represents the cvs version for the conductor
-  char *getConductorVersionString();
-
-
   // print the name/value pairs to the screen
   void dumpConfig(ostream &os = cout);
-
-  // validate the configuration
-  // checks for valid setup of different parts of the program
-  bool validateConfig();
 
   // utility function to build a map between attribute names and values
   static map<string,string> getAttributeMap(TiXmlElement &ele);
 
-private:
+protected:
 
+  // sets some default configuration info
+  // MUST OVERRIDE THIS IN SUBCLASS
+  virtual void setDefaults() = 0;
+
+  // validate the configuration
+  // checks for valid setup of different parts of the program
+  // returns true for success
+  // MUST OVERRIDE THIS IN SUBCLASS
+  virtual bool validateConfig() = 0;
+
+  // no value yet
   const RtConfigVal unset;
 
   // xml doc with all the config stuff
   TiXmlDocument parms;
 
-  // name of the xml config file to read
-  string confFilename;
-
-  // pointer to the conductor
-  RtConductor *conductor;
-
   // for conversion of string types to other types
   template <class T> inline bool convert(T &t, const string& s);
-
-  // prints the usage info for the realtime system
-  void printUsage();
 
   //**************************************************//
   // stuff to support printing to a stream

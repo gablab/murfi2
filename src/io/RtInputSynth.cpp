@@ -9,6 +9,7 @@ static char *VERSION = "$Id: RtInputSynth.cpp 383 2009-01-14 14:12:45Z alan $";
 
 #include"RtInputSynth.h"
 #include"RtDataIDs.h"
+#include"RtActivation.h"
 #include"RtExperiment.h"
 
 #include<fstream>

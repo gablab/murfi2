@@ -25,7 +25,7 @@ RtVar::RtVar() : RtStreamComponent() {
 
 // destructor
 RtVar::~RtVar() {
-  cout << "destroyed" << endl;
+  //cout << "destroyed" << endl;
 }
 
 // process a configuration option

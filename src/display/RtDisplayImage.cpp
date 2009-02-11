@@ -595,7 +595,7 @@ void RtDisplayImage::makeTexture() {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-  cout << "making image texture" << endl;
+  //  cout << "making image texture" << endl;
 
   // unmosaic if needed
   short *imageData;
@@ -1236,6 +1236,24 @@ void RtDisplayImage::drawString(GLint x, GLint y, const char* s, float r, float 
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
 }
+
+
+// NOTE: when we build app using frontend 
+// main is defined there
+#ifndef USE_FRONTEND
+
+// main function for the realtime system
+// very simple
+int ACE_TMAIN(int argc, char **args) {
+  ACE_TRACE(("ACE_TMAIN"));
+
+  RtDisplayImage di;
+  runBackend(argc, args);
+  return
+}
+
+#endif
+
 
 #endif //#ifndef USE_FRONTEND
 /*****************************************************************************

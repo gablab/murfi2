@@ -26,7 +26,7 @@ RtDataID::RtDataID() {
     roiID = "";
     validDataFlag = false;
 
-    instantiationTime = RtExperiment::getExperimentElapsedTime();
+    instantiationTime = getExperimentElapsedTime();
 }
 
 // constructor with known fields
@@ -48,7 +48,7 @@ RtDataID::RtDataID(unsigned int _studyNum,
     roiID = _roiID;
     validDataFlag = _validDataFlag;
 
-    instantiationTime = RtExperiment::getExperimentElapsedTime();
+    instantiationTime = getExperimentElapsedTime();
 }
 
 // copy constructor
@@ -214,7 +214,7 @@ void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
   history = history + moduleID;
   moduleID = thisModule.getID();
   
-  instantiationTime = RtExperiment::getExperimentElapsedTime();
+  instantiationTime = getExperimentElapsedTime();
 }
 
 // copy from other data

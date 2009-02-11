@@ -21,7 +21,7 @@ RtImageZScore::RtImageZScore() : RtActivationEstimator () {
 
 // destructor
 RtImageZScore::~RtImageZScore() {
-  cout << "destroyed" << endl;
+  //cout << "destroyed" << endl;
 }
 
 // process a configuration option

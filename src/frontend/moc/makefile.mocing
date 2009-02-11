@@ -20,16 +20,7 @@ UTL_DIR=$(FSRC_DIR)/Utils
 WGT_DIR=$(FSRC_DIR)/Widgets
 
 # Define make rules for different dirs
-%_moc.cpp: $(WIN_DIR)/%.h
-	-$(MOC) $< -o $@
-
-%_moc.cpp: $(APP_DIR)/%.h
-	-$(MOC) $< -o $@
-
-%_moc.cpp: $(UTL_DIR)/%.h
-	-$(MOC) $< -o $@
-
-%_moc.cpp: $(WGT_DIR)/%.h
+%_moc.cpp: %.h
 	-$(MOC) $< -o $@
 
 # Header files from different dirs

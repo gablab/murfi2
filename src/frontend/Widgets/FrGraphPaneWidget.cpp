@@ -144,7 +144,13 @@ void FrGraphPaneWidget::OnUpdate(){
 
         //int graphID = id++;
         QString& name = graphDO->GetSettings()->Name;
-        QColor& color = graphDO->GetSettings()->Color;
+        
+	/* ohinds 2009-02-07
+	 * temporary hack
+	QColor& color = graphDO->GetSettings()->Color;
+	*/
+	QColor color(Qt::red);
+
         bool visibility = graphDO->GetSettings()->Visibility;
 
         //m_GraphListWidget->AddGraphWidget(graphID, name, color, visibility);

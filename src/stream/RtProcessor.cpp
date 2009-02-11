@@ -1,8 +1,8 @@
 /******************************************************************************
  * RtProcessor.cpp is the definition of a class for a processing stream
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
+ * Oliver Hinds <ohinds@mit.edu> 2007-08-14
+ *
  *****************************************************************************/
 
 static char *VERSION = "$Id$";
@@ -15,14 +15,14 @@ static char *VERSION = "$Id$";
 #include"tinyxml/tinyxml.h"
 
 // default constructor
-RtProcessor::RtProcessor() 
+RtProcessor::RtProcessor()
   : RtStreamComponent() {
   setID("RtProcessor");
 }
 
 // destructor
 RtProcessor::~RtProcessor() {
-  
+
 }
 
 //*** initialization routines  ***//
@@ -32,7 +32,7 @@ RtProcessor::~RtProcessor() {
 //   config
 //  out
 //   success or failure
-int RtProcessor::addModules(RtConfig &config) {
+bool RtProcessor::addModules(RtConfig &config) {
   ACE_TRACE(("RtProcessor::addModules"));
 
   // make sure the stack is empty
@@ -40,22 +40,18 @@ int RtProcessor::addModules(RtConfig &config) {
     addMod.pop();
   }
 
-  // get the node for preprocessing 
+  // get the node for preprocessing
   TiXmlNode *procNode = config.getNode("processor");
 
   // check for preprocessor node (backward compatibility)
   if(procNode == NULL) {
     procNode = config.getNode("preprocessor");
-  }  
+  }
 
   // if no preprocessing was specified, just pass the data
-  if(procNode == NULL || procNode->Type() != TiXmlNode::ELEMENT) {    
-    if(config.getConductor()->getDisplayImage() != NULL) {
-      RtStreamComponent *sc 
-       = buildStreamComponent(RtPasser::moduleString, "original data passer");
-      sc->addOutput(config.getConductor()->getDisplayImage());
-      addSingleModule(sc);
-    }
+  if(procNode == NULL || procNode->Type() != TiXmlNode::ELEMENT) {
+    RtStreamComponent *sc = buildStreamComponent(RtPasser::moduleString);
+    addSingleModule(sc);
   }
   else { // find modules in the node and add each
     addModulesFromNode((TiXmlElement*) procNode, &config);
@@ -64,7 +60,7 @@ int RtProcessor::addModules(RtConfig &config) {
   pushAllModules();
 
 
-  return 0;
+  return true;
 }
 
 // process a single acquisition
@@ -72,7 +68,7 @@ int RtProcessor::process(ACE_Message_Block *mb) {
   ACE_TRACE(("RtProcessor::process"));
 
   // pass the message block down to our stream
-  RtStream::put(mb);  
+  RtStream::put(mb);
 
   return 0;
 }

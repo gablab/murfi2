@@ -4,6 +4,7 @@
 #include "FrTool.h"
 #include "FrMacro.h"
 
+class FrVoxelTool;
 class FrPanTool;
 class FrZoomTool;
 class FrTBCTool;
@@ -33,13 +34,14 @@ public:
 	bool IsInViewPort(FrInteractorStyle* is, FrMouseParams& params);
 
 private:
+    FrVoxelTool*  m_voxelTool;
     FrPanTool*  m_panTool;
     FrZoomTool* m_zoomTool;
     FrTBCTool*  m_tbcTool;
 	FrSliceScrollTool* m_ssTool;
 	
-	bool isZoom;
 	bool ZoomActivated;
+	bool PanZoomActivated;
 };
 
 #endif

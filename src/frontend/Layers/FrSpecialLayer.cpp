@@ -17,7 +17,7 @@ vtkStandardNewMacro(FrSpecialLayer);
 FrSpecialLayer::FrSpecialLayer() 
 : m_TextMapper(0),	m_TextActor(0),
   m_BorderPts(0), m_BorderMapper(0), 
-  m_BorderActor(0), m_Selection(0){
+  m_BorderActor(0), m_Selection(0), m_Crosshair(0){
     this->InitializeText();
     this->InitializeBorder();
 }
@@ -32,6 +32,7 @@ FrSpecialLayer::~FrSpecialLayer() {
     if(m_BorderActor) m_BorderActor->Delete();
     // Free Selection
     if(m_Selection) m_Selection->Delete();
+    if(m_Crosshair) m_Crosshair->Delete();
 }
 
 void FrSpecialLayer::InitializeText(){
@@ -92,9 +93,14 @@ void FrSpecialLayer::InitializeBorder(){
     selectRect->Delete();
     borderMapper->Delete();
 
-	m_Selection = FrSelection::New();
-	m_Selection->PickableOff();
+    m_Selection = FrSelection::New();
+    m_Selection->PickableOff();
     m_Renderer->AddActor(m_Selection);
+
+
+    m_Crosshair = FrCrosshair::New();
+    m_Crosshair->PickableOff();
+    m_Renderer->AddActor(m_Crosshair);
 }
 
 void FrSpecialLayer::SetText(const char* text){
@@ -128,4 +134,16 @@ void FrSpecialLayer::SetSelectionVisibility(bool visible){
     if(m_Selection){
         m_Selection->SetVisibility(visible);
     }
+}
+
+void FrSpecialLayer::SetCrosshairParams(CrosshairParams params){
+  m_Crosshair->SetCrosshairParams(params);
+  m_Crosshair->DrawCrosshair();
+}
+
+
+void FrSpecialLayer::SetCrosshairVisibility(bool visible){
+  if(m_Crosshair){
+    m_Crosshair->SetVisibility(visible);
+  }
 }

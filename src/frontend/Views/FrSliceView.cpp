@@ -143,11 +143,23 @@ void FrSliceView::UpdatePipeline(int point){
     if(timePoint < 0) 
         timePoint = -1;
 
-	char sliceNumText[32] = "";
+    char sliceNumText[32] = "";
     sprintf(sliceNumText, "Slice %d, TP %d", 
-        params.ViewSettings->SliceNumber, timePoint);
+	    params.ViewSettings->SliceNumber, timePoint);
 
     m_LayeredImage->SetText(sliceNumText);
+
+    // render a crosshair
+//    if(crosshairOn) {
+//      // get special layer
+//      FrMainWindow* mv = this->GetMainController()->GetMainView();
+//      FrSpecialLayer* sl = this->GetSpecialLayer();
+//
+//      if(sl) {	
+//	sl->SetCrosshairVisibility(true);
+//	//mv->GetCurrentView()->UpdatePipeline(FRP_SETCAM);
+//      }
+//    }
 
     // redraw scene
     vtkRenderWindow* renWin = GetRenderWindow();
@@ -225,18 +237,34 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
     viewDO->GetSliceViewSettings()->SliceNumber = Slice;
     params.ViewSettings->SliceNumber = Slice;
 
-    // set input to special layer here
-    m_docReader->SetTarget(FrDocumentReader::Points);
-    m_docReader->Update();
-
-    // set params
-    SelectionParams Params;
-    Params.type = 4;
+//    // set input to special layer here
+//    m_docReader->SetTarget(FrDocumentReader::Points);
+//    m_docReader->Update();
+//
+//    // set params
+//    SelectionParams Params;
+//    Params.type = 4;
 
     FrSpecialLayer* sl = m_LayeredImage->GetSpecialLayer();
-    sl->SetSelectionData(m_docReader->GetOutput());
-    sl->SetSelection(Params);
-    sl->SetSelectionVisibility(true);
+//    sl->SetSelectionData(m_docReader->GetOutput());
+//    sl->SetSelection(Params);
+//    sl->SetSelectionVisibility(false);
+
+    // crosshair
+    CrosshairParams cp = m_docReader->ReadCrosshair();
+
+    // Find appropriate image volume
+    vtkImageData *image = m_docReader->GetOutput();
+
+    if(image) {
+      // transform out of image space
+      viewDO->TransformIndicesToCoordinates(cp.x, cp.y, image);
+      viewDO->TransformIndicesToCoordinates(cp.xmin, cp.ymin, image);
+      viewDO->TransformIndicesToCoordinates(cp.xmax, cp.ymax, image);
+      
+      sl->SetCrosshairParams(cp);
+    }
+
 }
 
 void FrSliceView::UpdateColormap(FrUpdateParams0& params){

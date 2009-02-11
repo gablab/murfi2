@@ -41,9 +41,19 @@ double GetLength(int x1, int y1, int x2, int y2)
 }
 
 void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3], int imgNumber){
+  double dp[3];
+  dp[0] = point[0]; dp[1] = point[1]; dp[2] = point[2];
+  GetRealImagePosition(viewDO, data, dp, imgNumber);
+
+  point[0] = (int) rint(dp[0]);
+  point[1] = (int) rint(dp[1]);
+  point[2] = (int) rint(dp[2]);
+}
+
+void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point[3], int imgNumber){
     if(!data) return;
 
-    int oldPoint[2];
+    double oldPoint[2];
     oldPoint[0] = point[0];
     oldPoint[1] = point[1];
 
@@ -58,15 +68,15 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
                 // get slice number
                 int slice = viewDO->GetSliceViewSettings()->SliceNumber;			
                 // set current indices of point
-                point[0] = int((oldPoint[0]+1) / dSpacing[0]);
-                point[1] = int((oldPoint[1]+1) / dSpacing[1]);
+		point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
+		point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
                 point[2] = slice;
             }
             break;
         case MosaicView:
             {
-                point[0] = int((oldPoint[0]+1) / dSpacing[0]);
-                point[1] = int((oldPoint[1]+1) / dSpacing[1]);
+		point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
+		point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
                 point[2] = 0;
             }
             break;
@@ -79,9 +89,9 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
                         // get slice number
                         int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL];
 
-                        point[0] = int((oldPoint[0]+1) / dSpacing[0]);
+                        point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
                         point[1] = slice;
-                        point[2] = int((oldPoint[1]+1) / dSpacing[1]);
+                        point[2] = (oldPoint[1]-dSpacing[2]/2) / dSpacing[1] + 0.5;
                         break;
                         }
                     case DEF_SAGITAL: // sagital
@@ -90,8 +100,8 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
                         int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL];
 
                         point[0] = slice;
-                        point[1] = int((oldPoint[0]+1) / dSpacing[0]);
-                        point[2] = int((oldPoint[1]+1) / dSpacing[1]);
+                        point[1] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
+                        point[2] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
 			            break;
                     }
                     case DEF_AXIAL:
@@ -99,9 +109,9 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
                         int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL];
 
 
-                        point[0] = int((oldPoint[0]+1) / dSpacing[0]);
-		                point[1] = int((oldPoint[1]+1) / dSpacing[1]);
-			            point[2] = slice;
+                        point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
+			point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
+			point[2] = slice;
 			            break;
                     }
                 }

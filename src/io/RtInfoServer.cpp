@@ -41,12 +41,12 @@ RtInfoServer::~RtInfoServer() {
 void RtInfoServer::setData(RtData *data) {  
 
   //cout << "EVENT TRIGGER SETDATA " << data->getDataID() << endl;
-  if(data->getDataID().getRoiID() 
-     == RtExperiment::getConfig()->get("infoserver:posActivationRoiID").str()) {
+  if(data->getDataID().getDataName() 
+     == getConfig().get("infoserver:posActivationDataID").str()) {
     posAct[data->getDataID().getTimePoint()] = data;
   }
-  else if(data->getDataID().getRoiID() 
-	  == RtExperiment::getConfig()->get("infoserver:negActivationRoiID").str()) {
+  else if(data->getDataID().getDataName() 
+	  == getConfig().get("infoserver:negActivationDataID").str()) {
     negAct[data->getDataID().getTimePoint()] = data;
   }
   //else if(data->getDataID().getModuleID() == ID_EVENTTRIGGER) {
@@ -149,8 +149,8 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
       // set the id
       if(roi->Attribute("id")) {
 	roiResponse->SetAttribute("id", (pos ? 
-					 RtExperiment::getConfig()->get("infoserver:posActivationRoiID").str()
-					 : RtExperiment::getConfig()->get("infoserver:negActivationRoiID").str()));
+					 getConfig().get("infoserver:posActivationRoiID").str()
+					 : getConfig().get("infoserver:negActivationRoiID").str()));
       }
 
       // find get tags

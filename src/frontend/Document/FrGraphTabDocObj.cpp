@@ -9,7 +9,7 @@
 
 
 FrGraphTabDocObj::FrGraphTabDocObj(bool isDefault){
-    m_ID = (unsigned int)((void*)this);
+    m_ID = (unsigned long)((void*)this);
     m_Name = DEF_TBS_NAME;
 //    m_Description = DEF_TBS_DESCR;
     m_IsCurrent = DEF_TBS_CURRENT;

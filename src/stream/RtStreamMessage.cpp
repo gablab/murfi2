@@ -168,10 +168,10 @@ RtData *RtStreamMessage::getData(const string &moduleId,
 //  out
 //   pointer to the data or NULL, if such data doesnt exist
 RtData *RtStreamMessage::getData(const RtDataID &idTemplate) {
-  if(idTemplate.getDataName() == "activation-img_0") {
-    cout << "here" << endl;
-  }
   for(unsigned int i = 0; i < numData; i++) {
+    if(DEBUG_LEVEL & ADVANCED) {
+      cout << data[i]->getDataID() << endl;
+    }
     if(idTemplate == data[i]->getDataID()) {
        return data[i];
     }

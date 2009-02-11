@@ -9,6 +9,7 @@
 
 #include"RtIntensityNorm.h"
 #include"RtExperiment.h"
+#include"RtConfigFmriExperiment.h"
 #include"ace/Mutex.h"
 #include"RtDataIDs.h"
 
@@ -35,7 +36,7 @@ RtIntensityNorm::RtIntensityNorm() : RtStreamComponent() {
 
 // destructor
 RtIntensityNorm::~RtIntensityNorm() {
-  cout << "destroyed" << endl;
+  //cout << "destroyed" << endl;
 }
 
 // process a configuration option
@@ -92,7 +93,8 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
       if(!computingMask) {
 	// execute commands to make the mask
 	maskJobID = RtFSLInterface::makeBrainMask(
-		RtExperiment::getSeriesRefVolFilename(img->getDataID().getSeriesNum()), 
+	        getConfig().getSeriesRefVolFilename(
+				    img->getDataID().getSeriesNum()), 
 		mask.getFilename(),
 		betParms);
 	

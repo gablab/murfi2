@@ -50,12 +50,14 @@ public:
   // initialize stream and prepare to run
   //  out:
   //   true (for success) or false
-  int configure(RtConfig &config);
+  bool configure(RtConfig &config);
 
   // adds all modules to the stream
   //  in
   //   config: configuration info
-  virtual int addModules(RtConfig &config);
+  //  out
+  //   true for success
+  virtual bool addModules(RtConfig &config);
 
   // adds outputs to a stream component (needs to be here so that we have
   // access to the conductor to get pointers to the outputs)
@@ -100,8 +102,8 @@ public:
   // adds all the modules on the stack to the processing stream
   // the module stack is emtpty after this executes
   //  out
-  //   -1 for error, 0 on success
-  int pushAllModules();
+  //   true for success
+  bool pushAllModules();
 
   // get the version
   //  out: char array that represents the cvs version

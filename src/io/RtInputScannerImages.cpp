@@ -11,6 +11,7 @@ static char *VERSION = "$Id$";
 #include"site_config.h"
 #include"RtDataIDs.h"
 #include"RtExperiment.h"
+#include"RtConfigFmriExperiment.h"
 
 #include<vnl/vnl_matrix_fixed.h>
 #include<vnl/vnl_vector.h>
@@ -28,14 +29,15 @@ static const int    DEFAULT_PORT = 15000;
 #define MAX_SERIESNUM 99999
 static char buffer[MAX_BUFSIZ];
 
+static bool verbose = false;
+
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
   :  port(DEFAULT_PORT),
      //     savePath(""),
 //     saveFilestem(DEFAULT_SAVESTEM),
 //     saveFileext(DEFAULT_SAVEEXT),
-     seriesNum(1),
-     toBeDeleted(received.begin())
+     seriesNum(1)
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
@@ -51,11 +53,6 @@ RtInputScannerImages::RtInputScannerImages()
 
 // destructor
 RtInputScannerImages::~RtInputScannerImages() {
-#ifndef USE_FRONTEND
-  for(; toBeDeleted != received.end(); toBeDeleted++) {
-    delete *toBeDeleted;
-  }
-#endif
 }
 
 // configure and open
@@ -147,6 +144,11 @@ bool RtInputScannerImages::open(RtConfig &config) {
     alignSeries = false;
   }
 
+  if(config.isSet("info:terminal:verbose") 
+     && config.get("info:terminal:verbose")==true) {
+    verbose = true;
+  }
+
   return true;
 }
 
@@ -177,12 +179,17 @@ int RtInputScannerImages::svc() {
   static bool haveRefVol = false;
   stringstream infos;
 
-  int imageNum = 0;
+  unsigned int imageNum = 0;
+  unsigned int numImagesExpected 
+    = getConfig().get("scanner:measurements");
 
   cout << "listening for images on port " << port << endl;
 
   // continuously try to accept connections
-  for(; isOpen && acceptor.accept(stream) != -1; imageNum++) {
+  for(; isOpen 
+	&& imageNum < numImagesExpected 
+	&& acceptor.accept(stream) != -1; 
+      imageNum++) {
     cout << "connection accepted" << endl;
 
     // get the info
@@ -229,21 +236,20 @@ int RtInputScannerImages::svc() {
 
     // if there is motion info add it
     if(ei->bIsMoCo) {
-      /*RtMotion *mot = new RtMotion(ei->dMoCoTransX,
+      RtMotion *mot = new RtMotion(ei->dMoCoTransX,
 				   ei->dMoCoTransY,
 				   ei->dMoCoTransZ,
 				   ei->dMoCoRotX,
 				   ei->dMoCoRotY,
 				   ei->dMoCoRotZ);
-      RtExperiment::getDataStore()->setData(mot);*/
+      getDataStore().setData(mot);
     }
 
     // set the image id for handling
     //rti->addToID("scanner");
 
     // append this to a vector of gathered images
-    //received.push_back(rti);
-    RtExperiment::getDataStore()->setData(rti);
+    getDataStore().setData(rti);
 
     // signal that we got an image
     //cout << "sending event with code number " << codeNum << endl;
@@ -255,8 +261,8 @@ int RtInputScannerImages::svc() {
        && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI
        ) {
       
-      if(!(haveRefVol = RtExperiment::getExperimentRefVolExist())) {
-	if(rti->write(RtExperiment::getExperimentRefVolFilename())) {
+      if(!(haveRefVol = getConfig().getStudyRefVolExists())) {
+	if(rti->write(getConfig().get("study:xfm:referenceVol"))) {
 	  haveRefVol = true;
 	}
       }
@@ -265,22 +271,6 @@ int RtInputScannerImages::svc() {
       }
     }
 
- //   // if its the first image in a series save it no matter what
- //   if(isFirstInSeries(*ei)
- //      && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
-
- //     rti->write(RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
-
- //     // register with reference
- //     if(alignSeries) {
- //       RtFSLInterface::registerSameSubjEPI(
- //           RtExperiment::getSeriesRefVolFilename(rti->getDataID().getSeriesNum()),
- //           RtExperiment::getExperimentRefVolFilename(),
- //           RtExperiment::getSeriesXfmFilename(rti->getDataID().getSeriesNum()), true
- // 					  );
- //     }
-
- //   }
 
     sendCode(rti);
 
@@ -311,26 +301,15 @@ int RtInputScannerImages::svc() {
 
     //cout << "waiting for another image" << endl;
   }
-  cerr << "ERROR: could not open connection to accept "
-       << "images from the scanner on port "
-       << port << endl;
-    //<< "errno: " << ACE_OS::last_error();
-  isOpen = false;
 
+  if(imageNum < numImagesExpected) {
+    cerr << "ERROR: could not open connection to accept "
+	 << "images from the scanner on port "
+	 << port << endl;
+    isOpen = false;
+  }
 
   return 0;
-}
-
-
-// deleted some received images from the heap
-//  in
-//   deleteNum: maximum number of images to delete
-void RtInputScannerImages::deleteReceivedImages(int deleteNum) {
-
-  for(int i = 0; i < deleteNum && toBeDeleted != received.end();
-      i++, toBeDeleted++) {
-    delete *toBeDeleted;
-  }
 }
 
 
@@ -385,7 +364,10 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 						   const RtExternalImageInfo &info) {
 
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
-  cout << "receiving image " << info.iAcquisitionNumber << endl;
+
+  if(verbose) {
+    cout << "receiving image " << info.iAcquisitionNumber << endl;
+  }
 
   int numPix = (int) pow((double)info.iMosaicGridSize,2) * info.nLin * info.nCol;
   for(unsigned int rec = 0; rec < numPix*sizeof(short);
@@ -405,7 +387,7 @@ bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 
   cout << "writing image number " << img.getDataID().getSeriesNum() << ":" << img.getDataID().getTimePoint() << endl;
 
-  return img.write(RtExperiment::getExperimentVolFilename(
+  return img.write(getConfig().getVolFilename(
 			    img.getDataID().getSeriesNum(),
 			    img.getDataID().getTimePoint()));
 }

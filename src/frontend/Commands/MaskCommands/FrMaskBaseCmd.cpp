@@ -171,39 +171,8 @@ FrSpecialLayer* FrMaskBaseCmd::GetSpecialLayer(){
 
 void FrMaskBaseCmd::TransformCoordinatesToIndices(int point[2], vtkImageData* img, int imgID){
 
-    if(!img) return;
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+  if(!img) return;
+  FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+  doc->GetCurrentViewObject()->TransformCoordinatesToIndices(point,img,imgID);
 
-    double dSpacing[3];	
-    img->GetSpacing(dSpacing);
-    
-    // calc current indices of point
-    switch(viewDO->GetActiveView()){
-        case SliceView:
-            point[0] = int((point[0] + 1) / dSpacing[0]);
-            point[1] = int((point[1] + 1) / dSpacing[1]);
-            break;
-        case MosaicView:
-            point[0] = int((point[0] + 1) / dSpacing[0]);
-            point[1] = int((point[1] + 1) / dSpacing[1]);
-            break;
-        case OrthoView:
-            // Renderer number in ortho view
-            switch(imgID){				
-                case DEF_CORONAL:
-                    point[0] = int((point[0] + 1) / dSpacing[0]);
-                    point[1] = int((point[1] + 1) / dSpacing[1]);
-                    break;
-                case DEF_SAGITAL:
-                    point[0] = int((point[0] + 1) / dSpacing[0]);
-                    point[1] = int((point[1] + 1) / dSpacing[1]);
-		            break;
-                case DEF_AXIAL:
-                    point[0] = int((point[0] + 1) / dSpacing[0]);
-	                point[1] = int((point[1] + 1) / dSpacing[1]);
-		            break;
-            }
-            break;
-    } // end switch view
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Conductor.cpp defines a class that oversees and coordinates all
- * operations during a real-time fMRI session.
+ * operations during a single real-time fMRI session.
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14
  *
@@ -9,66 +9,49 @@
 static char *VERSION = "$Id$";
 
 #include"RtConductor.h"
-#include"RtInfoServer.h"
 #include"RtInputSynth.h"
 #include<iostream>
 
-//*** constructors/destructors  ***//
-
-// default constructor
-//RtConductor::RtConductor() {
-//}
 
 // constructor with command line args
-RtConductor::RtConductor(int argc, char **argv) {
+RtConductor::RtConductor(const RtConfigFmriRun &_config) : ACE_Task_Base(), 
+							   configured(false),
+							   running(false) {
   ACE_TRACE(("RtConductor::RtConductor"));
+
+  configure(config);
+}
+
+// destructor
+RtConductor::~RtConductor() {
+  ACE_TRACE(("RtConductor::~RtConductor"));
+
+}
+
+//*** initialization routines  ***//
+
+// configure the conductor
+//  in
+//   configuration
+bool RtConductor::configure(const RtConfigFmriRun &_config) {
+
+  // copy the config
+  config = _config;
 
   int curCodeNum;
 
-  // set us as the conductor for the config
-  config.setConductor(this);
-
-  // send the arguments to the configuration, check that it was okay
-  if(!config.parseArgs(argc,argv) || !config.validateConfig()) {
-    cerr << "config failed... exit" << endl;
-    exit(1);
-  }
-
-
   // prepare inputs
 
-  if(config.isSet("scanner:disabled") && config.get("scanner:disabled")==false) {
+  if(config.isSet("scanner:disabled")
+     && config.get("scanner:disabled")==false) {
     RtInputScannerImages *scanimg;
     ACE_NEW_NORETURN(scanimg, RtInputScannerImages);
 
     if(!addInput(scanimg)) {
       cerr << "ERROR: could not add scanner input" << endl;
-    }
-    else {
-      cout << "added scanner image input" << endl;
+      return false;
     }
   }
-
-  if(config.isSet("inputsynth:disabled") && config.get("inputsynth:disabled")==false) {
-    RtInputSynth *synth;
-    ACE_NEW_NORETURN(synth, RtInputSynth);
-
-    if(!addInput(synth)) {
-      cerr << "ERROR: could not add input synthesizer" << endl;
-    }
-    else {
-      cout << "added input synthesizer" << endl;
-    }
-  }
-
- /* if(config.get("receiveTriggers")==true) {
-    RtInputUSBKb *scantrig;
-    ACE_NEW_NORETURN(scantrig, RtInputUSBKb);
-
-    if(!addInput(scantrig)) {
-      cerr << "ERROR: could not add scanner trigger listener" << endl;
-    }
-  }*/
 
   // attach code numbers to inputs
   curCodeNum = START_CODE_INPUTS;
@@ -79,29 +62,6 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   // prepare outputs
-
-#ifndef USE_FRONTEND
-  // display always first, if here
-  if(config.get("display:image")==true) {
-    RtDisplayImage *dispimg;
-    ACE_NEW_NORETURN(dispimg, RtDisplayImage);    
-
-    if(!addOutput(dispimg)) {
-      cerr << "ERROR: could not initialize image display" << endl;
-    }
-  }
-#endif
-
-  //// open output socket
-  //if(config.get("infoserver:port")==true) {
-  //  RtInfoServer *infoserver;
-  //  ACE_NEW_NORETURN(infoserver, RtInfoServer);    
-
-  //  if(!addOutput(infoserver)) {
-  //    cerr << "ERROR: could not initialize info server" << endl;
-  //  }
-  //}
-
   if(config.get("info:log:disabled")==false) {
     if(!outputLog.open(config)) {
       cerr << "ERROR: could not open logfile \""
@@ -118,46 +78,58 @@ RtConductor::RtConductor(int argc, char **argv) {
   }
 
   // build the stream and its components
-  buildStream(config);
+  if(!buildStream()) {
+    cerr << "ERROR: failed to build the processing stream for the conductor"
+	 << endl;
+    return false;
+  }
 
+
+  configured = true;
+
+  // write configuration to the log
+  outputLog.writeConfig(config);
+  outputLog << "initialization completed at ";
+  outputLog.printNow();
+  outputLog << "\n";
+
+  return true;
 }
 
-// destructor
-RtConductor::~RtConductor() {
-  ACE_TRACE(("RtConductor::~RtConductor"));
+// deconfigure the conductor by cleaning up streams
+void RtConductor::deconfigure() {
 
   stream.close();
-  //delete stream;
 
-#ifndef USE_FRONTEND
   // tell everyone that we're done and delete them
   for(vector<RtInput*>::iterator i=inputs.begin(); i != inputs.end(); i++) {
     (*i)->close();
     delete (*i);
   }
 
-  for(vector<RtOutput*>::iterator k=outputs.begin(); k != outputs.end(); k++){
-    (*k)->close();
-    delete (*k);
+  for(vector<RtOutput*>::iterator o=outputs.begin(); o != outputs.end(); o++){
+    (*o)->close();
+    delete (*o);
   }
-#endif
-}
 
-//*** initialization routines  ***//
+  configured = false;
+}
 
 // builds the processing stream 
 //  in:
 //   config: configuration
 //  out:
 //   true (for success) or false
-bool RtConductor::buildStream(RtConfig config) {
+bool RtConductor::buildStream() {
   ACE_TRACE(("RtConductor::buildStream"));
 
   // set the conductor to us
   stream.setStreamConductor(this);
 
   // open the stream
-  stream.configure(config);
+  if(!stream.configure(config)) {
+    return false;
+  }
 
   return true;
 }
@@ -173,12 +145,13 @@ bool RtConductor::addInput(RtInput *in) {
 
   // open and configure
   if(!in->open(config)) {
+    cerr << "WARNING: failed to add input: " << in->getID() << endl;
     return false;
   }
-  else {
-    inputs.push_back(in);
-  }
-
+  
+  inputs.push_back(in);
+  cout << "added input: " << in->getID() << endl;
+  
   return true;
 }
 
@@ -207,13 +180,13 @@ bool RtConductor::addOutput(RtOutput *out) {
 
   // open and configure
   if(!out->open(config)) {
+    cerr << "WARNING: failed to add output: " << out->getID() << endl;
     return false;
   }
-  else {
-    outputs.push_back(out);
-  }
 
-  cout << "added " << out->getID() << " as output " << out << endl;
+  outputs.push_back(out);
+
+  cout << "added output: " << out->getID() << endl;
 
   return true;
 }
@@ -233,87 +206,49 @@ bool RtConductor::addVectorOfOutputs(vector<RtOutput*> &outs) {
   return ret;
 }
 
-// initialize config and prepare to run
-//  out:
-//   true (for success) or false
-bool RtConductor::init() {
-  ACE_TRACE(("RtConductor::init"));
-
-  outputLog.writeConfig(config);
-  RtExperiment::setConfig(&config);
-
-  outputLog << "initialization completed at ";
-  outputLog.printNow();
-  outputLog << "\n";
-
-  return true;
-}
-
 //*** operation routines  ***//
 
 // begins execution of a realtime fMRI session
 //  out:
 //   true (for success) or false
-bool RtConductor::run() {
-  ACE_TRACE(("RtConductor::run"));
-
-  // print startg time to log file
+int RtConductor::svc() {
+  ACE_TRACE(("RtConductor::svc"));
+ 
+  if(!configured) {
+    cerr << "ERROR: the conductor for this run has not been configured"
+ 	 << endl;
+    return false;
+  }
+ 
+  // print start time to log file
   outputLog << "began running at ";
   outputLog.printNow();
   outputLog << "\n";
-
-  // start the info server
-  //if(config.isSet("infoserver:port")) {  
-  //  getInfoServer()->activate();
-  //}
-
+ 
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     (*i)->activate();
   }
+ 
+  running = true;
 
-#ifndef USE_FRONTEND
-  // start the display
-  // DIRTY HACK TO LET DISPLAY RUN IN MAIN THREAD
-  if(config.get("display:image")==true) {  
-    //RtDisplayImage* out = getDisplay();
-    //out->svc();
-  //  //getDisplay()->activate();
-  }
-  //else {
-    // wait for threads to complete
-
-  // wait for threads to complete
+  // wait for all threads to complete
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     (*i)->wait();
   }
-#endif
+
+  running = false;
 
   // print end time to log file
   outputLog << "done running at ";
   outputLog.printNow();
   outputLog << "\n";
 
+  cout << "done" << endl;
+
+  deconfigure();
+
   return true;
-}
-
-void RtConductor::stop(){
-  //stream.close();
-  //delete stream;
-
-  // tell everyone that we're done and delete them
-   while(inputs.size() > 0){
-        RtInput* input = inputs[0];//(RtInput*)(*(inputs.begin()));
-        inputs.erase(inputs.begin());
-        input->close();
-        input->wait();
-        delete input;
-    }
-    
-  //for(vector<RtOutput*>::iterator k=outputs.begin(); k != outputs.end(); k++){
-  //  (*k)->close();
-  //  delete (*k);
-  //}
 }
 
 // receive a code signaling completetion of data input or processing
@@ -346,6 +281,8 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     // dont need to do much here
   }
 
+  // unset configured so that reconfig is necessary to rerun
+  configured = false;
 }
 
 // write to the log file
@@ -356,26 +293,6 @@ void RtConductor::log(const string &s) {
 // write to the log file
 void RtConductor::log(stringstream &s) {
   outputLog.write(s);
-}
-
-
-// get the display output
-//  out 
-//   pointer to the display output object
-RtDisplayImage *RtConductor::getDisplayImage() {
-  if(config.get("display:image")==true) {
-     return (RtDisplayImage*) (*outputs.begin());
-  }
-  else {
-    return NULL;
-  }
-}
-
-// get the info server
-//  out 
-//   pointer to the infoserver object
-RtInfoServer *RtConductor::getInfoServer() {
-  return (RtInfoServer*) getOutputByName("output:infoserver");
 }
 
 // get an input by its name
@@ -426,14 +343,6 @@ vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
   return outs;
 }
 
-// get data store map
-//  out
-//   pointer to data store map
-RtDataStore *RtConductor::getDataStore() {
-  //TODO put in checks?
-  return &dataStore;
-}
-
 // gets the version
 //  out:
 //   cvs version string for this class
@@ -441,26 +350,6 @@ char *RtConductor::getVersionString() {
   return VERSION;
 }
 
-// NOTE: when we build app using front end 
-// then main hasn't be defined several times
-#ifndef USE_FRONTEND
-
-// main function for the realtime system
-// very simple
-int ACE_TMAIN(int argc, char **args) {
-  ACE_TRACE(("ACE_TMAIN"));
-
-
-  RtConductor conductor(argc,args);
-
-  conductor.init();
-
-  conductor.run();
-
-  return 0;
-}
-
-#endif
 
 /*****************************************************************************
  * $Source$

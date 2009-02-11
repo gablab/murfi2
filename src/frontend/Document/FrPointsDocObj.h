@@ -10,6 +10,7 @@ class RtMRIImage;
 // Includes
 #include "FrMacro.h"
 #include "FrDocumentObj.h"
+#include "FrCrosshair.h"
 #include "FrGraphSettings.h"
 
 #include <vector>
@@ -41,6 +42,9 @@ public:
     vtkImageData* GetPointsYZ(int x);
     vtkImageData* GetMosaicData(int dimx, int dimy);
 
+    CrosshairParams GetCrosshairParams(int orientation);
+    CrosshairParams GetCrosshairParamsMosaic(int dimx, int dimy);
+
     // method to obtain one point (since we have only 1 point at the same time)
     void GetPoint(int* point);
 
@@ -51,7 +55,7 @@ private:
     //PointCollection m_Points;
     double m_spacing[3];
     int m_dimensions[3];
-
+    bool crosshairOn;
 };
 
 #endif

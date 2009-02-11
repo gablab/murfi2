@@ -189,18 +189,33 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
         }
     }
 
-    // set input to special layer here
-    m_docReader->SetTarget(FrDocumentReader::Points);
-    m_docReader->Update();
-
-    // set params
-    SelectionParams Params;
-    Params.type = 4;
+//    // set input to special layer here
+//    m_docReader->SetTarget(FrDocumentReader::Points);
+//    m_docReader->Update();
+//
+//    // set params
+//    SelectionParams Params;
+//    Params.type = 4;
 
     FrSpecialLayer* sl = m_LayeredImage->GetSpecialLayer();
-    sl->SetSelectionData(m_docReader->GetOutput());
-    sl->SetSelection(Params);
-    sl->SetSelectionVisibility(true);
+//    sl->SetSelectionData(m_docReader->GetOutput());
+//    sl->SetSelection(Params);
+//    sl->SetSelectionVisibility(false);
+
+    // crosshair
+    CrosshairParams cp = m_docReader->ReadCrosshair();
+
+    // Find appropriate image volume
+    vtkImageData *image = m_docReader->GetOutput();
+
+    if(image) {
+      // transform out of image space
+      vdo->TransformIndicesToCoordinates(cp.x, cp.y, image);
+      vdo->TransformIndicesToCoordinates(cp.xmin, cp.ymin, image);
+      vdo->TransformIndicesToCoordinates(cp.xmax, cp.ymax, image);
+      
+      sl->SetCrosshairParams(cp);
+    }
 }
 
 void FrMosaicView::UpdateColormap(FrUpdateParams1& params){

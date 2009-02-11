@@ -54,18 +54,27 @@ FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc, RtCo
 
  //   m_Conductor = new RtConductor(3, path);
     //    m_Conductor->addOutput(m_MainDocument->GetDataStore()->GetStore());
-    m_MainDocument->GetDataStore()->SetStore(conductor->getDataStore());
+
+    // ohinds: 2009-02-01
+    // changed to get datastore from rtexperiment instead
+    m_MainDocument->GetDataStore()->SetStore(&getDataStore());
     //m_Conductor->SetDataStore(m_MainDocument->GetDataStore()->GetStore());
 
+    /* ohinds: 2009-02-01
+     * commented init because that function has been replaced with configure
     conductor->init();
+     */
     //m_Conductor->run();
     
     // TODO: run conductor in another thread
     //ThrID = ACE_Thread_Manager::instance()->spawn((ACE_THR_FUNC)ConductorThread, m_Conductor);
  
+    /* ohinds 2009-02-02
+     * this is unnecessary, RtExperiment takes care of conductors
     //conductor = new FrBackground();
     ConductorThr.SetConductor(conductor);
     ConductorThr.start();
+    */
     
     //int err = errno;
     //perror(NULL);
@@ -88,8 +97,11 @@ FrMainController::~FrMainController(){
         ConductorThr.wait();
     }*/
 
+    /* ohinds 2009-02-02
+     * this is unnecessary, RtExperiment takes care of conductors
     // Need to stop it
     ConductorThr.terminate();
+    */
     
     // delete tool controller
     if(m_ToolController) {
@@ -684,9 +696,12 @@ void FrMainController::Test(){
 }
 
 
+    /* ohinds 2009-02-02
+     * this is unnecessary, RtExperiment takes care of conductors
 void* FrMainController::ConductorThread(void *arg){
     RtConductor* con = (RtConductor*)arg;
     con->run();
 
     return 0;
 }
+    */

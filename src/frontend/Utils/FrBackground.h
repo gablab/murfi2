@@ -4,7 +4,7 @@
 #include "Qt/qthread.h"
 #include "FrMacro.h"
 
-class RtConductor;
+class RtConfigFmriRun;
 
 class FrBackground : public QThread {
 public:
@@ -12,7 +12,7 @@ public:
      //void stop();
 
     // properties
-     FrSetPropMacro(RtConductor*, Conductor);
+     FrSetPropMacro(RtConfigFmriRun*, ConfigFmriRun);
 
 private:
     //bool stopped;

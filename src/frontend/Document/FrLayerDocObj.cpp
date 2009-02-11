@@ -14,7 +14,7 @@
 FrLayerDocObj::FrLayerDocObj(FrLayerSettings::LTypes type)
 : m_Settings(0), m_ID (0){
     m_Settings = FrLayerSettings::Create(type);
-    m_ID = (unsigned int)((void*)this);
+    m_ID = (unsigned long)(void*)(this);
 }
 
 FrLayerDocObj::~FrLayerDocObj(){

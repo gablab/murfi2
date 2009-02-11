@@ -85,12 +85,16 @@ bool FrVoxelTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
         cmd1->SetPointPicker(m_pointPicker);
         cmd1->SetMouseXY(params.X, params.Y);
 
-        FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
-        cmd2->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
+	FrChangeSliceCmd* cmd2 = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+	cmd2->SetMouseXY(params.X, params.Y);	
+
+        FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+        cmd3->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
 
         FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
         multiCmd->AddCommand(cmd1);
         multiCmd->AddCommand(cmd2);
+        multiCmd->AddCommand(cmd3);
         FrCommandController::Execute(multiCmd);
         delete multiCmd;
     }
@@ -117,14 +121,32 @@ bool FrVoxelTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrVoxelTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params){
-    //if(params.Button == FrMouseParams::LeftButton){
-    //    FrVoxelInfoCmd* cmd = FrCommandController::CreateCmd<FrVoxelInfoCmd>();
-    //    cmd->SetAction(FrVoxelInfoCmd::Update);
-    //    cmd->SetPointPicker(m_pointPicker);
-    //    cmd->SetMouseXY(params.X, params.Y);
-    //    FrCommandController::Execute(cmd);
-    //    delete cmd;
-    //}
+    if(params.Button == FrMouseParams::LeftButton){
+        FrVoxelInfoCmd* cmd1 = FrCommandController::CreateCmd<FrVoxelInfoCmd>();
+        cmd1->SetAction(FrVoxelInfoCmd::Add);
+        cmd1->SetPointPicker(m_pointPicker);
+        cmd1->SetMouseXY(params.X, params.Y);
+
+	FrChangeSliceCmd* cmd2 = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+	cmd2->SetMouseXY(params.X, params.Y);	
+
+        FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+        cmd3->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
+
+        FrMultiCmd* multiCmd = FrCommandController::CreateCmd<FrMultiCmd>();
+        multiCmd->AddCommand(cmd1);
+        multiCmd->AddCommand(cmd2);
+        multiCmd->AddCommand(cmd3);
+        FrCommandController::Execute(multiCmd);
+        delete multiCmd;
+
+//        FrVoxelInfoCmd* cmd = FrCommandController::CreateCmd<FrVoxelInfoCmd>();
+//        cmd->SetAction(FrVoxelInfoCmd::Update);
+//        cmd->SetPointPicker(m_pointPicker);
+//        cmd->SetMouseXY(params.X, params.Y);
+//        FrCommandController::Execute(cmd);
+//        delete cmd;
+    }
     if(params.Button == FrMouseParams::MidButton){
         params.Button = FrMouseParams::LeftButton;
         m_ssTool->OnMouseDrag(is, params);

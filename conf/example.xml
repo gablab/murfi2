@@ -4,84 +4,90 @@
 <!--  NOTE... ':' characters are not allowed in any names or values -->
 <!--  Oliver Hinds <ohinds@mit.edu> 2007-09-12                      -->
 
-<study
-    subject="foobar"
-    subjectsDir="/data/subjects"
-    > </study>
+<!-- basic setup of the study and subject -->
+<study name="foo">
+  <option name="subjectsDir"> /data/subjects </option>
 
-<info>
-  <terminal
-      verbose="true"
-      debug="false"
-      > </terminal>
+  <subject name="bar">
+  </subject>
 
-  <log
-      filename="log/log.rtl"
-      disabled="false"
-      > </log>
+  <terminal>
+      <option name="verbose"> true </option>
+      <option name="debug"> false </option>
+  </terminal>
 
-  <errlog
-      filename="log/log.rtl"
-      disabled="false"
-      > </errlog>
-</info>
+  <log>
+      <option name="filename"> log.rtl </option>
+      <option name="disabled"> false </option>
+  </log>
 
-<scanner
-    disabled="false"
+  <errlog>
+      <option name="filename"> log.rtl </option>
+      <option name="disabled"> false </option>
+  </errlog>
 
-    receiveImages="true"
-    port="15000"
-    saveImages="true"
+</study>
 
-    onlyReadMoco="false"
-    unmosaic="false"
+<!-- setup for connecting to and receiving images from the MRI scanner -->
+<scanner>
+  <!-- general options -->
+  <option name="disabled">      false </option>
+  <option name="receiveImages"> true </option>
+  <option name="saveImages">    true </option>
 
-    receiveTriggers="false"
-    triggerSync="false"
-    triggerCode="83"
+  <!-- sacquisition type -->
+  <option name="imageType">     epi </option>
 
-    tr="2.0"
-    measurements="153"
+  <!-- receiving parameters -->
+  <option name="port">          15000 </option>
+  <option name="onlyReadMoco">  true </option>
+  <option name="unmosaic">      true </option>
 
-    matrixSize="64"
-    slices="32"
+  <!-- acquistion parameters -->
+  <option name="tr"> 2.0 </option>
+  <option name="measurements">   153 </option>
+  <option name="matrixSize">      64 </option>
+  <option name="slices">          32 </option>
+  <option name="voxdim1">       3.13 </option>
+  <option name="voxdim2">       3.13 </option>
+  <option name="voxdim3">       3.85 </option>
 
-    voxdim1="3.13"
-    voxdim2="3.13"
-    voxdim3="3.85"
-> </scanner>
+</scanner>
 
-<display
-    image="1"
-    imageWinX="300"
-    imageWinY="0"
-    imageWinW="1000"
-    imageWinH="1000"
+<gui>
 
-    displayType="data.image.mri"
+  <option name="disabled">true</option>
 
-    posOverlayID="data.image.activation.voxel-fluctmon"
-    posOverlayRoiID="active"
-    negOverlayID="data.image.activation.voxel-fluctmon"
-    negOverlayRoiID="deactive"
+</gui>
 
-    posMaskID="data.image.mask"
-    posMaskRoiID="active"
-    negMaskID="data.image.mask"
-    negMaskRoiID="deactive"
+<oldgui>
+    <option name="disabled">     false </option>
 
-    posActivationSumID="data.image.activation.activation-sum"
-    posActivationSumRoiID="active"
-    negActivationSumID="data.image.activation.activation-sum"
-    negActivationSumRoiID="deactive"
+    <option name="winX">         300 </option>
+    <option name="winY">         0 </option>
+    <option name="winW">         1000 </option>
+    <option name="winH">         1000 </option>
 
-    makeMovie="false"
-    framePrefix="movie/frame"
+    <option name="displayType">  data.image.mri </option>
+    <option name="posOverlayID"> data.image.activation.voxel-fluctmon </option>
+    <option name="posOverlayRoiID"> active </option>
+    <option name="negOverlayID"> data.image.activation.voxel-fluctmon </option>
+    <option name="negOverlayRoiID"> deactive </option>
 
->
-</display>
+    <option name="posMaskID"> data.image.mask </option>
+    <option name="posMaskRoiID"> active </option>
+    <option name="negMaskID"> data.image.mask </option>
+    <option name="negMaskRoiID"> deactive </option>
+
+    <option name="posActivationSumID"> data.image.activation.activation-sum </option>
+    <option name="posActivationSumRoiID"> active </option>
+    <option name="negActivationSumID"> data.image.activation.activation-sum </option>
+    <option name="negActivationSumRoiID"> deactive </option>
+
+</oldgui>
 
 <infoserver
+    disabled="false"
     port="15001"
 >
 </infoserver>

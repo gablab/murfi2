@@ -35,6 +35,9 @@ bool FrSetCursorCmd::Execute(){
         case FrSetCursorCmd::Arrow:
             cursor.setShape(Qt::ArrowCursor);
             break;
+        case FrSetCursorCmd::Crosshair:
+            cursor.setShape(Qt::CrossCursor);
+            break;
         default:
             // do nothing here
             break;

@@ -50,7 +50,13 @@ int ACE_TMAIN(int argc, char **argv){
 	path[2] = "test_config.xml";
     
     // Create backend stuff
-    RtConductor* conductor = new RtConductor(3, path);
+	// ohinds 2009-02-02
+	// changed this to reflect new conductor architecture
+	RtConfigFmriRun config;
+	config.parseConfigFile(path[2]);
+	RtConductor conductor;
+	conductor.configure(config);
+	conductor.activate();
 
     // Create main view and document of app
     FrMainWindow* mainWindow = new FrMainWindow();
@@ -58,7 +64,7 @@ int ACE_TMAIN(int argc, char **argv){
 
     // Create main controller.
     // It takes care about all the stuff (i.e. init, manage and delete).
-    FrMainController controller(mainWindow, document, conductor);
+    FrMainController controller(mainWindow, document, &conductor);
     controller.Initialize();
 
     int result = 0;
@@ -66,7 +72,9 @@ int ACE_TMAIN(int argc, char **argv){
         result = 1;
     }
     
-    conductor->stop();
+    // ohinds 2009-02-02
+    // unnecessary
+    //conductor.stop();
 
     return result;
 }

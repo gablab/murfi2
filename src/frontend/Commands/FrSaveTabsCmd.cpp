@@ -199,7 +199,7 @@ void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, int id,
 
     // Layers       // save colormap and roi settings with different functions?
     QDomElement layersElem = m_Document->createElement(FR_XML_LAYERS_ELEM);
-    layersElem.setAttribute(FR_XML_COUNT_ATTR, olSets.size());
+    layersElem.setAttribute(FR_XML_COUNT_ATTR, (int) olSets.size());
     std::vector<FrLayerSettings*>::iterator it, itEnd(olSets.end());
     for(it = olSets.begin(); it != itEnd; ++it){
         SaveLayerSettings(layersElem, (*it));

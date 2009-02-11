@@ -7,6 +7,7 @@
 
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkgl.h" // ohinds: 2009-02-01, added 
 
 FrBaseView::FrBaseView(FrMainWindow* mainWindow){
     m_MainWindow = mainWindow;    

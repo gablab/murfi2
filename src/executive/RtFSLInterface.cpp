@@ -118,11 +118,12 @@ FslJobStatus RtFSLInterface::runCommandBlocking(string command) {
 //          is created) 
 FslJobID RtFSLInterface::registerSameSubjEPI(string target, string movable, 
 					     string xfmFile, bool block) {
-  string command = RtExperiment::getExperimentSoftwareDir() 
-    + "/scripts/fsl_reg_subj_epi.sh ";
-  command += " -t " + target
-    + " -m " + movable
-    + " -s " + xfmFile;
+  string command = getConfig().get("study:softwareDir"); 
+    command 
+      += string("/scripts/fsl_reg_subj_epi.sh ")
+      + " -t " + target
+      + " -m " + movable
+      + " -s " + xfmFile;
 
   return (block ? 
 	  RtFSLInterface::runCommandBlocking(command) :
@@ -141,9 +142,11 @@ FslJobID RtFSLInterface::registerSameSubjEPI(string target, string movable,
 FslJobID RtFSLInterface::applyTransform(string target, string movable, 
 					string input,  string output,
 					string xfmFile, bool block) {
-  string command = RtExperiment::getExperimentSoftwareDir() 
-    + "/scripts/fsl_reg_subj_epi.sh ";
-  command += " -t " + target
+  string command = getConfig().get("study:softwareDir"); 
+    
+  command 
+    += string("/scripts/fsl_reg_subj_epi.sh ")
+    + " -t " + target
     + " -m " + movable
     + " -i " + input
     + " -o " + output

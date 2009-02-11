@@ -232,6 +232,69 @@ vtkImageData* FrDocumentReader::ReadPoints(){
     return 0L;
 }
 
+CrosshairParams FrDocumentReader::ReadCrosshair(){
+  CrosshairParams result;
+
+  // don't show points if we have no any image opened
+  FrDocument::DocObjCollection imageObjects;
+  m_Document->GetObjectsByType(imageObjects, FrDocumentObj::ImageObject);
+  if ( imageObjects.size() == 0)
+    return result;
+
+  FrPointsDocObj* pointsDO = 0L;
+  FrDocument::DocObjCollection pointObjects;
+  m_Document->GetObjectsByType(pointObjects, FrDocumentObj::PointsObject);    
+    
+  if(pointObjects.size() > 0){
+    pointsDO = (FrPointsDocObj*)pointObjects[0];
+
+    // Find appropriate image volume
+    RtMRIImage* mri = 0;
+    FrDocument::DocObjCollection images;
+    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+
+    // NOTE Since we support the only one series 
+    // Time point is a unique data ID.
+    int timePoint = m_DataID;
+
+    if(images.size() > 0){
+      FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+      mri = imgDO->GetTimePointData(timePoint);
+    }
+    pointsDO->GetDimsFromImg(mri);
+
+    if (m_Mosaic){
+      RtMRIImage* image = new RtMRIImage(*mri);
+      
+      if(!image->mosaic()){
+	delete image;
+	return result;
+      }
+            
+      int xDim = image->getDim(0);
+      int yDim = image->getDim(1);
+
+      result = pointsDO->GetCrosshairParamsMosaic(xDim, yDim);
+    }
+    else{
+      switch(m_Orientation){
+      case XY:
+	result = pointsDO->GetCrosshairParams(XY);
+	break;
+      case XZ:
+	result = pointsDO->GetCrosshairParams(XZ);
+	break;
+      case YZ:
+	result = pointsDO->GetCrosshairParams(YZ);
+	break;
+      }
+    }
+
+  }
+  
+  return result;
+}
+
 vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
     // Params
     RtMRIImage* image = 0;

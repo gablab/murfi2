@@ -63,9 +63,9 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   dataID.setModuleID(ID_SCANNERIMG);
   dataID.setDataName(NAME_SCANNERIMG_EPI);
 
-  dataID.setStudyNum(RtExperiment::getExperimentStudyID());
+  dataID.setStudyNum(getExperimentStudyID());
   dataID.setSeriesNum
-    (RtExperiment::getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
+    (getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
   dataID.setTimePoint(extinfo.iAcquisitionNumber);
 
   // allocate and copy the img data

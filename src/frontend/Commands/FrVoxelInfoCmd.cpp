@@ -28,8 +28,11 @@
 
 
 FrVoxelInfoCmd::FrVoxelInfoCmd()
-: m_isMouseXY(false), m_Action(FrVoxelInfoCmd::Undefined), m_PointPicker(0) {
-
+  : m_Action(FrVoxelInfoCmd::Undefined), m_PointPicker(0), m_isMouseXY(false),
+    m_isVoxel(false) {
+  v[0] = 0;
+  v[1] = 0;
+  v[2] = 0;
 }
 
 void FrVoxelInfoCmd::SetMouseXY(int x, int y){
@@ -37,18 +40,28 @@ void FrVoxelInfoCmd::SetMouseXY(int x, int y){
     m_isMouseXY = true;
 }
 
+void FrVoxelInfoCmd::SetVoxel(int _v[3]){
+  v[0] = _v[0];
+  v[1] = _v[1];
+  v[2] = _v[2];
+  m_isVoxel = true;
+}
+
 bool FrVoxelInfoCmd::Execute(){
     if(!this->GetMainController() ||
         m_Action == FrVoxelInfoCmd::Undefined ||
-        !m_isMouseXY) return false;
+       !(m_isMouseXY || m_isVoxel) ) return false;
 
     bool result = false;
     switch(m_Action){
         case Update:
-            result = UpdateVoxelInfo(false);
+            result = UpdateVoxelInfoMouse(false);
             break;
         case Add:
-            result = UpdateVoxelInfo(true);
+            result = UpdateVoxelInfoMouse(true);
+            break;
+        case Set:
+            result = UpdateVoxelInfoDirect(true);
             break;
         case Reset:
             result = ResetVoxelInfo();
@@ -60,7 +73,7 @@ bool FrVoxelInfoCmd::Execute(){
     return result;
 }
 
-bool FrVoxelInfoCmd::UpdateVoxelInfo(bool addPoint){
+bool FrVoxelInfoCmd::UpdateVoxelInfoMouse(bool addPoint){
     // get renderer    
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
@@ -123,16 +136,6 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(bool addPoint){
     double dSpacing[3];	
     pImageData->GetSpacing(dSpacing);		
 
-    // Get the volume index within the entire volume now.
-    int nPointIdx = pImageData->FindPoint(ptMapped);
-
-    // We have to handle different number of scalar components.
-    unsigned short usPix;
-    unsigned char usPixR;
-    unsigned char usPixG;
-    unsigned char usPixB;
-    usPix = usPixR = usPixG = usPixB = 0;
-
     VoxelData vd;
     vd.name = "Timeseria 1";   // get timeseria
     vd.timepoint = viewDO->GetTimePoint();  // get timepoint
@@ -147,6 +150,89 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(bool addPoint){
     vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
     vd.Position[2] = int(vd.Index[2] * dSpacing[2]);
 
+    return UpdateVoxelInfo(vd, pImageData, addPoint);
+}
+
+bool FrVoxelInfoCmd::UpdateVoxelInfoDirect(bool addPoint){
+    // get renderer    
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    std::vector<vtkRenderer*> renCollection;
+    int imgNumber = -1;
+    FrLayeredImage* lim = 0;
+
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    switch(viewDO->GetActiveView()){
+        case SliceView:
+            mv->GetSliceView()->GetImage()->GetRenderers(renCollection);
+            lim = mv->GetSliceView()->GetImage();
+            break;
+        case MosaicView:
+            mv->GetMosaicView()->GetImage()->GetRenderers(renCollection);
+            lim = mv->GetMosaicView()->GetImage();
+            break;
+        case OrthoView:
+            {
+                FrOrthoView* ov =  mv->GetOrthoView();
+
+                // Find Image where click's occured
+                for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
+                    if (ov->GetImage(i)->IsInViewport(m_mouseX, m_mouseY)){
+                        imgNumber = i; 
+                        break;
+                    }
+                }
+                if (imgNumber != -1){
+                    ov->GetImage(imgNumber)->GetRenderers(renCollection);
+                    lim = ov->GetImage(imgNumber);
+                }
+                else{
+                    ResetVoxelInfo();
+                    return false;
+                }
+                break;
+            }
+    } // end switch(view)
+
+    // get image data
+    vtkImageData* pImageData = lim->GetImageInput();        // TODO: check
+    if(!pImageData) return false;
+
+    double dSpacing[3];	
+    pImageData->GetSpacing(dSpacing);		
+
+    VoxelData vd;
+    vd.name = "Timeseria 1";   // get timeseria
+    vd.timepoint = viewDO->GetTimePoint();  // get timepoint
+    
+    vd.Index[0] = int(v[0]);
+    vd.Index[1] = int(v[1]);
+    vd.Index[2] = int(v[2]);
+
+    // TODO: fix for side values
+    //GetRealImagePosition(viewDO, pImageData, vd.Index, imgNumber);
+    vd.Position[0] = int(vd.Index[0] * dSpacing[0]);
+    vd.Position[1] = int(vd.Index[1] * dSpacing[1]);
+    vd.Position[2] = int(vd.Index[2] * dSpacing[2]);
+
+    return UpdateVoxelInfo(vd, pImageData, addPoint);
+}
+
+bool FrVoxelInfoCmd::UpdateVoxelInfo(VoxelData &vd, vtkImageData* pImageData, bool addPoint) {
+    // get renderer    
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    // Get the volume index within the entire volume now.
+    int nPointIdx = pImageData->FindPoint(vd.Index[0], vd.Index[1], vd.Index[2]);
+
+    // We have to handle different number of scalar components.
+    unsigned short usPix;
+    unsigned char usPixR;
+    unsigned char usPixG;
+    unsigned char usPixB;
+    usPix = usPixR = usPixG = usPixB = 0;
 
     // Get voxel index, position
     // this should be done for all layers
@@ -159,9 +245,6 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(bool addPoint){
     if(layers.size() > 0){
         for (int i = 0; i < layers.size(); i++){
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-
-            // get image data
-            pImageData = lim->GetLayerByID(layerDO->GetID())->GetInput();
 
             switch (pImageData->GetNumberOfScalarComponents()) {
                 case 1:
@@ -206,12 +289,15 @@ bool FrVoxelInfoCmd::UpdateVoxelInfo(bool addPoint){
 }
 
 bool FrVoxelInfoCmd::AddPoint(int* Index, vtkImageData* pImageData){
-    if(!pImageData) return false;
+  
+
 
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     Views view = viewDO->GetActiveView();
+
+    if(view == MosaicView && !pImageData) return false;
 
     FrImageDocObj* imgDO = 0;
     std::vector<FrDocumentObj*> images;
@@ -271,6 +357,7 @@ bool FrVoxelInfoCmd::AddPoint(int* Index, vtkImageData* pImageData){
 
             switch (m_Action){
                 case FrVoxelInfoCmd::Add:
+                case FrVoxelInfoCmd::Set:
                     pointsDO->AddPoint(point);
                     break;
            //     case FrVoxelInfoCmd::Remove:

@@ -14,7 +14,8 @@
 FrGraphDocObj::FrGraphDocObj(FrGraphSettings::GraphTypes type)
 : m_Settings(0){
     m_Settings = FrGraphSettings::Create(type);
-    m_ID = (unsigned int)((void*)this);
+    m_ID = (unsigned long)((void*)this);
+
 }
 
 FrGraphDocObj::FrGraphDocObj(FrGraphDocObj* src){

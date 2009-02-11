@@ -17,6 +17,8 @@ string RtStreamComponent::moduleString(ID_STREAM);
 
 // default constructor
 RtStreamComponent::RtStreamComponent() : super(),
+					 passer(NULL),
+					 conductor(NULL),
 					 persistent(false), 
 					 putResultOnMessage(false),
 					 disabled(false) {
@@ -28,7 +30,6 @@ RtStreamComponent::RtStreamComponent() : super(),
   dataName = "";
 
   makeCurrentData = false;
-  passer = NULL;
   outFilename = "";
 }
 
@@ -42,8 +43,8 @@ RtStreamComponent::~RtStreamComponent() {
 // configure this stream component
 //  in
 //   xml module node from which to read <option>s
-bool RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
-  ACE_TRACE(("RtStreamComponent::init"));
+bool RtStreamComponent::init(TiXmlElement *module, RtConfig *config, RtConductor *_conductor) {
+    ACE_TRACE(("RtStreamComponent::init"));
 
   // process config info for cross module and global config info
   if(!processConfig(*config)) {
@@ -52,7 +53,7 @@ bool RtStreamComponent::init(TiXmlElement *module, RtConfig *config) {
   }
 
   // store the conductor
-  conductor = config->getConductor();
+  conductor = _conductor;
 
   string name;
   TiXmlElement *optionElmt;
@@ -206,12 +207,8 @@ void RtStreamComponent::passData(RtData* data) {
 // store any results to data store
 //  in: pointer to data to store
 void RtStreamComponent::storeData(RtData* data) {
-  // get DataStore from conductor
-  RtDataStore *dataStore = conductor->getDataStore();
-
   // set current acquisition into data store
-  dataStore->setData(static_cast<RtData*>(data));
-
+  getDataStore().setData(static_cast<RtData*>(data));
 }
 
 // sets the latest result of processing

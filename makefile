@@ -3,45 +3,90 @@
 # master makefile for the real-time fMRI system
 #
 # Oliver Hinds <ohinds@mit.edu> 2007-08-14
+# Alexey Sidorov scopicsoftware 2008-10-30
 #
 ##########################################################################
+
+
+#********************* SETTABLE FLAGS *******************************#
+
+### GENERAL
 
 # os we build for
 OS=linux
 
 # project name
-export PROJECT = festr
+PROJECT = festr
 
-# whether to compile with debug, optimize flags
-export DEBUG = 0
-export PROF = 0
-export OPTIM = 1
-export STRIP = 1
+# whether to compile with the frontend gui
+FRONTEND = 1
 
-export MTRACE = 0
-
-# ace log levels
-export ACE_NTRACE   = 1
-export ACE_NDEBUG   = 0
-export ACE_NLOGGING = 0
-
+# directories 
 export SRC_DIR = $(PWD)/src
+export FSRC_DIR = $(PWD)/src/frontend
 export BIN_DIR = $(PWD)/bin
 export OBJ_DIR = $(PWD)/obj
 
-################################ APPS ################################
+# whether to compile with debug, optimize flags
+DEBUG = 0
+PROF = 0
+OPTIM = 1
+STRIP = 1
+BLANK := 
+
+# for memory leak tracing
+MTRACE = 0
+
+# directories containing code and headers
+SUB_DIRS = executive \
+	   data \
+	   io \
+	   stream \
+	   stream/analysis \
+	   stream/preprocess \
+	   stream/postprocess \
+	   display \
+	   util \
+	   frontend
+
+### APP PATHS
 
 export RM = /bin/rm -v
 export ECHO = /bin/echo
 export CC = /usr/bin/g++
-export PKGCONFIG = /usr/bin/pkg-config
+export MOC = /usr/bin/moc-qt4
 
-################################ LIBS ################################
+### LIBS AND LIB CONFIG
 
-export SIGC_HOME=/usr/include/sigc++-2.0
-export CCPP_LIBS=-lccgnu2 -lccext2 -ldl -lpthread
+# global package directory
+#export PKG_DIR = /sw/packages
+PKG_DIR = /usr/local/packages
+
+# vtk
+VTK_HOME = /usr
+
+# qt
+QT_HOME = /usr
+
+# ace
+ACE_NTRACE   = 1
+ACE_NDEBUG   = 0
+ACE_NLOGGING = 0
+ACE_HOME = /usr
+
+# boost
+BOOST_HOME = /usr
+
+#********************* END SETTABLE FLAGS ***************************#
+
+
 
 ################################ FLAG ################################
+
+# build with frontend flag
+ifeq ($(FRONTEND),1)
+	FRONT_FLAG = -DUSE_FRONTEND
+endif
 
 # debug flag
 ifeq ($(DEBUG),1)
@@ -68,7 +113,8 @@ ifeq ($(MTRACE),1)
 	MTRACE_FLAG = -DMTRACE
 endif
 
-# ace log flags
+# ace flags
+
 ifeq ($(ACE_NTRACE),1)
 	ACE_NTRACE_FLAG = -DACE_NTRACE=1
 else
@@ -87,60 +133,130 @@ else
 	ACE_NLOGGING_FLAG = -DACE_NLOGGING=0
 endif
 
-SUB_DIRS = -I$(SRC_DIR)/executive -I$(SRC_DIR)/data -I$(SRC_DIR)/io -I$(SRC_DIR)/stream -I$(SRC_DIR)/stream/analysis -I$(SRC_DIR)/stream/preprocess -I$(SRC_DIR)/stream/postprocess -I$(SRC_DIR)/display -I$(SRC_DIR)/util
+ACE_INC = -I$(ACE_HOME)/include/ace
+ACE_LIB  = -L$(ACE_HOME)/lib -lACE
+ACE_FLAGS=-D _REENTRANT $(ACE_NLOGGING_FLAG) $(ACE_NDEBUG_FLAG) $(ACE_NTRACE_FLAG)
 
-# library flags
-
-#PKG_DIR = /sw/packages
-PKG_DIR = /usr/local/packages
+# include headers from all sub directories
+INC_SUB_DIRS = $(SUB_DIRS:%=-I$(SRC_DIR)/%)
 
 # math
-
 MATH_LIB =-lm
 
-GSL_INCS=-I/usr/include/gsl
+GSL_INC=-I/usr/include/gsl
 GSL_LIB=-lgsl -lgslcblas
 
-#DATETIME_LIB = -lboost_date_time
-#THREAD_LIB = -lboost_thread
-#SIGNALS_LIB = -lboost_signals -lsigc-2.0 
-#SOCKETS_LIB = $(CCPP_LIBS)
 
-#ACE_HOME=/usr/local/ACE_wrappers
-#ACE_INCS=-I$(ACE_HOME)/ace
-#ACE_LIB=-L$(ACE_HOME)/lib -lACE
-ACE_FLAGS=-D _REENTRANT $(ACE_NLOGGING_FLAG) $(ACE_NDEBUG_FLAG) $(ACE_NTRACE_FLAG)
-ACE_LIB=-lACE
+# computer vision
+VXL_INC=-I$(PKG_DIR)/vxl/include/vxl/core -I$(PKG_DIR)/vxl/include/vxl/vcl
+VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/vxl/lib
 
+# boost
+BOOST_INC=-I$(BOOST_HOME)/include/
+BOOST_LIB=-L$(BOOST_HOME)/lib -lboost_filesystem
+
+# xml libs
 TINYXML_FLAGS=-DTIXML_USE_STL
 
+
+# nifti image io libs
+NIFTI_INC=-I/usr/include/nifti
+NIFTI_LIB=-lniftiio -lznz -lz
+
+
+# gui
 GLUT_LIB=-lglut
 
-VXL_INCS=-I$(PKG_DIR)/vxl/include/vxl/core -I$(PKG_DIR)/vxl/include/vxl/vcl
-VXL_LIBS=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/vxl/lib
+GNUPLOT_INC=-I$(PKG_DIR)/gnuplot_i_vxl/include
+GNUPLOT_LIB=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
 
-GNUPLOT_INCS=-I$(PKG_DIR)/gnuplot_i_vxl/include
-GNUPLOT_LIBS=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
+# vtk
+VTK_INC = $(VTK_HOME)/include/vtk
+VTK_LIB = -L$(VTK_HOME)/lib \
+	-lvtkCommon \
+	-lvtkFiltering \
+	-lvtkftgl \
+	-lvtkGraphics \
+	-lvtkImaging \
+	-lvtkRendering \
+	-lQVTK
 
-NIFTI_INCS=-I/usr/include/nifti
-NIFTI_LIBS=-lniftiio -lznz -lz
+# qt
+QT_INC = \
+	-I$(QT_HOME)/include/qt4 \
+	-I$(QT_HOME)/include/qwt-qt4 \
+	-I$(QT_HOME)/include/qt4/Qt \
+	-I$(QT_HOME)/include/qt4/QtCore \
+	-I$(QT_HOME)/include/qt4/QtGui \
+
+QT_LIB = -lqwt-qt4 -lQtCore -lQtGui -lQtXml
+
 
 # build compiler flags
 
-export C_INCS = -I$(SRC_DIR) $(SUB_DIRS) $(GSL_INCS) $(ACE_INCS) $(ACE_FLAGS) $(TINYXML_FLAGS) $(VXL_INCS) $(GNUPLOT_INCS) $(NIFTI_INCS)
+C_INC = -I$(SRC_DIR) \
+	$(INC_SUB_DIRS) \
+	$(GSL_INC) \
+	$(ACE_INC) $(ACE_FLAGS) \
+	$(TINYXML_FLAGS) \
+	$(VXL_INC) \
+	$(GNUPLOT_INC) \
+	$(NIFTI_INC) \
+	$(BOOST_INC)
 
-export C_FLAGS = -Wall \
-	$(MTRACE_FLAG) $(PROF_FLAG) $(DEBUG_FLAG) $(OPTIM_FLAG) $(STRIP_FLAG) \
-	$(C_INCS) 
-#`$(PKGCONFIG_CMD)`
-#export C_FLAGS = -Werror -Wall \
+C_FLAGS = -Wall \
+	$(FRONT_FLAG) \
+	$(MTRACE_FLAG) \
+	$(PROF_FLAG) \
+	$(DEBUG_FLAG) \
+	$(OPTIM_FLAG) \
+	$(STRIP_FLAG) \
+	$(C_INC) 
 
-export C_LIBS = $(MATH_LIB) $(GSL_LIB) $(ACE_LIB) $(GLUT_LIB) $(VXL_LIBS) $(GNUPLOT_LIBS) $(NIFTI_LIBS)
+C_LIB = $(MATH_LIB) \
+	$(GSL_LIB) \
+	$(ACE_LIB) \
+	$(GLUT_LIB) \
+	$(VXL_LIB) \
+	$(GNUPLOT_LIB) \
+	$(NIFTI_LIB) \
+	$(BOOST_LIB)
 
-export PKGCONFIG_FLAGS = --cflags --libs sigc++-2.0
-export PKGCONFIG_CMD = pkg-config $(PKGCONFIG_FLAGS)
 
-export LDFLAGS = $(PROF_FLAG) $(C_LIBS)
+# add gui libs if building frontend
+ifeq ($(FRONTEND),1)
+	FRONT_DIR = $(SRC_DIR)/frontend/
+	FRONT_SUB_DIRS = \
+	        Actors \
+		Commands \
+		Commands/MaskCommands \
+		Controllers \
+		Document \
+		Filters \
+		FrApplication \
+		FrMainWindow \
+		Layers \
+		Qwt \
+		Tools \
+		Utils \
+		Views \
+		Widgets
+
+	FRONT_INC_SUB_DIRS += $(FRONT_SUB_DIRS:%=-I$(FRONT_DIR)/%)
+
+	FRONT_INC = $(FRONT_INC_SUB_DIRS) -I/$(VTK_INC) $(QT_INC)
+
+	C_INC += $(FRONT_INC) $(FRONT_FLAG)
+	C_LIB += $(VTK_LIB) $(QT_LIB)
+endif
+
+LDFLAGS = $(PROF_FLAG) $(C_LIB)
+
+# export vars for sub-makes
+export C_FLAGS
+export C_INC
+export C_LIB
+export LD_FLAGS
 
 
 ############################### SUFFIXES ##############################
@@ -151,15 +267,12 @@ OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
 
 default: $(PROJECT)
 all:     $(PROJECT)
+
 debug:	 
-	$(MAKE) DEBUG=1 OPTIM=0 STRIP=0 $(PROJECT)
+	$(MAKE) DEBUG=1 OPTIM=0 STRIP=0 $(subst debug,$(BLANK),$(MAKECMDGOALS))
+
 profile:	 
 	$(MAKE) DEBUG=1 PROF=1 OPTIM=0 STRIP=0 $(PROJECT)
-
-setdebug:
-	export DEBUG = 1
-	export OPTIM 0
-	export STRIP 0
 
 dirs: 
 	mkdir -p $(OBJ_DIR)
@@ -172,6 +285,22 @@ $(PROJECT): dirs $(OBJ_FILES)
 	@$(ECHO) '############################################'
 	@$(ECHO) 'make: built [$@] successfully!'
 	@$(ECHO) '############################################'
+
+# make the project with frontend support
+front: 
+	$(MAKE) FRONTEND=1 go_front
+
+
+# make the project with frontend support
+go_front: 
+	@$(ECHO) 'make: building $@ for $(OS)...'
+	cd $(SRC_DIR) && $(MAKE) 
+	cd $(SRC_DIR)/frontend && $(MAKE) front
+	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS) 
+	@$(ECHO) '############################################'
+	@$(ECHO) 'make: built [$@] successfully!'
+	@$(ECHO) '############################################'
+
 
 ############################### CLEAN ################################
 

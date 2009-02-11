@@ -687,16 +687,16 @@ void RtActivationEstimator::initEstimation(RtMRIImage &image) {
     if(alignMask) { // align mask before reading it in?
       FslJobID status
 	= RtFSLInterface::applyTransform(
-		RtExperiment::getSeriesRefVolFilename(seriesNum),
-		RtExperiment::getExperimentRefVolFilename(),
+		getConfig().getSeriesRefVolFilename(seriesNum),
+		getConfig().get("study:xfm:referenceVol"),
 		mask.getFilename(),
-		RtExperiment::getSeriesXfmOutputFilename(seriesNum,
-							 mask.getFilename()),
-		RtExperiment::getSeriesXfmFilename(seriesNum),
+		getConfig().getSeriesXfmOutputFilename(
+		                     seriesNum,mask.getFilename()),
+		getConfig().getSeriesXfmFilename(seriesNum),
 		true);
       if(status == FSL_JOB_FINISHED) {
-	mask.setFilename(RtExperiment::getSeriesXfmOutputFilename(seriesNum,
-							 mask.getFilename()));
+	mask.setFilename(getConfig().getSeriesXfmOutputFilename(seriesNum,
+						    mask.getFilename()));
       }
       else {
 	cerr << "error aligning mask, just using unaligned version." << endl;
@@ -763,7 +763,7 @@ double *RtActivationEstimator::getDesignMatrixRow(unsigned int timepoint) {
     motID.setModuleID("motion");
 
     RtMotion *mot = static_cast<RtMotion*>
-      (RtExperiment::getDataStore()->getData(motID));
+      (getDataStore().getData(motID));
 
     if(mot != NULL) {
       Xrow[curCol++] = mot->getMotionDimension(TRANSLATION_X);

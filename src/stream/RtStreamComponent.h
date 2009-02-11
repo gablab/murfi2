@@ -16,6 +16,7 @@
 #include"RtStreamMessage.h"
 #include"RtConfig.h"
 #include"RtConductor.h"
+#include"RtExperiment.h"
 #include"RtData.h"
 
 #include<map>
@@ -50,7 +51,8 @@ public:
   // configure this stream component
   //  in
   //   configuration
-  virtual bool init(TiXmlElement *module, RtConfig *config);
+  virtual bool init(TiXmlElement *module, RtConfig *config, RtConductor *conductor);
+
 
   // adds an output to receive the data of this stream component
   //  in
@@ -116,9 +118,6 @@ public:
 
 protected:
 
-  // whether this component is disabled
-  bool disabled;
-
   typedef ACE_Task<ACE_MT_SYNCH> super;
 
   // call the next processing step
@@ -155,6 +154,9 @@ protected:
   //  in
   //   data result
   virtual void setResult(RtStreamMessage *msg, RtData *data);
+
+  // whether this compoenent is disabled
+  bool disabled;
 
   // passer to send the results of our computation to outputs
   RtPasser *passer;

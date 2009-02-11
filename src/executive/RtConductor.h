@@ -9,37 +9,34 @@
 #ifndef RTCONDUCTOR_H
 #define RTCONDUCTOR_H
 
+#include"ace/Task.h"
+
 #include<vector>
 #include<sstream>
 
-#include"RtConfig.h"
-#include"RtExperiment.h"
-#include"RtDisplayImage.h"
-#include"RtDataStore.h"
-#include"RtInfoServer.h"
+#include"RtConfigFmriRun.h"
 #include"RtInput.h"
 #include"RtInputScannerImages.h"
-#include"RtInputUSBKb.h"
 #include"RtOutput.h"
 #include"RtOutputFile.h"
 #include"RtStream.h"
 #include"RtCode.h"
-#include"RtDisplay.h"
 
 using namespace std;
 
 // class declaration
-class RtConductor {
+class RtConductor : public ACE_Task_Base {
 
 public:
 
   //*** constructors/destructors  ***//
   
   // default constructor
-  //RtConductor(); 
+  // haha, you can't call this
+  RtConductor() : configured(false), running(false) {}; 
 
-  // constructor with command line args
-  RtConductor(int argc, char **argv); 
+  // constructor with config
+  explicit RtConductor(const RtConfigFmriRun &conf); 
 
   // destructor
   virtual ~RtConductor();
@@ -47,9 +44,16 @@ public:
   //*** initialization routines  ***//
  
   // initialize config and prepare to run
+  // NOTE: this function must me called before each call to run(), but its
+  // called from the constructor taking a config class, too.
+  //  in:
+  //   configuration for this run
   //  out:
   //   true (for success) or false
-  bool init();
+  bool configure(const RtConfigFmriRun &_config);
+
+  // after a run, clean up and close streams
+  void deconfigure();
 
   // adds input mode
   //  in:
@@ -83,11 +87,11 @@ public:
   
   // begins execution of a realtime fMRI session
   //  out:
-  //   true (for success) or false
-  bool run();
+  //   0 (for success) or error code
+  int svc();
 
-  // stop all threads
-  void stop();
+  // get whether execution is happening
+  bool isRunning() { return running; }
 
   //*** callback entries for threads ***//
 
@@ -101,17 +105,6 @@ public:
   void log(stringstream &s);
 
   //** gets **//
-
-  // get the display output
-  //  out 
-  //   pointer to the display output object
-//  RtDisplayImage *getDisplay();
-  RtDisplayImage *getDisplayImage();
-
-  // get the info server
-  //  out 
-  //   pointer to the infoserver object
-  RtInfoServer *getInfoServer();
 
   // get an input by its name
   //  in
@@ -134,11 +127,6 @@ public:
   //   vector of pointers to the output objects
   vector<RtOutput*> getAllOutputsWithName(const string &name);
 
-  // get data store map
-  //  out
-  //   pointer to data store map
-  RtDataStore *getDataStore();
-
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -148,16 +136,14 @@ protected:
   //*** methods ***//
 
   // builds the processing stream 
-  //  in:
-  //   config: configuration
   //  out:
   //   true (for success) or false
-  bool buildStream(RtConfig config);
+  bool buildStream();
 
   //*** members ***//
 
   // configuration object
-  RtConfig config;
+  RtConfigFmriRun config;
 
   // the data processing stream
   RtStream stream;
@@ -175,9 +161,14 @@ protected:
 
   // vector of output objects
   vector<RtOutput*> outputs;
-  
-  // data store object
-  RtDataStore dataStore;
+
+  // whether we are ready to run
+  bool configured;
+
+  // whether we are running
+  bool running;
+
+private:
 
 };
 

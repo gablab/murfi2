@@ -7,7 +7,6 @@ class FrMainWindow;
 class FrMainDocument;
 class FrToolController;
 class FrInteractorStyle;
-class RtConductor;
 
 class QString;
 
@@ -16,6 +15,7 @@ class QString;
 #include "FrController.h"
 #include "FrBackground.h"
 #include <vector>
+#include "RtExperiment.h"
 
 class FrMainController : public FrController {
 public:
@@ -75,17 +75,22 @@ public:
     FrGetPropMacro(FrMainWindow*, MainView);
     FrGetPropMacro(FrMainDocument*, MainDocument);
     FrGetPropMacro(FrToolController*, ToolController);
+    /* ohinds 2009-02-02
+     * this is unnecessary, RtExperiment takes care of conductors
     FrGetPropMacro(RtConductor*, Conductor);
+    */
     //FrGetPropMacro(FrBackground, ConductorThr);
 
 private:
     friend class FrInteractorStyle;
 
 private:
+    /* ohinds 2009-02-02
+     * this is unnecessary, RtExperiment takes care of conductors
     static void* ConductorThread(void *arg);
     int ThrID;
     FrBackground ConductorThr;
-
+    */
 };
 
 #endif

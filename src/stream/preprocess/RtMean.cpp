@@ -23,7 +23,7 @@ RtMean::RtMean() : RtStreamComponent() {
 
 // destructor
 RtMean::~RtMean() {
-  cout << "destroyed" << endl;
+  //cout << "destroyed" << endl;
 }
 
 // process a single acquisition

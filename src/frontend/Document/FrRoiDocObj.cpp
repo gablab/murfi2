@@ -21,13 +21,13 @@
 FrRoiDocObj::FrRoiDocObj()
 :  m_MaskImage(0) {
     // Assign ID
-    m_ID = (unsigned int)((void*)this);
+    m_ID = (unsigned long)((void*)this);
 }
 
 FrRoiDocObj::FrRoiDocObj(RtMaskImage* roi)
 : m_MaskImage(roi){
     // Assign ID
-    m_ID = (unsigned int)((void*)this);
+    m_ID = (unsigned long)((void*)this);
 }
 
 FrRoiDocObj::~FrRoiDocObj(){

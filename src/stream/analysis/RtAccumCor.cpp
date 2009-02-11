@@ -41,7 +41,7 @@ RtAccumCor::~RtAccumCor() {
     delete h;
   }
 
-  cout << "destroyed" << endl;
+  //cout << "destroyed" << endl;
 }
 
 // process a configuration option

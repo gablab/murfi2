@@ -91,3 +91,120 @@ int FrViewDocObj::GetActiveLayerID(){
     }
     return result;
 }
+
+
+void FrViewDocObj::TransformCoordinatesToIndices(int point[2], vtkImageData* img, int orientation){
+
+  double x = point[0];
+  double y = point[1];
+  TransformCoordinatesToIndices(x, y, img, orientation);
+  point[0] = (int) x;
+  point[1] = (int) y;
+}
+
+void FrViewDocObj::TransformCoordinatesToIndices(double point[2], vtkImageData* img, int orientation){
+
+  double x = point[0];
+  double y = point[1];
+  TransformCoordinatesToIndices(x, y, img, orientation);
+  point[0] = x;
+  point[1] = y;
+}
+
+void FrViewDocObj::TransformCoordinatesToIndices(double &x, double &y, vtkImageData* img, int orientation){
+
+    if(!img) return;
+
+    double dSpacing[3];
+    img->GetSpacing(dSpacing);
+
+    x = (x-dSpacing[0]/2) / dSpacing[0] + 0.5;
+    y = (y-dSpacing[1]/2) / dSpacing[1] + 0.5;
+
+//    // calc current indices of point
+//    switch(GetActiveView()){
+//      case SliceView:
+//	x = int((x + 1) / dSpacing[0]);
+//	y = int((y + 1) / dSpacing[1]);
+//	break;
+//      case MosaicView:
+//	x = int((x + 1) / dSpacing[0]);
+//	y = int((y + 1) / dSpacing[1]);
+//	break;
+//      case OrthoView:
+//	// Renderer number in ortho view
+//	switch(orientation){
+//	  case DEF_CORONAL:
+//	    x = int((x + 1) / dSpacing[0]);
+//	    y = int((y + 1) / dSpacing[1]);
+//	    break;
+//	  case DEF_SAGITAL:
+//	    x = int((x + 1) / dSpacing[0]);
+//	    y = int((y + 1) / dSpacing[1]);
+//	    break;
+//	  case DEF_AXIAL:
+//	    x = int((x + 1) / dSpacing[0]);
+//	    y = int((y + 1) / dSpacing[1]);
+//	    break;
+//	}
+//	break;
+//    } // end switch view
+}
+
+void FrViewDocObj::TransformIndicesToCoordinates(int point[2], vtkImageData* img, int orientation){
+
+  double x = point[0];
+  double y = point[1];
+  TransformIndicesToCoordinates(x, y, img, orientation);
+  point[0] = (int) rint(x);
+  point[1] = (int) rint(y);
+}
+
+void FrViewDocObj::TransformIndicesToCoordinates(double point[2], vtkImageData* img, int orientation){
+
+  double x = point[0];
+  double y = point[1];
+  TransformIndicesToCoordinates(x, y, img, orientation);
+  point[0] = x;
+  point[1] = y;
+}
+
+void FrViewDocObj::TransformIndicesToCoordinates(double &x, double &y, vtkImageData* img, int orientation){
+    if(!img) return;
+
+    double dSpacing[3];
+    img->GetSpacing(dSpacing);
+
+    x = dSpacing[0]*(x - 0.5) + dSpacing[0]/2;
+    y = dSpacing[1]*(y - 0.5) + dSpacing[0]/2;
+
+//    // calc current coords of point
+//    switch(GetActiveView()){
+//      case SliceView:
+//	x = dSpacing[0]*x + dSpacing[0]/2;
+//	y = dSpacing[1]*y + dSpacing[0]/2;
+//	break;
+//      case MosaicView:
+//	x = dSpacing[0]*x - 1;
+//	y = dSpacing[1]*y - 1;
+//	break;
+//      case OrthoView:
+//	// Renderer number in ortho view
+//	switch(orientation){
+//	  case DEF_CORONAL:
+//	    x = dSpacing[0]*x - 1;
+//	    y = dSpacing[1]*y - 1;
+//	    break;
+//	  case DEF_SAGITAL:
+//	    x = dSpacing[0]*x - 1;
+//	    y = dSpacing[1]*y - 1;
+//	    break;
+//	  case DEF_AXIAL:
+//	    x = dSpacing[0]*x - 1;
+//	    y = dSpacing[1]*y - 1;
+//	    break;
+//	}
+//	break;
+//    } // end switch view
+}
+

@@ -34,6 +34,7 @@ T ClampValue(T value, T min, T max){
 // Utils
 double GetLength(int x1, int y1, int x2, int y2);
 void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3], int imgNumber);
+void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point[3], int imgNumber);
 bool IsPointInsideOfPolygon(std::vector<Pos> Points, Pos point);
 bool IsPointInsideOfSphere(Pos center, int radius, Pos point);
 

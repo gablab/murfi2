@@ -19,11 +19,16 @@ FrMainController* FrCommandController::GetMainController(){
 }
 
 bool FrCommandController::Execute(FrBaseCmd* cmd){
-    lock();
-    bool result = cmd->Execute();
-    unlock();
+  /* ohinds 2009-02-05
+   * getting stuck on the lock on app init
+  lock();
+  */
+  bool result = cmd->Execute();
+  /*
+  unlock();
+  */
 
-    return result;
+  return result;
 }
 
 void FrCommandController::lock(){

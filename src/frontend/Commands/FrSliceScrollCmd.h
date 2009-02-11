@@ -1,5 +1,5 @@
-#ifndef FR_CHANGESLICE_CMD
-#define FR_CHANGESLICE_CMD
+#ifndef FR_SLICESCROLL_CMD
+#define FR_SLICESCROLL_CMD
 
 // Forward declarations
 class FrViewDocObj;
@@ -7,15 +7,18 @@ class FrViewDocObj;
 // Includes
 #include "FrBaseCmd.h"
 
-// This command changes current slice number and orthogonal slice view.
-class FrChangeSliceCmd : public FrBaseCmd
+// This command changes current slice number
+// it responsible for support of single slice view
+// as well as orthogonal slice view.
+class FrSliceScrollCmd : public FrBaseCmd
 {
 public:
     // Constructor/destructor
-    FrChangeSliceCmd();
+    FrSliceScrollCmd();
     
     // Modifiers
     void SetSliceDelta(double value);
+    void SetChangingSlice(int sliceIndex);
     void SetMouseXY(int x, int y);
 
     // Overrides
@@ -26,11 +29,8 @@ public:
     virtual bool Undo();
     virtual bool Redo();
 
-private:
-    bool ChangeOrthoViewSliceNums();
-    int GetCoronalSlice(double x, double y, int imgNum, FrViewDocObj* viewDO);
-    int GetSagitalSlice(double x, double y, int imgNum, FrViewDocObj* viewDO);
-    int GetAxialSlice(double x, double y, int imgNum, FrViewDocObj* viewDO);
+    int GetOrthoViewSliceNum(int x, int y);
+    void GetSelectedVoxel(int result[3]);
 
 private:
     // Params for simple views 
@@ -41,6 +41,7 @@ private:
     bool m_isXY;
     int m_X;
     int m_Y;
+    int m_changingSlice;
 };
 
-#endif // FR_CHANGESLICE_CMD
+#endif

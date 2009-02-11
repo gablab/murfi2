@@ -1,4 +1,5 @@
 #include "FrSliceScrollTool.h"
+#include "FrSliceScrollCmd.h"
 #include "FrToolController.h"
 #include "FrInteractorStyle.h"
 #include "FrMainDocument.h"
@@ -31,24 +32,26 @@ bool FrSliceScrollTool::OnMouseUp(FrInteractorStyle* is, FrMouseParams& params){
 }
 
 bool FrSliceScrollTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& params){
-	if(params.Button == FrMouseParams::LeftButton){
-        m_oldX = params.X;
-        m_oldY = params.Y;
+  if(params.Button == FrMouseParams::LeftButton){
+    m_oldX = params.X;
+    m_oldY = params.Y;
         
-        FrChangeSliceCmd* cmd1 = FrCommandController::CreateCmd<FrChangeSliceCmd>();
-        cmd1->SetMouseXY(params.X, params.Y);
-        cmd1->SetSliceDelta(0);
-        
-        FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
-        cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
+    FrSliceScrollCmd* cmd1 = FrCommandController::CreateCmd<FrSliceScrollCmd>();
+    cmd1->SetMouseXY(params.X, params.Y);	
+    cmd1->SetSliceDelta(0);
+    m_changingSlice = cmd1->GetOrthoViewSliceNum(params.X, params.Y);
+    cmd1->SetChangingSlice(m_changingSlice);        
 
-        FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
-        cmd->AddCommand(cmd1);
-        cmd->AddCommand(cmd2);
-        FrCommandController::Execute(cmd);
-        delete cmd;
-    }
-    return false;
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
+    FrCommandController::Execute(cmd);
+    delete cmd;
+  }
+  return false;
 }
 
 bool FrSliceScrollTool::OnMouseMove(FrInteractorStyle* is, FrMouseParams& params){
@@ -66,16 +69,29 @@ bool FrSliceScrollTool::OnMouseDrag(FrInteractorStyle* is, FrMouseParams& params
         m_oldY = params.Y;
     }
 
-    FrChangeSliceCmd* cmd1 = FrCommandController::CreateCmd<FrChangeSliceCmd>();
+    FrSliceScrollCmd* cmd1 = FrCommandController::CreateCmd<FrSliceScrollCmd>();
     cmd1->SetMouseXY(params.X, params.Y);
     cmd1->SetSliceDelta(sliceDelta);
+    cmd1->SetChangingSlice(m_changingSlice);        
 
-    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
-    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
+    int v[3];
+    cmd1->GetSelectedVoxel(v);
+
+    FrVoxelInfoCmd* cmd2 = FrCommandController::CreateCmd<FrVoxelInfoCmd>();
+    cmd2->SetAction(FrVoxelInfoCmd::Set);
+    cmd2->SetVoxel(v);
+
+    FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd3->SetTarget(FrRefreshWidgetsInfoCmd::ImageSettings);
+
+    FrRefreshWidgetsInfoCmd* cmd4 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd4->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
 
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
     cmd->AddCommand(cmd1);
     cmd->AddCommand(cmd2);
+    cmd->AddCommand(cmd3);
+    cmd->AddCommand(cmd4);
     FrCommandController::Execute(cmd);
     delete cmd;
 	

@@ -66,7 +66,6 @@ bool RtOutputFile::open(RtConfig &config) {
 	<< "# realtime system log file" << endl
 	<< "# " << getVersionString() << endl
 	<< "# " << config.getVersionString() << endl
-	<< "# " << config.getConductorVersionString() << endl << endl
 	<< "created ";
   printNow();
   outfp  << endl << endl;

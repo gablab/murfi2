@@ -9,7 +9,6 @@
 static char *VERSION = "$Id$";
 
 #include"RtConfig.h"
-#include"RtConductor.h"
 
 #include"ace/Get_Opt.h"
 #include"tinyxml/tinyxml.h"
@@ -20,24 +19,11 @@ static char *VERSION = "$Id$";
 #include<sstream>
 #include<cstdlib>
 
-// defaults
-#define DEFAULT_SUBJECTSDIR  "/data/subjects"
-#define NO_CONFFILENAME "undefined"
-
-// limits
-#define MAX_PORT 65535
-
 //*** constructors/destructors  ***//
 
-// default constructor
-RtConfig::RtConfig()
-    : confFilename(NO_CONFFILENAME), conductor(NULL) {
-  // nothing to do here
-}
-
-// default constructor
-RtConfig::RtConfig(RtConductor &_conductor)
-    : confFilename(NO_CONFFILENAME), conductor(&_conductor)  {
+// copy constructor (called often)
+RtConfig::RtConfig(const RtConfig &other) 
+  : parms(other.parms) {
   // nothing to do here
 }
 
@@ -48,139 +34,36 @@ RtConfig::~RtConfig() {
 
 //*** config loading routines ***//
 
-// parse command line args
-bool RtConfig::parseArgs(int argc, char **args) {
-  ACE_TRACE(("RtConfig::parseArgs"));
+// parse xml config file
+//  out: true (success) or false
+bool RtConfig::parseConfigFile(const string &filename) {
+  ACE_TRACE(("RtConfig::parseConfigFile"));
 
-  // set up short options
-  static const ACE_TCHAR options[] = ACE_TEXT (":f:h");
-  ACE_Get_Opt cmdOpts(argc, args, options, 1, 0,
-		      ACE_Get_Opt::PERMUTE_ARGS, 1);
-
-  // set up long options
-  cmdOpts.long_option("config",     'f', ACE_Get_Opt::ARG_REQUIRED);
-  cmdOpts.long_option("help",       'h', ACE_Get_Opt::NO_ARG);
-
-  // handle options
-  for(int option; (option = cmdOpts ()) != EOF; ) {
-    switch(option) {
-
-    case 'f':
-      confFilename = cmdOpts.opt_arg();
-      break;
-
-    case 'h':
-      printUsage();
-      exit(1);
-
-    case ':':
-      ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("-%c requires an argument\n"),
-          cmdOpts.opt_opt()), -1);
-
-    default:
-      ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("Parse error.\n")), -1);
-    }
-  }
-
-  // parse the logfile
-  if(!parseConfigFile()) {
-    ACE_DEBUG((LM_ERROR, ACE_TEXT("failed to parse config file %s\n"),
-	       confFilename));
-    cerr << "failed to parse config file: '" << confFilename << "'" << endl;
+  // try to read file
+  if(!parms.LoadFile(filename)) {
+    cout << parms.ErrorDesc() << endl;
+    parms.Clear();
+    parms.ClearError();
     return false;
-  }
-
-  // get the executable name and add it to the config
-  set("execName",args[0]);
-
-  // dump config to screen if verbose
-  if(get("info:terminal:verbose")==true) {
-    dumpConfig(cout);
   }
 
   return true;
 }
 
-// parse config file
+// parse xml config string
 //  out: true (success) or false
-bool RtConfig::parseConfigFile() {
-  ACE_TRACE(("RtConfig::parseConfigFile"));
+bool RtConfig::parseConfigStr(const string &xml) {
+  ACE_TRACE(("RtConfig::parseConfigStr"));
 
-  if(!parms.LoadFile(confFilename)) {
+  // try to parse string
+  parms.Parse(xml.c_str());
+  if(parms.Error()) {
     cout << parms.ErrorDesc() << endl;
+    parms.Clear();
+    parms.ClearError();
     return false;
   }
-  else {
-    return true;
-  }
-}
-
-// validate the configuration
-// checks for valid setup of different parts of the program
-bool RtConfig::validateConfig() {
-  ACE_TRACE(("RtConfig::validateConfig"));
-
-  bool valid = true;
-
-  // check subject
-  if(get("study:subject")==false) {
-    cerr << "ERROR: no subject name specified" << endl;
-    valid = false;
-  }
-
-  // check subjects directory
-  if(get("study:subjectsDir")==false) {
-    set("study:subjectsDir",DEFAULT_SUBJECTSDIR);
-  }
-
-  // check for existance of studyDir
-  stringstream studyDir;
-  studyDir << get("study:subjectsDir").str() << "/";
-  studyDir << get("study:subject").str() << "/";
-  string s1 = studyDir.str();
-
-  string testfile = s1 +  "/testfile";
-
-  ofstream fs(testfile.c_str());
-  if(fs.fail()) {
-    cerr << "ERROR: subject directory " << studyDir.str() << " is bad" << endl;
-    valid = false;
-  }
-  else {
-
-    set("study:dir",studyDir.str());
-  }
-  fs.close();
-
-
-  // check confile
-  if(confFilename == NO_CONFFILENAME) {
-    cerr << "ERROR: no configuration file name specified" << endl;
-    valid = false;
-  }
-
-  // check logfile name
-  if(get("info:log:disabled")==false) {
-    if(get("info:log:filename")==false) {
-      cerr << "WARNING: no logfile name specified" << endl;
-      set("info:log:disabled",true);
-    }
-  }
-
-  // check image receiver
-  if(get("scanner:disabled")==false) {
-    if(!isSet("scanner:receiveImages")) {
-      set("scanner:receiveImages",true);
-    }
-
-    if((int) get("scanner:port") < 1 || (int) get("scanner:port") > MAX_PORT) {
-      cerr << "WARNING: invalid port number for receiving scanner images"
-	   << endl;
-      set("scanner:receiveImages",false);
-    }
-  }
-
-  return valid;
+  return true;
 }
 
 //*** config get/set parms ***/
@@ -205,6 +88,7 @@ RtConfigVal RtConfig::get(const char *name) {
 RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
   ACE_TRACE((ACE_TEXT("RtConfig::get(string, node)")));
 
+  // if no node specified, make it the top level
   if(node == NULL) {
     node = &parms;
   }
@@ -277,6 +161,7 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
 TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
   ACE_TRACE((ACE_TEXT("RtConfig::get(string, node)")));
 
+  // if no node specified, make it the top level
   if(node == NULL) {
     node = &parms;
   }
@@ -393,24 +278,6 @@ bool RtConfig::set(const string name, const string value,
   return set(nextName, value, child);
 }
 
-// set a parm value
-template<class T>
-bool RtConfig::set(const string name, T tval) {
-  string val;
-  if(!RtConfigVal::convertToString<T>(val,tval)) {
-    return false;
-  }
-
-  return set(name, val, &parms);
-}
-
-// set a parm value
-template<class T>
-bool RtConfig::set(const char *name, T tval) {
-  string s(name);
-  return set(s,tval);
-}
-
 // print a parm value
 void RtConfig::print(const char *name) {
   if(name == NULL) {
@@ -420,19 +287,6 @@ void RtConfig::print(const char *name) {
 
   cout << get(name).str();
 }
-
-// set the conductor
-//  in: _conductor is a pointer to a conductor
-void RtConfig::setConductor(RtConductor *_conductor) {
-  conductor = _conductor;
-}
-
-// get the conductor
-//  out: pointer to the conductor
-RtConductor *RtConfig::getConductor() {
-  return conductor;
-}
-
 
 
 //*** private functions ***//
@@ -444,34 +298,11 @@ template <class T> inline bool RtConfig::convert(T &t, const string& s) {
 }
 
 
-// prints the usage info for the realtime system
-void RtConfig::printUsage() {
-  int w = 15;
-
-  cout << "usage: " << endl << get("execName")
-       << " [-f conffile]" << endl << endl
-       << "---------------------------------------------" << endl
-       << "some useful flags:" << endl
-       << setiosflags(ios::left)
-       << setw(w) << endl
-       << "---------------------------------------------" << endl;
-}
-
 // gets the version
 //  out:
 //   cvs version string for this class
 char *RtConfig::getVersionString() {
   return VERSION;
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtConfig::getConductorVersionString() {
-  if(conductor == NULL) {
-    return "null";
-  }
-  return conductor->getVersionString();
 }
 
 // print the name/value pairs to the screen

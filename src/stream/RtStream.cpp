@@ -38,7 +38,7 @@ void RtStream::setStreamConductor(RtConductor *_conductor) {
 // initialize stream and prepare to run
 //  out:
 //   true (for success) or false
-int RtStream::configure(RtConfig &config) {
+bool RtStream::configure(RtConfig &config) {
   
   Module *head = 0, *tail = 0;
 
@@ -175,7 +175,7 @@ void  RtStream::addSingleModule(RtStreamComponent *sc) {
 // adds modules to the stream
 //  in
 //   config: configuration info
-int RtStream::addModules(RtConfig &config) {
+bool RtStream::addModules(RtConfig &config) {
   ACE_TRACE(("RtStream::addModules"));
 
   // add the processing module
@@ -187,10 +187,11 @@ int RtStream::addModules(RtConfig &config) {
   proc->configure(config);
 
   if(this->push(procMod) == -1) {
-    ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT("failed to add processor\n")),-1);
+    cerr << "ERROR: failed to add processing modules" << endl;
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 // adds all 'module' nodes that are children of the passed node as modules
@@ -228,7 +229,7 @@ void RtStream::addModulesFromNode(TiXmlElement *elmt, RtConfig *config) {
       }
 
       // allow the stream component to configure itself
-      if(!sc->init(childElmt, config)) {
+      if(!sc->init(childElmt, config, streamConductor)) {
 	cout << "failed to configure stream: " << name << endl;
 	continue;	
       }
@@ -317,19 +318,20 @@ void RtStream::setInput(unsigned int code, RtData *data) {
 // the module stack is emtpty after this executes
 //  out
 //   -1 for error, 0 on success
-int RtStream::pushAllModules() {
+bool RtStream::pushAllModules() {
   ACE_TRACE(("RtStream::pushAllModules"));
 
   // add all the modules from the stack
   while(!addMod.empty()) {
     if(this->push(addMod.top()) == -1) {
-      ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT("failed to add a module\n")),-1);
+      cerr << "failed to add a module" << endl;
+      return false;
     }
     
     addMod.pop();
   }
   
-  return 0;
+  return true;
 }
 
 

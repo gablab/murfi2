@@ -10,13 +10,13 @@ class vtkImageData;
 // Some headers
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
-
+#include "FrVoxelInfoWidget.h"
 #include <vector>
 
 // This command updates voxel information.
 class FrVoxelInfoCmd : public FrBaseCmd {
 public:
-    enum Action { Undefined, Update, Reset, Add };
+  enum Action { Undefined, Update, Reset, Add, Set };
 
 public:
     // Constructor/destructor
@@ -31,13 +31,16 @@ public:
 
     // Properties
     void SetMouseXY(int x, int y);
+    void SetVoxel(int v[3]);
     FrSetPropMacro(Action, Action);
     FrSetPropMacro(vtkPointPicker*, PointPicker);
 
 private:
-    bool UpdateVoxelInfo(bool addPoint);
+    bool UpdateVoxelInfoMouse(bool addPoint);
+    bool UpdateVoxelInfoDirect(bool addPoint);
+    bool UpdateVoxelInfo(VoxelData &vd, vtkImageData* pImageData, bool addPoint);
     bool ResetVoxelInfo();
-    bool AddPoint(int* Index, vtkImageData* pImageData);
+    bool AddPoint(int* Index, vtkImageData* pImageData = NULL);
 
     void GetVoxelInfo();
     double* GetMappedPoint();
@@ -48,6 +51,8 @@ private:
     int m_mouseY;
     bool m_isMouseXY;
 
+    int v[3];
+    bool m_isVoxel;
 };
 
 #endif // FR_VOXEL_INFO_CMD

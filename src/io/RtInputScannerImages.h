@@ -141,12 +141,6 @@ protected:
   bool alignSeries;
   string alignTarget;
 
-  // vector to store received images 
-  vector<RtMRIImage*> received;
-
-  // iterator that points to the first undeleted image
-  vector<RtMRIImage*>::iterator toBeDeleted;
-
 };
 
 #endif

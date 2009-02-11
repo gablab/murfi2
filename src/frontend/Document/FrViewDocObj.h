@@ -5,6 +5,7 @@
 #include "FrMacro.h"
 #include "FrDocumentObj.h"
 #include "FrViewSettings.h"
+#include "vtkImageData.h"
 
 //#define BAD_LAYER_ID  0
 //#define ALL_LAYER_ID  1
@@ -44,6 +45,30 @@ public:
     FrGetPropMacro(FrSliceViewSettings*,  SliceViewSettings);
     FrGetPropMacro(FrMosaicViewSettings*, MosaicViewSettings);
     FrGetPropMacro(FrOrthoViewSettings*,  OrthoViewSettings);
+
+    void TransformCoordinatesToIndices(int point[2], 
+				       vtkImageData *img,
+				       int orientation = 0);
+
+    void TransformCoordinatesToIndices(double point[2], 
+				       vtkImageData *img,
+				       int orientation = 0);
+
+    void TransformCoordinatesToIndices(double &x, double &y, 
+				       vtkImageData *img,
+				       int orientation = 0);
+
+    void TransformIndicesToCoordinates(int point[2], 
+				       vtkImageData *img,
+				       int orientation = 0);
+
+    void TransformIndicesToCoordinates(double point[2], 
+				       vtkImageData *img,
+				       int orientation = 0);
+
+    void TransformIndicesToCoordinates(double &x, double &y, 
+				       vtkImageData *img,
+				       int orientation = 0);
 };
 
 #endif // FR_VIEWDOC_OBJ

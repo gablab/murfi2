@@ -10,13 +10,13 @@ public:
     FrAction(const QString &text, QObject* parent);
 
     // properties
-    FrSetPropMacro(int, ID);
+    FrSetPropMacro(unsigned long, ID);
 
 private Q_SLOTS:
     void OnPress(bool checked);
 
 signals:
-    void actionChecked(int id, bool checked);
+    void actionChecked(unsigned long id, bool checked);
 
 };
 

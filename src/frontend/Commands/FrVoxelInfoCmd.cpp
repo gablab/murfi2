@@ -303,17 +303,20 @@ bool FrVoxelInfoCmd::AddPoint(int* Index, vtkImageData* pImageData){
     std::vector<FrDocumentObj*> images;
     doc->GetObjectsByType(images, FrDocumentObj::ImageObject);
 
-    int timeSeries = doc->GetCurrentViewObject()->GetTimeSeries();
+    FrLayerDocObj* layerDO = doc->GetLayerDocObjByID(viewDO->GetActiveLayerID());
+
+    RtDataID id = layerDO->GetSettings()->DataID;
     int dimensions[3];
 
     std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
     for(it = images.begin(); it != itEnd; ++it){
         FrImageDocObj* imgDO = (FrImageDocObj*)(*it);
-        if(imgDO->GetSeriesNumber() == timeSeries){
+        if(imgDO->GetDataID() == id){
             RtMRIImage* img = imgDO->GetTimePointData(imgDO->GetLastTimePoint());
             dimensions[0] = img->getDim(0);
             dimensions[1] = img->getDim(1);
             dimensions[2] = img->getDim(2);
+	    break;
         }
     }
 

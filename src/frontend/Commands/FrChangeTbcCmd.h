@@ -33,7 +33,7 @@ public:
 	virtual bool Redo();
 
 private:
-    void ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, int ID);
+    void ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, unsigned long ID);
     void SetupTbcSettings(FrTbcSettings& settings);
 
 private:

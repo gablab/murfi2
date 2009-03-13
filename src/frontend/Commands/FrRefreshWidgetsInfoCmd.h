@@ -24,7 +24,7 @@ public:
     FrSetPropMacro(Target, Target);
 
 protected:
-    void UpdatePipelineForID(int id, int point);
+    void UpdatePipelineForID(unsigned long id, int point);
 };
 
 #endif // FR_REFRESH_WIDGETS_INFO_CMD

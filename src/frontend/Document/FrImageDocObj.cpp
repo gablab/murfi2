@@ -20,12 +20,10 @@
 
 FrImageDocObj::FrImageDocObj(){
     m_Images.clear();
-    m_SeriesNumber = BAD_SERIES_NUM;
 }
 
 FrImageDocObj::FrImageDocObj(RtMRIImage* img){    
     m_Images.push_back(img);
-    m_SeriesNumber = img->getDataID().getSeriesNum();
 }
 
 FrImageDocObj::~FrImageDocObj(){
@@ -67,6 +65,18 @@ FrDocumentObj::ObjTypes FrImageDocObj::GetType(){
     return FrDocumentObj::ImageObject;
 }
 
+RtDataID FrImageDocObj::GetDataID() {
+  RtDataID result;
+
+  if(!m_Images.empty()) {
+    result = RtDataID(m_Images[0]->getDataID());
+    result.setTimePoint(DATAID_UNSET_VALUE);
+  }
+
+  return result;
+  
+}
+
 RtMRIImage* FrImageDocObj::GetTimePointData(unsigned int timePoint){
     RtMRIImage* result = 0;
 
@@ -85,14 +95,13 @@ RtMRIImage* FrImageDocObj::GetTimePointData(unsigned int timePoint){
 bool FrImageDocObj::AddTimePointData(RtMRIImage* mriImage){
     // Some checks
     if(!mriImage) return false;
-    if(m_SeriesNumber == BAD_SERIES_NUM){
-        m_SeriesNumber = mriImage->getDataID().getSeriesNum();
-    }
 
-    // Add only with the same series number
-    if(m_SeriesNumber != mriImage->getDataID().getSeriesNum()){
-        return false;
-    }
+    // ohinds 2009-03-01
+    // todo: check data id for compatibilty
+//    // Add only with the same series number
+//    if(m_SeriesNumber != mriImage->getDataID().getSeriesNum()){
+//        return false;
+//    }
 
     // Check if we have this timepoint
     bool hasTP = false;
@@ -107,7 +116,10 @@ bool FrImageDocObj::AddTimePointData(RtMRIImage* mriImage){
         }
     }
 
-    if(hasTP) return false;
+    if(hasTP) {
+      cerr << "ERROR: already added timepoint " << timePoint << endl;
+      return false;
+    }
     m_Images.push_back(mriImage);
 
     // notify about new timepoint data has come
@@ -150,7 +162,6 @@ void FrImageDocObj::ClearAll(){
         delete (*it);
     }
     m_Images.clear();
-    m_SeriesNumber = BAD_SERIES_NUM;
 }
 
 void FrImageDocObj::NotifyAboutNewTimePointData(){

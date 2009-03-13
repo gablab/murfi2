@@ -19,10 +19,10 @@ class QPaintEvent;
 class FrGraphWidget : public QWidget {
 	Q_OBJECT
 public:
-	FrGraphWidget(int id, QWidget *parent = 0);
+	FrGraphWidget(unsigned long id, QWidget *parent = 0);
 
     // Properties
-    FrGetPropMacro(int, ID);
+    FrGetPropMacro(unsigned long, ID);
     FrGetPropMacro(QColor, Color);
     void SetColor(QColor& value);
 
@@ -36,7 +36,7 @@ public:
 
     // Here all signals
 Q_SIGNALS:
-    void VisibilityChanged(int id);    
+    void VisibilityChanged(unsigned long id);    
 
 private Q_SLOTS:
     void OnVisibilityChanged();

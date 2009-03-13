@@ -90,6 +90,10 @@ void FrUpdateTabsCmd::SetupTabObjects(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
 
+//    if(tabSets == NULL) {
+//      return;
+//    }
+
     // Remove Image and Colormap layers
     FrDocument::DocObjCollection oldLayers;
     doc->GetObjectsByType(oldLayers, FrDocumentObj::LayerObject);
@@ -115,16 +119,21 @@ void FrUpdateTabsCmd::SetupTabObjects(){
     viewDO->CopySettingsFrom(tabSets);
     doc->Add(viewDO);
 
-    FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType());
-    imgLayer->CopySettings(tabSets->GetImageLayer());
-    doc->Add(imgLayer);
-    
+    // ohinds 2009-02-25
+    // do not add a layer by default
+    //FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType());
+    //imgLayer->CopySettings(tabSets->GetImageLayer());
+    //doc->Add(imgLayer);
+
+    // ohinds 2009-03-02
+    // does this ever get called?    
     FrTabSettingsDocObj::LayersCollection& layers = tabSets->GetLayers();
     std::vector<FrLayerSettings*>::iterator itr, itrEnd(layers.end());
     for(itr = layers.begin(); itr != itrEnd; ++itr){
+      cout << "here, unexpectedly" << endl;
         // TODO: do not add roi(image) layers, may be just copy settings  ??
         if ((*itr)->GetType() != FrLayerSettings::LRoi){
-            FrLayerDocObj* layer = new FrLayerDocObj((*itr)->GetType());
+	  FrLayerDocObj* layer = new FrLayerDocObj((*itr)->GetType(), RtDataID());
             layer->CopySettings((*itr));
             doc->Add(layer);
         }

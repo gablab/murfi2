@@ -52,7 +52,7 @@ Q_SIGNALS:
     void LiveModeChanged(bool value);
     void PreviousTimePoint();
     void NextTimePoint();
-    void GraphChanged(int id, bool add);
+    void GraphChanged(unsigned long id, bool add);
     void UpdateSignal();
 
 protected:
@@ -74,13 +74,13 @@ private Q_SLOTS:
     void OnUpdate();
 
     // context menu 
-    void itemChecked(int id, bool checked);
+    void itemChecked(unsigned long id, bool checked);
     void ShowRoiMean(bool checked);
     void ShowRoiSTD(bool checked);
 
 private:
     // Video playback
-    int m_TimerID;
+    unsigned long m_TimerID;
     int m_PlayingTimePoint;
     bool m_IsPaused;
     QMutex mutex;

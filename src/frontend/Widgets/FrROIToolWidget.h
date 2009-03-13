@@ -36,7 +36,7 @@ public:
     int GetCurrentValue();
 
     // Methods
-    typedef struct _roiInfo { int ID; QString Name; } RoiInfo;
+    typedef struct _roiInfo { unsigned long ID; QString Name; } RoiInfo;
     void UpdateRoiInfo(std::vector<RoiInfo>& roiInfos);
 
     // Properties

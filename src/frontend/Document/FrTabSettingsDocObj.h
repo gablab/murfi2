@@ -16,7 +16,7 @@ class FrImageLayerSettings;
 
 #define DEF_TBS_NAME    QString("Tab")
 #define DEF_TBS_DESCR   QString("Description")
-#define DEF_TBS_VIEW    SliceView
+#define DEF_TBS_VIEW    OrthoView
 #define DEF_TBS_CURRENT false
 
 // This class represets settings of Tab
@@ -39,7 +39,7 @@ public:
     void ClearLayersInfo();
 
     // Properties
-    FrPropMacro(unsigned int,ID);
+    FrPropMacro(unsigned long,ID);
     FrPropMacro(QString, Name);
     //FrPropMacro(QString, Description);
     FrPropMacro(bool, IsCurrent);

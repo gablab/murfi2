@@ -17,7 +17,7 @@ class FrCameraSettings;
 class FrBaseLayer : public vtkObject {
 public:
     typedef enum _LayerTypes { 
-        LtBase, LtImage, LtRoi, LtColormap, LtSpecial 
+        LtBase, LtImage, LtRoi, LtSpecial 
     } LayerTypes;
 
 public:
@@ -26,7 +26,16 @@ public:
 
 public:
     // Properties
-    FrPropMacro(unsigned int, ID);
+
+    //FrPropMacro(unsigned long, ID);
+    unsigned long GetID() { return m_ID; }
+    void SetID(unsigned long l) { 
+      m_ID = l; 
+      //cout << "FrBaseLayer::SetID(): setting layer ID to " << m_ID << endl; 
+    }
+
+    FrPropMacro(RtDataID, DataID);
+
     vtkRenderer* GetRenderer(){ 
         return m_Renderer; 
     }
@@ -59,6 +68,7 @@ protected:
     vtkRenderer* m_Renderer;
 
 private:
+    unsigned long m_ID;
     FrBaseLayer(const FrBaseLayer&);  // Not implemented.
     void operator=(const FrBaseLayer&);  // Not implemented.
 

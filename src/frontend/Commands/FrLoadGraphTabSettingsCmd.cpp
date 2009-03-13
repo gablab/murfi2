@@ -196,9 +196,12 @@ bool FrLoadGraphTabSettingsCmd::LoadGraphs(QDomElement& elem, std::vector<FrGrap
     QDomElement graphElem = elem.firstChildElement();
     while(!graphElem.isNull()){
         if(graphElem.tagName() == FR_XML_GRAPH_ELEM){
+	  RtDataID gid;
             // read timeseria       
             if(!graphElem.hasAttribute(FR_XML_TIMESERIA_ATTR)) return false;
             int timeseria = graphElem.attribute(FR_XML_TIMESERIA_ATTR).toInt(&result);
+	    gid.setSeriesNum(timeseria);
+
             if(!result) return false;
             FrGraphSettings* gs;
 
@@ -285,7 +288,7 @@ bool FrLoadGraphTabSettingsCmd::LoadGraphs(QDomElement& elem, std::vector<FrGrap
 
                 // create new graph doc obj and add it to graphs
                 FrGraphDocObj* graphDO = new FrGraphDocObj(type);
-                graphDO->SetTimeSeria(timeseria);
+                graphDO->SetID(gid);
                 graphDO->SetSettings(gs);
                 graphs.push_back(graphDO);
             }

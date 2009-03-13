@@ -11,10 +11,12 @@
 #include <Qt/qfile.h>
 
 
-FrLayerDocObj::FrLayerDocObj(FrLayerSettings::LTypes type)
+FrLayerDocObj::FrLayerDocObj(FrLayerSettings::LTypes type, 
+			     const RtDataID &id, QString name)
 : m_Settings(0), m_ID (0){
-    m_Settings = FrLayerSettings::Create(type);
+  m_Settings = FrLayerSettings::Create(type,id,name);
     m_ID = (unsigned long)(void*)(this);
+    //cout << "FrLayerDocObj::FrLayerDocObj(): creating layer doc obj with id " << m_ID << endl;
 }
 
 FrLayerDocObj::~FrLayerDocObj(){
@@ -67,11 +69,6 @@ bool FrLayerDocObj::IsRoi(){
 bool FrLayerDocObj::IsImage(){
     return (m_Settings && 
         m_Settings->GetType() == FrLayerSettings::LImage);
-}
-
-bool FrLayerDocObj::IsColormap(){
-    return (m_Settings && 
-        m_Settings->GetType() == FrLayerSettings::LColormap);
 }
 
 bool FrLayerDocObj::CopySettings(FrLayerSettings* src){

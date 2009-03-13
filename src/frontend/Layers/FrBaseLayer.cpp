@@ -18,7 +18,7 @@
 vtkStandardNewMacro(FrBaseLayer);
 
 FrBaseLayer::FrBaseLayer() 
-: m_ID(BAD_LAYER_ID), m_Renderer(0) {
+  : m_ID(BAD_LAYER_ID), m_Renderer(0) {
     // renderer
     m_Renderer = vtkRenderer::New();
     m_Renderer->SetBackground(DEF_REN_BACKGROUND);

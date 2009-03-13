@@ -8,7 +8,7 @@
 #include "Qt/qstyle.h"
 
 
-FrGraphWidget::FrGraphWidget(int id, QWidget* parent) 
+FrGraphWidget::FrGraphWidget(unsigned long id, QWidget* parent) 
 : QWidget(parent){
     // init values
     m_ID = id;

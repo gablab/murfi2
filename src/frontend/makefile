@@ -14,6 +14,7 @@ front: sub_dirs
 sub_dirs:
 	cd ./Actors	&&	$(MAKE)
 	cd ./Commands	&&	$(MAKE)
+	cd ./Commands/MaskCommands	&&	$(MAKE)
 	cd ./Controllers &&	$(MAKE)
 	cd ./Document	&&	$(MAKE)
 	cd ./Filters	&&	$(MAKE)
@@ -23,10 +24,10 @@ sub_dirs:
 	cd ./Tools	&&	$(MAKE)
 	cd ./Views	&&	$(MAKE)	
 	cd ./Utils	&&	$(MAKE)
-	cd ./moc	&&	$(MAKE) TYPE=main -f ./makefile.util_moc
-	cd ./moc	&&	$(MAKE) TYPE=util -f ./makefile.util_moc
-	cd ./moc	&&	$(MAKE) TYPE=app -f ./makefile.util_moc
-	cd ./moc	&&	$(MAKE) TYPE=widget -f ./makefile.util_moc
+	cd ./moc	&&	$(MAKE) TYPE=main -f ./makefile.moc
+	cd ./moc	&&	$(MAKE) TYPE=util -f ./makefile.moc
+	cd ./moc	&&	$(MAKE) TYPE=app -f ./makefile.moc
+	cd ./moc	&&	$(MAKE) TYPE=widget -f ./makefile.moc
 	cd ./moc	&&	$(MAKE)
 	cd ./Widgets	&&	$(MAKE)
 

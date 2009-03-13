@@ -26,8 +26,7 @@ public:
     
     unsigned int GetMatrixSize();
 
-    // Series identifiers
-    FrGetPropMacro(unsigned int, SeriesNumber);
+    RtDataID GetDataID();
 
     RtMRIImage* GetTimePointData(unsigned int timePoint);
 
@@ -45,7 +44,7 @@ private:
 
 private:
     typedef std::vector<RtMRIImage*> ImageCollection; 
-    ImageCollection m_Images;
+    ImageCollection m_Images;    
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include "FrColormapWidget.h"
 #include "FrSettings.h"
 #include "FrLayerSettings.h"
+#include "RtDataID.h"
 
 #include "Qt/qlayout.h"
 #include "Qt/qlabel.h"
@@ -116,7 +117,7 @@ void FrLayerDialog::SetCaption(QString& caption){
     this->setWindowTitle(caption);
 }
 
-void FrLayerDialog::GetLayerParams(FrColormapLayerSettings& layerSets){
+void FrLayerDialog::GetLayerParams(FrImageLayerSettings& layerSets){
     // Common props
     layerSets.Name = m_txtName->text();
     //layerSets.ID = BAD_LAYER_ID;
@@ -134,7 +135,7 @@ void FrLayerDialog::GetLayerParams(FrColormapLayerSettings& layerSets){
     m_colormapWidget->GetColormapParams(layerSets);
 }
 
-void FrLayerDialog::SetLayerParams(FrColormapLayerSettings& layerSets){
+void FrLayerDialog::SetLayerParams(FrImageLayerSettings& layerSets){
     // Common props
     m_txtName->setText(layerSets.Name);
     m_chkVisibility->setChecked(layerSets.Visibility);
@@ -155,7 +156,7 @@ void FrLayerDialog::OnBtnOKClicked(){
     bool isValid = false;
     QString message = "Validation OK";
     VALIDATING_PIPELINE {
-        FrColormapLayerSettings params;
+      FrImageLayerSettings params(RtDataID(), "no name :(");
         m_colormapWidget->GetColormapParams(params);
 
         // Check min and max

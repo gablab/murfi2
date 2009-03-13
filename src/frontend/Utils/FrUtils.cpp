@@ -40,7 +40,7 @@ double GetLength(int x1, int y1, int x2, int y2)
 	return length;
 }
 
-void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3], int imgNumber){
+void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3], unsigned long imgNumber){
   double dp[3];
   dp[0] = point[0]; dp[1] = point[1]; dp[2] = point[2];
   GetRealImagePosition(viewDO, data, dp, imgNumber);
@@ -50,7 +50,7 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
   point[2] = (int) rint(dp[2]);
 }
 
-void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point[3], int imgNumber){
+void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point[3], unsigned long imgNumber){
     if(!data) return;
 
     double oldPoint[2];

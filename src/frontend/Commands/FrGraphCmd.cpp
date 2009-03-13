@@ -25,7 +25,7 @@ FrGraphCmd::FrGraphCmd()
   m_DocObj(0), m_isID(false){
 }
 
-void FrGraphCmd::SetID(int id){
+void FrGraphCmd::SetID(unsigned long id){
     m_ID = id;
     m_isID = true;
 }
@@ -75,13 +75,13 @@ bool FrGraphCmd::DeleteGraph(){
 }
 
 // delete active layer
-int FrGraphCmd::GetActiveLayerID(){
+unsigned long FrGraphCmd::GetActiveLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     return viewDO->GetActiveLayerID();
 }
 
-bool FrGraphCmd::IsRoiLayer(int id){
+bool FrGraphCmd::IsRoiLayer(unsigned long id){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     
     std::vector<FrDocumentObj*> objects;

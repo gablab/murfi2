@@ -32,8 +32,8 @@ public slots:
     void OnCurrentChanged(QWidget* page);
 
 signals:
-    void DeleteTab(int tabID);
-    void CurrentChanged(int tabID);
+    void DeleteTab(unsigned long tabID);
+    void CurrentChanged(unsigned long tabID);
 
 private:
     QTabWidget*         m_tabWidget;

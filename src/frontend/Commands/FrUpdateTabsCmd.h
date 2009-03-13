@@ -27,7 +27,7 @@ public:
     // Properties
     FrSetPropMacro(Actions, Action);
     FrSetPropMacro(FrTabSettingsDocObj*, TabSettingsDocObj);
-    FrSetPropMacro(int, TabID);
+    FrSetPropMacro(unsigned long, TabID);
 
     // Overrides
 	bool Execute();

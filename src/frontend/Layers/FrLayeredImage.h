@@ -14,6 +14,7 @@ class vtkImageActor;
 #include "FrSpecialLayer.h"
 #include "FrSettings.h"
 #include <vector>
+#include <limits>
 
 #include "vtkObject.h"
 
@@ -22,7 +23,7 @@ class vtkImageActor;
 // It keeps and manages all layers.
 class FrLayeredImage : public vtkObject {
 public:
-    typedef enum _LType { Roi, Image, Colormap } LayerType;
+    typedef enum _LType { Roi, Image } LayerType;
 
 public:
     vtkTypeMacro(FrLayeredImage, FrImageLayer);
@@ -30,18 +31,18 @@ public:
 
 public:
     // Accessors/Modifiers
-    void SetImageInput(vtkImageData* data);
-    vtkImageData* GetImageInput();
+    void SetImageInput(vtkImageData* data, unsigned long id);
+    vtkImageData* GetImageInput(unsigned long id = std::numeric_limits<unsigned long>::max());
 
-    void SetRoiInput(vtkImageData* data, unsigned int id);
-    vtkImageData* GetRoiInput(unsigned int id);
+    void SetRoiInput(vtkImageData* data, unsigned long id);
+    vtkImageData* GetRoiInput(unsigned long id);
 
     // Setup different settings
-    void SetTbcSettings(FrTbcSettings& settings, unsigned int id);
-    void SetCameraSettings(FrCameraSettings& settings, unsigned int id);
-    void SetColormapSettings(FrColormapSettings& settings, unsigned int id);
-    void SetOpacity(double value, unsigned int id);
-    void SetVisibility(bool value, unsigned int id);
+    void SetTbcSettings(FrTbcSettings& settings, unsigned long id);
+    void SetCameraSettings(FrCameraSettings& settings, unsigned long id);
+    void SetColormapSettings(FrColormapSettings& settings, unsigned long id);
+    void SetOpacity(double value, unsigned long id);
+    void SetVisibility(bool value, unsigned long id);
     
 
     // Update methods
@@ -52,16 +53,19 @@ public:
     //
     // Layer management
     //
-    bool AddLayer(unsigned int id, LayerType type);
-    bool RemoveLayer(unsigned int id);
+    bool AddLayer(unsigned long id, LayerType type);
+    bool RemoveLayer(unsigned long id);
     void RemoveLayers();
-    void RemoveColormapLayers();
+    //void RemoveColormapLayers();
 
     // Returns layer by ID
-    FrBaseLayer* GetLayerByID(unsigned int id);
+    FrBaseLayer* GetLayerByID(unsigned long id);
     FrSpecialLayer* GetSpecialLayer(){
         return m_SpecialLayer;
     };
+
+    // the next layer to be focused after the one passed
+    unsigned long GetNextLayerID(unsigned long id);
 
     // Returns set of renderers (sorted in predefined order)
     void GetRenderers(std::vector<vtkRenderer*>& renderers);
@@ -87,7 +91,7 @@ private:
     typedef std::vector<FrBaseLayer*> LayersCollection;
     LayersCollection m_Layers;
     
-    FrImageLayer*   m_ImageLayer;
+    //FrImageLayer*   m_ImageLayer;
     FrSpecialLayer* m_SpecialLayer;
 
 private:

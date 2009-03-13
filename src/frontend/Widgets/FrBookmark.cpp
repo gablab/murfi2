@@ -6,7 +6,7 @@
 #define DEF_TAB_NAME        "NoName"
 #define DEF_TAB_DESCRIPTION "No description"
 
-FrBookmark::FrBookmark(unsigned int id, QWidget *parent)
+FrBookmark::FrBookmark(unsigned long id, QWidget *parent)
 : QWidget(parent){
 
     //setup id

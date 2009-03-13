@@ -42,4 +42,7 @@ RtDataStore &getDataStore();
 // get the unique ID number for this image series UID
 unsigned int getSeriesNumFromUID(char *uid);
 
+// get a new unique series number
+unsigned int getNextUniqueSeriesNum();
+
 #endif

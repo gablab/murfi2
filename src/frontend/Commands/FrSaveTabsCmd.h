@@ -46,9 +46,9 @@ private:
     
     void SaveOrthoViewSettings(QDomElement& parent,  FrOrthoViewSettings* ovSets);
     
-    void SaveCameraSettings(QDomElement& parent, int id, FrCameraSettings* camSets);
+    void SaveCameraSettings(QDomElement& parent, unsigned long id, FrCameraSettings* camSets);
 
-    void SaveLayeredImageSettings(QDomElement& parent, int id,
+    void SaveLayeredImageSettings(QDomElement& parent, unsigned long id,
                                   FrImageLayerSettings* mlSets, 
                                   std::vector<FrLayerSettings*>& olSets);
     

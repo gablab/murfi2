@@ -104,7 +104,7 @@ void FrSaveTabsCmd::SaveSliceViewSettings(QDomElement& parent, FrSliceViewSettin
 
     // Active layer
     QDomElement layerNumElem = m_Document->createElement(FR_XML_LAYERNUM_ELEM);
-    layerNumElem.setAttribute(FR_XML_VALUE_ATTR, vs->ActiveLayerID);
+    layerNumElem.setAttribute(FR_XML_VALUE_ATTR, (qulonglong) vs->GetActiveLayerID());
     parent.appendChild(layerNumElem);
     
     // cameras
@@ -117,7 +117,7 @@ void FrSaveTabsCmd::SaveSliceViewSettings(QDomElement& parent, FrSliceViewSettin
 void FrSaveTabsCmd::SaveMosaicViewSettings(QDomElement& parent, FrMosaicViewSettings* vs){
     // Active layer
     QDomElement layerNumElem = m_Document->createElement(FR_XML_LAYERNUM_ELEM);
-    layerNumElem.setAttribute(FR_XML_VALUE_ATTR, vs->ActiveLayerID);
+    layerNumElem.setAttribute(FR_XML_VALUE_ATTR, (qulonglong) vs->GetActiveLayerID());
     parent.appendChild(layerNumElem);
     
     // cameras
@@ -137,7 +137,7 @@ void FrSaveTabsCmd::SaveOrthoViewSettings(QDomElement& parent, FrOrthoViewSettin
 
     // Active layer
     QDomElement layerNumElem = m_Document->createElement(FR_XML_LAYERNUM_ELEM);
-    layerNumElem.setAttribute(FR_XML_VALUE_ATTR, vs->ActiveLayerID);
+    layerNumElem.setAttribute(FR_XML_VALUE_ATTR, (qulonglong) vs->GetActiveLayerID());
     parent.appendChild(layerNumElem);
     
     // cameras
@@ -149,9 +149,9 @@ void FrSaveTabsCmd::SaveOrthoViewSettings(QDomElement& parent, FrOrthoViewSettin
     parent.appendChild(camerasElem);
 }
 
-void FrSaveTabsCmd::SaveCameraSettings(QDomElement& parent, int id, FrCameraSettings* camSets){
+void FrSaveTabsCmd::SaveCameraSettings(QDomElement& parent, unsigned long id, FrCameraSettings* camSets){
     QDomElement camElem = m_Document->createElement(FR_XML_CAM_ELEM);
-    camElem.setAttribute(FR_XML_ID_ATTR, id);
+    camElem.setAttribute(FR_XML_ID_ATTR, (qulonglong) id);
 
     // Scale elem
     QDomElement scaleElem = m_Document->createElement(FR_XML_SCALE_ELEM);
@@ -183,12 +183,12 @@ void FrSaveTabsCmd::SaveCameraSettings(QDomElement& parent, int id, FrCameraSett
 }
 
 
-void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, int id, 
+void FrSaveTabsCmd::SaveLayeredImageSettings(QDomElement& parent, unsigned long id, 
                                              FrImageLayerSettings* mlSets, 
                                              std::vector<FrLayerSettings*>& olSets){
     // image
     QDomElement imageElem = m_Document->createElement(FR_XML_IMG_ELEM);
-    imageElem.setAttribute(FR_XML_ID_ATTR, id);
+    imageElem.setAttribute(FR_XML_ID_ATTR, (qulonglong) id);
     imageElem.setAttribute(FR_XML_NAME_ATTR, mlSets->Name);
     imageElem.setAttribute(FR_XML_OPACITY_ATTR, mlSets->Opacity);
     imageElem.setAttribute(FR_XML_VISIBLE_ATTR, (mlSets->Visibility ? 1 : 0) );
@@ -223,8 +223,8 @@ void FrSaveTabsCmd::SaveLayerSettings(QDomElement& parent, FrLayerSettings* liSe
         case FrLayerSettings::LRoi:
             // do nothing
             break;
-        case FrLayerSettings::LColormap:
-            FrColormapLayerSettings* cmlSets = (FrColormapLayerSettings*)liSets;
+        case FrLayerSettings::LImage:
+            FrImageLayerSettings* cmlSets = (FrImageLayerSettings*)liSets;
 
             // pxRange
             QDomElement prElem = m_Document->createElement(FR_XML_PXRANGE_ELEM);

@@ -27,7 +27,7 @@ public:
     // Properties
     FrSetPropMacro(Actions, Action);
     FrSetPropMacro(FrGraphTabDocObj*, GraphTabDocObj);
-    FrSetPropMacro(int, TabID);
+    FrSetPropMacro(unsigned long, TabID);
 
     // Overrides
 	bool Execute();

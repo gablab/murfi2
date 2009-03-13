@@ -36,7 +36,7 @@ FrBaseView::~FrBaseView(){
 //    return result;
 //}
 
-void FrBaseView::GetRoiIDs(FrMainDocument* document, std::vector<int>& ids){
+void FrBaseView::GetRoiIDs(FrMainDocument* document, std::vector<unsigned long>& ids){
     std::vector<FrDocumentObj*> objects;
     document->GetObjectsByType(objects, FrDocumentObj::RoiObject);
 

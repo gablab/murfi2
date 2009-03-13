@@ -28,19 +28,19 @@ public:
     // Properties
     FrSetPropMacro(Actions, Action);    
     FrSetPropMacro(FrGraphDocObj*, DocObj);
-    void SetID(int id);
+    void SetID(unsigned long id);
 
 private:
     // Helper methods here
     bool AddGraph();
     bool DeleteGraph();
 
-    int GetActiveLayerID();
-    bool IsRoiLayer(int id);
+    unsigned long GetActiveLayerID();
+    bool IsRoiLayer(unsigned long id);
 
 private:
     bool m_isID;
-    int m_ID;
+    unsigned long m_ID;
 };
 
 #endif

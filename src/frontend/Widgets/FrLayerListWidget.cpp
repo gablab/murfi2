@@ -2,6 +2,7 @@
 #include "FrTabSettingsDocObj.h"
 #include "FrLayerWidget.h"
 #include "FrColormapWidget.h"
+#include "FrSliderWidget.h"
 #include "FrSpinSliderWidget.h"
 #include "FrROIToolWidget.h"
 #include "FrRoiDocObj.h"
@@ -55,14 +56,21 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
     m_btnDelete->setText("x");
     m_btnDelete->setToolTip("Delete selected layer");
     m_btnChange = new QToolButton(btnBlock);
-    m_btnChange->setText("C");
-    m_btnChange->setToolTip("Change selected layer");
+    m_btnChange->setText("c");
+    m_btnChange->setToolTip("Configure selected layer");
+
+    // opacity widget
+    //QLabel*	lblOpacity = new QLabel("Opacity: ", this);
+    m_opacityWidget = new FrSliderWidget(this);
+    m_opacityWidget->SetMinMax(0, 100);
+    m_opacityWidget->SetValue(100);
 
     QHBoxLayout* btnLayout = new QHBoxLayout(btnBlock);
     btnLayout->addWidget(m_btnAdd);
     btnLayout->addWidget(m_btnDelete);
     btnLayout->addWidget(m_btnChange);
-    btnLayout->addStretch();
+    btnLayout->addWidget(m_opacityWidget);
+    //btnLayout->addStretch();
     btnBlock->setLayout(btnLayout);
 
     // setup layer layout (leftmost)
@@ -70,16 +78,12 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
     layerLayout->addWidget(m_layerTable);
     layerLayout->addWidget(btnBlock);
    
-    // opacity widget
-    QLabel*	lblOpacity = new QLabel("Opacity: ", this);
-    m_opacityWidget = new FrSpinSliderWidget(this);
-    m_opacityWidget->SetMinMax(0, 100);
-    m_opacityWidget->SetValue(100);
-
-    QHBoxLayout* opacityLayout = new QHBoxLayout();
-    opacityLayout->addWidget(lblOpacity);
-    opacityLayout->addWidget(m_opacityWidget);
-
+    // ohinds: 2009-02-23
+    // moved the opacity slider to the btn block
+//    QHBoxLayout* opacityLayout = new QHBoxLayout();
+//    opacityLayout->addWidget(lblOpacity);
+//    opacityLayout->addWidget(m_opacityWidget);
+//
     //// spacer
     //QSpacerItem *spacerItem;
     //spacerItem = new QSpacerItem(40, 40, QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -95,7 +99,7 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
     QVBoxLayout* propLayout = new QVBoxLayout();
     propLayout->addWidget(m_colormapWidget);
     propLayout->addWidget(m_roiToolWidget);
-    propLayout->addLayout(opacityLayout);
+    //propLayout->addLayout(opacityLayout);
         
     // Setup main layout
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
@@ -137,8 +141,8 @@ void FrLayerListWidget::AddLayer(FrLayerDocObj* layerDO){
 
     // Create layer widget and add it to table
     FrLayerWidget* lw = new FrLayerWidget(layerDO, this);
-    connect(lw, SIGNAL(VisibilityChanged(int)), 
-            this, SLOT(OnVisibilityChanged(int)));
+    connect(lw, SIGNAL(VisibilityChanged(unsigned long)), 
+            this, SLOT(OnVisibilityChanged(unsigned long)));
     m_layerTable->setCellWidget(INSERT_ROW_NUM, TAB_LAYER_IDX, lw);
     
     // Init opacity
@@ -146,8 +150,8 @@ void FrLayerListWidget::AddLayer(FrLayerDocObj* layerDO){
     m_opacityWidget->SetValue(opacity);
 
     // if colormap layer then init Colormap settings
-    if (layerDO->IsColormap()){
-        FrColormapLayerSettings* cmlSet = (FrColormapLayerSettings*) layerDO->GetSettings();    
+    if (layerDO->IsImage()){
+        FrImageLayerSettings* cmlSet = (FrImageLayerSettings*) layerDO->GetSettings();    
         m_colormapWidget->SetColormapParams(*cmlSet);
     }
 }
@@ -166,7 +170,7 @@ void FrLayerListWidget::UpdateRoiList(){
     FrLayerWidget* curWgt = dynamic_cast<FrLayerWidget*>(
             m_layerTable->cellWidget(curRow, TAB_LAYER_IDX));
     
-    int id = 0;
+    unsigned long id = 0;
     if (curWgt)
         id = curWgt->GetID();
     
@@ -185,7 +189,7 @@ void FrLayerListWidget::UpdateRoiList(){
             FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
                 m_layerTable->cellWidget(row, TAB_LAYER_IDX));
             
-            int wid = 0;
+            unsigned long wid = 0;
             if (wgt)
                 wid = wgt->GetID();
             
@@ -202,12 +206,12 @@ void FrLayerListWidget::UpdateRoiList(){
     }
 }
 
-void FrLayerListWidget::SetSelectedLayer(int layerID){
+void FrLayerListWidget::SetSelectedLayer(unsigned long layerID){
     for(int row = 0; row < m_layerTable->rowCount(); ++row){
         FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
             m_layerTable->cellWidget(row, TAB_LAYER_IDX));
 
-        int id = 0;
+        unsigned long id = 0;
         if (wgt)
             id = wgt->GetID();
 
@@ -226,10 +230,14 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
 
     if(wgt){
         // Setup widgets
-        int id = wgt->GetID();
+        unsigned long id = wgt->GetID();
         
         // TODO: get layer DO with specified ID
         FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(id);
+
+	if(layerDO == NULL) {
+	  return;
+	}
 
         if(layerDO->IsRoi()){
             m_colormapWidget->setVisible(false);
@@ -243,10 +251,7 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
             
             //if (id == DEF_LAYER_ID){
             if (layerDO->IsImage()){        
-                m_colormapWidget->setVisible(false);
-            }
-            else {
-                FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+                FrImageLayerSettings* cmlParams = (FrImageLayerSettings*)layerDO->GetSettings();
 
                 m_colormapWidget->setVisible(true);
                 m_colormapWidget->BlockSignals(true);
@@ -289,7 +294,7 @@ void FrLayerListWidget::OnChangeClicked(){
 }
 
 // Manage some params
-void FrLayerListWidget::OnVisibilityChanged(int id){    
+void FrLayerListWidget::OnVisibilityChanged(unsigned long id){    
     this->SetSelectedLayer(id);
 
     if(m_signalsBlocked) return;
@@ -328,13 +333,13 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
         bool oldSB = m_signalsBlocked;
         m_signalsBlocked = true;
 
-        int id = wgt->GetID();
+        unsigned long id = wgt->GetID();
         FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(id);
                 
         layerDO->GetSettings()->Opacity = double(m_opacityWidget->GetValue()) / 
                          double(m_opacityWidget->GetMaximum());
 
-        FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+        FrImageLayerSettings* cmlParams = (FrImageLayerSettings*)layerDO->GetSettings();
         m_colormapWidget->GetColormapParams(*cmlParams);
         wgt->SetLayerParams(layerDO);
 
@@ -359,7 +364,7 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
 //    return 0L;
 //}
 
-bool FrLayerListWidget::GetLayerVisibility(int id){
+bool FrLayerListWidget::GetLayerVisibility(unsigned long id){
     // find widget with given id
     for(int row = 0; row < m_layerTable->rowCount(); ++row){
         FrLayerWidget* wgt = dynamic_cast<FrLayerWidget*>(
@@ -397,37 +402,17 @@ void FrLayerListWidget::OnUpdate(){
     FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
     if(viewDO == 0) return;
 
-    int layerID = viewDO->GetActiveLayerID();
+    unsigned long layerID = viewDO->GetActiveLayerID();
     
     this->BlockSignals(true);
 
-    // First add Image layers
+    // add layers in order
     std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
     for(it = layers.begin(); it != itEnd; ++it){
         FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
-        if(layerDO->IsImage())
-        {
-            this->AddLayer(layerDO);
-        }
+	this->AddLayer(layerDO);
     }
 
-    // Then colormap
-    for(it = layers.begin(); it != itEnd; ++it){
-        FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
-        if(layerDO->IsColormap())
-        {
-            this->AddLayer(layerDO);
-        }
-    }
-
-    // Then ROI
-    for(it = layers.begin(); it != itEnd; ++it){
-        FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
-        if(layerDO->IsRoi())
-        {
-            this->AddLayer(layerDO);
-        }
-    }
 
     this->SetSelectedLayer(layerID);
     this->UpdateRoiList();

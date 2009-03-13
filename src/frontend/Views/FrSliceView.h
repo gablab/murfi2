@@ -42,7 +42,7 @@ private:
 private:
     // Pipeline
     FrDocumentReader* m_docReader;
-	FrLayeredImage* m_LayeredImage;
+    FrLayeredImage* m_LayeredImage;
 };
 
 #endif

@@ -73,14 +73,14 @@ void FrActionSignalManager::Initialize(){
 
     // Connect some signals of BookmarkWidget 
     // to MainWindow object
-    connect( m_mainWindow->m_BookmarkWidget, SIGNAL(CurrentChanged(int)),
-             m_mainWindow, SLOT(OnBookmarkChanged(int)) );
-    connect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(int)),
-             m_mainWindow, SLOT(OnBookmarkDelete(int)) );
+    connect( m_mainWindow->m_BookmarkWidget, SIGNAL(CurrentChanged(unsigned long)),
+             m_mainWindow, SLOT(OnBookmarkChanged(unsigned long)) );
+    connect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(unsigned long)),
+             m_mainWindow, SLOT(OnBookmarkDelete(unsigned long)) );
 
     // Connect signals to layer list widget
-    connect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerSelected(int)),
-             m_mainWindow, SLOT(OnLayerSelected(int)) );
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerSelected(unsigned long)),
+             m_mainWindow, SLOT(OnLayerSelected(unsigned long)) );
 
     connect( m_mainWindow->m_LayerListWidget, SIGNAL(NewLayer()),
              this, SLOT(OnNewLayerAction()) );
@@ -105,13 +105,13 @@ void FrActionSignalManager::Initialize(){
              this, SLOT(OnPreviousTimePointPressed()) );
     connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
              this, SLOT(OnNextTimePointPressed()) );
-    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(GraphChanged(int, bool)),
-             this, SLOT(OnGraphChanged(int, bool)) );
+    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(GraphChanged(unsigned long, bool)),
+             this, SLOT(OnGraphChanged(unsigned long, bool)) );
 
-    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(int)),
-             m_mainWindow, SLOT(OnGraphBookmarkChanged(int)) );
-    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(int)),
-             m_mainWindow, SLOT(OnGraphBookmarkDelete(int)) );
+    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(unsigned long)),
+             m_mainWindow, SLOT(OnGraphBookmarkChanged(unsigned long)) );
+    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(unsigned long)),
+             m_mainWindow, SLOT(OnGraphBookmarkDelete(unsigned long)) );
 
 
     // Connect image settings widget
@@ -162,14 +162,14 @@ void FrActionSignalManager::Deinitialize(){
 
     // Connect some signals of BookmarkWidget 
     // to MainWindow object
-    disconnect( m_mainWindow->m_BookmarkWidget, SIGNAL(CurrentChanged(int)),
-             m_mainWindow, SLOT(OnBookmarkChanged(int)) );
-    disconnect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(int)),
-             m_mainWindow, SLOT(OnBookmarkDelete(int)) );
+    disconnect( m_mainWindow->m_BookmarkWidget, SIGNAL(CurrentChanged(unsigned long)),
+             m_mainWindow, SLOT(OnBookmarkChanged(unsigned long)) );
+    disconnect( m_mainWindow->m_BookmarkWidget, SIGNAL(DeleteTab(unsigned long)),
+             m_mainWindow, SLOT(OnBookmarkDelete(unsigned long)) );
 
     // Connect signals to layer list widget
-    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerSelected(int)),
-             m_mainWindow, SLOT(OnLayerSelected(int)) );
+    disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(LayerSelected(unsigned long)),
+             m_mainWindow, SLOT(OnLayerSelected(unsigned long)) );
 
     disconnect( m_mainWindow->m_LayerListWidget, SIGNAL(NewLayer()),
              this, SLOT(OnNewLayerAction()) );
@@ -199,10 +199,10 @@ void FrActionSignalManager::Deinitialize(){
     disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
              this, SLOT(OnNextTimePointPressed()) );
 
-    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(int)),
-             m_mainWindow, SLOT(OnGraphBookmarkChanged(int)) );
-    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(int)),
-             m_mainWindow, SLOT(OnGraphBookmarkDelete(int)) );
+    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(unsigned long)),
+             m_mainWindow, SLOT(OnGraphBookmarkChanged(unsigned long)) );
+    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(unsigned long)),
+             m_mainWindow, SLOT(OnGraphBookmarkDelete(unsigned long)) );
 
     // image settings widget
     disconnect( m_mainWindow->m_ImageSettingsWidget, SIGNAL(ImageParamsChanged()),
@@ -419,7 +419,7 @@ void FrActionSignalManager::OnNextTimePointPressed(){
         SetNextTimePoint();
 }
 
-void FrActionSignalManager::OnGraphChanged(int id, bool add){
+void FrActionSignalManager::OnGraphChanged(unsigned long id, bool add){
     m_mainWindow->
         GetMainController()->
         ChangeGraph(id, add);

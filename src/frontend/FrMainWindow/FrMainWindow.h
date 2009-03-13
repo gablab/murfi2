@@ -64,12 +64,12 @@ private: friend class FrActionSignalManager;
     FrGetPropMacro(FrActionManager*, ActionManager);
 
 public slots:
-    void OnBookmarkChanged(int id);
-    void OnBookmarkDelete(int id);
-    void OnGraphBookmarkChanged(int id);
-    void OnGraphBookmarkDelete(int id);
+    void OnBookmarkChanged(unsigned long id);
+    void OnBookmarkDelete(unsigned long id);
+    void OnGraphBookmarkChanged(unsigned long id);
+    void OnGraphBookmarkDelete(unsigned long id);
 
-    void OnLayerSelected(int id);
+    void OnLayerSelected(unsigned long id);
     
 private:
     void SetupUi(QMainWindow* mainWindow);

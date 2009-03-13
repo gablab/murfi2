@@ -54,13 +54,10 @@ void FrLayerWidget::SetLayerParams(FrLayerDocObj* layerDO){
         picLabel->setPixmap(QPixmap(CMTYPE_ROI_ICON));
     }
     else{
-        FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+        FrImageLayerSettings* cmlParams = (FrImageLayerSettings*)layerDO->GetSettings();
 
         FrColormapSettings::Types cmType = cmlParams->ColormapSettings.Type;
-        if(layerDO->GetID() == DEF_LAYER_ID){
-            picLabel->setPixmap(QPixmap(CMTYPE_DEF_ICON));
-        }
-        else if(cmType == FrColormapSettings::MultiColor) {
+	if(cmType == FrColormapSettings::MultiColor) {
             picLabel->setPixmap(QPixmap(CMTYPE_MULTI_ICON));
         }
         else if(cmType == FrColormapSettings::SingleColor){

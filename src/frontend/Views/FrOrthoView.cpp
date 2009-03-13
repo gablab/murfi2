@@ -87,18 +87,30 @@ void FrOrthoView::SetupRenderers(){
         for(it = renderers.begin(); it != itEnd; ++it){
             renWin->AddRenderer( (*it) );
             if(i == DEF_CORONAL){
-                (*it)->SetViewport(0.0, 0.5, 0.5, 1.0);
+                (*it)->SetViewport(0.0, 0.0, 0.33, 1.0);
             }
             else if(i == DEF_SAGITAL){
-                (*it)->SetViewport(0.5, 0.5, 1.0, 1.0);
+                (*it)->SetViewport(0.33, 0.0, 0.66, 1.0);
             }
             else if(i == DEF_AXIAL){
-                (*it)->SetViewport(0.0, 0.0, 0.5, 0.5);
+                (*it)->SetViewport(0.66, 0.0, 1.0, 1.0);
             }
         }
+//        for(it = renderers.begin(); it != itEnd; ++it){
+//            renWin->AddRenderer( (*it) );
+//            if(i == DEF_CORONAL){
+//                (*it)->SetViewport(0.0, 0.5, 0.5, 1.0);
+//            }
+//            else if(i == DEF_SAGITAL){
+//                (*it)->SetViewport(0.5, 0.5, 1.0, 1.0);
+//            }
+//            else if(i == DEF_AXIAL){
+//                (*it)->SetViewport(0.0, 0.0, 0.5, 0.5);
+//            }
+//        }
     }
     // add dummy renderer
-    renWin->AddRenderer(m_dummyRenderer);
+    //renWin->AddRenderer(m_dummyRenderer);
     m_dummyRenderer->SetViewport(0.5, 0.0, 1.0, 0.5);
 
     renWin->GetRenderers()->InitTraversal();
@@ -155,7 +167,7 @@ void FrOrthoView::UpdatePipeline(int point){
                     itEnd(params.Layers.end());
 
                 for(it = params.Layers.begin(); it != itEnd; ++it){
-                    unsigned int id = (*it)->GetID();
+                    unsigned long id = (*it)->GetID();
                     m_LayeredImage[i]->SetOpacity((*it)->GetOpacity(), id);
                     m_LayeredImage[i]->SetVisibility((*it)->GetVisibility(), id); 
                 }
@@ -200,7 +212,7 @@ bool FrOrthoView::InitUpdateParams(FrUpdateParams2& params){
         GetCurrentViewObject()->GetOrthoViewSettings();
 
     // Get layers for update
-    unsigned int activeLayerID = params.ViewSettings->ActiveLayerID;
+    unsigned long activeLayerID = params.ViewSettings->GetActiveLayerID();
     FrDocument::DocObjCollection objects;
     params.Document->GetObjectsByType(objects, FrDocumentObj::LayerObject);
 
@@ -224,7 +236,6 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
 
     m_docReader->SetDocument(params.Document);
     m_docReader->SetMosaic(false);
-    m_docReader->SetTimeSeries(vdo->GetTimeSeries());
     
     FrUpdateParams2::LayerCollection::iterator it,
         itEnd(params.Layers.end());
@@ -236,7 +247,8 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
         for(it = params.Layers.begin(); it != itEnd; ++it){
             if((*it)->IsRoi()){
                 m_docReader->SetTarget(FrDocumentReader::Roi);
-                m_docReader->SetDataID((*it)->GetID());
+                m_docReader->SetDataID((*it)->GetSettings()->DataID);
+                //m_docReader->SetDataID((*it)->GetID());
                 m_docReader->Update();
                 m_LayeredImage[i]->SetRoiInput(m_docReader->GetOutput(),
                                               (*it)->GetID());
@@ -245,10 +257,13 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
                 // ID is current Timepoint since we have 
                 // just one time series 
                 m_docReader->SetTarget(FrDocumentReader::Mri);
-                m_docReader->SetDataID(vdo->GetTimePoint());
+		RtDataID imID = (*it)->GetSettings()->DataID;
+                imID.setTimePoint(vdo->GetTimePoint());
+                m_docReader->SetDataID(imID);
                 m_docReader->Update();
 
-                m_LayeredImage[i]->SetImageInput(m_docReader->GetOutput());
+                m_LayeredImage[i]->SetImageInput(m_docReader->GetOutput(),
+                                              (*it)->GetID());
             }
             // .. Add other layers
         }
@@ -292,9 +307,9 @@ void FrOrthoView::UpdateColormap(FrUpdateParams2& params){
         // Update layers for each image
         for(it = params.Layers.begin(); it != itEnd; ++it){
             // Colormap layers only
-            if((*it)->IsColormap()){
-                FrColormapLayerSettings* cmls = 
-                    (FrColormapLayerSettings*)(*it)->GetSettings();
+            if((*it)->IsImage()){
+                FrImageLayerSettings* cmls = 
+                    (FrImageLayerSettings*)(*it)->GetSettings();
 
                 m_LayeredImage[i]->SetColormapSettings(
                     cmls->ColormapSettings, (*it)->GetID());
@@ -311,14 +326,7 @@ void FrOrthoView::UpdateTbc(FrUpdateParams2& params){
     for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
         // Update layers for each image
         for(it = params.Layers.begin(); it != itEnd; ++it){
-            if((*it)->IsColormap()){
-                FrColormapLayerSettings* cmls = 
-                    (FrColormapLayerSettings*)(*it)->GetSettings();
-
-                m_LayeredImage[i]->SetTbcSettings(
-                    cmls->TbcSettings, (*it)->GetID());
-            }
-            else if((*it)->IsImage()){
+	  if((*it)->IsImage()){
                 FrImageLayerSettings* ils = 
                     (FrImageLayerSettings*)(*it)->GetSettings();
 

@@ -3,6 +3,7 @@
 #include "FrDocument.h"
 #include "FrCommandController.h"
 #include "FrLayerDocObj.h"
+#include "RtDataID.h"
 
 // Implementation
 FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
@@ -17,7 +18,7 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
     m_MosaicViewSettings = new FrMosaicViewSettings();
     m_OrthoViewSettings = new FrOrthoViewSettings();
 
-    m_ImageLayer = new FrImageLayerSettings();
+    m_ImageLayer = new FrImageLayerSettings(RtDataID(),"empy name :(");
 }
 
 FrTabSettingsDocObj::~FrTabSettingsDocObj(){
@@ -81,19 +82,19 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
     FrSliceViewSettings* srcSlice = docObj->GetSliceViewSettings();
     FrSliceViewSettings* dstSlice = m_SliceViewSettings;
     dstSlice->CamSettings   = srcSlice->CamSettings;
-    dstSlice->ActiveLayerID = srcSlice->ActiveLayerID;
+    dstSlice->SetActiveLayerID(srcSlice->GetActiveLayerID());
     dstSlice->SliceNumber   = srcSlice->SliceNumber;
     
     // Init mosaic view settings
     FrMosaicViewSettings* srcMosaic = docObj->GetMosaicViewSettings();
     FrMosaicViewSettings* dstMosaic = m_MosaicViewSettings;
     dstMosaic->CamSettings   = srcMosaic->CamSettings;
-    dstMosaic->ActiveLayerID = srcMosaic->ActiveLayerID;
+    dstMosaic->SetActiveLayerID(srcMosaic->GetActiveLayerID());
         
     // Setup ortho view
     FrOrthoViewSettings* srcOrtho = docObj->GetOrthoViewSettings();
     FrOrthoViewSettings* dstOrtho = m_OrthoViewSettings;
-    dstOrtho->ActiveLayerID = srcOrtho->ActiveLayerID;
+    dstOrtho->SetActiveLayerID(srcOrtho->GetActiveLayerID());
     
     for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
         dstOrtho->SliceNumber[i] = srcOrtho->SliceNumber[i];
@@ -107,7 +108,7 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
     LayersCollection::iterator it, itEnd(docObj->m_Layers.end());
     for(it = docObj->m_Layers.begin(); it != itEnd; ++it){
         FrLayerSettings* src = (*it);
-        FrLayerSettings* dst = FrLayerSettings::Create(src->GetType());
+        FrLayerSettings* dst = FrLayerSettings::Create(src->GetType(),src->DataID, src->Name);
         if(dst){
             FrLayerSettings::CopySettings(src, dst);
             m_Layers.push_back(dst);

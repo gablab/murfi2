@@ -116,7 +116,7 @@ void FrSaveGraphTabSettingsCmd::SaveGraphs(QDomElement &parent, std::vector<FrGr
         FrGraphDocObj* graphDO = (FrGraphDocObj*) graphs[i];
 
         QDomElement graphElem = m_Document->createElement(FR_XML_GRAPH_ELEM);
-        graphElem.setAttribute(FR_XML_TIMESERIA_ATTR, graphDO->GetTimeSeria());
+        graphElem.setAttribute(FR_XML_TIMESERIA_ATTR, graphDO->GetID().getSeriesNum());
     
         // TODO: save graph settings
         QDomElement gsElem = m_Document->createElement(FR_XML_GRAPH_SETTINGS_ELEM);

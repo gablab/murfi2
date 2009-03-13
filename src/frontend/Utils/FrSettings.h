@@ -12,7 +12,7 @@
 #define DEF_CM_MAX_VALUE  255
 #define DEF_CM_MID_VALUE  128
 #define DEF_CM_THRESHOLD  4
-#define DEF_CM_COLOR      QColor(0,0,255,255)
+#define DEF_CM_COLOR      QColor(0,0,0,255)
 #define DEF_CM_TYPE       FrColormapSettings::SingleColor
 
 class FrColormapSettings {

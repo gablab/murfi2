@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrAction.h'
 **
-** Created: Fri Feb 6 15:34:37 2009
+** Created: Fri Mar 13 12:45:06 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -31,13 +31,13 @@ static const uint qt_meta_data_FrAction[] = {
       21,   10,    9,    9, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      53,   45,    9,    9, 0x08,
+      55,   47,    9,    9, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrAction[] = {
-    "FrAction\0\0id,checked\0actionChecked(int,bool)\0"
+    "FrAction\0\0id,checked\0actionChecked(ulong,bool)\0"
     "checked\0OnPress(bool)\0"
 };
 
@@ -66,7 +66,7 @@ int FrAction::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: actionChecked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 0: actionChecked((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         case 1: OnPress((*reinterpret_cast< bool(*)>(_a[1]))); break;
         }
         _id -= 2;
@@ -75,7 +75,7 @@ int FrAction::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void FrAction::actionChecked(int _t1, bool _t2)
+void FrAction::actionChecked(unsigned long _t1, bool _t2)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

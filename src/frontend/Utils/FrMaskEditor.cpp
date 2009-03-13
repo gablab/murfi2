@@ -94,8 +94,8 @@ void FrMaskEditor::UpdateSliceXY(RtMaskImage* img, vtkImageData* data){
     unsigned char* srcPtr = (unsigned char*)m_Data->GetScalarPointer();
         
     for(int i=0; i < sliceSize; ++i){ 
-        (*dstPtr) = (*srcPtr);
-        ++dstPtr; ++srcPtr;
+      (*dstPtr) = (*srcPtr);
+      ++dstPtr; ++srcPtr;
     }
 }
 

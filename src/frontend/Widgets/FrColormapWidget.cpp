@@ -191,7 +191,7 @@ void FrColormapWidget::OnBtnColorClicked(){
     }
 }
 
-void FrColormapWidget::GetColormapParams(FrColormapLayerSettings& params){
+void FrColormapWidget::GetColormapParams(FrImageLayerSettings& params){
     // Colormap props
     params.ColormapSettings.Type = m_cmType;
     params.ColormapSettings.MinValue = m_minWidget->GetValue();
@@ -201,7 +201,7 @@ void FrColormapWidget::GetColormapParams(FrColormapLayerSettings& params){
     params.ColormapSettings.Color = m_color;
 }
 
-void FrColormapWidget::SetColormapParams(FrColormapLayerSettings& params){
+void FrColormapWidget::SetColormapParams(FrImageLayerSettings& params){
     // Set colormap settings
     m_minWidget->SetValue(params.ColormapSettings.MinValue);
     m_maxWidget->SetValue(params.ColormapSettings.MaxValue);

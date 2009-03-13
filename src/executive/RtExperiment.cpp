@@ -106,6 +106,23 @@ unsigned int getSeriesNumFromUID(char *uid) {
   return seriesNum;
 }
 
+// get a new unique series number
+unsigned int getNextUniqueSeriesNum() {
+
+  string max = "A";
+  map<string, unsigned int>::iterator i = uids.begin();
+  for(; i != uids.end(); i++) {
+    if((*i).first >= max) {
+      max = (*i).first;
+    }
+  }
+  
+  // add "A" to the max string
+  string s(max + "A");
+  uids[s] = uids.size()+1+numExistingSeries;
+  return uids.size()+numExistingSeries;
+}
+
 // get the current experiment elapsed time in ms
 time_t getExperimentElapsedTime() {
   return getNow()-startTime;
@@ -282,6 +299,7 @@ bool parseArgs(int argc, char **args) {
 
   return true;
 }
+
 
 /* ohinds 2009-02-02
  * added this temporarily. we'll use this main soon....

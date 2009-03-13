@@ -110,8 +110,16 @@ bool FrChangeSliceCmd::ChangeOrthoViewSliceNums(){
 int FrChangeSliceCmd::GetCoronalSlice(double x, double y, int imgNum, FrViewDocObj* viewDO){
   FrOrthoView* ov = this->GetMainController()->GetMainView()->GetOrthoView();
          
+  //cout << " addr " << viewDO << endl;
+
   double spacing[3];
-  ov->GetImage(imgNum)->GetImageInput()->GetSpacing(spacing);
+  vtkImageData *di = ov->GetImage(imgNum)->GetImageInput(viewDO->GetActiveLayerID());
+
+  if(di == NULL) {
+    return 0;
+  }
+
+  di->GetSpacing(spacing);
  
   double* bounds = ov->GetImage(imgNum)->GetActorBounds();
   double result = double(viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL]);
@@ -129,8 +137,14 @@ int FrChangeSliceCmd::GetSagitalSlice(double x, double y, int imgNum, FrViewDocO
   FrOrthoView* ov = this->GetMainController()->GetMainView()->GetOrthoView();
     
   double spacing[3];
-  ov->GetImage(imgNum)->GetImageInput()->GetSpacing(spacing);
- 
+   vtkImageData *di = ov->GetImage(imgNum)->GetImageInput(viewDO->GetActiveLayerID());
+
+  if(di == NULL) {
+    return 0;
+  }
+
+  di->GetSpacing(spacing);
+  
   double* bounds = ov->GetImage(imgNum)->GetActorBounds();
   double result = double(viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL]);
   switch(imgNum)
@@ -147,8 +161,14 @@ int FrChangeSliceCmd::GetAxialSlice(double x, double y, int imgNum, FrViewDocObj
   FrOrthoView* ov = this->GetMainController()->GetMainView()->GetOrthoView();
     
   double spacing[3];
-  ov->GetImage(imgNum)->GetImageInput()->GetSpacing(spacing);
- 
+   vtkImageData *di = ov->GetImage(imgNum)->GetImageInput(viewDO->GetActiveLayerID());
+
+  if(di == NULL) {
+    return 0;
+  }
+
+  di->GetSpacing(spacing);
+  
   double* bounds = ov->GetImage(imgNum)->GetActorBounds();
   double result = double(viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL]);
   switch(imgNum)

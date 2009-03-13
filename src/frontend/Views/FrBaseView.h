@@ -37,7 +37,7 @@ public:
 protected:
     // Common method
 //    FrLayerSettings* GetActiveLayer(std::vector<FrLayerSettings*>& layers, int activeLayerID);
-    void GetRoiIDs(FrMainDocument* document, std::vector<int>& ids);
+    void GetRoiIDs(FrMainDocument* document, std::vector<unsigned long>& ids);
 //    bool GetRoiParams(FrMainDocument* document, int roiID, bool& roiVisibility, double& roiOpacity);
     void ResetCurrentContext(vtkRenderWindow* renWin);
 };

@@ -11,8 +11,8 @@
 class FrBookmark: public QWidget {
 	Q_OBJECT
 public:
-	FrBookmark(unsigned int id, QWidget *parent = 0);
-    FrGetPropMacro(unsigned int, ID);
+	FrBookmark(unsigned long id, QWidget *parent = 0);
+    FrGetPropMacro(unsigned long, ID);
 
     FrPropMacro(bool,IsDefault);
 	
@@ -27,7 +27,7 @@ protected:
 	virtual void mousePressEvent(QMouseEvent *event);
 
 private:
-    static int s_CurrentID;
+    static unsigned long s_CurrentID;
 };
 
 #endif

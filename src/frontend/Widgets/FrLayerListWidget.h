@@ -6,6 +6,7 @@ class FrLayerDocObj;
 class FrLayerSettings;
 class FrRoiDocObj;
 class FrSpinSliderWidget; 
+class FrSliderWidget; 
 class FrColormapWidget;
 class FrROIToolWidget;
 class FrMainDocument;
@@ -34,7 +35,7 @@ public:
     void RemoveLayers();
     void UpdateRoiList();
 
-    void SetSelectedLayer(int layerID);
+    void SetSelectedLayer(unsigned long layerID);
     void BlockSignals(bool value){ 
         m_signalsBlocked = value;
     }
@@ -43,7 +44,7 @@ public:
     //bool GetLayerParams(int id, FrLayerSettings& params);
     
     int GetOpacity();
-    bool GetLayerVisibility(int id);
+    bool GetLayerVisibility(unsigned long id);
 
     FrColormapWidget* GetColormapWidget(){
         return m_colormapWidget;
@@ -59,7 +60,7 @@ signals:
     void NewLayer();
     void DeleteLayer();
     void ChangeLayer();
-    void LayerSelected(int id);
+    void LayerSelected(unsigned long id);
     void UpdateSignal();
 
     // Emmited when Name, Visibility 
@@ -78,7 +79,7 @@ private Q_SLOTS:
     void OnDeleteClicked();
     void OnChangeClicked();
     // Manage some params
-    void OnVisibilityChanged(int id);
+    void OnVisibilityChanged(unsigned long id);
     void OnOpacityChanged(int value);
     void OnColormapParamsChanged();
     void OnRoiToolChanged();
@@ -95,7 +96,7 @@ private:
     QToolButton*    m_btnChange;
 
     FrColormapWidget*   m_colormapWidget;
-    FrSpinSliderWidget* m_opacityWidget;
+    FrSliderWidget* m_opacityWidget;
     FrROIToolWidget* m_roiToolWidget;
 
     bool m_signalsBlocked;

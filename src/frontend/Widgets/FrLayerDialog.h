@@ -1,7 +1,7 @@
 #ifndef FR_LAYER_DLG
 #define FR_LAYER_DLG
 
-class FrColormapLayerSettings;
+class FrImageLayerSettings;
 class FrSpinSliderWidget;
 class FrColormapWidget;
 
@@ -23,8 +23,8 @@ public:
     FrLayerDialog(QWidget* parent = 0L, bool isModal = true);
 
     void SetCaption(QString& caption);
-	void GetLayerParams(FrColormapLayerSettings& layerSets);
-    void SetLayerParams(FrColormapLayerSettings& layerSets);
+	void GetLayerParams(FrImageLayerSettings& layerSets);
+    void SetLayerParams(FrImageLayerSettings& layerSets);
 
     bool SimpleExec();
  

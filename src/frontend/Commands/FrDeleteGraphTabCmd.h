@@ -22,7 +22,7 @@ public:
 	virtual bool Redo();
 
     // Properties
-    FrSetPropMacro(int, TabID);
+    FrSetPropMacro(unsigned long, TabID);
 };
 
 #endif // FR_DELETEGRAPHTAB_CMD

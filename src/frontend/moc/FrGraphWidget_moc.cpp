@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrGraphWidget.h'
 **
-** Created: Fri Feb 6 15:34:37 2009
+** Created: Mon Mar 2 18:15:34 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -31,13 +31,13 @@ static const uint qt_meta_data_FrGraphWidget[] = {
       18,   15,   14,   14, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      41,   14,   14,   14, 0x08,
+      43,   14,   14,   14, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrGraphWidget[] = {
-    "FrGraphWidget\0\0id\0VisibilityChanged(int)\0"
+    "FrGraphWidget\0\0id\0VisibilityChanged(ulong)\0"
     "OnVisibilityChanged()\0"
 };
 
@@ -66,7 +66,7 @@ int FrGraphWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: VisibilityChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 0: VisibilityChanged((*reinterpret_cast< ulong(*)>(_a[1]))); break;
         case 1: OnVisibilityChanged(); break;
         }
         _id -= 2;
@@ -75,7 +75,7 @@ int FrGraphWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void FrGraphWidget::VisibilityChanged(int _t1)
+void FrGraphWidget::VisibilityChanged(unsigned long _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

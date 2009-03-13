@@ -35,18 +35,18 @@ void FrListToolWidget::ClearAll(){
     roiList->clear();
 }
 
-void FrListToolWidget::AddListItem(int ID, QString& name){
+void FrListToolWidget::AddListItem(unsigned long ID, QString& name){
     QListWidgetItem *item = new QListWidgetItem(name, roiList);
     item->setToolTip(QString("%1 : %2").arg(ID).arg(name));
-    item->setData(Qt::UserRole, QVariant(ID));
+    item->setData(Qt::UserRole, QVariant((qulonglong)ID));
     item->setCheckState(Qt::Unchecked);
 }
 
-int FrListToolWidget::GetCurrentItemID(){
-    int ID = -1;
+unsigned long FrListToolWidget::GetCurrentItemID(){
+    unsigned long ID = -1;
     QListWidgetItem *item = roiList->currentItem();
     if(item){
-        ID = item->data(Qt::UserRole).toInt();
+        ID = item->data(Qt::UserRole).toULongLong();
     }
     return ID;
 }

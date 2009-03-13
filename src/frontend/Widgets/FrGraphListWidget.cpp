@@ -37,11 +37,11 @@ FrGraphListWidget::FrGraphListWidget(QWidget* parent)
 void FrGraphListWidget::AddGraphWidget(FrGraphWidget* widget){
     widget->setParent(m_centralWidget);
     m_layout->addWidget(widget);
-    connect(widget, SIGNAL(VisibilityChanged(int)), 
-            this, SLOT(OnGraphVisibilityChanged(int)));
+    connect(widget, SIGNAL(VisibilityChanged(unsigned long)), 
+            this, SLOT(OnGraphVisibilityChanged(unsigned long)));
 }
 
-void FrGraphListWidget::AddGraphWidget(int id, QString& name, QColor& color, bool isVisible){
+void FrGraphListWidget::AddGraphWidget(unsigned long id, QString& name, QColor& color, bool isVisible){
     FrGraphWidget* gw = new FrGraphWidget(id);
     gw->SetName(name);
     gw->SetColor(color);
@@ -49,7 +49,7 @@ void FrGraphListWidget::AddGraphWidget(int id, QString& name, QColor& color, boo
     this->AddGraphWidget(gw);
 }
 
-bool FrGraphListWidget::RemoveGraphWidget(int id, bool doDelete){
+bool FrGraphListWidget::RemoveGraphWidget(unsigned long id, bool doDelete){
     bool result = false;
     FrGraphWidget* wgt = this->GetGraphWidget(id);
     if(wgt){
@@ -65,8 +65,8 @@ bool FrGraphListWidget::RemoveGraphWidget(FrGraphWidget* widget, bool doDelete){
     if(widget->parent() == m_centralWidget){
         m_layout->removeWidget(widget);
         widget->setParent(0);
-        disconnect(widget, SIGNAL(VisibilityChanged(int)), 
-                   this, SLOT(OnGraphVisibilityChanged(int)));
+        disconnect(widget, SIGNAL(VisibilityChanged(unsigned long)), 
+                   this, SLOT(OnGraphVisibilityChanged(unsigned long)));
 
         if(doDelete){
             delete widget;
@@ -93,7 +93,7 @@ void FrGraphListWidget::RemoveAll(){
     }
 }
 
-FrGraphWidget* FrGraphListWidget::GetGraphWidget(int id){
+FrGraphWidget* FrGraphListWidget::GetGraphWidget(unsigned long id){
     // Find widget by id
     FrGraphWidget* result = 0L;
     QObjectList::const_iterator it, itEnd = m_layout->children().end();
@@ -109,6 +109,6 @@ FrGraphWidget* FrGraphListWidget::GetGraphWidget(int id){
     return result;
 }
 
-void FrGraphListWidget::OnGraphVisibilityChanged(int id){
+void FrGraphListWidget::OnGraphVisibilityChanged(unsigned long id){
     emit GraphVisibilityChanged(id);
 }

@@ -260,7 +260,7 @@ void FrImageSettingsWidget::OnUpdate(){
             break;
     }
 
-    int layerID = viewDO->GetActiveLayerID();
+    unsigned long layerID = viewDO->GetActiveLayerID();
     
     mutex.unlock();
 

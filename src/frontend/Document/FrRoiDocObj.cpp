@@ -11,6 +11,7 @@
 // Backend includes
 #include "RtMaskImage.h"
 #include "RtMRIImage.h"
+#include "RtDataID.h"
 
 #define DEF_MASK_VALUE  0
 #define DEF_ROI_ID      -3 // equ BAD_LAYER_ID
@@ -36,7 +37,7 @@ FrRoiDocObj::~FrRoiDocObj(){
 
 void FrRoiDocObj::OnAdd(FrDocument* doc){
     // Add ROI layer doc object
-    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LRoi);
+  FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LRoi, RtDataID());
     layerDO->SetID(this->GetID());
     doc->Add(layerDO);    
 }

@@ -26,7 +26,7 @@ public:
 
     // Properties
     FrGetPropMacro(RtMaskImage*,MaskImage);
-    FrPropMacro(unsigned int, ID);
+    FrPropMacro(unsigned long, ID);
     
     // Initialization    
     void CreateEmptyMaskImage(FrImageDocObj* imgDO);

@@ -10,6 +10,7 @@
 #include "RtDataID.h"
 #include "RtDataStore.h"
 #include "RtDataImage.h"
+#include "RtDataID.h"
 #include "RtMaskImage.h"
 #include "RtMRIImage.h"
 
@@ -69,8 +70,14 @@ void FrDataStore::AddImageToDocument(RtData* data){
         std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
         for(it = objects.begin(); it != itEnd; ++it) {
             FrImageDocObj* ido = (FrImageDocObj*)(*it);
-            if(ido->GetSeriesNumber() == 
-               img->getDataID().getSeriesNum()){
+
+	    RtDataID imageDocDataID = ido->GetDataID();
+	    imageDocDataID.setTimePoint(DATAID_UNSET_VALUE);
+
+	    RtDataID imageDataID = img->getDataID();
+	    imageDataID.setTimePoint(DATAID_UNSET_VALUE);
+
+            if(imageDocDataID == imageDataID){
                    // Found!
                    imgDO = ido;
                    break;
@@ -87,7 +94,6 @@ void FrDataStore::AddImageToDocument(RtData* data){
             
             // get view doc obj and set current timeseria
             FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
-            viewDO->SetTimeSeries(img->getDataID().getSeriesNum());
 
             m_Document->Add(imgDO);
             imgDO->AddTimePointData(img);

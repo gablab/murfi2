@@ -1,7 +1,7 @@
 #include "FrLayeredImage.h"
 #include "FrROILayer.h"
 #include "FrImageLayer.h"
-#include "FrColormapLayer.h"
+//#include "FrColormapLayer.h"
 #include "FrSpecialLayer.h"
 #include "FrLayerSettings.h"
 
@@ -26,8 +26,8 @@ vtkStandardNewMacro(FrLayeredImage);
 
 
 FrLayeredImage::FrLayeredImage() {
-    m_ImageLayer = FrImageLayer::New();
-    m_ImageLayer->SetID(DEF_LAYER_ID);
+//    m_ImageLayer = FrImageLayer::New();
+//    m_ImageLayer->SetID(DEF_LAYER_ID);
 
     // Add layer to internal collection
 //    m_Layers.push_back(m_ImageLayer);
@@ -39,38 +39,40 @@ FrLayeredImage::FrLayeredImage() {
 FrLayeredImage::~FrLayeredImage(){
     // delete all layers here
     this->RemoveLayers();
-    if(m_ImageLayer){
-        m_ImageLayer->Delete();
-    }
+//    if(m_ImageLayer){
+//        m_ImageLayer->Delete();
+//    }
     if(m_SpecialLayer) {
         m_SpecialLayer->Delete();
     }
 }
 
 // Accessors/Modifiers
-void FrLayeredImage::SetImageInput(vtkImageData* data){
-    if(m_ImageLayer){
-        m_ImageLayer->SetInput(data);
-    }
-
+void FrLayeredImage::SetImageInput(vtkImageData* data, unsigned long id){
     // Setup all colormap images
     LayersCollection::iterator it, itEnd(m_Layers.end());
     for(it = m_Layers.begin(); it != itEnd; ++it){
-        if((*it)->GetType() == FrBaseLayer::LtColormap){
+        if((*it)->GetType() == FrBaseLayer::LtImage && (*it)->GetID() == id){
             (*it)->SetInput(data);
         }
     }
 }
 
-vtkImageData* FrLayeredImage::GetImageInput(){
+vtkImageData* FrLayeredImage::GetImageInput(unsigned long id){
     vtkImageData* result = 0;
-    if(m_ImageLayer){
-        result = m_ImageLayer->GetInput();
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+      //cout << "FrLayeredImage::GetImageInput " << (*it)->GetID() << " " << id << endl;
+        if((*it)->GetType() == FrBaseLayer::LtImage &&
+	   (id == std::numeric_limits<unsigned long>::max() || (*it)->GetID() == id )){
+            result = (*it)->GetInput();
+            break;
+        }
     }
     return result;
 }
 
-void FrLayeredImage::SetRoiInput(vtkImageData* data, unsigned int id){
+void FrLayeredImage::SetRoiInput(vtkImageData* data, unsigned long id){
     // find appropriate roi layer and set input to it
     LayersCollection::iterator it, itEnd(m_Layers.end());
     for(it = m_Layers.begin(); it != itEnd; ++it){
@@ -82,7 +84,7 @@ void FrLayeredImage::SetRoiInput(vtkImageData* data, unsigned int id){
     }
 }
 
-vtkImageData* FrLayeredImage::GetRoiInput(unsigned int id){
+vtkImageData* FrLayeredImage::GetRoiInput(unsigned long id){
     vtkImageData* result = 0;
 
     LayersCollection::iterator it, itEnd(m_Layers.end());
@@ -96,45 +98,38 @@ vtkImageData* FrLayeredImage::GetRoiInput(unsigned int id){
     return result;
 }
 
-void FrLayeredImage::SetColormapSettings(FrColormapSettings& settings, unsigned int id){
+void FrLayeredImage::SetColormapSettings(FrColormapSettings& settings, unsigned long id){
     if(id == ALL_LAYER_ID){
         LayersCollection::iterator it, itEnd(m_Layers.end());
         for(it = m_Layers.begin(); it != itEnd; ++it){
-            if((*it)->GetType() == FrBaseLayer::LtColormap){
-                ((FrColormapLayer*)(*it))->SetColormapSettings(settings);
+            if((*it)->GetType() == FrBaseLayer::LtImage){
+                ((FrImageLayer*)(*it))->SetColormapSettings(settings);
             }
         }
     }
     else{
         FrBaseLayer* layer = this->GetLayerByID(id);
-        if(layer->GetType() == FrBaseLayer::LtColormap){
-            ((FrColormapLayer*)layer)->SetColormapSettings(settings);
+        if(layer->GetType() == FrBaseLayer::LtImage){
+            ((FrImageLayer*)layer)->SetColormapSettings(settings);
         }
     }
 }
 
-void FrLayeredImage::SetTbcSettings(FrTbcSettings& settings, unsigned int id){
+void FrLayeredImage::SetTbcSettings(FrTbcSettings& settings, unsigned long id){
     if(id == ALL_LAYER_ID){
         LayersCollection::iterator it, itEnd(m_Layers.end());
         for(it = m_Layers.begin(); it != itEnd; ++it){
             switch((*it)->GetType()){
-            case FrBaseLayer::LtColormap:
-                ((FrColormapLayer*)(*it))->SetTbcSettings(settings);
-                break;
             case FrBaseLayer::LtImage:
                 ((FrImageLayer*)(*it))->SetTbcSettings(settings);
                 break;
             }
         }
-        m_ImageLayer->SetTbcSettings(settings);
     }
     else{
         FrBaseLayer* layer = this->GetLayerByID(id);
         if(layer){
             switch(layer->GetType()){
-                case FrBaseLayer::LtColormap:
-                    ((FrColormapLayer*)layer)->SetTbcSettings(settings);
-                    break;
                 case FrBaseLayer::LtImage:
                     ((FrImageLayer*)layer)->SetTbcSettings(settings);
                     break;
@@ -143,14 +138,13 @@ void FrLayeredImage::SetTbcSettings(FrTbcSettings& settings, unsigned int id){
     }
 }
 
-void FrLayeredImage::SetCameraSettings(FrCameraSettings& settings, unsigned int id){
+void FrLayeredImage::SetCameraSettings(FrCameraSettings& settings, unsigned long id){
     // Setup camera for image layers
     if(id == ALL_LAYER_ID){
         LayersCollection::iterator it, itEnd(m_Layers.end());
         for(it = m_Layers.begin(); it != itEnd; ++it){
             (*it)->SetCameraSettings(settings);
         }
-        m_ImageLayer->SetCameraSettings(settings);
     }
     else{
         FrBaseLayer* layer = this->GetLayerByID(id);
@@ -162,14 +156,13 @@ void FrLayeredImage::SetCameraSettings(FrCameraSettings& settings, unsigned int 
     m_SpecialLayer->SetCameraSettings(settings);
 }
 
-void FrLayeredImage::SetOpacity(double value, unsigned int id){
+void FrLayeredImage::SetOpacity(double value, unsigned long id){
     if(id == ALL_LAYER_ID){
         // Image layers
         LayersCollection::iterator it, itEnd(m_Layers.end());
         for(it = m_Layers.begin(); it != itEnd; ++it){
             (*it)->SetOpacity(value);
         }
-        m_ImageLayer->SetOpacity(value);
     }
     else{
         FrBaseLayer* layer = this->GetLayerByID(id);
@@ -179,14 +172,13 @@ void FrLayeredImage::SetOpacity(double value, unsigned int id){
     }
 }
 
-void FrLayeredImage::SetVisibility(bool value, unsigned int id){
+void FrLayeredImage::SetVisibility(bool value, unsigned long id){
     if(id == ALL_LAYER_ID){
         // Image layers
         LayersCollection::iterator it, itEnd(m_Layers.end());
         for(it = m_Layers.begin(); it != itEnd; ++it){
             (*it)->SetVisibility(value);
         }
-        m_ImageLayer->SetVisibility(value);
     }
     else{
         FrBaseLayer* layer = this->GetLayerByID(id);
@@ -200,8 +192,8 @@ void FrLayeredImage::SetVisibility(bool value, unsigned int id){
 void FrLayeredImage::UpdateColormap(){
     LayersCollection::iterator it, itEnd(m_Layers.end());
     for(it = m_Layers.begin(); it != itEnd; ++it){
-        if((*it)->GetType() == FrBaseLayer::LtColormap){
-            ((FrColormapLayer*)(*it))->UpdateColormap();
+        if((*it)->GetType() == FrBaseLayer::LtImage){
+            ((FrImageLayer*)(*it))->UpdateColormap();
         }
     }
 }
@@ -216,12 +208,8 @@ void FrLayeredImage::UpdateTbc(){
             case FrBaseLayer::LtImage:
                 ((FrImageLayer*)(*it))->UpdateTbc();
                 break;
-            case FrBaseLayer::LtColormap:
-                ((FrColormapLayer*)(*it))->UpdateTbc();
-                break;
         }
     }
-    m_ImageLayer->UpdateTbc();
 }
 
 void FrLayeredImage::UpdateCamera(){
@@ -230,11 +218,11 @@ void FrLayeredImage::UpdateCamera(){
     for(it = m_Layers.begin(); it != itEnd; ++it){
         (*it)->UpdateCamera();
     }
-    m_ImageLayer->UpdateCamera();
 }
 
 // Layer management
-bool FrLayeredImage::AddLayer(unsigned int id, LayerType type){    
+bool FrLayeredImage::AddLayer(unsigned long id, LayerType type){    
+  
     // first create layer
     FrBaseLayer* layer = 0;
     switch(type){
@@ -242,12 +230,14 @@ bool FrLayeredImage::AddLayer(unsigned int id, LayerType type){
             layer = FrRoiLayer::New();
             break;
         case FrLayeredImage::Image:
-            // HACK: just assign ID and return
-            m_ImageLayer->SetID(id);
-            return true;
-            break;
-        case FrLayeredImage::Colormap:
-            layer = FrColormapLayer::New();
+	  // ohinds: 2009-02-23
+	  // i dont understand this
+//            // HACK: just assign ID and return
+//            m_ImageLayer->SetID(id);
+//            return true;
+//            break;
+//        case FrLayeredImage::Colormap:
+	  layer = FrImageLayer::New();
             break;
     }
 
@@ -282,9 +272,9 @@ bool FrLayeredImage::AddLayer(unsigned int id, LayerType type){
     return (layer != 0);
 }
 
-bool FrLayeredImage::RemoveLayer(unsigned int id){
+bool FrLayeredImage::RemoveLayer(unsigned long id){
     // do not remove image layer!!!
-    if(m_ImageLayer->GetID() == id) return false;
+    //if(m_ImageLayer->GetID() == id) return false;
     
     // Find layer to remove
     LayersCollection::iterator it, itEnd(m_Layers.end());
@@ -330,101 +320,131 @@ void FrLayeredImage::RemoveLayers(){
 
     if(rw){
         // NOTE: we have 2 layers : default and special
-        m_ImageLayer->GetRenderer()->SetLayer(1);
+        //m_ImageLayer->GetRenderer()->SetLayer(1);
         m_SpecialLayer->GetRenderer()->SetLayer(1);
-        rw->SetNumberOfLayers(2);
+        rw->SetNumberOfLayers(1); // i think ??
     }
 }
+// ohinds: 2009-02-23
+// i dont understand this
+//void FrLayeredImage::RemoveColormapLayers(){
+//    // create new vector for non colormap layers
+//    LayersCollection tmpLayers;
+//
+//    LayersCollection::iterator it, itEnd(m_Layers.end());
+//    for(it = m_Layers.begin(); it != itEnd; ++it){
+//        if ((*it)->GetType() != FrBaseLayer::LtColormap){
+//            tmpLayers.push_back(*it);        
+//        }
+//    }
+//    
+//    // clear main layers vector (except roi layers, just erase them from list not delete objects)
+//    //this->RemoveLayers();
+//    while(m_Layers.size() > 0){
+//        FrBaseLayer* layer = (FrBaseLayer*)(*(m_Layers.begin()));
+//        //m_Layers.erase(m_Layers.begin());
+//        if (layer->GetType() == FrBaseLayer::LtColormap)
+//            this->RemoveLayer(layer->GetID());
+//        else
+//            m_Layers.erase(m_Layers.begin());
+//            //layer->Delete();
+//    }
+//
+//    // copy back all layers from temp layer
+//    LayersCollection::iterator itr, itrEnd(tmpLayers.end());
+//    for(itr = tmpLayers.begin(); itr != itrEnd; ++itr){
+//        m_Layers.push_back(*itr);        
+//    }
+//
+//    // clear temp vector
+//    tmpLayers.clear();
+//
+//    vtkRenderWindow* rw = m_SpecialLayer->
+//        GetRenderer()->GetRenderWindow();
+//    
+//    int count = m_Layers.size();
+//
+//    if(rw){
+//        // NOTE: we have 2 layers : default and special
+//        m_ImageLayer->GetRenderer()->SetLayer(1);
+//        m_SpecialLayer->GetRenderer()->SetLayer(1);
+//        rw->SetNumberOfLayers(2+count);
+//    }
+//}
 
-void FrLayeredImage::RemoveColormapLayers(){
-    // create new vector for non colormap layers
-    LayersCollection tmpLayers;
-
+FrBaseLayer* FrLayeredImage::GetLayerByID(unsigned long id){
     LayersCollection::iterator it, itEnd(m_Layers.end());
-    for(it = m_Layers.begin(); it != itEnd; ++it){
-        if ((*it)->GetType() != FrBaseLayer::LtColormap){
-            tmpLayers.push_back(*it);        
-        }
-    }
-    
-    // clear main layers vector (except roi layers, just erase them from list not delete objects)
-    //this->RemoveLayers();
-    while(m_Layers.size() > 0){
-        FrBaseLayer* layer = (FrBaseLayer*)(*(m_Layers.begin()));
-        //m_Layers.erase(m_Layers.begin());
-        if (layer->GetType() == FrBaseLayer::LtColormap)
-            this->RemoveLayer(layer->GetID());
-        else
-            m_Layers.erase(m_Layers.begin());
-            //layer->Delete();
-    }
-
-    // copy back all layers from temp layer
-    LayersCollection::iterator itr, itrEnd(tmpLayers.end());
-    for(itr = tmpLayers.begin(); itr != itrEnd; ++itr){
-        m_Layers.push_back(*itr);        
-    }
-
-    // clear temp vector
-    tmpLayers.clear();
-
-    vtkRenderWindow* rw = m_SpecialLayer->
-        GetRenderer()->GetRenderWindow();
-    
-    int count = m_Layers.size();
-
-    if(rw){
-        // NOTE: we have 2 layers : default and special
-        m_ImageLayer->GetRenderer()->SetLayer(1);
-        m_SpecialLayer->GetRenderer()->SetLayer(1);
-        rw->SetNumberOfLayers(2+count);
-    }
-}
-
-FrBaseLayer* FrLayeredImage::GetLayerByID(unsigned int id){
-    LayersCollection::iterator it, itEnd(m_Layers.end());
-    if (m_ImageLayer->GetID() == id)        // should we include m_ImageLayer to the layer collection??
-        return m_ImageLayer;
-
+//    if (m_ImageLayer->GetID() == id)        // should we include
+//        m_ImageLayer to the layer collection?? ohinds: yes!
+//        return m_ImageLayer;
+//
     for(it = m_Layers.begin(); it != itEnd; ++it){
         if((*it)->GetID() == id) return (*it);
     }
     return 0L;
 }
 
+// the next layer to be focused after the one passed
+unsigned long FrLayeredImage::GetNextLayerID(unsigned long id) {
+  unsigned long nextID = BAD_LAYER_ID;
+
+  LayersCollection::iterator it, itEnd(m_Layers.end());
+  bool found = false;
+  for(it = m_Layers.begin(); it != itEnd; ++it){
+    if((*it)->GetID() == id) {
+      found = true;
+    }
+    else {
+      nextID = (*it)->GetID();
+      if(found) {
+	return nextID;
+      }
+    }
+  }
+  return nextID;
+}
+
+
 void FrLayeredImage::GetRenderers(std::vector<vtkRenderer*>& renderers){
     // Add renderer of each layer and udate layer number
     renderers.clear();
     int layerNumber = 0;
 
-    // First add default image layer
-    vtkRenderer* ren = m_ImageLayer->GetRenderer();
-    renderers.push_back(ren);
-    ren->SetLayer(layerNumber);
-    ++layerNumber;
+    // ohinds 2009-02-23
+    // added layer to layer list
+//    // First add default image layer
+//    vtkRenderer* ren = m_ImageLayer->GetRenderer();
+//    renderers.push_back(ren);
+//    ren->SetLayer(layerNumber);
+//    ++layerNumber;
  
+    vtkRenderer* ren;
+
     // Add renderers for Colormap and Roi layers
     LayersCollection::iterator it, itEnd(m_Layers.end());
     for(it = m_Layers.begin(); it != itEnd; ++it){
-        if((*it)->GetType() == FrBaseLayer::LtColormap){
-            ren = (*it)->GetRenderer();
-            ren->SetLayer(layerNumber);
-            renderers.push_back(ren);
+      // ohinds 2009-02-23
+      // unneccesary
+//        if((*it)->GetType() == FrBaseLayer::LtColormap){
+//            ren = (*it)->GetRenderer();
+//            ren->SetLayer(layerNumber);
+//            renderers.push_back(ren);
+//
+//            ++layerNumber;
+//        }
+//    }
+//    
+//    // Rois
+//    for(it = m_Layers.begin(); it != itEnd; ++it){
+//        if((*it)->GetType() == FrBaseLayer::LtRoi){
 
-            ++layerNumber;
-        }
+      ren = (*it)->GetRenderer();
+      ren->SetLayer(layerNumber);
+      renderers.push_back(ren);
+      
+      ++layerNumber;
     }
-    
-    // Rois
-    for(it = m_Layers.begin(); it != itEnd; ++it){
-        if((*it)->GetType() == FrBaseLayer::LtRoi){
-            ren = (*it)->GetRenderer();
-            ren->SetLayer(layerNumber);
-            renderers.push_back(ren);
-
-            ++layerNumber;
-        }
-    }
+    //    }
 
     // Last add renderer from special layer
     ren = m_SpecialLayer->GetRenderer();
@@ -457,21 +477,43 @@ bool FrLayeredImage::IsInViewport(int mouseX, int mouseY){
 }
 
 double* FrLayeredImage::GetActorBounds(){
-    double *bounds;
+  double *bounds = NULL;
 
-    bounds = m_ImageLayer->GetActor()->GetBounds();
+  LayersCollection::iterator it, itEnd(m_Layers.end());
+  for(it = m_Layers.begin(); it != itEnd; ++it){
+    if((*it)->GetType() == FrBaseLayer::LtImage) {
+      bounds = ((FrImageLayer*) *it)->GetActor()->GetBounds();
+      break;
+    }
+  }
     
-    return bounds;
+  return bounds;
 }
 
 double* FrLayeredImage::GetActorCenter(){
-    double* center;
-
-    center = m_ImageLayer->GetActor()->GetCenter();
+    double* center = NULL;
+    
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+      if((*it)->GetType() == FrBaseLayer::LtImage) {
+	center = ((FrImageLayer*) *it)->GetActor()->GetCenter();
+	break;
+      }
+    }
 
     return center;
 }
 
 vtkImageActor* FrLayeredImage::GetActor(){
-    return m_ImageLayer->GetActor();
+  vtkImageActor* actor = NULL;
+   
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+  for(it = m_Layers.begin(); it != itEnd; ++it){
+    if((*it)->GetType() == FrBaseLayer::LtImage) {
+      actor = ((FrImageLayer*) *it)->GetActor();
+      break;
+    }
+  }
+
+  return actor;
 }

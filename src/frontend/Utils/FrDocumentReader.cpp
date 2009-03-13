@@ -17,6 +17,7 @@
 #include "RtMRIImage.h"
 #include "RtMaskImage.h"
 #include "RtActivation.h"
+#include "RtExperiment.h"
 
 vtkStandardNewMacro(FrDocumentReader);
 
@@ -75,18 +76,11 @@ void FrDocumentReader::SetTarget(Targets target){
     }
 }
 
-void FrDocumentReader::SetTimeSeries(unsigned int ID){
-    if(m_TimeSeries != ID){
-        m_TimeSeries = ID;
+void FrDocumentReader::SetDataID(const RtDataID &id){
+  //if(m_DataID != id){
+        m_DataID = id;
         this->SetOutput(0);
-    }
-}
-
-void FrDocumentReader::SetDataID(unsigned int ID){
-    if(m_DataID != ID){
-        m_DataID = ID;
-        this->SetOutput(0);
-    }
+	//}
 }
 
 void FrDocumentReader::SetOrientation(Orientations value){
@@ -116,18 +110,26 @@ void FrDocumentReader::SetOutput(vtkImageData* data){
 
 // Helpers
 vtkImageData* FrDocumentReader::ReadMri(){
-    // Find appropriate image volume
-    RtMRIImage* mri = 0;
-    FrDocument::DocObjCollection images;
-    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+    // ohinds 2009-02-28
+    // changed to get all images from data store
 
-    // NOTE Since we support the only one series 
-    // Time point is a unique data ID.
-    int timePoint = m_DataID;
-    if(images.size() > 0){
-        FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
-        mri = imgDO->GetTimePointData(timePoint);
-    }
+  getDataStore().getAvailableData();  
+
+    // Find appropriate image volume
+  RtMRIImage* mri = dynamic_cast<RtMRIImage*>(getDataStore().getData(m_DataID));
+
+    //FrDocument::DocObjCollection images;
+    //m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+
+    
+
+//    // NOTE Since we support the only one series 
+//    // Time point is a unique data ID.
+//    int timePoint = m_DataID;
+//    if(images.size() > 0){
+//        FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+//        mri = imgDO->GetTimePointData(timePoint);
+//    }
     
     // Process data
     vtkImageData* result = 0L;
@@ -139,20 +141,24 @@ vtkImageData* FrDocumentReader::ReadMri(){
 } 
 
 vtkImageData* FrDocumentReader::ReadRoi(){
-    // Find appropriate image volume
-    RtMaskImage* mask = 0;
-    FrDocument::DocObjCollection rois;
-    m_Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
+    // ohinds 2009-02-28
+    // changed to get all images from data store
 
-    int roiID = m_DataID;
-    FrDocument::DocObjCollection::iterator it, itEnd(rois.end());
-    for(it = rois.begin(); it != itEnd; ++it){
-        FrRoiDocObj* roiDO = (FrRoiDocObj*)(*it);
-        if(roiDO->GetID() == roiID){
-            mask = roiDO->GetMaskImage();
-            break;
-        }
-    }
+    // Find appropriate image volume
+  RtMaskImage* mask = dynamic_cast<RtMaskImage*>(getDataStore().getData(m_DataID));
+
+//    FrDocument::DocObjCollection rois;
+//    m_Document->GetObjectsByType(rois, FrDocumentObj::RoiObject);
+//
+//    int roiID = m_DataID;
+//    FrDocument::DocObjCollection::iterator it, itEnd(rois.end());
+//    for(it = rois.begin(); it != itEnd; ++it){
+//        FrRoiDocObj* roiDO = (FrRoiDocObj*)(*it);
+//        if(roiDO->GetID() == roiID){
+//            mask = roiDO->GetMaskImage();
+//            break;
+//        }
+//    }
 
     // 
     vtkImageData* result = 0L;
@@ -186,18 +192,19 @@ vtkImageData* FrDocumentReader::ReadPoints(){
         pointsDO = (FrPointsDocObj*)pointObjects[0];
 
         // Find appropriate image volume
-        RtMRIImage* mri = 0;
-        FrDocument::DocObjCollection images;
-        m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
-
-        // NOTE Since we support the only one series 
-        // Time point is a unique data ID.
-        int timePoint = m_DataID;
-
-        if(images.size() > 0){
-            FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
-            mri = imgDO->GetTimePointData(timePoint);
-        }
+	RtMRIImage* mri = dynamic_cast<RtMRIImage*>(getDataStore().getData(m_DataID));
+//        RtMRIImage* mri = 0;
+//        FrDocument::DocObjCollection images;
+//        m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+//
+//        // NOTE Since we support the only one series 
+//        // Time point is a unique data ID.
+//        int timePoint = m_DataID;
+//
+//        if(images.size() > 0){
+//            FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+//            mri = imgDO->GetTimePointData(timePoint);
+//        }
         pointsDO->GetDimsFromImg(mri);
 
         if (m_Mosaic){
@@ -249,18 +256,19 @@ CrosshairParams FrDocumentReader::ReadCrosshair(){
     pointsDO = (FrPointsDocObj*)pointObjects[0];
 
     // Find appropriate image volume
-    RtMRIImage* mri = 0;
-    FrDocument::DocObjCollection images;
-    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
-
-    // NOTE Since we support the only one series 
-    // Time point is a unique data ID.
-    int timePoint = m_DataID;
-
-    if(images.size() > 0){
-      FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
-      mri = imgDO->GetTimePointData(timePoint);
-    }
+    RtMRIImage* mri = dynamic_cast<RtMRIImage*>(getDataStore().getData(m_DataID));
+//    RtMRIImage* mri = 0;
+//    FrDocument::DocObjCollection images;
+//    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
+//
+//    // NOTE Since we support the only one series 
+//    // Time point is a unique data ID.
+//    int timePoint = m_DataID;
+//
+//    if(images.size() > 0){
+//      FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
+//      mri = imgDO->GetTimePointData(timePoint);
+//    }
     pointsDO->GetDimsFromImg(mri);
 
     if (m_Mosaic){

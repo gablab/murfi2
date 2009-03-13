@@ -17,7 +17,7 @@ public:
     virtual ~FrMaskBaseCmd();
 
     // Properties
-    void SetImageNumber(int value){
+    void SetImageNumber(unsigned long value){
         m_ImageNumber = value;
     }
 
@@ -27,17 +27,17 @@ protected:
     // Return current slice number of ROI
     int GetCurrentRoiSliceNumber();
     // Returns vtkImageData of current slice of the current ROI.
-    vtkImageData* GetRoiImageData(int id);    
+    vtkImageData* GetRoiImageData(unsigned long id);    
     // Applys given image data to current ROI
     virtual void ApplyDataToRoi(vtkImageData* data, FrRoiDocObj* roiDO, int sliceNumber = -1);
     // Returns Special Layer
     FrSpecialLayer* GetSpecialLayer();
     // Transforms values in point[2] param to proper indices
     // imgID is number of image in ortho view...
-    void TransformCoordinatesToIndices(int point[2], vtkImageData* img, int imgID);
+    void TransformCoordinatesToIndices(int point[2], vtkImageData* img, unsigned long imgID);
 
 protected:
-    int m_ImageNumber;
+    unsigned long m_ImageNumber;
 };
 
 #endif // FR_MASKBASE_CMD

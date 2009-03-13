@@ -60,7 +60,7 @@ bool FrBookmarkWidget::AddBookmark(FrTabSettingsDocObj* ts){
 bool FrBookmarkWidget::RemoveBookmark(FrTabSettingsDocObj* ts){
 
     // delete tab from TabWidget
-    unsigned int id = ts->GetID();
+    unsigned long id = ts->GetID();
     for(int i=0; i < m_tabWidget->count(); ++i){
         FrBookmark* bmw = dynamic_cast<FrBookmark*>(m_tabWidget->widget(i));
         if(bmw != 0L && id == bmw->GetID()){

@@ -22,7 +22,6 @@ FrGraphDocObj::FrGraphDocObj(FrGraphDocObj* src){
     m_Settings = FrGraphSettings::Create(src->GetSettings()->GetType());
     FrGraphSettings::CopySettings(src->GetSettings(), m_Settings);
     m_ID = src->GetID();
-    m_TimeSeria = src->GetTimeSeria();
 }
 
 FrGraphDocObj::~FrGraphDocObj(){

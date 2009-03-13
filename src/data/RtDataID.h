@@ -9,8 +9,10 @@
 #define RTDATAID_H
 
 #include<ctime>
-#include<climits>
-#define DATAID_UNSET_VALUE UINT_MAX
+#include<limits>
+
+static const unsigned int DATAID_UNSET_VALUE
+  = std::numeric_limits<unsigned int>::max();
 
 
 #include<ostream>

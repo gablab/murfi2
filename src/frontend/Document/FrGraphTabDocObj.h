@@ -32,7 +32,7 @@ public:
     void SetPoints(FrPointsDocObj* doc);
 
     // Properties
-    FrPropMacro(int, ID);
+    FrPropMacro(unsigned long, ID);
     FrGetPropMacro(FrPointsDocObj*, Points);
     FrGetRefPropMacro(GraphsCollection, Graphs);
 

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrBookmarkWidget.h'
 **
-** Created: Fri Feb 6 15:34:37 2009
+** Created: Mon Mar 2 12:19:42 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -29,18 +29,18 @@ static const uint qt_meta_data_FrBookmarkWidget[] = {
 
  // signals: signature, parameters, type, tag, flags
       24,   18,   17,   17, 0x05,
-      39,   18,   17,   17, 0x05,
+      41,   18,   17,   17, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      59,   17,   17,   17, 0x0a,
-      87,   82,   17,   17, 0x0a,
+      63,   17,   17,   17, 0x0a,
+      91,   86,   17,   17, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrBookmarkWidget[] = {
-    "FrBookmarkWidget\0\0tabID\0DeleteTab(int)\0"
-    "CurrentChanged(int)\0OnCloseButtonClicked()\0"
+    "FrBookmarkWidget\0\0tabID\0DeleteTab(ulong)\0"
+    "CurrentChanged(ulong)\0OnCloseButtonClicked()\0"
     "page\0OnCurrentChanged(QWidget*)\0"
 };
 
@@ -69,8 +69,8 @@ int FrBookmarkWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: DeleteTab((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 1: CurrentChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 0: DeleteTab((*reinterpret_cast< ulong(*)>(_a[1]))); break;
+        case 1: CurrentChanged((*reinterpret_cast< ulong(*)>(_a[1]))); break;
         case 2: OnCloseButtonClicked(); break;
         case 3: OnCurrentChanged((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
         }
@@ -80,14 +80,14 @@ int FrBookmarkWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void FrBookmarkWidget::DeleteTab(int _t1)
+void FrBookmarkWidget::DeleteTab(unsigned long _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
-void FrBookmarkWidget::CurrentChanged(int _t1)
+void FrBookmarkWidget::CurrentChanged(unsigned long _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);

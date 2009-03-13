@@ -51,8 +51,10 @@ void FrMaskToRgbaFilter::SimpleExecute(vtkImageData *inData,
     unsigned char* srcPtr = (unsigned char*)inArray->GetVoidPointer(0);
     unsigned char* dstPtr = (unsigned char*)outArray->GetVoidPointer(0);
     for(int i=0; i < inArray->GetSize(); ++i){
-        dstPtr[R_INDEX] = dstPtr[G_INDEX] = dstPtr[B_INDEX] = DEF_MIN_VALUE;
-        dstPtr[A_INDEX] = ( (*srcPtr) > 0 ) ? DEF_MIN_VALUE : DEF_MAX_VALUE;
+        dstPtr[R_INDEX] = DEF_MIN_VALUE;
+        dstPtr[G_INDEX] = DEF_MAX_VALUE;
+        dstPtr[B_INDEX] = DEF_MIN_VALUE;
+        dstPtr[A_INDEX] = ( (*srcPtr) == 0 ) ? DEF_MIN_VALUE : DEF_MAX_VALUE;
         dstPtr += COMPONENT_NUM;
         ++srcPtr;
     }

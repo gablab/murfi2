@@ -102,7 +102,7 @@ void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
                 docObj->GetImageLayer());
         }
         else {
-            FrLayerSettings* dst = FrLayerSettings::Create(layer->GetSettings()->GetType());
+	  FrLayerSettings* dst = FrLayerSettings::Create(layer->GetSettings()->GetType(), layer->GetSettings()->DataID, layer->GetSettings()->Name);
             FrLayerSettings::CopySettings(layer->GetSettings(), dst);
             docObj->GetLayers().push_back(dst);
         }

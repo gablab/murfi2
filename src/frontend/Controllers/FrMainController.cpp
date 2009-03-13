@@ -147,7 +147,7 @@ void FrMainController::Initialize(){
         }
         m_MainView->show();
     }
-    
+
     // test vtk log
     vtkOutputWindow* ow = vtkOutputWindow::GetInstance();
     vtkFileOutputWindow* fow = vtkFileOutputWindow::New();
@@ -365,7 +365,7 @@ void FrMainController::ChangeView(int view){
     delete cmd;
 }
 
-void FrMainController::SelectLayer(int id){
+void FrMainController::SelectLayer(unsigned long id){
     FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
     cmd1->SetAction(FrLayerCmd::UpdateSelectedID);
     cmd1->SetID(id);
@@ -410,7 +410,7 @@ void FrMainController::DeleteLayer(){
     delete cmd;            
 }
 
-void FrMainController::ChangeLayer(int action){
+void FrMainController::ChangeLayer(unsigned long action){
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
 
     // Changing using old style dialog
@@ -454,7 +454,7 @@ void FrMainController::ChangeImageSettings(){
     delete cmd;
 }
 
-void FrMainController::ChangeBookmark(int id){
+void FrMainController::ChangeBookmark(unsigned long id){
     // Create complex command and execute it
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
 
@@ -487,7 +487,7 @@ void FrMainController::ChangeBookmark(int id){
     delete cmd;
 }
 
-void FrMainController::DeleteBookmark(int id){
+void FrMainController::DeleteBookmark(unsigned long id){
     FrDeleteTabSettingsCmd* cmd = FrCommandController::CreateCmd<FrDeleteTabSettingsCmd>();
     cmd->SetTabID(id);
     if(!cmd->Execute()){
@@ -498,7 +498,7 @@ void FrMainController::DeleteBookmark(int id){
     delete cmd;
 }
 
-void FrMainController::ChangeGraphBookmark(int id){
+void FrMainController::ChangeGraphBookmark(unsigned long id){
     // Create complex command and execute it
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
 
@@ -527,7 +527,7 @@ void FrMainController::ChangeGraphBookmark(int id){
     delete cmd;
 }
 
-void FrMainController::DeleteGraphBookmark(int id){
+void FrMainController::DeleteGraphBookmark(unsigned long id){
     FrDeleteGraphTabCmd* cmd = FrCommandController::CreateCmd<FrDeleteGraphTabCmd>();
     cmd->SetTabID(id);
     if(!cmd->Execute()){
@@ -538,7 +538,7 @@ void FrMainController::DeleteGraphBookmark(int id){
     delete cmd;
 }
 
-void FrMainController::SetCurrentTool(int tool){
+void FrMainController::SetCurrentTool(unsigned long tool){
     FrManageToolCmd* cmd = FrCommandController::CreateCmd<FrManageToolCmd>();
     cmd->SetToolAction(FrManageToolCmd::NewToolAct);
 
@@ -623,7 +623,7 @@ void FrMainController::SetNextTimePoint(){
     delete cmd;
 }
 
-void FrMainController::ChangeGraph(int id, bool add){
+void FrMainController::ChangeGraph(unsigned long id, bool add){
     FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
     if (add){
         cmd->SetAction(FrUserActionCmd::AddGraph);

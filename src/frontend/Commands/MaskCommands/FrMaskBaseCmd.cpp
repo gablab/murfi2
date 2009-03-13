@@ -39,7 +39,7 @@ FrRoiDocObj* FrMaskBaseCmd::GetCurrentRoi(){
             FrViewDocObj* viewDO = doc->GetCurrentViewObject();
             if(viewDO == 0) return 0;
 
-            int layerID = viewDO->GetActiveLayerID();
+            unsigned long layerID = viewDO->GetActiveLayerID();
 
             std::vector<FrDocumentObj*>::iterator it, itEnd(rois.end());
             for(it = rois.begin(); it != itEnd; ++it){
@@ -54,7 +54,7 @@ FrRoiDocObj* FrMaskBaseCmd::GetCurrentRoi(){
     return result;
 }
 
-vtkImageData* FrMaskBaseCmd::GetRoiImageData(int id){
+vtkImageData* FrMaskBaseCmd::GetRoiImageData(unsigned long id){
     vtkImageData* result = 0L;
     if(this->GetMainController()){
         FrMainWindow* mv = this->GetMainController()->GetMainView();
@@ -169,7 +169,7 @@ FrSpecialLayer* FrMaskBaseCmd::GetSpecialLayer(){
     return sl;
 }
 
-void FrMaskBaseCmd::TransformCoordinatesToIndices(int point[2], vtkImageData* img, int imgID){
+void FrMaskBaseCmd::TransformCoordinatesToIndices(int point[2], vtkImageData* img, unsigned long imgID){
 
   if(!img) return;
   FrMainDocument* doc = this->GetMainController()->GetMainDocument();

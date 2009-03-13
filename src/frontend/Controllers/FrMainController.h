@@ -44,18 +44,18 @@ public:
 
     void ChangeView(int view);
 
-    void SelectLayer(int id);
+    void SelectLayer(unsigned long id);
 	void AddLayer();
     void DeleteLayer();
-    void ChangeLayer(int action);
+    void ChangeLayer(unsigned long action);
     void ChangeImageSettings();
 
-    void ChangeBookmark(int id);
-    void DeleteBookmark(int id);
-    void ChangeGraphBookmark(int id);
-    void DeleteGraphBookmark(int id);
+    void ChangeBookmark(unsigned long id);
+    void DeleteBookmark(unsigned long id);
+    void ChangeGraphBookmark(unsigned long id);
+    void DeleteGraphBookmark(unsigned long id);
 
-    void SetCurrentTool(int tool);
+    void SetCurrentTool(unsigned long tool);
 
     void ResetImage();
     void CreatNewROI();
@@ -65,7 +65,7 @@ public:
     void SetCurrentTimePoint(int newTimePoint);
     void SetPreviousTimePoint();
     void SetNextTimePoint();
-    void ChangeGraph(int id, bool add);
+    void ChangeGraph(unsigned long id, bool add);
 
 	// Override from base class
     virtual void Notify(int notifyCode);

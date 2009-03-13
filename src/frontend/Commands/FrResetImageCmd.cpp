@@ -127,16 +127,7 @@ void FrResetImageCmd::ResetTBC(){
 
             layerDO->SetSettings(imageParams);
         }
-        else if (layerDO->IsColormap()){
-            FrColormapLayerSettings* colormapParams = (FrColormapLayerSettings*)layerDO->GetSettings();
-            
-            colormapParams->TbcSettings.Threshold  = DEF_TBC_THRESHOLD;
-            colormapParams->TbcSettings.Brightness = DEF_TBC_BRIGHTNESS;
-            colormapParams->TbcSettings.Contrast   = DEF_TBC_CONTRAST;
-
-            layerDO->SetSettings(colormapParams);
-        }
-    }
+     }
 }
 
 ///////////////////////////////////////////////////////////////

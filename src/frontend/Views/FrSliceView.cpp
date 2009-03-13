@@ -117,7 +117,7 @@ void FrSliceView::UpdatePipeline(int point){
                 itEnd(params.Layers.end());
 
             for(it = params.Layers.begin(); it != itEnd; ++it){
-                unsigned int id = (*it)->GetID();
+                unsigned long id = (*it)->GetID();
                 m_LayeredImage->SetOpacity((*it)->GetOpacity(), id);
                 m_LayeredImage->SetVisibility((*it)->GetVisibility(), id); 
             }
@@ -178,7 +178,7 @@ bool FrSliceView::InitUpdateParams(FrUpdateParams0& params){
         GetCurrentViewObject()->GetSliceViewSettings();
 
     // Get layers for update
-    unsigned int activeLayerID = params.ViewSettings->ActiveLayerID;
+    unsigned long activeLayerID = params.ViewSettings->GetActiveLayerID();
     FrDocument::DocObjCollection objects;
     params.Document->GetObjectsByType(objects, FrDocumentObj::LayerObject);
 
@@ -204,7 +204,7 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
     m_docReader->SetMosaic(false);
     m_docReader->SetOrientation(FrDocumentReader::XY);
     m_docReader->SetSlice(params.ViewSettings->SliceNumber);
-    m_docReader->SetTimeSeries(vdo->GetTimeSeries());
+    //m_docReader->SetTimeSeries(vdo->GetTimeSeries());
 
     // update layers
     FrUpdateParams0::LayerCollection::iterator it, itEnd(params.Layers.end());
@@ -224,7 +224,8 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
             m_docReader->SetDataID(vdo->GetTimePoint());
             m_docReader->Update();
 
-            m_LayeredImage->SetImageInput(m_docReader->GetOutput());
+            m_LayeredImage->SetImageInput(m_docReader->GetOutput(),
+					  (*it)->GetID());
         }
         // .. Add other layers
     }
@@ -272,8 +273,8 @@ void FrSliceView::UpdateColormap(FrUpdateParams0& params){
         itEnd(params.Layers.end());
 
     for(it = params.Layers.begin(); it != itEnd; ++it){
-        if((*it)->IsColormap()){
-            FrColormapLayerSettings* cmls = (FrColormapLayerSettings*)(*it)->GetSettings();
+        if((*it)->IsImage()){
+            FrImageLayerSettings* cmls = (FrImageLayerSettings*)(*it)->GetSettings();
             m_LayeredImage->SetColormapSettings(cmls->ColormapSettings, (*it)->GetID());
         }
     }
@@ -285,11 +286,7 @@ void FrSliceView::UpdateTbc(FrUpdateParams0& params){
         itEnd(params.Layers.end());
 
     for(it = params.Layers.begin(); it != itEnd; ++it){
-        if((*it)->IsColormap()){
-            FrColormapLayerSettings* cmls = (FrColormapLayerSettings*)(*it)->GetSettings();
-            m_LayeredImage->SetTbcSettings(cmls->TbcSettings, (*it)->GetID());
-        }
-        else if((*it)->IsImage()){
+      if((*it)->IsImage()){
             FrImageLayerSettings* ils = (FrImageLayerSettings*)(*it)->GetSettings();
             m_LayeredImage->SetTbcSettings(ils->TbcSettings, (*it)->GetID());
         }

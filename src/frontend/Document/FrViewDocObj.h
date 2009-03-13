@@ -33,11 +33,10 @@ public:
     // Methods
     void CopySettingsFrom(FrTabSettingsDocObj* src);
     void SaveSettingsTo(FrTabSettingsDocObj* dst);
-    int GetActiveLayerID();
+    unsigned long GetActiveLayerID();
 
     // Properties
-    // ID of the current image time series 
-    FrPropMacro(unsigned int, TimeSeries);
+
     // ID of the current image time point
     FrPropMacro(unsigned int, TimePoint); 
 

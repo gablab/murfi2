@@ -32,8 +32,8 @@ public:
 
     FrAppSettingsDocObj* GetAppSettings();
 
-    FrLayerDocObj* GetLayerDocObjByID(int id);
-    FrGraphDocObj* GetGraphDocObjByID(int id);
+    FrLayerDocObj* GetLayerDocObjByID(unsigned long id);
+    FrGraphDocObj* GetGraphDocObjByID(unsigned long id);
 
     void AddDataToStore(RtData *data);
 

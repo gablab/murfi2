@@ -4,7 +4,7 @@
 #define FR_COLORMAP_WIDGET
 
 // Forward declarations
-class FrColormapLayerSettings;
+class FrImageLayerSettings;
 class FrSpinSliderWidget;
 class QComboBox;
 class QHBoxLayout;
@@ -22,8 +22,8 @@ class FrColormapWidget : public QWidget {
 public:
 	FrColormapWidget(QWidget *parent = 0);
 
-    void GetColormapParams(FrColormapLayerSettings& params);
-    void SetColormapParams(FrColormapLayerSettings& params);
+    void GetColormapParams(FrImageLayerSettings& params);
+    void SetColormapParams(FrImageLayerSettings& params);
     void BlockSignals(bool value){
         m_isBlocked = value;
     }

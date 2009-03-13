@@ -57,7 +57,7 @@ public slots:
     void OnTimePointChanged(int currentTimePoint);
     void OnPreviousTimePointPressed();
     void OnNextTimePointPressed();
-    void OnGraphChanged(int id, bool add);
+    void OnGraphChanged(unsigned long id, bool add);
 
 public:
     void Initialize();

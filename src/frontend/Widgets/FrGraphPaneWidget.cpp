@@ -112,6 +112,14 @@ void FrGraphPaneWidget::OnUpdate(){
     FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
     if(viewDO == 0) return;
 
+    FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(viewDO->GetActiveLayerID());
+
+    if(layerDO == NULL) {
+      return;
+    }
+
+    RtDataID id = layerDO->GetSettings()->DataID;
+
     int numberOfTimePoints = -1;
 
     // TODO: we need to get timepoints only from current timeseria
@@ -120,7 +128,7 @@ void FrGraphPaneWidget::OnUpdate(){
     std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
     for(it = images.begin(); it != itEnd; ++it){
         FrImageDocObj* img = (FrImageDocObj*)(*it);    
-        if(img->GetSeriesNumber() == viewDO->GetTimeSeries()){
+        if(img->GetDataID() == id) {
 
             numberOfTimePoints = 
                 img->GetNumberOfTimePoints();
@@ -138,7 +146,7 @@ void FrGraphPaneWidget::OnUpdate(){
     mutex.lock();
 
     itEnd = graphs.end();
-    int id = 0;
+    //int id = 0;
     for(it = graphs.begin(); it != itEnd; ++it){
         FrGraphDocObj* graphDO = (FrGraphDocObj*)(*it); 
 
@@ -154,7 +162,7 @@ void FrGraphPaneWidget::OnUpdate(){
         bool visibility = graphDO->GetSettings()->Visibility;
 
         //m_GraphListWidget->AddGraphWidget(graphID, name, color, visibility);
-        m_QwtPlotWidget->AddGraph(graphDO->GetID(), name, color);
+        m_QwtPlotWidget->AddGraph(graphDO->GetID().getSeriesNum(), name, color);
         
         // TODO: get and set graph data here
         FrGraphSettings::GraphTypes type = graphDO->GetSettings()->GetType();
@@ -334,9 +342,9 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
         FrImageDocObj* img = (FrImageDocObj*)(*it); 
         
         FrAction* action = new FrAction("mri timeseria", this);
-        action->SetID(img->GetSeriesNumber());
+        action->SetID(img->GetDataID().getSeriesNum());
         // TODO: check if we have graph with this timeseria ID
-        FrGraphDocObj* graph = m_Document->GetGraphDocObjByID(img->GetSeriesNumber());
+        FrGraphDocObj* graph = m_Document->GetGraphDocObjByID(img->GetDataID().getSeriesNum());
         
         if (graph)
             action->setChecked(true);
@@ -344,7 +352,7 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
             action->setChecked(false);
 
         m_GraphContextMenu->addAction(action);
-        connect(action, SIGNAL(actionChecked(int, bool)), this, SLOT(itemChecked(int, bool)));
+        connect(action, SIGNAL(actionChecked(unsigned long, bool)), this, SLOT(itemChecked(unsigned long, bool)));
     }
 
     // check if current layer is roi, if yes add items : ROI Mean, ROI STD
@@ -352,7 +360,7 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
     FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
     if(viewDO == 0) return;
 
-    int layerID = viewDO->GetActiveLayerID();
+    unsigned long layerID = viewDO->GetActiveLayerID();
     FrLayerDocObj* currentLayer = m_Document->GetLayerDocObjByID(layerID);
     if (currentLayer == 0) return;
 
@@ -376,7 +384,7 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
     m_GraphContextMenu->exec(event->globalPos());
 }
 
-void FrGraphPaneWidget::itemChecked(int id, bool checked){
+void FrGraphPaneWidget::itemChecked(unsigned long id, bool checked){
     emit GraphChanged(id, checked);
 }
 
@@ -428,7 +436,7 @@ void FrGraphPaneWidget::SetIntencityData(FrGraphDocObj* graphDO){
         }
         // NOTE: another types can be supported
     }    
-    m_QwtPlotWidget->SetData(graphDO->GetID(), idata, i);
+    m_QwtPlotWidget->SetData(graphDO->GetID().getSeriesNum(), idata, i);
 
     delete[] pImageData;
     delete idata;

@@ -1,6 +1,7 @@
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 #include "FrMainController.h"
+#include "FrViewDocObj.h"
 #include "FrSliceView.h"
 #include "FrMosaicView.h"
 #include "FrOrthoView.h"
@@ -91,7 +92,7 @@ void FrMainWindow::SetupUi(QMainWindow* mainWindow){
 void FrMainWindow::RetranslateUi(QMainWindow* mainWindow){
     // Performe retranslation
     mainWindow->setWindowTitle(
-        QApplication::translate("MainWindow", "MRI", 0, 
+        QApplication::translate("MainWindow", "festr", 0, 
         QApplication::UnicodeUTF8));
 
     m_ActionManager->Retranslate();
@@ -105,7 +106,8 @@ void FrMainWindow::InitializeWidgets(){
 
     // Create 3D view and logical views 
     m_QVTKWidget = new QVTKWidget(topPane);
-    m_QVTKWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);    
+    m_QVTKWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);    m_QVTKWidget->setMinimumHeight(400);
+
     m_SliceView  = new FrSliceView(this);
     m_MosaicView = new FrMosaicView(this);
     m_OrthoView  = new FrOrthoView(this);
@@ -126,6 +128,7 @@ void FrMainWindow::InitializeWidgets(){
 
     topPane->setLayout(viewLayout);
     this->setCentralWidget(topPane);
+    //topPane->setGeometry(QRect(0,0,600,400));
 
     m_mainMenu->GetMenuView()->addSeparator();
 
@@ -152,6 +155,7 @@ void FrMainWindow::InitializeWidgets(){
 
     dock->setWidget(m_VoxelInfoWidget);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
+    dock->setVisible(false);
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
     dock = new QDockWidget(tr("Image Settings"), this);
@@ -159,6 +163,7 @@ void FrMainWindow::InitializeWidgets(){
 
     dock->setWidget(m_ImageSettingsWidget);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
+    dock->setVisible(false);
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 
     //dock = new QDockWidget(tr("ROI Info"), this);
@@ -178,35 +183,38 @@ void FrMainWindow::InitializeWidgets(){
 }
 
 void FrMainWindow::Initialize(){
-    m_OrthoView->Initialize();
-    m_OrthoView->RemoveRenderers();
-
     m_MosaicView->Initialize();
     m_MosaicView->RemoveRenderers();
 
     m_SliceView->Initialize();
+    m_SliceView->RemoveRenderers();
+
+    m_OrthoView->Initialize();
 
     // make it as current
-    m_CurrentView = m_SliceView;
+    m_CurrentView = m_OrthoView;
+
+    FrViewDocObj* viewDO = new FrViewDocObj();
+    this->GetMainController()->GetMainDocument()->Add(viewDO);
 }
 
-void FrMainWindow::OnBookmarkChanged(int id){
+void FrMainWindow::OnBookmarkChanged(unsigned long id){
     this->GetMainController()->ChangeBookmark(id);
 }
 
-void FrMainWindow::OnBookmarkDelete(int id){
+void FrMainWindow::OnBookmarkDelete(unsigned long id){
     this->GetMainController()->DeleteBookmark(id);
 }
 
-void FrMainWindow::OnGraphBookmarkChanged(int id){
+void FrMainWindow::OnGraphBookmarkChanged(unsigned long id){
     this->GetMainController()->ChangeGraphBookmark(id);
 }
 
-void FrMainWindow::OnGraphBookmarkDelete(int id){
+void FrMainWindow::OnGraphBookmarkDelete(unsigned long id){
     this->GetMainController()->DeleteGraphBookmark(id);
 }
 
-void FrMainWindow::OnLayerSelected(int id){
+void FrMainWindow::OnLayerSelected(unsigned long id){
     this->GetMainController()->SelectLayer(id);
 }
 

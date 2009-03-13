@@ -6,9 +6,6 @@ bool FrLayerSettings::CopySettings(FrLayerSettings* src, FrLayerSettings* dst){
             case LImage:
                 *((FrImageLayerSettings*)dst) = *((FrImageLayerSettings*)src);
                 return true;
-            case LColormap:
-                *((FrColormapLayerSettings*)dst) = *((FrColormapLayerSettings*)src);
-                return true;
             case LRoi:
                 *((FrRoiLayerSettings*)dst) = *((FrRoiLayerSettings*)src);
                 return true;

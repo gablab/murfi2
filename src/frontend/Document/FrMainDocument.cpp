@@ -186,7 +186,7 @@ FrAppSettingsDocObj* FrMainDocument::GetAppSettings(){
     return result;
 }
 
-FrLayerDocObj* FrMainDocument::GetLayerDocObjByID(int id){
+FrLayerDocObj* FrMainDocument::GetLayerDocObjByID(unsigned long id){
     DocObjCollection layers;
     this->GetObjectsByType(layers, FrDocumentObj::LayerObject);    
 
@@ -194,6 +194,7 @@ FrLayerDocObj* FrMainDocument::GetLayerDocObjByID(int id){
     if(layers.size() > 0){
         for (int i = 0; i < layers.size(); i++){
             result = dynamic_cast<FrLayerDocObj*>(layers[i]);
+	    //cout << "FrMainDocument::GetLayerDocObjByID " << id << " " <<  result->GetID() << endl;
             if (result->GetID() == id)
                 break;
             else
@@ -204,7 +205,7 @@ FrLayerDocObj* FrMainDocument::GetLayerDocObjByID(int id){
     return result;
 }
 
-FrGraphDocObj* FrMainDocument::GetGraphDocObjByID(int id){
+FrGraphDocObj* FrMainDocument::GetGraphDocObjByID(unsigned long id){
     DocObjCollection graphs;
     this->GetObjectsByType(graphs, FrDocumentObj::GraphObject);    
 
@@ -213,7 +214,7 @@ FrGraphDocObj* FrMainDocument::GetGraphDocObjByID(int id){
         for (int i = 0; i < graphs.size(); i++){
             result = dynamic_cast<FrGraphDocObj*>(graphs[i]);
             // NOTE: we use timeseria number as id for graph
-            if (result->GetTimeSeria() == id)
+            if (result->GetID().getSeriesNum() == id)
                 break;
             else
                 result = 0;

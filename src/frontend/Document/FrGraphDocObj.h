@@ -5,6 +5,7 @@
 #include "FrMacro.h"
 #include "FrDocumentObj.h"
 #include "FrGraphSettings.h"
+#include "RtDataID.h"
 
 // This class represents graph data object
 // It contains data that application may use for plotting graphs.
@@ -21,8 +22,7 @@ public:
 
     // Properties
     FrPropMacro(FrGraphSettings*, Settings);
-    FrGetPropMacro(int, ID);
-    FrPropMacro(int, TimeSeria);
+    FrPropMacro(RtDataID, ID);
 
     // Methods
     void SetGraphData();

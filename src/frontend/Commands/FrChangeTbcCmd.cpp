@@ -34,30 +34,30 @@ bool FrChangeTbcCmd::Execute(){
 
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-    int layerID = BAD_LAYER_ID;
+    unsigned long layerID = BAD_LAYER_ID;
     std::vector<FrLayerSettings*> layers;
 
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     switch(viewDO->GetActiveView()){
     case SliceView:
     {
-        layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
-        ChangeTbcByLayerID(layers, layerID);
-        break;
+      layerID = viewDO->GetSliceViewSettings()->GetActiveLayerID();
+      ChangeTbcByLayerID(layers, layerID);
+      break;
     }
     case MosaicView:
     {
-        layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
-        ChangeTbcByLayerID(layers, layerID);
-        break;
+      layerID = viewDO->GetSliceViewSettings()->GetActiveLayerID();
+      ChangeTbcByLayerID(layers, layerID);
+      break;
     }
     case OrthoView:
-        // change for all 3 views
-        layerID = viewDO->GetSliceViewSettings()->ActiveLayerID;
-        for(int viewID=0; viewID < ORTHO_VIEWS_CNT; ++viewID){
-            ChangeTbcByLayerID(layers, layerID);
-        }
-        break;
+      // change for all 3 views
+      layerID = viewDO->GetSliceViewSettings()->GetActiveLayerID();
+      for(int viewID=0; viewID < ORTHO_VIEWS_CNT; ++viewID){
+	ChangeTbcByLayerID(layers, layerID);
+      }
+      break;
     default:
         return false;
     }
@@ -67,7 +67,7 @@ bool FrChangeTbcCmd::Execute(){
     return true;
 }
 
-void FrChangeTbcCmd::ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, int ID){
+void FrChangeTbcCmd::ChangeTbcByLayerID(std::vector<FrLayerSettings*>& layers, unsigned long ID){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
     // find layer by ID and change its settings

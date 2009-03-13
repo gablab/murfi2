@@ -20,8 +20,9 @@ vtkStandardNewMacro(FrImageLayer);
 
 
 FrImageLayer::FrImageLayer() 
-: m_tbcFilter(0), m_actor(0) {
+  : m_tbcFilter(0), m_cmFilter(0), m_actor(0) {
     // Pipline stuff
+    m_cmFilter = FrColormapFilter::New();
     m_tbcFilter = FrTbcFilter::New();
     m_actor = vtkImageActor::New();
     m_actor->InterpolateOff();
@@ -30,6 +31,7 @@ FrImageLayer::FrImageLayer()
 }
 
 FrImageLayer::~FrImageLayer(){
+    if(m_cmFilter) m_cmFilter->Delete();
     if(m_tbcFilter) m_tbcFilter->Delete();
     if(m_Renderer) m_Renderer->RemoveActor(m_actor);
     if(m_actor) m_actor->Delete();
@@ -40,10 +42,16 @@ void FrImageLayer::SetInput(vtkImageData* data){
     if(m_tbcFilter){
         m_tbcFilter->SetInput(data);
     }
+    if(m_cmFilter){
+        m_cmFilter->SetInput(data);
+    }
 }
 
 vtkImageData* FrImageLayer::GetInput(){
     vtkImageData* result = 0L;
+    if(m_cmFilter){
+        result = m_cmFilter->GetInput();
+    }
     if(m_tbcFilter){
         result = m_tbcFilter->GetInput();
     }
@@ -64,6 +72,48 @@ void FrImageLayer::GetTbcSettings(FrTbcSettings& settings){
     settings.Threshold = m_tbcFilter->GetThreshold();
     settings.Brightness = m_tbcFilter->GetBrightness();
     settings.Contrast = m_tbcFilter->GetContrast();
+}
+
+void FrImageLayer::SetColormapSettings(FrColormapSettings& settings){
+    if(!m_cmFilter) return;
+
+    // Set type first
+    if(settings.Type == FrColormapSettings::SingleColor){
+        m_cmFilter->SetType(FrColormapFilter::SingleColor);
+    }
+    else if(settings.Type == FrColormapSettings::MultiColor) {
+        m_cmFilter->SetType(FrColormapFilter::MultiColor);
+    }
+
+    // Set other params
+    m_cmFilter->SetPxMin(settings.MinValue);
+    m_cmFilter->SetPxMax(settings.MaxValue);    
+    m_cmFilter->SetColor(settings.Color);
+	m_cmFilter->SetPxMid(settings.MidValue);
+    m_cmFilter->SetThreshold(settings.Threshold);
+
+    if(m_cmFilter->GetIsModified()){
+        m_tbcFilter->Modified();
+    }
+}
+
+void FrImageLayer::GetColormapSettings(FrColormapSettings& settings){
+    if(!m_cmFilter) return;
+
+    // Get type first
+    if(m_cmFilter->GetType() == FrColormapFilter::SingleColor){
+        settings.Type = FrColormapSettings::SingleColor;
+    }
+    else if(m_cmFilter->GetType() == FrColormapFilter::MultiColor) {
+        settings.Type = FrColormapSettings::MultiColor;
+    }
+
+    // Get other params
+    settings.MinValue = m_cmFilter->GetPxMin();
+    settings.MaxValue = m_cmFilter->GetPxMax();    
+    settings.Color    = m_cmFilter->GetColor();
+    settings.MidValue = m_cmFilter->GetPxMid();
+    settings.Threshold = m_cmFilter->GetThreshold();
 }
 
 void FrImageLayer::SetOpacity(double value){
@@ -120,4 +170,13 @@ void FrImageLayer::UpdateCamera(){
 }
 
 void FrImageLayer::UpdateColormap(){
+    if(m_cmFilter && m_cmFilter->GetInput()){
+        m_cmFilter->Update();
+
+        // Pass data futher
+        vtkImageData* data = m_cmFilter->GetOutput();
+        if(data != m_tbcFilter->GetInput()){
+            m_tbcFilter->SetInput(data);
+        }
+    }
 }

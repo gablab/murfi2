@@ -25,20 +25,20 @@ public:
 
     // Methods
     void AddGraphWidget(FrGraphWidget* widget);
-    void AddGraphWidget(int id, QString& name, QColor& color, bool isVisible=true);
+    void AddGraphWidget(unsigned long id, QString& name, QColor& color, bool isVisible=true);
     
-    bool RemoveGraphWidget(int id, bool doDelete = false);
+    bool RemoveGraphWidget(unsigned long id, bool doDelete = false);
     bool RemoveGraphWidget(FrGraphWidget* widget, bool doDelete = false);
     void RemoveAll();
 
-    FrGraphWidget* GetGraphWidget(int id);
+    FrGraphWidget* GetGraphWidget(unsigned long id);
         
     // Here all signals
 Q_SIGNALS:
-    void GraphVisibilityChanged(int id);
+    void GraphVisibilityChanged(unsigned long id);
 
 private Q_SLOTS:
-    void OnGraphVisibilityChanged(int id);
+    void OnGraphVisibilityChanged(unsigned long id);
 
 private:
     //QPushButton* m_btnUp;

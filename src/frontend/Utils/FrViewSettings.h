@@ -14,12 +14,12 @@ class FrSliceViewSettings {
 public:
     FrSliceViewSettings(){
         this->SliceNumber = DEF_SLICE_NUMBER;
-        this->ActiveLayerID = DEF_LAYER_ID;
+        this->m_ActiveLayerID = BAD_LAYER_ID;
     }
 
 public:
     int SliceNumber;
-    int ActiveLayerID;
+    FrPropMacro(unsigned long, ActiveLayerID);
     FrCameraSettings CamSettings;
 };
 
@@ -27,11 +27,11 @@ public:
 class FrMosaicViewSettings {
 public:
     FrMosaicViewSettings(){
-        this->ActiveLayerID = DEF_LAYER_ID;
+        this->m_ActiveLayerID = BAD_LAYER_ID;
     }
 
 public:
-    int ActiveLayerID;
+    FrPropMacro(unsigned long, ActiveLayerID);
     FrCameraSettings CamSettings;
 };
 
@@ -44,7 +44,7 @@ public:
 class FrOrthoViewSettings {
 public:
     FrOrthoViewSettings(){        
-        this->ActiveLayerID = DEF_LAYER_ID;
+        this->m_ActiveLayerID = BAD_LAYER_ID;
         for(int i = 0; i < ORTHO_VIEWS_CNT; ++i){
             this->SliceNumber[i] = DEF_SLICE_NUMBER;
             this->CamSettings[i] = FrCameraSettings();
@@ -52,9 +52,13 @@ public:
     }
 
 public:
-    int ActiveLayerID;
+    unsigned long GetActiveLayerID() { return m_ActiveLayerID; }
+    void SetActiveLayerID(unsigned long id) { m_ActiveLayerID = id; }
+    //FrPropMacro(unsigned long, ActiveLayerID);
     int SliceNumber[ORTHO_VIEWS_CNT];
     FrCameraSettings CamSettings[ORTHO_VIEWS_CNT];
+ protected:
+    unsigned long m_ActiveLayerID;
 };
 
 #endif

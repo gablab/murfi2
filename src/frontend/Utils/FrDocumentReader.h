@@ -18,6 +18,8 @@ class RtMaskImage;
 #include "FrCrosshair.h"
 #include "vtkObject.h"
 
+#include "RtDataID.h"
+
 #include <vector>
 
 // This class performes reading of FrMainDocument objects.
@@ -60,16 +62,18 @@ public:
 
     FrGetPropMacro(int, Slice);
     void SetSlice(int slice);
-    
-    FrGetPropMacro(unsigned int, DataID);
-    void SetDataID(unsigned int ID);
+
+    // ohinds 2009-02-28
+    // changed to hold an actual data id
+    FrGetPropMacro(RtDataID, DataID);
+    void SetDataID(const RtDataID &id);
 
     // Output management
     FrGetPropMacro(vtkImageData*, Output);
 
     // Slice management
-    FrGetPropMacro(unsigned int, TimeSeries);
-    void SetTimeSeries(unsigned int ID);
+    //FrGetPropMacro(unsigned int, TimeSeries);
+    //void SetTimeSeries(unsigned int ID);
 
     CrosshairParams ReadCrosshair();
 

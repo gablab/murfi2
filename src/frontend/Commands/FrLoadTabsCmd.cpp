@@ -193,10 +193,10 @@ bool FrLoadTabsCmd::LoadSliceViewSettings(QDomElement& elem,  FrSliceViewSetting
         else if(childElem.tagName() == FR_XML_LAYERNUM_ELEM){
             // Load active layer id
             if(!childElem.hasAttribute(FR_XML_VALUE_ATTR)) return false;
-            vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
+            vs->SetActiveLayerID(childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer));
             if(!hasActiveLayer) return false;
             // NOTE: add this fix
-            vs->ActiveLayerID = DEF_LAYER_ID;
+            vs->SetActiveLayerID(1);
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -227,10 +227,10 @@ bool FrLoadTabsCmd::LoadMosaicViewSettings(QDomElement& elem, FrMosaicViewSettin
         if(childElem.tagName() == FR_XML_LAYERNUM_ELEM){
             // Load active layer id
             if(!childElem.hasAttribute(FR_XML_VALUE_ATTR)) return false;
-            vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
+            vs->SetActiveLayerID(childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer));
             if(!hasActiveLayer) return false;
             // NOTE: add this fix
-            vs->ActiveLayerID = DEF_LAYER_ID;
+            vs->SetActiveLayerID(1);
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -274,10 +274,10 @@ bool FrLoadTabsCmd::LoadOrthoViewSettings(QDomElement& elem,  FrOrthoViewSetting
         else if(childElem.tagName() == FR_XML_LAYERNUM_ELEM){
             // Load active layer id
             if(!childElem.hasAttribute(FR_XML_VALUE_ATTR)) return false;
-            vs->ActiveLayerID = childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer);
+            vs->SetActiveLayerID(childElem.attribute(FR_XML_VALUE_ATTR).toInt(&hasActiveLayer));
             if(!hasActiveLayer) return false;
             // NOTE: add this fix
-            vs->ActiveLayerID = DEF_LAYER_ID;
+            vs->SetActiveLayerID(1);
         }
         else if(childElem.tagName() == FR_XML_CAMS_ELEM){
             // Load camera settings for slice view
@@ -352,9 +352,12 @@ bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem,
     // NOTE: ID is always 0 for main layer of the image
 //    mlSets->ID = DEFAULT_LAYER_ID;
 
+
+    // ohinds 2009-02-25
+    // what is going on here??
     if(!imageElem.hasAttribute(FR_XML_NAME_ATTR)) return false;
     mlSets->Name = imageElem.attribute(FR_XML_NAME_ATTR);
-    if(mlSets->Name != QString(DEF_LAYER_NAME)) return false;
+    //if(mlSets->Name != QString(DEF_LAYER_NAME)) return false;
 
     // Opacity    
     if(!imageElem.hasAttribute(FR_XML_OPACITY_ATTR)) return false;
@@ -420,6 +423,9 @@ bool FrLoadTabsCmd::LoadTbcSettings(QDomElement& elem, FrTbcSettings* ts){
     return (hasThreshold && hasBrightness && hasContrast);
 }
 
+// ohinds 2009-02-25
+// this whole thing needs reconsideration. how do we know that the
+// same images are loaded or available?
 bool FrLoadTabsCmd::LoadLayersSettings(QDomElement& elem, 
                                        std::vector<FrLayerSettings*>& olSets){
     if(elem.tagName() != FR_XML_LAYERS_ELEM) return false;
@@ -439,7 +445,7 @@ bool FrLoadTabsCmd::LoadLayersSettings(QDomElement& elem,
             if(!isValid) return false;
 
             if(ltype == FrLayerSettings::LRoi){
-                FrRoiLayerSettings* layerSettings = new FrRoiLayerSettings();
+	      FrRoiLayerSettings* layerSettings = new FrRoiLayerSettings(RtDataID(), "roi");
 
                 if(LoadLayerSettings(childElem, layerSettings)){
                     olSets.push_back(layerSettings);
@@ -450,7 +456,7 @@ bool FrLoadTabsCmd::LoadLayersSettings(QDomElement& elem,
                 }
             }
             else{
-                FrColormapLayerSettings* layerSettings = new FrColormapLayerSettings();
+                FrImageLayerSettings* layerSettings = new FrImageLayerSettings(RtDataID(), "image");
 
                 if(LoadLayerSettings(childElem, layerSettings)){
                     olSets.push_back(layerSettings);
@@ -498,8 +504,8 @@ bool FrLoadTabsCmd::LoadLayerSettings(QDomElement& elem, FrLayerSettings* ls){
             return true;
             // do nothing
             break;
-        case FrLayerSettings::LColormap:
-            FrColormapLayerSettings* cmlSets = (FrColormapLayerSettings*)ls;
+        case FrLayerSettings::LImage:
+            FrImageLayerSettings* cmlSets = (FrImageLayerSettings*)ls;
 
             // Load other
             hasRange = hasCm = hasTbc = false;

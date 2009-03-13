@@ -24,6 +24,7 @@
 
 #include "Qt/qmessagebox.h"
 
+#include "RtDataID.h"
 
 #define ALL_ITEMS_COUNT 5
 
@@ -59,12 +60,12 @@ bool FrUserActionCmd::addLayer(){
     bool result = false;
     
     // create new layer doc object and get settings from dialog
-    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LColormap);
+    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, RtDataID());
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     FrLayerDialog dlg(mv, true);
     if(!dlg.SimpleExec()) return false;
-    FrColormapLayerSettings* cmlSets = new FrColormapLayerSettings();
+    FrImageLayerSettings* cmlSets = new FrImageLayerSettings(RtDataID(), QString("find some way to spec a good name"));
     dlg.GetLayerParams(*cmlSets);
 
     layerDO->SetSettings(cmlSets);
@@ -85,12 +86,15 @@ bool FrUserActionCmd::deleteLayer(){
 
     // if wrong ID is specified return
     // Default layer cannot be deleted
-    if(m_ID < DEF_LAYER_ID) return false;
-    if(m_ID == DEF_LAYER_ID){
-        QMessageBox::critical(this->GetMainController()->GetMainView(), 
-            "Delete Layer Command", "Can't delete default layer...");
-        return false;
-    }
+    if(m_ID <= BAD_LAYER_ID) return false;
+
+    // ohinds 2009-02-25
+    // sure you can!
+//    if(m_ID == DEF_LAYER_ID){
+//        QMessageBox::critical(this->GetMainController()->GetMainView(), 
+//            "Delete Layer Command", "Can't delete default layer...");
+//        return false;
+//    }
 
     // find appropriate layer doc obj and remove it from main doc
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
@@ -125,7 +129,7 @@ bool FrUserActionCmd::ChangeImageSettings(){
     bool roi = true;
 
     // get tbc settings from current layer
-    int id = GetActiveLayerID();
+    unsigned long id = GetActiveLayerID();
     FrLayerDocObj* layerDO = doc->GetLayerDocObjByID(id);
 
     if (!layerDO)
@@ -135,12 +139,7 @@ bool FrUserActionCmd::ChangeImageSettings(){
         roi = false;
         ls = layerDO->GetSettings();
 
-        if (layerDO->IsColormap()){
-            old_tbc = ((FrColormapLayerSettings*)ls)->TbcSettings;
-        }
-        else if (layerDO->IsImage()){
-            old_tbc = ((FrImageLayerSettings*)ls)->TbcSettings;
-        }
+	old_tbc = ((FrImageLayerSettings*)ls)->TbcSettings;
 
         // get tbc settings from widget
         new_tbc = mw->GetImageSettingsWidget()->GetTbcSettings();
@@ -153,16 +152,9 @@ bool FrUserActionCmd::ChangeImageSettings(){
             old_tbc.Contrast = new_tbc.Contrast;
             old_tbc.Threshold = new_tbc.Threshold;
             
-            if (layerDO->IsColormap()){
-                ((FrColormapLayerSettings*)ls)->TbcSettings.Brightness = new_tbc.Brightness;
-                ((FrColormapLayerSettings*)ls)->TbcSettings.Contrast = new_tbc.Contrast;
-                ((FrColormapLayerSettings*)ls)->TbcSettings.Threshold = new_tbc.Threshold;
-            }
-            else if (layerDO->IsImage()){
-                ((FrImageLayerSettings*)ls)->TbcSettings.Brightness = new_tbc.Brightness;
-                ((FrImageLayerSettings*)ls)->TbcSettings.Contrast = new_tbc.Contrast;
-                ((FrImageLayerSettings*)ls)->TbcSettings.Threshold = new_tbc.Threshold;
-            }
+	    ((FrImageLayerSettings*)ls)->TbcSettings.Brightness = new_tbc.Brightness;
+	    ((FrImageLayerSettings*)ls)->TbcSettings.Contrast = new_tbc.Contrast;
+	    ((FrImageLayerSettings*)ls)->TbcSettings.Threshold = new_tbc.Threshold;
 
             layerDO->SetSettings(ls);
 
@@ -231,7 +223,7 @@ bool FrUserActionCmd::addGraph(){
 
     // create new graph doc object and get settings from anywhere (widget, dialog)
     FrGraphDocObj* graphDO = new FrGraphDocObj(FrGraphSettings::GT_Intencity);  // set correct graph type
-    graphDO->SetTimeSeria(m_GraphID);
+    graphDO->SetID(m_GraphID);
     
     // prepare settings (NOTE: different settings for different types of graphs)
     FrIntencityGraphSettings* gs = new FrIntencityGraphSettings();
@@ -259,7 +251,7 @@ bool FrUserActionCmd::deleteGraph(){
     if(graphs.size() > 0){
         for (int i = 0; i < graphs.size(); i++){
             FrGraphDocObj* graphDO = dynamic_cast<FrGraphDocObj*>(graphs[i]);
-            if (graphDO->GetTimeSeria() == m_GraphID){
+            if (graphDO->GetID() == m_GraphID){
                 doc->Remove(graphDO);
                 break;
             }
@@ -270,7 +262,7 @@ bool FrUserActionCmd::deleteGraph(){
 }
 
 // delete active layer
-int FrUserActionCmd::GetActiveLayerID(){
+unsigned long FrUserActionCmd::GetActiveLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     return viewDO->GetActiveLayerID();

@@ -32,7 +32,7 @@ bool FrCreateROICmd::Execute(){
     
     if(images.size() == 0){
         QMessageBox::critical(mv, QString("Creation of ROI"), 
-            QString("Can't create ROI. None image opened.") );
+            QString("Can't create ROI. No images open.") );
         return false;
     }
 

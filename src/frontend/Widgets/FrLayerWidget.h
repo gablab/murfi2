@@ -25,11 +25,11 @@ public:
     void SetLayerParams(FrLayerDocObj* layerDO);
 
     // Properties
-    FrPropMacro(int, ID);
+    FrPropMacro(unsigned long, ID);
     FrPropMacro(bool, Visibility);
 
 signals:
-	void VisibilityChanged(int id);
+	void VisibilityChanged(unsigned long id);
 
 private Q_SLOTS:
     // Add slots here

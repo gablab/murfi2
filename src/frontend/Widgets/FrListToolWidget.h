@@ -18,9 +18,9 @@ public:
 
     void SetName(QString name);
     void ClearAll();
-    void AddListItem(int ID, QString& name);
+    void AddListItem(unsigned long ID, QString& name);
 
-    int GetCurrentItemID();
+    unsigned long GetCurrentItemID();
     
 signals:
     virtual void ParamsChanged();

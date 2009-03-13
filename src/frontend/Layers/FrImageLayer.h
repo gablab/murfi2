@@ -54,6 +54,7 @@ public:
 
 protected:
     // Pipline stuff
+    FrColormapFilter* m_cmFilter;
     FrTbcFilter* m_tbcFilter;
     vtkImageActor* m_actor;
 

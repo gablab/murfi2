@@ -12,7 +12,7 @@ FrToolBar::FrToolBar(QWidget* parent, FrActionManager* mngr)
 
 void FrToolBar::Retranslate(){
     this->setWindowTitle(
-        QApplication::translate("MainWindow", "MRI", 0, 
+        QApplication::translate("MainWindow", "festr", 0, 
         QApplication::UnicodeUTF8));
 }
 
@@ -29,19 +29,19 @@ void FrToolBar::SetupActions(){
     
     //Tool
     this->addAction(m_actManager->GetManipulatorToolAction());
-    this->addAction(m_actManager->GetVoxelToolAction());
+    //this->addAction(m_actManager->GetVoxelToolAction());
     this->addAction(m_actManager->GetRoiToolAction());
     //this->addAction(m_actManager->GetVoxelSelectionToolAction());
     this->addSeparator();
 
     // Help 
-    this->addAction(m_actManager->GetShowAboutAction());
-    this->addSeparator();
+    //this->addAction(m_actManager->GetShowAboutAction());
+    //this->addSeparator();
 
     // Some other
     this->addAction(m_actManager->GetResetImageAction());
     this->addSeparator();
 
     // Test
-    this->addAction(m_actManager->GetTestAction());
+    //this->addAction(m_actManager->GetTestAction());
 }

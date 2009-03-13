@@ -28,12 +28,12 @@ public:
     FrQwtPlotWidget(QWidget *parent = 0);
     virtual ~FrQwtPlotWidget();
     
-    void AddGraph(int id, QString& name, QColor& color);
-    void RemoveGraph(int id);
+    void AddGraph(unsigned long id, QString& name, QColor& color);
+    void RemoveGraph(unsigned long id);
     void RemoveAll();
 
-    void SetData(int id, double data[], int dataSize);
-    void SetVisibility(int id, bool visible);
+    void SetData(unsigned long id, double data[], int dataSize);
+    void SetVisibility(unsigned long id, bool visible);
     bool SetMarkerPosition(int timePoint, bool blockSignals = false);
     
     int GetMaxTimePoint();

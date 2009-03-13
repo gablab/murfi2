@@ -105,7 +105,7 @@ void FrMosaicView::UpdatePipeline(int point){
                 itEnd(params.Layers.end());
 
             for(it = params.Layers.begin(); it != itEnd; ++it){
-                unsigned int id = (*it)->GetID();
+                unsigned long id = (*it)->GetID();
                 m_LayeredImage->SetOpacity((*it)->GetOpacity(), id);
                 m_LayeredImage->SetVisibility((*it)->GetVisibility(), id); 
             }
@@ -140,7 +140,7 @@ bool FrMosaicView::InitUpdateParams(FrUpdateParams1& params){
         GetCurrentViewObject()->GetMosaicViewSettings();
 
     // Get layers for update
-    unsigned int activeLayerID = params.ViewSettings->ActiveLayerID;
+    unsigned long activeLayerID = params.ViewSettings->GetActiveLayerID();
     FrDocument::DocObjCollection objects;
     params.Document->GetObjectsByType(objects, FrDocumentObj::LayerObject);
 
@@ -164,7 +164,7 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
     m_docReader->SetDocument(params.Document);
     m_docReader->SetMosaic(true);
     m_docReader->SetOrientation(FrDocumentReader::XY);
-    m_docReader->SetTimeSeries(vdo->GetTimeSeries());
+    //m_docReader->SetDataID(vdo->GetTimeSeries());
 
     FrUpdateParams1::LayerCollection::iterator it,
         itEnd(params.Layers.end());
@@ -179,13 +179,15 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
             
         }
         else if((*it)->IsImage()){  
+	  // ohinds 2009-02-25
+	  // why do we have just one timeseries? thats not good....
             // ID is current Timepoint since we have 
             // just one time series 
             m_docReader->SetTarget(FrDocumentReader::Mri);
             m_docReader->SetDataID(vdo->GetTimePoint());
             m_docReader->Update();
 
-            m_LayeredImage->SetImageInput(m_docReader->GetOutput());
+            m_LayeredImage->SetImageInput(m_docReader->GetOutput(),(*it)->GetID());
         }
     }
 
@@ -223,8 +225,8 @@ void FrMosaicView::UpdateColormap(FrUpdateParams1& params){
         itEnd(params.Layers.end());
 
     for(it = params.Layers.begin(); it != itEnd; ++it){
-        if((*it)->IsColormap()){
-            FrColormapLayerSettings* cmls = (FrColormapLayerSettings*)(*it)->GetSettings();
+        if((*it)->IsImage()){
+            FrImageLayerSettings* cmls = (FrImageLayerSettings*)(*it)->GetSettings();
             m_LayeredImage->SetColormapSettings(cmls->ColormapSettings, (*it)->GetID());
         }
     }
@@ -236,11 +238,7 @@ void FrMosaicView::UpdateTbc(FrUpdateParams1& params){
         itEnd(params.Layers.end());
 
     for(it = params.Layers.begin(); it != itEnd; ++it){
-        if((*it)->IsColormap()){
-            FrColormapLayerSettings* cmls = (FrColormapLayerSettings*)(*it)->GetSettings();
-            m_LayeredImage->SetTbcSettings(cmls->TbcSettings, (*it)->GetID());
-        }
-        else if((*it)->IsImage()){
+      if((*it)->IsImage()){
             FrImageLayerSettings* ils = (FrImageLayerSettings*)(*it)->GetSettings();
             m_LayeredImage->SetTbcSettings(ils->TbcSettings, (*it)->GetID());
         }

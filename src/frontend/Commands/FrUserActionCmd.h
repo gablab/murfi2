@@ -5,6 +5,7 @@ class FrLayerDocObj;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
+#include "RtDataID.h"
 
 // This command allows user to add, remove 
 // and modify settings of the layer
@@ -27,7 +28,7 @@ public:
 
     // Properties
     FrSetPropMacro(Actions, Action);
-    FrSetPropMacro(int, GraphID);
+    FrSetPropMacro(RtDataID, GraphID);
 
 private:
     // helpers
@@ -37,13 +38,13 @@ private:
     bool deleteGraph();
     bool ChangeImageSettings();
 
-    int GetActiveLayerID();
-    //FrLayerDocObj* GetLayerDocObjByID(int id);
-    bool IsRoiLayer(int id);
+    unsigned long GetActiveLayerID();
+    //FrLayerDocObj* GetLayerDocObjByID(unsigned long id);
+    bool IsRoiLayer(unsigned long id);
 
 private:
     bool m_isID;
-    int m_ID;
+    unsigned long m_ID;
 
 };
 

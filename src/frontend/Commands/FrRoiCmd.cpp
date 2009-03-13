@@ -48,7 +48,7 @@ bool FrRoiCmd::AddRoi(){
     layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
     
     // NOTE: Assume that id is the same for all images
-    int id = BAD_LAYER_ID; 
+    unsigned long id = BAD_LAYER_ID; 
     for(int i=0; i < ALL_ITEMS_COUNT; ++i){             // TODO: not finished
         id = layeredImage[i]->AddLayer(m_Roi->GetID(), FrLayeredImage::Roi);
         id = m_Roi->GetID();

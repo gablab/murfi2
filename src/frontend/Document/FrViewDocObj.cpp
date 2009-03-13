@@ -15,8 +15,7 @@
 #define DEFAULT_TS 0
 
 FrViewDocObj::FrViewDocObj()
-: m_TimePoint(DEFAULT_TP), m_ActiveView(SliceView),
-  m_TimeSeries(DEFAULT_TS){
+: m_TimePoint(DEFAULT_TP), m_ActiveView(OrthoView) {
     // Create view settings
     m_SliceViewSettings = new FrSliceViewSettings();
     m_MosaicViewSettings = new FrMosaicViewSettings();
@@ -74,19 +73,19 @@ void FrViewDocObj::SaveSettingsTo(FrTabSettingsDocObj* dst){
     *(dst->GetOrthoViewSettings()) = *(m_OrthoViewSettings);
 }
 
-int FrViewDocObj::GetActiveLayerID(){
-    int result = BAD_LAYER_ID;
+unsigned long FrViewDocObj::GetActiveLayerID(){
+    unsigned long result = BAD_LAYER_ID;
 
     switch(this->GetActiveView()){
         case SliceView:
-            result = this->GetSliceViewSettings()->ActiveLayerID;
-            break;
+	  result = this->GetSliceViewSettings()->GetActiveLayerID();
+	  break;
         case MosaicView:
-            result = this->GetMosaicViewSettings()->ActiveLayerID;
-            break;
+	  result = this->GetMosaicViewSettings()->GetActiveLayerID();
+	  break;
         case OrthoView:
-            result = this->GetOrthoViewSettings()->ActiveLayerID;
-            break;
+	  result = this->GetOrthoViewSettings()->GetActiveLayerID();
+	  break;
         default:break;
     }
     return result;

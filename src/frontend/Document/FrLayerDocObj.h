@@ -6,6 +6,8 @@
 #include "FrDocumentObj.h"
 #include "FrLayerSettings.h"
 
+#include "RtDataID.h"
+
 //#define BAD_LAYER_ID  0
 //#define ALL_LAYER_ID  1
 //#define SPEC_LAYRE_ID 2
@@ -14,7 +16,8 @@
 // It contains data that application may use for plotting graphs.
 class FrLayerDocObj : public FrDocumentObj {
 public:
-    FrLayerDocObj(FrLayerSettings::LTypes type);
+  FrLayerDocObj(FrLayerSettings::LTypes type, 
+		const RtDataID &id, QString name = "no name");
     virtual ~FrLayerDocObj();
 
     // Overrides
@@ -24,11 +27,10 @@ public:
 
     bool IsRoi();
     bool IsImage();
-    bool IsColormap();
 
     // Properties
     FrPropMacro(FrLayerSettings*, Settings);
-    FrPropMacro(unsigned int, ID);
+    FrPropMacro(unsigned long, ID);
 
     double GetOpacity();
     bool GetVisibility();

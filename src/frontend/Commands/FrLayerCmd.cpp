@@ -29,7 +29,7 @@ FrLayerCmd::FrLayerCmd()
   m_DocObj(0), m_isID(false){
 }
 
-void FrLayerCmd::SetID(int id){
+void FrLayerCmd::SetID(unsigned long id){
     m_ID = id;
     m_isID = true;
 }
@@ -74,13 +74,14 @@ bool FrLayerCmd::AddLayer(){
 
     bool result = false;
     if(m_DocObj->IsImage()){
-        // set id to image layer
         for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-            // Do we need to copy values
-            // HACK: set default layer id (we have only 1 image layer)
-            m_DocObj->SetID(DEF_LAYER_ID);
+            // Do we need copy params here???
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Image);
         }
+        
+	// ohinds 2009-02-27
+	// there is no image data yet when we are adding the layer
+	// FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
         result = true;
     }
     else if(m_DocObj->IsRoi()){
@@ -88,15 +89,9 @@ bool FrLayerCmd::AddLayer(){
             // Do we need to copy values ???
             layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Roi);
         }
-        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
-        result = true;
-    }
-    else if(m_DocObj->IsColormap()){
-        for(int i=0; i < ALL_ITEMS_COUNT; ++i){
-            // Do we need copy params here???
-            layeredImage[i]->AddLayer(m_DocObj->GetID(), FrLayeredImage::Colormap);
-        }
-        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+	// ohinds 2009-02-27
+	// there is no image data yet when we are adding the layer
+        //FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
         result = true;
     }
     
@@ -104,10 +99,13 @@ bool FrLayerCmd::AddLayer(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     
-    int id = m_DocObj->GetID();
-    viewDO->GetSliceViewSettings()->ActiveLayerID = id;
-    viewDO->GetMosaicViewSettings()->ActiveLayerID = id;
-    viewDO->GetOrthoViewSettings()->ActiveLayerID = id;
+    unsigned long id = m_DocObj->GetID();
+    //cout << "layer doc id " << id << " addr " << viewDO << endl;
+    viewDO->GetSliceViewSettings()->SetActiveLayerID(id);
+    viewDO->GetMosaicViewSettings()->SetActiveLayerID(id);
+    viewDO->GetOrthoViewSettings()->SetActiveLayerID(id);
+
+    // set default view
 
     return result;
 }
@@ -124,6 +122,9 @@ bool FrLayerCmd::DeleteLayer(){
     layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
     layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
 
+    // next id to focus
+    unsigned long nextID = layeredImage[0]->GetNextLayerID(m_DocObj->GetID());
+
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
@@ -133,25 +134,30 @@ bool FrLayerCmd::DeleteLayer(){
     }
 
     // Assume that there is good sync between layers 
-    viewDO->GetSliceViewSettings()->ActiveLayerID = DEF_LAYER_ID;
-    viewDO->GetMosaicViewSettings()->ActiveLayerID = DEF_LAYER_ID;
-    viewDO->GetOrthoViewSettings()->ActiveLayerID = DEF_LAYER_ID;
+    // ohinds 2009-02-25
+    // find next layer id
+    
+    viewDO->GetSliceViewSettings()->SetActiveLayerID(nextID);
+    viewDO->GetMosaicViewSettings()->SetActiveLayerID(nextID);
+    viewDO->GetOrthoViewSettings()->SetActiveLayerID(nextID);
 
-    if (m_DocObj->GetID() != DEF_LAYER_ID)
-        FrBaseCmd::UpdatePipelineForID(DEF_LAYER_ID, FRP_COLORMAP);
+    // ohinds 2009-02-25
+    // need to make sure this is ok, might cause crash on update when deleting?
+    if (nextID != BAD_LAYER_ID)
+      FrBaseCmd::UpdatePipelineForID(nextID, FRP_COLORMAP);
 
     return true;
 }
 
 bool FrLayerCmd::UpdateSelectedLayerID(){
-    if(!m_isID || m_ID < DEF_LAYER_ID) return false;
+    if(!m_isID || m_ID <= BAD_LAYER_ID) return false;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     // update selected layer settings on LayerListWidget's right panel
-    viewDO->GetSliceViewSettings()->ActiveLayerID = m_ID;
-    viewDO->GetMosaicViewSettings()->ActiveLayerID = m_ID;
-    viewDO->GetOrthoViewSettings()->ActiveLayerID = m_ID;
+    viewDO->GetSliceViewSettings()->SetActiveLayerID(m_ID);
+    viewDO->GetMosaicViewSettings()->SetActiveLayerID(m_ID);
+    viewDO->GetOrthoViewSettings()->SetActiveLayerID(m_ID);
     return true;
 }
 
@@ -162,7 +168,7 @@ bool FrLayerCmd::ChangeLayerOld(){
         m_ID = this->GetActiveLayerID();
     }
     // if wrong ID is specified return
-    if(m_ID < DEF_LAYER_ID) return false;
+    if(m_ID <= BAD_LAYER_ID) return false;
 
     // Init data
     FrMainWindow* mv = this->GetMainController()->GetMainView();
@@ -190,11 +196,11 @@ bool FrLayerCmd::ChangeLayerOld(){
     bool result = false;
     if(layerDO != 0L && !layerDO->IsImage()){
         FrLayerDialog dlg(mv, true);
-        dlg.SetLayerParams(*((FrColormapLayerSettings*)layerDO->GetSettings()));
+        dlg.SetLayerParams(*((FrImageLayerSettings*)layerDO->GetSettings()));
 
         if(dlg.SimpleExec()){
             // NOTE: Need to save ID and TBC since they may be changed
-            FrColormapLayerSettings* cmlParams = (FrColormapLayerSettings*)layerDO->GetSettings();
+            FrImageLayerSettings* cmlParams = (FrImageLayerSettings*)layerDO->GetSettings();
             FrTbcSettings saveTbc = cmlParams->TbcSettings;
             dlg.GetLayerParams(*cmlParams);
             cmlParams->TbcSettings = saveTbc;
@@ -271,18 +277,18 @@ bool FrLayerCmd::ChangeLayerColormap(){
         }
     }    
 
-    if (layerDO->IsColormap()){
+    if (layerDO->IsImage()){
         // get colormap params and opacity
         int opacity = mw->GetLayerListWidget()->GetOpacity();
-        FrColormapLayerSettings* colormapParams = (FrColormapLayerSettings*)layerDO->GetSettings();
-        colormapParams->Opacity = opacity;
+        FrImageLayerSettings* imageParams = (FrImageLayerSettings*)layerDO->GetSettings();
+        imageParams->Opacity = opacity;
 
         bool visibility = mw->GetLayerListWidget()->GetLayerVisibility(m_ID);
-        colormapParams->Visibility = visibility;
+        imageParams->Visibility = visibility;
 
-        mw->GetLayerListWidget()->GetColormapWidget()->GetColormapParams(*colormapParams);
+        mw->GetLayerListWidget()->GetColormapWidget()->GetColormapParams(*imageParams);
         
-        layerDO->SetSettings(colormapParams);
+        layerDO->SetSettings(imageParams);
     }
     else
         return false;   // trying to update colormap params of non colormap layer
@@ -292,13 +298,13 @@ bool FrLayerCmd::ChangeLayerColormap(){
 }
 
 // delete active layer
-int FrLayerCmd::GetActiveLayerID(){
+unsigned long FrLayerCmd::GetActiveLayerID(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     return viewDO->GetActiveLayerID();
 }
 
-bool FrLayerCmd::IsRoiLayer(int id){
+bool FrLayerCmd::IsRoiLayer(unsigned long id){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     
     std::vector<FrDocumentObj*> objects;

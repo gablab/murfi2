@@ -21,7 +21,7 @@ public:
     FrPropMacro(FrMainController*, MainController);
 
 protected:
-    void UpdatePipelineForID(int id, int point);
+    void UpdatePipelineForID(unsigned long id, int point);
 };
 
 #endif // FR_REFRESH_LAYER_INFO_CMD

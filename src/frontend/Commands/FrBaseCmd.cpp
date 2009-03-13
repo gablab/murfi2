@@ -7,7 +7,7 @@
 #include "FrViewDocObj.h"
 
 
-void FrBaseCmd::UpdatePipelineForID(int id, int point){
+void FrBaseCmd::UpdatePipelineForID(unsigned long id, int point){
 
     if(id == BAD_LAYER_ID) return;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
@@ -15,19 +15,19 @@ void FrBaseCmd::UpdatePipelineForID(int id, int point){
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
 
     // Set id for update
-    int sliceID = viewDO->GetSliceViewSettings()->ActiveLayerID;
-    int mosaicID = viewDO->GetMosaicViewSettings()->ActiveLayerID;
-    int orthoID = viewDO->GetOrthoViewSettings()->ActiveLayerID;
+    unsigned long sliceID = viewDO->GetSliceViewSettings()->GetActiveLayerID();
+    unsigned long mosaicID = viewDO->GetMosaicViewSettings()->GetActiveLayerID();
+    unsigned long orthoID = viewDO->GetOrthoViewSettings()->GetActiveLayerID();
 
-    viewDO->GetSliceViewSettings()->ActiveLayerID  = id;
-    viewDO->GetMosaicViewSettings()->ActiveLayerID = id;
-    viewDO->GetOrthoViewSettings()->ActiveLayerID  = id;
+    viewDO->GetSliceViewSettings()->SetActiveLayerID(id);
+    viewDO->GetMosaicViewSettings()->SetActiveLayerID(id);
+    viewDO->GetOrthoViewSettings()->SetActiveLayerID(id);
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
     mv->GetCurrentView()->UpdatePipeline(point);
 
     // Restore id
-    viewDO->GetSliceViewSettings()->ActiveLayerID  = sliceID;
-    viewDO->GetMosaicViewSettings()->ActiveLayerID = mosaicID;
-    viewDO->GetOrthoViewSettings()->ActiveLayerID  = orthoID;
+    viewDO->GetSliceViewSettings()->SetActiveLayerID(sliceID);
+    viewDO->GetMosaicViewSettings()->SetActiveLayerID(mosaicID);
+    viewDO->GetOrthoViewSettings()->SetActiveLayerID(orthoID);
 }

@@ -60,7 +60,7 @@ bool FrGraphBookmarkWidget::AddBookmark(FrGraphTabDocObj* gts){
 bool FrGraphBookmarkWidget::RemoveBookmark(FrGraphTabDocObj* gts){
 
     // delete tab from TabWidget
-    unsigned int id = gts->GetID();
+    unsigned long id = gts->GetID();
     for(int i=0; i < m_tabWidget->count(); ++i){
         FrBookmark* bmw = dynamic_cast<FrBookmark*>(m_tabWidget->widget(i));
         if(bmw != 0L && id == bmw->GetID()){

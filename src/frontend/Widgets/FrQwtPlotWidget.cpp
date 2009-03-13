@@ -84,7 +84,7 @@ FrQwtPlotWidget::~FrQwtPlotWidget(){
     if (m_PlotPicker) delete m_PlotPicker;
 }
 
-void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
+void FrQwtPlotWidget::AddGraph(unsigned long id, QString& name, QColor& color){
     // Check if already added
     if(m_Curves.find(id) != m_Curves.end()) return;
     
@@ -112,7 +112,7 @@ void FrQwtPlotWidget::AddGraph(int id, QString& name, QColor& color){
     //this->replot();
 }
 
-void FrQwtPlotWidget::RemoveGraph(int id){
+void FrQwtPlotWidget::RemoveGraph(unsigned long id){
     // Check if exists
     CurvesMap::iterator it = m_Curves.find(id);
     if(it == m_Curves.end()) return;
@@ -152,7 +152,7 @@ void FrQwtPlotWidget::RemoveAll(){
 }
 
 
-void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
+void FrQwtPlotWidget::SetData(unsigned long id, double data[], int dataSize){
     // check
     CurvesMap::iterator it = m_Curves.find(id);
     if(it == m_Curves.end()) return;
@@ -196,7 +196,7 @@ void FrQwtPlotWidget::SetData(int id, double data[], int dataSize){
 //    this->replot();
 }
 
-void FrQwtPlotWidget::SetVisibility(int id, bool visible){
+void FrQwtPlotWidget::SetVisibility(unsigned long id, bool visible){
     // get specified curve
     CurvesMap::iterator it = m_Curves.find(id);
     if(it == m_Curves.end()) return;

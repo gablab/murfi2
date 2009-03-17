@@ -53,7 +53,8 @@ bool FrLoadImageCmd::Execute(){
 //    }
 
 	// open image
-    bool result = true;
+    bool result = false;
+    int voxInds[3];
     //if(openImage){
         // Open files
         std::sort(m_FilesToOpen.begin(), m_FilesToOpen.end());
@@ -79,10 +80,10 @@ bool FrLoadImageCmd::Execute(){
 	      FrTabSettingsDocObj* tabSets = md->GetCurrentTabSettings();
 	      FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType(), img->getDataID(), (*itr));
 
-
-	      viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL] = img->getDim(DEF_CORONAL)/2;
-	      viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL] = img->getDim(DEF_SAGITAL)/2;
-	      viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL] = img->getDim(DEF_AXIAL)/2;
+	      result = true;
+	      voxInds[0] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL] = img->getDim(DEF_CORONAL)/2;
+	      voxInds[1] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL] = img->getDim(DEF_SAGITAL)/2;
+	      voxInds[2] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL] = img->getDim(DEF_AXIAL)/2;
 	      md->Add(imgLayer);
 	    }
 	    timePoint++;
@@ -107,8 +108,16 @@ bool FrLoadImageCmd::Execute(){
 	  }
         }
 	
+	if(result) {
+	  FrVoxelInfoCmd* cmd = FrCommandController::CreateCmd<FrVoxelInfoCmd>();
+	  cmd->SetAction(FrVoxelInfoCmd::Set);
+	  cmd->SetVoxel(voxInds);
+	  FrCommandController::Execute(cmd);
+	}
+
         m_FilesToOpen.clear();
-        FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_FULL);
+	FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID,FRP_FULL);
+        //FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
 	//}
 	return result;
 }

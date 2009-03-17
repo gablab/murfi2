@@ -159,7 +159,6 @@ bool FrVoxelInfoCmd::UpdateVoxelInfoDirect(bool addPoint){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
     std::vector<vtkRenderer*> renCollection;
-    int imgNumber = -1;
     FrLayeredImage* lim = 0;
 
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
@@ -173,26 +172,10 @@ bool FrVoxelInfoCmd::UpdateVoxelInfoDirect(bool addPoint){
             lim = mv->GetMosaicView()->GetImage();
             break;
         case OrthoView:
-            {
-                FrOrthoView* ov =  mv->GetOrthoView();
-
-                // Find Image where click's occured
-                for(int i=0; i < ORTHO_VIEWS_CNT; ++i){
-                    if (ov->GetImage(i)->IsInViewport(m_mouseX, m_mouseY)){
-                        imgNumber = i; 
-                        break;
-                    }
-                }
-                if (imgNumber != -1){
-                    ov->GetImage(imgNumber)->GetRenderers(renCollection);
-                    lim = ov->GetImage(imgNumber);
-                }
-                else{
-                    ResetVoxelInfo();
-                    return false;
-                }
-                break;
-            }
+	  FrOrthoView* ov =  mv->GetOrthoView();
+	  ov->GetImage(0)->GetRenderers(renCollection);
+	  lim = ov->GetImage(0);
+	  break;
     } // end switch(view)
 
     // get image data

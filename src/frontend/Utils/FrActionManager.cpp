@@ -18,6 +18,7 @@ FrActionManager::FrActionManager(QObject* parent){
 
 FrActionManager::~FrActionManager(){
     if (m_OpenImageAction) delete m_OpenImageAction;
+    if (m_OpenConfigAction) delete m_OpenConfigAction;
     if (m_OpenDataStoreAction) delete m_OpenDataStoreAction;
     if (m_SaveTabsAction) delete m_SaveTabsAction;
     if (m_LoadTabsAction) delete m_LoadTabsAction;
@@ -52,6 +53,8 @@ void FrActionManager::Initialize(QObject* parent){
     // File
     m_OpenImageAction = new QAction(parent);
     m_OpenImageAction->setObjectName(QString::fromUtf8("m_OpenImageAction"));
+    m_OpenConfigAction = new QAction(parent);
+    m_OpenConfigAction->setObjectName(QString::fromUtf8("m_OpenConfigAction"));
     m_OpenDataStoreAction = new QAction(parent);
     m_OpenDataStoreAction->setObjectName(QString::fromUtf8("m_OpenDataStoreAction"));
     m_SaveTabsAction = new QAction(parent);
@@ -116,6 +119,8 @@ void FrActionManager::Retranslate(){
     // File
     m_OpenImageAction->setText(DO_TRANSLATE(TR_CONTEXT, "Open Image"));
     m_OpenImageAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Open Image"));
+    m_OpenConfigAction->setText(DO_TRANSLATE(TR_CONTEXT, "Open Config"));
+    m_OpenConfigAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Open Config"));
     m_OpenDataStoreAction->setText(DO_TRANSLATE(TR_CONTEXT, "Open Data Store"));
     m_OpenDataStoreAction->setToolTip(DO_TRANSLATE(TR_CONTEXT, "Open Data Store"));
     m_SaveTabsAction->setText(DO_TRANSLATE(TR_CONTEXT, "Save Tabset"));

@@ -142,6 +142,7 @@ bool FrManipulationTool::OnMouseDown(FrInteractorStyle* is, FrMouseParams& param
         params.Button = FrMouseParams::LeftButton;
         m_tbcTool->OnMouseDown(is, params);
     }
+
     return false;
 }
 

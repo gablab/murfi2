@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Mon Mar 2 17:57:02 2009
+** Created: Mon Mar 16 20:12:32 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,60 +23,62 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      33,   10, // methods
+      34,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
  // slots: signature, parameters, type, tag, flags
       23,   22,   22,   22, 0x0a,
       43,   22,   22,   22, 0x0a,
-      67,   22,   22,   22, 0x0a,
-      86,   22,   22,   22, 0x0a,
-     105,   22,   22,   22, 0x0a,
-     129,   22,   22,   22, 0x0a,
-     153,   22,   22,   22, 0x0a,
-     168,   22,   22,   22, 0x0a,
-     188,   22,   22,   22, 0x0a,
-     213,   22,   22,   22, 0x0a,
-     232,   22,   22,   22, 0x0a,
-     254,   22,   22,   22, 0x0a,
-     276,   22,   22,   22, 0x0a,
-     293,   22,   22,   22, 0x0a,
-     313,   22,   22,   22, 0x0a,
+      64,   22,   22,   22, 0x0a,
+      88,   22,   22,   22, 0x0a,
+     107,   22,   22,   22, 0x0a,
+     126,   22,   22,   22, 0x0a,
+     150,   22,   22,   22, 0x0a,
+     174,   22,   22,   22, 0x0a,
+     189,   22,   22,   22, 0x0a,
+     209,   22,   22,   22, 0x0a,
+     234,   22,   22,   22, 0x0a,
+     253,   22,   22,   22, 0x0a,
+     275,   22,   22,   22, 0x0a,
+     297,   22,   22,   22, 0x0a,
+     314,   22,   22,   22, 0x0a,
      334,   22,   22,   22, 0x0a,
-     354,   22,   22,   22, 0x0a,
+     355,   22,   22,   22, 0x0a,
      375,   22,   22,   22, 0x0a,
-     401,   22,   22,   22, 0x0a,
-     421,   22,   22,   22, 0x0a,
-     439,   22,   22,   22, 0x0a,
-     468,   22,   22,   22, 0x0a,
-     487,   22,   22,   22, 0x0a,
-     507,   22,   22,   22, 0x0a,
-     522,   22,   22,   22, 0x0a,
-     545,   22,   22,   22, 0x0a,
-     570,   22,   22,   22, 0x0a,
-     589,   22,   22,   22, 0x0a,
-     625,  612,   22,   22, 0x0a,
-     666,  649,   22,   22, 0x0a,
-     690,   22,   22,   22, 0x0a,
-     719,   22,   22,   22, 0x0a,
-     751,  744,   22,   22, 0x0a,
+     396,   22,   22,   22, 0x0a,
+     422,   22,   22,   22, 0x0a,
+     442,   22,   22,   22, 0x0a,
+     460,   22,   22,   22, 0x0a,
+     489,   22,   22,   22, 0x0a,
+     508,   22,   22,   22, 0x0a,
+     528,   22,   22,   22, 0x0a,
+     543,   22,   22,   22, 0x0a,
+     566,   22,   22,   22, 0x0a,
+     591,   22,   22,   22, 0x0a,
+     610,   22,   22,   22, 0x0a,
+     646,  633,   22,   22, 0x0a,
+     687,  670,   22,   22, 0x0a,
+     711,   22,   22,   22, 0x0a,
+     740,   22,   22,   22, 0x0a,
+     772,  765,   22,   22, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "FrActionSignalManager\0\0OnOpenImageAction()\0"
-    "OnOpenDataStoreAction()\0OnSaveTabsAction()\0"
-    "OnLoadTabsAction()\0OnSaveGraphTabsAction()\0"
-    "OnLoadGraphTabsAction()\0OnExitAction()\0"
-    "OnSaveToTabAction()\0OnSaveGraphToTabAction()\0"
-    "OnNewLayerAction()\0OnDeleteLayerAction()\0"
-    "OnChangeLayerAction()\0OnNewROIAction()\0"
-    "OnViewSliceAction()\0OnViewMosaicAction()\0"
-    "OnViewOrthoAction()\0OnResetImageAction()\0"
-    "OnManipulatorToolAction()\0OnVoxelToolAction()\0"
-    "OnRoiToolAction()\0OnVoxelSelectionToolAction()\0"
+    "OnOpenConfigAction()\0OnOpenDataStoreAction()\0"
+    "OnSaveTabsAction()\0OnLoadTabsAction()\0"
+    "OnSaveGraphTabsAction()\0OnLoadGraphTabsAction()\0"
+    "OnExitAction()\0OnSaveToTabAction()\0"
+    "OnSaveGraphToTabAction()\0OnNewLayerAction()\0"
+    "OnDeleteLayerAction()\0OnChangeLayerAction()\0"
+    "OnNewROIAction()\0OnViewSliceAction()\0"
+    "OnViewMosaicAction()\0OnViewOrthoAction()\0"
+    "OnResetImageAction()\0OnManipulatorToolAction()\0"
+    "OnVoxelToolAction()\0OnRoiToolAction()\0"
+    "OnVoxelSelectionToolAction()\0"
     "OnShowHelpAction()\0OnShowAboutAction()\0"
     "OnTestAction()\0OnLayerParamsChanged()\0"
     "OnLayerColormapChanged()\0OnRoiToolChanged()\0"
@@ -114,40 +116,41 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: OnOpenImageAction(); break;
-        case 1: OnOpenDataStoreAction(); break;
-        case 2: OnSaveTabsAction(); break;
-        case 3: OnLoadTabsAction(); break;
-        case 4: OnSaveGraphTabsAction(); break;
-        case 5: OnLoadGraphTabsAction(); break;
-        case 6: OnExitAction(); break;
-        case 7: OnSaveToTabAction(); break;
-        case 8: OnSaveGraphToTabAction(); break;
-        case 9: OnNewLayerAction(); break;
-        case 10: OnDeleteLayerAction(); break;
-        case 11: OnChangeLayerAction(); break;
-        case 12: OnNewROIAction(); break;
-        case 13: OnViewSliceAction(); break;
-        case 14: OnViewMosaicAction(); break;
-        case 15: OnViewOrthoAction(); break;
-        case 16: OnResetImageAction(); break;
-        case 17: OnManipulatorToolAction(); break;
-        case 18: OnVoxelToolAction(); break;
-        case 19: OnRoiToolAction(); break;
-        case 20: OnVoxelSelectionToolAction(); break;
-        case 21: OnShowHelpAction(); break;
-        case 22: OnShowAboutAction(); break;
-        case 23: OnTestAction(); break;
-        case 24: OnLayerParamsChanged(); break;
-        case 25: OnLayerColormapChanged(); break;
-        case 26: OnRoiToolChanged(); break;
-        case 27: OnImageParamsChanged(); break;
-        case 28: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 29: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 30: OnPreviousTimePointPressed(); break;
-        case 31: OnNextTimePointPressed(); break;
-        case 32: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 1: OnOpenConfigAction(); break;
+        case 2: OnOpenDataStoreAction(); break;
+        case 3: OnSaveTabsAction(); break;
+        case 4: OnLoadTabsAction(); break;
+        case 5: OnSaveGraphTabsAction(); break;
+        case 6: OnLoadGraphTabsAction(); break;
+        case 7: OnExitAction(); break;
+        case 8: OnSaveToTabAction(); break;
+        case 9: OnSaveGraphToTabAction(); break;
+        case 10: OnNewLayerAction(); break;
+        case 11: OnDeleteLayerAction(); break;
+        case 12: OnChangeLayerAction(); break;
+        case 13: OnNewROIAction(); break;
+        case 14: OnViewSliceAction(); break;
+        case 15: OnViewMosaicAction(); break;
+        case 16: OnViewOrthoAction(); break;
+        case 17: OnResetImageAction(); break;
+        case 18: OnManipulatorToolAction(); break;
+        case 19: OnVoxelToolAction(); break;
+        case 20: OnRoiToolAction(); break;
+        case 21: OnVoxelSelectionToolAction(); break;
+        case 22: OnShowHelpAction(); break;
+        case 23: OnShowAboutAction(); break;
+        case 24: OnTestAction(); break;
+        case 25: OnLayerParamsChanged(); break;
+        case 26: OnLayerColormapChanged(); break;
+        case 27: OnRoiToolChanged(); break;
+        case 28: OnImageParamsChanged(); break;
+        case 29: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 30: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 31: OnPreviousTimePointPressed(); break;
+        case 32: OnNextTimePointPressed(); break;
+        case 33: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         }
-        _id -= 33;
+        _id -= 34;
     }
     return _id;
 }

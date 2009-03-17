@@ -19,6 +19,7 @@ void FrToolBar::Retranslate(){
 void FrToolBar::SetupActions(){
     // File
     this->addAction(m_actManager->GetOpenImageAction());
+    this->addAction(m_actManager->GetOpenConfigAction());
     this->addSeparator();
     
     // View

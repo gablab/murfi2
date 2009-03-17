@@ -59,6 +59,7 @@ void FrMainMenu::Retranslate(){
 void FrMainMenu::SetupActions(){
     // File
     m_menuFile->addAction(m_actManager->GetOpenImageAction());
+    m_menuFile->addAction(m_actManager->GetOpenConfigAction());
     m_menuFile->addAction(m_actManager->GetOpenDataStoreAction());
     m_menuFile->addSeparator();
     m_menuFile->addAction(m_actManager->GetSaveTabsAction());

@@ -40,6 +40,7 @@ void FrActionSignalManager::Initialize(){
 
     // File 
     CONNECT_ACTION_TRIGGERED(am->GetOpenImageAction(), OnOpenImageAction());
+    CONNECT_ACTION_TRIGGERED(am->GetOpenConfigAction(), OnOpenConfigAction());
     CONNECT_ACTION_TRIGGERED(am->GetOpenDataStoreAction(), OnOpenDataStoreAction());
     CONNECT_ACTION_TRIGGERED(am->GetSaveTabsAction(), OnSaveTabsAction());
     CONNECT_ACTION_TRIGGERED(am->GetLoadTabsAction(), OnLoadTabsAction());
@@ -230,6 +231,19 @@ void FrActionSignalManager::OnOpenImageAction(){
             GetMainController()->
             LoadImageFromFile(fileNamesToLoad);
     }
+}
+
+void FrActionSignalManager::OnOpenConfigAction(){
+  QString fileName = QFileDialog::getOpenFileName(
+        m_mainWindow, tr("Open Run Configuration"), 
+        tr(""), tr("XML configuration (*.xml)"));
+        
+  RtConfigFmriRun runConfig;
+  if(!runConfig.parseConfigFile(fileName.toStdString())) {
+    cerr << "FrActionSignalManager::OnOpenConfig(): failed to parse config file " << fileName.toStdString() << endl;
+  }
+
+  executeRun(runConfig);
 }
 
 void FrActionSignalManager::OnOpenDataStoreAction(){

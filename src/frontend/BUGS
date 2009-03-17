@@ -1,0 +1,13 @@
+# bug list for frontend
+# 
+# Oliver Hinds <ohinds@mit.edu> 2009-02-23
+
+- crash when mouse clicked in view pane before image load
+
+- pixels change value on slice even if slice doesnt change when moving around crosshair
+
+- memory leak when putting new voxels as target for graph
+
+- roi tools are often one voxel off
+
+- default zoom/pan/crosshair position are really bad

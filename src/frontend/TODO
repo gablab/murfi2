@@ -1,0 +1,10 @@
+# todo list for frontend
+#
+# Oliver Hinds <ohinds@mit.edu> 2009-02-23
+
+- layers have bad, bad distinction between roi and colormap and base layer. eliminate this.
+
+- allow loading of images into a new layer.
+
+- configuration of backened
+

@@ -8,18 +8,18 @@
 #include "RtRoiFeedbackSynth.h"
 #include "RtDataIDs.h"
 
+
 #include"boost/random/normal_distribution.hpp"
 #include"boost/random/lagged_fibonacci.hpp"
-
 
 string RtRoiFeedbackSynth::moduleString(ID_ROIFEEDBACKSYNTH);
 
 // default constructor
-RtRoiFeedbackSynth::RtRoiFeedbackSynth() : RtRoi2Feedback() {
+RtRoiFeedbackSynth::RtRoiFeedbackSynth() : RtStreamComponent(),
+					   numTimepoints(0), 
+					   mean(0), 
+					   sd(1) {
   componentID = moduleString;
-
-  mean = 0;
-  sd = 1;
 }
 
 // destructor
@@ -39,8 +39,15 @@ bool RtRoiFeedbackSynth::processOption(const string &name,
     return RtConfigVal::convert<float>(sd,text);
   }
 
-  return RtRoi2Feedback::processOption(name, text, attrMap);
+  return RtStreamComponent::processOption(name, text, attrMap);
 }  
+
+// validate config
+bool RtRoiFeedbackSynth::validateComponentConfig() {
+  bool result = true;
+
+  return result;
+}
 
 // process a single acquisition
 int RtRoiFeedbackSynth::process(ACE_Message_Block *mb) {
@@ -58,7 +65,7 @@ int RtRoiFeedbackSynth::process(ACE_Message_Block *mb) {
   // setup the data id
   act->getDataID().setModuleID(componentID);
   act->getDataID().setDataName(NAME_ROIVAL);
-  act->getDataID().setRoiID(roiID);
+  act->getDataID().setRoiID("synth");
   act->getDataID().setTimePoint(numTimepoints);
 
   act->setPixel(0, rnd.operator()<boost::lagged_fibonacci19937>((engine)));
@@ -67,12 +74,12 @@ int RtRoiFeedbackSynth::process(ACE_Message_Block *mb) {
 
   // log the activation
   stringstream logs("");
-  logs << "activation synth: " << numTimepoints << ":" << roiID  
+  logs << "activation synth: " << numTimepoints << ":synth"  
        << " " << act->getPixel(0) << endl;
   log(logs);
 
   if(ofile.is_open()) {
-    ofile << tr << " " << act->getPixel(0) << endl;
+    ofile << numTimepoints << " " << act->getPixel(0) << endl;
     ofile.flush();
   }
 

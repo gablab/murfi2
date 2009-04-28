@@ -56,6 +56,9 @@ public:
 
 protected:
 
+  // validation configuration
+  bool validateComponentConfig() { return true; }
+
   // processes as a stream component
   int process(ACE_Message_Block*);
 

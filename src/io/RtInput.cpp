@@ -12,11 +12,11 @@ static char *VERSION = "$Id$";
 // default constructor
 RtInput::RtInput() {
   inputID = "input";
+  activatable = false;
 }
 
 // destructor
 RtInput::~RtInput() {
-  inputID = "input";
 }
 
 // init

@@ -33,7 +33,7 @@ public:
   
   // default constructor
   // haha, you can't call this
-  RtConductor() : configured(false), running(false) {}; 
+  RtConductor() : ACE_Task_Base(), configured(false), running(false) {}; 
 
   // constructor with config
   explicit RtConductor(const RtConfigFmriRun &conf); 
@@ -42,6 +42,9 @@ public:
   virtual ~RtConductor();
 
   //*** initialization routines  ***//
+
+  // retreive configuration
+  RtConfig &getConfig() { return config; }
  
   // initialize config and prepare to run
   // NOTE: this function must me called before each call to run(), but its
@@ -62,7 +65,14 @@ public:
   //   true (for success) or false
   bool addInput(RtInput *in);
 
-  // adds a vector of inputs
+  // adds input mode that has already been configured
+  //  in:
+  //   out: input object
+  //  out:
+  //   true (for success) or false
+  bool addExistingInput(RtInput *in);
+
+   // adds a vector of inputs
   //  in:
   //   in: vector of input object
   //  out:
@@ -75,6 +85,14 @@ public:
   //  out:
   //   true (for success) or false
   bool addOutput(RtOutput *out);
+
+
+  // adds output mode that has already been configured
+  //  in:
+  //   out: output object
+  //  out:
+  //   true (for success) or false
+  bool addExistingOutput(RtOutput *out);
 
   // adds outputs from a vector
   //  in:

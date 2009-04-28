@@ -80,14 +80,14 @@ bool RtStreamMessage::setLastDataAsCurrent() {
 // this point)
 //  out
 //   pointer to the current data or NULL, if none
-RtData *RtStreamMessage::getCurrentData() {
+RtData *RtStreamMessage::getCurrentData() const {
   return getData(curDataIndex);
 }
 
 // get the last added data
 //  out
 //   pointer to the last data or NULL, if none
-RtData *RtStreamMessage::getLastData() {
+RtData *RtStreamMessage::getLastData() const {
   if(numData == 0) {
     return NULL;
   }
@@ -102,7 +102,7 @@ RtData *RtStreamMessage::getLastData() {
 //   index of data to get
 //  out
 //   pointer to the data or NULL, if index invalid
-RtData *RtStreamMessage::getData(unsigned int index) {
+RtData *RtStreamMessage::getData(unsigned int index) const {
   if(index >= numData) {
     return NULL;
   }
@@ -111,39 +111,6 @@ RtData *RtStreamMessage::getData(unsigned int index) {
 
   return data[index];
 }
-
-// get a data portion by data id (returns the first found instance)
-//  in
-//   id of data to get
-//  out
-//   pointer to the data or NULL, if id doesnt exist
-//RtData *RtStreamMessage::getDataByID(const string &id) {
-//  for(unsigned int i = 0; i < numData; i++) {
-//    if(data[i]->getID() == id) {
-//      return data[i];
-//    }
-//  }
-//
-//  return NULL;
-//}
-
-// // get data by data id and roi id (returns the first found instance)
-// //  in
-// //   dataid id of data
-// //   roiid  id of roi
-// //  out
-// //   pointer to the data or NULL, if id doesnt exist
-// RtData *RtStreamMessage::getDataByIDAndRoiID(const string &dataid,
-// 					     const string &roiid) {
-//   for(unsigned int i = 0; i < numData; i++) {
-//     //cout << data[i]->getID() << " " << data[i]->getRoiID() << endl;
-//     if(data[i]->getID() == dataid && data[i]->getRoiID() == roiid) {
-//       return data[i];
-//     }
-//   }
-
-//   return NULL;
-// }
 
 // get a data portion by module id, data name, and roi id (returns
 // the first found instance). note that any of these can be "" to
@@ -156,7 +123,7 @@ RtData *RtStreamMessage::getData(unsigned int index) {
 //   pointer to the data or NULL, if such data doesnt exist
 RtData *RtStreamMessage::getData(const string &moduleId,
 				 const string &dataName,
-				 const string &roiId) {
+				 const string &roiId) const {
   RtDataID idTemplate(DATAID_UNSET_VALUE,DATAID_UNSET_VALUE,DATAID_UNSET_VALUE,
 		      "", moduleId, dataName, roiId);
   return getData(idTemplate);
@@ -167,10 +134,12 @@ RtData *RtStreamMessage::getData(const string &moduleId,
 //   template id
 //  out
 //   pointer to the data or NULL, if such data doesnt exist
-RtData *RtStreamMessage::getData(const RtDataID &idTemplate) {
+RtData *RtStreamMessage::getData(const RtDataID &idTemplate) const {
+  //cout << "serching for " << idTemplate << endl;
+
   for(unsigned int i = 0; i < numData; i++) {
-    if(DEBUG_LEVEL & ADVANCED) {
-      cout << data[i]->getDataID() << endl;
+    if(DEBUG_LEVEL & MODERATE) {
+      cout << data[i] << " " << data[i]->getDataID() << endl;
     }
     if(idTemplate == data[i]->getDataID()) {
        return data[i];
@@ -181,13 +150,13 @@ RtData *RtStreamMessage::getData(const RtDataID &idTemplate) {
 }
 
 // get the number of data objects we currently have
-unsigned int RtStreamMessage::getNumData() {
+unsigned int RtStreamMessage::getNumData() const {
   return numData;
 }
 
 
 // get pointer to our conductor
-RtConductor *RtStreamMessage::getConductor() {
+RtConductor *RtStreamMessage::getConductor() const {
   return conductor;
 }
 

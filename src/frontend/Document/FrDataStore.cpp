@@ -1,6 +1,7 @@
 #include "FrDataStore.h"
 #include "FrMainDocument.h"
 #include "FrImageDocObj.h"
+#include "FrLayerDocObj.h"
 #include "FrRoiDocObj.h"
 #include "FrPointsDocObj.h"
 #include "FrViewDocObj.h"
@@ -31,26 +32,30 @@ FrDataStore::~FrDataStore(){
 
 void FrDataStore::SetStore(RtDataStore *store){
     m_Store = store;
-    m_Store->addOutputForNotify(this);
+    m_Store->addListener(this);
 }
 
-void FrDataStore::setData(RtData *data){
+void FrDataStore::notify(const RtDataID &dataID){
     if(m_Store == 0) return;
 
-    // Process incoming data here
-    std::string id = data->getDataID().getModuleID();
-        
+    cout << dataID << endl;
+ 
     // For now support MRI and ROI
-    if(id == DEF_MRI_ID){
-        this->AddImageToDocument(data);
+    if(dataID.getModuleID() == DEF_MRI_ID){
+      RtMRIImage *img = dynamic_cast<RtMRIImage*>(m_Store->getData(dataID));
+      if(img) {
+	this->AddImageToDocument(img);
+      }
     }
-    else if(id == DEF_ROI_ID){
-        this->AddRoiToDocument(data);
+    else if(dataID.getModuleID() == DEF_ROI_ID){
+      RtMaskImage *roi = dynamic_cast<RtMaskImage*>(m_Store->getData(dataID));
+      if(roi) {
+	// ohinds: comment for debug
+	//this->AddRoiToDocument(roi);
+      }
     }
     else {
-        // TODO: Undefined data come
-        // so we need to handle this somehow...
-        delete data;
+      cout << "FrDataStore::notify(): ignoring " << dataID << endl;
     }
 }
 
@@ -90,18 +95,25 @@ void FrDataStore::AddImageToDocument(RtData* data){
             imgDO->AddTimePointData(img);
         }
         else {
-            imgDO = new FrImageDocObj();
-            
-            // get view doc obj and set current timeseria
-            FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
+	  FrTabSettingsDocObj* tabSets = m_Document->GetCurrentTabSettings();
+	  FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType(), img->getDataID(), QString(img->getDataID().getDataName().c_str()));
 
-            m_Document->Add(imgDO);
-            imgDO->AddTimePointData(img);
+	  m_Document->Add(imgLayer);
 
-            // initialize points doc object with new image
-            FrPointsDocObj* pointsDO = new FrPointsDocObj();
-            pointsDO->GetDimsFromImg(img);
-            m_Document->Add(pointsDO);
+	  imgDO = new FrImageDocObj();
+          
+	  // get view doc obj and set current timeseria
+	  //FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
+	  
+	  m_Document->Add(imgDO);
+	  imgDO->AddTimePointData(img);
+	  
+
+	  	  // initialize points doc object with new image
+	  FrPointsDocObj* pointsDO = new FrPointsDocObj();
+	  pointsDO->GetDimsFromImg(img);
+	  m_Document->Add(pointsDO);
+
         }
         
         //// test

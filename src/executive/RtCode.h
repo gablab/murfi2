@@ -20,7 +20,7 @@ using namespace std;
 #define START_CODE_INPUTS 1
 #define SCANNER_IMAGE_RECEIVED START_CODE_INPUTS
 #define START_CODE_OUTPUTS 32768
-
+#define SHUTDOWN 65535
 
 class RtConductor;
 

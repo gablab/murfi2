@@ -13,7 +13,7 @@
 #include<vnl/vnl_vector.h>
 #include<vnl/vnl_matrix.h>
 
-#include"RtActivationEstimator.h"
+#include"RtIncrementalGLM.h"
 #include"RtLeastSquaresSolve.h"
 #include"RtTypes.h"
 
@@ -21,77 +21,74 @@
 using namespace std;
 
 // class declaration
-class RtSingleImageCor : public RtActivationEstimator {
 
+class RtSingleImageCor : public RtIncrementalGLM {
 public:
 
-  static string moduleString;
+    static string moduleString;
 
-  //*** constructors/destructors  ***//
+    //*** constructors/destructors  ***//
 
-  // default constructor
-  RtSingleImageCor();
+    // default constructor
+    RtSingleImageCor();
 
-  // destructor
-  ~RtSingleImageCor();
+    // destructor
+    ~RtSingleImageCor();
 
 protected:
 
-  // deallocate internal data
-  void freeSolvers();
-  void freeEstErrSum();
+    // deallocate internal data
+    void freeEstErrSum();
 
-  // process a single acquisition
-  virtual int process(ACE_Message_Block *mb);
+    // process a single acquisition
+    virtual int process(ACE_Message_Block *mb);
 
-  // process an option
-  //  in 
-  //   name of the option to process
-  //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
-			     const map<string,string> &attr);
+    // process an option
+    //  in
+    //   name of the option to process
+    //   attr map bettwen attribute names and values
+    virtual bool processOption(const string &name, const string &text,
+                               const map<string, string> &attr);
 
-  // initialize the estimation algorithm for a particular image size
-  // in
-  //  first acquired image to use as a template for parameter inits
-  void initEstimation(RtMRIImage &image);
+    // make sure we are configured properly
+    bool validateComponentConfig();
 
-  // start a logfile 
-  virtual void startDumpAlgoVarsFile();
+    // initialize the estimation algorithm for a particular image size
+    // in
+    //  first acquired image to use as a template for parameter inits
+    void initEstimation(RtMRIImage &dat, RtMaskImage *mask);
 
-  //// parameters of the activation estimation algorithm
- 
-  // index of the condition of interest
-  unsigned int conditionOfInterest;
+    // start a logfile
+    virtual void startDumpAlgoVarsFile();
 
-  // whether to switch feedback conditions dynamically 
-  bool feedbackConditionSwitching;
+    //// parameters of the activation estimation algorithm
 
-  // number of data points to process
-  unsigned int numData;
+    // whether to include the condition mean in the stat computation
+    bool includeConditionMean;
 
-  // one solver for each voxel 
-  RtLeastSquaresSolve **solvers;
+    //// error estimation params
 
-  // whether to include the condition mean in the stat computation
-  bool includeConditionMean;
+    // error norm method
+    Norm errorNorm;
 
-  //// error estimation params
+    // store the per pixel sum of absolute error for the single image model fit
+    RtActivation *estErrSum;
 
-  // error norm method
-  Norm errorNorm;
+    // number of timepoints
+  unsigned int numTimepoints;
 
-  // store the per pixel sum of absolute error for the single image model fit
-  RtActivation *estErrSum;
+    // number of data actually in the error estimate so far
+    int numDataPointsCount;
 
-  // number of data actually in the error estimate so far
-  int numDataPointsInErrEst;
+    // the amount of data to use in the estimation of the error
+    int numDataPointsForErrEst;
 
-  // the amount of data to use in the estimation of the error
-  int numDataPointsForErrEst;
+    // whether errors should only be estimated in baseline
+    bool onlyEstErrInBaseline;
 
-  // whether errors should only be estimated in baseline
-  bool onlyEstErrInBaseline;
+    bool dumpAlgoVars;
+    string dumpAlgoVarsFilename;
+    ofstream dumpFile;
 };
 
 #endif

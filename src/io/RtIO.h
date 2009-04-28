@@ -37,6 +37,12 @@ public:
   //   true (for success) or false
   virtual bool close();
   
+  // set the deleteable property
+  void setDeleteable(bool _deleteable) { deleteable = _deleteable; }
+
+  // get the deleteable property
+  bool isDeleteable() { return deleteable; }
+
   // set the id string
   void setID(const string &s);
 
@@ -56,6 +62,7 @@ protected:
   bool isOpen;
   ACE_Date_Time now;
 
+  bool deleteable;
 };
 
 #endif

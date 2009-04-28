@@ -16,6 +16,7 @@ static char *VERSION = "$Id: RtConfig.cpp 268 2008-10-13 19:54:35Z ohinds $";
 // defaults
 static const unsigned int DEFAULT_SCANNERPORT = 15000;
 static const string DEFAULT_IMAGETYPE = "epi";
+static const string DEFAULT_STUDYREFNAME(  "study_ref");
 
 // set default config info
 void RtConfigFmriRun::setDefaults() {
@@ -81,6 +82,16 @@ bool RtConfigFmriRun::validateConfig() {
 
   if(!isSet("scanner:voxdim3")) {
     cerr << "ERROR: voxdim3 must be set!" << endl;
+  }
+
+  // study reference volume
+  if(!isSet("study:xfm:referenceVol")) {
+    path p;
+    p.operator=(get("study:xfm:directory").filepath()
+		/ (DEFAULT_STUDYREFNAME + "." 
+		   + get("study:volumeFormat").str()));
+    cout << "using default study reference volume name " << p.string() << endl;
+    set("study:xfm:referenceVol",p.string());
   }
 
   return valid;

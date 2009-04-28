@@ -96,12 +96,11 @@ bool FrImageDocObj::AddTimePointData(RtMRIImage* mriImage){
     // Some checks
     if(!mriImage) return false;
 
-    // ohinds 2009-03-01
-    // todo: check data id for compatibilty
-//    // Add only with the same series number
-//    if(m_SeriesNumber != mriImage->getDataID().getSeriesNum()){
-//        return false;
-//    }
+    // Add only with the same series number
+    if(!m_Images.empty() 
+       && GetDataID().getSeriesNum() != mriImage->getDataID().getSeriesNum()){
+        return false;
+    }
 
     // Check if we have this timepoint
     bool hasTP = false;
@@ -122,7 +121,7 @@ bool FrImageDocObj::AddTimePointData(RtMRIImage* mriImage){
     }
     m_Images.push_back(mriImage);
 
-    // notify about new timepoint data has come
+    // notify about new timepoint data has come    
     this->NotifyAboutNewTimePointData();
 
     return true;

@@ -7,16 +7,21 @@
 
 #include"ace/Log_Msg.h"
 #include<fstream>
+#include"RtFSLInterface.h"
 
 using namespace std;
 
 // default constructor
 template<class T>
 RtDataImage<T>::RtDataImage() : RtData(),
-       magicNumber(MAGIC_NUMBER),
-       filename(""),
-       imgDataLen(0),
-       numPix(0) {
+				magicNumber(MAGIC_NUMBER),
+				filename(""),
+				alignOnRead(false),
+				mosaicOnRead(false),
+				unMosaicOnRead(false),
+				flipLROnRead(false),
+				imgDataLen(0),
+				numPix(0) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage()"));
 
   //addToID("image");
@@ -35,11 +40,15 @@ RtDataImage<T>::RtDataImage() : RtData(),
 // constructor that accepts a filename to read an image from
 template<class T>
 RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
-       magicNumber(MAGIC_NUMBER),
-       filename(""),
-       imgDataLen(0),
-       numPix(0),
-       bytesPerPix(sizeof(unsigned short)) {
+						      magicNumber(MAGIC_NUMBER),
+						      filename(""),
+						      alignOnRead(false),
+						      mosaicOnRead(false),
+						      unMosaicOnRead(false),
+						      flipLROnRead(false),
+						      imgDataLen(0),
+						      numPix(0),
+						      bytesPerPix(sizeof(unsigned short)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
   isMosaiced = false;
@@ -416,13 +425,15 @@ bool RtDataImage<T>::writeData(ostream &os) {
 //   success or failure
 template<class T>
 bool RtDataImage<T>::load() {
-  ACE_TRACE(("RtDataImage<T>::save"));
+  ACE_TRACE(("RtDataImage<T>::load"));
 
   if(filename == "") {
     return false;
   }
 
-  return read(filename);
+  bool ret = read(filename);
+
+  return ret;
 }
 
 
@@ -436,11 +447,21 @@ bool RtDataImage<T>::read(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::read"));
   bool suc = readNifti(_filename);
 
-  // decide if the image is mosaiced and unmosaic it if so
-  if(suc && seemsMosaic()) {
+  //  unmosaic (guessed by default, or read the parm)
+  if(suc && (seemsMosaic() || unMosaicOnRead)) {
     unmosaic();
   }
 
+  // mosaic if we need to
+  if(suc && mosaicOnRead) {
+    mosaic();
+  }
+
+  // flip if we need to
+  if(suc && flipLROnRead) {
+    flipLR();
+  }
+  
   return suc;
 }
 
@@ -1194,6 +1215,25 @@ void RtDataImage<T>::initToZeros() {
   }  unlock();
 }
 
+// initialize to all nans
+template<class T>
+void RtDataImage<T>::initToNans() {
+  if(data == NULL) {
+    return;
+  }
+
+  lock(); {
+    for(unsigned int i = 0; i < numPix; i++) {
+      if(std::numeric_limits<T>::has_quiet_NaN) {
+	data[i] = std::numeric_limits<T>::quiet_NaN();
+      }
+      else {
+	data[i] = 0;
+      }
+    }
+  }  unlock();
+}
+
 //************ sets *****************//
 
 // get filename
@@ -1329,6 +1369,12 @@ void RtDataImage<T>::setPixel(unsigned int i, T v) {
   lock(); {
     data[i] = v;
   }  unlock();
+}
+
+// set element value
+template<class T>
+void RtDataImage<T>::setElement(unsigned int i, T v) {
+  return setPixel(i, v);
 }
 
 // sets the min and max pixel value for this data image

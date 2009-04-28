@@ -11,7 +11,6 @@
 
 #include"RtStreamComponent.h"
 #include"RtActivation.h"
-#include"RtRoi2Feedback.h"
 
 // class declaration
 class RtRoiDifference : public RtStreamComponent {
@@ -36,6 +35,9 @@ protected:
   //   attr map bettwen attribute names and values
   virtual bool processOption(const string &name, const string &text, 
 			     const map<string,string> &attr);
+
+  // validate config
+  bool validateComponentConfig();
 
   // process a single acquisition
   int process(ACE_Message_Block *mb);

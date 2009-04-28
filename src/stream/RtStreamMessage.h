@@ -58,14 +58,14 @@ public:
   //   index of data to get
   //  out
   //   pointer to the data or NULL, if index invalid
-  RtData *getData(unsigned int index);
+  RtData *getData(unsigned int index) const;
 
   // get a data portion by a template data id. uses RtDataID::operator==
   //  in
   //   template id
   //  out
   //   pointer to the data or NULL, if such data doesnt exist
-  RtData *getData(const RtDataID &idTemplate);
+  RtData *getData(const RtDataID &idTemplate) const;
 
   // get a data portion by module id, data name, and roi id (returns 
   // the first found instance). note that any of these can be "" to
@@ -78,18 +78,18 @@ public:
   //   pointer to the data or NULL, if such data doesnt exist
   RtData *getData(const string &moduleId, 
 		  const string &dataName = "",
-		  const string &roiId = "");
+		  const string &roiId = "") const;
 
   // get the current data (original data plus any desired processing up to
   // this point) 
   //  out 
   //   pointer to the current data or NULL, if none
-  RtData *getCurrentData();
+  RtData *getCurrentData() const;
 
   // get the last added data
   //  out
   //   pointer to the last data or NULL, if none
-  RtData *getLastData();
+  RtData *getLastData() const;
 
 
   // get data by data id and roi id (returns the first found instance)
@@ -101,10 +101,10 @@ public:
   //RtData *getDataByIDAndRoiID(const string &dataid, const string &roiid);
 
   // get number of data objects currently stored
-  unsigned int getNumData();
+  unsigned int getNumData() const;
 
   // get pointer to our conductor
-  RtConductor *getConductor();
+  RtConductor *getConductor() const;
 
   // set the pointer to our conductor
   void init(RtConductor *_conductor);

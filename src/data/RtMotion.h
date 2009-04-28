@@ -11,7 +11,7 @@
 #include"RtData.h"
 #include"tinyxml/tinyxml.h"
 
-#define NUM_MOTION_DIMENSIONS 6
+static const unsigned int NUM_MOTION_DIMENSIONS = 6;
 typedef enum {
   TRANSLATION_X = 0,
   TRANSLATION_Y,

@@ -34,13 +34,11 @@ static bool verbose = false;
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
   :  port(DEFAULT_PORT),
-     //     savePath(""),
-//     saveFilestem(DEFAULT_SAVESTEM),
-//     saveFileext(DEFAULT_SAVEEXT),
      seriesNum(1)
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
+  print = true;
   unmosaicInputImages = true;
   onlyReadMoCo = false;
   matrixSize = 64;
@@ -49,6 +47,12 @@ RtInputScannerImages::RtInputScannerImages()
   voxDim[0] = voxDim[1] = voxDim[2] = 1.0;
 
   alignSeries = false;
+
+  initialized = false;
+  imageNum = 0;
+  numImagesExpected = 0;
+  haveRefVol = false;
+  
 }
 
 // destructor
@@ -113,26 +117,11 @@ bool RtInputScannerImages::open(RtConfig &config) {
   // see if we should save images to a file
   if(config.get("scanner:saveImages")==true) {
     saveImagesToFile = true;
+  }
 
-//    // set up the directory to save to
-//    if(config.isSet("scanner:imageDir")) {
-//      saveDir = config.get("scanner:imageDir").str();
-//    }
-//
-//    if(config.isSet("scanner:imageStem")) {
-//      saveFilestem = config.get("scanner:imageStem").str();
-//    }
-//
-//    if(config.isSet("scanner:imageExt")) {
-//      saveFileext = config.get("scanner:imageExt").str();
-//    }
-//
-//    // set the save path
-//    //string sp(config.get("studyDir").str());
-//    stringstream sp;
-//    //sp << "/home/mri/subjects/foobar/" << saveDir << "/" << saveFilestem;
-//    sp <<  << "/" << saveFilestem;
-//    savePath = sp.str();
+  // whether to print when images received
+  if(config.get("scanner:print")==true) {
+    print = true;
   }
 
   // see if we should align the series to a reference
@@ -157,18 +146,35 @@ bool RtInputScannerImages::open(RtConfig &config) {
 //   success flag
 bool RtInputScannerImages::close() {
 
+  bool ret = true;
+
+  cout << "shutting down the scanner image listener...";
+
   if(isOpen) {
     // other stuff
+    if(acceptor.close() != 0) {
+      cout << endl;
+      cerr << "WARNING: failed to close the socket" << endl;
+      ret = false;
+    }
   }
 
-  RtInput::close();
+  ret = ret && RtInput::close();
 
-  // we should close acceptor also, Alan <scopic>
-  #ifdef USE_FRONTEND 
-    acceptor.close();
-  #endif
+  if(ret) {
+    cout << "done" << endl;
+  }
+  
+  return ret;
+}
 
-  return true;
+// initialize a series run
+// call this before each run
+bool RtInputScannerImages::init(RtConfigFmriRun &config) {
+  haveRefVol = false;
+  imageNum = 0;
+  numImagesExpected = config.get("scanner:measurements");
+  initialized = true;
 }
 
 // run the scanner input
@@ -176,50 +182,47 @@ int RtInputScannerImages::svc() {
   RtExternalImageInfo *ei;
   short *img;
   RtMRIImage *rti;
-  static bool haveRefVol = false;
   stringstream infos;
-
-  unsigned int imageNum = 0;
-  unsigned int numImagesExpected 
-    = getConfig().get("scanner:measurements");
 
   cout << "listening for images on port " << port << endl;
 
   // continuously try to accept connections
   for(; isOpen 
-	&& imageNum < numImagesExpected 
-	&& acceptor.accept(stream) != -1; 
-      imageNum++) {
-    cout << "connection accepted" << endl;
+	&& acceptor.accept(stream) != -1;) {
+
+    if(!initialized) {
+      cerr << "ERROR: accepting images when scanner image input not initialized!" << endl;
+      continue;
+    }
+    //cout << "connection accepted" << endl;
 
     // get the info
     ei = receiveImageInfo(stream);
     if(ei == NULL) {
+      stream.close();
       continue;
     }
 
-
     // DEBUGGING
     //ei->displayImageInfo();
-    #ifdef USE_FRONTEND
-        ei->iAcquisitionNumber = imageNum;
-    #endif
+    //ei->iAcquisitionNumber = imageNum++;
 
     // get the image
     img = receiveImage(stream, *ei);
 
+    // close the stream (scanner connects anew for each image)
+    stream.close();
+
+
     if(onlyReadMoCo && !ei->bIsMoCo) {
-      cout << "ignoring non-MoCo image." << endl;
+      //cout << "ignoring non-MoCo image." << endl;
       continue;
     }
 
+    imageNum++;
+
     // build data class
     rti = new RtMRIImage(*ei,img);
-
-    // test, Alan <scopic>
-    #ifdef USE_FRONTEND
-        rti->getDataID().setSeriesNum(0);
-    #endif
 
     //rti->setSeriesNum(seriesNum);
     rti->setMatrixSize(matrixSize);
@@ -261,8 +264,8 @@ int RtInputScannerImages::svc() {
        && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI
        ) {
       
-      if(!(haveRefVol = getConfig().getStudyRefVolExists())) {
-	if(rti->write(getConfig().get("study:xfm:referenceVol"))) {
+      if(!getExperimentConfig().getStudyRefVolExists()) {
+	if(rti->write(getExperimentConfig().get("study:xfm:referenceVol"))) {
 	  haveRefVol = true;
 	}
       }
@@ -271,9 +274,7 @@ int RtInputScannerImages::svc() {
       }
     }
 
-
     sendCode(rti);
-
 
     if(saveImagesToFile) {
       saveImage(*rti);
@@ -284,6 +285,12 @@ int RtInputScannerImages::svc() {
     infos << "received image from scanner: series " << seriesNum
 	  << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
+
+    if(print) {
+      cout << "received image from scanner: series " << seriesNum
+	   << " acquisition " << rti->getDataID().getTimePoint() << endl;
+    }
+
     
 //    cout << "started processing image at ";
 //    printNow(cout);
@@ -293,20 +300,15 @@ int RtInputScannerImages::svc() {
     delete ei;
     delete [] img;
 
+    if(imageNum == numImagesExpected) {
+      cout << "received last image" << endl;
+      sendCode(NULL);
+      initialized = false;
+    }
 
     //delete rti;
 
-    // close the stream (scanner connects anew for each image)
-    stream.close();
-
     //cout << "waiting for another image" << endl;
-  }
-
-  if(imageNum < numImagesExpected) {
-    cerr << "ERROR: could not open connection to accept "
-	 << "images from the scanner on port "
-	 << port << endl;
-    isOpen = false;
   }
 
   return 0;
@@ -385,9 +387,9 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 //   img: image to save
 bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 
-  cout << "writing image number " << img.getDataID().getSeriesNum() << ":" << img.getDataID().getTimePoint() << endl;
+  //cout << "writing image number " << img.getDataID().getSeriesNum() << ":" << img.getDataID().getTimePoint() << endl;
 
-  return img.write(getConfig().getVolFilename(
+  return img.write(getExperimentConfig().getVolFilename(
 			    img.getDataID().getSeriesNum(),
 			    img.getDataID().getTimePoint()));
 }

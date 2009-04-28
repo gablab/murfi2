@@ -29,6 +29,9 @@ public:
 
 protected:
 
+  // make sure we are configured properly
+  bool validateComponentConfig();
+
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 

@@ -16,7 +16,6 @@ string RtEventTriggerActivationSums::moduleString(ID_EVENTTRIGGER_ACTIVATIONSUMS
 // default constructor
 RtEventTriggerActivationSums::RtEventTriggerActivationSums() : RtEventTrigger() {
   componentID = moduleString;
-  dataName = "";
 }
 
 // destructor
@@ -31,6 +30,13 @@ bool RtEventTriggerActivationSums::processOption(const string &name,
 					  const map<string,string> &attrMap) {
   return RtStreamComponent::processOption(name, text, attrMap);
 }  
+
+// validate the configuration
+bool RtEventTriggerActivationSums::validateComponentConfig() {
+  bool result = true;
+
+  return result;
+}
 
 // process a single acquisition
 int RtEventTriggerActivationSums::process(ACE_Message_Block *mb) {  

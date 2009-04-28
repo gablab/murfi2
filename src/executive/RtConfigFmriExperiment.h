@@ -51,6 +51,9 @@ public:
   // for a single series
   string getSeriesRefVolFilename(unsigned int series);
 
+  // get the filename for the mask volume for a series
+  string getSeriesMaskFilename(unsigned int series, string roiID);
+
   // determine if the reference volume already exists
   // true if reference volume exists
   bool getStudyRefVolExists();

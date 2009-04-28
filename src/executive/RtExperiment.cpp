@@ -1,8 +1,8 @@
 /******************************************************************************
- * definition of a class that holds information about the loaded experiment
+ * definition of a class that holds information about the loaded experiment 
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-09-02
- *
+ * Oliver Hinds <ohinds@mit.edu> 2008-09-02 
+ * 
  *****************************************************************************/
 
 #include"RtExperiment.h"
@@ -12,10 +12,12 @@
 #include"RtConfigFmriRun.h"
 
 // frontend gui includes
-#include"FrApplication.h"
-#include"FrMainWindow.h"
-#include"FrMainDocument.h"
-#include"FrMainController.h"
+#ifdef USE_FRONTEND
+ #include"FrApplication.h"
+ #include"FrMainWindow.h"
+ #include"FrMainDocument.h"
+ #include"FrMainController.h"
+#endif
 
 // old gui includes
 #include"RtDisplayImage.h"
@@ -34,7 +36,7 @@
 
 using namespace boost::filesystem;
 
-#include<ctime>
+#include"util/timer/timer.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // experiment data (all at static file scope)
@@ -47,18 +49,21 @@ static RtConfigFmriExperiment config;
 static string confFilename;
 static string confXmlStr;
 
-// to conduct a single run
-static RtConductor conductor;
-
 // store and allow access to collected and computed data
 static RtDataStore dataStore;
 
 // tcpip interface to experiment information
 static RtInfoServer infoServer;
 
+// tcpip interface to scanner input
+static RtInputScannerImages scannerInput;
+
+// conductor to execute fmri runs
+static RtConductor *conductor = NULL;
+
 // raw data identifiers that we've seen (need for knowing which data
 // streams are novel)
-static map<string, unsigned int> uids;
+static map<string, unsigned int> uids;  
 
 // number of unique input data series we've seen
 static unsigned int numExistingSeries;
@@ -66,10 +71,9 @@ static unsigned int numExistingSeries;
 // unique id for this study (date and time of first initialization)
 static unsigned int studyID;
 
-// experiment initialization time
-static time_t startTime;
+// experiment timer
+static timer experimentTimer;
 
-// experiment initialization time
 static string execName;
 
 
@@ -81,16 +85,16 @@ unsigned int getExperimentStudyID() {
 }
 
 // get the unique ID number for this image series UID
-// checks if this uid exists
+// checks if this uid exists 
 //  if so returns its index+1
 //  if not adds it to the end and returns the length for the list
 unsigned int getSeriesNumFromUID(char *uid) {
   // serach for the uid
   map<string, unsigned int>::iterator i = uids.find(uid);
-
+  
   unsigned int seriesNum = 0;
 
-  if(i == uids.end()) { // not found
+  if(i == uids.end()) { // not found 
     string s(uid);
     uids[s] = uids.size()+1+numExistingSeries;
     seriesNum = uids.size()+numExistingSeries;
@@ -100,7 +104,7 @@ unsigned int getSeriesNumFromUID(char *uid) {
   }
 
   if(DEBUG_LEVEL & ADVANCED) {
-    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end()) << " series num=" << seriesNum << endl;
+    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end()) << " series num=" << seriesNum << endl; 
   }
 
   return seriesNum;
@@ -124,17 +128,12 @@ unsigned int getNextUniqueSeriesNum() {
 }
 
 // get the current experiment elapsed time in ms
-time_t getExperimentElapsedTime() {
-  return getNow()-startTime;
+double getExperimentElapsedTime() {
+  return 1000*experimentTimer.elapsed_time();
 }
-
-// get the current time in ms
-time_t getNow() {
-  return time(NULL);
-}
-
+  
 // get the configuration for this experiment
-RtConfigFmriExperiment &getConfig() {
+RtConfigFmriExperiment &getExperimentConfig() {
   return config;
 }
 
@@ -146,11 +145,11 @@ RtDataStore &getDataStore() {
 // initialize the experiment (call before the first run is prepared)
 // returns true for success
 bool initExperiment() {
-
+  
   cout << "intializing experiment" << endl;
 
   // set the start time of the experiment
-  startTime = getNow();
+  experimentTimer.restart();
 
   // make the study id
   ACE_Date_Time t;
@@ -182,9 +181,13 @@ bool initExperiment() {
 
     cout << "done" << endl;
   }
+  else { // error, no config
+    cerr << "ERROR: no experiment configuration provided" << endl;
+    return false;
+  }
 
   // count existing series for this experiment
-  cout << "searching for existing series... " << endl;
+  cout << "searching for existing series... " << endl;  
   numExistingSeries = -1;
   path p;
   do {
@@ -201,37 +204,104 @@ bool initExperiment() {
     if(!infoServer.open(config)) {
       cerr << "ERROR: could not initialize info server" << endl;
     }
-    infoServer.activate(); // start the info server thread
+    else {
+      infoServer.activate(); // start the info server thread
+    }
   }
 
+  // start scanner listener
+  if(config.isSet("scanner:disabled")
+     && config.get("scanner:disabled")==false) {
+    if(!scannerInput.open(config)) {
+      cerr << "ERROR: could not add scanner input" << endl;
+    }
+    else {
+      scannerInput.activate(); // start the scanner input thread
+    }
+  }
+
+  return true;
+}
+
+
+// deinitialize the experiment (call after last run is complete)
+// returns true for success
+bool deinitExperiment() {
+  
+  cout << "deintializing experiment" << endl;
+
+  // set the start time of the experiment
+  experimentTimer.stop();
+
+  // stop info server
+  if(!infoServer.close()) {
+    cerr << "ERROR: could not deinitialize info server" << endl;
+  }
+  else {
+    cout << "stopped the infoserver" << endl;
+  }
+
+  // stop info server
+  if(!scannerInput.close()) {
+    cerr << "ERROR: could not deinitialize scanner input" << endl;
+  }
+  else {
+    cout << "stopped the scanner image listener" << endl;
+  }
+
+  return true;
 }
 
 // initialize and run the backend computation system
-int executeRun(const RtConfigFmriRun &conf) {
+int executeRun(RtConfigFmriRun &conf) {
 
   // make sure only one backend is running at a time
-  if(conductor.isRunning()) {
+  if(conductor != NULL && conductor->isRunning()) {
     cerr << "an instance of the backend computation is already running. can't start another" << endl;
     return 1;
   }
+  else if(conductor != NULL) {
+    delete conductor;
+  }
 
-  conductor.configure(conf);
-  conductor.activate();
+  // reinitialize scanner listener
+  scannerInput.init(conf);
+
+  conductor = new RtConductor();
+
+  // add the inputs and outputs to the conductor
+  conductor->addExistingInput(&scannerInput);
+  conductor->addExistingOutput(&infoServer);
+  conductor->configure(conf);
+
+  conductor->activate();
 
   return 0;
 }
 
-// initialize and run the backend computation system
-int executeRunBlocking(const RtConfigFmriRun &conf) {
+// initialize and run the backend computation system and block
+int executeRunBlocking(RtConfigFmriRun &conf) {
 
   // make sure only one backend is running at a time
-  if(conductor.isRunning()) {
+  if(conductor != NULL && conductor->isRunning()) {
     cerr << "an instance of the backend computation is already running. can't start another" << endl;
     return 1;
   }
+  else if(conductor != NULL) {
+    delete conductor;
+  }
 
-  conductor.configure(conf);
-  conductor.svc();
+  // reinitialize scanner listener
+  scannerInput.init(conf);
+
+  conductor = new RtConductor();
+
+  // add the inputs and outputs to the conductor
+  conductor->addExistingInput(&scannerInput);
+  conductor->addExistingOutput(&infoServer);
+  conductor->configure(conf);
+
+  conductor->svc();
 
   return 0;
 }
@@ -240,14 +310,14 @@ int executeRunBlocking(const RtConfigFmriRun &conf) {
 void printUsage() {
   int w = 15;
 
-  cout << "usage: " << endl <<execName
-       << " [-f conffile | -s confxmlstr]" << endl
-       << endl
-       << "---------------------------------------------" << endl
-       << "some useful flags:" << endl
-       << setiosflags(ios::left)
-       << setw(w) << endl
-       << "---------------------------------------------" << endl;
+  cout << "usage: " << endl << execName
+       << " [-f conffile | -s confxmlstr]"
+       << endl;
+//       << "---------------------------------------------" << endl
+//       << "some useful flags:" << endl
+//       << setiosflags(ios::left)
+//       << setw(w) << endl
+//       << "---------------------------------------------" << endl;
 }
 
 // parse command line args
@@ -257,20 +327,27 @@ bool parseArgs(int argc, char **args) {
   execName = args[0];
 
   // set up short options
-  static const ACE_TCHAR options[] = ACE_TEXT (":f:s:h");
+  static const ACE_TCHAR options[] = ACE_TEXT (":f:c:s:h?");
   ACE_Get_Opt cmdOpts(argc, args, options, 1, 0,
 		      ACE_Get_Opt::PERMUTE_ARGS, 1);
 
   // set up long options
   cmdOpts.long_option("conffile",   'f', ACE_Get_Opt::ARG_REQUIRED);
+  cmdOpts.long_option("conffile",   'c', ACE_Get_Opt::ARG_REQUIRED);
   cmdOpts.long_option("confxmlstr", 's', ACE_Get_Opt::ARG_REQUIRED);
   cmdOpts.long_option("help",       'h', ACE_Get_Opt::NO_ARG);
+  cmdOpts.long_option("help",       '?', ACE_Get_Opt::NO_ARG);
 
   // handle options
   for(int option; (option = cmdOpts ()) != EOF; ) {
+    if(DEBUG_LEVEL & MODERATE) {
+      cout << "-" << (char) option << " " << cmdOpts.opt_arg() << endl;
+    }
+
     switch(option) {
 
     case 'f':
+    case 'c':
       confFilename = cmdOpts.opt_arg();
       break;
 
@@ -279,15 +356,18 @@ bool parseArgs(int argc, char **args) {
       break;
 
     case 'h':
-      printUsage();
-      exit(1);
+    case '?':
+      cout << "here" << endl;
+      return false; // automatically prints usage
 
     case ':':
-      ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("-%c requires an argument\n"),
-          cmdOpts.opt_opt()), -1);
+      cerr << "ERROR: -" << cmdOpts.opt_opt() 
+	   << " requires an argument" << endl;
+      return false;
 
     default:
-      ACE_ERROR_RETURN((LM_ERROR, ACE_TEXT ("Parse error.\n")), -1);
+      cerr << "ERROR: unknown command line parameter: " << option << endl;
+      return false;
     }
   }
 
@@ -296,17 +376,15 @@ bool parseArgs(int argc, char **args) {
     cerr << "ERROR: no configuration specified" << endl;
     return false;
   }
+  else if(DEBUG_LEVEL & BASIC) {
+    cout << "config file is: " << confFilename << endl
+	 << "config str is: " << confXmlStr << endl;
+  }
 
   return true;
 }
 
-
-/* ohinds 2009-02-02
- * added this temporarily. we'll use this main soon....
- */
-#ifndef USE_FRONTEND
-
-// main entry function
+// main entry function 
 int ACE_TMAIN(int argc, char **args) {
   ACE_TRACE(("ACE_TMAIN"));
 
@@ -318,7 +396,7 @@ int ACE_TMAIN(int argc, char **args) {
 
   // initialize experiment
   if(!initExperiment()) {
-    cerr << "ERROR: experiment initialization failed. check your config"
+    cerr << "ERROR: experiment initialization failed. check your config" 
 	 << endl;
     return 1;
   }
@@ -326,8 +404,10 @@ int ACE_TMAIN(int argc, char **args) {
   int result = 0;
 
   // if the gui frontend is being used, give it control
-  if(config.get("gui:disabled")==false) {
+  if(config.isSet("gui:disabled") &&
+     config.get("gui:disabled")==false) { 
 
+#ifdef USE_FRONTEND
     FrApplication application(argc, args);
 
     // Create main view and document of app
@@ -335,36 +415,53 @@ int ACE_TMAIN(int argc, char **args) {
     FrMainDocument* document = new FrMainDocument();
 
     // Create main controller.
-    // It takes care about all the stuff (i.e. init, manage and delete).
     FrMainController controller(mainWindow, document);
     controller.Initialize();
 
+    int result = 0;
     if(!application.exec()){
       result = 1;
     }
+#else
+    cerr << "ERROR: this build does not support the gui frontend" << endl;
+#endif
   }
-  else if(config.get("oldgui:disabled")==false) {
-
-    /* ohinds 2009-02-02
-     * commented because of the #ifdef USE_FRONTEND in
-     * RtdisplayImage.cpp, which we should get rid of
+  else if(config.isSet("oldgui:disabled")
+	  && config.get("oldgui:disabled")==false) { 
+    
+    // start a display
     RtDisplayImage dispImg;
     if(!dispImg.open(config)) {
       cerr << "ERROR: could not open display" << endl;
       result = 1;
     }
-
     result = dispImg.svc();
-    */
+
   }
   else { // just run once in the terminal with the passed config
     RtConfigFmriRun runConf;
     runConf.parseConfigFile(confFilename);
-    conductor.configure(runConf);
-    result = conductor.svc();
+
+
+    conductor = new RtConductor();
+
+    scannerInput.init(runConf);
+
+    conductor->addExistingInput(&scannerInput);
+    conductor->addExistingOutput(&infoServer);
+
+    conductor->configure(runConf);
+    result = conductor->svc();
+  }
+
+  // deinitialize experiment
+  if(!deinitExperiment()) {
+    cerr << "ERROR: experiment deinitialization failed." 
+	 << endl;
+    result = 1;
   }
 
   return result;
 }
 
-#endif
+

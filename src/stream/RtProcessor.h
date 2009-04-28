@@ -28,6 +28,10 @@ public:
 
   //*** initialization routines  ***//
 
+  // initialize stream and prepare to run
+  //  out:
+  //   true (for success) or false
+  bool configure(RtConfig &config);
 
   // adds all modules to the stream
   //  in
@@ -41,6 +45,9 @@ public:
   
 
 protected:
+
+  // pure virtual for validation of component configuration
+  bool validateComponentConfig();
 
   // process a single acquisition
   int process(ACE_Message_Block *mb);

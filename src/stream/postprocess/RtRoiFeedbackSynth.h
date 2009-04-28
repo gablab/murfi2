@@ -9,7 +9,7 @@
 #ifndef RTROIFEEDBACKSYNTH_H
 #define RTROIFEEDBACKSYNTH_H
 
-#include"RtRoi2Feedback.h"
+#include"RtStreamComponent.h"
 
 // scopic alexsid: #define WIN32
 #ifdef WIN32
@@ -21,7 +21,7 @@
 #endif
 
 // class declaration
-class RtRoiFeedbackSynth : public RtRoi2Feedback {
+class RtRoiFeedbackSynth : public RtStreamComponent {
 
 public:
 
@@ -35,6 +35,8 @@ public:
   // destructor
   ~RtRoiFeedbackSynth();
 
+protected:
+
   // process an option
   //  in 
   //   name of the option to process
@@ -43,11 +45,13 @@ public:
 		     const string &text,
 		     const map<string,string> &attrMap);
 
-protected:
+  // validate config
+  bool validateComponentConfig();
 
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
+  unsigned int numTimepoints;
   float mean;
   float sd;
 

@@ -18,23 +18,24 @@
 // returns true for success
 bool initExperiment();
 
+// deinitialize the experiment (call after the last run is complete)
+// returns true for success
+bool deinitExperiment();
+
 // execute a single run of the backend computation system
-int executeRun(const RtConfigFmriRun &conf);
+int executeRun(RtConfigFmriRun &conf);
 
 // execute a single run of the backend computation system and block
-int executeRunBlocking(const RtConfigFmriRun &conf);
+int executeRunBlocking(RtConfigFmriRun &conf);
 
 // get the unique ID number for this study
 unsigned int getExperimentStudyID();
 
 // get the current experiment elapsed time in ms
-time_t getExperimentElapsedTime();
-
-// get the current time in ms since
-time_t getNow();
+double getExperimentElapsedTime();
 
 // get the configuration for this experiment
-RtConfigFmriExperiment &getConfig();
+RtConfigFmriExperiment &getExperimentConfig();
 
 // get the data store for this experiment
 RtDataStore &getDataStore();

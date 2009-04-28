@@ -35,6 +35,9 @@ protected:
   virtual bool processOption(const string &name, const string &text, 
 			     const map<string,string> &attr);
 
+  // make sure we are configured properly
+  bool validateComponentConfig();
+
   // process a single acquisition
   virtual int process(ACE_Message_Block *mb) = 0;
 

@@ -1,19 +1,17 @@
 /******************************************************************************
- * RtImageZScore.h is the header for a class that estimates the
- * instantaneous activation at each voxel in an image using simple z-scores
+ * RtMaskLoad.h is the header for a stream module that loads a mask  
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-09-25
+ * Oliver Hinds <ohinds@mit.edu> 2009-01-31
  *
  *****************************************************************************/
 
-#ifndef RTIMAGEZSCORE_H
-#define RTIMAGEZSCORE_H
+#ifndef RTMASKLOAD_H
+#define RTMASKLOAD_H
 
-#include"RtActivationEstimator.h"
-#include"RtDataImage.h"
+#include"RtStreamComponent.h"
 
 // class declaration
-class RtImageZScore : public RtActivationEstimator {
+class RtMaskLoad : public RtStreamComponent {
 
 public:
 
@@ -22,26 +20,38 @@ public:
   //*** constructors/destructors  ***//
 
   // default constructor
-  RtImageZScore();
+  RtMaskLoad();
 
   // destructor
-  ~RtImageZScore();
+  ~RtMaskLoad();
 
 protected:
 
-  // process a single acquisition
-  virtual int process(ACE_Message_Block *mb);
-
-  // process a configuration option
-  //  in
+  // process an option
+  //  in 
   //   name of the option to process
   //   attr map bettwen attribute names and values
   virtual bool processOption(const string &name, const string &text, 
 			     const map<string,string> &attr);
 
-  // data ids to get the mean and variance images from
-  string meanDataID;
-  string varDataID;
+  // make sure we are configured properly
+  virtual bool validateComponentConfig();
+
+  // process a single acquisition
+  int process(ACE_Message_Block *mb);
+
+  // data members
+  string filename;
+  string roiID;
+  bool align;
+  bool mosaic;
+  bool unmosaic;
+  bool flipLR;
+  bool dynamic;
+  bool save;
+
+  // data
+  RtMaskImage *maskLoad;
 };
 
 #endif

@@ -50,6 +50,7 @@ protected:
   //*** private data members  ***//
 
   string outputID;
+  bool deleteable;
 };
 
 #endif

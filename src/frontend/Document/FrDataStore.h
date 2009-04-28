@@ -3,22 +3,21 @@
 
 
 // Forward declarations
-class RtData;
 class RtDataStore;
 class FrMainDocument;
 
 #include "FrMacro.h"
-#include "RtOutput.h"
+#include "RtDataListener.h"
 #include <vector>
 
 
-class FrDataStore : public RtOutput {
+class FrDataStore : public RtDataListener {
 public:
     FrDataStore(FrMainDocument* document);
     virtual ~FrDataStore();
 
     // Overrides
-    virtual void setData(RtData *data);
+    virtual void notify(const RtDataID &data);
 
     // Properties
     FrGetPropMacro(RtDataStore*, Store);

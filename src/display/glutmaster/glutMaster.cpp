@@ -82,6 +82,11 @@ void GlutMaster::CallBackKeyboardFunc(unsigned char key, int x, int y){
    viewPorts[windowID]->CallBackKeyboardFunc(key, x, y);
 }
 
+void GlutMaster::CallBackMenuFunc(int code){
+   int windowID = glutGetWindow();
+   viewPorts[windowID]->CallBackMenuFunc(code);
+}
+
 void GlutMaster::CallBackMotionFunc(int x, int y){
 
    int windowID = glutGetWindow();
@@ -141,6 +146,7 @@ void GlutMaster::CallGlutCreateWindow(char * setTitle, GlutWindow * glutWindow){
 
    glutTimerFunc(timerPeriod,CallBackTimerFunc,timerVal); 
    glutKeyboardFunc(CallBackKeyboardFunc);
+   glutCreateMenu(CallBackMenuFunc);
    glutSpecialFunc(CallBackSpecialFunc);
    glutMouseFunc(CallBackMouseFunc);
    glutMotionFunc(CallBackMotionFunc);
@@ -152,6 +158,11 @@ void GlutMaster::CallGlutCreateWindow(char * setTitle, GlutWindow * glutWindow){
 void GlutMaster::CallGlutMainLoop(void){
 
    glutMainLoop();
+}
+                              
+void GlutMaster::CallGlutLeaveMainLoop(void){
+
+   glutLeaveMainLoop();
 }
                               
 #ifndef DISABLE_IDLE

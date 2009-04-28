@@ -143,7 +143,7 @@ void FrOrthoView::UpdatePipeline(int point){
     // Get common settings
     FrUpdateParams2 params;
     if(!this->InitUpdateParams(params)) return;
-                        	
+
     // Update pipeline
     switch(point)
     {
@@ -179,7 +179,7 @@ void FrOrthoView::UpdatePipeline(int point){
                 m_LayeredImage[i]->SetCameraSettings(
                     params.ViewSettings->CamSettings[i], 
                     ALL_LAYER_ID);
-
+		// here
                 //m_LayeredImage[i]->UpdateCamera();
             }
         }
@@ -187,6 +187,7 @@ void FrOrthoView::UpdatePipeline(int point){
         // do nothing
         break;
     }
+
 
     // Draw border
     const char* text[] = { "Coronal XZ", "Sagital YZ", "Axial XY" };
@@ -197,8 +198,14 @@ void FrOrthoView::UpdatePipeline(int point){
 
     // redraw scene
     vtkRenderWindow* renWin = GetRenderWindow();
-    if (renWin) renWin->Render();
 
+    // ohinds 2009-04-11
+    // NOTE: here we get hangs and crashes due to thread
+    // synchronization issues when the data comes from the
+    // backend. 
+    // 
+    if (renWin) renWin->Render();
+    
     this->ResetCurrentContext(renWin);
 }
 

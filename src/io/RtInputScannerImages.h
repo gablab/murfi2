@@ -11,6 +11,7 @@
 
 #include"RtInput.h"
 #include"RtConfig.h"
+#include"RtConfigFmriRun.h"
 #include"RtExternalSenderImageInfo.h"
 #include"RtMRIImage.h"
 #include"RtServerSocket.h"
@@ -34,6 +35,10 @@ public:
 
   // set the handler that should receive new data
   //  bool setHandler(ACE_Handler &handler);
+
+  // initialize a series run
+  // call this before each run
+  bool init(RtConfigFmriRun &config);
 
   // close and clean up
   bool close();
@@ -120,6 +125,8 @@ protected:
   // whether to only read moco images
   bool onlyReadMoCo;
 
+  bool print;
+
   // parms for image saving to disk
   bool   saveImagesToFile;
   bool unmosaicInputImages;
@@ -141,6 +148,11 @@ protected:
   bool alignSeries;
   string alignTarget;
 
+  // run specific info
+  bool initialized;
+  unsigned int imageNum;
+  unsigned int numImagesExpected;
+  bool haveRefVol;
 };
 
 #endif

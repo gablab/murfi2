@@ -22,7 +22,7 @@ RtIO::~RtIO() {
 // open and start accepting input
 bool RtIO::open(RtConfig &config) {
   isOpen = true;
-
+  deleteable = false;
   return true;
 }
 

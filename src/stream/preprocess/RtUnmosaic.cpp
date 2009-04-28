@@ -14,12 +14,18 @@ string RtUnmosaic::moduleString(ID_UNMOSAIC);
 // default constructor
 RtUnmosaic::RtUnmosaic() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = ""; // unused
 }
 
 // destructor
 RtUnmosaic::~RtUnmosaic() {
   //cout << "destroyed" << endl;
+}
+
+// validate the configuration
+bool RtUnmosaic::validateComponentConfig() {
+  bool result = true;
+
+  return result;
 }
 
 // process a single acquisition

@@ -41,7 +41,7 @@ public:
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtConfig() {}; 
+  RtConfig() { }; 
 
   // copy constructor (called often)
   RtConfig(const RtConfig &other); 
@@ -79,7 +79,9 @@ public:
   // get an xml node in the config. start searching from a specified node
   //  in
   //   name is a ':' delimited str spcifying a path into the XML configuration
-  //        for example preprocessor:module:name
+  //        for example preprocessor:module:name. an asterisk node name (eg
+  //        'node1:*:node3' works as a wildcard and all children at that
+  //        level will be searched.  WARNING: the first match is returned
   //   node is a xml node to start looking at
   //  out
   //   string representing the value
@@ -92,9 +94,11 @@ public:
   //   true if the var has been set
   bool isSet(const string &name);
 
+  ///// templated sets must be defined in the header :(
+
   // set a parm value
   template<class T>
-  bool set(const string &name, T tval) {
+  bool set(const string &name, const T &tval) {
     string val;
     if(!RtConfigVal::convertToString<T>(val,tval)) {
       return false;
@@ -105,7 +109,7 @@ public:
 
   // set a parm value
   template<class T>
-  bool set(const char *name, T tval) {
+  bool set(const char *name, const T &tval) {
     string s(name);
     return set(s,tval);
   }
@@ -117,7 +121,7 @@ public:
   //   value: the value to set the attribute to
   //   node:  the xml node to start from
   //  out: success or failure
-  bool set(const string name, const string value, TiXmlNode *node);
+  bool set(const string &name, const string &value, TiXmlNode *node);
 
   // print a parm value
   void print(const char *name);
@@ -147,7 +151,7 @@ protected:
   virtual bool validateConfig() = 0;
 
   // no value yet
-  const RtConfigVal unset;
+  static const RtConfigVal unset;
 
   // xml doc with all the config stuff
   TiXmlDocument parms;

@@ -243,6 +243,9 @@ public:
   // initialize to all zeros
   void initToZeros();
 
+  // initialize to all nans
+  void initToNans();
+
   // get dimensions
   vector<int> &getDims();
 
@@ -289,6 +292,9 @@ public:
 
   // set pixel value
   void setPixel(unsigned int i, T v);
+
+  // set element value
+  void setElement(unsigned int i, T v);
 
   // sets the min and max pixel value for this data image
   void setMinMax();
@@ -356,6 +362,16 @@ protected:
 
   // filename to save/load the image to/from
   string filename;
+
+  //// transformations on read
+
+  bool alignOnRead;    // whether to transform this image into series
+		       // reference space before loading it. assumes that
+		       // this image is in study reference space and may
+		       // severly slow down initial loading.
+  bool mosaicOnRead;   // automatically mosaic loaded images 
+  bool unMosaicOnRead; // automatically unmosaic loaded images 
+  bool flipLROnRead;   // automatically flip loaded images along LR axis
 
   // dimensions of the image data
   vector<int> dims;

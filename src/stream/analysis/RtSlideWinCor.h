@@ -12,11 +12,11 @@
 #include<vnl/vnl_matrix.h>
 #include<vector>
 
-#include"RtActivationEstimator.h"
+#include"RtModelFit.h"
 #include"RtDataID.h"
 
 // class declaration
-class RtSlideWinCor : public RtActivationEstimator {
+class RtSlideWinCor : public RtModelFit {
 
 public:
 
@@ -38,11 +38,16 @@ protected:
     // process an option in name of the option to process val  text of the option node
     virtual bool processOption(const string &name, const string &text, const map<string,string> &attr);
 
+    // make sure we are configured properly
+    virtual bool validateComponentConfig();
+
+    // initialize estimation on first image
+    // in
+    //  first acquired image to use as a template for parameter inits
+    //void initEstimation(const RtData &dat, RtMaskImage *mask);
+
     // start a logfile
     virtual void startDumpAlgoVarsFile();
-
-    // if we should reinit
-    bool needsInit;
 
     // condition column
     unsigned int conditionColumn;
@@ -68,6 +73,10 @@ protected:
 
     // store value for stat calculation
     vnl_vector<double> *rs;
+
+    // roi mask 
+    RtMaskImage *mask;
+
 };
 
 #endif /*RTSLIDEWINCOR_*/

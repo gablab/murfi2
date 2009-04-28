@@ -21,6 +21,9 @@
 //#include"RtStreamMessage.h"
 #include"RtConfig.h"
 #include"RtOutput.h"
+#include"util/timer/timer.h"
+
+#include<set>
 
 class RtConductor;
 class RtStreamComponent;
@@ -51,6 +54,11 @@ public:
   //  out:
   //   true (for success) or false
   bool configure(RtConfig &config);
+
+  // whether this stream is still processing
+  //  out:
+  //   true  or false
+  bool isProcessing() { return !openMsgs.empty(); };
 
   // adds all modules to the stream
   //  in
@@ -122,6 +130,9 @@ protected:
 
   // stack of moules to be added
   stack<Module*> addMod;
+
+  // map of messages and the completion status
+  set<ACE_Message_Block*> openMsgs;
 };
 
 

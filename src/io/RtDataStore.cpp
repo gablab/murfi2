@@ -12,7 +12,7 @@ static char *VERSION = "$Id$";
 #define INITIAL_NOTIFY_LIST_LEN 128
 
 RtDataStore::RtDataStore() {
-  outputNotifyList.reserve(INITIAL_NOTIFY_LIST_LEN);
+  notifyList.reserve(INITIAL_NOTIFY_LIST_LEN);
 }
 
 // destructor
@@ -21,8 +21,8 @@ RtDataStore::~RtDataStore() {
 }
 
 // add an output to be notified when new data arrives
-void RtDataStore::addOutputForNotify(RtOutput *out) {
-  outputNotifyList.push_back(out);
+void RtDataStore::addListener(RtDataListener *lis) {
+  notifyList.push_back(lis);
 }
 
 //*** data methods ***//
@@ -30,9 +30,6 @@ void RtDataStore::addOutputForNotify(RtOutput *out) {
 // hand off some data to be output
 void RtDataStore::setData(RtData *data) {
   
-  // set valid data flag to true
-  data->getDataID().setValidDataFlag(true);
-
   mut.acquire();
 
   // put data into datastore with its dataID as the key
@@ -48,9 +45,9 @@ void RtDataStore::setData(RtData *data) {
   //endebug
   
   // notify listeners
-  for(vector<RtOutput*>::iterator i = outputNotifyList.begin();
-      i != outputNotifyList.end(); i++) {
-    (*i)->setData(data);
+  for(vector<RtDataListener*>::iterator i = notifyList.begin();
+      i != notifyList.end(); i++) {
+    (*i)->notify(data->getDataID());
   }
 }
 
@@ -66,7 +63,7 @@ void RtDataStore::setAvailableData(RtDataID dataID) {
 }
 
 // get data by id
-RtData *RtDataStore::getData(RtDataID &dataID) {
+RtData *RtDataStore::getData(const RtDataID &dataID) {
   
   // iterator for map
   map<RtDataID,RtData*,RtDataIDCompare>::const_iterator it;
@@ -82,23 +79,6 @@ RtData *RtDataStore::getData(RtDataID &dataID) {
   mut.release();
 
   return (*it).second;
-}
-
-// get data by direct indexing
-RtData *RtDataStore::getDataFast(RtDataID &dataID) {
-  
-  // get data from store directly
-  mut.acquire();
-  RtData *data = store[dataID];
-  mut.release();
-  
-  // if data is valid, return it
-  if (data->getDataID().getValidDataFlag()) {
-    return data;
-  }
-  else {
-    return NULL;
-  }
 }
 
 // get available data

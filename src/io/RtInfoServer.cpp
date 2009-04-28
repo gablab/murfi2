@@ -20,6 +20,10 @@ RtInfoServer::RtInfoServer() : RtServerSocket() {
 
   lastGoodTriggerTR = -1;
   lastBadTriggerTR = -1;
+
+  posAct = new RtData*[1024];
+  numPos = 1;
+  //negAct.reserve(1000);
 } 
   
 // constructor with port and host
@@ -28,11 +32,14 @@ RtInfoServer::RtInfoServer(unsigned short portNum) : RtServerSocket(portNum) {
 
   lastGoodTriggerTR = -1;
   lastBadTriggerTR = -1;
+
+  posAct = new RtData*[1024];
+  numPos = 1;
 }
 
 // destructor
 RtInfoServer::~RtInfoServer() {
-
+  delete [] posAct;
 }
 
 // set some data
@@ -40,13 +47,17 @@ RtInfoServer::~RtInfoServer() {
 // each tr in an xml document 
 void RtInfoServer::setData(RtData *data) {  
 
+  //  cout << getExperimentConfig().get("infoserver:posActivationDataID").str() << ":" << data->getDataID().getRoiID() << endl;
+
   //cout << "EVENT TRIGGER SETDATA " << data->getDataID() << endl;
-  if(data->getDataID().getDataName() 
-     == getConfig().get("infoserver:posActivationDataID").str()) {
+  if(data->getDataID().getRoiID() 
+     == getExperimentConfig().get("infoserver:posActivationDataID").str()) {
+    //    cout << "!! FOUND pos !!!!!!!!!!!!!!!!!" << endl;
     posAct[data->getDataID().getTimePoint()] = data;
+    numPos++;
   }
-  else if(data->getDataID().getDataName() 
-	  == getConfig().get("infoserver:negActivationDataID").str()) {
+  else if(data->getDataID().getRoiID() 
+     == getExperimentConfig().get("infoserver:negActivationDataID").str()) {
     negAct[data->getDataID().getTimePoint()] = data;
   }
   //else if(data->getDataID().getModuleID() == ID_EVENTTRIGGER) {
@@ -76,6 +87,8 @@ void RtInfoServer::setData(RtData *data) {
 //  stream recieved on
 // out XML string response
 string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
+  cout << message << endl;
+  
   // set up the response
   TiXmlDocument response;
   TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
@@ -143,14 +156,15 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
       TiXmlElement *roiResponse = new TiXmlElement("roi");
       infoResponse->LinkEndChild(roiResponse);
       
-      // check if its pos or neg (MAKE THIS MORE GENERAL: DIRTY HACK)
-      bool pos = (roi->Attribute("id") == "pos");
+      // check if its pos or neg (MAKE THIS MORE GENERAL: DIRTY HACK: ASSHOLE)
+      //      bool pos = (roi->Attribute("id") == getExperimentConfig().get("infoserver:posActivationRoiID").str());
+      bool pos = true;
 
       // set the id
       if(roi->Attribute("id")) {
 	roiResponse->SetAttribute("id", (pos ? 
-					 getConfig().get("infoserver:posActivationRoiID").str()
-					 : getConfig().get("infoserver:negActivationRoiID").str()));
+	      getExperimentConfig().get("infoserver:posActivationRoiID").str()
+	      : getExperimentConfig().get("infoserver:negActivationRoiID").str()));
       }
 
       // find get tags
@@ -172,7 +186,8 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	if(get->Attribute("tr")) {
 	  // check for proper format and get tr
 	  if(!strcmp(get->Attribute("tr"),"last")) {
-	    trStart = posAct.size();
+	    //	    trStart = posAct.size();
+	    trStart = numPos-1;
 	  }
 	  else if(!RtConfigVal::convert<unsigned int>(trStart,
 						 get->Attribute("tr"))) {
@@ -204,7 +219,7 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 
 	  // check for proper format and get trEnd
 	  if(!strcmp(get->Attribute("trEnd"),"last")) {
-	    trEnd = posAct.size();
+	    trEnd = numPos-1;
 	  }
 	  else if(!RtConfigVal::convert<unsigned int>(trEnd,
 						 get->Attribute("trEnd"))) {
@@ -218,10 +233,10 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 
 	}
 	  
-	//cout << trStart << " trend=" << trEnd << " database size=" << database.size() << endl; 
+	cout << trStart << " trend=" << trEnd << " database size=" << numPos-1 << endl; 
 
 	// check range (fix this when database is better)
-	if(trStart < 1 || trEnd > posAct.size()) {
+	if(trStart < 1 || trEnd > numPos-1) {
 	  string errString = "tr range requested is invalid";
 	  cerr << errString << endl;
 	  TiXmlElement *errEl = createErrorElement(errString);
@@ -232,9 +247,10 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	  
 	// get the data as xml (zero vs one based)
 	for(unsigned int tr=trStart; tr <= trEnd; tr++) {
+	  cout << "tr: " << tr << endl;
 	  TiXmlElement *trel = (pos ? 
-				posAct[tr-1]->serializeAsXML()
-				: negAct[tr-1]->serializeAsXML());
+				posAct[tr]->serializeAsXML()
+				: negAct[tr]->serializeAsXML());
 	  trel->SetAttribute("tr",tr);
 	  roiResponse->LinkEndChild(trel);
 	  // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS

@@ -17,13 +17,17 @@ string RtDiff::moduleString(ID_TEMPDIFF);
 // default constructor
 RtDiff::RtDiff() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = NAME_TEMPDIFF_IMG;
 
   last = NULL;
 }
 
 // destructor
 RtDiff::~RtDiff() {}
+
+// validate the configuration
+bool RtDiff::validateComponentConfig() {
+  return true;
+}
 
 // process a single acquisition
 int RtDiff::process(ACE_Message_Block *mb) {
@@ -58,7 +62,7 @@ int RtDiff::process(ACE_Message_Block *mb) {
   RtMRIImage *diff = new RtMRIImage(*img);
 
   diff->getDataID().setFromInputData(*img,*this);
-  diff->getDataID().setDataName(dataName);
+  diff->getDataID().setDataName(NAME_TEMPDIFF_IMG);
 
 
   // compute the absolute difference

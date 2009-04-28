@@ -66,7 +66,7 @@ bool FrResetImageCmd::Execute(){
     }
 
     if(result){
-        mv->GetCurrentView()->UpdatePipeline(FRP_TBC);
+      //mv->GetCurrentView()->UpdatePipeline(FRP_TBC);
     }
     return result;
 }

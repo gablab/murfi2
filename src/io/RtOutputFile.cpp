@@ -8,6 +8,7 @@ static char *VERSION = "$Id$";
 
 
 #include"RtOutputFile.h"
+#include"RtExperiment.h"
 #include<iostream>
 #include<sstream>
 
@@ -30,12 +31,12 @@ bool RtOutputFile::open(RtConfig &config) {
   }
 
   // if logging is off, return
-  if(config.get("info:log:disabled")==true) {
+  if(config.get("study:log:disabled")==true) {
     return true;
   }
   
   // open the file for output
-  string logname = config.get("info:log:filename");
+  string logname = config.get("study:log:filename");
 
   // check the filename
   if(logname.empty()) {
@@ -43,7 +44,7 @@ bool RtOutputFile::open(RtConfig &config) {
   }
   else if(logname.substr(0,1) != "/") {
     stringstream fs;
-    fs << config.get("study:dir") << "/"  << logname;
+    fs << getExperimentConfig().get("study:log:directory") << "/"  << logname;
   
     logname = fs.str();
   }

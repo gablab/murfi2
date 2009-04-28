@@ -472,8 +472,11 @@ void Gnuplot::plot_x(vector<double> d, const string &title)
     //
     // write the data to file
     //
-    for (vector<double>::size_type i = 0; i < d.size(); i++)
+    for (vector<double>::size_type i = 0; i < d.size(); i++) {
+      if(!isnan(d[i])) {
         tmp << d[i] << endl;
+      }
+    }
     tmp.flush();    
     tmp.close();
 
@@ -532,8 +535,11 @@ void Gnuplot::plot_x(vnl_vector<double> d, const string &title)
     //
     // write the data to file
     //
-    for (unsigned int i = 0; i < d.size(); i++)
+    for (unsigned int i = 0; i < d.size(); i++) {
+      if(!isnan(d[i])) {
         tmp << d[i] << endl;
+      }
+    }
     tmp.flush();    
     tmp.close();
 

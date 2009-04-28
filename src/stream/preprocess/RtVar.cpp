@@ -17,7 +17,6 @@ string RtVar::moduleString(ID_TEMPVAR);
 RtVar::RtVar() : RtStreamComponent() {
   numTimePoints = 0;
   componentID = moduleString;
-  dataName = NAME_TEMPVAR_IMG;
 
   meanModuleID = ID_TEMPMEAN;
   meanDataName = NAME_TEMPMEAN_IMG;
@@ -46,6 +45,13 @@ bool RtVar::processOption(const string &name, const string &text,
   }
 
   return RtStreamComponent::processOption(name, text, attrMap);
+}
+
+// validate the configuration
+bool RtVar::validateComponentConfig() {
+  bool result = true;
+  
+  return result;
 }
 
 // process a single acquisition
@@ -106,7 +112,7 @@ int RtVar::process(ACE_Message_Block *mb) {
   // allocate a new data image for the variance
   RtMRIImage *var = new RtMRIImage(*img);
   var->getDataID().setFromInputData(*img,*this);
-  var->getDataID().setDataName(dataName);
+  var->getDataID().setDataName(NAME_TEMPVAR_IMG);
 
   
   // update the mean and variance numerator due to west (1979) for each voxel 

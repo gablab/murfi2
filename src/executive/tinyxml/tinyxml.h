@@ -1035,6 +1035,18 @@ public:
 		return TIXML_SUCCESS;
 	}
 	*/
+	int QueryValueAttribute( const std::string& name, std::string &outValue ) const
+	{
+		const TiXmlAttribute* node = attributeSet.Find( name );
+		if ( !node )
+			return TIXML_NO_ATTRIBUTE;
+
+		std::stringstream sstream( node->ValueStr() );
+		sstream >> outValue;
+		if ( !sstream.fail() )
+			return TIXML_SUCCESS;
+		return TIXML_WRONG_TYPE;
+	}
 	#endif
 
 	/** Sets an attribute of name to a given value. The attribute

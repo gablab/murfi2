@@ -13,6 +13,7 @@
 #define MODERATE ((unsigned int) (1 << 2))
 #define ALLOC    ((unsigned int) (1 << 3))
 #define ADVANCED ((unsigned int) (1 << 4))
+#define TIMER    ((unsigned int) (1 << 5))
 
 //#define DEBUG_LEVEL (TEMP | BASIC | MODERATE | ALLOC | ADVANCED)
 //#define DEBUG_LEVEL (BASIC | ADVANCED)

@@ -245,13 +245,14 @@ bool FrLayeredImage::AddLayer(unsigned long id, LayerType type){
     if(layer){
         // Since special layer is always on so use it
         layer->SetID(id);
-        
+
         FrCameraSettings cs;
         m_SpecialLayer->GetCameraSettings(cs);
         layer->SetCameraSettings(cs);
         
         vtkRenderer* ren = m_SpecialLayer->GetRenderer();
         layer->GetRenderer()->SetViewport(ren->GetViewport());
+
 
         // Add layer to internal collection
         m_Layers.push_back(layer);
@@ -265,6 +266,12 @@ bool FrLayeredImage::AddLayer(unsigned long id, LayerType type){
             this->GetRenderers(rens);
 
             // Add renderer to render window
+
+	    // ohinds 2009-04-11 
+	    //
+	    // NOTE: here we get hangs and crashes due to thread
+	    // synchronization issues when the data comes from the
+	    // backend. 
             rw->AddRenderer(layer->GetRenderer());
             rw->SetNumberOfLayers(int(rens.size()));
         }
@@ -325,52 +332,6 @@ void FrLayeredImage::RemoveLayers(){
         rw->SetNumberOfLayers(1); // i think ??
     }
 }
-// ohinds: 2009-02-23
-// i dont understand this
-//void FrLayeredImage::RemoveColormapLayers(){
-//    // create new vector for non colormap layers
-//    LayersCollection tmpLayers;
-//
-//    LayersCollection::iterator it, itEnd(m_Layers.end());
-//    for(it = m_Layers.begin(); it != itEnd; ++it){
-//        if ((*it)->GetType() != FrBaseLayer::LtColormap){
-//            tmpLayers.push_back(*it);        
-//        }
-//    }
-//    
-//    // clear main layers vector (except roi layers, just erase them from list not delete objects)
-//    //this->RemoveLayers();
-//    while(m_Layers.size() > 0){
-//        FrBaseLayer* layer = (FrBaseLayer*)(*(m_Layers.begin()));
-//        //m_Layers.erase(m_Layers.begin());
-//        if (layer->GetType() == FrBaseLayer::LtColormap)
-//            this->RemoveLayer(layer->GetID());
-//        else
-//            m_Layers.erase(m_Layers.begin());
-//            //layer->Delete();
-//    }
-//
-//    // copy back all layers from temp layer
-//    LayersCollection::iterator itr, itrEnd(tmpLayers.end());
-//    for(itr = tmpLayers.begin(); itr != itrEnd; ++itr){
-//        m_Layers.push_back(*itr);        
-//    }
-//
-//    // clear temp vector
-//    tmpLayers.clear();
-//
-//    vtkRenderWindow* rw = m_SpecialLayer->
-//        GetRenderer()->GetRenderWindow();
-//    
-//    int count = m_Layers.size();
-//
-//    if(rw){
-//        // NOTE: we have 2 layers : default and special
-//        m_ImageLayer->GetRenderer()->SetLayer(1);
-//        m_SpecialLayer->GetRenderer()->SetLayer(1);
-//        rw->SetNumberOfLayers(2+count);
-//    }
-//}
 
 FrBaseLayer* FrLayeredImage::GetLayerByID(unsigned long id){
     LayersCollection::iterator it, itEnd(m_Layers.end());

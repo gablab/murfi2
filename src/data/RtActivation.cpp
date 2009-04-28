@@ -19,10 +19,12 @@ RtActivation::RtActivation() : RtDataImage<double>() {
   ceiling = 50.0;
   bytesPerPix = sizeof(double);
 
+  elType = RT_DOUBLE_TYPE;
+
   scaleIsInverted = false;
 }
 
-// constructor with MRIInfo
+// constructor with data
 RtActivation::RtActivation(RtMRIImage &img) 
   : RtDataImage<double>() {
   ACE_TRACE(("RtMRIImage::RtActivation(RtMRIImage)")); 
@@ -32,6 +34,8 @@ RtActivation::RtActivation(RtMRIImage &img)
   bytesPerPix = sizeof(double);
   threshold = 10.0;
   ceiling = 50.0;
+
+  elType = RT_DOUBLE_TYPE;
 
   scaleIsInverted = false;
 }
@@ -56,6 +60,8 @@ RtActivation::RtActivation(unsigned int numElements)
 
   threshold = 0.0;
   ceiling = 50.0;
+
+  elType = RT_DOUBLE_TYPE;
 
   scaleIsInverted = false;
 }

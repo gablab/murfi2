@@ -124,11 +124,11 @@ bool RtLeastSquaresSolve::include(double *yelems, double *Xrow, double weight) {
       thetabar[i][j] = cbar * thetabar[i][j] + sbar * xk;
     }
 
-//    if(DEBUG_LEVEL & TEMP) {
-//      cerr << "y*y is " << y*y << endl;
-//    }
-
     sserr[i] += weight * y * y;
+
+//    if(DEBUG_LEVEL & TEMP) {
+//      cerr << "sserr is " << sserr[i] << endl;
+//    }
 
     delete xrow;
   }

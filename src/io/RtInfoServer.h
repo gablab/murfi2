@@ -61,8 +61,11 @@ protected:
   // database
   // NOTE: now this only stores activation sums by tr.
   // TODO: reconfigure this to access the data store
-  vector<RtData*> posAct;
-  vector<RtData*> negAct;
+  RtData** posAct;
+  RtData** negAct;
+
+  unsigned int numPos;
+  unsigned int numNeg;
 
   // the last good trigger time
   int lastGoodTriggerTR;

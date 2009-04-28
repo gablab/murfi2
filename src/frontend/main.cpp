@@ -1,3 +1,8 @@
+/* ohinds: 2009-03-18
+ * added 
+ */
+#if 0
+
 #include "FrApplication.h"
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
@@ -78,3 +83,5 @@ int ACE_TMAIN(int argc, char **argv){
 
     return result;
 }
+
+#endif

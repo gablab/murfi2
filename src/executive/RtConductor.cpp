@@ -12,8 +12,7 @@ static char *VERSION = "$Id$";
 #include"RtInputSynth.h"
 #include<iostream>
 
-
-// constructor with command line args
+// constructor with config
 RtConductor::RtConductor(const RtConfigFmriRun &_config) : ACE_Task_Base(), 
 							   configured(false),
 							   running(false) {
@@ -42,17 +41,6 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
 
   // prepare inputs
 
-  if(config.isSet("scanner:disabled")
-     && config.get("scanner:disabled")==false) {
-    RtInputScannerImages *scanimg;
-    ACE_NEW_NORETURN(scanimg, RtInputScannerImages);
-
-    if(!addInput(scanimg)) {
-      cerr << "ERROR: could not add scanner input" << endl;
-      return false;
-    }
-  }
-
   // attach code numbers to inputs
   curCodeNum = START_CODE_INPUTS;
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end();
@@ -62,10 +50,10 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
   }
 
   // prepare outputs
-  if(config.get("info:log:disabled")==false) {
+  if(config.get("study:log:disabled")==false) {
     if(!outputLog.open(config)) {
       cerr << "ERROR: could not open logfile \""
-	   << config.get("info:log:logFilename") << "\"" << endl;
+	   << config.get("study:log:filename") << "\"" << endl;
     }
   }
 
@@ -103,13 +91,17 @@ void RtConductor::deconfigure() {
 
   // tell everyone that we're done and delete them
   for(vector<RtInput*>::iterator i=inputs.begin(); i != inputs.end(); i++) {
-    (*i)->close();
-    delete (*i);
+    if((*i)->isDeleteable()) {
+      (*i)->close();
+      delete (*i);
+    }
   }
 
   for(vector<RtOutput*>::iterator o=outputs.begin(); o != outputs.end(); o++){
-    (*o)->close();
-    delete (*o);
+    if((*o)->isDeleteable()) {
+      (*o)->close();
+      delete (*o);
+    }
   }
 
   configured = false;
@@ -148,10 +140,29 @@ bool RtConductor::addInput(RtInput *in) {
     cerr << "WARNING: failed to add input: " << in->getID() << endl;
     return false;
   }
+  else {
+    in->setActivatable(true);
+    in->setDeleteable(true);
+  }
   
   inputs.push_back(in);
   cout << "added input: " << in->getID() << endl;
   
+  return true;
+}
+
+// adds input mode that has already been configured
+//  in:
+//   out: input object
+//  out:
+//   true (for success) or false
+bool RtConductor::addExistingInput(RtInput *in) {
+  ACE_TRACE(("RtConductor::addInput"));
+
+  inputs.push_back(in);
+
+  cout << "added input: " << in->getID() << endl;
+
   return true;
 }
 
@@ -183,6 +194,25 @@ bool RtConductor::addOutput(RtOutput *out) {
     cerr << "WARNING: failed to add output: " << out->getID() << endl;
     return false;
   }
+  else {
+    out->setDeleteable(true);
+  }
+
+  outputs.push_back(out);
+
+  cout << "added output: " << out->getID() << endl;
+
+  return true;
+}
+
+
+// adds output mode that has already been configured
+//  in:
+//   out: output object
+//  out:
+//   true (for success) or false
+bool RtConductor::addExistingOutput(RtOutput *out) {
+  ACE_TRACE(("RtConductor::addOutput"));
 
   outputs.push_back(out);
 
@@ -227,24 +257,32 @@ int RtConductor::svc() {
  
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
-    (*i)->activate();
+    if((*i)->isActivatable()) {
+      (*i)->activate();
+    }
   }
  
   running = true;
+  while(running) { usleep(10000); }
 
   // wait for all threads to complete
-  for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
-    (*i)->wait();
-  }
+//  for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
+//    (*i)->wait();
+//  }
+//
+//  running = false;
 
-  running = false;
+  cout << "conductor waiting for stream to complete processing...";
+  while(stream.isProcessing()) {
+    sleep(10000);
+  }
+  cout << "done" << endl;
+
 
   // print end time to log file
   outputLog << "done running at ";
   outputLog.printNow();
   outputLog << "\n";
-
-  cout << "done" << endl;
 
   deconfigure();
 
@@ -256,7 +294,11 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
   ACE_TRACE(("RtConductor::receiveCode"));
 
   // handle based on the thrower
-  if(code == START_CODE_STREAM) { // stream component has data
+  if(code == SHUTDOWN) {
+    cout << "shutdown signal " << code << " received" << endl;
+    running = false;
+  }
+  else if(code == START_CODE_STREAM) { // stream component has data
     //cout << "caught data " << data << " available signal from a stream component" << endl;
 
     // make data available to all output processes
@@ -268,7 +310,7 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     return;
   }
   else if(code < START_CODE_OUTPUTS) { // this is an input
-    //cout << "caught a ready signal from an input " << endl;
+    //cout << "caught data " << data << " as input to the stream" << endl;
 
     // let the stream decide if it should spawn a new processing instance 
     stream.setInput(code,data);
@@ -280,9 +322,6 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
 
     // dont need to do much here
   }
-
-  // unset configured so that reconfig is necessary to rerun
-  configured = false;
 }
 
 // write to the log file

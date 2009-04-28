@@ -14,14 +14,6 @@ string RtRoiDifference::moduleString(ID_ROIDIFFERENCE);
 // default constructor
 RtRoiDifference::RtRoiDifference() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = NAME_ROIVAL;
-
-  posRoiModuleID = ID_ROIMEAN2FEEDBACK;
-  negRoiModuleID = ID_ROIMEAN2FEEDBACK;
-  posRoiDataName = NAME_ROIVAL;
-  negRoiDataName = NAME_ROIVAL;
-  posRoiRoiID = "active";
-  negRoiRoiID = "deactive";
 }
 
 // destructor
@@ -63,6 +55,43 @@ bool RtRoiDifference::processOption(const string &name,
 
   return RtStreamComponent::processOption(name,text,attrMap);
 }  
+
+// validate config
+bool RtRoiDifference::validateComponentConfig() {
+  bool result = true;
+
+  if(posRoiModuleID.empty()) {
+    cout << "ERROR: posRoiModuleID must be set to compute an roi difference" << endl;
+    result = false;
+  }
+
+  if(negRoiModuleID.empty()) {
+    cout << "ERROR: negRoiModuleID must be set to compute an roi difference" << endl;
+    result = false;
+  }
+
+  if(posRoiDataName.empty()) {
+    cout << "ERROR: posRoiDataName must be set to compute an roi difference" << endl;
+    result = false;
+  }
+
+  if(negRoiDataName.empty()) {
+    cout << "ERROR: negRoiDataName must be set to compute an roi difference" << endl;
+    result = false;
+  }
+
+  if(posRoiRoiID.empty()) {
+    cout << "ERROR: posRoiRoiID must be set to compute an roi difference" << endl;
+    result = false;
+  }
+
+  if(negRoiRoiID.empty()) {
+    cout << "ERROR: negRoiRoiID must be set to compute an roi difference" << endl;
+    result = false;
+  }
+
+  return result;
+}
 
 // process a single acquisition
 int RtRoiDifference::process(ACE_Message_Block *mb) {
@@ -106,8 +135,8 @@ int RtRoiDifference::process(ACE_Message_Block *mb) {
 
   // setup the data id
   diff->getDataID().setFromInputData(*posact,*this);
-  diff->getDataID().setDataName(dataName);
-  diff->getDataID().setRoiID(roiID);
+  diff->getDataID().setDataName(NAME_ROIDIFF);
+  diff->getDataID().setRoiID(posRoiRoiID + "-" + negRoiRoiID);
   
 
   // compute the difference

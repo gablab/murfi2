@@ -12,6 +12,9 @@
 #include"RtMRIImage.h"
 #include"RtActivation.h"
 
+#include<vector>
+using namespace std;
+
 class RtActivation;
 
 // class declaration
@@ -60,7 +63,7 @@ public:
   unsigned int initByMeanIntensityThreshold(RtActivation &img, double threshold);
 
   // set the info based on an activation's image info
-  // NOTE: will change mask geometry must match the img
+  // NOTE: will change mask geometry to match the img
   // in:
   //  img:    image to build mask from
   void setInfo(RtActivation &img);
@@ -77,11 +80,13 @@ public:
   void setAll(short val);
 
   // compute the number of "on" voxels
-  void computeNumberOfOnVoxels();
+  void updateOnVoxelIndices();
+
+  // get the indices of "on" voxels
+  vector<unsigned int> getOnVoxelIndices() const;
 
   // get the number of "on" voxels
   unsigned int getNumberOfOnVoxels() const;
-
 
   // read the image from a file
   //  in
@@ -92,8 +97,8 @@ public:
 
 protected:
 
-  // number of "on" voxels
-  unsigned int numOnVoxels;
+  // "on" voxel indices
+  vector<unsigned int> onIndices;
 };
 
 

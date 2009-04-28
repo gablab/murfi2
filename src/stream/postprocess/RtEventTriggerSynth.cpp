@@ -42,6 +42,13 @@ bool RtEventTriggerSynth::processOption(const string &name,
   return RtEventTrigger::processOption(name, text, attrMap);
 }  
 
+// validate the configuration
+bool RtEventTriggerSynth::validateComponentConfig() {
+  bool result = true;
+  
+  return RtEventTrigger::validateComponentConfig() && result;
+}
+
 // process a single acquisition
 int RtEventTriggerSynth::process(ACE_Message_Block *mb) {  
   ACE_TRACE(("RtEventTriggerSynth::process"));

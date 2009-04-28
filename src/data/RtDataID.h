@@ -9,10 +9,8 @@
 #define RTDATAID_H
 
 #include<ctime>
-#include<limits>
-
-static const unsigned int DATAID_UNSET_VALUE
-  = std::numeric_limits<unsigned int>::max();
+#include<climits>
+#define DATAID_UNSET_VALUE UINT_MAX
 
 
 #include<ostream>
@@ -36,8 +34,7 @@ public:
              const string &_history = "",
              const string &_moduleID = "",
              const string &_dataName = "",
-             const string &_roiID = "",
-             bool _validData = false);
+             const string &_roiID = "");
 
     // constructor from a data id from a previous module
     RtDataID(RtDataID &prevModuleData,
@@ -102,9 +99,6 @@ public:
     time_t       getInstantiationTime() const {
         return instantiationTime;
     }
-    bool         getValidDataFlag()     const {
-        return validDataFlag;
-    }
 
     //*** sets ***//
     void setSiteIDNum(unsigned int n) {
@@ -131,9 +125,6 @@ public:
     void setRoiID(string s)           {
         roiID = s;
     }
-    void setValidDataFlag(bool b)     {
-        validDataFlag = b;
-    }
 
 protected:
 
@@ -147,7 +138,6 @@ protected:
     string        dataName;         // name indicating the particular data kind
     string        roiID;            // if this was processed on a particular ROI
     time_t        instantiationTime;// time this data was first constructed
-    bool          validDataFlag;    // whether object has actual data
 };
 
 // comparison class for storing ids in a map (see RtDataStore.h)

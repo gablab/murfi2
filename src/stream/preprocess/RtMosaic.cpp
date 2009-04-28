@@ -14,12 +14,19 @@ string RtMosaic::moduleString(ID_MOSAIC);
 // default constructor
 RtMosaic::RtMosaic() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = ""; // not used
 }
 
 // destructor
 RtMosaic::~RtMosaic() {
   //cout << "destroyed" << endl;
+}
+
+// validate the configuration
+bool RtMosaic::validateComponentConfig() {
+  bool result = true;
+
+  
+  return result;
 }
 
 // process a single acquisition
@@ -48,6 +55,11 @@ int RtMosaic::process(ACE_Message_Block *mb) {
   //mosaic->addToID("mosaic");
 
   setResult(msg,mosaic);
+
+  if(print) {
+    cout << "RtMosaic: done at tr " 
+	 << img->getDataID().getTimePoint() << endl;
+  }
 
   return 0;
 }

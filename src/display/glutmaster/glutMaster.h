@@ -14,6 +14,7 @@
 #define __GLUT_MASTER_H__
 
 #include <GL/glut.h>
+#include <GL/freeglut.h>
 #include "glutWindow.h"
 
 // comment this out to make idling possible (but it'll eat all your cycles)
@@ -32,6 +33,7 @@ private:
 #endif
 
    static void CallBackTimerFunc(int val); 
+   static void CallBackMenuFunc(int code);
    static void CallBackKeyboardFunc(unsigned char key, int x, int y);
    static void CallBackMotionFunc(int x, int y);
    static void CallBackMouseFunc(int button, int state, int x, int y);
@@ -58,6 +60,7 @@ public:
     
    void CallGlutCreateWindow(char * setTitle, GlutWindow * glutWindow);
    void CallGlutMainLoop(void);
+   void CallGlutLeaveMainLoop(void);
 
 #ifndef DISABLE_IDLE
    void DisableIdleFunction(void);

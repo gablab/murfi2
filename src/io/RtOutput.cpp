@@ -47,7 +47,8 @@ void RtOutput::addToID(string add) {
 string RtOutput::getID() {
   return outputID;
 }
-  
+ 
+
 // gets the version
 //  out:
 //   cvs version string for this class

@@ -12,21 +12,17 @@
 string RtIncrementalGLM::moduleString(ID_INCREMENTALGLM);
 
 // default constructor
-RtIncrementalGLM::RtIncrementalGLM() : RtActivationEstimator() {
+RtIncrementalGLM::RtIncrementalGLM() : RtModelFit(), 
+				       numSolvers(0),
+				       solvers (NULL) {
   componentID = moduleString;
-  dataName = NAME_INCREMENTALGLM_TSTAT;
-
-  needsInit = true;
-
-  solvers = NULL; 
-  numData = 0;
 }
 
 // destructor
 RtIncrementalGLM::~RtIncrementalGLM() {
   // delete all solvers
   if(solvers != NULL) {
-    for(unsigned int i = 0; i < numData; i++) {
+    for(unsigned int i = 0; i < numSolvers; i++) {
       if(solvers[i] != NULL) {
 	delete solvers[i];
       }
@@ -43,12 +39,48 @@ bool RtIncrementalGLM::processOption(const string &name, const string &text,
 				     const map<string,string> &attrMap) {
   // look for known options
 
-  return RtActivationEstimator::processOption(name, text, attrMap);
+  return RtModelFit::processOption(name, text, attrMap);
 }  
+
+// validate the configuration
+bool RtIncrementalGLM::validateComponentConfig() {
+  bool result = true;
+  
+  return RtModelFit::validateComponentConfig() && result;
+}
+
+
+// initialize the estimation algorithm for a particular image size
+// in
+//  first acquired image to use as a template for parameter inits
+void RtIncrementalGLM::initEstimation(const RtData &dat, 
+				      RtMaskImage *mask) {
+
+  if(mask) { // set the number of solvers (one per voxel)
+    numSolvers = mask->getNumberOfOnVoxels();
+  }
+  else {
+    numSolvers = dat.getNumEl();
+  }
+
+  // allocate solvers
+  solvers = new RtLeastSquaresSolve*[numSolvers];
+  for(unsigned int i = 0; i < numSolvers; i++) {
+    solvers[i] = new RtLeastSquaresSolve(design.getNumColumns());
+  }
+
+  RtModelFit::initEstimation(dat, mask);
+}
+
 
 // process a single acquisition
 int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   ACE_TRACE(("RtIncrementalGLM::process"));
+
+  timer tim;
+  if(printTiming) {
+    tim.start();
+  }
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
@@ -56,178 +88,150 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   RtMRIImage *dat = (RtMRIImage*)msg->getCurrentData();
 
   if(dat == NULL) {
-    cout << "RtIncrementalGLM::process: data passed is NULL" << endl;
+    cerr << "RtIncrementalGLM::process: data passed is NULL" << endl;
 
-    ACE_DEBUG((LM_INFO, "RtIncrementalGLM:process: data passed is NULL\n"));
+    if(logOutput) {
+      stringstream logs("");
+      logs << "RtIncrementalGLM::process: data passed is NULL" << endl;
+      log(logs);
+    }
+
     return 0;
   }
 
-  numTimepoints++;
+  RtMaskImage *mask = getMaskFromMessage(*msg);
+
+  if(mask == NULL) {
+    cerr << "RtIncrementalGLM::process: mask is NULL" << endl;
+
+    if(logOutput) {
+      stringstream logs("");
+      logs << "RtIncrementalGLM::process: mask is NULL at tr " 
+	   << dat->getDataID().getTimePoint() << endl;
+      log(logs);
+    }
+
+    return 0;
+  }
+
+  design.updateAtTr(dat->getDataID().getTimePoint()-1);
 
   // initialize the computation if necessary
   if(needsInit) {
-
-    // get the number of datapoints we must process
-    numData = dat->getNumEl();
-
-    // build the mask image
-    initEstimation(*dat);
-
-    // set up the solvers
-    solvers = new RtLeastSquaresSolve*[numData];
-    for(unsigned int i = 0; i < numData; i++) {
-      solvers[i] = new RtLeastSquaresSolve(numTrends+numConditions);
-    }
-
-    needsInit = false;
+    // initialize parent and solvers
+    initEstimation(*dat, mask);
   }
 
-  // validate sizes
-  if(dat->getNumEl() != numData) {
-    ACE_DEBUG((LM_INFO, "RtIncrementalGLM::process: new data has wrong number of elements\n"));
-    return -1;    
-  }
-
-  // allocate a new data image for the estimation
-  RtActivation *est = new RtActivation(*dat);
-
-  // setup the data id
-  est->getDataID().setFromInputData(*dat,*this);
-  est->getDataID().setDataName(dataName);
-  est->getDataID().setRoiID(roiID);
-
-  est->initToZeros();
-
-  if(numTimepoints > numTrends+1) {
-    est->setThreshold(getTStatThreshold(numTimepoints-numTrends-1));
-    cout << "t thresh: " << est->getThreshold() << " (p=" 
-	 << getProbThreshold() << ")" << endl;
-  }
-
-  // allocate a new data images for the betas
-  RtActivation **betas = new RtActivation*[numConditions];
-  for(unsigned int i = 0; i < numConditions; i++) {
-    betas[i] = new RtActivation(*dat);
+  // allocate a data images for the betas and residuals
+  RtActivation **betas = new RtActivation*[design.getNumColumns()];
+  for(unsigned int b = 0; b < design.getNumColumns(); b++) {
+    betas[b] = new RtActivation(*dat);
 
     // setup the data id
-    betas[i]->getDataID().setFromInputData(*dat,*this);
-    betas[i]->getDataID().setDataName(string(NAME_INCREMENTALGLM_BETA)+"_"+conditionNames[i]);
-
-    betas[i]->initToZeros();
+    betas[b]->getDataID().setFromInputData(*dat,*this);
+    betas[b]->getDataID().setDataName(string(NAME_BETA)
+				      + "_" + 
+				      design.getColumnName(b));
+    betas[b]->getDataID().setRoiID(mask->getDataID().getRoiID());
+    betas[b]->initToNans();
   }
 
-  // residual sum of squares map
-  RtActivation *res = new RtActivation(*dat);
+  RtActivation *residual = new RtActivation(*dat);
   // setup the data id
-  res->getDataID().setFromInputData(*dat,*this);
-  res->getDataID().setDataName(NAME_INCREMENTALGLM_RESIDUAL);
-  res->initToZeros();
+  residual->getDataID().setFromInputData(*dat,*this);
+  residual->getDataID().setDataName(NAME_RESIDUAL_MSE);
+  residual->getDataID().setRoiID(mask->getDataID().getRoiID());  
+  residual->initToNans();
 
 
   //// element independent setup
   
-  // build a design matrix xrow
-  double *Xrow = new double[numConditions+numTrends];
-  for(unsigned int i = 0; i < numTrends; i++) {
-    Xrow[i] = nuisance.get(numTimepoints-1,i);
-  }
-  for(unsigned int i = 0; i < numConditions; i++) {
-    Xrow[i+numTrends] = conditions.get(numTimepoints-1,i);
-  }
+  // get this design matrix row
+  vnl_vector<double> row = design.getRow(dat->getDataID().getTimePoint()-1);
 
-  //// compute t map for each element
-  for(unsigned int i = 0; i < dat->getNumEl(); i++) {
-    if(!mask.getPixel(i)) {
-      for(unsigned int j = 0; j < numConditions; j++) {
-        // SCOPIC couldn't compile that in MS VS
-          // getting error C2124: divide or mod by zero
-	    // betas[j]->setPixel(i,0.0/0.0); // nan
+  //// include this timepoint for each voxel
+  vector<unsigned int> inds = mask->getOnVoxelIndices();
+  unsigned int curSolver = 0;
+  for(vector<unsigned int>::iterator it = inds.begin(); it != inds.end(); 
+      it++, curSolver++) {
+
+    double y = dat->getElement(*it);
+    solvers[curSolver]->include(&y,row.data_block(),1.0);
+
+    // provide betas only after the number of trends has been passed
+    if(dat->getDataID().getTimePoint() > design.getMaxTrendOrder()) {
+      double *beta = solvers[curSolver]->regress(0);
+
+      // save beta and res
+      for(unsigned int j = 0; j < design.getNumColumns(); j++) {
+	betas[j]->setPixel(*it,beta[j]);
       }
-      //res->setPixel(i, 0.0/0.0);
+      residual->setPixel(*it, solvers[curSolver]->getTotalSquaredError(0));
 
-      est->setPixel(i,0.0);
-      continue;
-    }
-
-    double y = dat->getElement(i);
-    solvers[i]->include(&y,Xrow,1.0);
-
-    if(numTimepoints > numTrends+1) {
-      double *beta = solvers[i]->regress(0);
-      double *columnSEs = solvers[i]->getSquaredError(0);
-//      double se = sqrt((solvers[i]->getTotalSquaredError(0)
-//			/(numTimepoints-numTrends))
-//		       /columnSEs[numTrends]);
-
-      // save beta and res and stat
-      for(unsigned int j = 0; j < numConditions; j++) {
-	betas[j]->setPixel(i,beta[j]);
+      if(dumpAlgoVars && dat->getDataID().getTimePoint() > 2) {
+	dumpFile 
+	  << dat->getDataID().getTimePoint() << " " 
+	  << *it << " " 
+	  << y << " "
+	  << row[0] << " "
+	  << residual->getPixel(*it) << " ";
+	for(int b = 0; b < design.getNumColumns(); b++) {
+	  dumpFile << beta[b] << " ";
+	}
+	dumpFile << endl;
       }
-      res->setPixel(i, 
-	     sqrt(solvers[i]->getTotalSquaredError(0)/(numTimepoints-1)));
-
-      est->setPixel(i,
-		    beta[numTrends]*sqrt(columnSEs[numTrends]
-			 * (numTimepoints-numTrends)/(double)numTimepoints
-			 / solvers[i]->getTotalSquaredError(0)));
-
-      //cout << est->getPixel(i) << endl;
-      //est->setPixel(i, beta[numTrends]/se);
-
-      delete columnSEs;
+	  
+      
       delete beta;
     }
-
+    
   }  
-//  cout << endl;
 
-  delete Xrow;
-
-  for(unsigned int j = 0; j < numConditions; j++) {
+  // pass our results out
+  for(unsigned int j = 0; j < design.getNumColumns(); j++) {
     setResult(msg,betas[j]);
   }
-  setResult(msg,res);
-  setResult(msg,est);
+  setResult(msg,residual);
 
-  // test if this is the last measurement for mask conversion and saving
-  if(numTimepoints == numMeas && saveTVol) {
-    cout << "saving t vol to " << saveTVolFilename << endl;
 
-    if(unmosaicTVol) {
-      est->unmosaic();
-    }
-
-    est->write(saveTVolFilename);
-
-    if(unmosaicTVol) {
-      est->mosaic();
-    }
-    
+  if(printTiming) {
+    tim.stop();
+    cout << "RtIncrementalGLM process at tr " 
+	 << dat->getDataID().getTimePoint()
+	 << " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
   }
-  if(numTimepoints == numMeas && savePosResultAsMask) {
-    RtMaskImage *activationMask = est->toMask(POS);
 
-    if(unmosaicPosMask) {
-      activationMask->unmosaic();
-    }
-
-    activationMask->setFilename(savePosAsMaskFilename);
-    activationMask->save();
+  if(print) {
+    cout << "RtIncrementalGLM: done at tr " 
+	 << dat->getDataID().getTimePoint() << endl;
   }
-  if(numTimepoints == numMeas && saveNegResultAsMask) {
-    RtMaskImage *activationMask = est->toMask(NEG);
 
-    if(unmosaicNegMask) {
-      activationMask->unmosaic();
-    }
-
-    activationMask->setFilename(saveNegAsMaskFilename);
-    activationMask->save();
+  if(logOutput) {
+    stringstream logs("");
+    logs << "RtIncrementalGLM: done at tr " 
+	 << dat->getDataID().getTimePoint() << endl;
+    log(logs);
   }
 
   return 0;
 }
 
+// start a logfile 
+void RtIncrementalGLM::startDumpAlgoVarsFile() {
+  dumpFile << "started at ";
+  printNow(dumpFile);
+  dumpFile << endl
+	   << "time_point "
+	   << "voxel_index "
+	   << "voxel_intensity "
+	   << "regressor "
+	   << "residual ";
+  for(int b = 0; b < design.getNumColumns(); b++) {
+    dumpFile << "beta[" << b << "] ";
+  }
+
+  dumpFile << "end" << endl;  
+}
 
 /*****************************************************************************
  * $Source$

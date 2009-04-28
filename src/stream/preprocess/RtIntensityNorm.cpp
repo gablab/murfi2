@@ -15,23 +15,9 @@
 
 string RtIntensityNorm::moduleString(ID_SPATIALINTENSITYNORM);
 
-#define DEFAULT_BET_PARMS "-f 0.5 -g 0 -n -m"
-#define DEFAULT_MASK_FILENAME "mask/brain_mask.nii"
-
 // default constructor
 RtIntensityNorm::RtIntensityNorm() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = NAME_SPATIALINTENSITYNORM_IMG;
-
-  meanIntensity = fmod(1.0,0.0); // assign nan
-
-  makeBETMask = false;
-  computingMask = false;
-  betParms = DEFAULT_BET_PARMS;
-  maskFilename = DEFAULT_MASK_FILENAME;
-
-  maskIntensityThreshold = 0.7;
-
 }
 
 // destructor
@@ -47,32 +33,37 @@ bool RtIntensityNorm::processOption(const string &name, const string &text,
 				      const map<string,string> &attrMap) {
 
   // look for known options
-  if(name == "maskFilename") {
-    maskFilename = text;
+  if(name == "maskRoiID") {
+    maskRoiID = text;
     return true; 
-  }
-  if(name == "betMask") {
-    return RtConfigVal::convert<bool>(makeBETMask,text);
-  }
-  if(name == "betParms") {
-    betParms = text;
-    return true;
   }
 
   return RtStreamComponent::processOption(name, text, attrMap);
 }
 
+// validate the configuration
+bool RtIntensityNorm::validateComponentConfig() {
+  bool result = true;
+
+  if(maskRoiID == "") {
+    cerr << "ERROR: maskRoiID must be set to do intensity normalization" << endl;
+    result = false;
+  }
+  
+  return result;
+}
+
 // process a single acquisition
 int RtIntensityNorm::process(ACE_Message_Block *mb) {
-  static bool needsInit = true; 
   double sum = 0;
   
   ACE_TRACE(("RtIntensityNorm::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
-  // get the current image to operate on
+  // get the current image and mask to operate on
   RtMRIImage *img = (RtMRIImage*) msg->getCurrentData();
+  RtMaskImage *mask = getMaskFromMessage(*msg);
 
   if(img == NULL) {
     cout << "RtIntensityNorm::process: image passed is NULL" << endl;
@@ -81,65 +72,25 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  // look for first image, compute ROI and mean intensity
+  if(mask == NULL) {
+    cout << "RtIntensityNorm::process: mask is NULL" << endl;
+    return 0;
+  }
+
+  // look for first image, compute mean intensity to norm further images by
   if(needsInit) {
     ACE_DEBUG((LM_DEBUG, "intensity normalization found first image\n"));
-
-    mask.setFilename(maskFilename);
-
-    // if we are getting a brain mask from bet write the first image and
-    // wait for bet to finish before we read it back in and continue
-    if(makeBETMask) {
-      if(!computingMask) {
-	// execute commands to make the mask
-	maskJobID = RtFSLInterface::makeBrainMask(
-	        getConfig().getSeriesRefVolFilename(
-				    img->getDataID().getSeriesNum()), 
-		mask.getFilename(),
-		betParms);
-	
-	computingMask = true;
-
-	return 0;
-      }
-      else if(computingMask 
-	      && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_FINISHED) {
-
-	computingMask = false;
-	mask.load();
-	mask.computeNumberOfOnVoxels();
-	//mask.mosaic();
-	//	  mask.setFilename("/tmp/mosaic_mask.nii");
-	//	  mask.write("/tmp/mosaic_mask.nii");
-      }
-      else if(computingMask 
-	      && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_ERROR) {	
-	computingMask = false;
-	cerr << "RtIntensityNorm: error computing brain mask. guessing by threshold" << endl;
-	mask.initByMeanIntensityThreshold(*img, maskIntensityThreshold);
-      }
-      else {
-	cerr << "not done computing mask..." << endl;
-	return 0;
-      }
-    }
-    else {
-      mask.initByMeanIntensityThreshold(*img, maskIntensityThreshold);
-    }
-
+    
     // iterate over pixels accumulating intensity
-    sum = 0;
+    double sum = 0;
     for(unsigned int i = 0; i < img->getNumPix(); i++) {
-      if(mask.getPixel(i)) {
+      if(mask->getPixel(i)) {
 	sum += img->getPixel(i);
       }
     }
 
     // store the average intensity in mask
-    meanIntensity = sum/mask.getNumberOfOnVoxels();
-
-    cout << "found mean intensity of " << meanIntensity << "=" 
-	 << sum << "/" << mask.getNumberOfOnVoxels() << endl;
+    meanIntensity = sum/mask->getNumberOfOnVoxels();
 
     needsInit = false;
   }
@@ -152,20 +103,20 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   // iterate over pixels accumulating intensity
   sum = 0;
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
-    if(mask.getPixel(i)) {
+    if(mask->getPixel(i)) {
       sum += img->getPixel(i);
     }
   }
 
   // norm factor
   short intensityDiff 
-    = (short) rint(sum/mask.getNumberOfOnVoxels() - meanIntensity);
+    = (short) rint(sum/mask->getNumberOfOnVoxels() - meanIntensity);
   
   // allocate a new data image for normalized image
   RtMRIImage *inorm = new RtMRIImage(*img);
   
   inorm->getDataID().setFromInputData(*img,*this);
-  inorm->getDataID().setDataName(dataName);
+  inorm->getDataID().setDataName(NAME_SPATIALINTENSITYNORM_IMG);
 
   // subtract the difference for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {

@@ -38,7 +38,10 @@ protected:
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
-  // idss for the activation sums
+  // make sure we are configured properly
+  bool validateComponentConfig();
+
+  // ids for the activation sums
   string posActivationSumModuleID;
   string negActivationSumModuleID;
   string posActivationSumDataName;

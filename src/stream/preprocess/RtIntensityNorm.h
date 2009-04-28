@@ -12,9 +12,8 @@
 
 #include"RtStreamComponent.h"
 #include"RtMaskImage.h"
+#include"RtMRIImage.h"
 #include"RtDataImage.h"
-
-#include"RtFSLInterface.h"
 
 #include <float.h>
 #include "add_functions.h"
@@ -45,9 +44,15 @@ public:
 
 protected:
 
+  // make sure we are configured properly
+  bool validateComponentConfig();
+
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
+  // initialize processing
+  bool initINorm(RtMRIImage *img);
+  
   // process an option
   //  in 
   //   name of the option to process
@@ -55,20 +60,6 @@ protected:
   virtual bool processOption(const string &name, const string &text, 
 			     const map<string,string> &attr);
 
-  // which voxels to normalize
-  RtMaskImage mask;
-  string maskFilename;
-  double maskIntensityThreshold;
-
-  // methods for making the mask
-
-  // use fsl BET for brain mask
-  bool makeBETMask;  // default
-  bool computingMask;
-  FslJobID maskJobID;
-  string betParms;
-  
-  // dont use bet
   double meanIntensity; // intensity to normalize to
 };
 

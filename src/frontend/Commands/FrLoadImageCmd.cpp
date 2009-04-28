@@ -75,16 +75,17 @@ bool FrLoadImageCmd::Execute(){
 	    // than one file
 	    img->getDataID().setSeriesNum(series);
 	    img->getDataID().setTimePoint(timePoint);
+	    img->getDataID().setDataName((*itr).toStdString());
 
 	    if(timePoint == 0) {
-	      FrTabSettingsDocObj* tabSets = md->GetCurrentTabSettings();
-	      FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType(), img->getDataID(), (*itr));
+//	      FrTabSettingsDocObj* tabSets = md->GetCurrentTabSettings();
+//	      FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType(), img->getDataID(), (*itr));
+//	      md->Add(imgLayer);
 
 	      result = true;
 	      voxInds[0] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL] = img->getDim(DEF_CORONAL)/2;
 	      voxInds[1] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL] = img->getDim(DEF_SAGITAL)/2;
 	      voxInds[2] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL] = img->getDim(DEF_AXIAL)/2;
-	      md->Add(imgLayer);
 	    }
 	    timePoint++;
 

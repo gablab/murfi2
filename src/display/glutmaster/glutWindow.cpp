@@ -40,6 +40,11 @@ void GlutWindow::CallBackKeyboardFunc(unsigned char key, int x, int y){
   //key; x; y;                //dummy function
 }
 
+void GlutWindow::CallBackMenuFunc(int code){
+
+  //code;                     //dummy function
+}
+
 void GlutWindow::CallBackMotionFunc(int x, int y){
 
   //x; y;                     //dummy function

@@ -19,6 +19,8 @@ static char *VERSION = "$Id$";
 #include<sstream>
 #include<cstdlib>
 
+const RtConfigVal RtConfig::unset;
+
 //*** constructors/destructors  ***//
 
 // copy constructor (called often)
@@ -39,6 +41,8 @@ RtConfig::~RtConfig() {
 bool RtConfig::parseConfigFile(const string &filename) {
   ACE_TRACE(("RtConfig::parseConfigFile"));
 
+  setDefaults();
+
   // try to read file
   if(!parms.LoadFile(filename)) {
     cout << parms.ErrorDesc() << endl;
@@ -47,13 +51,15 @@ bool RtConfig::parseConfigFile(const string &filename) {
     return false;
   }
 
-  return true;
+  return validateConfig();
 }
 
 // parse xml config string
 //  out: true (success) or false
 bool RtConfig::parseConfigStr(const string &xml) {
   ACE_TRACE(("RtConfig::parseConfigStr"));
+
+  setDefaults();
 
   // try to parse string
   parms.Parse(xml.c_str());
@@ -63,7 +69,8 @@ bool RtConfig::parseConfigStr(const string &xml) {
     parms.ClearError();
     return false;
   }
-  return true;
+
+  return validateConfig();
 }
 
 //*** config get/set parms ***/
@@ -104,7 +111,7 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
   size_t delind = name.find(':');
 
   string childName(name.substr(0,delind));
-  string rest;
+  string rest, optionName;
   if(delind == string::npos) { // found no more delim cases, try to return val
     const char *val;
 
@@ -115,9 +122,22 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
 
     // search children for text elements to return
     TiXmlNode *text = 0;
+
+    // find either a node with the child name or an "option" with the right
+    // "name" attribute
     while((text = elmt->IterateChildren(childName, text))) {
       if(text->Type() == TiXmlNode::TEXT) {
 	return RtConfigVal(text->ValueStr());
+      }
+    }
+
+    while((text = elmt->IterateChildren("option", text))) {
+      if(text->ToElement() != NULL 
+	 && TIXML_SUCCESS 
+	   == text->ToElement()->QueryValueAttribute("name",&optionName)
+	 && optionName == childName) {
+	
+	return RtConfigVal(text->ToElement()->GetText());
       }
     }
 
@@ -137,7 +157,7 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     rest = name.substr(delind+1);
   }
 
-  // look for child with name
+  // look for child with name or "option" child with correct "name" attribute
   TiXmlNode *child = 0;
   while((child = elmt->IterateChildren(childName, child))) {
     string val = get(rest,child);
@@ -145,6 +165,20 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     // FIGURE OUT WHAT TO DO IF WE'RE EMPTY (COULD MEAN TO BE EMPTY)
     if(!val.empty()) {
       return RtConfigVal(val);
+    }
+  }
+
+  while((child = elmt->IterateChildren("option", child))) {
+    if(child->ToElement() != NULL 
+       && TIXML_SUCCESS 
+         == child->ToElement()->QueryValueAttribute("name",&optionName)
+       && optionName == childName) {
+      string val = get(rest,child);
+	
+      // FIGURE OUT WHAT TO DO IF WE'RE EMPTY (COULD MEAN TO BE EMPTY)
+      if(!val.empty()) {
+	return RtConfigVal(val);
+      }
     }
   }
 
@@ -210,8 +244,12 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
   }
 
   // look though each child with name, return the first non NULL
+  bool searchAllChildren = (childName == "*"); 
   TiXmlNode *child = 0;
-  while((child = elmt->IterateChildren(childName, child))) {
+  while((child = (searchAllChildren 
+		  ? elmt->IterateChildren(child)
+		  : elmt->IterateChildren(childName, child)
+		  ))) {
     TiXmlNode *ret = getNode(rest,child);
     if(ret != NULL) {
       return ret;
@@ -238,7 +276,7 @@ bool RtConfig::isSet(const string &name) {
 //   value: the value to set the attribute to
 //   node:  the xml node to start from
 //  out: success or failure
-bool RtConfig::set(const string name, const string value,
+bool RtConfig::set(const string &name, const string &value,
 		      TiXmlNode *node) {
   if(node == NULL) {
     return "";
@@ -261,6 +299,7 @@ bool RtConfig::set(const string name, const string value,
     }
 
     return true; // termination condition
+
   }
 
   // find the node with the next name piece
@@ -272,6 +311,7 @@ bool RtConfig::set(const string name, const string value,
 
   if(child == NULL) {
     child = new TiXmlElement(nextNode);
+    node->LinkEndChild(child);
   }
 
   // recursive set

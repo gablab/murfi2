@@ -50,7 +50,6 @@ static const unsigned int DEFAULT_INFOSERVERPORT(15001);
 // copy constructor (called often)
 RtConfigFmriExperiment::RtConfigFmriExperiment(const RtConfigFmriExperiment &other) 
   : RtConfig(other) {
-  
 }
 
 // set default config info
@@ -195,6 +194,11 @@ bool RtConfigFmriExperiment::validateConfig() {
     }
   }
 
+  // set the default volume fileStem if its not been set
+  string volumeFileStem;
+  if(!isSet("study:volumeFileStem")) { // not set, make default
+    set("study:volumeFileStem",DEFAULT_VOLUMEFILESTEM);
+  }
   
   // filenames
 
@@ -238,6 +242,15 @@ bool RtConfigFmriExperiment::validateConfig() {
 
 //******* computed values must have special functions
 
+// get the filename for the series reference volume
+string RtConfigFmriExperiment::getSeriesRefVolFilename(unsigned int series) {
+  stringstream ss;
+  ss << "series" << series << "_ref." << get("study:volumeFormat").str();
+
+  path seriesFile(get("info:xfm:directory").filepath() / ss.str());
+  return seriesFile.string();
+}
+
 // get the filename for the transformation file that takes the
 // experiment reference volume into the space of the current series
 string RtConfigFmriExperiment::getSeriesXfmFilename(unsigned int series) {
@@ -265,13 +278,14 @@ string RtConfigFmriExperiment::getSeriesXfmOutputFilename(unsigned int series,
   return input;
 }
 
-// get the filename for the epi volume that is the reference space
-// for a single series
-string RtConfigFmriExperiment::getSeriesRefVolFilename(unsigned int series) {
+// get the filename for the mask volume for a single series
+string RtConfigFmriExperiment::getSeriesMaskFilename(unsigned int series,
+						     string roiID) {
   stringstream ss;
-  ss << "series" << series << "_ref" << get("study:volumeFormat").str();
+  ss << "series" << series << "_" << roiID << "." 
+     << get("study:volumeFormat").str();
   
-  path p(get("study:xfm:directory").filepath() / ss.str());
+  path p(get("study:maskDir").filepath() / ss.str());
   return p.string();
 }
 
@@ -299,7 +313,7 @@ string RtConfigFmriExperiment::getVolFilename(int _seriesNum,int _timepoint) {
 	 / (get("study:volumeFileStem").str()
 	    + "-" + srnum 
 	    + "-" + acnum 
-	    + "." + get("study:volFormat").str()));
+	    + "." + get("study:volumeFormat").str()));
 
   return p.string();
 }

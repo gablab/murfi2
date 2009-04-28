@@ -8,12 +8,13 @@
 #ifndef RTDISPLAYIMAGE_H
 #define RTDISPLAYIMAGE_H
 
+#include"RtConfigFmriExperiment.h"
+#include"RtConfigFmriRun.h"
 #include"RtDataImage.h"
 #include"RtMRIImage.h"
 #include"RtMaskImage.h"
 #include"RtActivation.h"
-#include"RtOutput.h"
-#include"RtConfig.h"
+#include"RtDataListener.h"
 #include"glutmaster/glutWindow.h"
 #include"glutmaster/glutMaster.h"
 
@@ -22,8 +23,11 @@
 #include "add_functions.h"
 
 // class declaration
-class RtDisplayImage : public RtOutput, 
-  public GlutWindow, public ACE_Task_Base, public ACE_Service_Handler {
+class RtDisplayImage 
+  : public GlutWindow, 
+    public RtDataListener, 
+    public ACE_Task_Base, 
+    public ACE_Service_Handler {
 
 public:
 
@@ -60,11 +64,14 @@ public:
   // initialize the display
   bool init();
 
+  // prepare the display for a single run
+  bool prepareRun(RtConfig &config);
+
   // sets the window running
   virtual int svc();
 
-  // sets the image to be displayed
-  void setData(RtData *_img);
+  // notification that new data is available
+  void notify(const RtDataID &id);
 
   // makes a texture from the image data and prepares it for display
   void makeTexture();
@@ -79,12 +86,16 @@ public:
   void makeNegMaskTexture();
 
   // callbacks for opengl
+  void action(int code);
   void CallBackDisplayFunc(void);
   void CallBackReshapeFunc(int w, int h);   
   void CallBackTimerFunc(int, int);
   void CallBackKeyboardFunc(unsigned char key, int x, int y);
+  void CallBackMenuFunc(int code);
 
 protected:
+
+  bool initialized;
 
   GlutMaster glutMaster;
 
@@ -111,6 +122,9 @@ protected:
 
   RtActivation *posOverlay;
   RtActivation *negOverlay;
+  double threshold; // for stat display
+  double thresholdModAmount;
+
   GLuint imageTex;
   int imageW, imageH;
   GLuint posOverlayTex;

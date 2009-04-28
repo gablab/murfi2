@@ -41,7 +41,7 @@
 static int thr;
 
 // Implementation of FrMainController
-FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc, RtConductor* conductor)
+FrMainController::FrMainController(FrMainWindow* view, FrMainDocument* doc)
 : m_MainView(view), m_MainDocument(doc), m_ToolController(0){
 
     m_ToolController = new FrToolController(this);    

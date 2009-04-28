@@ -207,6 +207,10 @@ void FrImageSettingsWidget::OnUpdate(){
     FrImageDocObj* imgDO = (FrImageDocObj*)images[0];
     mri = imgDO->GetTimePointData(imgDO->GetLastTimePoint());   // any timepoint is good
     
+    if(mri == NULL) {
+      return;
+    }
+
     int xDim = mri->getDim(0)-1;
     int yDim = mri->getDim(1)-1;
     int zDim = mri->getDim(2)-1;

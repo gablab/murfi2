@@ -11,6 +11,7 @@
 
 
 #include"RtConfig.h"
+#include"RtConfigFmriExperiment.h"
 
 // class declaration
 class RtConfigFmriRun : public RtConfig {
@@ -20,7 +21,9 @@ public:
   //*** constructors/destructors  ***//
   
   // default constructor
-  RtConfigFmriRun() : RtConfig() {};
+  RtConfigFmriRun() : RtConfig() {
+    
+  };
 
   // copy constructor (called often)
   RtConfigFmriRun(const RtConfigFmriRun &other) : RtConfig(other) {};

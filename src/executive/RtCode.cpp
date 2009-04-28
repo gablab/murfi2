@@ -48,6 +48,11 @@ void RtCode::sendCode(RtData *data) {
     return;
   }
 
+  if(data == NULL) {
+    conductor->receiveCode(SHUTDOWN,NULL);
+    return;
+  }
+
   conductor->receiveCode(codeNum,data);
 }
 

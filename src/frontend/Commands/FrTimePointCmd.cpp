@@ -59,13 +59,10 @@ bool FrTimePointCmd::SetLastTimePoint(){
         }
     }
 
-    // ohinds 2009-02-28
-    // dont know what image docs are for yet
-//    FrImageDocObj* imgDO = this->GetImageObject();
-//    if(imgDO != 0){
-
-    //m_TimePoint = imgDO->GetLastTimePoint();
-	//    }
+    FrImageDocObj* imgDO = this->GetImageObject();
+    if(imgDO != 0){
+      m_TimePoint = imgDO->GetLastTimePoint();
+    }
     return this->SetUserDefinedTimePoint();
 }
 
@@ -91,47 +88,50 @@ bool FrTimePointCmd::SetUserDefinedTimePoint(){
     if(m_TimePoint == BAD_TIME_POINT) return false;
     
     // Check if specified timepoint exists
-//    FrImageDocObj* imgDO = this->GetImageObject();
-//    if(imgDO == 0 || imgDO->GetTimePointData(m_TimePoint) == 0){
-//
-//        return false;
-//    }
+    FrImageDocObj* imgDO = this->GetImageObject();
+    if(imgDO == 0 || imgDO->GetTimePointData(m_TimePoint) == 0){
+
+        return false;
+    }
 
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrViewDocObj* viewDO = doc->GetCurrentViewObject();
     viewDO->SetTimePoint(m_TimePoint);
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
-    mv->GetGraphPaneWidget()->UpdateTimePoint();
 
-//    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+    mv->GetGraphPaneWidget()->UpdateTimePoint();
+    
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
 
     return true;
 }
 
-//FrImageDocObj* FrTimePointCmd::GetImageObject(){
-//    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-//
-//    // NOTE: use the only one image for now
-//    FrImageDocObj* imgDO = 0;
-//    std::vector<FrDocumentObj*> images;
-//    doc->GetObjectsByType(images, FrDocumentObj::ImageObject);
-//    
-//    int id = doc->GetCurrentViewObject()->GetID();
-//
-//    std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
-//    for(it = images.begin(); it != itEnd; ++it){
-//
-//        FrImageDocObj* img = (FrImageDocObj*)(*it);
-//        if(img->GetSeriesNumber() == id){
-//
-//            imgDO = img;
-//            break;
-//        }
-//    }
-//    
-//    return imgDO;
-//}
+FrImageDocObj* FrTimePointCmd::GetImageObject(){
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    // NOTE: use the only one image for now
+    FrImageDocObj* imgDO = 0;
+    std::vector<FrDocumentObj*> images;
+    doc->GetObjectsByType(images, FrDocumentObj::ImageObject);
+    
+    unsigned long id = doc->GetCurrentViewObject()->GetActiveLayerID();
+
+    std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
+    for(it = images.begin(); it != itEnd; ++it){
+
+        FrImageDocObj* img = (FrImageDocObj*)(*it);
+	// ohinds: 2009-04-10
+	// does this matter?
+        //if(img->GetDataID().getSeriesNum() == id){
+
+            imgDO = img;
+            break;
+	    //}
+    }
+    
+    return imgDO;
+}
 
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now

@@ -21,6 +21,8 @@ RtMRIImage::RtMRIImage() : RtDataImage<short>() {
 
   dataID.setModuleID("mri");
 
+  elType = RT_SHORT_TYPE;
+
   magicNumber = MAGIC_NUMBER;
 
 //  // init motion parms
@@ -56,6 +58,8 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   ACE_TRACE(("RtMRIImage::RtMRIImage(RtExternalImageInfo,short*)"));
 
   magicNumber = MAGIC_NUMBER;
+
+  elType = RT_SHORT_TYPE;
 
   setInfo(extinfo);
 
@@ -96,6 +100,8 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
 RtMRIImage::RtMRIImage(RtMRIImage &img) {
   ACE_TRACE(("RtMRIImage::RtMRIImage(RtMRIImage)"));
   
+  elType = RT_SHORT_TYPE;
+
   (*this) = img;
 
   magicNumber = MAGIC_NUMBER;

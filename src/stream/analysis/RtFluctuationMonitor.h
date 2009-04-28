@@ -13,16 +13,14 @@
 #include<vnl/vnl_vector.h>
 #include<vnl/vnl_matrix.h>
 
-#include"RtActivationEstimator.h"
+#include"RtIncrementalGLM.h"
 #include"RtOutput.h"
-
-#include"RtLeastSquaresSolve.h"
 
 #include<vector>
 using namespace std;
 
 // class declaration
-class RtFluctuationMonitor : public RtActivationEstimator {
+class RtFluctuationMonitor : public RtIncrementalGLM {
 
 public:
 
@@ -54,21 +52,16 @@ protected:
   virtual bool processOption(const string &name, const string &text, 
 			     const map<string,string> &attr);
 
+  // make sure we are configured properly
+  bool validateComponentConfig();
+
   // start a logfile 
   virtual void startDumpAlgoVarsFile();
 
-  // build a row of the design matrix
-  // in
-  //  timepoint to build the row from 
-  virtual double *getDesignMatrixRow(unsigned int timepoint);
-
   //// parameters of the activation estimation algorithm
 
-  // number of data points to process
-  unsigned int numData;
-
-  // one solver for each voxel 
-  RtLeastSquaresSolve **solvers;
+  // number of timepoints
+  unsigned int numTimepoints; // so far
 
   // store the per pixel sum of squared error
   RtActivation *absEstErrSum;

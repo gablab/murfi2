@@ -17,6 +17,8 @@
 #include<string>
 #include"tinyxml/tinyxml.h"
 
+#include"RtTypes.h"
+
 //#include"RtLocker.h"
 
 using namespace std;
@@ -41,33 +43,19 @@ public:
   //   id string
   RtDataID &getDataID();
 
-  // get the roiID
-  //  string getRoiID() const;
-
-  // append to the id string for this data
-  //  in
-  //   string to append to the id
-//  void addToID(string &s);
-//
-//  // append to the id string for this data
-//  //  in
-//  //   string to append to the id
-//  void addToID(char *s);
+  // gets the id string for this data without modification
+  //  out
+  //   id string
+  RtDataID getDataID() const;
 
   // set the id string
   void setDataID(const RtDataID &id);
 
-  // set the roiID
-  //  void setRoiID(const string &id);
-
-  // get if we should delete this data after stream processing (not persistent)
-  bool getPersistent() const;
-
-  // get if we should delete this data after stream processing (not persistent)
-  void setPersistent(bool p);
-
   // get the number of elements in this datatype
   unsigned int getNumEl() const;
+
+  // get the underlying datatype this data stores
+  RtElementType getElementType() const { return elType; }
 
   // serialize the data as xml for transmission or saving to a file
   virtual TiXmlElement *serializeAsXML() = 0;
@@ -79,18 +67,12 @@ protected:
 
   //*** data members  ***//
 
-  // old id stuff
-  //string dataID;     // data type id
-  //string roiID;  // roi id
-  //
-  //ACE_Date_Time creationTime;
-
   RtDataID dataID;
-
-  bool persistent;
 
   // number of distinct elements of data 
   unsigned int numEl;
+
+  RtElementType elType;
 
 };
 

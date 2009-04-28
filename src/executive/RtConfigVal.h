@@ -142,6 +142,9 @@ public:
     if(s == "true") {
       iss.str("1");
     }
+    else if(s == "false") {
+      iss.str("0");
+    }
 
     return !(iss >> dec >> t).fail();
   }

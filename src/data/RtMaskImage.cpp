@@ -23,7 +23,6 @@ RtMaskImage::RtMaskImage() : RtDataImage<short>() {
 
   magicNumber = MAGIC_NUMBER;
   bytesPerPix = sizeof(short);
-  numOnVoxels = 0;
 }
 
 // destructor
@@ -45,8 +44,6 @@ RtMaskImage::RtMaskImage(RtMaskImage &img) {
   imgDataLen = numPix*sizeof(short);
   memcpy(data, img.data, imgDataLen);
   bytesPerPix = sizeof(short);
-
-  numOnVoxels = 0;
 }
 
 
@@ -62,8 +59,6 @@ RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold)
 
   magicNumber = MAGIC_NUMBER;
   bytesPerPix = sizeof(short);
-
-  numOnVoxels = 0;
 
   setInfo(img);
 
@@ -89,8 +84,6 @@ RtMaskImage::RtMaskImage(RtActivation &img, double threshold)
 
   setInfo(img);
 
-  numOnVoxels = 0;
-
   // build mask if threshold is specified
   if(fabs(threshold) > EPS) {
     initByMeanIntensityThreshold(img,threshold);
@@ -111,7 +104,7 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtMRIImage &image,
     setInfo(image);
   }
 
-  numOnVoxels = 0;
+  onIndices.clear();
 
   // first compute the mean voxel intensity
   double mean = 0;
@@ -127,14 +120,14 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtMRIImage &image,
   for(unsigned int i = 0; i < image.getNumEl(); i++) {
     if(image.getElement(i) > maskThresh) {
       setPixel(i,1);
-      numOnVoxels++;
+      onIndices.push_back(i);
     }
     else {
       setPixel(i,0);
     }
   }
   
-  return numOnVoxels;
+  return onIndices.size();
 }
 
 // initialize mask by mean intensity threshold of another image
@@ -150,7 +143,7 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtActivation &image,
     setInfo(image);
   }
 
-  numOnVoxels = 0;
+  onIndices.clear();
 
   // first compute the mean voxel intensity
   double mean = 0;
@@ -166,27 +159,32 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtActivation &image,
   for(unsigned int i = 0; i < image.getNumEl(); i++) {
     if(image.getElement(i) > maskThresh) {
       setPixel(i,1);
-      numOnVoxels++;
+      onIndices.push_back(i);
     }
     else {
       setPixel(i,0);
     }
   }
   
-  return numOnVoxels;
+  return onIndices.size();
 }
 
 // get the number of "on" voxels
 unsigned int RtMaskImage::getNumberOfOnVoxels() const {
-  return numOnVoxels;
+  return onIndices.size();
+}
+
+// get the indices of "on" voxels
+vector<unsigned int> RtMaskImage::getOnVoxelIndices() const {
+  return onIndices;
 }
 
 // set the number of "on" voxels
-void RtMaskImage::computeNumberOfOnVoxels() {
-  numOnVoxels = 0;
+void RtMaskImage::updateOnVoxelIndices() {
+  onIndices.clear();
   for(unsigned int i = 0; i < getNumEl(); i++) {
     if(getElement(i)) {
-      numOnVoxels++;
+      onIndices.push_back(i);
     }
   }  
 }
@@ -198,7 +196,8 @@ void RtMaskImage::computeNumberOfOnVoxels() {
 //   success or failure
 bool RtMaskImage::read(const string &_filename) {
   bool ret = RtDataImage<short>::read(_filename);
-  computeNumberOfOnVoxels();
+  updateOnVoxelIndices();
+
   return ret;
 }
 

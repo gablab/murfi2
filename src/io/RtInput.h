@@ -28,6 +28,12 @@ public:
 
   // destructor
   virtual ~RtInput();
+  
+  // set the activatable property
+  void setActivatable(bool _activatable) { activatable = _activatable; }
+
+  // get the activatable property
+  bool isActivatable() { return activatable; }
 
   // opens an io object and initialize it
   //  out:
@@ -60,6 +66,7 @@ protected:
   //sigc::signal<void, RtData&> callback;
   
   string inputID;
+  bool activatable;
 
 };
 

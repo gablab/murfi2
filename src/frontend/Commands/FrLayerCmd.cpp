@@ -81,7 +81,7 @@ bool FrLayerCmd::AddLayer(){
         
 	// ohinds 2009-02-27
 	// there is no image data yet when we are adding the layer
-	// FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
+	//FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
         result = true;
     }
     else if(m_DocObj->IsRoi()){

@@ -19,7 +19,7 @@ OS=linux
 PROJECT = festr
 
 # whether to compile with the frontend gui
-FRONTEND = 1
+FRONTEND = 0
 
 # directories 
 export SRC_DIR = $(PWD)/src

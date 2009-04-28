@@ -16,10 +16,10 @@ string RtEventTriggerActivationDiff::moduleString(ID_EVENTTRIGGER_ACTIVATIONDIFF
 // default constructor
 RtEventTriggerActivationDiff::RtEventTriggerActivationDiff() : RtEventTrigger() {
 
-  posActivationSumModuleID = ID_ROIMEAN2FEEDBACK;
-  negActivationSumModuleID = ID_ROIMEAN2FEEDBACK;
-  posActivationSumDataName = NAME_ROIVAL;
-  negActivationSumDataName = NAME_ROIVAL;
+  posActivationSumModuleID = ID_ROICOMBINE;
+  negActivationSumModuleID = ID_ROICOMBINE;
+  posActivationSumDataName = NAME_ROIMEAN;
+  negActivationSumDataName = NAME_ROIMEAN;
 
   componentID = moduleString;
   diffThresh = 1.0;
@@ -57,6 +57,13 @@ bool RtEventTriggerActivationDiff::processOption(const string &name,
 
   return RtEventTrigger::processOption(name, text, attrMap);
 }  
+
+// validate the configuration
+bool RtEventTriggerActivationDiff::validateComponentConfig() {
+  bool result = true;
+  
+  return result;
+}
 
 // process a single acquisition
 int RtEventTriggerActivationDiff::process(ACE_Message_Block *mb) {  

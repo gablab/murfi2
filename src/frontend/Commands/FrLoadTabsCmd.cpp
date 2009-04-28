@@ -353,8 +353,6 @@ bool FrLoadTabsCmd::LoadLayeredImageSettings(QDomElement& elem,
 //    mlSets->ID = DEFAULT_LAYER_ID;
 
 
-    // ohinds 2009-02-25
-    // what is going on here??
     if(!imageElem.hasAttribute(FR_XML_NAME_ATTR)) return false;
     mlSets->Name = imageElem.attribute(FR_XML_NAME_ATTR);
     //if(mlSets->Name != QString(DEF_LAYER_NAME)) return false;

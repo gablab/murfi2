@@ -39,7 +39,7 @@ private:
     bool SetPreviousTimePoint();
     bool SetUserDefinedTimePoint();
 
-    //FrImageDocObj* GetImageObject();
+    FrImageDocObj* GetImageObject();
 };
 
 #endif

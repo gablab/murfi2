@@ -12,7 +12,7 @@
 string RtSlideWinCor::moduleString("slidewincor");
 
 // default constructor
-RtSlideWinCor::RtSlideWinCor() : RtActivationEstimator() {
+RtSlideWinCor::RtSlideWinCor() : RtModelFit() {
     componentID = moduleString;
 
     needsInit = true;
@@ -72,7 +72,14 @@ bool RtSlideWinCor::processOption(const string &name, const string &text, const 
         return RtConfigVal::convert<unsigned int>(windowLen,text);
     }
 
-    return RtActivationEstimator::processOption(name, text, attrMap);
+    return RtModelFit::processOption(name, text, attrMap);
+}
+
+// validate the configuration
+bool RtSlideWinCor::validateComponentConfig() {
+  bool result = true;
+  
+  return result;
 }
 
 // process a single acquisition
@@ -84,6 +91,8 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
     // get the current image to operate on
     RtMRIImage *dat = (RtMRIImage*)msg->getCurrentData();
 
+    RtMaskImage *mask = getMaskFromMessage(*msg);
+
     if(dat == NULL) {
         cout << "RtSlideWinCor::process: data passed is NULL" << endl;
 
@@ -91,11 +100,13 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
         return 0;
     }
 
+    unsigned int timePoint = dat->getDataID().getTimePoint();
+
     // set current acquisition into data (requires RtData cast)
     getDataStore().setData(static_cast<RtData*>(dat));
 
     // increment number of time points
-    numTimepoints++;
+    //numTimepoints++;
 
     // initialize the computation if necessary
     if(needsInit) {
@@ -121,10 +132,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
         rs = new vnl_vector<double>(windowLen);
         rs->fill(0.0);
 
-        // build the mask image
-        initEstimation(*dat);
-
-        needsInit = false;
+        initEstimation(*dat, mask);
     }
 
     //ACE_DEBUG((LM_DEBUG, "including image %d in the sliding window correlation estimate\n", 
@@ -140,38 +148,40 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
     // TODO perhaps make a function so this can grow more nicely
     RtActivation *cor   = new RtActivation(*dat);
     cor->getDataID().setFromInputData(*dat,*this);
-    cor->getDataID().setDataName(NAME_SLIDEWINCOR_COR);
-    cor->getDataID().setRoiID(roiID);
+    cor->getDataID().setDataName(NAME_CORRELATION);
+    cor->getDataID().setRoiID(mask->getDataID().getRoiID());
 
     RtActivation *beta1 = new RtActivation(*dat);
     beta1->getDataID().setFromInputData(*dat,*this);
-    beta1->getDataID().setDataName(NAME_SLIDEWINCOR_BETA_MEAN);
-    beta1->getDataID().setRoiID(roiID);
+    beta1->getDataID().setDataName(NAME_BETA_MEAN);
+    beta1->getDataID().setRoiID(mask->getDataID().getRoiID());
 
     RtActivation *beta2 = new RtActivation(*dat);
     beta2->getDataID().setFromInputData(*dat,*this);
-    beta2->getDataID().setDataName(NAME_SLIDEWINCOR_BETA_ACT);
-    beta2->getDataID().setRoiID(roiID);
+    beta2->getDataID().setDataName(NAME_BETA_ACT);
+    beta2->getDataID().setRoiID(mask->getDataID().getRoiID());
 
     RtActivation *stat = new RtActivation(*dat);
     stat->getDataID().setFromInputData(*dat,*this);
-    stat->getDataID().setDataName(NAME_SLIDEWINCOR_STAT);
-    stat->getDataID().setRoiID(roiID);
+    stat->getDataID().setDataName(NAME_STAT);
+    stat->getDataID().setRoiID(mask->getDataID().getRoiID());
 
     cor->initToZeros();
     beta1->initToZeros();
     beta2->initToZeros();
     stat->initToZeros();
-    if(numTimepoints > numTrends+1) {
-        cor->setThreshold(getTStatThreshold(1));
-        beta1->setThreshold(getTStatThreshold(1));
-        beta2->setThreshold(getTStatThreshold(1));
-        stat->setThreshold(getTStatThreshold(1));
-    }
+    // ohinds: 2009-02-13
+    // haven't got a good scheme for thresholding yet
+//    if(numTimepoints > numTrends+1) {
+//        cor->setThreshold(getTStatThreshold(1));
+//        beta1->setThreshold(getTStatThreshold(1));
+//        beta2->setThreshold(getTStatThreshold(1));
+//        stat->setThreshold(getTStatThreshold(1));
+//    }
     // end allocation
 
     // set up indexing variables
-    unsigned int newIndex = numTimepoints-1, oldIndex = 0;
+    unsigned int newIndex = timePoint-1, oldIndex = 0;
     unsigned int N = newIndex;
 
     // initialize h for correlation calculation
@@ -181,22 +191,25 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
     RtDataID tempDataID = dat->getDataID();
 
     // get current timepoint
-    unsigned int timePoint = tempDataID.getTimePoint();
+    // unsigned int timePoint = tempDataID.getTimePoint();
 
     // Accumulation phase. Use numTimepoints here to get the current number of data sets in window (N in pseudocode)
     if(N < windowLen) {
-        rNew = conditions.get(newIndex,conditionColumn);
+      // ohinds: 2009-02-13
+      // had to changethis to come from design matrix
+        //rNew = conditions.get(newIndex,conditionColumn);
+        rNew = design.getColumn(conditionColumn).get(newIndex);
         rWindow->put(newIndex,rNew);  // store a window's length of reg vector
 
         b = b + rNew;
         d = d + rNew*rNew;
 
         // fm for stat calculation TODO this will spit out NaN until numerator is positive
-        double fm = sqrt(((double)numTimepoints-(double)L-1.0)/(double)numTimepoints);
+        double fm = sqrt(((double)timePoint-(double)L-1.0)/(double)timePoint);
 
         // loop through voxel data
         for(unsigned int dataIndex = 0; dataIndex < dat->getNumEl(); dataIndex++) {
-            if(!mask.getPixel(dataIndex)) {
+            if(!mask->getPixel(dataIndex)) {
                 cor->setPixel(dataIndex,fmod(1.0,0.0));  // assign nan
                 beta1->setPixel(dataIndex,fmod(1.0,0.0));
                 beta2->setPixel(dataIndex,fmod(1.0,0.0));
@@ -214,8 +227,8 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
             c->put(dataIndex,c->get(dataIndex)+xNew);       // sum of x
             e->put(dataIndex,e->get(dataIndex)+xNew*xNew);  // sum of x*x
 
-            h = (numTimepoints*d - b*b)*(numTimepoints*e->get(dataIndex) - c->get(dataIndex)*c->get(dataIndex));
-            cor->setPixel(dataIndex,(numTimepoints*a->get(dataIndex) - b*c->get(dataIndex)) / sqrt(h));
+            h = (timePoint*d - b*b)*(timePoint*e->get(dataIndex) - c->get(dataIndex)*c->get(dataIndex));
+            cor->setPixel(dataIndex,(timePoint*a->get(dataIndex) - b*c->get(dataIndex)) / sqrt(h));
 
             // The calculation below is a sort of hard-coded: beta = (w'*w)^-1*w'*xWindow(:,dataIndex).
             // version of this equation to make things a bit easier. It will need to be rewritten more
@@ -229,7 +242,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
             for(unsigned int winInd = 0; winInd < N; winInd++) {
                 /*// old temps using xWindow
                 tempb1d += (d-b*rWindow->get(winInd))*xWindow->get(winInd,dataIndex);
-                tempb2d += (-b+numTimepoints*rWindow->get(winInd))*xWindow->get(winInd,dataIndex);*/
+                tempb2d += (-b+timePoint*rWindow->get(winInd))*xWindow->get(winInd,dataIndex);*/
 
                 // increment through window
                 tempDataID.setTimePoint(timePoint-N+winInd); // this index mimics having a window of data
@@ -245,10 +258,10 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
 
                 // do intermediate calculations for beta1 and beta2
                 tempb1 += (d-b*rWindow->get(winInd))*dataWindowElement->getPixel(dataIndex);
-                tempb2 += (-b+numTimepoints*rWindow->get(winInd))*dataWindowElement->getPixel(dataIndex);
+                tempb2 += (-b+timePoint*rWindow->get(winInd))*dataWindowElement->getPixel(dataIndex);
             }
-            beta1->setPixel(dataIndex,tempb1/(numTimepoints*d - b*b));
-            beta2->setPixel(dataIndex,tempb2/(numTimepoints*d - b*b));
+            beta1->setPixel(dataIndex,tempb1/(timePoint*d - b*b));
+            beta2->setPixel(dataIndex,tempb2/(timePoint*d - b*b));
 
             // stat calculation
             // Reset temporary dataID
@@ -257,7 +270,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
             double tempd = 0.0;
             for(unsigned int winInd = 0; winInd < N; winInd++) {
                 // set rs vector
-                rs->put(winInd,rWindow->get(winInd) - b/numTimepoints);
+                rs->put(winInd,rWindow->get(winInd) - b/timePoint);
 
                 // increment through window
                 tempDataID.setTimePoint(timePoint-N+winInd); // this index mimics having a window of data
@@ -282,15 +295,21 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
                                     - beta2->getPixel(dataIndex)*rWindow->get(winInd),2);
             }
             // stat calculation
-            stat->setPixel(dataIndex,beta2->getPixel(dataIndex)*((double)numTimepoints/tempd)*rs->one_norm()*fm);
+            stat->setPixel(dataIndex,beta2->getPixel(dataIndex)*((double)timePoint/tempd)*rs->one_norm()*fm);
         }
     }
     // Steady-state calculation
     else {
         // Update storage variables
         oldIndex = newIndex - windowLen;
-        rOld = conditions.get(oldIndex,conditionColumn); // discarded element of reference vector
-        rNew = conditions.get(newIndex,conditionColumn); // new element of reference vector
+
+	// ohinds: 2009-02-13
+	// changed to read from design matrix
+//      rOld = conditions.get(oldIndex,conditionColumn); // discarded element of reference vector
+//      rNew = conditions.get(newIndex,conditionColumn); // new element of reference vector
+
+        rOld = design.getColumn(conditionColumn).get(oldIndex); // discarded element of reference vector
+        rNew = design.getColumn(conditionColumn).get(newIndex); // new element of reference vector
 
         // Slide rWindow
         for(unsigned int k = 0; k < windowLen-1; k++) {
@@ -309,7 +328,7 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
 
         // loop through voxel data
         for(unsigned int dataIndex = 0; dataIndex < dat->getNumEl(); dataIndex++) {
-            if(!mask.getPixel(dataIndex)) {
+            if(!mask->getPixel(dataIndex)) {
                 cor->setPixel(dataIndex,fmod(1.0,0.0));  // assign nan
                 beta1->setPixel(dataIndex,fmod(1.0,0.0));
                 beta2->setPixel(dataIndex,fmod(1.0,0.0));
@@ -411,10 +430,9 @@ int RtSlideWinCor::process(ACE_Message_Block *mb) {
             // fill log file
             if(dumpAlgoVars) {
                 dumpFile
-                << numTimepoints << " "
+                << timePoint << " "
                 << dataIndex << " "
                 << dataWindowElement->getPixel(dataIndex) << " "
-                << conditions.get(numTimepoints-1,0) << " "
                 << cor->getPixel(dataIndex) << " "
                 << beta1->getPixel(dataIndex) << " "
                 << beta2->getPixel(dataIndex) << " "
@@ -441,7 +459,6 @@ void RtSlideWinCor::startDumpAlgoVarsFile() {
     << "time_point "
     << "voxel_index "
     << "voxel_intensity "
-    << "condition "
     << "correlation "
     << "beta1 "
     << "beta2 "

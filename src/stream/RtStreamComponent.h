@@ -13,13 +13,14 @@
 #include"RtOutput.h"
 
 #include"RtStream.h"
+#include"RtExperiment.h"
 #include"RtStreamMessage.h"
 #include"RtConfig.h"
 #include"RtConductor.h"
-#include"RtExperiment.h"
 #include"RtData.h"
 
 #include<map>
+#include<set>
 #include<fstream>
 using namespace std;
 
@@ -34,181 +35,238 @@ using namespace std;
 class RtPasser;
 
 // class declaration
-class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH>, public RtOutput {
 
+class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH>, public RtOutput {
 public:
 
-  //*** constructors/destructors  ***//
+    //*** constructors/destructors  ***//
 
-  // default constructor
-  RtStreamComponent();
+    // default constructor
+    RtStreamComponent();
 
-  // destructor
-  virtual ~RtStreamComponent();
+    // destructor
+    virtual ~RtStreamComponent();
 
-  //*** initialization routines  ***//
+    //*** initialization routines  ***//
 
-  // configure this stream component
-  //  in
-  //   configuration
-  virtual bool init(TiXmlElement *module, RtConfig *config, RtConductor *conductor);
+    // configure this stream component
+    //  in
+    //   configuration
+    virtual bool init(TiXmlElement *module, RtConfig *config, RtConductor *conductor);
 
 
-  // adds an output to receive the data of this stream component
-  //  in
-  //   output to add
-  virtual void addOutput(RtOutput *out, const RtDataID &dataId = RtDataID());
+    // adds an output to receive the data of this stream component
+    //  in
+    //   output to add
+    virtual void addOutput(RtOutput *out, const RtDataID &dataId = RtDataID());
 
-  // adds outputs from a vector
-  //  in:
-  //   out: vector of output objects
-  //  out:
-  //   true (for success) or false
-  virtual void addVectorOfOutputs(vector<RtOutput*> &outs);
+    // adds outputs from a vector
+    //  in:
+    //   out: vector of output objects
+    //  out:
+    //   true (for success) or false
+    virtual void addVectorOfOutputs(vector<RtOutput*> &outs);
 
-  // initialize and run thread
-  //  out:
-  //   0 (for success) or -1 (failure)
-  virtual int open(void * = 0);
+    // initialize and run thread
+    //  out:
+    //   0 (for success) or -1 (failure)
+    virtual int open(void * = 0);
 
-  // send data when we're done
-  //  in
-  //   msg: message to send
-  //   to:  timeout
-  virtual int put(ACE_Message_Block *msg, ACE_Time_Value *to);
+    // send data when we're done
+    //  in
+    //   msg: message to send
+    //   to:  timeout
+    virtual int put(ACE_Message_Block *msg, ACE_Time_Value *to);
 
-  // close a stream component
-  //  in
-  //   flags: flags to tell us who called
-  virtual int close(u_long flags);
+    // close a stream component
+    //  in
+    //   flags: flags to tell us who called
+    virtual int close(u_long flags);
 
-  // run the stream
-  virtual int svc();
+    // run the stream
+    virtual int svc();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString() const;
+    // get the version
+    //  out: char array that represents the cvs version
+    virtual char *getVersionString() const;
 
-  // sets whether this data should be kept around after the stream is done
-  void setPersistent(bool p);
+    // gets whether this component is disabled
+    bool getDisabled() const;
 
-  // gets whether this data should be kept around after the stream is done
-  bool getPersistent() const;
+    // gets the id for this stream component
+    string getID() const;
 
-  // gets whether this component is disabled
-  bool getDisabled() const;
+    // gets the data id for the input
+    string getInputModuleID() const;
 
-  // gets the id for this stream component
-  string getID() const;
+    // gets the data name for the input
+    string getInputDataName() const;
 
-  // gets the data id for the input
-  string getInputModuleID() const;
+    // gets the roi id for the input
+    string getInputRoiID() const;
 
-  // sets the data id for the input
-  void setInputModuleID(string id);
+    // gets the mask roi id
+    string getMaskRoiID() const;
 
-  // gets the data name for the input
-  string getInputDataName() const;
-
-  // sets the data name for the input
-  void setInputDataName(string id);
-
-  // module name for config
-  static string moduleString;
+    // module name for config
+    static string moduleString;
 
 protected:
 
-  typedef ACE_Task<ACE_MT_SYNCH> super;
+    typedef ACE_Task<ACE_MT_SYNCH> super;
 
-  // call the next processing step
-  virtual int nextStep(ACE_Message_Block *mb);
+    // call the next processing step
+    virtual int nextStep(ACE_Message_Block *mb);
 
-  // process the configuration: only use this for cross module or global config
-  // that is not available in the xml node for this stream component
-  //  in
-  //   config class
-  virtual bool processConfig(RtConfig &config);
+    // process the configuration: only use this for cross module or global config
+    // that is not available in the xml node for this stream component
+    //  in
+    //   config class
+    virtual bool processConfig(RtConfig &config);
 
-  // process an option
-  //  in
-  //   name of the option to process
-  //   val  text of the option node
-  //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text,
-			     const map<string,string> &attr);
+    // process an option
+    //  in
+    //   name of the option to process
+    //   val  text of the option node
+    //   attr map bettwen attribute names and values
+    virtual bool processOption(const string &name, const string &text,
+                               const map<string, string> &attr);
 
-  // finish initialization tasks for run
-  virtual bool finishInit();
 
-  // pure virtual for implementation of real processing
-  virtual int process(ACE_Message_Block *mb) = 0;
+    // pure virtual for validation of component configuration
+    virtual bool validateComponentConfig() = 0;
 
-  // pass any results to outputs
-  virtual void passData(RtData* data);
+    // retreive the data with inputModuleID, inputDataName, and input RoiID
+    // from the stream message
 
-  // store any results to data store
-  //  in: pointer to data to store
-  virtual void storeData(RtData* data);
+    template<class T>
+    RtDataImage<T> *getDataFromMessage(const RtStreamMessage &msg) {
+        // find the data with the right id
+        RtDataImage<T> *img
+                = (RtDataImage<T>*) msg.getData(inputModuleID,
+                                                inputDataName,
+                                                inputRoiID);
 
-  // sets the latest result of processing
-  //  in
-  //   data result
-  virtual void setResult(RtStreamMessage *msg, RtData *data);
+        if (img == NULL) {
+            cerr << "WARNING: RtRoiCombine couldn't find " << inputModuleID << ":" << inputDataName << ":" << inputRoiID << endl;
+            return NULL;
+        }
 
-  // whether this compoenent is disabled
-  bool disabled;
+        return img;
+    }
 
-  // passer to send the results of our computation to outputs
-  RtPasser *passer;
+    // retreive the mask with maskRoiID from the stream message
+    RtMaskImage *getMaskFromMessage(const RtStreamMessage &msg);
 
-  // pointer to the conductor controlling execution
-  RtConductor *conductor;
+    // pure virtual for implementation of real processing
+    virtual int process(ACE_Message_Block *mb) = 0;
 
-  // whether data created by this component should be persistent
-  bool persistent;
+    // pass any results to outputs
+    virtual void passData(RtData* data);
 
-  // whether the result should be placed on the message data
-  bool putResultOnMessage;
+    // store any results to data store
+    //  in: pointer to data to store
+    virtual void storeData(RtData* data);
 
-  // whether the result should be made the current data on the message
-  bool makeCurrentData;
+    // sets the latest result of processing
+    //  in
+    //   data result
+    virtual void setResult(RtStreamMessage *msg, RtData *data);
 
-  // pointer to the display output object
-  //RtDisplayImage *display;
+    // start a logfile
+    virtual void startDumpAlgoVarsFile();
 
-  // id string
-  string componentID; // for the module id
-  string roiID;       // roi to be operated on
-  string dataName;    // base dataname to assign result
+    // whether this compoenent is disabled
+    bool disabled;
 
-  // input data
-  string inputModuleID;
-  string inputDataName;
+    // whether to print info on results to log file
+    bool logOutput;
 
-  // file to log processing results to
-  ofstream ofile;
-  string outFilename;
+    // whether to print info on results to command line
+    bool print;
 
-  // create mutex for datastore lockdown
-  ACE_Mutex mut;
+    // whether this compoenent should print info bout computation times
+    bool printTiming;
+
+    // whether we've done initialization
+    bool needsInit;
+
+    // passer to send the results of our computation to outputs
+    RtPasser *passer;
+
+    // pointer to the conductor controlling execution
+    RtConductor *conductor;
+
+    // whether the result should be placed on the message data
+    bool putResultOnMessage;
+
+    // whether the result should be made the current data on the message
+    bool makeCurrentData;
+
+    // id string
+    string componentID; // for the module id
+
+    // input data
+    string inputModuleID;
+    string inputDataName;
+    string inputRoiID;
+
+    // mask
+    string maskRoiID;
+
+    // file to log processing results to
+    ofstream ofile;
+    string outFilename;
+
+    // create mutex for datastore lockdown
+    ACE_Mutex mut;
+
+    // for logging the analysis process
+    bool dumpAlgoVars;
+    string dumpAlgoVarsFilename;
+    ofstream dumpFile;
 };
 
-
 class RtEndTask : public RtStreamComponent {
-
 public:
-  RtEndTask() : RtStreamComponent() {
-    componentID = "end-task";
-  }
+
+  RtEndTask(set<ACE_Message_Block*> *_openMsgs = NULL) : RtStreamComponent() {
+        componentID = "end-task";
+	openMsgs = _openMsgs;
+    }
 
 protected:
-  virtual int process(ACE_Message_Block*) {
-    return 0;
-  }
 
-  virtual int nextStep(ACE_Message_Block *) {
-    return 0;
-  }
+    bool validateComponentConfig() {
+        return true;
+    }
+
+    int process(ACE_Message_Block* mb) {
+      
+      
+      if(DEBUG_LEVEL & TIMER) {
+	cout << "RtStream elapsed time: " 
+	     << getExperimentElapsedTime() << endl;
+      }
+      
+      if(DEBUG_LEVEL & MODERATE) {
+	if(openMsgs != NULL) {
+	  cout << "RtEndTask: mb is " 
+	       << mb << " openMsgs->size() is " << openMsgs->size() << endl;
+	  openMsgs->erase(mb);
+	}
+      }
+
+      return 0;
+    }
+
+    int nextStep(ACE_Message_Block *) {
+
+        return 0;
+    }
+
+  set<ACE_Message_Block*> *openMsgs;
+
 };
 
 

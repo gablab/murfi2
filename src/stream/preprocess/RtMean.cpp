@@ -16,7 +16,6 @@ string RtMean::moduleString(ID_TEMPMEAN);
 // default constructor
 RtMean::RtMean() : RtStreamComponent() {
   componentID = moduleString;
-  dataName = NAME_TEMPMEAN_IMG;
 
   numTimePoints = 0;
 }
@@ -24,6 +23,13 @@ RtMean::RtMean() : RtStreamComponent() {
 // destructor
 RtMean::~RtMean() {
   //cout << "destroyed" << endl;
+}
+
+// validate the configuration
+bool RtMean::validateComponentConfig() {
+  bool result = true;
+  
+  return result;
 }
 
 // process a single acquisition
@@ -61,7 +67,7 @@ int RtMean::process(ACE_Message_Block *mb) {
   RtMRIImage *mean = new RtMRIImage(*img);
 
   mean->getDataID().setFromInputData(*img,*this);
-  mean->getDataID().setDataName(dataName);
+  mean->getDataID().setDataName(NAME_TEMPMEAN_IMG);
 
   // update the mean and variance numerator due to west (1979) for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {

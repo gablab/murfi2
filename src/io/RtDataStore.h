@@ -8,6 +8,7 @@
 #define RTDATASTORE_H
 
 #include"RtDataID.h"
+#include"RtDataListener.h"
 #include"RtData.h"
 #include"ace/Mutex.h"
 
@@ -33,8 +34,8 @@ public:
   // destructor
   virtual ~RtDataStore();
 
-  // add an output to be notified when new data arrives
-  virtual void addOutputForNotify(RtOutput *out);
+  // add listener to be notified when new data arrives
+  virtual void addListener(RtDataListener *lis);
 
   //*** data methods ***//
 
@@ -42,10 +43,7 @@ public:
   virtual void setData(RtData *data);
 
   // get data by id
-  virtual RtData *getData(RtDataID &id);
-
-  // get data by indexing
-  virtual RtData *getDataFast(RtDataID &id);
+  virtual RtData *getData(const RtDataID &id);
 
   // get the version
   //  out: char array that represents the cvs version
@@ -58,7 +56,7 @@ public:
   protected:
 
   // list of outputs to be notified when new data arrives
-  vector<RtOutput*> outputNotifyList;
+  vector<RtDataListener*> notifyList;
 
   // hash map to store pointers to acquired data
   map<RtDataID,RtData*,RtDataIDCompare> store;

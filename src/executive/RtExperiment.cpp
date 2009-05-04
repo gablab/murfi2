@@ -38,8 +38,7 @@
 
 using namespace boost::filesystem;
 
-// Alan: have not found timer.h file
-//#include"util/timer/timer.h"
+#include"util/timer/timer.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // experiment data (all at static file scope)
@@ -74,9 +73,8 @@ static unsigned int numExistingSeries;
 // unique id for this study (date and time of first initialization)
 static unsigned int studyID;
 
-// Alan: have not found timer.h file
 // experiment timer
-//static timer experimentTimer;
+static timer experimentTimer;
 
 static string execName;
 
@@ -131,11 +129,9 @@ unsigned int getNextUniqueSeriesNum() {
   return uids.size()+numExistingSeries;
 }
 
-// Alan: timer.h file was not found
 // get the current experiment elapsed time in ms
 double getExperimentElapsedTime() {
-//  return 1000*experimentTimer.elapsed_time();
-    return 0;
+  return 1000*experimentTimer.elapsed_time();
 }
   
 // get the configuration for this experiment
@@ -154,9 +150,8 @@ bool initExperiment() {
   
   cout << "intializing experiment" << endl;
 
-// Alan: have not found timer.h file
 //  // set the start time of the experiment
-//  experimentTimer.restart();
+  experimentTimer.restart();
 
   // make the study id
   ACE_Date_Time t;
@@ -237,9 +232,8 @@ bool deinitExperiment() {
   
   cout << "deintializing experiment" << endl;
 
-  // Alan: have not found timer.h file
   // set the start time of the experiment
-//  experimentTimer.stop();
+  experimentTimer.stop();
 
   // stop info server
   if(!infoServer.close()) {

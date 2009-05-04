@@ -259,8 +259,8 @@ bool FrQwtPlotWidget::SetMarkerPosition(int timePoint, bool blockSignals){
 
     m_PlotMarker->setValue(x, y);
     
-    this->replot();
-
+    //this->replot();   // scopic Alan: test 01.05.09, this string causes crushes while getting data from backend
+                        // probably qt threading issue 
     if(!blockSignals){
 
         emit markerPositionChange(int(x));

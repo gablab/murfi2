@@ -11,7 +11,7 @@
 
 #include"RtModelFit.h"
 #include"RtLeastSquaresSolve.h"
-#include"util/timer/timer.h"
+//#include"util/timer/timer.h"
 
 // class declaration
 class RtIncrementalGLM : public RtModelFit {

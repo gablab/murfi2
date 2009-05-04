@@ -62,6 +62,7 @@ signals:
     void ChangeLayer();
     void LayerSelected(unsigned long id);
     void UpdateSignal();
+    void ChangeLayerPosition(int inc);
 
     // Emmited when Name, Visibility 
     // or Opacity are changed
@@ -78,6 +79,9 @@ private Q_SLOTS:
     void OnAddClicked();
     void OnDeleteClicked();
     void OnChangeClicked();
+    void OnUpArrowClicked();
+    void OnDownArrowClicked();
+
     // Manage some params
     void OnVisibilityChanged(unsigned long id);
     void OnOpacityChanged(int value);
@@ -94,6 +98,8 @@ private:
     QToolButton*    m_btnAdd;
     QToolButton*    m_btnDelete;
     QToolButton*    m_btnChange;
+    QToolButton*    m_btnUpArrow;
+    QToolButton*    m_btnDownArrow;
 
     FrColormapWidget*   m_colormapWidget;
     FrSliderWidget* m_opacityWidget;

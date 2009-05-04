@@ -81,10 +81,13 @@ FrGraphPaneWidget::FrGraphPaneWidget(QWidget* parent, FrMainDocument* doc)
 
     this->setMinimumHeight(this->sizeHint().height());
     //this->setFixedWidth(this->sizeHint().width());
+
+    mutex = new QMutex(QMutex::NonRecursive);
 }
 
 FrGraphPaneWidget::~FrGraphPaneWidget(){
     if (m_QwtPlotWidget) delete m_QwtPlotWidget;
+    if (mutex) delete mutex;
 }
 
 void FrGraphPaneWidget::SetDocument(FrMainDocument* doc){
@@ -101,6 +104,8 @@ void FrGraphPaneWidget::Update(){
 }
 
 void FrGraphPaneWidget::OnUpdate(){
+    //mutex->lock();
+
     // Clear all
     //m_GraphListWidget->RemoveAll();
     m_QwtPlotWidget->RemoveAll();
@@ -142,8 +147,6 @@ void FrGraphPaneWidget::OnUpdate(){
 
     std::vector<FrDocumentObj*> graphs;
     m_Document->GetObjectsByType(graphs, FrDocumentObj::GraphObject);
-
-    mutex.lock();
 
     itEnd = graphs.end();
     //int id = 0;
@@ -195,11 +198,12 @@ void FrGraphPaneWidget::OnUpdate(){
     m_QwtPlotWidget->replot();
     // NOTE: marker position will not be changed before replot
     m_QwtPlotWidget->SetMarkerPosition(viewDO->GetTimePoint());
+    //m_QwtPlotWidget->replot();
 
     QString info = QString("Current Time Point: %1").arg(viewDO->GetTimePoint());
     m_PlayControlWidget->SetAdditionalInfo(info);
 
-    mutex.unlock();
+    //mutex->unlock();
 }
 
 

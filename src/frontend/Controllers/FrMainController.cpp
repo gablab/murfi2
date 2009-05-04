@@ -454,6 +454,14 @@ void FrMainController::ChangeImageSettings(){
     delete cmd;
 }
 
+void FrMainController::ChangeLayerPosition(int inc){
+    // TODO: add change layer position command here
+    //FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+    //cmd->SetAction(FrUserActionCmd::ChangeSettings);
+    //FrCommandController::Execute(cmd);
+    //delete cmd;
+}
+
 void FrMainController::ChangeBookmark(unsigned long id){
     // Create complex command and execute it
     FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();

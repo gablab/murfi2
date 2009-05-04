@@ -12,10 +12,10 @@
 
 #define fTol 0.00000000001f
 
-#include "boost/filesystem.hpp"
-
 #include<sstream>
 #include<string>
+
+#include "boost/filesystem.hpp"
 
 using namespace std;
 using namespace boost::filesystem;

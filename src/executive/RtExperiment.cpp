@@ -19,8 +19,10 @@
  #include"FrMainController.h"
 #endif
 
-// old gui includes
-#include"RtDisplayImage.h"
+#ifndef USE_FRONTEND
+    // old gui includes
+    #include"RtDisplayImage.h"
+#endif
 
 // site specific defines (siteID, etc)
 #include"site_config.h"
@@ -36,7 +38,8 @@
 
 using namespace boost::filesystem;
 
-#include"util/timer/timer.h"
+// Alan: have not found timer.h file
+//#include"util/timer/timer.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // experiment data (all at static file scope)
@@ -71,8 +74,9 @@ static unsigned int numExistingSeries;
 // unique id for this study (date and time of first initialization)
 static unsigned int studyID;
 
+// Alan: have not found timer.h file
 // experiment timer
-static timer experimentTimer;
+//static timer experimentTimer;
 
 static string execName;
 
@@ -127,9 +131,11 @@ unsigned int getNextUniqueSeriesNum() {
   return uids.size()+numExistingSeries;
 }
 
+// Alan: timer.h file was not found
 // get the current experiment elapsed time in ms
 double getExperimentElapsedTime() {
-  return 1000*experimentTimer.elapsed_time();
+//  return 1000*experimentTimer.elapsed_time();
+    return 0;
 }
   
 // get the configuration for this experiment
@@ -148,8 +154,9 @@ bool initExperiment() {
   
   cout << "intializing experiment" << endl;
 
-  // set the start time of the experiment
-  experimentTimer.restart();
+// Alan: have not found timer.h file
+//  // set the start time of the experiment
+//  experimentTimer.restart();
 
   // make the study id
   ACE_Date_Time t;
@@ -212,7 +219,7 @@ bool initExperiment() {
   // start scanner listener
   if(config.isSet("scanner:disabled")
      && config.get("scanner:disabled")==false) {
-    if(!scannerInput.open(config)) {
+    if(!scannerInput.open(config)) {    
       cerr << "ERROR: could not add scanner input" << endl;
     }
     else {
@@ -230,8 +237,9 @@ bool deinitExperiment() {
   
   cout << "deintializing experiment" << endl;
 
+  // Alan: have not found timer.h file
   // set the start time of the experiment
-  experimentTimer.stop();
+//  experimentTimer.stop();
 
   // stop info server
   if(!infoServer.close()) {
@@ -338,6 +346,10 @@ bool parseArgs(int argc, char **args) {
   cmdOpts.long_option("help",       'h', ACE_Get_Opt::NO_ARG);
   cmdOpts.long_option("help",       '?', ACE_Get_Opt::NO_ARG);
 
+// scopic Alan: for MRI testers
+#ifdef MRI_TEST
+    confFilename = "test_config.xml";
+#else
   // handle options
   for(int option; (option = cmdOpts ()) != EOF; ) {
     if(DEBUG_LEVEL & MODERATE) {
@@ -370,6 +382,7 @@ bool parseArgs(int argc, char **args) {
       return false;
     }
   }
+#endif
 
   // parse the xml config (file or string)
   if(confFilename.empty() && confXmlStr.empty()) {
@@ -429,6 +442,8 @@ int ACE_TMAIN(int argc, char **args) {
   else if(config.isSet("oldgui:disabled")
 	  && config.get("oldgui:disabled")==false) { 
     
+// scopic Alan: old image display was removed from Frontend project on windows
+#ifndef WIN32
     // start a display
     RtDisplayImage dispImg;
     if(!dispImg.open(config)) {
@@ -436,6 +451,7 @@ int ACE_TMAIN(int argc, char **args) {
       result = 1;
     }
     result = dispImg.svc();
+#endif
 
   }
   else { // just run once in the terminal with the passed config

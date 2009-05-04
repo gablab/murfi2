@@ -93,6 +93,9 @@ void FrActionSignalManager::Initialize(){
              this, SLOT(OnLayerParamsChanged()) );
     connect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerColormap()),
              this, SLOT(OnLayerColormapChanged()) );
+    // new (for updating layers order)
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(ChangeLayerPosition(int)),
+             this, SLOT(OnLayerPositionChanged(int)) );
 
     connect( m_mainWindow->m_LayerListWidget, SIGNAL(RoiToolChanged()),
              this, SLOT(OnRoiToolChanged()) );
@@ -239,8 +242,13 @@ void FrActionSignalManager::OnOpenConfigAction(){
         tr(""), tr("XML configuration (*.xml)"));
         
   RtConfigFmriRun runConfig;
-  if(!runConfig.parseConfigFile(fileName.toStdString())) {
-    cerr << "FrActionSignalManager::OnOpenConfig(): failed to parse config file " << fileName.toStdString() << endl;
+    
+  string st;
+  st = fileName.toLatin1();
+//  st = fileName.toStdString();
+
+  if(!runConfig.parseConfigFile(st)) {
+    cerr << "FrActionSignalManager::OnOpenConfig(): failed to parse config file " << st << endl;
   }
 
   executeRun(runConfig);
@@ -400,6 +408,10 @@ void FrActionSignalManager::OnLayerColormapChanged(){
 
 void FrActionSignalManager::OnImageParamsChanged(){
     m_mainWindow->GetMainController()->ChangeImageSettings();
+}
+
+void FrActionSignalManager::OnLayerPositionChanged(int inc){
+    m_mainWindow->GetMainController()->ChangeLayerPosition(inc);
 }
 
 void FrActionSignalManager::OnRoiToolChanged(){

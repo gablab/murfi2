@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;TIXML_USE_STL;USE_FRONTEND"
+				AdditionalIncludeDirectories="data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\;./frontend/Qwt;./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;..\src;$(NOINHERIT)"
+				PreprocessorDefinitions="WIN32;_DEBUG;TIXML_USE_STL;USE_FRONTEND"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,11 +60,16 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 				AdditionalDependencies="ACEd.lib niftiio.lib znz.lib opengl32.lib glut32.lib vnl.lib ACEXML.lib vcl.lib ACEXML_Parser.lib gsl.lib vnl_algo.lib vul.lib netlib.lib v3p_netlib.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				GenerateDebugInformation="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -76,6 +81,12 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -83,7 +94,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -104,8 +115,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;TIXML_USE_STL;USE_FRONTEND"
+				AdditionalIncludeDirectories="data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\;./frontend/Qwt;./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;..\src;$(NOINHERIT)"
+				PreprocessorDefinitions="WIN32;TIXML_USE_STL;USE_FRONTEND;MRI_TEST"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -122,11 +133,17 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
 				AdditionalDependencies="ACE.lib niftiio.lib znz.lib opengl32.lib glut32.lib vnl.lib ACEXML.lib vcl.lib ACEXML_Parser.lib gsl.lib vnl_algo.lib vul.lib netlib.lib v3p_netlib.lib"
+				IgnoreDefaultLibraryNames="MSVCP80D.lib MSVCR80D.lib"
+				GenerateDebugInformation="true"
+				SubSystem="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -136,6 +153,12 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -192,19 +215,19 @@
 				Name="analysis"
 				>
 				<File
-					RelativePath=".\stream\analysis\RtAccumCor.cpp"
+					RelativePath=".\stream\analysis\RtContrast.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\stream\analysis\RtAccumCor.h"
+					RelativePath=".\stream\analysis\RtContrast.h"
 					>
 				</File>
 				<File
-					RelativePath=".\stream\analysis\RtActivationEstimator.cpp"
+					RelativePath=".\stream\analysis\RtCurrentActivation.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\stream\analysis\RtActivationEstimator.h"
+					RelativePath=".\stream\analysis\RtCurrentActivation.h"
 					>
 				</File>
 				<File
@@ -213,14 +236,6 @@
 				</File>
 				<File
 					RelativePath=".\stream\analysis\RtFluctuationMonitor.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\analysis\RtImageZScore.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\analysis\RtImageZScore.h"
 					>
 				</File>
 				<File
@@ -237,6 +252,14 @@
 				</File>
 				<File
 					RelativePath=".\stream\analysis\RtLeastSquaresSolve.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\analysis\RtModelFit.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\analysis\RtModelFit.h"
 					>
 				</File>
 				<File
@@ -292,11 +315,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\stream\postprocess\RtRoi2Feedback.cpp"
+					RelativePath=".\stream\postprocess\RtRoiCombine.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\stream\postprocess\RtRoi2Feedback.h"
+					RelativePath=".\stream\postprocess\RtRoiCombine.h"
 					>
 				</File>
 				<File
@@ -313,38 +336,6 @@
 				</File>
 				<File
 					RelativePath=".\stream\postprocess\RtRoiFeedbackSynth.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiMean2Feedback.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiMean2Feedback.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiMedian2Feedback.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiMedian2Feedback.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiSum2Feedback.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiSum2Feedback.h"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiWeightedAve2Feedback.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\postprocess\RtRoiWeightedAve2Feedback.h"
 					>
 				</File>
 			</Filter>
@@ -365,6 +356,22 @@
 				</File>
 				<File
 					RelativePath=".\stream\preprocess\RtIntensityNorm.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\preprocess\RtMaskGen.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\preprocess\RtMaskGen.h"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\preprocess\RtMaskLoad.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\preprocess\RtMaskLoad.h"
 					>
 				</File>
 				<File
@@ -438,6 +445,22 @@
 			</File>
 			<File
 				RelativePath=".\data\RtDataImage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\data\RtDesignMatrix.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\data\RtDesignMatrix.h"
+				>
+			</File>
+			<File
+				RelativePath=".\data\RtElementAccess.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\data\RtElementAccess.h"
 				>
 			</File>
 			<File
@@ -650,6 +673,22 @@
 			</File>
 			<File
 				RelativePath=".\executive\RtConfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtConfigFmriExperiment.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtConfigFmriExperiment.h"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtConfigFmriRun.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\executive\RtConfigFmriRun.h"
 				>
 			</File>
 			<File

@@ -49,9 +49,9 @@ FrOrthoView::FrOrthoView(FrMainWindow* mainWindow)
 	for(int i = 0; i < ORTHO_VIEWS_CNT; i++){
         m_LayeredImage[i] = FrLayeredImage::New();
     }
-    m_dummyRenderer = vtkRenderer::New();
-    m_dummyRenderer->SetBackground(0.0, 0.0, 0.0);
-    m_dummyRenderer->GetActiveCamera()->ParallelProjectionOn();
+    //m_dummyRenderer = vtkRenderer::New();
+    //m_dummyRenderer->SetBackground(0.0, 0.0, 0.0);
+    //m_dummyRenderer->GetActiveCamera()->ParallelProjectionOn();
 }
 
 FrOrthoView::~FrOrthoView(){
@@ -62,7 +62,7 @@ FrOrthoView::~FrOrthoView(){
         if(m_LayeredImage[i]) m_LayeredImage[i]->Delete();
     } 
 
-    if(m_dummyRenderer) m_dummyRenderer->Delete();
+    //if(m_dummyRenderer) m_dummyRenderer->Delete();
 }
 
 void FrOrthoView::Initialize(){
@@ -111,7 +111,7 @@ void FrOrthoView::SetupRenderers(){
     }
     // add dummy renderer
     //renWin->AddRenderer(m_dummyRenderer);
-    m_dummyRenderer->SetViewport(0.5, 0.0, 1.0, 0.5);
+    //m_dummyRenderer->SetViewport(0.5, 0.0, 1.0, 0.5);
 
     renWin->GetRenderers()->InitTraversal();
     renWin->SetNumberOfLayers(layersNum);
@@ -133,7 +133,7 @@ void FrOrthoView::RemoveRenderers(){
         
     }
     // remove dummy renderer
-    renWin->RemoveRenderer(m_dummyRenderer);
+    //renWin->RemoveRenderer(m_dummyRenderer);
 
     renWin->GetRenderers()->InitTraversal();
     renWin->SetNumberOfLayers(0);
@@ -154,11 +154,11 @@ void FrOrthoView::UpdatePipeline(int point){
         }
     case FRP_COLORMAP:
         {
-            this->UpdateColormap(params);
+            this->UpdateColormap(params);     // test
         }
     case FRP_TBC:
         {
-            this->UpdateTbc(params);
+            this->UpdateTbc(params);          // test
         }
     case FRP_OPACITY_VISIBILITY:
         {   

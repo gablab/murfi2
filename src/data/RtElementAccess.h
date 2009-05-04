@@ -12,9 +12,22 @@
 #include"RtData.h"
 #include"RtMaskImage.h"
 #include<vector>
+#include<limits>
 #include"RtTypes.h"
 
+#include "add_functions.h"
+
 using namespace std;
+
+
+// scopic alexsid: #define WIN32
+#ifdef WIN32
+    // MS VS2005 provides _isnan function not isnan
+    // as it is in *nix system. So add this fix.
+    #ifndef isnan
+        #define isnan(x) _isnan(x)
+    #endif
+#endif
 
 // class declaration
 class RtElementAccess {

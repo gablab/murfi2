@@ -278,7 +278,7 @@ bool RtDesignMatrix::build() {
 
     // build block-wise condition vectors if required
     if(modelEachBlock) {
-      unsigned int numBlocks = ceil((numMeas-conditionShift)/blockLen);
+      unsigned int numBlocks = ceil((double)((numMeas-conditionShift)/blockLen));
 
       // create a design matrix column per block
       for(unsigned int block = 0; block <= numBlocks; block++) {

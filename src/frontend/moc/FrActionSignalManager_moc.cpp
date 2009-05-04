@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Mon Mar 16 20:12:32 2009
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
+** Created: Mon 4. May 16:33:57 2009
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,19 +11,18 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrActionSignalManager.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.4.3. It"
+#error "This file was generated using the moc from 4.3.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
-QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_FrActionSignalManager[] = {
 
  // content:
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      34,   10, // methods
+      35,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -55,13 +54,14 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
      528,   22,   22,   22, 0x0a,
      543,   22,   22,   22, 0x0a,
      566,   22,   22,   22, 0x0a,
-     591,   22,   22,   22, 0x0a,
-     610,   22,   22,   22, 0x0a,
-     646,  633,   22,   22, 0x0a,
-     687,  670,   22,   22, 0x0a,
-     711,   22,   22,   22, 0x0a,
-     740,   22,   22,   22, 0x0a,
-     772,  765,   22,   22, 0x0a,
+     595,  591,   22,   22, 0x0a,
+     623,   22,   22,   22, 0x0a,
+     642,   22,   22,   22, 0x0a,
+     678,  665,   22,   22, 0x0a,
+     719,  702,   22,   22, 0x0a,
+     743,   22,   22,   22, 0x0a,
+     772,   22,   22,   22, 0x0a,
+     804,  797,   22,   22, 0x0a,
 
        0        // eod
 };
@@ -81,10 +81,11 @@ static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "OnVoxelSelectionToolAction()\0"
     "OnShowHelpAction()\0OnShowAboutAction()\0"
     "OnTestAction()\0OnLayerParamsChanged()\0"
-    "OnLayerColormapChanged()\0OnRoiToolChanged()\0"
-    "OnImageParamsChanged()\0currentValue\0"
-    "OnLiveModeChanged(bool)\0currentTimePoint\0"
-    "OnTimePointChanged(int)\0"
+    "OnLayerColormapChanged()\0inc\0"
+    "OnLayerPositionChanged(int)\0"
+    "OnRoiToolChanged()\0OnImageParamsChanged()\0"
+    "currentValue\0OnLiveModeChanged(bool)\0"
+    "currentTimePoint\0OnTimePointChanged(int)\0"
     "OnPreviousTimePointPressed()\0"
     "OnNextTimePointPressed()\0id,add\0"
     "OnGraphChanged(ulong,bool)\0"
@@ -104,7 +105,7 @@ void *FrActionSignalManager::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrActionSignalManager))
-        return static_cast<void*>(const_cast< FrActionSignalManager*>(this));
+	return static_cast<void*>(const_cast< FrActionSignalManager*>(this));
     return QObject::qt_metacast(_clname);
 }
 
@@ -142,16 +143,16 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 24: OnTestAction(); break;
         case 25: OnLayerParamsChanged(); break;
         case 26: OnLayerColormapChanged(); break;
-        case 27: OnRoiToolChanged(); break;
-        case 28: OnImageParamsChanged(); break;
-        case 29: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 30: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 31: OnPreviousTimePointPressed(); break;
-        case 32: OnNextTimePointPressed(); break;
-        case 33: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 27: OnLayerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 28: OnRoiToolChanged(); break;
+        case 29: OnImageParamsChanged(); break;
+        case 30: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 31: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 32: OnPreviousTimePointPressed(); break;
+        case 33: OnNextTimePointPressed(); break;
+        case 34: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         }
-        _id -= 34;
+        _id -= 35;
     }
     return _id;
 }
-QT_END_MOC_NAMESPACE

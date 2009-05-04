@@ -77,10 +77,11 @@ void RtIncrementalGLM::initEstimation(const RtData &dat,
 int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   ACE_TRACE(("RtIncrementalGLM::process"));
 
-  timer tim;
-  if(printTiming) {
-    tim.start();
-  }
+  // Alan: had to comment these strings because no timer.h file was found
+  //timer tim;
+  //if(printTiming) {
+  //  tim.start();
+  //}
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
@@ -193,13 +194,13 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   }
   setResult(msg,residual);
 
-
-  if(printTiming) {
-    tim.stop();
-    cout << "RtIncrementalGLM process at tr " 
-	 << dat->getDataID().getTimePoint()
-	 << " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
-  }
+  // Alan: had to comment these strings because no timer.h file was found
+  //if(printTiming) {
+  //  tim.stop();
+  //  cout << "RtIncrementalGLM process at tr " 
+	 //<< dat->getDataID().getTimePoint()
+	 //<< " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
+  //}
 
   if(print) {
     cout << "RtIncrementalGLM: done at tr " 

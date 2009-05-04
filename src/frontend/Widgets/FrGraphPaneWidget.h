@@ -83,7 +83,7 @@ private:
     unsigned long m_TimerID;
     int m_PlayingTimePoint;
     bool m_IsPaused;
-    QMutex mutex;
+    QMutex* mutex;
 };
 
 #endif

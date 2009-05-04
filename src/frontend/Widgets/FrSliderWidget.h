@@ -30,7 +30,7 @@ public:
     int GetMaximum();
 
     // add signals here
-signals:
+Q_SIGNALS:
     void ValueChanged(int newValue);
 
 private Q_SLOTS:

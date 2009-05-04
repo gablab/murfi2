@@ -8,6 +8,7 @@
 
 #include"RtElementAccess.h"
 
+
 // setup to access elements of this image
 RtElementAccess::RtElementAccess(RtData *_data) : data(_data), 
 						  mask(NULL) {
@@ -53,7 +54,7 @@ double RtElementAccess::getDoubleElement(unsigned int index) {
       break;
 
     default:
-      return numeric_limits<double>::quiet_NaN();
+        return numeric_limits<double>::quiet_NaN();
   }
 }
 
@@ -71,7 +72,7 @@ short RtElementAccess::getShortElement(unsigned int index) {
       break;
 
     default:
-      return numeric_limits<short>::quiet_NaN();
+        return numeric_limits<short>::quiet_NaN();
   }
 }
 

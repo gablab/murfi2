@@ -50,6 +50,7 @@ class FrMainController;
 #include "FrMaskCopyAdjacentCmd.h"
 
 #include"ace/Mutex.h"
+#include "Qt/qmutex.h"
 
 
 // This class allow user to create 
@@ -102,7 +103,8 @@ private:
 
     static FrCommandController* m_controller;
 private:
-    static ACE_Mutex m_Mutex;
+    //static ACE_Mutex m_Mutex;
+    static QMutex m_Mutex;
 
 };
 

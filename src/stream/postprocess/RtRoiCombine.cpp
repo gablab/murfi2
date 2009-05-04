@@ -9,6 +9,7 @@
 #include "RtRoiCombine.h"
 #include "RtDataIDs.h"
 #include "RtElementAccess.h"
+#include <math.h> 
 
 string RtRoiCombine::moduleString(ID_ROICOMBINE);
 

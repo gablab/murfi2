@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- configuration file for the example dataset -->
+<!--  Oliver Hinds <ohinds@mit.edu> 2008-08-11  -->
+
+<study 
+    subject="mri_test"
+    subjectsDir="mri_test"
+	>
+
+  <subject>
+    <option name="name">bar</option>
+  </subject>	
+
+  <terminal>
+      <option name="verbose"> true </option>
+      <option name="debug"> false </option>
+  </terminal>
+
+  <log>
+      <option name="filename"> log.rtl </option>
+      <option name="disabled"> false </option>
+  </log>
+
+  <errlog>
+      <option name="filename"> log.rtl </option>
+      <option name="disabled"> false </option>
+  </errlog>
+
+</study>
+
+<scanner
+    disabled="false"
+
+    receiveImages="true"
+    port="15000"
+    saveImages="true"
+
+    receiveTriggers="false"
+    triggerSync="false"
+    triggerCode="83"
+
+    onlyReadMoCo="false"
+
+    unmosaic="false"
+
+    tr="3.0"
+    measurements="85"
+
+  matrixSize="64"
+  slices="10"
+  voxdim1="3.13"
+  voxdim2="3.13"
+  voxdim3="3.85"
+> 
+
+</scanner>
+
+<gui>
+  <option name="disabled">false</option>
+</gui>
+
+<!-- <display -->
+<!--     image="1" -->
+<!--     displayType="data.image.mri.mosaic" -->
+<!--     imageWinX="300" -->
+<!--     imageWinY="0" -->
+<!--     imageWinW="1000" -->
+<!--     imageWinH="1000" -->
+
+<!--     posOverlayID="data.image.activation.voxel-singleimcor-stat_vistap" -->
+<!--     posOverlayRoiID="unset" -->
+
+<!--     posActivationSumID="data.image.activation.activation-sum" -->
+<!--     posActivationSumRoiID="active" -->
+
+<!--     posMaskID="data.image.mask" -->
+<!--     posMaskRoiID="active" -->
+<!-- > -->
+<!-- </display> -->
+
+<infoserver
+    port="15000"
+>
+</infoserver>
+
+<!-- processing steps -->
+<processor>
+<!--   <output>display</output> -->
+
+
+</processor>
+

@@ -17,6 +17,7 @@ class QStackedLayout;
 
 #include "FrMacro.h"
 #include "Qt/qwidget.h"
+#include <vector>
 
 // Class represents widgets with all ROI tools
 // together with params.

@@ -15,6 +15,8 @@
 #include <Qt/qfile.h>
 #include <Qt/qstring.h>
 
+#include "add_functions.h"
+
 #define MY_PI 3.1415926854
 
 // This function is used to ensure that

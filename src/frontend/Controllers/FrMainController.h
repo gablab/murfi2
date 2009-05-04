@@ -49,6 +49,7 @@ public:
     void DeleteLayer();
     void ChangeLayer(unsigned long action);
     void ChangeImageSettings();
+    void ChangeLayerPosition(int inc);
 
     void ChangeBookmark(unsigned long id);
     void DeleteBookmark(unsigned long id);

@@ -18,6 +18,8 @@
     #ifndef isnan
         #define isnan(x) _isnan(x)
     #endif
+
+    #define isinf(x) (!_finite(3))
 #endif
 
 // how can we combine the data

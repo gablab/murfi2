@@ -18,7 +18,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="2"
 			>
 			<Tool
@@ -40,7 +40,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="./frontend/Qwt;./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
-				PreprocessorDefinitions="WIN32;TIXML_USE_STL;USE_FRONTEND"
+				PreprocessorDefinitions="WIN32;TIXML_USE_STL;USE_FRONTEND;_LIB;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -58,16 +58,12 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
+				Name="VCLibrarianTool"
 				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib vtksys.lib vtkzlib.lib vtkfreetype.lib vtktiff.lib vtkjpeg.lib vtklibxml2.lib vtkexpat.lib vtkftgl.lib qwt.lib ACEd.lib"
-				GenerateDebugInformation="true"
-				TargetMachine="1"
+				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -79,12 +75,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -92,7 +82,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -113,8 +103,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
-				PreprocessorDefinitions="WIN32;TIXML_USE_STL;USE_FRONTEND"
+				AdditionalIncludeDirectories="./frontend/Qwt;./frontend/Layers;./frontend/Actors;./frontend/Widgets;./frontend/Utils;./frontend/FrMainWindow;./frontend/FrApplication;./frontend/Document;./frontend/Tools;./frontend/Views;./frontend/Controllers;./frontend/Commands;./frontend/Commands/MaskCommands;./frontend/Filters;data\;display\;executive\;io\;stream\;stream\analysis;stream\postprocess;stream\preprocess;util\"
+				PreprocessorDefinitions="WIN32;TIXML_USE_STL;USE_FRONTEND;_LIB"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -130,19 +120,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
+				Name="VCLibrarianTool"
 				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib vtkCommon.lib vtkFiltering.lib vtkGraphics.lib vtkImaging.lib vtkRendering.lib vtkpng.lib vtkIO.lib vtksys.lib vtkzlib.lib vtkfreetype.lib vtktiff.lib vtkjpeg.lib vtklibxml2.lib vtkexpat.lib vtkftgl.lib qwt.lib ACE.lib"
+				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="msvcp80d.lib;msvcr80d.lib"
-				GenerateDebugInformation="true"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -152,12 +136,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -362,6 +340,10 @@
 			</File>
 			<File
 				RelativePath=".\frontend\moc\FrROIToolWidget_moc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\moc\FrSliderWidget_moc.cpp"
 				>
 			</File>
 			<File
@@ -1719,6 +1701,34 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrSliderWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrSliderWidget.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Mocing $(InputPath)"
+						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
+						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrSpinSliderWidget.cpp"
 				>
 			</File>
@@ -1904,6 +1914,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Actors\FrBaseActor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrCrosshair.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Actors\FrCrosshair.h"
 				>
 			</File>
 			<File
@@ -2119,6 +2137,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\frontend\Commands\FrSliceScrollCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Commands\FrSliceScrollCmd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Commands\FrTimePointCmd.cpp"
 				>
 			</File>
@@ -2252,14 +2278,6 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Layers\FrBaseLayer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Layers\FrColormapLayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Layers\FrColormapLayer.h"
 				>
 			</File>
 			<File

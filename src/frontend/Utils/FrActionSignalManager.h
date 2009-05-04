@@ -51,6 +51,7 @@ public slots:
     // Other stuff
     void OnLayerParamsChanged();
     void OnLayerColormapChanged();
+    void OnLayerPositionChanged(int inc);
     void OnRoiToolChanged();
     void OnImageParamsChanged();
     // Graph pane

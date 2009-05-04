@@ -77,7 +77,32 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
     QVBoxLayout* layerLayout = new QVBoxLayout();
     layerLayout->addWidget(m_layerTable);
     layerLayout->addWidget(btnBlock);
-   
+
+    // add up and down arrow buttons
+    m_btnUpArrow = new QToolButton();
+    m_btnUpArrow->setToolTip("Move layer up");
+    m_btnUpArrow->setArrowType(Qt::UpArrow);
+
+    m_btnDownArrow = new QToolButton();
+    m_btnDownArrow->setToolTip("Move layer down");
+    m_btnDownArrow->setArrowType(Qt::DownArrow);
+    
+    // setup layout for arrow buttons
+	QSpacerItem *spacerItem1;
+	spacerItem1 = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	QSpacerItem *spacerItem2;
+	spacerItem2 = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    QVBoxLayout* arrowsLayout = new QVBoxLayout();
+    arrowsLayout->addItem(spacerItem1);
+    arrowsLayout->addWidget(m_btnUpArrow);
+    arrowsLayout->addWidget(m_btnDownArrow);
+    arrowsLayout->addItem(spacerItem2);
+
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    hLayout->addLayout(arrowsLayout);
+    hLayout->addLayout(layerLayout);
+
     // ohinds: 2009-02-23
     // moved the opacity slider to the btn block
 //    QHBoxLayout* opacityLayout = new QHBoxLayout();
@@ -103,7 +128,7 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
         
     // Setup main layout
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
-    mainLayout->addLayout(layerLayout);
+    mainLayout->addLayout(hLayout);//layerLayout);
     mainLayout->addLayout(propLayout);
 
     // Connect signals
@@ -114,6 +139,9 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
     connect( m_btnAdd, SIGNAL(clicked()), this, SLOT(OnAddClicked()) );
     connect( m_btnDelete, SIGNAL(clicked()), this, SLOT(OnDeleteClicked()) );
     connect( m_btnChange, SIGNAL(clicked()), this, SLOT(OnChangeClicked()) );
+
+    connect( m_btnUpArrow, SIGNAL(clicked()), this, SLOT(OnUpArrowClicked()) );
+    connect( m_btnDownArrow, SIGNAL(clicked()), this, SLOT(OnDownArrowClicked()) );
 
     connect( m_opacityWidget, SIGNAL(ValueChanged(int)), 
              this, SLOT(OnOpacityChanged(int)) );
@@ -291,6 +319,16 @@ void FrLayerListWidget::OnDeleteClicked(){
 void FrLayerListWidget::OnChangeClicked(){
     if(m_signalsBlocked) return;
     emit ChangeLayer();
+}
+
+void FrLayerListWidget::OnUpArrowClicked(){
+    if(m_signalsBlocked) return;
+    emit ChangeLayerPosition(1);    // move layer up
+}
+
+void FrLayerListWidget::OnDownArrowClicked(){
+    if(m_signalsBlocked) return;
+    emit ChangeLayerPosition(-1);   // move layer down
 }
 
 // Manage some params

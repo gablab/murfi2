@@ -75,7 +75,11 @@ bool FrLoadImageCmd::Execute(){
 	    // than one file
 	    img->getDataID().setSeriesNum(series);
 	    img->getDataID().setTimePoint(timePoint);
-	    img->getDataID().setDataName((*itr).toStdString());
+        
+        string st = (*itr).toLatin1();
+        //string st = *itr).toStdString();
+        
+        img->getDataID().setDataName(st);
 
 	    if(timePoint == 0) {
 //	      FrTabSettingsDocObj* tabSets = md->GetCurrentTabSettings();

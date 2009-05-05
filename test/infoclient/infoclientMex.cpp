@@ -3,8 +3,9 @@
  * communication with festr's infoserver
  *
  *    first argument is a command (success indicated with logical 0) :
- *       start: starts the infoclient.
- *              usage: success = infoclient('start', host, port)
+ *       start:  starts the infoclient.
+ *               usage: success 
+                     = infoclient('start', localport, remotehost, remoteport)
  *
  *       add:    adds a data id to the notify list.
  *               usage: success = infoclient('add', dataName, roiName)
@@ -115,30 +116,39 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   string errMsg;
   if(command == "start") {  // find host and port from args 
     TcpInfo info;
+    TcpInfo remoteInfo;
 
     // check number of parameters
-    if(nrhs != 3) {
-      mexErrMsgTxt("host and port are required arguments for 'start'.");
+    if(nrhs != 4) {
+      mexErrMsgTxt("localport, remotehost and remoteport are required arguments for 'start'.");
       assignSuccessStatus(nlhs,plhs,FAILURE);
       return;
     }
 
-    // get the host
-    if(mxGetString(prhs[1],info.host,MAX_STR_LEN)) {
-      mexErrMsgTxt("host name can't be converted to a string.");
+    // get the localport
+    if(!mxIsNumeric(prhs[1])) {
+      mexErrMsgTxt("localport can't be converted to a number.");
+      assignSuccessStatus(nlhs,plhs,FAILURE);
+      return;
+    }
+    info.port = (int) mxGetScalar(prhs[1]);
+
+    // get the remotehost
+    if(mxGetString(prhs[2],remoteInfo.host,MAX_STR_LEN)) {
+      mexErrMsgTxt("remotehost name can't be converted to a string.");
       assignSuccessStatus(nlhs,plhs,FAILURE);
       return;
     }
 
-    // get the port
-    if(!mxIsNumeric(prhs[2])) {
-      mexErrMsgTxt("port can't be converted to a number.");
+    // get the remoteport
+    if(!mxIsNumeric(prhs[3])) {
+      mexErrMsgTxt("remoteport can't be converted to a number.");
       assignSuccessStatus(nlhs,plhs,FAILURE);
       return;
     }
-    info.port = (int) mxGetScalar(prhs[2]);
+    remoteInfo.port = (int) mxGetScalar(prhs[3]);
 
-    status = startInfoclient(info, errMsg);
+    status = startInfoclient(info, remoteInfo, errMsg);
 
     if(status == SUCCESS) {
       mexPrintf("started the infoclient.\n");

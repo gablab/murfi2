@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?> 
+
+<!-- add request -->
+<info>
+  <add name="activation" roi="active">
+  </add>
+</info>
+
+<!-- remove request -->
+<info>
+  <remove name="activation" roi="active">
+  </add>
+</info>
+
+<!-- data update -->
 <info>
   <data name="activation" roi="active" tr="32">
       3.14159
   </data>
 </info>
+
+<!-- data acknowledgement -->
+<info>
+  <acknowledge name="activation" roi="active" tr="32">
+  </acknowledge>
+</info>
+
 

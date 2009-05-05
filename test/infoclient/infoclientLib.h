@@ -73,6 +73,7 @@ struct TcpInfo {
  * start the infoclient 
  */
 int startInfoclient(const TcpInfo &tcpInfo, 
+		    const TcpInfo &remoteTcpInfo, 
 		    string &errMsg);
 
 /**

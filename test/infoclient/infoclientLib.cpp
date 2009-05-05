@@ -27,8 +27,10 @@ using namespace std;
   #include<unistd.h> /* for sleep */
 #endif
 
+#include"ace/Date_Time.h"
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Acceptor.h"
+#include"ace/SOCK_Connector.h"
 
 #include"tinyxml/tinyxml.h"
 
@@ -38,6 +40,9 @@ using namespace std;
 // net
 static bool serverRunning = false;
 static ACE_SOCK_Acceptor acceptor;
+static long WAIT_USEC = 10000;
+static ACE_INET_Addr remoteAddress;
+static const char messageTerminationChar = '\n';
 
 // thread
 static bool threadRunning = false;
@@ -57,17 +62,40 @@ static queue<Info> changedData;
 // functions
 
 /**
+ * convert an ace date/time struct to a long
+ */
+long timeToLong(const ACE_Date_Time &time) {
+  long ret = time.microsec();
+  int power = 0;
+
+  power += 6;
+  ret += pow(10,power) * time.second();
+
+  power += 2;
+  ret += pow(10,power) * time.minute();
+
+  power += 2;
+  ret += pow(10,power) * time.hour();
+
+  power += 2;
+  ret += pow(10,power) * time.day();
+
+  power += 2;
+  ret += pow(10,power) * time.month();
+}
+
+/**
  * open a listener for data
  */
-int openDataListener(char *host, unsigned short port, string &errMsg) {
+int openDataListener(unsigned short port, string &errMsg) {
 
-  ACE_INET_Addr address(port, host);
+  ACE_INET_Addr address(port);
   errMsg = "";
 
   if(acceptor.open(address,1) == -1) {
     stringstream err;
-    err << "couldn't open acceptor to listen on " << address.get_host_name() 
-	<< ":" << address.get_port_number() << endl;
+    err << "couldn't open acceptor to listen on port "
+	<< address.get_port_number() << endl;
     errMsg = err.str();
     return FAILURE;
   }
@@ -81,6 +109,7 @@ int openDataListener(char *host, unsigned short port, string &errMsg) {
  * handle an xml string received from the infoserver
  */
 void handleReceivedXml(const string &xml) {
+
   // parse the xml
   TiXmlDocument doc;
   doc.Parse(xml.c_str());
@@ -104,8 +133,10 @@ void handleReceivedXml(const string &xml) {
       // find this data in the database
       set<Info>::iterator i = dataBase.find(info);
       if(i != dataBase.end()) { // if found, update the info in the set
+	ACE_Date_Time time;
+
 	info.tr =  atoi(data->Attribute("tr"));
-	info.time= time(NULL);
+	info.time = timeToLong(time);
 	info.value = atof(data->FirstChild()->Value());
 	info.changed = true;
 
@@ -146,19 +177,19 @@ int closeDataListener() {
 void *listenForData(void *tcpInfo) {
   string errMsg;
   ACE_SOCK_Stream stream;
-  ACE_INET_Addr remoteAddress;
+  ACE_INET_Addr connected;
   ACE_Time_Value timeout(0,10000);
 
   TcpInfo *info = (TcpInfo*) tcpInfo;
 
-  if(openDataListener(info->host, info->port, errMsg) == FAILURE) {
+  if(openDataListener(info->port, errMsg) == FAILURE) {
     cout << errMsg << endl;
     return NULL;
   }
 
   // continuously try to accept connections
   while(serverRunning) {
-    if(acceptor.accept(stream, &remoteAddress, &timeout, 0) != -1) {
+    if(acceptor.accept(stream, &connected, &timeout, 0) != -1) {
       stringstream message;
 
       // get characters until null character
@@ -173,7 +204,7 @@ void *listenForData(void *tcpInfo) {
 
       // receive the message, store the response
       string recieved = message.str();
-      cout << "received: " << recieved << endl;
+      //cout << "received: " << recieved << endl;
 
       handleReceivedXml(recieved);
 
@@ -187,9 +218,84 @@ void *listenForData(void *tcpInfo) {
 }
 
 /**
+ * send an add message to the remote client
+ */
+int sendAddMessage(const Info &info) {
+  ACE_SOCK_Stream stream;
+  ACE_SOCK_Connector connector;
+  
+  if(!connector.connect(stream, remoteAddress)) {
+    // build add message 
+    stringstream xml;
+    xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"  
+	<< "<info>" 
+	<< "<add name=\"" << info.dataName 
+	<< "\" roi=\"" << info.roiName 
+	<< "\">" 
+	<< "</add>" 
+	<< "</info>";
+
+    unsigned int sent = stream.send_n(xml.str().c_str(), xml.str().length());
+    if(sent < xml.str().length()) {
+      cerr << "incomplete send" << endl;
+      return FAILURE;
+    }
+  
+    stream.send_n(&messageTerminationChar,1);
+    stream.close();
+
+    cout << "sent " << xml.str() << endl;    
+    
+  }
+  else {
+    return FAILURE;
+  }
+
+  return SUCCESS;
+}
+
+/**
+ * send an remove message to the remote client
+ */
+int sendRemoveMessage(const Info &info) {
+  ACE_SOCK_Stream stream;
+  ACE_SOCK_Connector connector;
+  
+  if(!connector.connect(stream, remoteAddress)) {
+    // build remove message 
+    stringstream xml;
+    xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"  
+	<< "<info>" 
+	<< "<remove name=\"" << info.dataName 
+	<< "\" roi=\"" << info.roiName 
+	<< "\">" 
+	<< "</remove>" 
+	<< "</info>";
+
+    unsigned int sent = stream.send_n(xml.str().c_str(), xml.str().length());
+    if(sent < xml.str().length()) {
+      cerr << "incomplete send" << endl;
+      return FAILURE;
+    }
+  
+    stream.send_n(&messageTerminationChar,1);
+    stream.close();
+
+    cout << "sent " << xml.str() << endl;    
+    
+  }
+  else {
+    return FAILURE;
+  }
+
+  return SUCCESS;
+}
+
+/**
  * start the infoclient 
  */
 int startInfoclient(const TcpInfo &tcpInfo, 
+		    const TcpInfo &remoteTcpInfo, 
 		    string &errMsg) {
   errMsg = "";
 
@@ -205,8 +311,12 @@ int startInfoclient(const TcpInfo &tcpInfo,
     return FAILURE;
   }
   else {
+    // wait a little while for the tcp stuff to happen
+    usleep(WAIT_USEC);
     threadRunning = true;
   }
+
+  remoteAddress.set(remoteTcpInfo.port, remoteTcpInfo.host);
 
   return SUCCESS;
 }
@@ -221,17 +331,18 @@ int addInfoclient(const string &dataName, const string &roiName,
     return FAILURE;
   }
 
-  // send add message
-  
   // add template to database
   Info info;
   info.dataName = dataName;
   info.roiName  = roiName;
   pair<set<Info,InfoCompare>::iterator,bool> i = dataBase.insert(info);
 
-  cout << "inserted " << (*i.first).dataName << ":" << (*i.first).roiName << " " 
-       << i.second << endl;
+  // send add message
+  sendAddMessage(info);
 
+//  cout << "inserted " << (*i.first).dataName << ":" << (*i.first).roiName << " " 
+//       << i.second << endl;
+//
 
   return SUCCESS;
 }
@@ -259,6 +370,8 @@ int removeInfoclient(const string &dataName, const string &roiName,
   }
 
   dataBase.erase(i);
+
+  sendRemoveMessage(info);
 
   return SUCCESS;
 }

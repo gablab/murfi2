@@ -1,6 +1,7 @@
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Connector.h"
 #include"ace/SOCK_Stream.h"
+#include"ace/Date_Time.h"
 #include<iostream>
 #include<string>
 #include<sstream>
@@ -35,12 +36,14 @@ int main(int argc, char **args) {
   for(int t = 1; !connector.connect(stream, my_addr); t++) {
     entered = true;
     stringstream xml;
+    ACE_Date_Time time;
+
     xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"  
 	<< "<info>" 
 	<< "<data name=\"" << dataName 
 	<< "\" roi=\"" << roiName 
 	<< "\" tr=\"" << t << "\">" 
-	<< time(NULL) 
+	<< time.second() << "." << time.microsec() 
 	<< "</data>" 
 	<< "</info>";
     
@@ -56,7 +59,6 @@ int main(int argc, char **args) {
     cout << "sent " << xml.str() << endl;    
 
     sleep(tr);
-    return 0;
   }
 
   if(!entered) {

@@ -9,7 +9,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 #include "vtkImageActor.h"
-#include "vtkRenderer.h"
+//#include "vtkRenderer.h"
 #include "vtkCamera.h"
 
 // Some defines

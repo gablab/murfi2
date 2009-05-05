@@ -158,20 +158,20 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
 }
 
 // Common actions
-void FrLayerListWidget::AddLayer(FrLayerDocObj* layerDO){
+void FrLayerListWidget::AddLayer(FrLayerDocObj* layerDO, int pos){
     // NOTE: Layers are added in the top
-    m_layerTable->insertRow(INSERT_ROW_NUM);
-    m_layerTable->setRowHeight(INSERT_ROW_NUM, 40);
+    //m_layerTable->insertRow(INSERT_ROW_NUM);
+    //m_layerTable->setRowHeight(INSERT_ROW_NUM, 40);
 
     // Set ID
     QString strID = QString().setNum(layerDO->GetID());
-    m_layerTable->setItem(INSERT_ROW_NUM, TAB_ID_IDX, new QTableWidgetItem(strID));
+    m_layerTable->setItem(pos, TAB_ID_IDX, new QTableWidgetItem(strID));
 
     // Create layer widget and add it to table
     FrLayerWidget* lw = new FrLayerWidget(layerDO, this);
     connect(lw, SIGNAL(VisibilityChanged(unsigned long)), 
             this, SLOT(OnVisibilityChanged(unsigned long)));
-    m_layerTable->setCellWidget(INSERT_ROW_NUM, TAB_LAYER_IDX, lw);
+    m_layerTable->setCellWidget(pos, TAB_LAYER_IDX, lw);
     
     // Init opacity
     int opacity = int(layerDO->GetOpacity() * m_opacityWidget->GetMaximum());
@@ -436,6 +436,12 @@ void FrLayerListWidget::OnUpdate(){
     // Clear
     this->RemoveLayers();
     
+    // TRICK: first create rows in table 
+    for (int i = 0; i<layers.size(); i++){
+        m_layerTable->insertRow(INSERT_ROW_NUM);
+        m_layerTable->setRowHeight(INSERT_ROW_NUM, 40);
+    }
+
     // Get selected layer ID 
     FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
     if(viewDO == 0) return;
@@ -448,11 +454,13 @@ void FrLayerListWidget::OnUpdate(){
     std::vector<FrDocumentObj*>::iterator it, itEnd(layers.end());
     for(it = layers.begin(); it != itEnd; ++it){
         FrLayerDocObj* layerDO = (FrLayerDocObj*) (*it);
-	this->AddLayer(layerDO);
+        // get layer position
+        int pos = layers.size() - layerDO->GetPosition() - 1;   // first layer has max position but should be at top in widget (0)
+	    this->AddLayer(layerDO, pos);
     }
-
 
     this->SetSelectedLayer(layerID);
     this->UpdateRoiList();
     this->BlockSignals(false);
 }
+

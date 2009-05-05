@@ -274,6 +274,7 @@ bool FrLayeredImage::AddLayer(unsigned long id, LayerType type){
 	    // backend. 
             rw->AddRenderer(layer->GetRenderer());
             rw->SetNumberOfLayers(int(rens.size()));
+            this->GetRenderers(rens);
         }
     }
     return (layer != 0);
@@ -344,37 +345,36 @@ bool FrLayeredImage::ChangeLayerPosition(unsigned long id, int inc){
     if(it != itEnd){
         FrBaseLayer* layer = (*it);
 
-
         // check if we can perform this operation
-        std::vector<vtkRenderer*> rens;
-        this->GetRenderers(rens);
-
         int oldPos = layer->GetRenderer()->GetLayer();
         int newPos = oldPos + inc;
-        int nol = rens.size();          // total number of layers
+        int nol = m_Layers.size();          // total number of layers
 
         if (newPos < 0 || newPos > nol)
             return false;
 
-        vtkRenderWindow* rw = layer->GetRenderer()->GetRenderWindow();
-        if(rw != 0){
-            // change layer order
-            // find layer with newPos
-            for(it = m_Layers.begin(); it != itEnd; ++it){
-                if((*it)->GetRenderer()->GetLayer() == newPos) break;
-            }
-            if(it != itEnd){
-                FrBaseLayer* layer2 = (*it);
-            
-                // change order
-                layer->GetRenderer()->SetLayer(newPos);
-                layer2->GetRenderer()->SetLayer(oldPos);
-
-                // HACK: GetRenderers() reorder all layers
-                // by setting up proper 'LayerNumber' !!!
-                rw->SetNumberOfLayers(rens.size());
-            }
+        // change layer order
+        // find layer with newPos
+        for(it = m_Layers.begin(); it != itEnd; ++it){
+            if((*it)->GetRenderer()->GetLayer() == newPos) break;
         }
+
+        if(it != itEnd){
+            FrBaseLayer* layer2 = (*it);
+        
+            // change render order
+            m_Layers[oldPos] = layer2;
+            m_Layers[newPos] = layer;
+            //layer->GetRenderer()->SetLayer(newPos);
+            //layer2->GetRenderer()->SetLayer(oldPos);
+            
+            // HACK: GetRenderers() reorder all layers
+            // by setting up proper 'LayerNumber' !!!
+            std::vector<vtkRenderer*> rens;
+            this->GetRenderers(rens);
+        }
+
+        result = true;
     }
     return result;
 }

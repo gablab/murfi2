@@ -2,6 +2,7 @@
 #define FR_LAYER_CMD
 
 class FrLayerDocObj;
+class FrLayeredImage;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
@@ -47,6 +48,7 @@ private:
 
     unsigned long GetActiveLayerID();
     bool IsRoiLayer(unsigned long id);
+    void SetLayersOrder();
 
 private:
     bool m_isID;

@@ -109,6 +109,9 @@ bool FrLayerCmd::AddLayer(){
 
     // set default view
 
+    // set layers order
+    SetLayersOrder();
+
     return result;
 }
 
@@ -143,10 +146,14 @@ bool FrLayerCmd::DeleteLayer(){
     viewDO->GetMosaicViewSettings()->SetActiveLayerID(nextID);
     viewDO->GetOrthoViewSettings()->SetActiveLayerID(nextID);
 
+
     // ohinds 2009-02-25
     // need to make sure this is ok, might cause crash on update when deleting?
     if (nextID != BAD_LAYER_ID)
       FrBaseCmd::UpdatePipelineForID(nextID, FRP_COLORMAP);
+
+    // set layers order
+    SetLayersOrder();
 
     return true;
 }
@@ -309,6 +316,8 @@ bool FrLayerCmd::ChangeLayerPosition(){
 
     // Init data
     FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
     FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
     layeredImage[0] = mv->GetSliceView()->GetImage();
     layeredImage[1] = mv->GetMosaicView()->GetImage();
@@ -316,14 +325,19 @@ bool FrLayerCmd::ChangeLayerPosition(){
     layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
     layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
     
+    bool result = false;
     // change layer position for all layered images
     for(int i=0; i < ALL_ITEMS_COUNT; ++i){
         layeredImage[i]->ChangeLayerPosition(m_ID, m_Increment);
     }
-
-    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);   
     
-    return true;
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);   
+    result = true;
+    
+    // set layers order
+    SetLayersOrder();
+
+    return result;
 }
 
 
@@ -348,6 +362,42 @@ bool FrLayerCmd::IsRoiLayer(unsigned long id){
     }
     return false;
 }
+
+void FrLayerCmd::SetLayersOrder(){
+    // init data
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+
+    FrLayeredImage* layeredImage;
+    
+    switch (doc->GetCurrentViewObject()->GetActiveView()){
+            case SliceView:
+                layeredImage = mv->GetSliceView()->GetImage();
+                break;
+            case MosaicView:
+                layeredImage = mv->GetMosaicView()->GetImage();
+                break;
+            case OrthoView:
+                layeredImage = mv->GetOrthoView()->GetImage(DEF_CORONAL);
+                break;
+    }
+
+    // find appropriate layer doc obj
+    FrDocument::DocObjCollection layers;
+    doc->GetObjectsByType(layers, FrDocumentObj::LayerObject); 
+
+    FrLayerDocObj* layerDO = 0L;
+    if(layers.size() > 0){
+        // find appropriate Layer in layered image
+        for (int i = 0; i < layers.size(); i++){
+            layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
+            int id = layerDO->GetID();
+            int pos = layeredImage->GetLayerByID(id)->GetPosition();
+            layerDO->SetPosition(pos);
+        }
+    }   
+}
+
 ///////////////////////////////////////////////////////////////
 // Do not implement undo/redo setion for now
 bool FrLayerCmd::CanUndo(){

@@ -13,7 +13,7 @@
 
 FrLayerDocObj::FrLayerDocObj(FrLayerSettings::LTypes type, 
 			     const RtDataID &id, QString name)
-: m_Settings(0), m_ID (0){
+: m_Settings(0), m_ID (0), m_Position (0){
   m_Settings = FrLayerSettings::Create(type,id,name);
     m_ID = (unsigned long)(void*)(this);
     //cout << "FrLayerDocObj::FrLayerDocObj(): creating layer doc obj with id " << m_ID << endl;

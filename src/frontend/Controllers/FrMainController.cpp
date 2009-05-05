@@ -455,10 +455,18 @@ void FrMainController::ChangeImageSettings(){
 }
 
 void FrMainController::ChangeLayerPosition(int inc){
-    // TODO: add change layer position command here
-    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
-    cmd->SetAction(FrLayerCmd::ChangePosition);
-    cmd->SetIncrement(inc);
+    // Create complex command and execute it
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+
+    FrLayerCmd* cmd1 = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd1->SetAction(FrLayerCmd::ChangePosition);
+    cmd1->SetIncrement(inc);
+    
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::LayerList);
+
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
     FrCommandController::Execute(cmd);
     delete cmd;
 }

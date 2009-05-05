@@ -31,7 +31,7 @@ public:
 
     // Common actions
     void Update();
-    void AddLayer(FrLayerDocObj* layerDO);
+    void AddLayer(FrLayerDocObj* layerDO, int pos);
     void RemoveLayers();
     void UpdateRoiList();
 
@@ -106,6 +106,7 @@ private:
     FrROIToolWidget* m_roiToolWidget;
 
     bool m_signalsBlocked;
+
 };
 
 #endif

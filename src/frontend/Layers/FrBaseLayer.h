@@ -3,7 +3,7 @@
 #define FR_BASE_LAYER
 
 //Forward declarations
-class vtkRenderer;
+//class vtkRenderer;
 class vtkImageData;
 class FrCameraSettings;
 
@@ -11,6 +11,7 @@ class FrCameraSettings;
 #include "FrMacro.h"
 #include "FrLayerSettings.h"
 #include "vtkObject.h"
+#include "vtkRenderer.h"
 
 // Represents layer object.
 // Base abstract class.
@@ -38,6 +39,10 @@ public:
 
     vtkRenderer* GetRenderer(){ 
         return m_Renderer; 
+    }
+
+    unsigned int GetPosition(){
+        return m_Renderer->GetLayer();
     }
 
     // Input management

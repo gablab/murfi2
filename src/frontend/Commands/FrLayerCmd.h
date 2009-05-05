@@ -13,7 +13,8 @@ public:
     typedef enum _Action { 
         Undefined, Add, Delete, 
         ChangeOld, ChangeParams, 
-        ChangeColormap, UpdateSelectedID 
+        ChangeColormap, UpdateSelectedID,
+        ChangePosition
     } Actions;
 
 public:
@@ -30,6 +31,7 @@ public:
     // Properties
     FrSetPropMacro(Actions, Action);    
     FrSetPropMacro(FrLayerDocObj*, DocObj);
+    FrSetPropMacro(int, Increment);
     void SetID(unsigned long id);
 
 private:
@@ -41,6 +43,7 @@ private:
     bool ChangeLayerOld();
     bool ChangeLayerParams();
     bool ChangeLayerColormap();
+    bool ChangeLayerPosition();
 
     unsigned long GetActiveLayerID();
     bool IsRoiLayer(unsigned long id);

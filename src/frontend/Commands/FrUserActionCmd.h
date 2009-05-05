@@ -37,6 +37,7 @@ private:
     bool addGraph();
     bool deleteGraph();
     bool ChangeImageSettings();
+    bool changeLayerPosition();
 
     unsigned long GetActiveLayerID();
     //FrLayerDocObj* GetLayerDocObjByID(unsigned long id);

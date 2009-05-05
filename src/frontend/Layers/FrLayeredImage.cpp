@@ -333,6 +333,53 @@ void FrLayeredImage::RemoveLayers(){
     }
 }
 
+bool FrLayeredImage::ChangeLayerPosition(unsigned long id, int inc){
+    // Find layer
+    LayersCollection::iterator it, itEnd(m_Layers.end());
+    for(it = m_Layers.begin(); it != itEnd; ++it){
+        if((*it)->GetID() == id) break;
+    }
+    
+    bool result = false;
+    if(it != itEnd){
+        FrBaseLayer* layer = (*it);
+
+
+        // check if we can perform this operation
+        std::vector<vtkRenderer*> rens;
+        this->GetRenderers(rens);
+
+        int oldPos = layer->GetRenderer()->GetLayer();
+        int newPos = oldPos + inc;
+        int nol = rens.size();          // total number of layers
+
+        if (newPos < 0 || newPos > nol)
+            return false;
+
+        vtkRenderWindow* rw = layer->GetRenderer()->GetRenderWindow();
+        if(rw != 0){
+            // change layer order
+            // find layer with newPos
+            for(it = m_Layers.begin(); it != itEnd; ++it){
+                if((*it)->GetRenderer()->GetLayer() == newPos) break;
+            }
+            if(it != itEnd){
+                FrBaseLayer* layer2 = (*it);
+            
+                // change order
+                layer->GetRenderer()->SetLayer(newPos);
+                layer2->GetRenderer()->SetLayer(oldPos);
+
+                // HACK: GetRenderers() reorder all layers
+                // by setting up proper 'LayerNumber' !!!
+                rw->SetNumberOfLayers(rens.size());
+            }
+        }
+    }
+    return result;
+}
+
+
 FrBaseLayer* FrLayeredImage::GetLayerByID(unsigned long id){
     LayersCollection::iterator it, itEnd(m_Layers.end());
 //    if (m_ImageLayer->GetID() == id)        // should we include

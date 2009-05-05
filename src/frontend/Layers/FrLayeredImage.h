@@ -57,6 +57,7 @@ public:
     bool RemoveLayer(unsigned long id);
     void RemoveLayers();
     //void RemoveColormapLayers();
+    bool ChangeLayerPosition(unsigned long id, int inc);
 
     // Returns layer by ID
     FrBaseLayer* GetLayerByID(unsigned long id);

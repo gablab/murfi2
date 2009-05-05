@@ -52,6 +52,8 @@ bool FrLayerCmd::Execute(){
             break;
         case FrLayerCmd::UpdateSelectedID: result = UpdateSelectedLayerID();
             break;
+        case FrLayerCmd::ChangePosition: result = ChangeLayerPosition();
+            break;
         case FrLayerCmd::Undefined:
         default:
             // Do nothing here
@@ -296,6 +298,34 @@ bool FrLayerCmd::ChangeLayerColormap(){
     FrBaseCmd::UpdatePipelineForID(m_ID, FRP_COLORMAP);
     return true;
 }
+
+bool FrLayerCmd::ChangeLayerPosition(){
+    if (m_Increment == 0) return false;
+
+    // Get proper ID
+    if(!m_isID){
+        m_ID = this->GetActiveLayerID();
+    }
+
+    // Init data
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrLayeredImage* layeredImage[ALL_ITEMS_COUNT];
+    layeredImage[0] = mv->GetSliceView()->GetImage();
+    layeredImage[1] = mv->GetMosaicView()->GetImage();
+    layeredImage[2] = mv->GetOrthoView()->GetImage(DEF_CORONAL);
+    layeredImage[3] = mv->GetOrthoView()->GetImage(DEF_SAGITAL);
+    layeredImage[4] = mv->GetOrthoView()->GetImage(DEF_AXIAL);
+    
+    // change layer position for all layered images
+    for(int i=0; i < ALL_ITEMS_COUNT; ++i){
+        layeredImage[i]->ChangeLayerPosition(m_ID, m_Increment);
+    }
+
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);   
+    
+    return true;
+}
+
 
 // delete active layer
 unsigned long FrLayerCmd::GetActiveLayerID(){

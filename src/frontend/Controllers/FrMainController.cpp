@@ -456,10 +456,11 @@ void FrMainController::ChangeImageSettings(){
 
 void FrMainController::ChangeLayerPosition(int inc){
     // TODO: add change layer position command here
-    //FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
-    //cmd->SetAction(FrUserActionCmd::ChangeSettings);
-    //FrCommandController::Execute(cmd);
-    //delete cmd;
+    FrLayerCmd* cmd = FrCommandController::CreateCmd<FrLayerCmd>();
+    cmd->SetAction(FrLayerCmd::ChangePosition);
+    cmd->SetIncrement(inc);
+    FrCommandController::Execute(cmd);
+    delete cmd;
 }
 
 void FrMainController::ChangeBookmark(unsigned long id){

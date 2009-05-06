@@ -14,6 +14,7 @@
 #include "FrColormapWidget.h"
 #include "FrImageSettingsWidget.h"
 #include "FrPointsDocObj.h"
+#include "FrDataStoreDialog.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -56,18 +57,22 @@ bool FrUserActionCmd::Execute(){
     return result;
 }
 
+// new addLayer function (it adds images as layers from datastore)
 bool FrUserActionCmd::addLayer(){
     bool result = false;
-    
-    // create new layer doc object and get settings from dialog
-    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, RtDataID());
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrLayerDialog dlg(mv, true);
+    FrDataStoreDialog dlg(mv, true);
+    QString title("Data Store Viewer");
+    dlg.SetCaption(title);
+    dlg.Initialize(this->GetMainController()->GetMainDocument());
     if(!dlg.SimpleExec()) return false;
-    FrImageLayerSettings* cmlSets = new FrImageLayerSettings(RtDataID(), QString("find some way to spec a good name"));
-    dlg.GetLayerParams(*cmlSets);
+    // scopic Alan 06.05.09, NOTE: we can get image name from datastore t set it as layer name
+    // TODO: check if image with specified ID already exists as layer
+    FrImageLayerSettings* cmlSets = new FrImageLayerSettings(dlg.GetID(), QString("find some way to spec a good name"));
 
+    // create new layer doc object and get settings from dialog
+    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, dlg.GetID());
     layerDO->SetSettings(cmlSets);
 
     // finally add new doc to MainDocument
@@ -77,6 +82,30 @@ bool FrUserActionCmd::addLayer(){
 
     return result;
 }
+
+
+//bool FrUserActionCmd::addLayer(){
+//    bool result = false;
+//    
+//    // scopic Alan, NOTE: memory leak, if user cancel dialog new layer doc object will be created anyway
+//    // create new layer doc object and get settings from dialog
+//    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, RtDataID());
+//
+//    FrMainWindow* mv = this->GetMainController()->GetMainView();
+//    FrLayerDialog dlg(mv, true);
+//    if(!dlg.SimpleExec()) return false;
+//    FrImageLayerSettings* cmlSets = new FrImageLayerSettings(RtDataID(), QString("find some way to spec a good name"));
+//    dlg.GetLayerParams(*cmlSets);
+//
+//    layerDO->SetSettings(cmlSets);
+//
+//    // finally add new doc to MainDocument
+//    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+//    doc->Add(layerDO);
+//    result = true;
+//
+//    return result;
+//}
 
 bool FrUserActionCmd::deleteLayer(){
     // Get proper ID

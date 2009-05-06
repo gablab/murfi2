@@ -93,6 +93,7 @@ void FrCrosshair::DrawCrosshair(){
   m_actor->SetMapper(m_mapper);
   m_actor->Modified();
 
+  colors->Delete();  
   linePoints->Delete();
   lines->Delete();
   lineData->Delete();

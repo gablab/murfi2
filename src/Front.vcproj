@@ -1841,6 +1841,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\frontend\Widgets\FrTreeWidgetItem.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Widgets\FrTreeWidgetItem.h"
+				>
+			</File>
+			<File
 				RelativePath=".\frontend\Widgets\FrVoxelInfoWidget.cpp"
 				>
 			</File>

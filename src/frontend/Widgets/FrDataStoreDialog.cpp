@@ -2,6 +2,8 @@
 #include "FrMainDocument.h"
 #include "FrDataStore.h"
 #include "FrBrowseFileWidget.h"
+#include "FrLayerDocObj.h"
+#include "FrTreeWidgetItem.h"
 
 #include "Qt/qtreewidget.h"
 #include "Qt/qlayout.h"
@@ -12,7 +14,6 @@
 #include "Qt/qgroupbox.h"
 #include "Qt/qvariant.h"
 
-#include "RtDataID.h"
 #include <algorithm>
 #include <string>
 
@@ -45,11 +46,11 @@ FrDataStoreDialog::FrDataStoreDialog(QWidget* parent, bool isModal)
     this->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
    
     m_tvDataStore = this->CreateTreeViewWidget();
-    m_tvApplication = this->CreateTreeViewWidget();
+    //m_tvApplication = this->CreateTreeViewWidget();
 
     QHBoxLayout* wgtLayout = new QHBoxLayout();
     wgtLayout->addWidget(m_tvDataStore);
-    wgtLayout->addWidget(m_tvApplication);
+    //wgtLayout->addWidget(m_tvApplication);
 
     QHBoxLayout* btnLayout = this->CreateButtonLayout();
    
@@ -59,6 +60,8 @@ FrDataStoreDialog::FrDataStoreDialog(QWidget* parent, bool isModal)
 
     this->setFixedHeight(this->sizeHint().height());
     this->setFixedWidth(this->sizeHint().width());
+
+    connect(m_tvDataStore, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(SelectID(QTreeWidgetItem*, int)));
 }
 
 QTreeWidget* FrDataStoreDialog::CreateTreeViewWidget(){
@@ -76,8 +79,8 @@ QTreeWidget* FrDataStoreDialog::CreateTreeViewWidget(){
 
 QHBoxLayout* FrDataStoreDialog::CreateButtonLayout(){
     // create buttons
-    QPushButton* btnClose = new QPushButton(tr("Close"), this);
-    connect( btnClose, SIGNAL( clicked() ), this, SLOT( accept() ) );
+    QPushButton* btnClose = new QPushButton(tr("Cancel"), this);
+    connect( btnClose, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->addStretch();
@@ -150,9 +153,39 @@ void FrDataStoreDialog::Initialize(FrMainDocument* doc){
             // Data ID (Time Point for child for root)
             itemValues.push_back(QString("%1").arg(itr->getTimePoint())); 
 
-            rootItem->addChild(new QTreeWidgetItem(itemValues));
+            FrTreeWidgetItem* childItem = new FrTreeWidgetItem(itemValues);
+            childItem->SetID((*itr));
+
+            // check if current image has been already added as layer
+            if (this->IsLayerAdded(doc, (*itr)))
+                childItem->setBackgroundColor(1, QColor(125,125,125));
+
+            rootItem->addChild(childItem);//new QTreeWidgetItem(itemValues));
         }
 
     }
     m_tvDataStore->insertTopLevelItems(0, rootItems);
+}
+
+bool FrDataStoreDialog::IsLayerAdded(FrMainDocument* doc, RtDataID id){
+    FrDocument::DocObjCollection objects;
+    doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+    FrDocument::DocObjCollection::iterator it, itEnd(objects.end());
+
+    for(it = objects.begin(); it != itEnd; ++it){
+        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+        RtDataID layerID = layerDO->GetSettings()->DataID;
+        if (layerID == id)
+            return true;
+    }
+
+    return false;
+}
+
+void FrDataStoreDialog::SelectID(QTreeWidgetItem* item, int column){
+    FrTreeWidgetItem* it = dynamic_cast<FrTreeWidgetItem*>(item);
+  
+    m_ID = it->GetID();
+    
+    this->accept();
 }

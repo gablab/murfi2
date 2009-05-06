@@ -4,13 +4,16 @@
 // Forward declarations 
 class QTreeWidget;
 class QHBoxLayout;
+class QTreeWidgetItem;
 class FrBrowseFileWidget;
 class FrMainDocument;
+//class RtDataID;
 
 // includes
+#include "FrMacro.h"
 #include "Qt/qstring.h"
 #include "QtGui/qdialog.h"
-
+#include "RtDataID.h"
 
 // This class aloow user to choose 
 // how to create ROI
@@ -27,12 +30,18 @@ public:
     // Initializer
     void Initialize(FrMainDocument* doc);
 
+    // helpers
+    bool IsLayerAdded(FrMainDocument* doc, RtDataID id);
+    
+    FrPropMacro(RtDataID, ID);
+
 private:
     QHBoxLayout* CreateButtonLayout();
     QTreeWidget* CreateTreeViewWidget();
 
 private Q_SLOTS:
-    
+    void SelectID(QTreeWidgetItem* item, int column);
+
 private:
     QTreeWidget* m_tvDataStore;
     QTreeWidget* m_tvApplication;

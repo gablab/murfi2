@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrDataStoreDialog.h'
 **
-** Created: Mon 4. May 16:33:57 2009
+** Created: Wed 6. May 17:35:56 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,15 +22,19 @@ static const uint qt_meta_data_FrDataStoreDialog[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       1,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
+
+ // slots: signature, parameters, type, tag, flags
+      31,   19,   18,   18, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_FrDataStoreDialog[] = {
-    "FrDataStoreDialog\0"
+    "FrDataStoreDialog\0\0item,column\0"
+    "SelectID(QTreeWidgetItem*,int)\0"
 };
 
 const QMetaObject FrDataStoreDialog::staticMetaObject = {
@@ -56,5 +60,11 @@ int FrDataStoreDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QDialog::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: SelectID((*reinterpret_cast< QTreeWidgetItem*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        }
+        _id -= 1;
+    }
     return _id;
 }

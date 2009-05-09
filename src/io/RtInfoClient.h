@@ -1,35 +1,44 @@
 /******************************************************************************
- * RtInfoSever.h declares a class for serving info about real to clients
+ * RtInfoClient.h declares a class that sends new data to a remote server
  * 
- * Oliver Hinds <ohinds@mit.edu> 2008-02-11
+ * Oliver Hinds <ohinds@mit.edu> 2009-05-05
  * 
  *****************************************************************************/
 
-#ifndef RTINFOSERVER_H
-#define RTINFOSERVER_H
+#ifndef RTINFOCLIENT_H
+#define RTINFOCLIENT_H
 
 #include"RtServerSocket.h"
-#include<vector>
+#include"RtClientSocket.h"
+#include"RtOutput.h"
+
+#include<set>
+
 using namespace std;
 
 // class declaration
-class RtInfoServer : public RtServerSocket  {
+class RtInfoClient : public RtServerSocket, RtClientSocket  {
 
 public:
 
   //*** constructors/destructors  ***//
   
-  // default
-  RtInfoServer(); 
-
   // constructor with port and host
-  RtInfoServer(unsigned short portNum); 
+  explicit RtInfoClient(unsigned short localPortNum, 
+			const string &remoteHost, 
+			unsigned short remotePortNum);
 
   // destructor
-  virtual ~RtInfoServer();
+  virtual ~RtInfoClient();
 
-  // open and start accepting
-  virtual bool open(RtConfig &config);
+  // add data to listen for
+  bool addListenData(const string &dataName, const string &roiName);
+
+  // remove data from the listener
+  bool removeListenData(const string &dataName, const string &roiName);
+
+  // acknowledge receipt of data from the server
+  bool acknowledgeListenData(const string &dataName, const string &roiName, unsigned int tr);
 
   // hand of some data to be output
   virtual void setData(RtData *data);
@@ -54,29 +63,13 @@ protected:
   //  string representation
   string buildXMLString(TiXmlDocument &doc);
 
-  // build an error element
-  // in
-  //  name of the error
-  // out
-  //  XML element containing error info
-  TiXmlElement *createErrorElement(string error);
+  // data
 
-  // database
-  // NOTE: now this only stores activation sums by tr.
-  // TODO: reconfigure this to access the data store
-  RtData** posAct;
-  RtData** negAct;
-
-  unsigned int numPos;
-  unsigned int numNeg;
-
-  // the last good trigger time
-  int lastGoodTriggerTR;
-
-  // the last bad trigger time
-  int lastBadTriggerTR;
+  // list of dataids to listen for
+  set<RtDataID,RtDataIDPartialCompare> listenData;
 
 private:
+  RtInfoClient();   
 
 };
 

@@ -10,6 +10,7 @@ static char *VERSION = "$Id$";
 
 #include"RtConductor.h"
 #include"RtInputSynth.h"
+#include"RtInfoClient.h"
 #include<iostream>
 
 // constructor with config
@@ -55,6 +56,26 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
       cerr << "ERROR: could not open logfile \""
 	   << config.get("study:log:filename") << "\"" << endl;
     }
+  }
+
+  // look for infoclient
+  if(config.isSet("infoclient:disabled") 
+     && config.get("infoclient:disabled") == false) {
+
+    if(!config.isSet("infoclient:localPort") 
+       ||!config.isSet("infoclient:remoteHost") 
+       || !config.isSet("infoclient:remotePort")) {
+      cerr << "ERROR: localPort, remoteHost and remotePort are required options for infoclient" 
+	   << endl;
+      return false;
+    }
+
+    RtInfoClient *infoClient 
+      = new RtInfoClient((unsigned int) config.get("infoclient:localPort"),
+			 config.get("infoclient:remoteHost").str(),
+			 (unsigned int) config.get("infoclient:remotePort"));
+    addOutput(infoClient);
+    infoClient->activate();
   }
 
   // attach code numbers to outputs
@@ -199,6 +220,7 @@ bool RtConductor::addOutput(RtOutput *out) {
   }
 
   outputs.push_back(out);
+  
 
   cout << "added output: " << out->getID() << endl;
 

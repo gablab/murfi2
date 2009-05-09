@@ -54,9 +54,6 @@ public:
 
   //*** constructors/destructors  ***//
   
-  // default constructor
-  RtServerSocket(); 
-  
   // constructor with port and host
   RtServerSocket(unsigned short portNum); 
 
@@ -104,6 +101,12 @@ protected:
 
   // termination character
   char messageTerminationChar;
+
+private:
+  
+  // default constructor
+  RtServerSocket(); 
+
 };
 
 #endif

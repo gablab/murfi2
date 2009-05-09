@@ -22,8 +22,8 @@ aname=$3
 odir=$sdir/$subj/"$aname"/
 
 #run model fit
-echo fsl_model_fit.sh -S $sdir/$subj/nii/[0-9]*-$run.nii -M $adir/"$aname"_design.mat -o $odir -O
-fsl_model_fit.sh -S $sdir/$subj/nii/[0-9]*-$run.nii -M $adir/"$aname"_design.mat -o $odir -O
+echo fsl_model_fit.sh -r $run -M $adir/"$aname"_design.mat -o $odir -O
+fsl_model_fit.sh -r $run -M $adir/"$aname"_design.mat -o $odir -O
 
 # initial contrast for zstat
 echo fsl_contrast.sh -n "$aname" -c `cat $adir/"$aname"_contrast_vector.txt` -i $odir

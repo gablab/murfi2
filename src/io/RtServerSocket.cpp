@@ -10,10 +10,10 @@
 
 static char *VERSION = "$Id$";
 
-// default constructor
-RtServerSocket::RtServerSocket() {
-  messageTerminationChar = '\n';
-}
+//// default constructor
+//RtServerSocket::RtServerSocket() {
+//  messageTerminationChar = '\n';
+//}
 
 // constructor with port and host
 RtServerSocket::RtServerSocket(unsigned short portNum) {
@@ -30,10 +30,10 @@ RtServerSocket::~RtServerSocket() {
 
 // open and start accepting
 bool RtServerSocket::open(RtConfig &config) {
-  // find port
-  if(config.isSet("infoserver:port")) {
-    address.set_port_number((unsigned short) config.get("infoserver:port"));
-  }
+//  // find port
+//  if(config.isSet("infoserver:port")) {
+//    address.set_port_number((unsigned short) config.get("infoserver:port"));
+//  }
 
   if(acceptor.open(address,1) == -1) {
     cerr << "couldn't open acceptor to listen on " << address.get_host_name() 
@@ -104,7 +104,9 @@ int RtServerSocket::svc() {
     string response = recieveMessage(recieved,stream);
 
     // send the response
-    sendMessage(response, stream);
+    if(!response.empty()) {
+      sendMessage(response, stream);
+    }
 
     // close the stream (scanner connects anew for each image)
     stream.close();

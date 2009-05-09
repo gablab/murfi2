@@ -161,6 +161,69 @@ bool RtDataID::operator<(const RtDataID &other) const {
     return false;
 }
 
+// partial less
+bool RtDataID::partless(const RtDataID &other) const {
+    /* Logic:
+     * if a != b, return whether or not it's a < b or a > b
+     * if a == b, continue to next field
+     * NOTE: If fields are added to the DataID in the future, another logic block needs to be added*/
+
+    // siteIDNum
+    if (siteIDNum != other.siteIDNum 
+	&& !(siteIDNum == DATAID_UNSET_VALUE
+	     || other.siteIDNum == DATAID_UNSET_VALUE)) {
+        return (siteIDNum < other.siteIDNum);
+    };
+
+    // studyNum
+    if (studyNum != other.studyNum
+	&& !(studyNum == DATAID_UNSET_VALUE
+	     || other.studyNum == DATAID_UNSET_VALUE)) {
+        return (studyNum < other.studyNum);
+    };
+
+    // seriesNum
+    if (seriesNum != other.seriesNum 
+	&& !(seriesNum == DATAID_UNSET_VALUE
+	     || other.seriesNum == DATAID_UNSET_VALUE)) {
+        return (seriesNum < other.seriesNum);
+    };
+
+    // timePoint
+    if (timePoint != other.timePoint 
+	&& !(timePoint == DATAID_UNSET_VALUE
+	     || other.timePoint == DATAID_UNSET_VALUE)) {
+        return (timePoint < other.timePoint);
+    };
+
+    // history
+    if (history != other.history 
+	&& !(history.empty() || other.history.empty())) {
+        return (history < other.history);
+    };
+
+    // moduleID
+    if (moduleID != other.moduleID 
+	&& !(moduleID.empty() || other.moduleID.empty())) {
+        return (moduleID < other.moduleID);
+    };
+
+    // dataName
+    if (dataName != other.dataName 
+	&& !(dataName.empty() || other.dataName.empty())) {
+        return (dataName < other.dataName);
+    };
+
+    // roiID
+    if (roiID != other.roiID 
+	&& !(roiID.empty() || other.roiID.empty())) {
+        return (roiID < other.roiID);
+    };
+
+    // If reached, all a == b, so return false (a !< b)
+    return false;
+}
+
 // output to a stream
 // ostream &RtDataID::operator<<(ostream &out) const {
 //   out

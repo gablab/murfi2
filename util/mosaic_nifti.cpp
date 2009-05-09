@@ -52,7 +52,7 @@ bool mosaic(nifti_image *img, int matrixSize, int numSlices) {
     }
   }
 
-img->data = (void*) newdata;
+  img->data = (void*) newdata;
 
 
   return true;

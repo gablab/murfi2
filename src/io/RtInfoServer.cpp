@@ -14,8 +14,10 @@
 
 static char *VERSION = "$Id$";
 
+const unsigned short DEFAULT_PORT_NUM = 15001;
+
 // default constructor
-RtInfoServer::RtInfoServer() : RtServerSocket() {
+RtInfoServer::RtInfoServer() : RtServerSocket(DEFAULT_PORT_NUM) {
   addToID(":infoserver");
 
   lastGoodTriggerTR = -1;
@@ -40,6 +42,16 @@ RtInfoServer::RtInfoServer(unsigned short portNum) : RtServerSocket(portNum) {
 // destructor
 RtInfoServer::~RtInfoServer() {
   delete [] posAct;
+}
+
+// open and start accepting
+bool RtInfoServer::open(RtConfig &config) {
+  // find port
+  if(config.isSet("infoserver:port")) {
+    address.set_port_number((unsigned short) config.get("infoserver:port"));
+  }
+
+  return RtServerSocket::open(config);
 }
 
 // set some data
@@ -251,7 +263,6 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	  TiXmlElement *trel = (pos ? 
 				posAct[tr]->serializeAsXML()
 				: negAct[tr]->serializeAsXML());
-	  trel->SetAttribute("tr",tr);
 	  roiResponse->LinkEndChild(trel);
 	  // I THINK WE DON'T FREE THE ELEMENTS, BUT CHECK THIS
 	}

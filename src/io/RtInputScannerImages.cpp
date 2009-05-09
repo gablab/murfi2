@@ -133,6 +133,10 @@ bool RtInputScannerImages::open(RtConfig &config) {
     print = true;
   }
 
+  if(config.get("study:teminal:verbose")==true) {
+    verbose = true;
+  }
+
   // see if we should align the series to a reference
   if(config.isSet("scanner:alignSeries") 
      && config.get("scanner:alignSeries")==true) {
@@ -205,7 +209,10 @@ int RtInputScannerImages::svc() {
       cerr << "ERROR: accepting images when scanner image input not initialized!" << endl;
       continue;
     }
-    //cout << "connection accepted" << endl;
+    
+    if(verbose) {
+      cout << "connection accepted" << endl;
+    }
 
     // get the info
     ei = receiveImageInfo(stream);

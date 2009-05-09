@@ -63,7 +63,7 @@ export MOC = /usr/bin/moc-qt4
 PKG_DIR = /usr/local/packages
 
 # vtk
-VTK_HOME = /usr
+VTK_HOME = /usr/local
 
 # qt
 QT_HOME = /usr
@@ -172,13 +172,31 @@ GNUPLOT_LIB=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
 
 # vtk
 VTK_INC = $(VTK_HOME)/include/vtk
-VTK_LIB = -L$(VTK_HOME)/lib \
+VTK_LIB = -L$(VTK_HOME)/lib/vtk \
 	-lvtkCommon \
+	-lvtkIO \
 	-lvtkFiltering \
 	-lvtkftgl \
 	-lvtkGraphics \
 	-lvtkImaging \
 	-lvtkRendering \
+	-lvtkverdict \
+	-lvtksys \
+	-lvtkfreetype \
+	-lvtkDICOMParser \
+	-lvtkNetCDF \
+	-lvtkmetaio \
+	-lvtksqlite \
+	-lvtkjpeg \
+	-lvtkexpat \
+	-lvtkQtChart \
+	-lvtkViews \
+	-lvtkInfovis \
+	-lvtkWidgets \
+	-lvtkHybrid \
+	-lvtkexoIIc \
+	-lvtklibxml2 \
+	-lvtkalglib \
 	-lQVTK
 
 # qt

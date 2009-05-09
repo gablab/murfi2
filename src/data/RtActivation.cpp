@@ -103,8 +103,9 @@ RtMaskImage *RtActivation::toMask(Sign direction) {
 TiXmlElement *RtActivation::serializeAsXML() {
   // add an element for the data
   TiXmlElement *element = new TiXmlElement("data");
-  element->SetAttribute("name","activation");
-  element->SetAttribute("roiID",dataID.getRoiID());
+  element->SetAttribute("name",dataID.getDataName());
+  element->SetAttribute("roi",dataID.getRoiID());
+  element->SetAttribute("tr",dataID.getTimePoint());
 
   // build text string containing all the data separated by spaces
   #define NUM_SIGFIGS 6

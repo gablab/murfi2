@@ -28,11 +28,12 @@ RtDataImage<T>::RtDataImage() : RtData(),
   data = NULL;
   bytesPerPix = sizeof(T);
   matrixSize = 64;
-  numSlices = 32;
+  numSlices = 1;
   sliceThick = 1;
   sliceGap = 0.1;
   dims.reserve(4);
   pixdims.reserve(4);
+
 
   isMosaiced = false;
 }
@@ -53,7 +54,7 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
 
   isMosaiced = false;
   matrixSize = 64;
-  numSlices = 32;
+  numSlices = 1;
   sliceThick = 1;
   sliceGap = 0.1;
   dims.reserve(4);
@@ -1073,6 +1074,10 @@ bool RtDataImage<T>::mosaicUnlocked() {
     return false;
   }
 
+  if(dims.size() < 3) { // must be more than one slice
+    return false;
+  }
+
   // set the matrix size and number of slices
   matrixSize = dims[0];
   numSlices = dims[2];
@@ -1135,10 +1140,12 @@ T* RtDataImage<T>::getMosaicedCopy() {
   T* copy;
   lock(); {
 
-    mosaicUnlocked();
+    bool mos = mosaicUnlocked();
     copy = new T[numPix];
     memcpy(copy, data, numPix*sizeof(T));
-    unmosaicUnlocked();
+    if(mos) {
+      unmosaicUnlocked();
+    }
 
   } unlock();
 
@@ -1177,7 +1184,7 @@ bool RtDataImage<T>::isMosaic() {
 template<class T>
 bool RtDataImage<T>::seemsMosaic() {
   // see whether there are only two dimensions
-  bool onlyTwo = dims[0] >= 2;
+  bool onlyTwo = dims.size() >= 2;
   for(int i = 2; i < dims.size(); i++) {
     if(dims[i] > 1) {
       onlyTwo = false;
@@ -1191,7 +1198,7 @@ bool RtDataImage<T>::seemsMosaic() {
   // see if the two dimensions look like mosaiced dimensions
   // assumptions: if the matrix size is 32, 64, or 128 assume its a single slice
   // scopic: dims from 0 to 2
-  return (dims[1] != dims[0]) 
+  return (dims[1] != dims[0])
     || !(dims[1] == 32 || dims[1] == 64 || dims[1] == 128);
 }
 

@@ -13,6 +13,7 @@
 #define DATAID_UNSET_VALUE UINT_MAX
 
 
+#include<iostream>
 #include<ostream>
 #include<string>
 using namespace std;
@@ -53,6 +54,7 @@ public:
 
     // less
     bool operator<(const RtDataID &other) const;
+    bool partless(const RtDataID &other) const;
 
     // get a string version of the ID
     string toString() const;
@@ -140,17 +142,29 @@ protected:
     time_t        instantiationTime;// time this data was first constructed
 };
 
-// comparison class for storing ids in a map (see RtDataStore.h)
-class RtDataIDCompare {
-public:
-    bool operator()(const RtDataID &one, const RtDataID &two) const {
-        return (one) < (two);
-    }
-};
-
 
 // output to stream
 ostream &operator<<(ostream &out, const RtDataID &id);
+
+// comparison class for storing ids in a map (see RtDataStore.h)
+class RtDataIDCompare {
+public:
+  bool operator()(const RtDataID &one, const RtDataID &two) const {
+    //cout << "comparing: " << one << " " << two << (one < two) << endl;
+      return (one) < (two);
+  }
+};
+
+// comparison class for storing ids in a map or set when unset values
+// are not considered in the ordering
+class RtDataIDPartialCompare {
+public:
+  bool operator()(const RtDataID &one, const RtDataID &two) const {
+    //cout << "comparing: " << one << " " << two << (one < two) << endl;
+    return one.partless(two);
+  }
+};
+
 
 
 #endif

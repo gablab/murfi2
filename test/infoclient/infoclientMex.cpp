@@ -5,7 +5,7 @@
  *    first argument is a command (success indicated with logical 0) :
  *       start:  starts the infoclient.
  *               usage: success 
-                     = infoclient('start', localport, remotehost, remoteport)
+ *                   = infoclient('start', localport, remotehost, remoteport)
  *
  *       add:    adds a data id to the notify list.
  *               usage: success = infoclient('add', dataName, roiName)
@@ -22,6 +22,9 @@
  *
  *       stop:   stops the infoclient.
  *               usage: success = infoclient('stop')
+ *
+ *       send:   sends a message independent of the infoclient
+ *               usage: success = infoclient('send',message,host,port)
  *
  *
  * Oliver Hinds <ohinds@mit.edu> 2009-05-01
@@ -110,6 +113,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     return;
   }
   command = tmpChars;
+
+  //  mexPrintf("handling command %s\n", command.c_str());
 
   // different behavior based on command
   int status;
@@ -255,6 +260,43 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
   else if(command == "stop") {
     status = stopInfoclient(errMsg);
+    assignSuccessStatus(nlhs,plhs,status);
+  }
+  else if(command == "send") {  // send a message
+    char message[MAX_STR_LEN];
+    TcpInfo info;
+
+    // check number of parameters
+    if(nrhs != 4) {
+      mexErrMsgTxt("message, host, and port are required arguments for 'send'.");
+      assignSuccessStatus(nlhs,plhs,FAILURE);
+      return;
+    }
+
+    // get the message
+    if(mxGetString(prhs[1],message,MAX_STR_LEN)) {
+      mexErrMsgTxt("message name can't be converted to a string.");
+      assignSuccessStatus(nlhs,plhs,FAILURE);
+      return;
+    }
+
+    // get the host
+    if(mxGetString(prhs[2],info.host,MAX_STR_LEN)) {
+      mexErrMsgTxt("host name can't be converted to a string.");
+      assignSuccessStatus(nlhs,plhs,FAILURE);
+      return;
+    }
+
+    // get the port
+    if(!mxIsNumeric(prhs[3])) {
+      mexErrMsgTxt("port can't be converted to a number.");
+      assignSuccessStatus(nlhs,plhs,FAILURE);
+      return;
+    }
+    info.port = (int) mxGetScalar(prhs[3]);
+
+    status = sendMessage(message, info, errMsg);
+
     assignSuccessStatus(nlhs,plhs,status);
   }
   else {

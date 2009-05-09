@@ -103,4 +103,9 @@ int acknowledgeInfoclient(const Info &info, string &errMsg);
  */
 int stopInfoclient(string &errMsg);
 
+/**
+ * send a message to a remote client
+ */
+int sendMessage(const string &message, const TcpInfo &info, string &errMsg);
+
 #endif

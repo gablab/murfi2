@@ -19,6 +19,7 @@
 
 #include<vnl/vnl_vector.h>
 #include "gnuplot_i_vxl.h"
+#include "simple_ls.h"
 
 
 #include"ace/Mutex.h"
@@ -1254,10 +1255,15 @@ void RtDisplayImage::action(int code) {
     glutMaster.CallGlutLeaveMainLoop();
     break;
   case 'r': // run
+    cout << endl;
+    simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
+    cout << endl;
+
     // ask for a config file name 
     cout << "enter the config file name for the fmri run (q to quit): ";
     cin >> response;
-    runConfig.parseConfigFile(response);
+    runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
+			      + response);
     prepareRun(runConfig);
     executeRun(runConfig);    
     break;

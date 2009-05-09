@@ -150,7 +150,7 @@ bool initExperiment() {
   
   cout << "intializing experiment" << endl;
 
-//  // set the start time of the experiment
+  // set the start time of the experiment
   experimentTimer.restart();
 
   // make the study id

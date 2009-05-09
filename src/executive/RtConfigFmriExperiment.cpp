@@ -53,13 +53,13 @@ RtConfigFmriExperiment::RtConfigFmriExperiment(const RtConfigFmriExperiment &oth
 }
 
 // set default config info
+// doesn't work
 void RtConfigFmriExperiment::setDefaults() {
-
-  set("study:softwareDir", DEFAULT_SOFTWAREDIR);
-  set("study:siteID",      SITE_ID_NUMBER);
-  set("study:id",          getExperimentStudyID());
-  set("gui:disabled",      true);
-  set("oldgui:disabled",   true);
+  //set("study:softwareDir", DEFAULT_SOFTWAREDIR);
+  //set("study:siteID",      SITE_ID_NUMBER);
+  //set("study:id",          getExperimentStudyID());
+  //set("gui:disabled",      true);
+  //set("oldgui:disabled",   true);
 }
 
 // validate the configuration
@@ -98,6 +98,31 @@ bool RtConfigFmriExperiment::validateConfig() {
   }
 
   // check or set the paths for all kinds of data
+
+  // software directory
+  if(!isSet("study:softwareDir")) { // not set, make default
+    set("study:softwareDir",DEFAULT_SOFTWAREDIR);
+  }
+
+  // study id
+  if(!isSet("study:id")) { // not set, make default
+    set("study:id", getExperimentStudyID());
+  }
+
+  // site id
+  if(!isSet("study:siteID")) { // not set, make default
+    set("study:siteID", SITE_ID_NUMBER);
+  }
+
+  // gui 
+  if(!isSet("gui:disabled")) { // not set, make default
+    set("gui:disabled", true);
+  }
+
+  // old gui 
+  if(!isSet("oldgui:disabled")) { // not set, make default
+    set("oldgui:disabled", true);
+  }
 
   // volume directory
   if(!isSet("study:volumeDir")) { // not set, make default
@@ -236,6 +261,7 @@ bool RtConfigFmriExperiment::validateConfig() {
       set("infoserver:disabled",true);
     }
   }
+
 
   return valid;
 }

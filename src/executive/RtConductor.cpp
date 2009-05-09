@@ -9,6 +9,7 @@
 static char *VERSION = "$Id$";
 
 #include"RtConductor.h"
+#include"RtExperiment.h"
 #include"RtInputSynth.h"
 #include"RtInfoClient.h"
 #include<iostream>
@@ -92,7 +93,6 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
 	 << endl;
     return false;
   }
-
 
   configured = true;
 

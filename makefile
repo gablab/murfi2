@@ -46,9 +46,13 @@ SUB_DIRS = executive \
 	   stream/analysis \
 	   stream/preprocess \
 	   stream/postprocess \
-	   display \
 	   util \
 	   frontend
+
+ifeq ($(OLDFRONTEND),1)
+  SUB_DIRS += display 
+endif
+
 
 ### APP PATHS
 

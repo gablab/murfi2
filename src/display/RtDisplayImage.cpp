@@ -5,6 +5,8 @@
  *
  *****************************************************************************/
 
+#ifdef USE_OLDFRONTEND
+
 #include"RtDisplayImage.h"
 #include"RtDataIDs.h"
 #include"RtExperiment.h"
@@ -14,7 +16,6 @@
 // Alexsid <scopic> 
 // commented since this stuff is not used 
 // int frontend app. (Remove errors).
-#ifndef USE_FRONTEND
 **************/
 
 #include<vnl/vnl_vector.h>
@@ -1378,8 +1379,8 @@ void RtDisplayImage::drawString(GLint x, GLint y, const char* s, float r, float 
 
 /*************
  * ohinds: 2009-01-18
-#endif //#ifndef USE_FRONTEND
 **************/
+#endif //#ifndef USE_FRONTEND
 
 /*****************************************************************************
  * $Source$

@@ -19,8 +19,8 @@
  #include"FrMainController.h"
 #endif
 
-#ifndef USE_FRONTEND
-    // old gui includes
+// old gui includes
+#ifdef USE_OLDFRONTEND
     #include"RtDisplayImage.h"
 #endif
 
@@ -437,7 +437,8 @@ int ACE_TMAIN(int argc, char **args) {
 	  && config.get("oldgui:disabled")==false) { 
     
 // scopic Alan: old image display was removed from Frontend project on windows
-#ifndef WIN32
+// ohinds: 2009-05-10 used a makefile flag instead of the win32 define
+#ifdef USE_OLDFRONTEND
     // start a display
     RtDisplayImage dispImg;
     if(!dispImg.open(config)) {
@@ -445,6 +446,8 @@ int ACE_TMAIN(int argc, char **args) {
       result = 1;
     }
     result = dispImg.svc();
+#else
+    cerr << "ERROR: this build does not support the old gui frontend" << endl;
 #endif
 
   }

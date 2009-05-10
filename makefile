@@ -20,6 +20,7 @@ PROJECT = festr
 
 # whether to compile with the frontend gui
 FRONTEND = 0
+OLDFRONTEND = 1
 
 # directories 
 export SRC_DIR = $(PWD)/src
@@ -86,6 +87,10 @@ BOOST_HOME = /usr
 # build with frontend flag
 ifeq ($(FRONTEND),1)
 	FRONT_FLAG = -DUSE_FRONTEND
+endif
+
+ifeq ($(OLDFRONTEND),1)
+	OLDFRONT_FLAG = -DUSE_OLDFRONTEND
 endif
 
 # debug flag
@@ -224,6 +229,7 @@ C_INC = -I$(SRC_DIR) \
 
 C_FLAGS = -Wall \
 	$(FRONT_FLAG) \
+	$(OLDFRONT_FLAG) \
 	$(MTRACE_FLAG) \
 	$(PROF_FLAG) \
 	$(DEBUG_FLAG) \

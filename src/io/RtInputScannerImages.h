@@ -141,8 +141,6 @@ protected:
   double sliceGap;
   double voxDim[3];
 
-  unsigned int num2Discard;
-  
   // current series number
   unsigned int seriesNum;
 
@@ -152,9 +150,15 @@ protected:
 
   // run specific info
   bool initialized;
+
   unsigned int imageNum;
   unsigned int numImagesExpected;
-  bool haveRefVol;
+
+  unsigned int num2Discard;
+  unsigned int numDiscarded;
+  
+  bool haveStudyRefVol;
+  bool haveSeriesRefVol;
 };
 
 #endif

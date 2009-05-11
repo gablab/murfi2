@@ -19,8 +19,8 @@ OS=linux
 PROJECT = festr
 
 # whether to compile with the frontend gui
-FRONTEND = 0
-OLDFRONTEND = 0
+export FRONTEND = 0
+export OLDFRONTEND = 1
 
 # directories 
 export SRC_DIR = $(PWD)/src
@@ -64,8 +64,11 @@ export MOC = /usr/bin/moc-qt4
 ### LIBS AND LIB CONFIG
 
 # global package directory
-export PKG_DIR = /software/fastr/packages
-#PKG_DIR = /usr/local/packages
+#export PKG_DIR = /software/fastr/packages
+export PKG_DIR = /usr/local/
+
+#NIFTI_HOME=/software/fastr/packages/nifticlib-1.1.0
+NIFTI_HOME=/usr
 
 # vtk
 VTK_HOME = /usr/local
@@ -157,8 +160,8 @@ GSL_LIB=-lgsl -lgslcblas
 
 
 # computer vision
-VXL_INC=-I$(PKG_DIR)/vxl/include/vxl/core -I$(PKG_DIR)/vxl/include/vxl/vcl
-VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/vxl/lib
+VXL_INC=-I$(PKG_DIR)/include/vxl/core -I$(PKG_DIR)/include/vxl/vcl
+VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/lib
 
 # boost
 BOOST_INC=-I$(BOOST_HOME)/include/
@@ -169,8 +172,8 @@ TINYXML_FLAGS=-DTIXML_USE_STL
 
 
 # nifti image io libs
-NIFTI_INC=-I/software/fastr/packages/nifticlib-1.1.0/include
-NIFTI_LIB=-lniftiio -lznz -lz -L/software/fastr/packages/nifticlib-1.1.0/lib
+NIFTI_INC=-I/$(NIFTI_HOME)/include/nifti
+NIFTI_LIB=-lniftiio -lznz -lz -L/$(NIFTI_HOME)/lib
 
 
 # oldgui libs

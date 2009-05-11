@@ -12,7 +12,7 @@ CFLAGS += $(FRONT_FLAG)
 ifeq ($(OLDFRONTEND),1)
   MAKE_DISP=cd ./display && $(MAKE)
 else
-  MAK_DISP=echo not compiling old frontend
+  MAKE_DISP=echo not compiling old frontend
 endif
 
 default: 

@@ -53,8 +53,9 @@ RtInputScannerImages::RtInputScannerImages()
   initialized = false;
   imageNum = 0;
   numImagesExpected = 0;
-  haveRefVol = false;
-  
+  haveStudyRefVol = false;
+  haveSeriesRefVol = false;
+
 }
 
 // destructor
@@ -66,7 +67,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
   RtInput::open(config);
 
   // scopic Alan: check for enabled/disabled (another way scanner is always disabled by default if we use frontend gui)
-  if(config.isSet("scanner:disabled") 
+  if(config.isSet("scanner:disabled")
      && config.get("scanner:disabled")==false) {
     initialized = true;
   }
@@ -82,7 +83,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
   ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
 
   if(acceptor.open(address,1) == -1) {
-    cerr << "failed to open acceptor for scanner images on port " 
+    cerr << "failed to open acceptor for scanner images on port "
 	 << port << endl;
     isOpen = false;
     return false;
@@ -111,12 +112,8 @@ bool RtInputScannerImages::open(RtConfig &config) {
     voxDim[2] = config.get("scanner:voxdim3");
   }
 
-  if(config.isSet("scanner:discard")) {
-    num2Discard = config.get("scanner:discard");
-  }
-
   // see if we should only read moco images
-  if(config.isSet("scanner:onlyReadMoCo") 
+  if(config.isSet("scanner:onlyReadMoCo")
      && config.get("scanner:onlyReadMoCo")==true) {
     onlyReadMoCo = true;
   }
@@ -128,7 +125,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
   if(config.isSet("scanner:unmosaic")) {
       unmosaicInputImages = (bool) config.get("scanner:unmosaic");
   }
- 
+
   // see if we should save images to a file
   if(config.get("scanner:saveImages")==true) {
     saveImagesToFile = true;
@@ -144,7 +141,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
 
   // see if we should align the series to a reference
-  if(config.isSet("scanner:alignSeries") 
+  if(config.isSet("scanner:alignSeries")
      && config.get("scanner:alignSeries")==true) {
     alignSeries = true;
   }
@@ -152,7 +149,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
     alignSeries = false;
   }
 
-  if(config.isSet("info:terminal:verbose") 
+  if(config.isSet("info:terminal:verbose")
      && config.get("info:terminal:verbose")==true) {
     verbose = true;
   }
@@ -183,15 +180,26 @@ bool RtInputScannerImages::close() {
   if(ret) {
     cout << "done" << endl;
   }
-  
+
   return ret;
 }
 
 // initialize a series run
 // call this before each run
 bool RtInputScannerImages::init(RtConfigFmriRun &config) {
-  haveRefVol = false;
+  haveStudyRefVol = false;
+  haveSeriesRefVol = false;
+
   imageNum = 0;
+
+  numDiscarded = 0;
+  if(config.isSet("scanner:discard")) {
+    num2Discard = config.get("scanner:discard");
+  } 
+  else {
+    num2Discard = 0;
+  }
+
   numImagesExpected = config.get("scanner:measurements");
   initialized = true;
 
@@ -204,19 +212,18 @@ int RtInputScannerImages::svc() {
   short *img;
   RtMRIImage *rti;
   stringstream infos;
-  static unsigned int discardSubtract = num2Discard;
 
   cout << "listening for images on port " << port << endl;
 
   // continuously try to accept connections
-  for(; isOpen 
+  for(; isOpen
 	&& acceptor.accept(stream) != -1;) {
 
     if(!initialized) {
       cerr << "ERROR: accepting images when scanner image input not initialized!" << endl;
       continue;
     }
-    
+
     if(verbose) {
       cout << "connection accepted" << endl;
     }
@@ -227,7 +234,8 @@ int RtInputScannerImages::svc() {
       stream.close();
       continue;
     }
-    ei->iAcquisitionNumber -= discardSubtract;
+    ei->iAcquisitionNumber = std::max(ei->iAcquisitionNumber-num2Discard,
+				      (unsigned int) 1);
 
     // DEBUGGING
     //ei->displayImageInfo();
@@ -245,29 +253,46 @@ int RtInputScannerImages::svc() {
       continue;
     }
 
-    if(num2Discard > 0) {
-      num2Discard--;
-      cout << "discarding this and " << num2Discard << " further images" << endl;
-      continue;
-    }
-
     imageNum++;
 
     // build data class
     rti = new RtMRIImage(*ei,img);
 
-    //rti->setSeriesNum(seriesNum);
     rti->setMatrixSize(matrixSize);
     rti->setNumSlices(numSlices);
-
-
-//    rti->setPixDim(0,voxDim[0]);
-//    rti->setPixDim(1,voxDim[1]);
-//    rti->setPixDim(2,voxDim[2]);
 
     if(unmosaicInputImages) {
       rti->unmosaic();
     }
+
+    // if its the first image in a series save it no matter what
+    if(!haveSeriesRefVol) { // && isFirstInSeries(*ei)) {
+      cout << "HEREHREHRERHEHRHERHEHRER" << endl;
+      rti->write(getExperimentConfig()
+		 .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
+      haveSeriesRefVol = true;
+
+      // register with reference
+      if(alignSeries) {
+        RtFSLInterface::registerSameSubjEPI(
+	     getExperimentConfig()
+		 .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()),
+	     getExperimentConfig()
+	         .get("study:xfm:referenceVol"),
+	     getExperimentConfig()
+	         .getSeriesXfmFilename(rti->getDataID().getSeriesNum()),
+		 true);
+      }
+
+    }
+
+
+    if(numDiscarded < num2Discard) {
+      numDiscarded++;
+      cout << "discarding image " << numDiscarded << " of " << num2Discard << endl;
+      continue;
+    }
+
 
     // if there is motion info add it
     if(ei->bIsMoCo) {
@@ -292,17 +317,17 @@ int RtInputScannerImages::svc() {
     //rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
-    if(!haveRefVol 
+    if(!haveStudyRefVol
        && rti->getDataID().getDataName() == NAME_SCANNERIMG_EPI
        ) {
-      
+
       if(!getExperimentConfig().getStudyRefVolExists()) {
 	if(rti->write(getExperimentConfig().get("study:xfm:referenceVol"))) {
-	  haveRefVol = true;
+	  haveStudyRefVol = true;
 	}
       }
       else {
-	haveRefVol = true;
+	haveStudyRefVol = true;
       }
     }
 
@@ -323,7 +348,7 @@ int RtInputScannerImages::svc() {
 	   << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
 
-    
+
 //    cout << "started processing image at ";
 //    printNow(cout);
 //    cout << endl;

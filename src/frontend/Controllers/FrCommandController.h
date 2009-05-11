@@ -48,6 +48,7 @@ class FrMainController;
 #include "FrMaskDilateErodeCmd.h"
 #include "FrMaskMaskOperationCmd.h"
 #include "FrMaskCopyAdjacentCmd.h"
+#include "FrMaskClearCmd.h"
 
 #include"ace/Mutex.h"
 #include "Qt/qmutex.h"

@@ -13,6 +13,7 @@ class QComboBox;
 class QGroupBox;
 class QHBoxLayout;
 class QStackedLayout;
+class QPushButton;
 
 
 #include "FrMacro.h"
@@ -56,10 +57,12 @@ public:
 Q_SIGNALS:    
     void CurrentToolChanged();
     void CurrentToolParamChanged(int value);
+    void ClearCurrentRoiAction();
 
 private Q_SLOTS:
     void OnToolChanged(int index);
     void OnToolParamChanged();
+    void OnClearBtnPressed();
 
 private:
     // helpers
@@ -69,6 +72,7 @@ private:
 private:
     QLabel* m_label;
     QComboBox* m_cmbTool;
+    QPushButton* m_clearBtn;
     QStackedLayout* m_layout;
 };
 

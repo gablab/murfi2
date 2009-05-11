@@ -11,6 +11,7 @@
 #include "Qt/qcombobox.h"
 #include "Qt/qgroupbox.h"
 #include "Qt/qstackedlayout.h"
+#include "Qt/qpushbutton.h"
 
 
 FrROIToolWidget::FrROIToolWidget(QWidget *parent)
@@ -50,9 +51,16 @@ QHBoxLayout* FrROIToolWidget::CreateSelectionLayout(){
     // connect signal
     connect( m_cmbTool, SIGNAL(currentIndexChanged(int)), this, SLOT(OnToolChanged(int)) );
     
+    m_clearBtn = new QPushButton(tr("Clear"), this);
+    connect( m_clearBtn, SIGNAL(clicked()), this, SLOT(OnClearBtnPressed()) );
+
+    QHBoxLayout* hlayout = new QHBoxLayout();
+    hlayout->addWidget(m_cmbTool);
+    hlayout->addWidget(m_clearBtn);
+
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(m_label);
-    layout->addWidget(m_cmbTool);
+    layout->addLayout(hlayout);
 
     QHBoxLayout* result = new QHBoxLayout();
     result->addLayout(layout);
@@ -120,6 +128,10 @@ void FrROIToolWidget::OnToolParamChanged(){
     // TODO: get value of current tool
     int value = 0;
     emit CurrentToolParamChanged(value);
+}
+
+void FrROIToolWidget::OnClearBtnPressed(){
+    emit ClearCurrentRoiAction();
 }
 
 void FrROIToolWidget::UpdateRoiInfo(std::vector<RoiInfo>& roiInfos){

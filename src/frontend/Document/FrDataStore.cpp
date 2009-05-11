@@ -51,7 +51,7 @@ void FrDataStore::notify(const RtDataID &dataID){
       RtMaskImage *roi = dynamic_cast<RtMaskImage*>(m_Store->getData(dataID));
       if(roi) {
 	// ohinds: comment for debug
-	//this->AddRoiToDocument(roi);
+	this->AddRoiToDocument(roi);
       }
     }
     else {

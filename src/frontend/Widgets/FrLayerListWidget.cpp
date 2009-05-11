@@ -150,6 +150,7 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
              this, SLOT(OnColormapParamsChanged()) );
        
     connect( m_roiToolWidget, SIGNAL(CurrentToolChanged()), this, SLOT(OnRoiToolChanged()) );
+    connect( m_roiToolWidget, SIGNAL(ClearCurrentRoiAction()), this, SLOT(OnClearCurrentRoiAction()) );
 
     connect(this, SIGNAL(UpdateSignal()), this, SLOT(OnUpdate()));
 
@@ -357,6 +358,10 @@ void FrLayerListWidget::OnColormapParamsChanged(){
 void FrLayerListWidget::OnRoiToolChanged(){
     this->UpdateRoiList();
     emit RoiToolChanged();
+}
+
+void FrLayerListWidget::OnClearCurrentRoiAction(){
+    emit ClearCurrentRoi();
 }
 
 // Utility methods

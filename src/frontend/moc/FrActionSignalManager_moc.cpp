@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Mon 4. May 16:33:57 2009
+** Created: Fri 8. May 17:48:23 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      35,   10, // methods
+      36,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -57,11 +57,12 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
      595,  591,   22,   22, 0x0a,
      623,   22,   22,   22, 0x0a,
      642,   22,   22,   22, 0x0a,
-     678,  665,   22,   22, 0x0a,
-     719,  702,   22,   22, 0x0a,
-     743,   22,   22,   22, 0x0a,
-     772,   22,   22,   22, 0x0a,
-     804,  797,   22,   22, 0x0a,
+     662,   22,   22,   22, 0x0a,
+     698,  685,   22,   22, 0x0a,
+     739,  722,   22,   22, 0x0a,
+     763,   22,   22,   22, 0x0a,
+     792,   22,   22,   22, 0x0a,
+     824,  817,   22,   22, 0x0a,
 
        0        // eod
 };
@@ -83,9 +84,10 @@ static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "OnTestAction()\0OnLayerParamsChanged()\0"
     "OnLayerColormapChanged()\0inc\0"
     "OnLayerPositionChanged(int)\0"
-    "OnRoiToolChanged()\0OnImageParamsChanged()\0"
-    "currentValue\0OnLiveModeChanged(bool)\0"
-    "currentTimePoint\0OnTimePointChanged(int)\0"
+    "OnRoiToolChanged()\0OnClearCurrentRoi()\0"
+    "OnImageParamsChanged()\0currentValue\0"
+    "OnLiveModeChanged(bool)\0currentTimePoint\0"
+    "OnTimePointChanged(int)\0"
     "OnPreviousTimePointPressed()\0"
     "OnNextTimePointPressed()\0id,add\0"
     "OnGraphChanged(ulong,bool)\0"
@@ -145,14 +147,15 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 26: OnLayerColormapChanged(); break;
         case 27: OnLayerPositionChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 28: OnRoiToolChanged(); break;
-        case 29: OnImageParamsChanged(); break;
-        case 30: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 31: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 32: OnPreviousTimePointPressed(); break;
-        case 33: OnNextTimePointPressed(); break;
-        case 34: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 29: OnClearCurrentRoi(); break;
+        case 30: OnImageParamsChanged(); break;
+        case 31: OnLiveModeChanged((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 32: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 33: OnPreviousTimePointPressed(); break;
+        case 34: OnNextTimePointPressed(); break;
+        case 35: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         }
-        _id -= 35;
+        _id -= 36;
     }
     return _id;
 }

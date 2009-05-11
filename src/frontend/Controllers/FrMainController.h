@@ -61,6 +61,7 @@ public:
     void ResetImage();
     void CreatNewROI();
     void UpdateRoiTool();
+    void ClearCurrentRoi();
 
     void SetLiveMode(bool newLiveMode);
     void SetCurrentTimePoint(int newTimePoint);

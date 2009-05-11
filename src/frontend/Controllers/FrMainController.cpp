@@ -612,6 +612,12 @@ void FrMainController::UpdateRoiTool(){
     }
 }
 
+void FrMainController::ClearCurrentRoi(){
+    FrMaskClearCmd* cmd = FrCommandController::CreateCmd<FrMaskClearCmd>();
+    FrCommandController::Execute(cmd);
+    delete cmd;
+}
+
 void FrMainController::SetLiveMode(bool newLiveMode){
     // NOTE: can do it here no need to delegate
     m_MainDocument->GetAppSettings()->SetLiveMode(newLiveMode);

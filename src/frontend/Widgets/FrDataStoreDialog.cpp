@@ -157,7 +157,7 @@ void FrDataStoreDialog::Initialize(FrMainDocument* doc){
             childItem->SetID((*itr));
 
             // check if current image has been already added as layer
-            if (this->IsLayerAdded(doc, (*itr)))
+            if (IsImageAddedAsLayer(doc, (*itr)))
                 childItem->setBackgroundColor(1, QColor(125,125,125));
 
             rootItem->addChild(childItem);//new QTreeWidgetItem(itemValues));
@@ -167,22 +167,25 @@ void FrDataStoreDialog::Initialize(FrMainDocument* doc){
     m_tvDataStore->insertTopLevelItems(0, rootItems);
 }
 
-bool FrDataStoreDialog::IsLayerAdded(FrMainDocument* doc, RtDataID id){
-    FrDocument::DocObjCollection objects;
-    doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
-    FrDocument::DocObjCollection::iterator it, itEnd(objects.end());
-
-    for(it = objects.begin(); it != itEnd; ++it){
-        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
-        RtDataID layerID = layerDO->GetSettings()->DataID;
-        if (layerID == id)
-            return true;
-    }
-
-    return false;
-}
+//bool FrDataStoreDialog::IsImageAddedAsLayer(FrMainDocument* doc, RtDataID id){
+//    FrDocument::DocObjCollection objects;
+//    doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+//    FrDocument::DocObjCollection::iterator it, itEnd(objects.end());
+//
+//    for(it = objects.begin(); it != itEnd; ++it){
+//        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+//        RtDataID layerID = layerDO->GetSettings()->DataID;
+//        if (layerID == id)
+//            return true;
+//    }
+//
+//    return false;
+//}
 
 void FrDataStoreDialog::SelectID(QTreeWidgetItem* item, int column){
+    if (item->childCount() > 0)    // root item
+        return;
+
     FrTreeWidgetItem* it = dynamic_cast<FrTreeWidgetItem*>(item);
   
     m_ID = it->GetID();

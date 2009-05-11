@@ -53,6 +53,7 @@ public slots:
     void OnLayerColormapChanged();
     void OnLayerPositionChanged(int inc);
     void OnRoiToolChanged();
+    void OnClearCurrentRoi();
     void OnImageParamsChanged();
     // Graph pane
     void OnLiveModeChanged(bool currentValue);

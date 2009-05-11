@@ -37,7 +37,7 @@ FrRoiDocObj::~FrRoiDocObj(){
 
 void FrRoiDocObj::OnAdd(FrDocument* doc){
     // Add ROI layer doc object
-  FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LRoi, RtDataID());
+  FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LRoi, m_MaskImage->getDataID());
     layerDO->SetID(this->GetID());
     doc->Add(layerDO);    
 }

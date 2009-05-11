@@ -59,7 +59,7 @@ public:
 
 // Settings of camera
 // Some defines
-#define  DEF_CAM_SCALE      200.0
+#define  DEF_CAM_SCALE      300.0
 #define  DEF_CAM_POSITION   0.0, 0.0, 1.0
 #define  DEF_CAM_FOCALPOINT 0.0, 0.0, 0.0
 #define  DEF_CAM_VIEWUP     0.0, 1.0, 0.0

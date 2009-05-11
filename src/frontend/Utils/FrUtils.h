@@ -4,11 +4,14 @@
 #include "FrSettings.h"
 #include "FrViewDocObj.h"
 #include "FrSelection.h"
+#include "FrMainDocument.h"
+#include "FrLayerDocObj.h"
 
 #include "vtkImageData.h"
 
 // Backend includes
 #include "RtMRIImage.h"
+#include "RtDataID.h"
 
 #include <vector>
 
@@ -39,5 +42,6 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
 void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point[3], unsigned long imgNumber);
 bool IsPointInsideOfPolygon(std::vector<Pos> Points, Pos point);
 bool IsPointInsideOfSphere(Pos center, int radius, Pos point);
+bool IsImageAddedAsLayer(FrMainDocument* doc, RtDataID id);
 
 #endif

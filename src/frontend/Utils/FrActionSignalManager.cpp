@@ -99,6 +99,8 @@ void FrActionSignalManager::Initialize(){
 
     connect( m_mainWindow->m_LayerListWidget, SIGNAL(RoiToolChanged()),
              this, SLOT(OnRoiToolChanged()) );
+    connect( m_mainWindow->m_LayerListWidget, SIGNAL(ClearCurrentRoi()),
+             this, SLOT(OnClearCurrentRoi()) );
 
     // Connect graph pane
     connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(LiveModeChanged(bool)),
@@ -418,6 +420,12 @@ void FrActionSignalManager::OnRoiToolChanged(){
     m_mainWindow->
         GetMainController()->
         UpdateRoiTool();
+}
+
+void FrActionSignalManager::OnClearCurrentRoi(){
+    m_mainWindow->
+        GetMainController()->
+        ClearCurrentRoi();
 }
 
 // Graph pane events

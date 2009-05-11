@@ -178,3 +178,18 @@ bool IsPointInsideOfSphere(Pos center, int radius, Pos point){
     
     return isInside;
 }
+
+bool IsImageAddedAsLayer(FrMainDocument* doc, RtDataID id){
+    FrDocument::DocObjCollection objects;
+    doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
+    FrDocument::DocObjCollection::iterator it, itEnd(objects.end());
+
+    for(it = objects.begin(); it != itEnd; ++it){
+        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+        RtDataID layerID = layerDO->GetSettings()->DataID;
+        if (layerID == id)
+            return true;
+    }
+
+    return false;
+}

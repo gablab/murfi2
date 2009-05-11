@@ -11,6 +11,8 @@ class FrMainDocument;
 
 // includes
 #include "FrMacro.h"
+#include "FrUtils.h"
+
 #include "Qt/qstring.h"
 #include "QtGui/qdialog.h"
 #include "RtDataID.h"
@@ -30,9 +32,6 @@ public:
     // Initializer
     void Initialize(FrMainDocument* doc);
 
-    // helpers
-    bool IsLayerAdded(FrMainDocument* doc, RtDataID id);
-    
     FrPropMacro(RtDataID, ID);
 
 private:

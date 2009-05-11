@@ -2220,6 +2220,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskClearCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\frontend\Commands\MaskCommands\FrMaskClearCmd.h"
+					>
+				</File>
+				<File
 					RelativePath=".\frontend\Commands\MaskCommands\FrMaskCopyAdjacentCmd.cpp"
 					>
 				</File>

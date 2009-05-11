@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrDataStoreDialog.h'
 **
-** Created: Wed 6. May 17:35:56 2009
+** Created: Thu 7. May 15:55:54 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!

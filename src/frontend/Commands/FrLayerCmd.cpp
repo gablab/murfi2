@@ -111,6 +111,7 @@ bool FrLayerCmd::AddLayer(){
 
     // set layers order
     SetLayersOrder();
+    FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);     // scopic Alan 07.05.09: without this command display will not be updated to show new layer
 
     return result;
 }

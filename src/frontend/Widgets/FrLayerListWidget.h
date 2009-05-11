@@ -71,6 +71,7 @@ signals:
     void ChangeLayerColormap();
     //Emited when current ROI tool is changed
     void RoiToolChanged();
+    void ClearCurrentRoi();
     
 private Q_SLOTS:
     // Add slots here
@@ -87,6 +88,7 @@ private Q_SLOTS:
     void OnOpacityChanged(int value);
     void OnColormapParamsChanged();
     void OnRoiToolChanged();
+    void OnClearCurrentRoiAction();
 
     // Utility methods
     void UpdateCurrentLayerParams();

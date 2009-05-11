@@ -20,7 +20,7 @@ PROJECT = festr
 
 # whether to compile with the frontend gui
 FRONTEND = 0
-OLDFRONTEND = 1
+OLDFRONTEND = 0
 
 # directories 
 export SRC_DIR = $(PWD)/src
@@ -64,8 +64,8 @@ export MOC = /usr/bin/moc-qt4
 ### LIBS AND LIB CONFIG
 
 # global package directory
-#export PKG_DIR = /sw/packages
-PKG_DIR = /usr/local/packages
+export PKG_DIR = /software/fastr/packages
+#PKG_DIR = /usr/local/packages
 
 # vtk
 VTK_HOME = /usr/local
@@ -169,15 +169,18 @@ TINYXML_FLAGS=-DTIXML_USE_STL
 
 
 # nifti image io libs
-NIFTI_INC=-I/usr/include/nifti
-NIFTI_LIB=-lniftiio -lznz -lz
+NIFTI_INC=-I/software/fastr/packages/nifticlib-1.1.0/include
+NIFTI_LIB=-lniftiio -lznz -lz -L/software/fastr/packages/nifticlib-1.1.0/lib
 
 
-# gui
-GLUT_LIB=-lglut
+# oldgui libs
+ifeq ($(OLDFRONTEND),1)
+  GLUT_LIB=-lglut
+  GLUT_INC=-I/usr/include/GL
 
-GNUPLOT_INC=-I$(PKG_DIR)/gnuplot_i_vxl/include
-GNUPLOT_LIB=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
+  GNUPLOT_INC=-I$(PKG_DIR)/gnuplot_i_vxl/include
+  GNUPLOT_LIB=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
+endif
 
 # vtk
 VTK_INC = $(VTK_HOME)/include/vtk
@@ -223,6 +226,7 @@ QT_LIB = -lqwt-qt4 -lQtCore -lQtGui -lQtXml
 
 C_INC = -I$(SRC_DIR) \
 	$(INC_SUB_DIRS) \
+	$(GLUT_INC) \
 	$(GSL_INC) \
 	$(ACE_INC) $(ACE_FLAGS) \
 	$(TINYXML_FLAGS) \

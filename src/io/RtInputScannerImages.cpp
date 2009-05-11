@@ -48,6 +48,8 @@ RtInputScannerImages::RtInputScannerImages()
 
   alignSeries = false;
 
+  num2Discard = 0;
+
   initialized = false;
   imageNum = 0;
   numImagesExpected = 0;
@@ -107,6 +109,10 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
   if(config.isSet("scanner:voxdim3")) {
     voxDim[2] = config.get("scanner:voxdim3");
+  }
+
+  if(config.isSet("scanner:discard")) {
+    num2Discard = config.get("scanner:discard");
   }
 
   // see if we should only read moco images
@@ -198,6 +204,7 @@ int RtInputScannerImages::svc() {
   short *img;
   RtMRIImage *rti;
   stringstream infos;
+  static unsigned int discardSubtract = num2Discard;
 
   cout << "listening for images on port " << port << endl;
 
@@ -220,6 +227,7 @@ int RtInputScannerImages::svc() {
       stream.close();
       continue;
     }
+    ei->iAcquisitionNumber -= discardSubtract;
 
     // DEBUGGING
     //ei->displayImageInfo();
@@ -234,6 +242,12 @@ int RtInputScannerImages::svc() {
 
     if(onlyReadMoCo && !ei->bIsMoCo) {
       //cout << "ignoring non-MoCo image." << endl;
+      continue;
+    }
+
+    if(num2Discard > 0) {
+      num2Discard--;
+      cout << "discarding this and " << num2Discard << " further images" << endl;
       continue;
     }
 
@@ -342,8 +356,8 @@ int RtInputScannerImages::svc() {
 RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &stream) {
   unsigned int rec;
 
-  static int acnum = 1;
-  acnum++;
+  //static int acnum = 1;
+  //acnum++;
 
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!

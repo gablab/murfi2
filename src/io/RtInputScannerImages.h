@@ -140,6 +140,8 @@ protected:
   unsigned int numSlices;
   double sliceGap;
   double voxDim[3];
+
+  unsigned int num2Discard;
   
   // current series number
   unsigned int seriesNum;

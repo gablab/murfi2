@@ -24,8 +24,7 @@ RtInfoServer::RtInfoServer() : RtServerSocket(DEFAULT_PORT_NUM) {
   lastBadTriggerTR = -1;
 
   posAct = new RtData*[1024];
-  numPos = 1;
-  //negAct.reserve(1000);
+  negAct = new RtData*[1024];
 } 
   
 // constructor with port and host
@@ -36,7 +35,7 @@ RtInfoServer::RtInfoServer(unsigned short portNum) : RtServerSocket(portNum) {
   lastBadTriggerTR = -1;
 
   posAct = new RtData*[1024];
-  numPos = 1;
+  negAct = new RtData*[1024];
 }
 
 // destructor
@@ -50,6 +49,9 @@ bool RtInfoServer::open(RtConfig &config) {
   if(config.isSet("infoserver:port")) {
     address.set_port_number((unsigned short) config.get("infoserver:port"));
   }
+
+  numPos = 1;
+  numNeg = 1;
 
   return RtServerSocket::open(config);
 }
@@ -71,6 +73,7 @@ void RtInfoServer::setData(RtData *data) {
   else if(data->getDataID().getRoiID() 
      == getExperimentConfig().get("infoserver:negActivationDataID").str()) {
     negAct[data->getDataID().getTimePoint()] = data;
+    numNeg++;
   }
   //else if(data->getDataID().getModuleID() == ID_EVENTTRIGGER) {
 
@@ -199,7 +202,7 @@ string RtInfoServer::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
 	  // check for proper format and get tr
 	  if(!strcmp(get->Attribute("tr"),"last")) {
 	    //	    trStart = posAct.size();
-	    trStart = numPos-1;
+	    trStart = numNeg-1; // FIX THIS< DICKHEAD!!!
 	  }
 	  else if(!RtConfigVal::convert<unsigned int>(trStart,
 						 get->Attribute("tr"))) {

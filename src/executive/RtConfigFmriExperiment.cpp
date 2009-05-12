@@ -281,8 +281,8 @@ string RtConfigFmriExperiment::getSeriesRefVolFilename(unsigned int series) {
 // experiment reference volume into the space of the current series
 string RtConfigFmriExperiment::getSeriesXfmFilename(unsigned int series) {
   stringstream ss;
-  ss << "series" << series << "." << get("study:xfm:fileExt").str();
-
+  ss << "series" << series << "." << DEFAULT_XFMFILEEXT;
+ 
   path xfmFile(get("study:xfm:directory").filepath() / ss.str());
   return xfmFile.string();
 }

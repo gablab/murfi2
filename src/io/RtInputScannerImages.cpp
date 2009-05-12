@@ -338,12 +338,14 @@ int RtInputScannerImages::svc() {
 
     // log that we received the image
     infos.str("");
-    infos << "received image from scanner: series " << seriesNum
+    infos << "received image from scanner: series " 
+	  << rti->getDataID().getSeriesNum()
 	  << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
 
     if(print) {
-      cout << "received image from scanner: series " << seriesNum
+      cout << "received image from scanner: series " 
+	   << rti->getDataID().getSeriesNum()
 	   << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
 

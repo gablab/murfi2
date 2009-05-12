@@ -688,17 +688,17 @@ void RtDisplayImage::makeTexture() {
 
   // unmosaic if needed
   short *imageData;
-  if(!img->isMosaic()) {
-    imageData = img->getMosaicedCopy();
-    imageW = img->getMosaicedWidth();
-    imageH = img->getMosaicedHeight();
-  }
-  else {
+//  if(!img->isMosaic()) {
+//    imageData = img->getMosaicedCopy();
+//    imageW = img->getMosaicedWidth();
+//    imageH = img->getMosaicedHeight();
+//  }
+//  else {
     imageData = new short[img->getNumEl()];
     imageW = img->getDim(0);
     imageH = img->getDim(1);
     imageData = img->getDataCopy();
-  }
+//  }
 
   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, imageW, imageH,
 	       0, GL_LUMINANCE, GL_SHORT, imageData);

@@ -117,20 +117,19 @@ newstem="$movestem"2"$targstem"
 default_options=""
 
 ## run mcflirt to get the transformation
-if [ ! "$xfmfile" ]; then
+if [ ! -f "$xfmfile" ]; then
     of="$movedir""$newstem"
 
     echo mcflirt $default_options -in "$move" -out "$of" -reffile "$targ" -mats
     mcflirt $default_options -in "$move" -out "$of" -reffile "$targ" -mats
 
-    echo mv "$of".mat/MAT_0000 "$savexfmfile"
-    mv "$of".mat/MAT_0000 "$savexfmfile"
+    echo mv "$of".mat/MAT_0000 "$xfmfile"
+    mv "$of".mat/MAT_0000 "$xfmfile"
 
     echo rmdir "$of".mat
     rmdir "$of".mat
-else
-    savexfmfile=$xfmfile
 fi
+savexfmfile=$xfmfile
 
 ## apply the transform to the required files
 for file in $input; do

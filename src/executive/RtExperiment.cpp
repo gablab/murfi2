@@ -73,6 +73,9 @@ static unsigned int numExistingSeries;
 // unique id for this study (date and time of first initialization)
 static unsigned int studyID;
 
+// list of mask filenames to align
+static vector<string> masksToAlign;
+
 // experiment timer
 static timer experimentTimer;
 
@@ -268,6 +271,9 @@ int executeRun(RtConfigFmriRun &conf) {
 
   // reinitialize scanner listener
   scannerInput.init(conf);
+
+  // clear align mask names
+  masksToAlign.clear();
 
   conductor = new RtConductor();
 

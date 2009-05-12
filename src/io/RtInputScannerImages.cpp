@@ -149,8 +149,8 @@ bool RtInputScannerImages::open(RtConfig &config) {
     alignSeries = false;
   }
 
-  if(config.isSet("info:terminal:verbose")
-     && config.get("info:terminal:verbose")==true) {
+  if(config.isSet("study:terminal:verbose")
+     && config.get("study:terminal:verbose")==true) {
     verbose = true;
   }
 
@@ -267,7 +267,6 @@ int RtInputScannerImages::svc() {
 
     // if its the first image in a series save it no matter what
     if(!haveSeriesRefVol) { // && isFirstInSeries(*ei)) {
-      cout << "HEREHREHRERHEHRHERHEHRER" << endl;
       rti->write(getExperimentConfig()
 		 .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
       haveSeriesRefVol = true;
@@ -284,8 +283,8 @@ int RtInputScannerImages::svc() {
 		 true);
       }
 
-    }
 
+    }
 
     if(numDiscarded < num2Discard) {
       numDiscarded++;

@@ -1169,34 +1169,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Widgets\FrDrawingPanelWidget.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\frontend\Widgets\FrEmptyToolWidget.cpp"
 				>
 			</File>
@@ -1286,34 +1258,6 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Widgets\FrGraphDialog.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Mocing $(InputPath)"
-						CommandLine="moc.exe &quot;$(InputPath)&quot; -o ./frontend/moc/&quot;$(InputName)&quot;_moc.cpp&#x0D;&#x0A;"
-						Outputs="./frontend/moc/&quot;$(InputName)&quot;_moc.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\frontend\Widgets\FrGraphListWidget.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\frontend\Widgets\FrGraphListWidget.h"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

@@ -141,7 +141,6 @@ vtkImageData* FrDocumentReader::ReadMri(){
     // Process data
     vtkImageData* result = 0L;
     if(mri){
-      cout << "got mri image with tp :" << mri->getDataID().getTimePoint() << endl;
         result = this->GetMriSlice(mri);
     }
 

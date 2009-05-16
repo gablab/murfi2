@@ -19,8 +19,8 @@ OS=linux
 PROJECT = festr
 
 # whether to compile with the frontend gui
-export FRONTEND = 0
-export OLDFRONTEND = 1
+export FRONTEND = 1
+export OLDFRONTEND = 0
 
 # directories 
 export SRC_DIR = $(PWD)/src
@@ -71,7 +71,7 @@ export PKG_DIR = /usr/local/
 NIFTI_HOME=/usr
 
 # vtk
-VTK_HOME = /usr/local
+VTK_HOME = /usr/
 
 # qt
 QT_HOME = /usr
@@ -195,24 +195,24 @@ VTK_LIB = -L$(VTK_HOME)/lib/vtk \
 	-lvtkGraphics \
 	-lvtkImaging \
 	-lvtkRendering \
-	-lvtkverdict \
 	-lvtksys \
-	-lvtkfreetype \
 	-lvtkDICOMParser \
 	-lvtkNetCDF \
-	-lvtkmetaio \
-	-lvtksqlite \
-	-lvtkjpeg \
-	-lvtkexpat \
-	-lvtkQtChart \
-	-lvtkViews \
-	-lvtkInfovis \
 	-lvtkWidgets \
 	-lvtkHybrid \
 	-lvtkexoIIc \
-	-lvtklibxml2 \
-	-lvtkalglib \
-	-lQVTK
+	-lQVTK \
+#	-lvtkverdict \
+#	-lvtkfreetype \
+#	-lvtksqlite \
+#	-lvtkjpeg \
+#	-lvtkexpat \
+#	-lvtkmetaio \
+#	-lvtkQtChart \
+#	-lvtkViews \
+#	-lvtkInfovis \
+#	-lvtklibxml2 \
+#	-lvtkalglib \
 
 # qt
 QT_INC = \

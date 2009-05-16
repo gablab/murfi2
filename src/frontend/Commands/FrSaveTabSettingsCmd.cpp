@@ -97,6 +97,7 @@ void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
         if(layer->IsImage()){
             // Update image layer 
             // NOTE: (assume there may be only one)
+	  // ohinds: this assumption is no longer valid
             FrLayerSettings::CopySettings(
                 layer->GetSettings(), 
                 docObj->GetImageLayer());

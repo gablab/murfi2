@@ -241,6 +241,8 @@ bool FrOrthoView::InitUpdateParams(FrUpdateParams2& params){
 void FrOrthoView::ReadDocument(FrUpdateParams2& params){
     FrViewDocObj* vdo = params.Document->GetCurrentViewObject();
 
+    //cout << "reading vdo " << vdo << endl;
+
     m_docReader->SetDocument(params.Document);
     m_docReader->SetMosaic(false);
     
@@ -267,8 +269,6 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
                 m_docReader->SetTarget(FrDocumentReader::Mri);
 		RtDataID imID = (*it)->GetSettings()->DataID;
                 imID.setTimePoint(vdo->GetTimePoint());
-
-		cout << "showing tp " << imID.getTimePoint() << endl;
 
                 m_docReader->SetDataID(imID);
                 m_docReader->Update();

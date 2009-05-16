@@ -94,30 +94,33 @@ void FrUpdateTabsCmd::SetupTabObjects(){
 //      return;
 //    }
 
-    // Remove Image and Colormap layers
-    FrDocument::DocObjCollection oldLayers;
-    doc->GetObjectsByType(oldLayers, FrDocumentObj::LayerObject);
-    
-    FrDocument::DocObjCollection::iterator it, itEnd(oldLayers.end());
-    for(it = oldLayers.begin(); it != itEnd; ++it){
-        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
-        // NOTE: do not touch ROI layers
-        if(!layerDO->IsRoi()) 
-            doc->Remove(layerDO);
-    }
-
-    // Remove view settings
-    FrDocument::DocObjCollection views;
-    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);
-    for(it = views.begin(); it != views.end(); ++it){
-        doc->Remove(*it);
-    }
+// ohinds: hypothesis that this removing is causing broken tab behavior
+//    // Remove Image and Colormap layers
+//    FrDocument::DocObjCollection oldLayers;
+//    doc->GetObjectsByType(oldLayers, FrDocumentObj::LayerObject);
+//    
+//    FrDocument::DocObjCollection::iterator it, itEnd(oldLayers.end());
+//    for(it = oldLayers.begin(); it != itEnd; ++it){
+//        FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
+//        // NOTE: do not touch ROI layers
+//        if(!layerDO->IsRoi()) 
+//            doc->Remove(layerDO);
+//    }
+//
+//    // Remove view settings
+//    FrDocument::DocObjCollection views;
+//    doc->GetObjectsByType(views, FrDocumentObj::ViewObject);
+//    for(it = views.begin(); it != views.end(); ++it){
+//        doc->Remove(*it);
+//    }
 
     ////////////////////////////
     // Add new
     FrViewDocObj* viewDO = new FrViewDocObj();
     viewDO->CopySettingsFrom(tabSets);
     doc->Add(viewDO);
+
+    cout << "added viewdo " << viewDO << endl;
 
     // ohinds 2009-02-25
     // do not add a layer by default

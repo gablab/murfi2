@@ -9,10 +9,16 @@
 
 CFLAGS += $(FRONT_FLAG)
 
-ifeq ($(OLDFRONTEND),1)
-  MAKE_DISP=cd ./display && $(MAKE)
+ifeq ($(FRONTEND),1)
+  MAKE_FRONT=cd ./frontend && $(MAKE)
 else
-  MAKE_DISP=echo not compiling old frontend
+  MAKE_FRONT=echo not compiling frontend
+endif
+
+ifeq ($(OLDFRONTEND),1)
+  MAKE_OLDFRONT=cd ./display && $(MAKE)
+else
+  MAKE_OLDFRONT=echo not compiling old frontend
 endif
 
 default: 
@@ -20,7 +26,8 @@ default:
 	cd ./io &&        $(MAKE)
 	cd ./data &&      $(MAKE)
 	cd ./stream &&    $(MAKE)
-	$(MAKE_DISP)
+	$(MAKE_FRONT)
+	$(MAKE_OLDFRONT)
 
 clean: 
 	cd ./executive && $(MAKE) clean

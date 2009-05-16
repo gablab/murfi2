@@ -153,6 +153,8 @@ FrViewDocObj* FrMainDocument::GetCurrentViewObject(){
     DocObjCollection viewObjects;
     this->GetObjectsByType(viewObjects, FrDocumentObj::ViewObject);
 
+    //cout << "there are " << viewObjects.size() << " vdos but i'm just returning the first" << endl;
+
     FrViewDocObj* result = 0;
     if(viewObjects.size() > 0){
         result = (FrViewDocObj*)viewObjects[0];

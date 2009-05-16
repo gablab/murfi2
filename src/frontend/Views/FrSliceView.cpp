@@ -66,7 +66,8 @@ void FrSliceView::SetupRenderers(){
     vtkRenderWindow* renWin = QTVIEW3D->GetRenderWindow();
     std::vector<vtkRenderer*>::iterator it, itEnd(renderers.end());
     for(it = renderers.begin(); it != itEnd; ++it){
-        renWin->AddRenderer( (*it) );
+      renWin->AddRenderer( (*it) );
+      (*it)->SetViewport(0.0, 0.0, 1.0, 1.0);
     }
 
     renWin->GetRenderers()->InitTraversal();
@@ -218,10 +219,16 @@ void FrSliceView::ReadDocument(FrUpdateParams0& params){
                                         (*it)->GetID());
         }
         else if((*it)->IsImage()){  
+	  // ohinds: the below comment is no longer correct
             // ID is current Timepoint since we have 
             // just one time series 
             m_docReader->SetTarget(FrDocumentReader::Mri);
-            m_docReader->SetDataID(vdo->GetTimePoint());
+            //m_docReader->SetDataID(vdo->GetTimePoint());
+
+	    RtDataID imID = (*it)->GetSettings()->DataID;
+	    imID.setTimePoint(vdo->GetTimePoint());
+
+	    m_docReader->SetDataID(imID);
             m_docReader->Update();
 
             m_LayeredImage->SetImageInput(m_docReader->GetOutput(),

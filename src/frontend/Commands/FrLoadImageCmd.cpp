@@ -76,8 +76,9 @@ bool FrLoadImageCmd::Execute(){
 	    img->getDataID().setSeriesNum(series);
 	    img->getDataID().setTimePoint(timePoint);
         
-        string st = (*itr).toLatin1();
-        //string st = *itr).toStdString();
+	    // ohinds: had to change this to get it to compile
+	    //string st = (*itr).toLatin1();
+	    string st = (*itr).toStdString();
         
         img->getDataID().setDataName(st);
 

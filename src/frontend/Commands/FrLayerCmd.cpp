@@ -392,7 +392,7 @@ void FrLayerCmd::SetLayersOrder(){
         // find appropriate Layer in layered image
         for (int i = 0; i < layers.size(); i++){
             layerDO = dynamic_cast<FrLayerDocObj*>(layers[i]);
-            int id = layerDO->GetID();
+            unsigned long id = layerDO->GetID();
             int pos = layeredImage->GetLayerByID(id)->GetPosition();
             layerDO->SetPosition(pos);
         }

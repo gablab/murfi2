@@ -257,6 +257,10 @@ CrosshairParams FrDocumentReader::ReadCrosshair(){
 
     // Find appropriate image volume
     RtMRIImage* mri = dynamic_cast<RtMRIImage*>(getDataStore().getData(m_DataID));
+
+    if(mri == NULL) {
+      return result;
+    }
 //    RtMRIImage* mri = 0;
 //    FrDocument::DocObjCollection images;
 //    m_Document->GetObjectsByType(images, FrDocumentObj::ImageObject);
@@ -271,17 +275,9 @@ CrosshairParams FrDocumentReader::ReadCrosshair(){
 //    }
     pointsDO->GetDimsFromImg(mri);
 
-    if (m_Mosaic){
-      RtMRIImage* image = new RtMRIImage(*mri);
-      
-      if(!image->mosaic()){
-	delete image;
-	return result;
-      }
-            
-      int xDim = image->getDim(0);
-      int yDim = image->getDim(1);
-
+    if(m_Mosaic){
+      unsigned int xDim = mri->getMosaicedWidth();
+      unsigned int yDim = mri->getMosaicedHeight();
       result = pointsDO->GetCrosshairParamsMosaic(xDim, yDim);
     }
     else{

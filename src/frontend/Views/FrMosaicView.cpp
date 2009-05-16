@@ -184,7 +184,11 @@ void FrMosaicView::ReadDocument(FrUpdateParams1& params){
             // ID is current Timepoint since we have 
             // just one time series 
             m_docReader->SetTarget(FrDocumentReader::Mri);
-            m_docReader->SetDataID(vdo->GetTimePoint());
+
+	    RtDataID imID = (*it)->GetSettings()->DataID;
+	    imID.setTimePoint(vdo->GetTimePoint());
+
+	    m_docReader->SetDataID(imID);
             m_docReader->Update();
 
             m_LayeredImage->SetImageInput(m_docReader->GetOutput(),(*it)->GetID());

@@ -246,8 +246,9 @@ void FrActionSignalManager::OnOpenConfigAction(){
   RtConfigFmriRun runConfig;
     
   string st;
-  st = fileName.toLatin1();
-//  st = fileName.toStdString();
+  // ohinds: had to change to compile
+  //st = fileName.toLatin1();
+  st = fileName.toStdString();
 
   if(!runConfig.parseConfigFile(st)) {
     cerr << "FrActionSignalManager::OnOpenConfig(): failed to parse config file " << st << endl;

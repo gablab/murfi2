@@ -76,11 +76,13 @@ void FrDataStore::AddImageToDocument(RtData* data){
         for(it = objects.begin(); it != itEnd; ++it) {
             FrImageDocObj* ido = (FrImageDocObj*)(*it);
 
-	    RtDataID imageDocDataID = ido->GetDataID();
+	    RtDataID imageDocDataID(ido->GetDataID());
 	    imageDocDataID.setTimePoint(DATAID_UNSET_VALUE);
+	    imageDocDataID.setDataName("");
 
 	    RtDataID imageDataID = img->getDataID();
-	    imageDataID.setTimePoint(DATAID_UNSET_VALUE);
+	    //imageDataID.setTimePoint(DATAID_UNSET_VALUE);
+	    //imageDataID.setDataName("");
 
             if(imageDocDataID == imageDataID){
                    // Found!

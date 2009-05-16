@@ -261,11 +261,13 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
                                               (*it)->GetID());
             }
             else if((*it)->IsImage()){  
+	      // ohinds: the below comment is no longer correct
                 // ID is current Timepoint since we have 
                 // just one time series 
                 m_docReader->SetTarget(FrDocumentReader::Mri);
 		RtDataID imID = (*it)->GetSettings()->DataID;
                 imID.setTimePoint(vdo->GetTimePoint());
+
                 m_docReader->SetDataID(imID);
                 m_docReader->Update();
 

@@ -83,6 +83,13 @@ void FrDocumentReader::SetDataID(const RtDataID &id){
 	//}
 }
 
+//void FrDocumentReader::SetTimePoint(unsigned int timePoint){
+//  if(m_DataID.getTimePoint() != timePoint){
+//    m_DataID.setTimePoint(timePoint);
+//    this->SetOutput(0);
+//  }
+//}
+ 
 void FrDocumentReader::SetOrientation(Orientations value){
     if(m_Orientation != value){
         m_Orientation = value;
@@ -113,7 +120,7 @@ vtkImageData* FrDocumentReader::ReadMri(){
     // ohinds 2009-02-28
     // changed to get all images from data store
 
-  getDataStore().getAvailableData();  
+  //getDataStore().getAvailableData();  
 
     // Find appropriate image volume
   RtMRIImage* mri = dynamic_cast<RtMRIImage*>(getDataStore().getData(m_DataID));
@@ -134,6 +141,7 @@ vtkImageData* FrDocumentReader::ReadMri(){
     // Process data
     vtkImageData* result = 0L;
     if(mri){
+      cout << "got mri image with tp :" << mri->getDataID().getTimePoint() << endl;
         result = this->GetMriSlice(mri);
     }
 

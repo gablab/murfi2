@@ -440,6 +440,7 @@ void FrActionSignalManager::OnTimePointChanged(int newValue){
     m_mainWindow->
         GetMainController()->
         SetCurrentTimePoint(newValue);
+    cout << "changing timepoint to " << newValue << endl;
 }
 
 void FrActionSignalManager::OnPreviousTimePointPressed(){

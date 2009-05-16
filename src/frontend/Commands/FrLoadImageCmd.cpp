@@ -19,6 +19,8 @@ FrLoadImageCmd::FrLoadImageCmd(){
 }
 
 bool FrLoadImageCmd::Execute(){
+  static int fileLoadNum = 0;
+
     if(!this->GetMainController() ||
         this->m_FilesToOpen.empty()) return false;
 
@@ -68,6 +70,7 @@ bool FrLoadImageCmd::Execute(){
 	  // for now load all selected images as a single timeseries
 
 	  if (img){
+	    stringstream dataname;
 
 	    // create appropriate data id
 	    // ohinds 2009-02-27
@@ -77,11 +80,12 @@ bool FrLoadImageCmd::Execute(){
 	    img->getDataID().setTimePoint(timePoint);
         
 	    // ohinds: had to change this to get it to compile
+	    // ohinds: also, this is the reason some tp stuff isnt
+	    // working, so changed to have unique names for each file
 	    //string st = (*itr).toLatin1();
-	    string st = (*itr).toStdString();
+	    //string st = (*itr).toStdString();
         
-        img->getDataID().setDataName(st);
-
+	    
 	    if(timePoint == 0) {
 //	      FrTabSettingsDocObj* tabSets = md->GetCurrentTabSettings();
 //	      FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType(), img->getDataID(), (*itr));
@@ -91,8 +95,14 @@ bool FrLoadImageCmd::Execute(){
 	      voxInds[0] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL] = img->getDim(DEF_CORONAL)/2;
 	      voxInds[1] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_SAGITAL] = img->getDim(DEF_SAGITAL)/2;
 	      voxInds[2] = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_AXIAL] = img->getDim(DEF_AXIAL)/2;
+
+	      fileLoadNum++;
+	      
 	    }
 	    timePoint++;
+
+	    dataname << "loaded img " << fileLoadNum;
+	    img->getDataID().setDataName(dataname.str());
 
 	    //imgLayer->CopySettings(tabSets->GetImageLayer());
 	    

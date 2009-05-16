@@ -63,6 +63,8 @@ public:
     FrGetPropMacro(int, Slice);
     void SetSlice(int slice);
 
+    //void SetTimePoint(unsigned int timePoint);
+
     // ohinds 2009-02-28
     // changed to hold an actual data id
     FrGetPropMacro(RtDataID, DataID);

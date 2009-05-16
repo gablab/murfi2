@@ -268,6 +268,8 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
 		RtDataID imID = (*it)->GetSettings()->DataID;
                 imID.setTimePoint(vdo->GetTimePoint());
 
+		cout << "showing tp " << imID.getTimePoint() << endl;
+
                 m_docReader->SetDataID(imID);
                 m_docReader->Update();
 

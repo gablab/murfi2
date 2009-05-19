@@ -277,7 +277,7 @@ RtActivation *RtRoiCombine::getMedian(RtData *dat, RtMaskImage *mask) {
     }
   }
 
-  unsigned int numPix = indices.size();
+  unsigned int numPix = roiVals.size();
   double medVal = 0;
   if(numPix != 0) {
     sort(roiVals.begin(), roiVals.end());

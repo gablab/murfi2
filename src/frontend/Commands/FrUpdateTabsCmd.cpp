@@ -90,9 +90,9 @@ void FrUpdateTabsCmd::SetupTabObjects(){
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
     FrTabSettingsDocObj* tabSets = doc->GetCurrentTabSettings();
 
-//    if(tabSets == NULL) {
-//      return;
-//    }
+    if(tabSets == NULL) {
+      return;
+    }
 
 // ohinds: hypothesis that this removing is causing broken tab behavior
 //    // Remove Image and Colormap layers
@@ -116,11 +116,11 @@ void FrUpdateTabsCmd::SetupTabObjects(){
 
     ////////////////////////////
     // Add new
-    FrViewDocObj* viewDO = new FrViewDocObj();
-    viewDO->CopySettingsFrom(tabSets);
-    doc->Add(viewDO);
-
-    cout << "added viewdo " << viewDO << endl;
+    //FrViewDocObj* viewDO = new FrViewDocObj();
+    //viewDO->CopySettingsFrom(tabSets);
+    //doc->Add(viewDO);
+    //
+    //cout << "added viewdo " << viewDO << endl;
 
     // ohinds 2009-02-25
     // do not add a layer by default
@@ -129,17 +129,17 @@ void FrUpdateTabsCmd::SetupTabObjects(){
     //doc->Add(imgLayer);
 
     // ohinds 2009-03-02
-    // does this ever get called?    
+    // should this ever get called?    
     FrTabSettingsDocObj::LayersCollection& layers = tabSets->GetLayers();
     std::vector<FrLayerSettings*>::iterator itr, itrEnd(layers.end());
     for(itr = layers.begin(); itr != itrEnd; ++itr){
-      cout << "here, unexpectedly" << endl;
-        // TODO: do not add roi(image) layers, may be just copy settings  ??
-        if ((*itr)->GetType() != FrLayerSettings::LRoi){
-	  FrLayerDocObj* layer = new FrLayerDocObj((*itr)->GetType(), RtDataID());
-            layer->CopySettings((*itr));
-            doc->Add(layer);
-        }
+      //cout << "here, unexpectedly" << endl;
+      // TODO: do not add roi(image) layers, may be just copy settings  ??
+      if ((*itr)->GetType() != FrLayerSettings::LRoi){
+	FrLayerDocObj* layer = new FrLayerDocObj((*itr)->GetType(), RtDataID());
+	layer->CopySettings((*itr));
+	doc->Add(layer);
+      }
     }   
 }
 

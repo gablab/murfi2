@@ -35,6 +35,7 @@ clean:
 	cd ./data &&      $(MAKE) clean
 	cd ./stream &&    $(MAKE) clean
 	cd ./display &&   $(MAKE) clean
+	cd ./frontend &&   $(MAKE) clean
 
 
 

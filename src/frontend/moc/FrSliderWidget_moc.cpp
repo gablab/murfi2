@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrSliderWidget.h'
 **
-** Created: Mon 4. May 16:33:55 2009
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
+** Created: Mon May 18 12:31:44 2009
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,11 +11,12 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrSliderWidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.3.3. It"
+#error "This file was generated using the moc from 4.4.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
+QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_FrSliderWidget[] = {
 
  // content:
@@ -54,7 +55,7 @@ void *FrSliderWidget::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrSliderWidget))
-	return static_cast<void*>(const_cast< FrSliderWidget*>(this));
+        return static_cast<void*>(const_cast< FrSliderWidget*>(this));
     return QWidget::qt_metacast(_clname);
 }
 
@@ -79,3 +80,4 @@ void FrSliderWidget::ValueChanged(int _t1)
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
+QT_END_MOC_NAMESPACE

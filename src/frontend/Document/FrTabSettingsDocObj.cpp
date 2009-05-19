@@ -18,7 +18,7 @@ FrTabSettingsDocObj::FrTabSettingsDocObj(bool isDefault){
     m_MosaicViewSettings = new FrMosaicViewSettings();
     m_OrthoViewSettings = new FrOrthoViewSettings();
 
-    m_ImageLayer = new FrImageLayerSettings(RtDataID(),"empy name :(");
+    //m_ImageLayer = new FrImageLayerSettings(RtDataID(),"empy name :(");
 }
 
 FrTabSettingsDocObj::~FrTabSettingsDocObj(){
@@ -26,7 +26,7 @@ FrTabSettingsDocObj::~FrTabSettingsDocObj(){
     delete m_MosaicViewSettings;
     delete m_OrthoViewSettings;
 
-    delete m_ImageLayer;
+    //delete m_ImageLayer;
     this->ClearLayersInfo();
 }
 
@@ -102,7 +102,7 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
     }
 
     // Copy image layer
-    (*m_ImageLayer) = (*docObj->m_ImageLayer);
+    //(*m_ImageLayer) = (*docObj->m_ImageLayer);
 
     // Copy other layers
     LayersCollection::iterator it, itEnd(docObj->m_Layers.end());
@@ -114,6 +114,21 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
             m_Layers.push_back(dst);
         }
     }
+}
+
+
+FrImageLayerSettings* FrTabSettingsDocObj::GetImageLayer(const RtDataID &id) {
+  FrImageLayerSettings* result = NULL;
+  
+  LayersCollection::iterator it, itEnd(m_Layers.end());
+  for(it = m_Layers.begin(); it != itEnd; ++it){
+    if((*it)->GetType() == FrLayerSettings::LImage && (*it)->DataID == id) {
+      result = (FrImageLayerSettings*) (*it);
+      break;
+    }
+  }  
+
+  return result;
 }
 
 void FrTabSettingsDocObj::ClearLayersInfo(){

@@ -161,9 +161,10 @@ bool FrLoadTabsCmd::LoadTabSettings(QDomElement& elem, FrTabSettingsDocObj* tabs
             if(!hasOrtho) return false;
         }
         else if(viewElem.tagName() == FR_XML_LIS_ELEM){
-            hasLayeredImage = LoadLayeredImageSettings(viewElem, 
-                              tabs->GetImageLayer(), tabs->GetLayers());
-            if(!hasLayeredImage) return false;       
+// ohinds 2009-05-18: removed image layer from tab settings
+//            hasLayeredImage = LoadLayeredImageSettings(viewElem, 
+//                              tabs->GetImageLayer(), tabs->GetLayers());
+//            if(!hasLayeredImage) return false;       
         }
         viewElem = viewElem.nextSiblingElement();
     }

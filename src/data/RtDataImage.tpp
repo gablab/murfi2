@@ -27,8 +27,8 @@ RtDataImage<T>::RtDataImage() : RtData(),
   //addToID("image");
   data = NULL;
   bytesPerPix = sizeof(T);
-  matrixSize = 64;
-  numSlices = 1;
+  matrixSize = -1;
+  numSlices = -1;
   sliceThick = 1;
   sliceGap = 0.1;
   dims.reserve(4);
@@ -53,8 +53,8 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
   isMosaiced = false;
-  matrixSize = 64;
-  numSlices = 1;
+  matrixSize = -1;
+  numSlices = -1;
   sliceThick = 1;
   sliceGap = 0.1;
   dims.reserve(4);
@@ -670,6 +670,11 @@ bool RtDataImage<T>::readInfo(istream &is) {
   for(unsigned int ind = 0; ind < ndims && ind < MAX_NDIMS; ind++) {
     dims.push_back(dimarr[ind]);
   }
+  
+  matrixSize = dims[0];
+  if(ndims > 2) {
+    numSlices = dims[2];
+  }
 
   // pixdims
   double pixdimarr[MAX_NDIMS];
@@ -742,6 +747,11 @@ bool RtDataImage<T>::setInfo(nifti_image *hdr) {
   numPix = hdr->nvox;
   bytesPerPix = hdr->nbyper;
   imgDataLen = numPix*hdr->nbyper;
+
+  matrixSize = dims[0];
+  if(hdr->ndim > 2) {
+    numSlices = dims[2];
+  }
 
   // vxl2ras
   vxl2ras.put(0,0,hdr->sto_xyz.m[0][0]);

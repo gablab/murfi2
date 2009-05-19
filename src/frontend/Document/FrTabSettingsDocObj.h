@@ -10,6 +10,8 @@ class FrImageLayerSettings;
 #include "FrMacro.h"
 #include "FrViewSettings.h"
 
+#include "RtDataID.h"
+
 #include "Qt/qstring.h"
 #include "Qt/qcolor.h"
 #include <vector>
@@ -34,6 +36,8 @@ public:
     virtual void OnRemove(FrDocument* doc);
     virtual ObjTypes GetType();
     
+    virtual FrImageLayerSettings* GetImageLayer(const RtDataID &id);
+
     // Initialization
     void InitFrom(FrTabSettingsDocObj* docObj);
     void ClearLayersInfo();
@@ -56,7 +60,7 @@ public:
     // Common layers for all views
     typedef std::vector<FrLayerSettings*> LayersCollection;
     FrGetRefPropMacro(LayersCollection, Layers);
-    FrGetPropMacro(FrImageLayerSettings*, ImageLayer);
+    //FrGetPropMacro(FrImageLayerSettings*, ImageLayer);
 };
 
 #endif

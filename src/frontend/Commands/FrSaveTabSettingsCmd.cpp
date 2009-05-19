@@ -4,6 +4,7 @@
 #include "FrMainWindow.h"
 #include "FrMainDocument.h"
 #include "FrLayerDocObj.h"
+#include "FrImageDocObj.h"
 #include "FrViewDocObj.h"
 
 #include "Qt/qstring.h"
@@ -94,18 +95,20 @@ void FrSaveTabSettingsCmd::InitDocObjFromActive(FrTabSettingsDocObj* docObj){
     FrDocument::DocObjCollection::iterator it, itEnd(layers.end());
     for(it = layers.begin(); it != itEnd; ++it){
         FrLayerDocObj* layer = (FrLayerDocObj*)(*it);
+
+	// copy to the stored layers	
         if(layer->IsImage()){
-            // Update image layer 
-            // NOTE: (assume there may be only one)
-	  // ohinds: this assumption is no longer valid
-            FrLayerSettings::CopySettings(
-                layer->GetSettings(), 
-                docObj->GetImageLayer());
+	  // Update image layers
+// ohinds 2009-05-18: we need to rethink how view settings for images
+//	  are stored for tabs. 
+//	  FrImageDocObj *imgLayer = (FrImageDocObj*) layer;
+//	  FrLayerSettings::CopySettings(layer->GetSettings(), 
+//			       docObj->GetImageLayer(imgLayer->GetDataID()));
         }
         else {
 	  FrLayerSettings* dst = FrLayerSettings::Create(layer->GetSettings()->GetType(), layer->GetSettings()->DataID, layer->GetSettings()->Name);
-            FrLayerSettings::CopySettings(layer->GetSettings(), dst);
-            docObj->GetLayers().push_back(dst);
+	  FrLayerSettings::CopySettings(layer->GetSettings(), dst);
+	  docObj->GetLayers().push_back(dst);
         }
     }
 }

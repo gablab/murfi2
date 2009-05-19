@@ -2,6 +2,7 @@
 #include "FrMainDocument.h"
 #include "FrImageDocObj.h"
 #include "FrLayerDocObj.h"
+#include "FrLayerSettings.h"
 #include "FrRoiDocObj.h"
 #include "FrPointsDocObj.h"
 #include "FrViewDocObj.h"
@@ -77,17 +78,15 @@ void FrDataStore::AddImageToDocument(RtData* data){
             FrImageDocObj* ido = (FrImageDocObj*)(*it);
 
 	    RtDataID imageDocDataID(ido->GetDataID());
-	    imageDocDataID.setTimePoint(DATAID_UNSET_VALUE);
+
+	    // look for any timepoint (and maybe dataname)
+	    imageDocDataID.setTimePoint(DATAID_UNSET_VALUE); 
 	    imageDocDataID.setDataName("");
 
-	    RtDataID imageDataID = img->getDataID();
-	    //imageDataID.setTimePoint(DATAID_UNSET_VALUE);
-	    //imageDataID.setDataName("");
-
-            if(imageDocDataID == imageDataID){
-                   // Found!
-                   imgDO = ido;
-                   break;
+            if(imageDocDataID == img->getDataID()){
+	      // Found!
+	      imgDO = ido;
+	      break;
             }
         }
 
@@ -98,7 +97,7 @@ void FrDataStore::AddImageToDocument(RtData* data){
         }
         else {
 	  FrTabSettingsDocObj* tabSets = m_Document->GetCurrentTabSettings();
-	  FrLayerDocObj* imgLayer = new FrLayerDocObj(tabSets->GetImageLayer()->GetType(), img->getDataID(), QString(img->getDataID().getDataName().c_str()));
+	  FrLayerDocObj* imgLayer = new FrLayerDocObj(FrLayerSettings::LImage, img->getDataID(), QString(img->getDataID().getDataName().c_str()));
 
 	  m_Document->Add(imgLayer);
 

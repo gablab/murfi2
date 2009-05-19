@@ -71,7 +71,7 @@ export PKG_DIR = /usr/local/
 NIFTI_HOME=/usr
 
 # vtk
-VTK_HOME = /usr/
+VTK_HOME = /usr
 
 # qt
 QT_HOME = /usr

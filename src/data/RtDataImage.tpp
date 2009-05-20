@@ -1535,6 +1535,15 @@ template<class T>
 void RtDataImage<T>::get3Dfrom1D(unsigned int i1D,
 		 unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
 
+  unsigned int vi = i1D % (dims[0]*dims[1]);
+  k3D = (i1D - vi)/(dims[0]*dims[1]);
+  
+  i1D = vi;
+  
+  vi = i1D % dims[0];
+  j3D = (i1D - vi)/dims[0];  
+
+  i3D = vi;
 }
 
 // transform 2D index into 3D index

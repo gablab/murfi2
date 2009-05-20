@@ -34,6 +34,9 @@ const string ID_MOSAIC = "mosaic";
 const string ID_UNMOSAIC = "unmosaic";
 // same names as scanner image
 
+const string ID_SMOOTHROI = "smooth-roi";
+const string NAME_SMOOTHROI = "smooth-roi-img";
+
 const string ID_TEMPDIFF = "temporal-difference";
 const string NAME_TEMPDIFF_IMG = "diff-img";
 

@@ -156,6 +156,10 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
       it++, curSolver++) {
 
     double y = dat->getElement(*it);
+    if(curSolver == 0) {
+      cout << "pix: " << dat->getPixel(*it) << endl;
+    }
+
     solvers[curSolver]->include(&y,row.data_block(),1.0);
 
     // provide betas only after the number of trends has been passed

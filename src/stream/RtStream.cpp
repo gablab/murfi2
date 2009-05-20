@@ -59,6 +59,7 @@ bool RtStream::configure(RtConfig &config) {
 #include"RtUnmosaic.h"
 #include"RtMaskLoad.h"
 #include"RtMaskGen.h"
+#include"RtSmoothRoi.h"
 #include"RtDiff.h"
 #include"RtMean.h"
 #include"RtVar.h"
@@ -104,6 +105,9 @@ RtStreamComponent *RtStream::buildStreamComponent(const string &type,
     }
     else if (type == RtMaskGen::moduleString) { // generate a mask
         ACE_NEW_NORETURN(sc, RtMaskGen());
+    }
+    else if (type == RtSmoothRoi::moduleString) { // roi smoothing
+        ACE_NEW_NORETURN(sc, RtSmoothRoi());
     }
     else if (type == RtDiff::moduleString) { // voxel time difference
         ACE_NEW_NORETURN(sc, RtDiff());

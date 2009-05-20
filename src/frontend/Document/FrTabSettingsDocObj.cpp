@@ -109,6 +109,7 @@ void FrTabSettingsDocObj::InitFrom(FrTabSettingsDocObj* docObj){
     for(it = docObj->m_Layers.begin(); it != itEnd; ++it){
         FrLayerSettings* src = (*it);
         FrLayerSettings* dst = FrLayerSettings::Create(src->GetType(),src->DataID, src->Name);
+      cout << "copying layer " << src->DataID << endl;
         if(dst){
             FrLayerSettings::CopySettings(src, dst);
             m_Layers.push_back(dst);

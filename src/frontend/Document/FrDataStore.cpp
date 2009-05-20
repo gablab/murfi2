@@ -39,8 +39,6 @@ void FrDataStore::SetStore(RtDataStore *store){
 void FrDataStore::notify(const RtDataID &dataID){
     if(m_Store == 0) return;
 
-    cout << dataID << endl;
- 
     // For now support MRI and ROI
     if(dataID.getModuleID() == DEF_MRI_ID){
       RtMRIImage *img = dynamic_cast<RtMRIImage*>(m_Store->getData(dataID));

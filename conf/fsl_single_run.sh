@@ -1,6 +1,6 @@
 #!/bin/bash
-## run a single fun of fsl analysis 
-## 
+## run a single fun of fsl analysis
+##
 ## $Id: fsl_contrast.sh,v 1.3 2008-07-22 21:13:49 ohinds Exp $
 
 usage() {
@@ -8,6 +8,9 @@ usage() {
     echo " options:"
     echo "  -h hpf:          high pass filter cutoff (default 32 seconds)"
     echo "  -d drop:         drop scans from the begining"
+    echo "  -t target:       target nii image for motion correction. if "
+    echo "                   left blank this will search for xfm/study_ref.nii" 
+    echo "                   as the target"
     echo "  -a analysis_dir: analysis directory (default ../../analysis)"
     echo "  -o :             run in online mode (use 3d files)"
 }
@@ -17,12 +20,14 @@ usage() {
 # in: $@
 parse_args() {
    # get the options
-    while getopts ":oh:d:a:?" Option
+    while getopts ":oh:d:t:a:?" Option
     do
 	case $Option in
 	    h ) hpf="$OPTARG"
 		;;
 	    d ) drop="$OPTARG"
+		;;
+	    t ) mc_target="$OPTARG"
 		;;
 	    a ) adir="$OPTARG"
 		;;
@@ -39,7 +44,7 @@ parse_args() {
 	usage
 	exit
     fi
-    
+
     export subj=$1
     export run=$2
     export model=$3
@@ -60,22 +65,43 @@ parse_args "$@"
 aname=$model
 
 odir=$sdir/$subj/"$aname"/
+echo mkdir -p "$odir"
+mkdir -p "$odir"
 
 # make the design if you need to
 if [ ! -f "$adir/"$aname"_design.mat" ]; then
-    echo "save a design in the file: $adir/"$aname"_design.mat" 
+    echo "save a design in the file: $adir/"$aname"_design.mat"
     Glm
 fi
 
-#run model fit
+# copy the images for analysis
+input_file="$odir/"input.nii
 if [ "$online" == 1 ]; then
-    run_flag="-r $run"
+    vol_str=`printf $sdir/$subj/img/img-%05d-*.nii $run`
+    echo fslmerge -t "$odir/"input.nii "$vol_str"
+    fslmerge -t "$input_file" $vol_str
 else
-    run_flag="-S $sdir/$subj/nii/[0-9]*-$run.nii"
+    cp "$sdir/$subj"/nii/[0-9]*-$run.nii "$input_file"
 fi
 
-echo fsl_model_fit.sh $run_flag -M $adir/"$aname"_design.mat -s $drop -o $odir -O
-fsl_model_fit.sh $run_flag -M $adir/"$aname"_design.mat -s $drop -o $odir -O
+# motion correct
+if [ ! "$mc_target" ]; then
+    mc_target="$sdir/$subj/xfm/study_ref.nii"
+fi
+
+if [ ! -f "$mc_target" ]; then
+    echo "error: motion correction target $mc_target doesn't exist"
+    exit
+fi
+
+echo mcflirt -in "$input_file" -out "$odir/"mc_input.nii -r "$mc_target" -plots
+mcflirt -in "$input_file" -out "$odir/"mc_input.nii -r "$mc_target" -plots
+input_file="$odir/"mc_input.nii
+
+
+# run model fit
+echo fsl_model_fit.sh -S $input_file -M $adir/"$aname"_design.mat -s $drop -o $odir -O
+fsl_model_fit.sh -S $input_file -M $adir/"$aname"_design.mat -s $drop -o $odir -O
 
 # make the contrast vector if you need to
 if [ ! -f "$adir/"$aname"_contrast_vector.txt" ]; then

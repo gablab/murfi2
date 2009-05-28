@@ -67,7 +67,9 @@ public:
     void SetCurrentTimePoint(int newTimePoint);
     void SetPreviousTimePoint();
     void SetNextTimePoint();
-    void ChangeGraph(unsigned long id, bool add);
+    void ChangeGraph(unsigned long gID, unsigned long id, bool add);
+    void AddGraphWidget();
+    void DeleteGraphWidget(unsigned long gID);
 
 	// Override from base class
     virtual void Notify(int notifyCode);

@@ -8,7 +8,7 @@
 #include "FrViewDocObj.h"
 #include "FrLayerDocObj.h"
 #include "FrImageSettingsWidget.h"
-#include "FrGraphPaneWidget.h"
+#include "FrGraphSetWidget.h"
 
 
 FrRefreshWidgetsInfoCmd::FrRefreshWidgetsInfoCmd(){
@@ -24,7 +24,7 @@ bool FrRefreshWidgetsInfoCmd::Execute(){
 
     FrLayerListWidget* widget = mv->GetLayerListWidget();
     FrImageSettingsWidget* widget2 = mv->GetImageSettingsWidget();
-    FrGraphPaneWidget* widget3 = mv->GetGraphPaneWidget();
+    FrGraphSetWidget* widget3 = mv->GetGraphSetWidget();
 
 
     if (m_Target == All){

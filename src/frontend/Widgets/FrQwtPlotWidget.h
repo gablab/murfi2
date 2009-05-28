@@ -58,6 +58,9 @@ private:
     QwtPlotGrid* m_Grid;
     QwtPlotMarker* m_PlotMarker;
     QwtPlotPicker *m_PlotPicker;
+
+    double yMin;
+    double yMax;
     
 };
 

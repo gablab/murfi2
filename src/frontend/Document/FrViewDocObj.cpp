@@ -173,9 +173,11 @@ void FrViewDocObj::TransformIndicesToCoordinates(double &x, double &y, vtkImageD
 
     double dSpacing[3];
     img->GetSpacing(dSpacing);
+    double dOrigin[3];
+    img->GetOrigin(dOrigin);
 
-    x = dSpacing[0]*(x - 0.5) + dSpacing[0]/2;
-    y = dSpacing[1]*(y - 0.5) + dSpacing[0]/2;
+    x = dSpacing[0]*(x - 0.5) + dSpacing[0]/2 + dOrigin[0];
+    y = dSpacing[1]*(y - 0.5) + dSpacing[0]/2 + dOrigin[1];
 
 //    // calc current coords of point
 //    switch(GetActiveView()){

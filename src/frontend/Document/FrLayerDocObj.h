@@ -31,6 +31,7 @@ public:
     // Properties
     FrPropMacro(FrLayerSettings*, Settings);
     FrPropMacro(unsigned long, ID);
+    //FrPropMacro(RtDataID, ID);
     FrPropMacro(unsigned int, Position);
 
     double GetOpacity();

@@ -5,7 +5,7 @@
 #include "FrBookmarkWidget.h"
 #include "FrGraphBookmarkWidget.h"
 #include "FrLayerListWidget.h"
-#include "FrGraphPaneWidget.h"
+#include "FrGraphSetWidget.h"
 #include "FrImageSettingsWidget.h"
 #include "FrSettings.h"
 
@@ -103,21 +103,28 @@ void FrActionSignalManager::Initialize(){
              this, SLOT(OnClearCurrentRoi()) );
 
     // Connect graph pane
-    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(LiveModeChanged(bool)),
+    connect( m_mainWindow->m_GraphSetWidget, SIGNAL(LiveModeChanged(bool)),
              this, SLOT(OnLiveModeChanged(bool)) );
-    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(TimePointChanged(int)),
+    connect( m_mainWindow->m_GraphSetWidget, SIGNAL(TimePointChanged(int)),
              this, SLOT(OnTimePointChanged(int)) );
-    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(PreviousTimePoint()),
+    connect( m_mainWindow->m_GraphSetWidget, SIGNAL(PreviousTimePoint()),
              this, SLOT(OnPreviousTimePointPressed()) );
-    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
+    connect( m_mainWindow->m_GraphSetWidget, SIGNAL(NextTimePoint()),
              this, SLOT(OnNextTimePointPressed()) );
-    connect( m_mainWindow->m_GraphPaneWidget, SIGNAL(GraphChanged(unsigned long, bool)),
-             this, SLOT(OnGraphChanged(unsigned long, bool)) );
+    connect( m_mainWindow->m_GraphSetWidget, SIGNAL(GraphChanged(unsigned long, unsigned long, bool)),
+             this, SLOT(OnGraphChanged(unsigned long, unsigned long, bool)) );
 
-    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(unsigned long)),
-             m_mainWindow, SLOT(OnGraphBookmarkChanged(unsigned long)) );
-    connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(unsigned long)),
-             m_mainWindow, SLOT(OnGraphBookmarkDelete(unsigned long)) );
+    connect( m_mainWindow->m_GraphSetWidget, SIGNAL(NewGraphWidget()),
+             this, SLOT(OnNewGraphWidgetAction()) );
+    connect( m_mainWindow->m_GraphSetWidget, SIGNAL(DeleteGraphWidget(unsigned long)),
+             this, SLOT(OnDeleteGraphWidgetAction(unsigned long)) );
+
+
+    // scopic Alan 12.05.09: temporary disabled
+    //connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(unsigned long)),
+    //         m_mainWindow, SLOT(OnGraphBookmarkChanged(unsigned long)) );
+    //connect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(unsigned long)),
+    //         m_mainWindow, SLOT(OnGraphBookmarkDelete(unsigned long)) );
 
 
     // Connect image settings widget
@@ -192,23 +199,27 @@ void FrActionSignalManager::Deinitialize(){
              this, SLOT(OnRoiToolChanged()) );
 
     // Graph pane
-    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(LiveModeChanged(bool)),
+    disconnect( m_mainWindow->m_GraphSetWidget, SIGNAL(LiveModeChanged(bool)),
              this, SLOT(OnLiveModeChanged(bool)) );
 
-    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(TimePointChanged(int)),
+    disconnect( m_mainWindow->m_GraphSetWidget, SIGNAL(TimePointChanged(int)),
              this, SLOT(OnTimePointChanged(int)) );
 
-    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(PreviousTimePoint()),
+    disconnect( m_mainWindow->m_GraphSetWidget, SIGNAL(PreviousTimePoint()),
              this, SLOT(OnPreviousTimePointPressed()) );
-    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
+    disconnect( m_mainWindow->m_GraphSetWidget, SIGNAL(NextTimePoint()),
              this, SLOT(OnNextTimePointPressed()) );
-    disconnect( m_mainWindow->m_GraphPaneWidget, SIGNAL(NextTimePoint()),
+    disconnect( m_mainWindow->m_GraphSetWidget, SIGNAL(NextTimePoint()),
              this, SLOT(OnNextTimePointPressed()) );
 
-    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(unsigned long)),
-             m_mainWindow, SLOT(OnGraphBookmarkChanged(unsigned long)) );
-    disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(unsigned long)),
-             m_mainWindow, SLOT(OnGraphBookmarkDelete(unsigned long)) );
+    disconnect( m_mainWindow->m_GraphSetWidget, SIGNAL(NewGraphWidget()),
+             this, SLOT(OnNewGraphWidgetAction()) );
+
+    // scopic Alan 12.05.09: temporary disabled
+    //disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(CurrentChanged(unsigned long)),
+    //         m_mainWindow, SLOT(OnGraphBookmarkChanged(unsigned long)) );
+    //disconnect( m_mainWindow->m_GraphPaneWidget->GetGraphBookmarkWidget(), SIGNAL(DeleteTab(unsigned long)),
+    //         m_mainWindow, SLOT(OnGraphBookmarkDelete(unsigned long)) );
 
     // image settings widget
     disconnect( m_mainWindow->m_ImageSettingsWidget, SIGNAL(ImageParamsChanged()),
@@ -454,8 +465,20 @@ void FrActionSignalManager::OnNextTimePointPressed(){
         SetNextTimePoint();
 }
 
-void FrActionSignalManager::OnGraphChanged(unsigned long id, bool add){
+void FrActionSignalManager::OnGraphChanged(unsigned long gID, unsigned long id, bool add){
     m_mainWindow->
         GetMainController()->
-        ChangeGraph(id, add);
+        ChangeGraph(gID, id, add);
+}
+
+void FrActionSignalManager::OnNewGraphWidgetAction(){
+    m_mainWindow->
+        GetMainController()->
+        AddGraphWidget();
+}
+
+void FrActionSignalManager::OnDeleteGraphWidgetAction(unsigned long gID){
+    m_mainWindow->
+        GetMainController()->
+        DeleteGraphWidget(gID);
 }

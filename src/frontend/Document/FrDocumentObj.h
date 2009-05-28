@@ -11,7 +11,7 @@ public:
     // Object types
     typedef enum _ObjTypes { BaseObject, ImageObject,
                              TabSettings, RoiObject, 
-                             GraphObject, GraphTab,
+                             GraphObject, GraphTab, GraphSet,
                              LayerObject, ViewObject,
                              PointsObject, AppSettings} ObjTypes;
 

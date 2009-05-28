@@ -3,7 +3,7 @@
 #include "FrMainWindow.h"
 #include "FrViewDocObj.h"
 #include "FrImageDocObj.h"
-#include "FrGraphPaneWidget.h"
+#include "FrGraphSetWidget.h"
 #include "FrAppSettingsDocObj.h"
 
 #define BAD_TIME_POINT -1
@@ -100,7 +100,8 @@ bool FrTimePointCmd::SetUserDefinedTimePoint(){
 
     FrMainWindow* mv = this->GetMainController()->GetMainView();
 
-    mv->GetGraphPaneWidget()->UpdateTimePoint();
+// scopic Alan 12.05.09: temporary disabled
+//    mv->GetGraphPaneWidget()->UpdateTimePoint();
     
     FrBaseCmd::UpdatePipelineForID(ALL_LAYER_ID, FRP_READ);
 

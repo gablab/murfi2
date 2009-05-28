@@ -263,10 +263,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\moc\FrDrawingPanelWidget_moc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\frontend\moc\FrEmptyToolWidget_moc.cpp"
 				>
 			</File>
@@ -283,15 +279,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\moc\FrGraphListWidget_moc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\frontend\moc\FrGraphPaneWidget_moc.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\moc\FrGraphWidget_moc.cpp"
+				RelativePath=".\frontend\moc\FrGraphSetWidget_moc.cpp"
 				>
 			</File>
 			<File
@@ -560,6 +552,14 @@
 			</File>
 			<File
 				RelativePath=".\frontend\Document\FrGraphDocObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrGraphPaneDocObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\frontend\Document\FrGraphPaneDocObj.h"
 				>
 			</File>
 			<File
@@ -1309,11 +1309,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\frontend\Widgets\FrGraphWidget.cpp"
+				RelativePath=".\frontend\Widgets\FrGraphSetWidget.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\frontend\Widgets\FrGraphWidget.h"
+				RelativePath=".\frontend\Widgets\FrGraphSetWidget.h"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

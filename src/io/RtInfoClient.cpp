@@ -12,6 +12,7 @@
 #include"RtDataIDs.h"
 #include"tinyxml/tinyxml.h"
 
+
 static char *VERSION = "$Id: RtInfoServer.cpp 415 2009-02-11 22:20:24Z ohinds $";
 
 //// default constructor
@@ -79,7 +80,7 @@ void RtInfoClient::setData(RtData *data) {
 //       << "==? " << (data->getDataID() == (*listenData.begin())) << endl;
 
 
-  set<RtDataID>::iterator i = listenData.find(data->getDataID());
+    set<RtDataID, RtDataIDPartialCompare>::iterator i = listenData.find(data->getDataID());
   if(i != listenData.end()) { // find the appropriate data in the listened
 
     // build an xml document to send the data

@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrActionSignalManager.h'
 **
-** Created: Wed May 20 10:16:10 2009
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
+** Created: Mon 25. May 16:10:25 2009
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.3.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,19 +11,18 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrActionSignalManager.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.4.3. It"
+#error "This file was generated using the moc from 4.3.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
-QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_FrActionSignalManager[] = {
 
  // content:
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-      36,   10, // methods
+      38,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -63,7 +62,9 @@ static const uint qt_meta_data_FrActionSignalManager[] = {
      739,  722,   22,   22, 0x0a,
      763,   22,   22,   22, 0x0a,
      792,   22,   22,   22, 0x0a,
-     824,  817,   22,   22, 0x0a,
+     828,  817,   22,   22, 0x0a,
+     861,   22,   22,   22, 0x0a,
+     890,  886,   22,   22, 0x0a,
 
        0        // eod
 };
@@ -90,8 +91,10 @@ static const char qt_meta_stringdata_FrActionSignalManager[] = {
     "OnLiveModeChanged(bool)\0currentTimePoint\0"
     "OnTimePointChanged(int)\0"
     "OnPreviousTimePointPressed()\0"
-    "OnNextTimePointPressed()\0id,add\0"
-    "OnGraphChanged(ulong,bool)\0"
+    "OnNextTimePointPressed()\0gID,id,add\0"
+    "OnGraphChanged(ulong,ulong,bool)\0"
+    "OnNewGraphWidgetAction()\0gID\0"
+    "OnDeleteGraphWidgetAction(ulong)\0"
 };
 
 const QMetaObject FrActionSignalManager::staticMetaObject = {
@@ -108,7 +111,7 @@ void *FrActionSignalManager::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrActionSignalManager))
-        return static_cast<void*>(const_cast< FrActionSignalManager*>(this));
+	return static_cast<void*>(const_cast< FrActionSignalManager*>(this));
     return QObject::qt_metacast(_clname);
 }
 
@@ -154,10 +157,11 @@ int FrActionSignalManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 32: OnTimePointChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 33: OnPreviousTimePointPressed(); break;
         case 34: OnNextTimePointPressed(); break;
-        case 35: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
+        case 35: OnGraphChanged((*reinterpret_cast< ulong(*)>(_a[1])),(*reinterpret_cast< ulong(*)>(_a[2])),(*reinterpret_cast< bool(*)>(_a[3]))); break;
+        case 36: OnNewGraphWidgetAction(); break;
+        case 37: OnDeleteGraphWidgetAction((*reinterpret_cast< ulong(*)>(_a[1]))); break;
         }
-        _id -= 36;
+        _id -= 38;
     }
     return _id;
 }
-QT_END_MOC_NAMESPACE

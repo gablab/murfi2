@@ -22,7 +22,8 @@ public:
 
     // Properties
     FrPropMacro(FrGraphSettings*, Settings);
-    FrPropMacro(RtDataID, ID);
+    FrPropMacro(unsigned long, ID);
+    FrPropMacro(unsigned long, TimeSeria);
 
     // Methods
     void SetGraphData();

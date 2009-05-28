@@ -188,116 +188,117 @@ bool FrLoadGraphTabSettingsCmd::LoadPoints(QDomElement& elem, FrPointsDocObj* po
     return result;
 }
 
+// scopic Alan 18.05.09 : temporary disabled
 bool FrLoadGraphTabSettingsCmd::LoadGraphs(QDomElement& elem, std::vector<FrGraphDocObj*>& graphs){
     bool result = false;
 
-    graphs.clear();
+   // graphs.clear();
 
-    QDomElement graphElem = elem.firstChildElement();
-    while(!graphElem.isNull()){
-        if(graphElem.tagName() == FR_XML_GRAPH_ELEM){
-	  RtDataID gid;
-            // read timeseria       
-            if(!graphElem.hasAttribute(FR_XML_TIMESERIA_ATTR)) return false;
-            int timeseria = graphElem.attribute(FR_XML_TIMESERIA_ATTR).toInt(&result);
-	    gid.setSeriesNum(timeseria);
+   // QDomElement graphElem = elem.firstChildElement();
+   // while(!graphElem.isNull()){
+   //     if(graphElem.tagName() == FR_XML_GRAPH_ELEM){
+	  //RtDataID gid;
+   //         // read timeseria       
+   //         if(!graphElem.hasAttribute(FR_XML_TIMESERIA_ATTR)) return false;
+   //         int timeseria = graphElem.attribute(FR_XML_TIMESERIA_ATTR).toInt(&result);
+	  //  gid.setSeriesNum(timeseria);
 
-            if(!result) return false;
-            FrGraphSettings* gs;
+   //         if(!result) return false;
+   //         FrGraphSettings* gs;
 
-            QDomElement gsElem = graphElem.firstChildElement();
-            if(gsElem.tagName() == FR_XML_GRAPH_SETTINGS_ELEM){
-                // read type
-                if(!gsElem.hasAttribute(FR_XML_GRAPHTYPE_ATTR)) return false;
-                FrGraphSettings::GraphTypes type = (FrGraphSettings::GraphTypes)
-                    gsElem.attribute(FR_XML_GRAPHTYPE_ATTR).toInt(&result);
-                if(!result) return false;
+   //         QDomElement gsElem = graphElem.firstChildElement();
+   //         if(gsElem.tagName() == FR_XML_GRAPH_SETTINGS_ELEM){
+   //             // read type
+   //             if(!gsElem.hasAttribute(FR_XML_GRAPHTYPE_ATTR)) return false;
+   //             FrGraphSettings::GraphTypes type = (FrGraphSettings::GraphTypes)
+   //                 gsElem.attribute(FR_XML_GRAPHTYPE_ATTR).toInt(&result);
+   //             if(!result) return false;
 
-                // read common parameters
-                // Get color
-                QColor color;
-                QString value = gsElem.attribute(FR_XML_COLOR_ATTR);
-                if(value.length() != 7) return false;
-                int r = value.mid(1,2).toInt(&result, 16);
-                if(!result) return false;
-                int g = value.mid(3,2).toInt(&result, 16);
-                if(!result) return false;
-                int b = value.mid(5,2).toInt(&result, 16);
-                if(!result) return false;
-                color.setRgb(r, g, b);
+   //             // read common parameters
+   //             // Get color
+   //             QColor color;
+   //             QString value = gsElem.attribute(FR_XML_COLOR_ATTR);
+   //             if(value.length() != 7) return false;
+   //             int r = value.mid(1,2).toInt(&result, 16);
+   //             if(!result) return false;
+   //             int g = value.mid(3,2).toInt(&result, 16);
+   //             if(!result) return false;
+   //             int b = value.mid(5,2).toInt(&result, 16);
+   //             if(!result) return false;
+   //             color.setRgb(r, g, b);
 
-                // get draw method
-                if(!gsElem.hasAttribute(FR_XML_DRAWMETHOD_ATTR)) return false;
-                FrGraphSettings::DrawMethods method = (FrGraphSettings::DrawMethods)
-                    gsElem.attribute(FR_XML_DRAWMETHOD_ATTR).toInt(&result);
-                if(!result) return false;
-                
-                // get visibility
-                if(!gsElem.hasAttribute(FR_XML_VISIBLE_ATTR)) return false;
-                int intValue = gsElem.attribute(FR_XML_VISIBLE_ATTR).toInt(&result);
-                if(!result || (intValue != 0 && intValue != 1)) return false;
-                bool visible = (intValue != 0);
+   //             // get draw method
+   //             if(!gsElem.hasAttribute(FR_XML_DRAWMETHOD_ATTR)) return false;
+   //             FrGraphSettings::DrawMethods method = (FrGraphSettings::DrawMethods)
+   //                 gsElem.attribute(FR_XML_DRAWMETHOD_ATTR).toInt(&result);
+   //             if(!result) return false;
+   //             
+   //             // get visibility
+   //             if(!gsElem.hasAttribute(FR_XML_VISIBLE_ATTR)) return false;
+   //             int intValue = gsElem.attribute(FR_XML_VISIBLE_ATTR).toInt(&result);
+   //             if(!result || (intValue != 0 && intValue != 1)) return false;
+   //             bool visible = (intValue != 0);
 
-                // get name
-                /*if(!gsElem.hasAttribute(FR_XML_NAME_ATTR)) return false;
-                QString name = gsElem.attribute(FR_XML_NAME_ATTR).toInt(&result);
-                if(!result) return false;*/
+   //             // get name
+   //             /*if(!gsElem.hasAttribute(FR_XML_NAME_ATTR)) return false;
+   //             QString name = gsElem.attribute(FR_XML_NAME_ATTR).toInt(&result);
+   //             if(!result) return false;*/
 
-                int x, y, z;
-                QDomElement voxelElem;
+   //             int x, y, z;
+   //             QDomElement voxelElem;
 
-                switch (type){
-                    case FrGraphSettings::GT_Intencity:
-                        gs = new FrIntencityGraphSettings();
+   //             switch (type){
+   //                 case FrGraphSettings::GT_Intencity:
+   //                     gs = new FrIntencityGraphSettings();
 
-                        // read voxel
-                        voxelElem = gsElem.firstChildElement();
-                        
-                        if(!voxelElem.hasAttribute(FR_XML_X_ATTR)) return false;
-                        x = voxelElem.attribute(FR_XML_X_ATTR).toInt(&result);
-                        if(!result) return false;
-                        if(!voxelElem.hasAttribute(FR_XML_Y_ATTR)) return false;
-                        y = voxelElem.attribute(FR_XML_Y_ATTR).toInt(&result);
-                        if(!result) return false;
-                        if(!voxelElem.hasAttribute(FR_XML_Z_ATTR)) return false;
-                        z = voxelElem.attribute(FR_XML_Z_ATTR).toInt(&result);
-                        if(!result) return false;
-                       
-                        ((FrIntencityGraphSettings*)gs)->I = x;
-                        ((FrIntencityGraphSettings*)gs)->J = y;
-                        ((FrIntencityGraphSettings*)gs)->K = z;
-                        break;
-                    case FrGraphSettings::GT_Movements:
-                        //gs = new FrMovementsGraphSettings();
-                        break;
-                    case FrGraphSettings::GT_Stimulus:
-                        //gs = new FrStimulusGraphSettings();
-                        break;
-                    case FrGraphSettings::GT_RoiMean:
-                        //gs = new FrRoiMeanGraphSettings();
-                        break;
-                    case FrGraphSettings::GT_RoiStd:
-                        //gs = new FrRoiStdGraphSettings();
-                        break;
-                }
+   //                     // read voxel
+   //                     voxelElem = gsElem.firstChildElement();
+   //                     
+   //                     if(!voxelElem.hasAttribute(FR_XML_X_ATTR)) return false;
+   //                     x = voxelElem.attribute(FR_XML_X_ATTR).toInt(&result);
+   //                     if(!result) return false;
+   //                     if(!voxelElem.hasAttribute(FR_XML_Y_ATTR)) return false;
+   //                     y = voxelElem.attribute(FR_XML_Y_ATTR).toInt(&result);
+   //                     if(!result) return false;
+   //                     if(!voxelElem.hasAttribute(FR_XML_Z_ATTR)) return false;
+   //                     z = voxelElem.attribute(FR_XML_Z_ATTR).toInt(&result);
+   //                     if(!result) return false;
+   //                    
+   //                     ((FrIntencityGraphSettings*)gs)->I = x;
+   //                     ((FrIntencityGraphSettings*)gs)->J = y;
+   //                     ((FrIntencityGraphSettings*)gs)->K = z;
+   //                     break;
+   //                 case FrGraphSettings::GT_Movements:
+   //                     //gs = new FrMovementsGraphSettings();
+   //                     break;
+   //                 case FrGraphSettings::GT_Stimulus:
+   //                     //gs = new FrStimulusGraphSettings();
+   //                     break;
+   //                 case FrGraphSettings::GT_RoiMean:
+   //                     //gs = new FrRoiMeanGraphSettings();
+   //                     break;
+   //                 case FrGraphSettings::GT_RoiStd:
+   //                     //gs = new FrRoiStdGraphSettings();
+   //                     break;
+   //             }
 
-                //gs->Name = name;
-                gs->Color = color;
-                gs->Visibility = visible;
-                gs->DrawMethod = method;
+   //             //gs->Name = name;
+   //             gs->Color = color;
+   //             gs->Visibility = visible;
+   //             gs->DrawMethod = method;
 
-                // create new graph doc obj and add it to graphs
-                FrGraphDocObj* graphDO = new FrGraphDocObj(type);
-                graphDO->SetID(gid);
-                graphDO->SetSettings(gs);
-                graphs.push_back(graphDO);
-            }
-            else
-                return false;
-        }
+   //             // create new graph doc obj and add it to graphs
+   //             FrGraphDocObj* graphDO = new FrGraphDocObj(type);
+   //             graphDO->SetID(gid);
+   //             graphDO->SetSettings(gs);
+   //             graphs.push_back(graphDO);
+   //         }
+   //         else
+   //             return false;
+   //     }
 
-        graphElem = graphElem.nextSiblingElement();
-    }
+   //     graphElem = graphElem.nextSiblingElement();
+   // }
 
     return result;
 }

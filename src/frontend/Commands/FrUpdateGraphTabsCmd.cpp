@@ -3,7 +3,7 @@
 #include "FrMainDocument.h"
 #include "FrMainController.h"
 #include "FrGraphBookmarkWidget.h"
-#include "FrGraphPaneWidget.h"
+#include "FrGraphSetWidget.h"
 #include "FrGraphTabDocObj.h"
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -62,26 +62,28 @@ bool FrUpdateGraphTabsCmd::SetupTab(){
     return true;
 }
 
+// scopic Alan 12.05.09: temporary disabled
 bool FrUpdateGraphTabsCmd::UpdateGraphs(){
-    // check params
-    if(m_GraphTabDocObj == 0L) return false;
-    // Performe action in view
-    FrGraphBookmarkWidget* bmWidget = 
-        this->GetMainController()->GetMainView()->GetGraphPaneWidget()->GetGraphBookmarkWidget();
+    //// check params
+    //if(m_GraphTabDocObj == 0L) return false;
+
+    //// Performe action in view
+    //FrGraphBookmarkWidget* bmWidget = 
+    //    this->GetMainController()->GetMainView()->GetGraphPaneWidget()->GetGraphBookmarkWidget();
 
     bool result = false;
-    switch(m_Action){
-        case FrUpdateGraphTabsCmd::Add:
-            result = bmWidget->AddBookmark(m_GraphTabDocObj);
-            break;
-        case FrUpdateGraphTabsCmd::Remove: 
-            result = bmWidget->RemoveBookmark(m_GraphTabDocObj);
-            break;
-        case FrUpdateGraphTabsCmd::Update:
-            // TODO: Implement !!!
-            //result = bmWidget->UpdateTab(m_GraphTabDocObj);
-            break;
-    }
+    //switch(m_Action){
+    //    case FrUpdateGraphTabsCmd::Add:
+    //        result = bmWidget->AddBookmark(m_GraphTabDocObj);
+    //        break;
+    //    case FrUpdateGraphTabsCmd::Remove: 
+    //        result = bmWidget->RemoveBookmark(m_GraphTabDocObj);
+    //        break;
+    //    case FrUpdateGraphTabsCmd::Update:
+    //        // TODO: Implement !!!
+    //        //result = bmWidget->UpdateTab(m_GraphTabDocObj);
+    //        break;
+    //}
     return result;
 }
 

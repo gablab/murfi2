@@ -15,7 +15,7 @@
 #include "FrPointsDocObj.h"
 #include "FrGraphDocObj.h"
 #include "FrGraphSettings.h"
-#include "FrGraphPaneWidget.h"
+#include "FrGraphSetWidget.h"
 #include "FrImageDocObj.h"
 
 #include "vtkPointPicker.h"

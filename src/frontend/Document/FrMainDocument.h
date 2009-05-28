@@ -8,10 +8,13 @@ class FrViewDocObj;
 class FrTabSettingsDocObj;
 class FrAppSettingsDocObj;
 class FrLayerDocObj;
+class FrImageDocObj;
 class FrGraphTabDocObj;
 class FrGraphDocObj;
 class FrPointsDocObj;
 class RtData;
+class RtDataID;
+class FrGraphPaneDocObj;
 
 // Some includes
 #include "FrDocument.h"
@@ -33,7 +36,9 @@ public:
     FrAppSettingsDocObj* GetAppSettings();
 
     FrLayerDocObj* GetLayerDocObjByID(unsigned long id);
+    FrImageDocObj* GetImageDocObjByID(RtDataID id);
     FrGraphDocObj* GetGraphDocObjByID(unsigned long id);
+    FrGraphPaneDocObj* GetGraphSetDocObjByID(unsigned long id);
 
     void AddDataToStore(RtData *data);
 

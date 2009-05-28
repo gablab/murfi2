@@ -60,7 +60,9 @@ public slots:
     void OnTimePointChanged(int currentTimePoint);
     void OnPreviousTimePointPressed();
     void OnNextTimePointPressed();
-    void OnGraphChanged(unsigned long id, bool add);
+    void OnGraphChanged(unsigned long gID, unsigned long id, bool add);
+    void OnNewGraphWidgetAction();
+    void OnDeleteGraphWidgetAction(unsigned long gID);
 
 public:
     void Initialize();

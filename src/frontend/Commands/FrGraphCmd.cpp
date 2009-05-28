@@ -9,6 +9,8 @@
 #include "FrViewDocObj.h"
 #include "FrQwtPlotWidget.h"
 #include "FrGraphDocObj.h"
+#include "FrGraphPaneDocObj.h"
+#include "FrGraphSetWidget.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -36,10 +38,14 @@ bool FrGraphCmd::Execute(){
 
     bool result = false;
     switch(m_Action){
-        case FrGraphCmd::Add: result = AddGraph();
+        case FrGraphCmd::AddGraph: result = addGraph();
             break;
-        case FrGraphCmd::Delete: result = DeleteGraph();
+        case FrGraphCmd::DeleteGraph: result = deleteGraph();
             break;
+        case FrGraphCmd::AddGraphWidget: result = addGraphWidget();
+            break;
+        case FrGraphCmd::DeleteGraphWidget: result = deleteGraphWidget();
+            break;        
         case FrGraphCmd::Undefined:
         default:
             // Do nothing here
@@ -48,7 +54,7 @@ bool FrGraphCmd::Execute(){
     return result;
 }
 
-bool FrGraphCmd::AddGraph(){
+bool FrGraphCmd::addGraph(){
     if(m_DocObj == 0) return false;
     
     //// add graph to FrQwtPlotWidget
@@ -61,7 +67,7 @@ bool FrGraphCmd::AddGraph(){
     return true;
 }
 
-bool FrGraphCmd::DeleteGraph(){
+bool FrGraphCmd::deleteGraph(){
     if(m_DocObj == 0) return false;
 
     //// remove graph from FrQwtPlotWidget
@@ -73,6 +79,29 @@ bool FrGraphCmd::DeleteGraph(){
 
     return true;
 }
+
+bool FrGraphCmd::addGraphWidget(){
+    if(m_DocObj == 0) return false;
+    
+    // TODO: implement
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    
+    mv->GetGraphSetWidget()->AddGraphWidget(m_DocObj->GetID());
+        
+    return true;
+}
+
+bool FrGraphCmd::deleteGraphWidget(){
+    if(m_DocObj == 0) return false;
+
+    // TODO: implement
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    
+    mv->GetGraphSetWidget()->RemoveGraphWidget(m_DocObj->GetID());
+
+    return true;
+}
+
 
 // delete active layer
 unsigned long FrGraphCmd::GetActiveLayerID(){

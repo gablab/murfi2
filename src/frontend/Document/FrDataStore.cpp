@@ -75,16 +75,16 @@ void FrDataStore::AddImageToDocument(RtData* data){
         for(it = objects.begin(); it != itEnd; ++it) {
             FrImageDocObj* ido = (FrImageDocObj*)(*it);
 
-	    RtDataID imageDocDataID(ido->GetDataID());
+	        RtDataID imageDocDataID(ido->GetDataID());
 
-	    // look for any timepoint (and maybe dataname)
-	    imageDocDataID.setTimePoint(DATAID_UNSET_VALUE); 
-	    imageDocDataID.setDataName("");
+	        // look for any timepoint (and maybe dataname)
+	        imageDocDataID.setTimePoint(DATAID_UNSET_VALUE); 
+	        imageDocDataID.setDataName("");
 
             if(imageDocDataID == img->getDataID()){
-	      // Found!
-	      imgDO = ido;
-	      break;
+                // Found!
+                imgDO = ido;
+                break;
             }
         }
 
@@ -94,25 +94,25 @@ void FrDataStore::AddImageToDocument(RtData* data){
             imgDO->AddTimePointData(img);
         }
         else {
-	  FrTabSettingsDocObj* tabSets = m_Document->GetCurrentTabSettings();
-	  FrLayerDocObj* imgLayer = new FrLayerDocObj(FrLayerSettings::LImage, img->getDataID(), QString(img->getDataID().getDataName().c_str()));
+            FrTabSettingsDocObj* tabSets = m_Document->GetCurrentTabSettings();
+            FrLayerDocObj* imgLayer = new FrLayerDocObj(FrLayerSettings::LImage, img->getDataID(), 
+                QString(img->getDataID().getDataName().c_str()));
 
-	  m_Document->Add(imgLayer);
+            m_Document->Add(imgLayer);
 
-	  imgDO = new FrImageDocObj();
-          
-	  // get view doc obj and set current timeseria
-	  //FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
-	  
-	  m_Document->Add(imgDO);
-	  imgDO->AddTimePointData(img);
-	  
+            imgDO = new FrImageDocObj();
+              
+            // get view doc obj and set current timeseria
+            //FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
 
-	  	  // initialize points doc object with new image
-	  FrPointsDocObj* pointsDO = new FrPointsDocObj();
-	  pointsDO->GetDimsFromImg(img);
-	  m_Document->Add(pointsDO);
+            m_Document->Add(imgDO);
+            imgDO->AddTimePointData(img);
 
+
+              // initialize points doc object with new image
+            FrPointsDocObj* pointsDO = new FrPointsDocObj();
+            pointsDO->GetDimsFromImg(img);
+            m_Document->Add(pointsDO);
         }
         
         //// test
@@ -162,4 +162,36 @@ void FrDataStore::GetStuff(std::vector<RtDataID>& data){
             ++it;
         }
     }
+}
+
+void FrDataStore::GetAvailableData(std::vector<DataItem>& data){
+    // Get descriptors of data from data store
+    std::vector<RtDataID> dataIDs;
+    this->GetStuff(dataIDs);
+
+    // Prepare list of items to add 
+    std::vector<RtDataID>::iterator i, iEnd(dataIDs.end());
+    for(i = dataIDs.begin(); i != iEnd; ++i){
+        // find root item here
+        RtDataID& dataID = (*i);
+        std::vector<DataItem>::iterator it = 
+            std::find_if( data.begin(), data.end(), 
+                          MatchByID(dataID) );
+
+        // if not found create new and add 
+        if(it == data.end()){
+
+            DataItem newDataItem;
+            newDataItem.ModuleID = dataID.getModuleID();
+            newDataItem.TimeSeries = dataID.getSeriesNum();
+            data.push_back(newDataItem);
+            
+            it = data.end();
+            --it;
+        }
+        
+        // add item to that root
+        it->Items.push_back(dataID);
+    }
+
 }

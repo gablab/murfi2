@@ -2,6 +2,7 @@
 #define FR_GRAPH_CMD
 
 class FrGraphDocObj;
+class FrGraphPaneDocObj;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
@@ -11,7 +12,7 @@ class FrGraphDocObj;
 class FrGraphCmd : public FrBaseCmd {
 public:
     typedef enum _Action { 
-        Undefined, Add, Delete 
+        Undefined, AddGraph, AddGraphWidget, DeleteGraph, DeleteGraphWidget 
     } Actions;
 
 public:
@@ -27,13 +28,15 @@ public:
 
     // Properties
     FrSetPropMacro(Actions, Action);    
-    FrSetPropMacro(FrGraphDocObj*, DocObj);
+    FrSetPropMacro(FrGraphPaneDocObj*, DocObj);
     void SetID(unsigned long id);
 
 private:
     // Helper methods here
-    bool AddGraph();
-    bool DeleteGraph();
+    bool addGraph();
+    bool deleteGraph();
+    bool addGraphWidget();
+    bool deleteGraphWidget();
 
     unsigned long GetActiveLayerID();
     bool IsRoiLayer(unsigned long id);

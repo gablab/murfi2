@@ -53,12 +53,14 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, int point[3]
 void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point[3], unsigned long imgNumber){
     if(!data) return;
 
-    double oldPoint[2];
-    oldPoint[0] = point[0];
-    oldPoint[1] = point[1];
-
     double dSpacing[3];	
-    data->GetSpacing(dSpacing);		
+    data->GetSpacing(dSpacing);
+    double dOrigin[3];
+    data->GetOrigin(dOrigin);
+
+    double oldPoint[2];
+    oldPoint[0] = point[0] - dOrigin[0];
+    oldPoint[1] = point[1] - dOrigin[1];
 
     Views view = viewDO->GetActiveView();
     
@@ -68,15 +70,15 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point
                 // get slice number
                 int slice = viewDO->GetSliceViewSettings()->SliceNumber;			
                 // set current indices of point
-		point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
-		point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
+		        point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
+		        point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
                 point[2] = slice;
             }
             break;
         case MosaicView:
             {
-		point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
-		point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
+		        point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
+		        point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
                 point[2] = 0;
             }
             break;
@@ -89,7 +91,7 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point
                         // get slice number
                         int slice = viewDO->GetOrthoViewSettings()->SliceNumber[DEF_CORONAL];
 
-                        point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
+                        point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;;
                         point[1] = slice;
                         point[2] = (oldPoint[1]-dSpacing[2]/2) / dSpacing[1] + 0.5;
                         break;
@@ -110,8 +112,8 @@ void GetRealImagePosition(FrViewDocObj* viewDO, vtkImageData* data, double point
 
 
                         point[0] = (oldPoint[0]-dSpacing[0]/2) / dSpacing[0] + 0.5;
-			point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
-			point[2] = slice;
+			            point[1] = (oldPoint[1]-dSpacing[1]/2) / dSpacing[1] + 0.5;
+			            point[2] = slice;
 			            break;
                     }
                 }
@@ -179,7 +181,7 @@ bool IsPointInsideOfSphere(Pos center, int radius, Pos point){
     return isInside;
 }
 
-bool IsImageAddedAsLayer(FrMainDocument* doc, RtDataID id){
+bool IsTimeseriaAddedAsLayer(FrMainDocument* doc, RtDataID id){
     FrDocument::DocObjCollection objects;
     doc->GetObjectsByType(objects, FrDocumentObj::LayerObject);
     FrDocument::DocObjCollection::iterator it, itEnd(objects.end());
@@ -187,7 +189,12 @@ bool IsImageAddedAsLayer(FrMainDocument* doc, RtDataID id){
     for(it = objects.begin(); it != itEnd; ++it){
         FrLayerDocObj* layerDO = (FrLayerDocObj*)(*it);
         RtDataID layerID = layerDO->GetSettings()->DataID;
-        if (layerID == id)
+
+        // look for any timepoint (and maybe dataname)
+        //layerID.setTimePoint(DATAID_UNSET_VALUE); 
+        //layerID.setDataName("");
+
+        if (layerID.getSeriesNum() == id.getSeriesNum())
             return true;
     }
 

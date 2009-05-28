@@ -7,6 +7,10 @@
 #include "FrGraphTabDocObj.h"
 #include "FrPointsDocObj.h"
 #include "FrGraphDocObj.h"
+#include "FrGraphPaneDocObj.h"
+#include "FrImageDocObj.h"
+
+#include "RtDataID.h"
 
 
 FrMainDocument::FrMainDocument() 
@@ -207,6 +211,24 @@ FrLayerDocObj* FrMainDocument::GetLayerDocObjByID(unsigned long id){
     return result;
 }
 
+FrImageDocObj* FrMainDocument::GetImageDocObjByID(RtDataID id){
+    DocObjCollection images;
+    this->GetObjectsByType(images, FrDocumentObj::ImageObject);    
+
+    FrImageDocObj* result = 0;
+    if(images.size() > 0){
+        for (int i = 0; i < images.size(); i++){
+            result = dynamic_cast<FrImageDocObj*>(images[i]);
+            if (result->GetDataID() == id)
+                break;
+            else
+                result = 0;
+        }
+    }
+
+    return result;
+}
+
 FrGraphDocObj* FrMainDocument::GetGraphDocObjByID(unsigned long id){
     DocObjCollection graphs;
     this->GetObjectsByType(graphs, FrDocumentObj::GraphObject);    
@@ -216,7 +238,26 @@ FrGraphDocObj* FrMainDocument::GetGraphDocObjByID(unsigned long id){
         for (int i = 0; i < graphs.size(); i++){
             result = dynamic_cast<FrGraphDocObj*>(graphs[i]);
             // NOTE: we use timeseria number as id for graph
-            if (result->GetID().getSeriesNum() == id)
+            if (result->GetID() == id)
+                break;
+            else
+                result = 0;
+        }
+    }
+
+    return result;
+}
+
+FrGraphPaneDocObj* FrMainDocument::GetGraphSetDocObjByID(unsigned long id){
+    DocObjCollection graphSets;
+    this->GetObjectsByType(graphSets, FrDocumentObj::GraphSet);    
+
+    FrGraphPaneDocObj* result = 0;
+    if(graphSets.size() > 0){
+        for (int i = 0; i < graphSets.size(); i++){
+            result = dynamic_cast<FrGraphPaneDocObj*>(graphSets[i]);
+            // NOTE: we use timeseria number as id for graph
+            if (result->GetID() == id)
                 break;
             else
                 result = 0;

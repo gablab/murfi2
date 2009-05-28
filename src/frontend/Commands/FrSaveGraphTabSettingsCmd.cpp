@@ -111,63 +111,65 @@ void FrSaveGraphTabSettingsCmd::SavePoints(QDomElement& parent, FrPointsDocObj* 
     }
 }
 
+
+// scopic Alan 18.05.09 : temporary disabled
 void FrSaveGraphTabSettingsCmd::SaveGraphs(QDomElement &parent, std::vector<FrGraphDocObj*> graphs){
-    for(int i = 0; i < graphs.size(); ++i){
-        FrGraphDocObj* graphDO = (FrGraphDocObj*) graphs[i];
+    //for(int i = 0; i < graphs.size(); ++i){
+    //    FrGraphDocObj* graphDO = (FrGraphDocObj*) graphs[i];
 
-        QDomElement graphElem = m_Document->createElement(FR_XML_GRAPH_ELEM);
-        graphElem.setAttribute(FR_XML_TIMESERIA_ATTR, graphDO->GetID().getSeriesNum());
-    
-        // TODO: save graph settings
-        QDomElement gsElem = m_Document->createElement(FR_XML_GRAPH_SETTINGS_ELEM);
-        FrGraphSettings* gs = graphDO->GetSettings();
-        gsElem.setAttribute(FR_XML_NAME_ATTR, gs->Name);        
+    //    QDomElement graphElem = m_Document->createElement(FR_XML_GRAPH_ELEM);
+    //    graphElem.setAttribute(FR_XML_TIMESERIA_ATTR, graphDO->GetID().getSeriesNum());
+    //
+    //    // TODO: save graph settings
+    //    QDomElement gsElem = m_Document->createElement(FR_XML_GRAPH_SETTINGS_ELEM);
+    //    FrGraphSettings* gs = graphDO->GetSettings();
+    //    gsElem.setAttribute(FR_XML_NAME_ATTR, gs->Name);        
 
-        QColor color = gs->Color;
-        QString colorValue = "#";
-        colorValue += GET_HEX_COLOR_STRING(color.red());
-        colorValue += GET_HEX_COLOR_STRING(color.green());
-        colorValue += GET_HEX_COLOR_STRING(color.blue());
-        
-        gsElem.setAttribute(FR_XML_COLOR_ATTR, colorValue);        
-        gsElem.setAttribute(FR_XML_VISIBLE_ATTR, (gs->Visibility ? 1 : 0));        
-        gsElem.setAttribute(FR_XML_DRAWMETHOD_ATTR, (int)gs->DrawMethod);        
+    //    QColor color = gs->Color;
+    //    QString colorValue = "#";
+    //    colorValue += GET_HEX_COLOR_STRING(color.red());
+    //    colorValue += GET_HEX_COLOR_STRING(color.green());
+    //    colorValue += GET_HEX_COLOR_STRING(color.blue());
+    //    
+    //    gsElem.setAttribute(FR_XML_COLOR_ATTR, colorValue);        
+    //    gsElem.setAttribute(FR_XML_VISIBLE_ATTR, (gs->Visibility ? 1 : 0));        
+    //    gsElem.setAttribute(FR_XML_DRAWMETHOD_ATTR, (int)gs->DrawMethod);        
 
-        FrGraphSettings::GraphTypes gtype = graphDO->GetSettings()->GetType();
-        gsElem.setAttribute(FR_XML_GRAPHTYPE_ATTR, (int)gtype);
+    //    FrGraphSettings::GraphTypes gtype = graphDO->GetSettings()->GetType();
+    //    gsElem.setAttribute(FR_XML_GRAPHTYPE_ATTR, (int)gtype);
 
-        int I, J, K;
-        QDomElement posElem;
+    //    int I, J, K;
+    //    QDomElement posElem;
 
-        switch(gtype){
-            case FrGraphSettings::GT_Intencity:
-                I = ((FrIntencityGraphSettings*)gs)->I;
-                J = ((FrIntencityGraphSettings*)gs)->J;
-                K = ((FrIntencityGraphSettings*)gs)->K;
+    //    switch(gtype){
+    //        case FrGraphSettings::GT_Intencity:
+    //            I = ((FrIntencityGraphSettings*)gs)->I;
+    //            J = ((FrIntencityGraphSettings*)gs)->J;
+    //            K = ((FrIntencityGraphSettings*)gs)->K;
 
-                posElem = m_Document->createElement(FR_XML_GRAPH_VOXEL_ELEM);
-                posElem.setAttribute(FR_XML_X_ATTR, I);
-                posElem.setAttribute(FR_XML_Y_ATTR, J);
-                posElem.setAttribute(FR_XML_Z_ATTR, K);
-                gsElem.appendChild(posElem);
-                break;
-            case FrGraphSettings::GT_Movements:
-                //gs = new FrMovementsGraphSettings();
-                break;
-            case FrGraphSettings::GT_Stimulus:
-                //gs = new FrStimulusGraphSettings();
-                break;
-            case FrGraphSettings::GT_RoiMean:
-                //gs = new FrRoiMeanGraphSettings();
-                break;
-            case FrGraphSettings::GT_RoiStd:
-                //gs = new FrRoiStdGraphSettings();
-                break;
-        }
+    //            posElem = m_Document->createElement(FR_XML_GRAPH_VOXEL_ELEM);
+    //            posElem.setAttribute(FR_XML_X_ATTR, I);
+    //            posElem.setAttribute(FR_XML_Y_ATTR, J);
+    //            posElem.setAttribute(FR_XML_Z_ATTR, K);
+    //            gsElem.appendChild(posElem);
+    //            break;
+    //        case FrGraphSettings::GT_Movements:
+    //            //gs = new FrMovementsGraphSettings();
+    //            break;
+    //        case FrGraphSettings::GT_Stimulus:
+    //            //gs = new FrStimulusGraphSettings();
+    //            break;
+    //        case FrGraphSettings::GT_RoiMean:
+    //            //gs = new FrRoiMeanGraphSettings();
+    //            break;
+    //        case FrGraphSettings::GT_RoiStd:
+    //            //gs = new FrRoiStdGraphSettings();
+    //            break;
+    //    }
 
-        graphElem.appendChild(gsElem);
-        parent.appendChild(graphElem);
-    }
+    //    graphElem.appendChild(gsElem);
+    //    parent.appendChild(graphElem);
+    //}
 }
 
 ///////////////////////////////////////////////////////////////

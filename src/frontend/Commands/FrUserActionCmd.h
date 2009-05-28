@@ -2,6 +2,7 @@
 #define FR_USERACTION_CMD
 
 class FrLayerDocObj;
+class FrGraphDocObj;
 
 #include "FrBaseCmd.h"
 #include "FrMacro.h"
@@ -12,7 +13,8 @@ class FrLayerDocObj;
 class FrUserActionCmd : public FrBaseCmd {
 public:
     typedef enum _Action { 
-        Undefined, AddLayer, DeleteLayer, AddGraph, DeleteGraph, ChangeSettings
+        Undefined, AddLayer, DeleteLayer, AddGraph, AddGraphWidget, 
+        DeleteGraph, DeleteGraphWidget, ChangeSettings
     } Actions;
 
 public:
@@ -28,16 +30,21 @@ public:
 
     // Properties
     FrSetPropMacro(Actions, Action);
-    FrSetPropMacro(RtDataID, GraphID);
+    FrSetPropMacro(unsigned long, TimeSeria);
+    FrSetPropMacro(unsigned long, GraphWidgetID);
 
 private:
     // helpers
     bool addLayer();
     bool deleteLayer();
     bool addGraph();
+    bool addGraphWidget();
     bool deleteGraph();
+    bool deleteGraphWidget();
     bool ChangeImageSettings();
     bool changeLayerPosition();
+
+    FrGraphDocObj* CreateIntensityGraphDocObj();
 
     unsigned long GetActiveLayerID();
     //FrLayerDocObj* GetLayerDocObjByID(unsigned long id);

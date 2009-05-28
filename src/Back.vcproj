@@ -391,6 +391,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\stream\preprocess\RtSmoothRoi.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\preprocess\RtSmoothRoi.h"
+					>
+				</File>
+				<File
 					RelativePath=".\stream\preprocess\RtUnmosaic.cpp"
 					>
 				</File>
@@ -508,6 +516,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\io\RtClientSocket.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\io\RtClientSocket.h"
+				>
+			</File>
+			<File
 				RelativePath=".\io\RtDataStore.cpp"
 				>
 			</File>
@@ -521,6 +537,14 @@
 			</File>
 			<File
 				RelativePath=".\io\RtExternalSenderImageInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\io\RtInfoClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\io\RtInfoClient.h"
 				>
 			</File>
 			<File

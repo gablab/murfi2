@@ -267,7 +267,7 @@ void FrOrthoView::ReadDocument(FrUpdateParams2& params){
                 // ID is current Timepoint since we have 
                 // just one time series 
                 m_docReader->SetTarget(FrDocumentReader::Mri);
-		RtDataID imID = (*it)->GetSettings()->DataID;
+		        RtDataID imID = (*it)->GetSettings()->DataID;
                 imID.setTimePoint(vdo->GetTimePoint());
 
                 m_docReader->SetDataID(imID);

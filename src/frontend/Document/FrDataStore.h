@@ -13,6 +13,28 @@ class FrMainDocument;
 
 class FrDataStore : public RtDataListener {
 public:
+    typedef struct dataItem {
+        std::string ModuleID;
+        unsigned long TimeSeries;
+
+        std::vector<RtDataID> Items;
+    } DataItem;
+
+    struct MatchByID{
+        std::string moduleID;
+        unsigned long seriesNum;
+
+        MatchByID(RtDataID dataID){
+            moduleID = dataID.getModuleID();
+            seriesNum = dataID.getSeriesNum();
+        }
+        bool operator()(DataItem& item){
+            return (seriesNum == item.TimeSeries &&
+                    moduleID == item.ModuleID);
+        }
+    };
+
+public:
     FrDataStore(FrMainDocument* document);
     virtual ~FrDataStore();
 
@@ -27,6 +49,7 @@ public:
     void SetStore(RtDataStore* store);
 
     void GetStuff(std::vector<RtDataID>& data);
+    void GetAvailableData(std::vector<DataItem>& data);     // get data sorted by timeserias
 
 private:
     // helpers

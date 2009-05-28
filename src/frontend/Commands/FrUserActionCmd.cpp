@@ -15,6 +15,9 @@
 #include "FrImageSettingsWidget.h"
 #include "FrPointsDocObj.h"
 #include "FrDataStoreDialog.h"
+#include "FrGraphPaneDocObj.h"
+#include "FrDataStore.h"
+#include "FrImageDocObj.h"
 
 #include "FrBaseView.h"
 #include "FrSliceView.h"
@@ -26,8 +29,14 @@
 #include "Qt/qmessagebox.h"
 
 #include "RtDataID.h"
+#include "RtData.h"
+#include "RtDataStore.h"
 
 #define ALL_ITEMS_COUNT 5
+
+#define DEF_MRI_NAME "mri"
+#define DEF_MOTION_NAME "motion"
+
 
 FrUserActionCmd::FrUserActionCmd() 
 : m_Action(FrUserActionCmd::Undefined), m_isID(false){
@@ -45,7 +54,11 @@ bool FrUserActionCmd::Execute(){
             break;
         case FrUserActionCmd::AddGraph: result = addGraph();
             break;
+        case FrUserActionCmd::AddGraphWidget: result = addGraphWidget();
+            break;
         case FrUserActionCmd::DeleteGraph: result = deleteGraph();
+            break;
+        case FrUserActionCmd::DeleteGraphWidget: result = deleteGraphWidget();
             break;
         case FrUserActionCmd::ChangeSettings: result = ChangeImageSettings();
             break;
@@ -58,28 +71,55 @@ bool FrUserActionCmd::Execute(){
 }
 
 // new addLayer function (it adds images as layers from datastore)
+bool FrUserActionCmd::addLayer(){
+    bool result = false;
+
+    FrMainWindow* mv = this->GetMainController()->GetMainView();
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    FrDataStoreDialog dlg(mv, true);
+    QString title("Data Store Viewer");
+    dlg.SetCaption(title);
+    dlg.Initialize(this->GetMainController()->GetMainDocument());
+    if(!dlg.SimpleExec()) return false;
+
+    // check if image with specified ID already exists as layer
+    RtDataID id = dlg.GetID();
+//    id.setTimePoint(DATAID_UNSET_VALUE); 
+//    id.setDataName("");
+
+    if (IsTimeseriaAddedAsLayer(this->GetMainController()->GetMainDocument(), id)){
+        QMessageBox::warning(mv, QString("Warning"), 
+            QString("This timeseria has been already added.") );
+        return false;
+    }
+
+    // NOTE: we assume that we already have appropriate doc object with this data 
+    // (because data can't get to datastore without creating doc obj)
+    // create new layer doc object and get settings from dialog
+    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, id, QString(id.getDataName().c_str()));
+
+    // finally add new doc to MainDocument
+    doc->Add(layerDO);
+    result = true;
+
+    return result;
+}
+
+
 //bool FrUserActionCmd::addLayer(){
 //    bool result = false;
+//    
+//    // scopic Alan, NOTE: memory leak, if user cancel dialog new layer doc object will be created anyway
+//    // create new layer doc object and get settings from dialog
+//    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, RtDataID());
 //
 //    FrMainWindow* mv = this->GetMainController()->GetMainView();
-//    FrDataStoreDialog dlg(mv, true);
-//    QString title("Data Store Viewer");
-//    dlg.SetCaption(title);
-//    dlg.Initialize(this->GetMainController()->GetMainDocument());
+//    FrLayerDialog dlg(mv, true);
 //    if(!dlg.SimpleExec()) return false;
-//    // scopic Alan 06.05.09, NOTE: we can get image name from datastore t set it as layer name
-//    // check if image with specified ID already exists as layer
-//    RtDataID id = dlg.GetID();
-//    if (IsImageAddedAsLayer(this->GetMainController()->GetMainDocument(), id)){
-//        QMessageBox::warning(mv, QString("Warning"), 
-//            QString("This image has beed already added.") );
-//        return false;
-//    }
+//    FrImageLayerSettings* cmlSets = new FrImageLayerSettings(RtDataID(), QString("find some way to spec a good name"));
+//    dlg.GetLayerParams(*cmlSets);
 //
-//    FrImageLayerSettings* cmlSets = new FrImageLayerSettings(id, QString(id.getDataName().c_str()));
-//
-//    // create new layer doc object and get settings from dialog
-//    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, id);
 //    layerDO->SetSettings(cmlSets);
 //
 //    // finally add new doc to MainDocument
@@ -89,30 +129,6 @@ bool FrUserActionCmd::Execute(){
 //
 //    return result;
 //}
-
-
-bool FrUserActionCmd::addLayer(){
-    bool result = false;
-    
-    // scopic Alan, NOTE: memory leak, if user cancel dialog new layer doc object will be created anyway
-    // create new layer doc object and get settings from dialog
-    FrLayerDocObj* layerDO = new FrLayerDocObj(FrLayerSettings::LImage, RtDataID());
-
-    FrMainWindow* mv = this->GetMainController()->GetMainView();
-    FrLayerDialog dlg(mv, true);
-    if(!dlg.SimpleExec()) return false;
-    FrImageLayerSettings* cmlSets = new FrImageLayerSettings(RtDataID(), QString("find some way to spec a good name"));
-    dlg.GetLayerParams(*cmlSets);
-
-    layerDO->SetSettings(cmlSets);
-
-    // finally add new doc to MainDocument
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    doc->Add(layerDO);
-    result = true;
-
-    return result;
-}
 
 bool FrUserActionCmd::deleteLayer(){
     // Get proper ID
@@ -238,8 +254,126 @@ bool FrUserActionCmd::addGraph(){
     bool result = false;
     FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
-    // TODO: get graph type by id
+    // Get available timeserias from data store
+    std::vector<FrDataStore::DataItem> data;
+    FrDataStore* dataStore = doc->GetDataStore();
+    dataStore->GetAvailableData(data);
+    
+    FrGraphSettings::GraphTypes gType;
 
+    // Get graph type by timeseria id
+    std::vector<FrDataStore::DataItem>::iterator it, itEnd(data.end());
+    for(it = data.begin(); it != itEnd; ++it){
+        if ((*it).TimeSeries == m_TimeSeria){
+            string type = (*it).ModuleID;
+
+            if(type == DEF_MRI_NAME){
+                gType = FrGraphSettings::GT_Intencity;
+            }
+            else if (type == DEF_MOTION_NAME){
+            }
+            // TODO: add other types
+
+            break;
+        }
+    }
+    
+    FrGraphDocObj* graphDO = 0;
+
+    switch(gType){
+        case FrGraphSettings::GT_Intencity:
+            graphDO = CreateIntensityGraphDocObj();
+            break;
+        case FrGraphSettings::GT_Movements:
+            // not supported yet
+            break;
+        case FrGraphSettings::GT_RoiMean:
+            // not supported yet
+            break;
+        case FrGraphSettings::GT_RoiStd:
+            // not supported yet
+            break;
+        case FrGraphSettings::GT_Stimulus:
+            // not supported yet
+            break;
+    }
+
+    if (graphDO){
+        graphDO->SetTimeSeria(m_TimeSeria);
+
+        // finally add new doc to the appropriate graphSetDocObj
+        FrGraphPaneDocObj* graphSet = doc->GetGraphSetDocObjByID(m_GraphWidgetID);
+        graphSet->AddGraph(graphDO);
+
+        //doc->Add(graphDO);        // add graphDO to main doc??
+        result = true;
+    }
+
+    return result;
+}
+
+bool FrUserActionCmd::addGraphWidget(){
+    bool result = false;
+
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    // create new graphset doc object
+    FrGraphPaneDocObj* graphSetDO = new FrGraphPaneDocObj(); 
+
+    // finally add new doc to MainDocument
+    doc->Add(graphSetDO);
+    result = true;
+    
+    return result;
+}
+
+bool FrUserActionCmd::deleteGraph(){
+    // TODO: implement
+
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    // find appropriate graphSetDocObj
+    FrGraphPaneDocObj* graphSetDO = doc->GetGraphSetDocObjByID(m_GraphWidgetID);
+    graphSetDO->RemoveGraph(m_TimeSeria);
+
+    //// find appropriate graph doc obj and remove it from main doc
+    //FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    //FrDocument::DocObjCollection graphs;
+    //doc->GetObjectsByType(graphs, FrDocumentObj::GraphObject);    
+
+    //if(graphs.size() > 0){
+    //    for (int i = 0; i < graphs.size(); i++){
+    //        FrGraphDocObj* graphDO = dynamic_cast<FrGraphDocObj*>(graphs[i]);
+    //        if (graphDO->GetID() == m_GraphID){
+    //            doc->Remove(graphDO);
+    //            break;
+    //        }
+    //    }
+    //}  
+    
+    return true;
+}
+
+bool FrUserActionCmd::deleteGraphWidget(){
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+
+    // find appropriate graphSetDocObj
+    FrGraphPaneDocObj* graphSetDO = doc->GetGraphSetDocObjByID(m_GraphWidgetID);
+
+    doc->Remove(graphSetDO);
+    
+    return true;
+}
+
+// delete active layer
+unsigned long FrUserActionCmd::GetActiveLayerID(){
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
+    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
+    return viewDO->GetActiveLayerID();
+}
+
+FrGraphDocObj* FrUserActionCmd::CreateIntensityGraphDocObj(){
+    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
 
     // do not add graph if don't have a point
     // get point from points doc obj
@@ -258,10 +392,10 @@ bool FrUserActionCmd::addGraph(){
         return false;
 
     // create new graph doc object and get settings from anywhere (widget, dialog)
-    FrGraphDocObj* graphDO = new FrGraphDocObj(FrGraphSettings::GT_Intencity);  // set correct graph type
-    graphDO->SetID(m_GraphID);
+    FrGraphDocObj* graphDO = new FrGraphDocObj(FrGraphSettings::GT_Intencity);  
+    graphDO->SetTimeSeria(m_TimeSeria);
     
-    // prepare settings (NOTE: different settings for different types of graphs)
+    // prepare settings 
     FrIntencityGraphSettings* gs = new FrIntencityGraphSettings();
 
     gs->Color = QColor(0, 0, 0);
@@ -270,38 +404,8 @@ bool FrUserActionCmd::addGraph(){
     gs->K = point[2];
     
     graphDO->SetSettings(gs);
-
-    // finally add new doc to MainDocument
-    doc->Add(graphDO);
-    result = true;
-
-    return result;
-}
-
-bool FrUserActionCmd::deleteGraph(){
-    // find appropriate graph doc obj and remove it from main doc
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrDocument::DocObjCollection graphs;
-    doc->GetObjectsByType(graphs, FrDocumentObj::GraphObject);    
-
-    if(graphs.size() > 0){
-        for (int i = 0; i < graphs.size(); i++){
-            FrGraphDocObj* graphDO = dynamic_cast<FrGraphDocObj*>(graphs[i]);
-            if (graphDO->GetID() == m_GraphID){
-                doc->Remove(graphDO);
-                break;
-            }
-        }
-    }  
     
-    return true;
-}
-
-// delete active layer
-unsigned long FrUserActionCmd::GetActiveLayerID(){
-    FrMainDocument* doc = this->GetMainController()->GetMainDocument();
-    FrViewDocObj* viewDO = doc->GetCurrentViewObject();
-    return viewDO->GetActiveLayerID();
+    return graphDO;
 }
 
 //FrLayerDocObj* FrUserActionCmd::GetLayerDocObjByID(int id){

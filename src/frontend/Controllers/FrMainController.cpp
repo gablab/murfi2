@@ -18,7 +18,7 @@
 #include "FrAppSettingsDocObj.h"
 #include "FrDataStoreDialog.h"
 #include "FrDataStore.h"
-#include "FrGraphPaneWidget.h"
+#include "FrGraphSetWidget.h"
 #include "FrGraphBookmarkWidget.h"
 
 // VTK stuff
@@ -515,33 +515,35 @@ void FrMainController::DeleteBookmark(unsigned long id){
     delete cmd;
 }
 
+
+// scopic Alan 12.05.09: temporary disabled
 void FrMainController::ChangeGraphBookmark(unsigned long id){
-    // Create complex command and execute it
-    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    //// Create complex command and execute it
+    //FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
 
-    // save current tab before switching (only if we have more than 1 bookmarks
-    // HACK: check if we have more than 1 tabs
-    if (this->GetMainView()->GetGraphPaneWidget()->
-        GetGraphBookmarkWidget()->GetBookmarkCount() > 1){
+    //// save current tab before switching (only if we have more than 1 bookmarks
+    //// HACK: check if we have more than 1 tabs
+    //if (this->GetMainView()->GetGraphPaneWidget()->
+    //    GetGraphBookmarkWidget()->GetBookmarkCount() > 1){
 
-        FrSaveGraphTabCmd* cmd1 = FrCommandController::CreateCmd<FrSaveGraphTabCmd>();
-        cmd1->SetAction(FrSaveGraphTabCmd::SaveCurrent);
-        cmd->AddCommand(cmd1);
-    }
+    //    FrSaveGraphTabCmd* cmd1 = FrCommandController::CreateCmd<FrSaveGraphTabCmd>();
+    //    cmd1->SetAction(FrSaveGraphTabCmd::SaveCurrent);
+    //    cmd->AddCommand(cmd1);
+    //}
 
-    FrUpdateGraphTabsCmd* cmd2 = FrCommandController::CreateCmd<FrUpdateGraphTabsCmd>();
-    cmd2->SetAction(FrUpdateGraphTabsCmd::SetCurrentTab);
-    cmd2->SetGraphTabDocObj(0L);
-    cmd2->SetTabID( id );
+    //FrUpdateGraphTabsCmd* cmd2 = FrCommandController::CreateCmd<FrUpdateGraphTabsCmd>();
+    //cmd2->SetAction(FrUpdateGraphTabsCmd::SetCurrentTab);
+    //cmd2->SetGraphTabDocObj(0L);
+    //cmd2->SetTabID( id );
 
-    FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
-    cmd3->SetTarget(FrRefreshWidgetsInfoCmd::All);
+    //FrRefreshWidgetsInfoCmd* cmd3 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    //cmd3->SetTarget(FrRefreshWidgetsInfoCmd::All);
 
-    cmd->AddCommand(cmd2);
-    cmd->AddCommand(cmd3);
-    FrCommandController::Execute(cmd);
+    //cmd->AddCommand(cmd2);
+    //cmd->AddCommand(cmd3);
+    //FrCommandController::Execute(cmd);
 
-    delete cmd;
+    //delete cmd;
 }
 
 void FrMainController::DeleteGraphBookmark(unsigned long id){
@@ -646,15 +648,39 @@ void FrMainController::SetNextTimePoint(){
     delete cmd;
 }
 
-void FrMainController::ChangeGraph(unsigned long id, bool add){
-    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+void FrMainController::ChangeGraph(unsigned long gID, unsigned long id, bool add){
+    FrUserActionCmd* cmd1 = FrCommandController::CreateCmd<FrUserActionCmd>();
     if (add){
-        cmd->SetAction(FrUserActionCmd::AddGraph);
+        cmd1->SetAction(FrUserActionCmd::AddGraph);
     }
     else{
-        cmd->SetAction(FrUserActionCmd::DeleteGraph);
+        cmd1->SetAction(FrUserActionCmd::DeleteGraph);
     }
-    cmd->SetGraphID(id);
+    cmd1->SetTimeSeria(id);
+    cmd1->SetGraphWidgetID(gID);
+
+    FrRefreshWidgetsInfoCmd* cmd2 = FrCommandController::CreateCmd<FrRefreshWidgetsInfoCmd>();
+    cmd2->SetTarget(FrRefreshWidgetsInfoCmd::GraphPane);
+
+    FrMultiCmd* cmd = FrCommandController::CreateCmd<FrMultiCmd>();
+    cmd->AddCommand(cmd1);
+    cmd->AddCommand(cmd2);
+    FrCommandController::Execute(cmd);
+    delete cmd;
+}
+
+void FrMainController::AddGraphWidget(){
+    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+    cmd->SetAction(FrUserActionCmd::AddGraphWidget);
+    FrCommandController::Execute(cmd);
+    delete cmd;
+}
+
+void FrMainController::DeleteGraphWidget(unsigned long gID){
+    FrUserActionCmd* cmd = FrCommandController::CreateCmd<FrUserActionCmd>();
+    cmd->SetAction(FrUserActionCmd::DeleteGraphWidget);
+    cmd->SetGraphWidgetID(gID);
+
     FrCommandController::Execute(cmd);
     delete cmd;
 }

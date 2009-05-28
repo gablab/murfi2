@@ -14,7 +14,7 @@
 #include "FrMainMenu.h"
 #include "FrActionManager.h"
 #include "FrActionSignalManager.h"
-#include "FrGraphPaneWidget.h"
+#include "FrGraphSetWidget.h"
 #include "FrImageSettingsWidget.h"
 
 #include "Qt/qgroupbox.h"
@@ -53,8 +53,8 @@ void FrMainWindow::SetMainDocument(FrMainDocument* document){
         m_LayerListWidget->SetDocument(document);
         m_LayerListWidget->Update();
 
-        m_GraphPaneWidget->SetDocument(document);
-        m_GraphPaneWidget->Update();
+        m_GraphSetWidget->SetDocument(document);
+        m_GraphSetWidget->Update();
 
         m_ImageSettingsWidget->SetDocument(document);
         m_ImageSettingsWidget->Update();
@@ -136,10 +136,10 @@ void FrMainWindow::InitializeWidgets(){
     dock->setAllowedAreas(Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea | 
                           Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_GraphPaneWidget = new FrGraphPaneWidget(dock);
-    m_GraphPaneWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_GraphSetWidget = new FrGraphSetWidget(dock);
+    m_GraphSetWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    dock->setWidget(m_GraphPaneWidget);
+    dock->setWidget(m_GraphSetWidget);
     addDockWidget(Qt::BottomDockWidgetArea, dock);
     m_mainMenu->GetMenuView()->addAction(dock->toggleViewAction());	
 

@@ -373,11 +373,28 @@ vtkImageData* FrDocumentReader::GetMriSlice(RtMRIImage* mri){
         }
     }
 
+    vnl_matrix_fixed<double, 4, 4> vxl2ras = image->getVxl2Ras();
+   
+    // center should be located in 0, 0, 0
+    // find center of image
+    double xcenter = xDim*pixDim0 / 2.0f;
+    double ycenter = yDim*pixDim1 / 2.0f;
+
+    // get shift value
+    double x0 = -xcenter;
+    double y0 = -ycenter;
+    double z0 = 0.0f;
+    
+    //double x0 = vxl2ras.get(0, 3);
+    //double y0 = vxl2ras.get(1, 3);
+    //double z0 = vxl2ras.get(2, 3);
+
     vtkImageData* result = vtkImageData::New();
     result->SetScalarTypeToUnsignedChar();
     result->SetDimensions(xDim, yDim, 1);
     result->SetSpacing(pixDim0, pixDim1, 1.0);
     result->SetNumberOfScalarComponents(1);
+    result->SetOrigin(x0, y0, z0);
     result->AllocateScalars();
     
     // Copy data and map values through lookup table

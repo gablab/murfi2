@@ -17,26 +17,26 @@
 #include <algorithm>
 #include <string>
 
-struct RootItem {
-    std::string ModuleID;
-    int TimeSeries;
-
-    std::vector<RtDataID> Items;
-};
-
-struct MatchByID{
-    std::string moduleID;
-    int seriesNum;
-
-    MatchByID(RtDataID dataID){
-        moduleID = dataID.getModuleID();
-        seriesNum = dataID.getSeriesNum();
-    }
-    bool operator()(RootItem& item){
-        return (seriesNum == item.TimeSeries &&
-                moduleID == item.ModuleID);
-    }
-};
+//struct RootItem {
+//    std::string ModuleID;
+//    int TimeSeries;
+//
+//    std::vector<RtDataID> Items;
+//};
+//
+//struct MatchByID{
+//    std::string moduleID;
+//    int seriesNum;
+//
+//    MatchByID(RtDataID dataID){
+//        moduleID = dataID.getModuleID();
+//        seriesNum = dataID.getSeriesNum();
+//    }
+//    bool operator()(RootItem& item){
+//        return (seriesNum == item.TimeSeries &&
+//                moduleID == item.ModuleID);
+//    }
+//};
 
 
 // Implementation
@@ -99,42 +99,15 @@ bool FrDataStoreDialog::SimpleExec(){
 }
 
 void FrDataStoreDialog::Initialize(FrMainDocument* doc){
-    // Get descriptors of data from data store
-    std::vector<RtDataID> data;
+    std::vector<FrDataStore::DataItem> roots;
     FrDataStore* dataStore = doc->GetDataStore();
-    dataStore->GetStuff(data);
-    
-    // Prepare list of items to add 
-    std::vector<RootItem> roots;
-    std::vector<RtDataID>::iterator i, iEnd(data.end());
-    for(i = data.begin(); i != iEnd; ++i){
-        // find root item here
-        RtDataID& dataID = (*i);
-        std::vector<RootItem>::iterator it = 
-            std::find_if( roots.begin(), roots.end(), 
-                          MatchByID(dataID) );
-
-        // if not found create new and add 
-        if(it == roots.end()){
-
-            RootItem newRootItem;
-            newRootItem.ModuleID = dataID.getModuleID();
-            newRootItem.TimeSeries = dataID.getSeriesNum();
-            roots.push_back(newRootItem);
-            
-            it = roots.end();
-            --it;
-        }
-        
-        // add item to that root
-        it->Items.push_back(dataID);
-    }
+    dataStore->GetAvailableData(roots);
 
     // Add data 
     QStringList itemValues;
     QList<QTreeWidgetItem*> rootItems;
 
-    std::vector<RootItem>::iterator it, itEnd(roots.end());
+    std::vector<FrDataStore::DataItem>::iterator it, itEnd(roots.end());
     for(it = roots.begin(); it != itEnd; ++it){
         // Create root item
         itemValues.clear();
@@ -157,8 +130,8 @@ void FrDataStoreDialog::Initialize(FrMainDocument* doc){
             childItem->SetID((*itr));
 
             // check if current image has been already added as layer
-            if (IsImageAddedAsLayer(doc, (*itr)))
-                childItem->setBackgroundColor(1, QColor(125,125,125));
+            //if (IsImageAddedAsLayer(doc, (*itr)))
+            //    childItem->setBackgroundColor(1, QColor(125,125,125));
 
             rootItem->addChild(childItem);//new QTreeWidgetItem(itemValues));
         }

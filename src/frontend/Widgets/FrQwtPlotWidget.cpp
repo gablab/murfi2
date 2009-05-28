@@ -68,6 +68,9 @@ FrQwtPlotWidget::FrQwtPlotWidget(QWidget* parent)
     //this->setFixedWidth(this->sizeHint().width());
     //this->setFixedHeight(this->sizeHint().height());
 
+    yMin = 999.0f;      // test
+    yMax = 0.0f;
+
 }
 
 FrQwtPlotWidget::~FrQwtPlotWidget(){
@@ -157,18 +160,19 @@ void FrQwtPlotWidget::SetData(unsigned long id, double data[], int dataSize){
     CurvesMap::iterator it = m_Curves.find(id);
     if(it == m_Curves.end()) return;
 
+    yMin = data[0];
+    yMax = data[0];
+
     // Init x values and find min and max
-    double minY = data[0];
-    double maxY = data[0];
     double* xValues = new double[dataSize];
     for (int i = 0; i < dataSize; i++){
         xValues[i] = double(i);
-	if(minY > data[i]) {
-	  minY = data[i];
-	}
-	if(maxY < data[i]) {
-	  maxY = data[i];
-	}
+	    if(yMin > data[i]) {
+	      yMin = data[i];
+	    }
+	    if(yMax < data[i]) {
+	      yMax = data[i];
+	    }
     }
     it->second->setData(xValues, data, dataSize);
     delete[] xValues;
@@ -189,7 +193,7 @@ void FrQwtPlotWidget::SetData(unsigned long id, double data[], int dataSize){
         this->setAxisScale(QwtPlot::xBottom, 0.0, maxTimePoint, step);
     }
  
-    this->setAxisScale(QwtPlot::yLeft, minY, maxY);
+    this->setAxisScale(QwtPlot::yLeft, yMin, yMax);
 
    
     // refresh the plot
@@ -259,7 +263,7 @@ bool FrQwtPlotWidget::SetMarkerPosition(int timePoint, bool blockSignals){
 
     m_PlotMarker->setValue(x, y);
     
-    //this->replot();   // scopic Alan: test 01.05.09, this string causes crushes while getting data from backend
+    this->replot();   // scopic Alan: test 01.05.09, this string causes crushes while getting data from backend
                         // probably qt threading issue 
     if(!blockSignals){
 

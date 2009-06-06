@@ -7,23 +7,20 @@
 
 #include"ExternalSenderImageInfo.h"
 
-#ifdef WIN32
 #include <winsock.h>
-#else
 
-#endif
-
+#include <cmath>
 #include <iostream>
 using namespace std;
 
 
 // defaults
-static const unsigned int defaultPort = 15000;
+static const int defaultPort = 15000;
 
 
 // prototypes
-int runReceiverWin(unsigned int port);
-SOCKET getListenerWin(unsigned int port);
+int runReceiverWin(int port);
+SOCKET getListenerWin(int port);
 SOCKET acceptWin(SOCKET sock, sockaddr_in& remote);
 ExternalImageInfo *readImageInfoWin(SOCKET sock);
 short *readImageDataWin(SOCKET sock, const ExternalImageInfo &info);
@@ -34,7 +31,7 @@ int closeWin(SOCKET sock);
 int main(int argc, char** argv) {
   
   // get port if specified
-  unsigned int port = defaultPort
+  int port = defaultPort;
   if(argc > 1) {
     port = atoi(argv[1]);
   }
@@ -42,22 +39,30 @@ int main(int argc, char** argv) {
   cout << "trying to start scanner listener on port " << port << endl;
   runReceiverWin(port);
   cout << "done" << endl;
+
+  return 0;
 }
 
 
 // listens for incomming images on a port until error
 // out: 0 for sucess, 1 for error
-int runReceiverWin(unsigned int port) {
+int runReceiverWin(int port) {
+  // start winsock
+  WSAData dat;
+  if(0 != WSAStartup(MAKEWORD(1,1),&dat)) {
+    cout << "error starting winsock" << endl;
+  }
+
   cout << "starting the receiver...";
-  SOCKET sock = getWinListener(htons(port));
+  SOCKET sock = getListenerWin(htons(port));
   if(sock == INVALID_SOCKET) {
-    cout << "failed"
+    cout << "failed" << endl;
     return 1;
   }
   cout << "success" << endl;
 
   while(1) {
-    cout << "listening..." << flush;
+    cout << "listening..." << endl << flush;
     sockaddr_in remote;
     SOCKET sd = acceptWin(sock, remote);
     if(sd != INVALID_SOCKET) {
@@ -70,10 +75,10 @@ int runReceiverWin(unsigned int port) {
     }
 
     // receive and build header
-    ExternalImageInfo *info = readImageInfo(sd);
+    ExternalImageInfo *info = readImageInfoWin(sd);
 
     // receive and build data
-    short *data = readImageData(sd,info);
+    short *data = readImageDataWin(sd,*info);
 
     // error check 
     if(info == NULL || data == NULL) {
@@ -82,7 +87,7 @@ int runReceiverWin(unsigned int port) {
     }
     
     // close connection
-    close(sd);
+    closeWin(sd);
   }
 
   return 0;
@@ -90,12 +95,13 @@ int runReceiverWin(unsigned int port) {
 
 // get a new socket on a local port to listen on
 // out: SOCKET on sucess, INVALID_SOCKET on error
-SOCKET getListenerWin(unsigned int port) {
+SOCKET getListenerWin(int port) {
+  u_long addr = inet_addr("0.0.0.0");
   SOCKET sd = socket(AF_INET, SOCK_STREAM, 0);
   if(sd != INVALID_SOCKET) {
     sockaddr_in sin;
     sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = INADDR_ANY;
+    sin.sin_addr.s_addr = addr;
     sin.sin_port = port;
     if(bind(sd, (sockaddr*)&sin, sizeof(sockaddr_in)) != SOCKET_ERROR) {
       listen(sd, 1);
@@ -120,7 +126,7 @@ SOCKET acceptWin(SOCKET sock, sockaddr_in& remote) {
 //   image info struct on successful read (NULL otherwise)
 ExternalImageInfo *readImageInfoWin(SOCKET sock) {
   char buffer[EXTERNALSENDERSIZEOF];
-  unsigned int rec;
+  int rec;
 
   // read header
   for(rec = 0; rec < EXTERNALSENDERSIZEOF && rec != SOCKET_ERROR; 
@@ -133,7 +139,7 @@ ExternalImageInfo *readImageInfoWin(SOCKET sock) {
   }
 
   cout << "received header" << endl;
-  ExternalImageInfo *info = new ExternalImageInfo(buffer, bytesRead);
+  ExternalImageInfo *info = new ExternalImageInfo(buffer, rec);
 
   return info;
 }
@@ -148,13 +154,14 @@ ExternalImageInfo *readImageInfoWin(SOCKET sock) {
 short *readImageDataWin(SOCKET sock, const ExternalImageInfo &info) {
   cout << "receiving image " << info.iAcquisitionNumber << endl;
 
-  unsigned int numPix 
+  int numPix 
     = (int) pow((double)info.iMosaicGridSize,2)*info.nLin*info.nCol;
-  unsigned int rec;
+  char *buffer = new char[numPix]();
+  int rec;
 
   // read image data
   for(rec = 0; rec < numPix*sizeof(short) && rec != SOCKET_ERROR;
-      rec += recv(sock, buffer+rec, numPix*sizeof(short)-rec));
+      rec += recv(sock, buffer+rec, numPix*sizeof(short)-rec,0));
 
   // error check
   if(rec != numPix*sizeof(short)) {
@@ -165,18 +172,20 @@ short *readImageDataWin(SOCKET sock, const ExternalImageInfo &info) {
   short *img = new short[numPix];
   memcpy(img,buffer,numPix*sizeof(short));
 
+  delete [] buffer;
+
   return img;
 }
 
 // gracefully close a socket
 int closeWin(SOCKET sock) {
-  if(shutdown(sock, SD_SEND) == SOCKET_ERROR) {
+  if(shutdown(sock, 1) == SOCKET_ERROR) {
     return 1;
   }
 
   // clear remaining data
   char buffer[1024];
-  unsigned int num = 1;
+  int num = 1;
   while(0 != (num = recv(sock, buffer, 1024, 0)) && num != SOCKET_ERROR);
 
   if(num == SOCKET_ERROR) {

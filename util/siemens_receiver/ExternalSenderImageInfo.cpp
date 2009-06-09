@@ -7,6 +7,10 @@
 
 #include"ExternalSenderImageInfo.h"
 
+#include<fstream>
+using namespace std;
+
+
 // default constructor
 ExternalImageInfo::ExternalImageInfo()
   :
@@ -93,11 +97,13 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   char *readptr = data;
 
 // DEBUGGING
-//  ofstream of("/tmp/dat.hdr");
+//  ofstream of("debug_dat.hdr");
 //  of.write(data,len);
+//  of.close();
 
   // check that we have enough data to read iSizeOfExternalImageInfo
   if(len < 4*CHARSIZE + LONGSIZE + INTSIZE) {
+    cerr << "not enough data to read size of external image info" << endl;
     return;
   }
 
@@ -112,6 +118,7 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
 
   // test that we have enough data
   if(len < (unsigned int) iSizeOfExternalImageInfo) {
+    cerr << "not enough data to fill image info: " << len << " < " << iSizeOfExternalImageInfo << endl;
     return;
   }
 
@@ -314,7 +321,13 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   
   memcpy(trash, readptr, 32*CHARSIZE);
   readptr += 32*CHARSIZE;
-  
+
+  // necessary on windows?
+  memcpy(trash, readptr, 8*CHARSIZE);
+  readptr += 8*CHARSIZE;  
+
+  // DEBUG
+  //cout << "read " << readptr - data << " bytes" << endl;
 }
 
 // build data to send as the physical scanner would
@@ -534,7 +547,7 @@ char *ExternalImageInfo::convertToScannerDataArray() {
   
   memcpy(writeptr, trash, 32*CHARSIZE);
   writeptr += 32*CHARSIZE;
-  
+
   free(trash);
   return data;
 }
@@ -583,7 +596,6 @@ void ExternalImageInfo::displayImageInfo() {
   cout << "Trigger Time                      = " << dTriggerTime << endl;
   cout << "ImageTypeValue4[0]                = " << chImageTypeValue4[0] << endl;
   cout << "AbsTablePosition                  = " << lAbsTablePosition << endl;
-  cout << "Data Source                       = " << iDataSource << endl;
   cout << "Frame Of Reference                = " << chframeOfReference << endl;
   cout << "Time Delay                        = " << dTimeDelay << endl;
   cout << endl;

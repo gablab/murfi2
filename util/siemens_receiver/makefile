@@ -1,14 +1,14 @@
 ## Visual C++
-CC = cl
-CFLAGS = -GX -Os -G5
-LFLAGS = wsock32.lib /Fe$@
-OBJEXT = obj
+#CC = cl
+#CFLAGS = -GX -Os -G5
+#LFLAGS = wsock32.lib /Fe$@
+#OBJEXT = obj
 
 ## Cygwin/GNU C++
-#CC = g++
-#CFLAGS = -Wall -O
-#LFLAGS = -lwsock32 -o $@
-#OBJEXT = o
+CC = g++
+CFLAGS = -Wall -g
+LFLAGS = -lwsock32 -o $@
+OBJEXT = o
 
 
 .SUFFIXES: .cpp .$(OBJEXT)

@@ -30,6 +30,9 @@
 #include "Qt/qevent.h"
 #include "Qt/qlabel.h"
 
+#include<string>
+#include<sstream>
+
 
 // Implementation of FrGraphPaneWidget
 FrGraphPaneWidget::FrGraphPaneWidget(unsigned long id, QWidget* parent, FrMainDocument* doc) 
@@ -177,27 +180,24 @@ void FrGraphPaneWidget::contextMenuEvent(QContextMenuEvent *event){
 
     std::vector<FrDataStore::DataItem>::iterator it, itEnd(data.end());
     for(it = data.begin(); it != itEnd; ++it){
-        // create a name for timeseria 
-        char* name = (char*)(*it).ModuleID.c_str();
-        char tmp[20];
-        itoa((*it).TimeSeries, tmp, 10);
-        strcat(name, " ");
-        strcat(name, tmp);
+      // create a name for timeseria 
+      stringstream name;
+      name << (*it).TimeSeries << " " << (*it).ModuleID.c_str();
 
-        FrAction* action = new FrAction(QString(name), this);
-        action->SetID((*it).TimeSeries);
-
-        // check if we have graph with this timeseria ID
-        FrGraphPaneDocObj* graphSet = m_Document->GetGraphSetDocObjByID(m_ID);
-        FrGraphDocObj* graph = graphSet->GetGraphDocObjByTS((*it).TimeSeries);
-        
-        if (graph)
-            action->setChecked(true);
-        else
-            action->setChecked(false);
-
-        m_GraphContextMenu->addAction(action);
-        connect(action, SIGNAL(actionChecked(unsigned long, bool)), this, SLOT(itemChecked(unsigned long, bool)));
+      FrAction* action = new FrAction(QString(name.str().c_str()), this);
+      action->SetID((*it).TimeSeries);
+      
+      // check if we have graph with this timeseria ID
+      FrGraphPaneDocObj* graphSet = m_Document->GetGraphSetDocObjByID(m_ID);
+      FrGraphDocObj* graph = graphSet->GetGraphDocObjByTS((*it).TimeSeries);
+      
+      if (graph)
+	action->setChecked(true);
+      else
+	action->setChecked(false);
+      
+      m_GraphContextMenu->addAction(action);
+      connect(action, SIGNAL(actionChecked(unsigned long, bool)), this, SLOT(itemChecked(unsigned long, bool)));
     }
 
     m_GraphContextMenu->exec(event->globalPos());

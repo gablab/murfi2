@@ -5,15 +5,29 @@
  * Oliver Hinds <ohinds@mit.edu> 2009-05-31
  *****************************************************************************/
 
-#include"ExternalSenderImageInfo.h"
+#include"ExternalImageInfo.h"
 
-#include <winsock.h>
+// platform specific includes and defines
+#ifdef WIN32
+  #include <winsock.h>
+  #define close closesock
+#else
+  #include <sys/socket.h>
+  #include <sys/types.h>
+  #include <netinet/in.h>
+  #define SOCKET int
+  #define INVALID_SOCKET -1
+  #define SOCKET_ERROR -1
+#endif
 
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <csignal>
+#include <cerrno>
 using namespace std;
 
 ///// defaults
@@ -22,37 +36,41 @@ static const string defaultDir(".");
 static const string defaultFilestem("img");
 
 ///// types
-enum ImageFileType {RAW, NII};
-static const ImageFileType defaultImageType = RAW;
-
-// params
 struct Params {
+ public:
   unsigned int port;
   string dir;
   string filestem;
-  ImageFileType imagetype;
+  bool onlyReadMoco;
+  bool quiet;
 
-  Params::Params() :
+  Params() :
     port(defaultPort),
     dir(defaultDir),
     filestem(defaultFilestem),
-    imagetype(defaultImageType) {};
+    onlyReadMoco(false),
+    quiet(false)
+  {};
 };
 
+///// globals
+static SOCKET sock = INVALID_SOCKET;
 
 ///// prototypes
-int runReceiverWin(const Params &p);
-SOCKET getListenerWin(int port);
-SOCKET acceptWin(SOCKET sock, sockaddr_in& remote);
+int runReceiver(const Params &p);
+SOCKET getListener(int port);
+SOCKET acceptConnection(SOCKET sock, sockaddr_in& remote);
 string getImageFilename(const Params &p, int runNum, int imgNum, const ExternalImageInfo &info);
-ExternalImageInfo *readImageInfoWin(SOCKET sock);
-short *readImageDataWin(SOCKET sock, const ExternalImageInfo &info);
+ExternalImageInfo *readImageInfo(SOCKET sock);
+short *readImageData(SOCKET sock, const ExternalImageInfo &info);
 int saveImage(const Params &p, const ExternalImageInfo &info, short *data);
 int saveRawImage(const string &filename, 
 		 const ExternalImageInfo &info, short *data);
-int closeWin(SOCKET sock);
+int closeSocket(SOCKET sock);
+void onTerminate(int param);
 void usage(string name);
 Params parseArgs(int argc, char** argv);
+
 
 ///// functions
 
@@ -61,9 +79,24 @@ int main(int argc, char** argv) {
 
   Params p = parseArgs(argc,argv);
 
-  cout << "trying to start scanner listener on port " << p.port << endl;
-  runReceiverWin(p);
-  cout << "done" << endl;
+  // setup termination handler for clean exit
+  signal(SIGTERM,onTerminate);
+  signal(SIGSEGV,onTerminate);
+  signal(SIGABRT,onTerminate);
+  signal(SIGFPE,onTerminate);
+  signal(SIGILL,onTerminate);
+
+  if(!p.quiet) {
+    cout << "trying to start scanner listener on port " << p.port << endl;
+  }
+
+  // run the receiver
+  runReceiver(p);
+
+
+  if(!p.quiet) {
+    cout << "done" << endl;
+  }
 
   return 0;
 }
@@ -71,47 +104,64 @@ int main(int argc, char** argv) {
 
 // listens for incomming images on a port until error
 // out: 0 for sucess, 1 for error
-int runReceiverWin(const Params &p) {
-  // start winsock
-  WSAData dat;
-  if(0 != WSAStartup(MAKEWORD(1,1),&dat)) {
-    cout << "error starting winsock" << endl;
-  }
+int runReceiver(const Params &p) {
+  #ifdef WIN32
+    // start winsock
+    WSAData dat;
+    if(0 != WSAStartup(MAKEWORD(1,1),&dat)) {
+      cerr << "error starting winsock" << endl;
+      return 1;
+    }
+  #endif
 
-  cout << "starting the receiver...";
-  SOCKET sock = getListenerWin(htons(p.port));
+  if(!p.quiet) {
+    cout << "starting the receiver...";
+  }
+  sock = getListener(htons(p.port));
   if(sock == INVALID_SOCKET) {
-    cout << "failed" << endl;
+    cerr << "failed" << endl;
     return 1;
   }
-  cout << "success" << endl;
+  if(!p.quiet) {
+    cout << "success" << endl;
+  }
 
   for(unsigned int imageNum = 0; true; imageNum++) {
-    cout << "listening..." << endl << flush;
+    if(!p.quiet) {
+      cout << "listening..." << endl << flush;
+    }
     sockaddr_in remote;
-    SOCKET sd = acceptWin(sock, remote);
+    SOCKET sd = acceptConnection(sock, remote);
     if(sd == INVALID_SOCKET) {
-      cout << "connection error" << endl;
+      cerr << "connection error" << endl;
       return 1;
     }
 
     // receive and build header
-    ExternalImageInfo *info = readImageInfoWin(sd);
-
-    // receive and build data
-    short *data = readImageDataWin(sd,*info);
+    ExternalImageInfo *info = readImageInfo(sd);
 
     // error check
-    if(info == NULL || data == NULL) {
-      cout << "error receiving image, exit" << endl;
-      break;
+    if(info == NULL) {
+      cerr << "error receiving image header, exit" << endl;
+      return 1;
+    }
+
+    // receive and build data
+    short *data = readImageData(sd,*info);
+
+    // error check
+    if(data == NULL) {
+      cerr << "error receiving image, exit" << endl;
+      return 1;
     }
 
     // save
-    saveImage(p, *info, data);
+    if(!p.onlyReadMoco || info->bIsMoCo) {
+      saveImage(p, *info, data);
+    }
 
     // close connection
-    closeWin(sd);
+    closeSocket(sd);
   }
 
   return 0;
@@ -119,13 +169,13 @@ int runReceiverWin(const Params &p) {
 
 // get a new socket on a local port to listen on
 // out: SOCKET on sucess, INVALID_SOCKET on error
-SOCKET getListenerWin(int port) {
-  u_long addr = inet_addr("0.0.0.0");
+SOCKET getListener(int port) {
+  //u_long addr = inet_addr("0.0.0.0");
   SOCKET sd = socket(AF_INET, SOCK_STREAM, 0);
   if(sd != INVALID_SOCKET) {
     sockaddr_in sin;
     sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = addr;
+    sin.sin_addr.s_addr = INADDR_ANY;
     sin.sin_port = port;
     if(bind(sd, (sockaddr*)&sin, sizeof(sockaddr_in)) != SOCKET_ERROR) {
       listen(sd, 1);
@@ -138,8 +188,8 @@ SOCKET getListenerWin(int port) {
 
 // accept an incoming connection
 // out: return value of accept()
-SOCKET acceptWin(SOCKET sock, sockaddr_in& remote) {
-  int nAddrSize = sizeof(remote);
+SOCKET acceptConnection(SOCKET sock, sockaddr_in& remote) {
+  socklen_t nAddrSize = sizeof(remote);
   return accept(sock, (sockaddr*)&remote, &nAddrSize);
 }
 
@@ -148,7 +198,7 @@ SOCKET acceptWin(SOCKET sock, sockaddr_in& remote) {
 //   sock: a socket to receive on
 //  out
 //   image info struct on successful read (NULL otherwise)
-ExternalImageInfo *readImageInfoWin(SOCKET sock) {
+ExternalImageInfo *readImageInfo(SOCKET sock) {
   char buffer[EXTERNALSENDERSIZEOF];
   int rec;
 
@@ -158,11 +208,9 @@ ExternalImageInfo *readImageInfoWin(SOCKET sock) {
 
   // error check
   if(rec != EXTERNALSENDERSIZEOF) {
-    //cout << "error receiving header" << endl;
     return NULL;
   }
 
-  cout << "received header" << endl;
   ExternalImageInfo *info = new ExternalImageInfo(buffer, rec);
 
   return info;
@@ -175,16 +223,14 @@ ExternalImageInfo *readImageInfoWin(SOCKET sock) {
 //   info:   the last read image info struct
 //  out
 //   image data on successful read (NULL otherwise)
-short *readImageDataWin(SOCKET sock, const ExternalImageInfo &info) {
-  //cout << "receiving image " << info.iAcquisitionNumber << endl;
-
+short *readImageData(SOCKET sock, const ExternalImageInfo &info) {
   int numPix
     = (int) pow((double)info.iMosaicGridSize,2)*info.nLin*info.nCol;
   char *buffer = new char[numPix*sizeof(short)]();
 
   // read image data
   int rec;
-  for(rec = 0; rec < numPix*sizeof(short) && rec != SOCKET_ERROR;) {
+  for(rec = 0; rec < numPix*(int)sizeof(short) && rec != SOCKET_ERROR;) {
     int recNow = recv(sock, buffer+rec, numPix*sizeof(short)-rec,0);
     if(recNow == SOCKET_ERROR) {
       rec = SOCKET_ERROR;
@@ -195,8 +241,8 @@ short *readImageDataWin(SOCKET sock, const ExternalImageInfo &info) {
   }
 
   // error check
-  if(rec != numPix*sizeof(short)) {
-    cout << "error receiving image data" << endl;
+  if(rec != numPix*(int)sizeof(short)) {
+    cerr << "error receiving image data" << endl;
     return NULL;
   }
 
@@ -215,28 +261,23 @@ int saveImage(const Params &p, const ExternalImageInfo &info, short *data) {
   int imgNum = info.iAcquisitionNumber;
 
   // if this is first image, find the run number of already existing
-  if(imgNum == 1 && !info.bIsMoCo) {
+  if(imgNum == 1 && (p.onlyReadMoco || !info.bIsMoCo)) {
     ifstream intest;
     do {
+      intest.close();
       runNum++;
       filename = getImageFilename(p,runNum,imgNum,info);
+      cout << filename << endl;
       intest.open(filename.c_str());
-    }  while(!intest.fail());
+    } while(!intest.fail());
   }
 
-  // save the image based on type
-  switch(p.imagetype) {
-    case NII:
-      cerr << "nifti not yet supported, sorry" << endl;
-      return 1;
-      break;
-    case RAW:
-      filename = getImageFilename(p,runNum,imgNum,info);
-      saveRawImage(filename, info, data);
-      break;
-    default:
-      cerr << "unknown image filetype. :(" << endl;
-      break;
+  // save the image
+  filename = getImageFilename(p,runNum,imgNum,info);
+
+  if(!saveRawImage(filename, info, data) && !p.quiet) {
+    cout << "saved raw image " << filename << " of " 
+	 << info.iImageDataLength << " bytes" << endl;
   }
 
   return 0;
@@ -251,18 +292,11 @@ string getImageFilename(const Params &p, int runNum, int imgNum, const ExternalI
     name << "_moco";
   }
 
-  name << "-" << runNum << "-" << imgNum;
-
-  switch(p.imagetype) {
-    case NII:
-      name << ".nii";
-      break;
-    case RAW:
-      name << ".raw";
-      break;
-    default:
-      break;
-  }  
+  name << "-" 
+       << setw(5) << setfill('0') << runNum 
+       << "-" 
+       << setw(5) << setfill('0') << imgNum 
+       << ".raw";
 
   return name.str();
 }
@@ -301,7 +335,7 @@ int saveRawImage(const string &filename,
   os.write((char*) &num, sizeof(unsigned int));
 
   // write the data
-  os.write((char*) data, info.lImageDataLength);
+  os.write((char*) data, info.iImageDataLength);
   if(!os.good()) {
     cerr << "error writing file " << filename << endl;
     return 1;
@@ -309,40 +343,12 @@ int saveRawImage(const string &filename,
 
   os.close();
 
-  cout << "saved raw image " << filename << endl;
-
   return 0;
 }
 
-// write the image to a nifti file
-int saveNiftiImage(const string &filename,
-		   const ExternalImageInfo &info, short *data) {
-
-//  // fill the nifti struct with our data
-//  nifti_image *img = (nifti_image*) malloc(sizeof(nifti_image));
-//
-//  lock(); {
-//
-//    copyInfo(img);
-//
-//    // allocate and copy data
-//    img->data = (void*) malloc(img->nbyper*img->nvox);
-//    memcpy(img->data, data, img->nbyper*img->nvox);
-//
-//    // debugging
-//    //nifti_image_infodump(img);
-//
-//    // write the file
-//    nifti_image_write(img);
-//  } unlock();
-//
-//  nifti_image_free(img);
-//
-  return 0;
-}
 
 // gracefully close a socket
-int closeWin(SOCKET sock) {
+int closeSocket(SOCKET sock) {
   if(shutdown(sock, 1) == SOCKET_ERROR) {
     return 1;
   }
@@ -356,7 +362,7 @@ int closeWin(SOCKET sock) {
     return 1;
   }
 
-  if(closesocket(sock) == SOCKET_ERROR) {
+  if(close(sock) == SOCKET_ERROR) {
     return 1;
   }
 
@@ -367,17 +373,18 @@ int closeWin(SOCKET sock) {
 void usage(string name) {
   cout << "usage: " << name << " [options]" << endl
        << "  where options are:" << endl
-       << "    -i imagetype: types can be 'raw' or 'nii'" << endl
        << "    -d dir:       directory to save into (default is '.')" << endl
        << "    -f filestem:  begining of filenames (default 'img')" << endl
-       << "    -p port:      port to listen on (default 15000)" << endl;
+       << "    -p port:      port to listen on (default 15000)" << endl
+       << "    -m flag:      1 or 0 whether to ignore non-moco images (default 0)" << endl
+       << "    -q flag:      1 or 0 whether to suppress output (default 0)" << endl;
   return;
 }
 
 // argument parsing
 Params parseArgs(int argc, char **argv) {
   // special check for help
-  if(argc == 2 && argv[1][1] == 'h') {
+  if(argc == 2 && (argv[1][1] == 'h' || argv[1][1] == '?')) {
     usage(argv[0]);
     exit(0);
   }
@@ -385,8 +392,6 @@ Params parseArgs(int argc, char **argv) {
   Params p;
 
   for(int arg = 1; arg < argc-1; arg+=2) {
-    cout << argv[arg] << " " << argv[arg+1] << endl;
-
     // error check
     if(strlen(argv[arg]) != 2 || argv[arg][0] != '-') {
       cerr << "error parsing command line. missing option at arg "
@@ -400,19 +405,6 @@ Params parseArgs(int argc, char **argv) {
     // find appropriate option
     switch(opt) {
 
-     case 'i':
-       if(!strcmp(optval,"raw")) {
-	 p.imagetype = RAW;
-       }
-       else if(!strcmp(optval,"nii")) {
-	 p.imagetype = NII;
-       }
-       else {
-	 cout << "unknown image file type " << optval << ", using default"
-	      << endl;
-       }
-       break;
-
      case 'd':
        p.dir = optval;
        break;
@@ -425,6 +417,14 @@ Params parseArgs(int argc, char **argv) {
        p.port = atoi(optval);
        break;
 
+     case 'm':
+       p.onlyReadMoco = bool(atoi(optval));
+       break;
+
+     case 'q':
+       p.quiet = bool(atoi(optval));
+       break;
+
      default:
        cerr << "ignoring unknown option -" << opt << endl;
        break;
@@ -433,4 +433,10 @@ Params parseArgs(int argc, char **argv) {
   }
 
   return p;
+}
+
+// cleanly shutdown the socket
+void onTerminate(int param) {
+  closeSocket(sock);
+  exit(0);
 }

@@ -5,7 +5,7 @@
  * Oliver Hinds <ohinds@mit.edu> 2007-08-14
  *****************************************************************************/
 
-#include"ExternalSenderImageInfo.h"
+#include"ExternalImageInfo.h"
 
 #include<fstream>
 using namespace std;
@@ -14,16 +14,16 @@ using namespace std;
 // default constructor
 ExternalImageInfo::ExternalImageInfo()
   :
-  lVersion(0),
+  iVersion(0),
   iSizeOfExternalImageInfo(EXTERNALSENDERSIZEOF),
   dFOVread(200),
   dFOVphase(200),
   dThick(5),
   nCol(256),
   nLin(256),
-  lImageDataLength(294912),
-  lNumberOfPixels(147456),
-  lBytesPerPixel(2),
+  iImageDataLength(294912),
+  iNumberOfPixels(147456),
+  iBytesPerPixel(2),
   dPosSag(0),
   dPosCor(0),
   dPosTra(0),
@@ -55,12 +55,12 @@ ExternalImageInfo::ExternalImageInfo()
   dTR(3000),
   dTI(0),
   dTriggerTime(0),
-  lSliceIndex(0),
-  lNumTrackCha(0),
-  lCurrentTrackCha(0),
+  iSliceIndex(0),
+  iNumTrackCha(0),
+  iCurrentTrackCha(0),
   iWindowCenter(737),
   iWindowWidth(1694),
-  lAbsTablePosition(0),
+  iAbsTablePosition(0),
   iDataSource(0),
   dTimeDelay(0)
 {
@@ -73,36 +73,22 @@ ExternalImageInfo::ExternalImageInfo()
 
   strcpy(chframeOfReference,"123456.789101");
 
-
-  lReserved[0] = 0;
+  iReserved[0] = 0;
   dReserved[0] = 0;
   chReserved[0] = '\0';
   cSeriesInstanceUID[0] = '\0';
-}
-
-// constructor for data 
-ExternalImageInfo::ExternalImageInfo(char *data) {
-  memcpy(this,data,sizeof(ExternalImageInfo));
 }
 
 // constructor for data from physical scanner
 // this function does selective memcpy through the passed data because the 
 // scanner sends packed data with a few trash spots, which were identified 
 // manually with plenty of frustration. 
-//  in
-//   data: byte data to read the structure from
-//   len:  number of bytes we have
 ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   char trash[TRASHSIZE];
   char *readptr = data;
 
-// DEBUGGING
-//  ofstream of("debug_dat.hdr");
-//  of.write(data,len);
-//  of.close();
-
   // check that we have enough data to read iSizeOfExternalImageInfo
-  if(len < 4*CHARSIZE + LONGSIZE + INTSIZE) {
+  if(len < 4*CHARSIZE + 2*INTSIZE) {
     cerr << "not enough data to read size of external image info" << endl;
     return;
   }
@@ -110,8 +96,8 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   memcpy(chID, readptr, 4*CHARSIZE);
   readptr += 4*CHARSIZE;
   
-  memcpy(&lVersion, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iVersion, readptr, INTSIZE);
+  readptr += INTSIZE;
 
   memcpy(&iSizeOfExternalImageInfo, readptr, INTSIZE);
   readptr += INTSIZE;
@@ -141,14 +127,14 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   memcpy(&nLin, readptr, INTSIZE);
   readptr += INTSIZE;
 
-  memcpy(&lImageDataLength, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iImageDataLength, readptr, INTSIZE);
+  readptr += INTSIZE;
 
-  memcpy(&lNumberOfPixels, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iNumberOfPixels, readptr, INTSIZE);
+  readptr += INTSIZE;
 
-  memcpy(&lBytesPerPixel, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iBytesPerPixel, readptr, INTSIZE);
+  readptr += INTSIZE;
 
   memcpy(trash, readptr, INTSIZE);
   readptr += INTSIZE;
@@ -281,14 +267,14 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   memcpy(chAcquisitionTime, readptr, ACQUISITION_TIME_LEN*CHARSIZE);
   readptr += ACQUISITION_TIME_LEN*CHARSIZE;
   
-  memcpy(&lSliceIndex, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iSliceIndex, readptr, INTSIZE);
+  readptr += INTSIZE;
   
-  memcpy(&lNumTrackCha, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iNumTrackCha, readptr, INTSIZE);
+  readptr += INTSIZE;
   
-  memcpy(&lCurrentTrackCha, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iCurrentTrackCha, readptr, INTSIZE);
+  readptr += INTSIZE;
 
   memcpy(trash, readptr, 3);
   readptr += 3;
@@ -304,8 +290,8 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   readptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
 
 
-  memcpy(&lAbsTablePosition, readptr, LONGSIZE);
-  readptr += LONGSIZE;
+  memcpy(&iAbsTablePosition, readptr, INTSIZE);
+  readptr += INTSIZE;
 
   memcpy(chframeOfReference, readptr, FOR_ARRAY_LEN*CHARSIZE);
   readptr += FOR_ARRAY_LEN*CHARSIZE;
@@ -313,244 +299,23 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   memcpy(&dTimeDelay, readptr, DOUBLESIZE);
   readptr += DOUBLESIZE;
 
-  memcpy(trash, readptr, 16*LONGSIZE);
-  readptr += 16*LONGSIZE;
+  memcpy(trash, readptr, 16*INTSIZE);
+  readptr += 16*INTSIZE;
   
   memcpy(trash, readptr, 16*DOUBLESIZE);
   readptr += 16*DOUBLESIZE;
   
   memcpy(trash, readptr, 32*CHARSIZE);
   readptr += 32*CHARSIZE;
-
-  // necessary on windows?
+  
   memcpy(trash, readptr, 8*CHARSIZE);
   readptr += 8*CHARSIZE;  
 
-  // DEBUG
-  //cout << "read " << readptr - data << " bytes" << endl;
+  //displayImageInfo();
+
+  cout << "read image header with " << readptr - data << " bytes" << endl;
 }
 
-// build data to send as the physical scanner would
-// this function does selective memcpy through the passed data because the 
-// scanner sends packed data with a few trash spots, which were identified 
-// manually with plenty of frustration. 
-//  out
-//   array of data that conforms to the ExternalImageSender format
-char *ExternalImageInfo::convertToScannerDataArray() {
-  char *data = (char*) calloc(EXTERNALSENDERSIZEOF,1);
-  char *writeptr = data;
-  char *trash = (char*) calloc(TRASHSIZE,1);
-
-  memcpy(writeptr, chID, 4*CHARSIZE);
-  writeptr += 4*CHARSIZE;
-  
-  memcpy(writeptr, &lVersion, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &iSizeOfExternalImageInfo, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, trash, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &dFOVread, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dFOVphase, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dThick, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &nCol, INTSIZE);
-  writeptr += INTSIZE;
-
-
-  memcpy(writeptr, &nLin, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &lImageDataLength, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &lNumberOfPixels, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &lBytesPerPixel, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, trash, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &dPosSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dPosCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dPosTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dNorSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dNorCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dNorTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dPhaSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dPhaCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dPhaTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dRowSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dRowCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dRowTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dColSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dColCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dColTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dMoCoTransX, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoTransY, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoTransZ, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoRotX, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoRotY, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoRotZ, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-
-  memcpy(writeptr, &bIsMoCo, sizeof(bool));
-  writeptr += sizeof(bool);
-
-  memcpy(writeptr, trash, 3);
-  writeptr += 3;
-
-  memcpy(writeptr, &iNoOfImagesInMosaic, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &iMosaicGridSize, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, cSeriesInstanceUID, 65*CHARSIZE);
-  writeptr += 65*CHARSIZE;
-
-
-  memcpy(writeptr, &bSwapReadPhase, sizeof(bool));
-  writeptr += sizeof(bool);
-
-  memcpy(writeptr, trash, 2);
-  writeptr += 2;
-
- 
-  memcpy(writeptr, &iAcquisitionNumber, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, trash, 4);
-  writeptr += 4;
-
-  memcpy(writeptr, &dTimeAfterStart, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTE, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTR, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTI, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTriggerTime, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, chAcquisitionDate, ACQUISITION_DATE_LEN*CHARSIZE);
-  writeptr += ACQUISITION_DATE_LEN*CHARSIZE;
-  
-  memcpy(writeptr, chAcquisitionTime, ACQUISITION_TIME_LEN*CHARSIZE);
-  writeptr += ACQUISITION_TIME_LEN*CHARSIZE;
-  
-  memcpy(writeptr, &lSliceIndex, LONGSIZE);
-  writeptr += LONGSIZE;
-  
-  memcpy(writeptr, &lNumTrackCha, LONGSIZE);
-  writeptr += LONGSIZE;
-  
-  memcpy(writeptr, &lCurrentTrackCha, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, trash, 3);
-  writeptr += 3;
-
-
-  memcpy(writeptr, &iWindowCenter, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &iWindowWidth, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, chImageTypeValue4, _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
-  writeptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
-
-
-  memcpy(writeptr, &lAbsTablePosition, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, chframeOfReference, FOR_ARRAY_LEN*CHARSIZE);
-  writeptr += FOR_ARRAY_LEN*CHARSIZE;
-
-  memcpy(writeptr, &dTimeDelay, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, trash, 16*LONGSIZE);
-  writeptr += 16*LONGSIZE;
-  
-  memcpy(writeptr, trash, 16*DOUBLESIZE);
-  writeptr += 16*DOUBLESIZE;
-  
-  memcpy(writeptr, trash, 32*CHARSIZE);
-  writeptr += 32*CHARSIZE;
-
-  free(trash);
-  return data;
-}
 
 // print info about a received image
 //  in
@@ -563,7 +328,7 @@ void ExternalImageInfo::displayImageInfo() {
   cout << "Dumping ExternalImageInfo         " << endl;
   cout << "Data:"  << sizeof (ExternalImageInfo) << " Bytes used" << endl;
   cout << "-----------------------------" << endl;
-  cout << "ID -->" << myID << "<-- Version" << lVersion << endl;
+  cout << "ID -->" << myID << "<-- Version" << iVersion << endl;
   cout << "nlin / ncol / FOVread / FOVphase  = " << nLin 
        << " / " << nCol << " / " << dFOVread << " / " << dFOVphase << endl;
   cout << "Slice Thickness                   = " << dThick << endl;
@@ -587,15 +352,15 @@ void ExternalImageInfo::displayImageInfo() {
        << " / " << dTI << endl;
   cout << "AcquisitionDate                   = " << chAcquisitionDate << endl;
   cout << "AcquisitionTime                   = " << chAcquisitionTime << endl;
-  cout << "Number of pixels / dataLength     = " << lNumberOfPixels
-       << " / " << lImageDataLength << endl;
-  cout << "Bytes per pixel                   = " << lBytesPerPixel << endl;
-  cout << "Current Slice Index               = " << lSliceIndex <<  endl;
+  cout << "Number of pixels / dataLength     = " << iNumberOfPixels
+       << " / " << iImageDataLength << endl;
+  cout << "Bytes per pixel                   = " << iBytesPerPixel << endl;
+  cout << "Current Slice Index               = " << iSliceIndex <<  endl;
   cout << "Window Width                      = " << iWindowWidth << endl;
   cout << "Window Center                     = " << iWindowCenter << endl;
   cout << "Trigger Time                      = " << dTriggerTime << endl;
   cout << "ImageTypeValue4[0]                = " << chImageTypeValue4[0] << endl;
-  cout << "AbsTablePosition                  = " << lAbsTablePosition << endl;
+  cout << "AbsTablePosition                  = " << iAbsTablePosition << endl;
   cout << "Frame Of Reference                = " << chframeOfReference << endl;
   cout << "Time Delay                        = " << dTimeDelay << endl;
   cout << endl;

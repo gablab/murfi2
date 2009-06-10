@@ -6,8 +6,9 @@
 
 1) Overview
 2) Running
-3) Known issues
-4) Compilation
+3) Image file format
+4) Known issues
+5) Compilation
 
 ######################################################################
 
@@ -18,10 +19,11 @@ The Siemens receiver application saves images sent via TCP/IP from a
 scanner enabled with the External Sender ICE functor. The receiver
 runs on a computer that is on the same network as the scanner host (or
 on the host itself) and runs a server that listens for images sent by
-the External Sender ICE functor. Images are saved to disk. The target
-directory and filenames are configurable, and each incoming series is
-identified and handled in a rational manner. The application runs on
-linux and windows.
+the External Sender ICE functor. Images are saved to disk, as well as
+MoCo images if motion correction is turned on in the sequence. The
+target directory and filenames are configurable, and each incoming
+series is identified and handled in a rational manner. The application
+runs on linux and windows.
 
 #######################################################################
 
@@ -51,6 +53,19 @@ The receiver application is designed so that it needs to be executed
 just once per scanning session. Each time the first image of a new run
 is received the run number is automatically incremented. There is no
 need to stop the application between runs. 
+
+#######################################################################
+
+
+####################  Image file format  ##############################
+
+RAW images are written. This is a binary file in the following format:
+*) number of image dimensions (unsigned int 32)
+*) size of each dimension (unsigned int 32)
+*) data (short 16)
+
+The included file 'read_raw.m' will load a RAW image into octave or
+matlab.
 
 #######################################################################
 

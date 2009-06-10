@@ -12,7 +12,7 @@
 
 ## uncomment for Cygwin/GNU C++
 CC = g++
-CFLAGS = -Wall -g -DWIN32
+CFLAGS = -Wall -DWIN32
 LFLAGS = -lwsock32 -o $@
 OBJEXT = o
 

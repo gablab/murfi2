@@ -88,7 +88,7 @@ make -f makefile.win
 linux:
 
 At the command line, execute
-make -f makefile.lin
+make -f makefile.linux
 
 #######################################################################
 

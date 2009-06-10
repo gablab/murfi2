@@ -379,7 +379,7 @@ void usage(string name) {
   cout << "usage: " << name << " [options]" << endl
        << "  where options are:" << endl
        << "    -d dir:       directory to save into (default is '.')" << endl
-       << "    -f filestem:  begining of filenames (default 'img')" << endl
+       << "    -f filestem:  beginning of filenames (default 'img')" << endl
        << "    -p port:      port to listen on (default 15000)" << endl
        << "    -m flag:      1 or 0 whether to ignore non-moco images (default 0)" << endl
        << "    -q flag:      1 or 0 whether to suppress output (default 0)" << endl;

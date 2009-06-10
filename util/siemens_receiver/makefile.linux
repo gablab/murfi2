@@ -5,7 +5,7 @@
 ########################################################################
 
 CC = g++
-CFLAGS = -Wall -g
+CFLAGS = -Wall -02
 LFLAGS =  -o $@
 OBJEXT = o
 
@@ -18,10 +18,10 @@ OBJEXT = o
 default: siemens_receiver
 
 clean:
-	rm *.$(OBJEXT) *~
+	-rm *.$(OBJEXT) *~
 
 distclean: clean
-	rm siemens_receiver
+	-rm siemens_receiver
 
 siemens_receiver: siemens_receiver.$(OBJEXT) ExternalImageInfo.$(OBJEXT)
 	$(CC) siemens_receiver.$(OBJEXT)  ExternalImageInfo.$(OBJEXT) $(LFLAGS)

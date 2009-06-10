@@ -1,7 +1,18 @@
-# readme for the siemens receiver 
+# README for the siemens receiver 
 #
 # oliver hinds <ohinds@mit.edu> 2009-06-10
 
+####################  Contents  ######################################
+
+1) Overview
+2) Running
+3) Known issues
+4) Compilation
+
+######################################################################
+
+
+####################  Overview  ######################################
 
 The Siemens receiver application saves images sent via TCP/IP from a
 scanner enabled with the External Sender ICE functor. The receiver
@@ -9,21 +20,77 @@ runs on a computer that is on the same network as the scanner host (or
 on the host itself) and runs a server that listens for images sent by
 the External Sender ICE functor. Images are saved to disk. The target
 directory and filenames are configurable, and each incoming series is
-identified and handled in a rational manner.
+identified and handled in a rational manner. The application runs on
+linux and windows.
+
+#######################################################################
 
 
-################## 1) Installation ####################################
+####################  Running  ########################################
 
-To install the receiver, use make.
+You must be connected to the same network as the scanner. The External
+Sender functor on the scanner must be configured to send images to the
+ip address of your computer (see the External Sender functor
+documentation). 
 
+The application 'siemens_receiver' must be executed from the command
+line. The application takes several arguments:
+
+usage: ./siemens_receiver [options]
+  where options are:
+    -d dir:       directory to save into (default is '.')
+    -f filestem:  beginning of filenames (default 'img')
+    -p port:      port to listen on (default 15000)
+    -m flag:      1 or 0 whether to ignore non-moco images (default 0)
+    -q flag:      1 or 0 whether to suppress output (default 0)
+
+To stop the application terminate the command line process using
+Ctrl-C.
+
+The receiver application is designed so that it needs to be executed
+just once per scanning session. Each time the first image of a new run
+is received the run number is automatically incremented. There is no
+need to stop the application between runs. 
+
+#######################################################################
+
+
+####################  Known issues  ###################################
+
+*) Although the termination of the program and the associated network
+   connection is handled properly, sometimes there is a lag after
+   program termination where the connection doesn't look closed to the
+   operating system, and the application fails to start the server on
+   startup. Things go back to normal after a few seconds, so just wait
+   a minute and try again. Note that if the server fails to start the
+   first time you run the application something else is wrong. Also,
+   I have only experienced this behavior on linux, so if you find it
+   happening on windows let me know.
+
+#######################################################################
+
+
+####################  Compilation  ####################################
+
+********
+windows:
+
+Both compilation with visual c++ and mingw g++ (http://www.mingw.org/)
+are supported. The windows makefile (makefile.win) is setup to use
+mingw g++ by default. To compile with visual c++ edit makefile.win and
+comment out the GNU stuff and uncomment the M$ stuff.
+
+For either compiler, at the command line, execute
+make -f makefile.win
+
+
+********
+linux:
+
+At the command line, execute
+make -f makefile.lin
 
 #######################################################################
 
 
 
-################## 2) Running #########################################
-
-Execute the file 'siemens_receiver'
-
-
-#######################################################################

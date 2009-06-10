@@ -312,8 +312,8 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   readptr += 8*CHARSIZE;  
 
   //displayImageInfo();
-
-  cout << "read image header with " << readptr - data << " bytes" << endl;
+  //
+  //cout << "read image header with " << readptr - data << " bytes" << endl;
 }
 
 

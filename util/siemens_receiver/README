@@ -1,0 +1,29 @@
+# readme for the siemens receiver 
+#
+# oliver hinds <ohinds@mit.edu> 2009-06-10
+
+
+The Siemens receiver application saves images sent via TCP/IP from a
+scanner enabled with the External Sender ICE functor. The receiver
+runs on a computer that is on the same network as the scanner host (or
+on the host itself) and runs a server that listens for images sent by
+the External Sender ICE functor. Images are saved to disk. The target
+directory and filenames are configurable, and each incoming series is
+identified and handled in a rational manner.
+
+
+################## 1) Installation ####################################
+
+To install the receiver, use make.
+
+
+#######################################################################
+
+
+
+################## 2) Running #########################################
+
+Execute the file 'siemens_receiver'
+
+
+#######################################################################

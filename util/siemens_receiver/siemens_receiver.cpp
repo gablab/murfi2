@@ -460,7 +460,7 @@ bool fileExist(const string &filename) {
   } 
   #else 
   {
-    ifstream intest(filename);
+    ifstream intest(filename.c_str());
     return !intest.fail();
   }
   #endif

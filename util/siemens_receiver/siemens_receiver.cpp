@@ -10,7 +10,8 @@
 // platform specific includes and defines
 #ifdef WIN32
   #include <winsock.h>
-  #define close closesock
+  #define CLOSE closesocket
+  typedef int socklen_t; 
 #else
   #include <sys/socket.h>
   #include <sys/types.h>
@@ -18,6 +19,7 @@
   #define SOCKET int
   #define INVALID_SOCKET -1
   #define SOCKET_ERROR -1
+  #define CLOSE close
 #endif
 
 #include <cmath>
@@ -27,7 +29,6 @@
 #include <string>
 #include <sstream>
 #include <csignal>
-#include <cerrno>
 using namespace std;
 
 ///// defaults
@@ -61,6 +62,7 @@ int runReceiver(const Params &p);
 SOCKET getListener(int port);
 SOCKET acceptConnection(SOCKET sock, sockaddr_in& remote);
 string getImageFilename(const Params &p, int runNum, int imgNum, const ExternalImageInfo &info);
+bool fileExist(const string &filename);
 ExternalImageInfo *readImageInfo(SOCKET sock);
 short *readImageData(SOCKET sock, const ExternalImageInfo &info);
 int saveImage(const Params &p, const ExternalImageInfo &info, short *data);
@@ -261,15 +263,13 @@ int saveImage(const Params &p, const ExternalImageInfo &info, short *data) {
   int imgNum = info.iAcquisitionNumber;
 
   // if this is first image, find the run number of already existing
+  bool found = true;
   if(imgNum == 1 && (p.onlyReadMoco || !info.bIsMoCo)) {
-    ifstream intest;
     do {
-      intest.close();
       runNum++;
       filename = getImageFilename(p,runNum,imgNum,info);
-      cout << filename << endl;
-      intest.open(filename.c_str());
-    } while(!intest.fail());
+      found = fileExist(filename);
+    } while(found);
   }
 
   // save the image
@@ -286,7 +286,12 @@ int saveImage(const Params &p, const ExternalImageInfo &info, short *data) {
 string getImageFilename(const Params &p, int runNum, int imgNum, const ExternalImageInfo &info) {
   stringstream name;
 
-  name << p.dir << "/" << p.filestem;
+  if(p.dir == "." || p.dir == "./") {
+    name << p.filestem;
+  }
+  else {
+    name << p.dir << "/" << p.filestem;
+  }
 
   if(info.bIsMoCo) {
     name << "_moco";
@@ -362,7 +367,7 @@ int closeSocket(SOCKET sock) {
     return 1;
   }
 
-  if(close(sock) == SOCKET_ERROR) {
+  if(CLOSE(sock) == SOCKET_ERROR) {
     return 1;
   }
 
@@ -439,4 +444,24 @@ Params parseArgs(int argc, char **argv) {
 void onTerminate(int param) {
   closeSocket(sock);
   exit(0);
+}
+
+// check if file exists on either windoze or posix
+bool fileExist(const string &filename) {
+  #ifdef WIN32 
+  {
+    DWORD fileattr;
+    
+    fileattr = GetFileAttributes(filename.c_str());
+    if(fileattr == 0xFFFFFFFF) {
+      return false;
+    }
+    return true;
+  } 
+  #else 
+  {
+    ifstream intest(filename);
+    return !intest.fail();
+  }
+  #endif
 }

@@ -34,7 +34,7 @@ else ifeq ($(TYPE),app)
 else ifeq ($(TYPE),widget)
 
   HDR_DIR=$(FSRC_DIR)/Widgets
-  HDR_FILES = FrBaseToolWidget.h FrBookmark.h FrBookmarkWidget.h FrBrowseFileWidget.h FrColormapWidget.h FrCreateRoiDialog.h FrDataStoreDialog.h FrDrawingPanelWidget.h FrEmptyToolWidget.h FrGraphBookmarkWidget.h FrGraphContextMenu.h FrGraphDialog.h FrGraphPaneWidget.h FrGraphSetWidget.h FrGraphWidget.h FrImageSettingsWidget.h FrLayerDialog.h FrLayerListWidget.h FrLayerToolWidget.h FrLayerWidget.h FrListToolWidget.h FrMainMenu.h FrPlayControlWidget.h FrQwtPlotWidget.h FrROIInfoWidget.h FrROIToolWidget.h FrSliderWidget.h FrSpinSliderWidget.h FrSpinToolWidget.h FrTabInfoDialog.h FrToolBar.h FrVoxelInfoWidget.h QVTKWidget.h 
+  HDR_FILES = FrBaseToolWidget.h FrBookmark.h FrBookmarkWidget.h FrBrowseFileWidget.h FrColormapWidget.h FrCreateRoiDialog.h FrDataStoreDialog.h FrDrawingPanelWidget.h FrEmptyToolWidget.h FrGraphBookmarkWidget.h FrGraphContextMenu.h FrGraphDialog.h FrGraphPaneWidget.h FrGraphSetWidget.h FrGraphListWidget.h FrGraphWidget.h FrImageSettingsWidget.h FrLayerDialog.h FrLayerListWidget.h FrLayerToolWidget.h FrLayerWidget.h FrListToolWidget.h FrMainMenu.h FrPlayControlWidget.h FrQwtPlotWidget.h FrROIInfoWidget.h FrROIToolWidget.h FrSliderWidget.h FrSpinSliderWidget.h FrSpinToolWidget.h FrTabInfoDialog.h FrToolBar.h FrVoxelInfoWidget.h QVTKWidget.h 
 
 endif
 

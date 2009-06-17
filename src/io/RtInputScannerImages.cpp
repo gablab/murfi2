@@ -81,7 +81,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
 
   // build the address
   ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
-
+  
   if(acceptor.open(address,1) == -1) {
     cerr << "failed to open acceptor for scanner images on port "
 	 << port << endl;
@@ -237,12 +237,18 @@ int RtInputScannerImages::svc() {
     ei->iAcquisitionNumber = std::max(ei->iAcquisitionNumber-num2Discard,
 				      (unsigned int) 1);
 
+    if(verbose) {
+      cout << "image info recived" << endl;
+    }
     // DEBUGGING
     //ei->displayImageInfo();
     //ei->iAcquisitionNumber = imageNum++;
 
     // get the image
     img = receiveImage(stream, *ei);
+    if(verbose) {
+      cout << "image recived" << endl;
+    }
 
     // close the stream (scanner connects anew for each image)
     stream.close();
@@ -380,16 +386,19 @@ int RtInputScannerImages::svc() {
 //  out
 //   image info struct on successful read (NULL otherwise)
 RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &stream) {
-  unsigned int rec;
+  int rec, rec_delta;
 
   //static int acnum = 1;
   //acnum++;
 
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
-  for(rec = 0; rec < EXTERNALSENDERSIZEOF;
-      rec += stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF-rec));
-  //rec = stream.recv_n (buffer, EXTERNALSENDERSIZEOF);
+  for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
+      rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
+      rec += rec_delta; 
+      if(rec_delta <= 0) break;
+  }
+  //rec += stream.recv_n(buffer, EXTERNALSENDERSIZEOF);
 
   // arbitrary limit
   if(rec < 100) {

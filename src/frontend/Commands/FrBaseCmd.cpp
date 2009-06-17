@@ -6,6 +6,7 @@
 #include "FrNotify.h"
 #include "FrViewDocObj.h"
 
+#include "FrMarshalling.h"
 
 void FrBaseCmd::UpdatePipelineForID(unsigned long id, int point){
 

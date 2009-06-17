@@ -27,7 +27,7 @@ class QModelIndex;
 class FrLayerListWidget: public QWidget {
 	Q_OBJECT
 public:
-	FrLayerListWidget(QWidget *parent = 0, FrMainDocument* doc = 0);
+    FrLayerListWidget(QWidget *parent = 0, FrMainDocument* doc = 0);
 
     // Common actions
     void Update();
@@ -56,12 +56,13 @@ public:
 
     FrSetPropMacro(FrMainDocument*, Document);
 
+    void OnUpdate();
+
 signals:
     void NewLayer();
     void DeleteLayer();
     void ChangeLayer();
     void LayerSelected(unsigned long id);
-    void UpdateSignal();
     void ChangeLayerPosition(int inc);
 
     // Emmited when Name, Visibility 
@@ -92,7 +93,6 @@ private Q_SLOTS:
 
     // Utility methods
     void UpdateCurrentLayerParams();
-    void OnUpdate();
 
 private:
     QTableWidget*   m_layerTable;

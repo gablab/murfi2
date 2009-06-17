@@ -52,11 +52,14 @@ public:
     // GUI elements
     FrGetPropMacro(QVTKWidget*, QVTKWidget);
     FrGetPropMacro(FrBookmarkWidget*, BookmarkWidget);
-	FrGetPropMacro(FrLayerListWidget*, LayerListWidget);
-	FrGetPropMacro(FrVoxelInfoWidget*, VoxelInfoWidget);
-	FrGetPropMacro(FrROIInfoWidget*, ROIInfoWidget);
-	FrGetPropMacro(FrGraphSetWidget*, GraphSetWidget);
+    FrGetPropMacro(FrLayerListWidget*, LayerListWidget);
+    FrGetPropMacro(FrVoxelInfoWidget*, VoxelInfoWidget);
+    FrGetPropMacro(FrROIInfoWidget*, ROIInfoWidget);
+    FrGetPropMacro(FrGraphSetWidget*, GraphSetWidget);
     FrGetPropMacro(FrImageSettingsWidget*, ImageSettingsWidget);
+
+protected:
+    bool event(QEvent *event);
 
     // Some others
 private: friend class FrActionSignalManager;

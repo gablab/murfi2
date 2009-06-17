@@ -305,10 +305,13 @@ void FrQwtPlotWidget::SetNumberOfTimePoints(int num){
 }
 
 int FrQwtPlotWidget::GetMaxTimePoint(){
-
+#if QWT_VERSION < 0x050200
     double result = this->axisScaleDiv(
         QwtPlot::xBottom)->hBound();
-
+#else
+    double result = this->axisScaleDiv(
+	QwtPlot::xBottom)->upperBound();
+#endif
     return int(result);
 }
 

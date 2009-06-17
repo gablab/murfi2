@@ -29,10 +29,10 @@ export BIN_DIR = $(PWD)/bin
 export OBJ_DIR = $(PWD)/obj
 
 # whether to compile with debug, optimize flags
-DEBUG = 0
+DEBUG = 1
 PROF = 0
-OPTIM = 1
-STRIP = 1
+OPTIM = 0
+STRIP = 0
 BLANK := 
 
 # for memory leak tracing
@@ -187,21 +187,22 @@ endif
 
 # vtk
 VTK_INC = $(VTK_HOME)/include/vtk
-VTK_LIB = -L$(VTK_HOME)/lib/vtk \
-	-lvtkCommon \
-	-lvtkIO \
-	-lvtkFiltering \
-	-lvtkftgl \
-	-lvtkGraphics \
-	-lvtkImaging \
-	-lvtkRendering \
-	-lvtksys \
-	-lvtkDICOMParser \
-	-lvtkNetCDF \
-	-lvtkWidgets \
-	-lvtkHybrid \
-	-lvtkexoIIc \
-	-lQVTK \
+VTK_LIB = -lglut -L$(VTK_HOME)/lib/vtk \
+	-lvtkGraphics -lvtkRendering -lvtkftgl -lvtkImaging -lvtkFiltering -lvtkCommon
+#scopic Alex: the order is important for me because of I use VTK as static libs
+#	-lvtkCommon \
+#	-lvtkIO \
+#	-lvtkftgl \
+#	-lvtkGraphics \
+#	-lvtkImaging \
+#	-lvtkRendering \
+#	-lvtksys \
+#	-lvtkDICOMParser \
+#	-lvtkNetCDF \
+#	-lvtkWidgets \
+#	-lvtkHybrid \
+#	-lvtkexoIIc \
+#	-lQVTK \
 #	-lvtkverdict \
 #	-lvtkfreetype \
 #	-lvtksqlite \
@@ -222,7 +223,7 @@ QT_INC = \
 	-I$(QT_HOME)/include/qt4/QtCore \
 	-I$(QT_HOME)/include/qt4/QtGui \
 
-QT_LIB = -lqwt-qt4 -lQtCore -lQtGui -lQtXml
+QT_LIB = -lQtCore -lQtGui -lQtXml -lqwt-qt4
 
 
 # build compiler flags
@@ -279,10 +280,10 @@ ifeq ($(FRONTEND),1)
 
 	FRONT_INC_SUB_DIRS += $(FRONT_SUB_DIRS:%=-I$(FRONT_DIR)/%)
 
-	FRONT_INC = $(FRONT_INC_SUB_DIRS) -I/$(VTK_INC) $(QT_INC)
+	FRONT_INC = $(FRONT_INC_SUB_DIRS) -I/usr/include -I/$(VTK_INC) $(QT_INC)
 
 	C_INC += $(FRONT_INC) $(FRONT_FLAG)
-	C_LIB += $(VTK_LIB) $(QT_LIB)
+	C_LIB += $(QT_LIB) $(VTK_LIB)
 endif
 
 LDFLAGS = $(PROF_FLAG) $(C_LIB)

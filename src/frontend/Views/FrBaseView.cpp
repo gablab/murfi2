@@ -5,9 +5,9 @@
 #include "FrSettings.h"
 #include "QVTKWidget.h"
 
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkgl.h" // ohinds: 2009-02-01, added 
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkgl.h> // ohinds: 2009-02-01, added 
 
 FrBaseView::FrBaseView(FrMainWindow* mainWindow){
     m_MainWindow = mainWindow;    
@@ -66,15 +66,15 @@ void FrBaseView::GetRoiIDs(FrMainDocument* document, std::vector<unsigned long>&
 //    return false;
 //}
 
-#include "vtkToolkits.h"
-#include "vtkOpenGL.h"
+#include <vtkToolkits.h>
+#include <vtkOpenGL.h>
 
 #if defined Q_WS_X11
-#if defined(VTK_USE_OPENGL_LIBRARY) || (!defined(QVTK_HAVE_VTK_4_5) && defined(OPENGL_LIBRARY))
-#include "vtkXOpenGLRenderWindow.h"
+#if defined(VTK_USE_OPENGL_LIBRARY) || defined(OPENGL_LIBRARY)
+#include <vtkXOpenGLRenderWindow.h>
 #endif
 #ifdef VTK_USE_MANGLED_MESA
-#include "vtkXMesaRenderWindow.h"
+#include <vtkXMesaRenderWindow.h>
 #endif
 #endif
 

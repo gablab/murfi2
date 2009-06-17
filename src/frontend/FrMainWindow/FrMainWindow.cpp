@@ -16,6 +16,8 @@
 #include "FrActionSignalManager.h"
 #include "FrGraphSetWidget.h"
 #include "FrImageSettingsWidget.h"
+#include "FrMarshalling.h"
+#include "FrApplication.h"
 
 #include "Qt/qgroupbox.h"
 #include "Qt/qboxlayout.h"
@@ -37,9 +39,12 @@ FrMainWindow::FrMainWindow()
 
     // Initialize signals
     m_SignalManager = new FrActionSignalManager(this);
+    FrApplication::MainWindow = const_cast<FrMainWindow*>(this);
 }
 
 FrMainWindow::~FrMainWindow(){
+    FrApplication::MainWindow = NULL;
+
     if(m_SignalManager) delete m_SignalManager;
     if(m_ActionManager) delete m_ActionManager;
     if(m_SliceView) delete m_SliceView;
@@ -221,3 +226,15 @@ void FrMainWindow::OnLayerSelected(unsigned long id){
 void FrMainWindow::DisconnectActions(){
     m_SignalManager->Deinitialize();
 }
+
+bool FrMainWindow::event(QEvent *event)
+{
+    if (event->type() == FrMarshallingEvent::EventType) 
+    {
+         FrMarshallingEvent* marshallingEvent = static_cast<FrMarshallingEvent*>(event);
+         marshallingEvent->Execute();
+         return true;
+    }
+    return QMainWindow::event(event);
+}
+

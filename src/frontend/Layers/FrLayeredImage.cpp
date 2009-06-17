@@ -123,6 +123,9 @@ void FrLayeredImage::SetTbcSettings(FrTbcSettings& settings, unsigned long id){
             case FrBaseLayer::LtImage:
                 ((FrImageLayer*)(*it))->SetTbcSettings(settings);
                 break;
+	    default:
+  		// NOTE: do nothing here
+		break;
             }
         }
     }
@@ -133,6 +136,9 @@ void FrLayeredImage::SetTbcSettings(FrTbcSettings& settings, unsigned long id){
                 case FrBaseLayer::LtImage:
                     ((FrImageLayer*)layer)->SetTbcSettings(settings);
                     break;
+		default:
+  		    // NOTE: do nothing here
+		    break;
             }
         }
     }

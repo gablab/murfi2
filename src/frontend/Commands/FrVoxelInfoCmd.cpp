@@ -289,7 +289,9 @@ bool FrVoxelInfoCmd::AddPoint(int* Index, vtkImageData* pImageData){
     FrLayerDocObj* layerDO = doc->GetLayerDocObjByID(viewDO->GetActiveLayerID());
 
     RtDataID id = layerDO->GetSettings()->DataID;
+
     int dimensions[3];
+    dimensions[0] = dimensions[1] = dimensions[2] = 0;
 
     std::vector<FrDocumentObj*>::iterator it, itEnd(images.end());
     for(it = images.begin(); it != itEnd; ++it){

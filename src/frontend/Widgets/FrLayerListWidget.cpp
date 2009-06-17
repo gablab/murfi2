@@ -9,6 +9,7 @@
 #include "FrLayerDocObj.h"
 #include "FrMainDocument.h"
 #include "FrViewDocObj.h"
+#include "FrMarshalling.h"
 
 #include "Qt/qtablewidget.h"
 #include "Qt/qboxlayout.h"
@@ -151,8 +152,6 @@ FrLayerListWidget::FrLayerListWidget(QWidget *parent, FrMainDocument* doc)
        
     connect( m_roiToolWidget, SIGNAL(CurrentToolChanged()), this, SLOT(OnRoiToolChanged()) );
     connect( m_roiToolWidget, SIGNAL(ClearCurrentRoiAction()), this, SLOT(OnClearCurrentRoiAction()) );
-
-    connect(this, SIGNAL(UpdateSignal()), this, SLOT(OnUpdate()));
 
     this->setMinimumHeight(this->sizeHint().height());
     this->setFixedWidth(this->sizeHint().width());
@@ -427,7 +426,11 @@ int FrLayerListWidget::GetOpacity(){
 
 // HACK: signal will be emited to main thread
 void FrLayerListWidget::Update(){
-    emit UpdateSignal();
+    // We have to create update event and marshal it to main thread 
+    // to prevent cross thread interaction in Qt (this may freeze app)
+    FrLayerListWidget* llw = const_cast<FrLayerListWidget*>(this);
+    FrLLWMarshalingEvent* event = new FrLLWMarshalingEvent(llw);
+    MarshalToMainThread(event);
 }
 
 // Update info displayed by widget

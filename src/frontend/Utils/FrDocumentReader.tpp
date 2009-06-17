@@ -30,7 +30,7 @@ T* FrDocumentReader::GetSliceDataYZ(RtDataImage<T>* img, int slice){
         result = new T[dataSize];
         T* dstPtr = result;
         T* srcPtr = img->data + m_Slice;
-        
+
         int stride = img->getDim(0);
         for(int i=0; i < dataSize; ++i){
             // copy vertical line from each slice

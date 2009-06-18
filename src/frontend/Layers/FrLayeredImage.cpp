@@ -236,12 +236,6 @@ bool FrLayeredImage::AddLayer(unsigned long id, LayerType type){
             layer = FrRoiLayer::New();
             break;
         case FrLayeredImage::Image:
-	  // ohinds: 2009-02-23
-	  // i dont understand this
-//            // HACK: just assign ID and return
-//            m_ImageLayer->SetID(id);
-//            return true;
-//            break;
 //        case FrLayeredImage::Colormap:
 	  layer = FrImageLayer::New();
             break;
@@ -255,7 +249,7 @@ bool FrLayeredImage::AddLayer(unsigned long id, LayerType type){
         FrCameraSettings cs;
         m_SpecialLayer->GetCameraSettings(cs);
         layer->SetCameraSettings(cs);
-        
+
         vtkRenderer* ren = m_SpecialLayer->GetRenderer();
         layer->GetRenderer()->SetViewport(ren->GetViewport());
 

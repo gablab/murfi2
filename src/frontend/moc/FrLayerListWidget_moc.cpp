@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'FrLayerListWidget.h'
 **
-** Created: Thu Jun 11 11:09:37 2009
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.0)
+** Created: Wed Jun 17 23:04:42 2009
+**      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -10,8 +10,8 @@
 #include "../Widgets/FrLayerListWidget.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'FrLayerListWidget.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.4.0. It"
+#elif Q_MOC_OUTPUT_REVISION != 61
+#error "This file was generated using the moc from 4.5.0. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -20,39 +20,38 @@ QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_FrLayerListWidget[] = {
 
  // content:
-       1,       // revision
+       2,       // revision
        0,       // classname
        0,    0, // classinfo
-      23,   10, // methods
+      21,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
+       0,    0, // constructors
 
  // signals: signature, parameters, type, tag, flags
       19,   18,   18,   18, 0x05,
       30,   18,   18,   18, 0x05,
       44,   18,   18,   18, 0x05,
       61,   58,   18,   18, 0x05,
-      82,   18,   18,   18, 0x05,
-     101,   97,   18,   18, 0x05,
-     126,   18,   18,   18, 0x05,
-     146,   18,   18,   18, 0x05,
-     168,   18,   18,   18, 0x05,
-     185,   18,   18,   18, 0x05,
+      86,   82,   18,   18, 0x05,
+     111,   18,   18,   18, 0x05,
+     131,   18,   18,   18, 0x05,
+     153,   18,   18,   18, 0x05,
+     170,   18,   18,   18, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-     211,  203,   18,   18, 0x08,
+     196,  188,   18,   18, 0x08,
+     219,   18,   18,   18, 0x08,
      234,   18,   18,   18, 0x08,
-     249,   18,   18,   18, 0x08,
-     267,   18,   18,   18, 0x08,
-     285,   18,   18,   18, 0x08,
-     304,   18,   18,   18, 0x08,
-     325,   58,   18,   18, 0x08,
-     358,  352,   18,   18, 0x08,
-     380,   18,   18,   18, 0x08,
-     406,   18,   18,   18, 0x08,
-     425,   18,   18,   18, 0x08,
-     451,   18,   18,   18, 0x08,
-     478,   18,   18,   18, 0x08,
+     252,   18,   18,   18, 0x08,
+     270,   18,   18,   18, 0x08,
+     289,   18,   18,   18, 0x08,
+     310,   58,   18,   18, 0x08,
+     343,  337,   18,   18, 0x08,
+     365,   18,   18,   18, 0x08,
+     391,   18,   18,   18, 0x08,
+     410,   18,   18,   18, 0x08,
+     436,   18,   18,   18, 0x08,
 
        0        // eod
 };
@@ -60,18 +59,17 @@ static const uint qt_meta_data_FrLayerListWidget[] = {
 static const char qt_meta_stringdata_FrLayerListWidget[] = {
     "FrLayerListWidget\0\0NewLayer()\0"
     "DeleteLayer()\0ChangeLayer()\0id\0"
-    "LayerSelected(ulong)\0UpdateSignal()\0"
-    "inc\0ChangeLayerPosition(int)\0"
-    "ChangeLayerParams()\0ChangeLayerColormap()\0"
-    "RoiToolChanged()\0ClearCurrentRoi()\0"
-    "row,col\0OnCellClicked(int,int)\0"
-    "OnAddClicked()\0OnDeleteClicked()\0"
-    "OnChangeClicked()\0OnUpArrowClicked()\0"
-    "OnDownArrowClicked()\0OnVisibilityChanged(ulong)\0"
-    "value\0OnOpacityChanged(int)\0"
-    "OnColormapParamsChanged()\0OnRoiToolChanged()\0"
-    "OnClearCurrentRoiAction()\0"
-    "UpdateCurrentLayerParams()\0OnUpdate()\0"
+    "LayerSelected(ulong)\0inc\0"
+    "ChangeLayerPosition(int)\0ChangeLayerParams()\0"
+    "ChangeLayerColormap()\0RoiToolChanged()\0"
+    "ClearCurrentRoi()\0row,col\0"
+    "OnCellClicked(int,int)\0OnAddClicked()\0"
+    "OnDeleteClicked()\0OnChangeClicked()\0"
+    "OnUpArrowClicked()\0OnDownArrowClicked()\0"
+    "OnVisibilityChanged(ulong)\0value\0"
+    "OnOpacityChanged(int)\0OnColormapParamsChanged()\0"
+    "OnRoiToolChanged()\0OnClearCurrentRoiAction()\0"
+    "UpdateCurrentLayerParams()\0"
 };
 
 const QMetaObject FrLayerListWidget::staticMetaObject = {
@@ -88,7 +86,7 @@ void *FrLayerListWidget::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_FrLayerListWidget))
-	return static_cast<void*>(const_cast< FrLayerListWidget*>(this));
+        return static_cast<void*>(const_cast< FrLayerListWidget*>(this));
     return QWidget::qt_metacast(_clname);
 }
 
@@ -103,27 +101,26 @@ int FrLayerListWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 1: DeleteLayer(); break;
         case 2: ChangeLayer(); break;
         case 3: LayerSelected((*reinterpret_cast< ulong(*)>(_a[1]))); break;
-        case 4: UpdateSignal(); break;
-        case 5: ChangeLayerPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: ChangeLayerParams(); break;
-        case 7: ChangeLayerColormap(); break;
-        case 8: RoiToolChanged(); break;
-        case 9: ClearCurrentRoi(); break;
-        case 10: OnCellClicked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 11: OnAddClicked(); break;
-        case 12: OnDeleteClicked(); break;
-        case 13: OnChangeClicked(); break;
-        case 14: OnUpArrowClicked(); break;
-        case 15: OnDownArrowClicked(); break;
-        case 16: OnVisibilityChanged((*reinterpret_cast< ulong(*)>(_a[1]))); break;
-        case 17: OnOpacityChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 18: OnColormapParamsChanged(); break;
-        case 19: OnRoiToolChanged(); break;
-        case 20: OnClearCurrentRoiAction(); break;
-        case 21: UpdateCurrentLayerParams(); break;
-        case 22: OnUpdate(); break;
+        case 4: ChangeLayerPosition((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 5: ChangeLayerParams(); break;
+        case 6: ChangeLayerColormap(); break;
+        case 7: RoiToolChanged(); break;
+        case 8: ClearCurrentRoi(); break;
+        case 9: OnCellClicked((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 10: OnAddClicked(); break;
+        case 11: OnDeleteClicked(); break;
+        case 12: OnChangeClicked(); break;
+        case 13: OnUpArrowClicked(); break;
+        case 14: OnDownArrowClicked(); break;
+        case 15: OnVisibilityChanged((*reinterpret_cast< ulong(*)>(_a[1]))); break;
+        case 16: OnOpacityChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 17: OnColormapParamsChanged(); break;
+        case 18: OnRoiToolChanged(); break;
+        case 19: OnClearCurrentRoiAction(); break;
+        case 20: UpdateCurrentLayerParams(); break;
+        default: ;
         }
-        _id -= 23;
+        _id -= 21;
     }
     return _id;
 }
@@ -154,39 +151,33 @@ void FrLayerListWidget::LayerSelected(unsigned long _t1)
 }
 
 // SIGNAL 4
-void FrLayerListWidget::UpdateSignal()
-{
-    QMetaObject::activate(this, &staticMetaObject, 4, 0);
-}
-
-// SIGNAL 5
 void FrLayerListWidget::ChangeLayerPosition(int _t1)
 {
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 5, _a);
+    QMetaObject::activate(this, &staticMetaObject, 4, _a);
+}
+
+// SIGNAL 5
+void FrLayerListWidget::ChangeLayerParams()
+{
+    QMetaObject::activate(this, &staticMetaObject, 5, 0);
 }
 
 // SIGNAL 6
-void FrLayerListWidget::ChangeLayerParams()
+void FrLayerListWidget::ChangeLayerColormap()
 {
     QMetaObject::activate(this, &staticMetaObject, 6, 0);
 }
 
 // SIGNAL 7
-void FrLayerListWidget::ChangeLayerColormap()
+void FrLayerListWidget::RoiToolChanged()
 {
     QMetaObject::activate(this, &staticMetaObject, 7, 0);
 }
 
 // SIGNAL 8
-void FrLayerListWidget::RoiToolChanged()
-{
-    QMetaObject::activate(this, &staticMetaObject, 8, 0);
-}
-
-// SIGNAL 9
 void FrLayerListWidget::ClearCurrentRoi()
 {
-    QMetaObject::activate(this, &staticMetaObject, 9, 0);
+    QMetaObject::activate(this, &staticMetaObject, 8, 0);
 }
 QT_END_MOC_NAMESPACE

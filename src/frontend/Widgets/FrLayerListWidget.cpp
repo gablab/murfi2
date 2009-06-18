@@ -259,13 +259,13 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
     if(wgt){
         // Setup widgets
         unsigned long id = wgt->GetID();
-        
+
         // TODO: get layer DO with specified ID
         FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(id);
 
-	if(layerDO == NULL) {
-	  return;
-	}
+        if(layerDO == NULL) {
+            return;
+        }
 
         if(layerDO->IsRoi()){
             m_colormapWidget->setVisible(false);
@@ -276,7 +276,7 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
             // Not a ROI layer selected
             m_roiToolWidget->setVisible(false);
             m_colormapWidget->setVisible(true);
-            
+
             //if (id == DEF_LAYER_ID){
             if (layerDO->IsImage()){        
                 FrImageLayerSettings* cmlParams = (FrImageLayerSettings*)layerDO->GetSettings();
@@ -293,13 +293,13 @@ void FrLayerListWidget::OnCellClicked(int row, int col){
 
         // Update visibility
         bool visibility = layerDO->GetSettings()->Visibility;
-        
+
         bool old = m_signalsBlocked;
         m_signalsBlocked = true;
         m_opacityWidget->SetValue(opacity);
         //wgt->SetVisibility(visibility);
         m_signalsBlocked = old;
-        
+
         if(m_signalsBlocked) return;
         emit LayerSelected(id);
     }
@@ -377,7 +377,6 @@ void FrLayerListWidget::UpdateCurrentLayerParams(){
 
         unsigned long id = wgt->GetID();
         FrLayerDocObj* layerDO = m_Document->GetLayerDocObjByID(id);
-                
         layerDO->GetSettings()->Opacity = double(m_opacityWidget->GetValue()) / 
                          double(m_opacityWidget->GetMaximum());
 
@@ -424,13 +423,17 @@ int FrLayerListWidget::GetOpacity(){
     return m_opacityWidget->GetValue();    
 }
 
-// HACK: signal will be emited to main thread
 void FrLayerListWidget::Update(){
-    // We have to create update event and marshal it to main thread 
-    // to prevent cross thread interaction in Qt (this may freeze app)
-    FrLayerListWidget* llw = const_cast<FrLayerListWidget*>(this);
-    FrLLWMarshalingEvent* event = new FrLLWMarshalingEvent(llw);
-    MarshalToMainThread(event);
+    //// We have to create update event and marshal it to main thread 
+    //// to prevent cross thread interaction in Qt (this may freeze app)
+    //FrLayerListWidget* llw = const_cast<FrLayerListWidget*>(this);
+    //FrLLWMarshalingEvent* event = new FrLLWMarshalingEvent(llw);
+    //MarshalToMainThread(event);
+
+    // NOTE: seems no more cross thread problem after marshalling execution 
+    // from DataStore notifications ((should be tested more))...
+    // So call update directly...
+    this->OnUpdate();
 }
 
 // Update info displayed by widget

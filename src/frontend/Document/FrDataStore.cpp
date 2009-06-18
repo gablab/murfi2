@@ -7,6 +7,7 @@
 #include "FrPointsDocObj.h"
 #include "FrViewDocObj.h"
 #include "FrCommandController.h"
+#include "FrMarshalling.h"
 
 // Backend includes
 #include "RtDataID.h"
@@ -39,6 +40,21 @@ void FrDataStore::SetStore(RtDataStore *store){
 void FrDataStore::notify(const RtDataID &dataID){
     if(m_Store == 0) return;
 
+    // Data to data store may come from different thread context (i.e. from server)
+    // This cause problems(crashes) with rendering subsystem. 
+    // So we must marshall execution to main thread.
+    FrDataStoreNotifyMarshallingEvent* event = 
+        new FrDataStoreNotifyMarshallingEvent(
+            const_cast<FrDataStore*>(this), dataID);
+
+    if(!MarshalToMainThread(event)){
+        // Cannot marshall... Something went wrong maybe try to update directly????
+        // this->OnNotify(dataID);
+        cout << "Marshalling failed for " << dataID << endl;
+    }
+}
+
+void FrDataStore::OnNotify(const RtDataID &dataID){
     // For now support MRI and ROI
     if(dataID.getModuleID() == DEF_MRI_ID){
       RtMRIImage *img = dynamic_cast<RtMRIImage*>(m_Store->getData(dataID));
@@ -54,7 +70,7 @@ void FrDataStore::notify(const RtDataID &dataID){
       }
     }
     else {
-      cout << "FrDataStore::notify(): ignoring " << dataID << endl;
+      cout << "FrDataStore::notify(): ignoring for " << dataID << endl;
     }
 }
 
@@ -69,17 +85,17 @@ void FrDataStore::AddImageToDocument(RtData* data){
         // into existing Image Document Object
         std::vector<FrDocumentObj*> objects;
         m_Document->GetObjectsByType(objects, FrDocumentObj::ImageObject);
-        
+
         FrImageDocObj* imgDO = 0;
         std::vector<FrDocumentObj*>::iterator it, itEnd(objects.end());
         for(it = objects.begin(); it != itEnd; ++it) {
             FrImageDocObj* ido = (FrImageDocObj*)(*it);
 
-	        RtDataID imageDocDataID(ido->GetDataID());
+            RtDataID imageDocDataID(ido->GetDataID());
 
-	        // look for any timepoint (and maybe dataname)
-	        imageDocDataID.setTimePoint(DATAID_UNSET_VALUE); 
-	        imageDocDataID.setDataName("");
+            // look for any timepoint (and maybe dataname)
+            imageDocDataID.setTimePoint(DATAID_UNSET_VALUE); 
+            imageDocDataID.setDataName("");
 
             if(imageDocDataID == img->getDataID()){
                 // Found!
@@ -101,7 +117,7 @@ void FrDataStore::AddImageToDocument(RtData* data){
             m_Document->Add(imgLayer);
 
             imgDO = new FrImageDocObj();
-              
+
             // get view doc obj and set current timeseria
             //FrViewDocObj* viewDO = m_Document->GetCurrentViewObject();
 
@@ -114,7 +130,7 @@ void FrDataStore::AddImageToDocument(RtData* data){
             pointsDO->GetDimsFromImg(img);
             m_Document->Add(pointsDO);
         }
-        
+
         //// test
         //// Remove points objects
         //m_Document->GetObjectsByType(objects, FrDocumentObj::PointsObject);

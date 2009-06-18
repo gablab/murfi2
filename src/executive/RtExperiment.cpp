@@ -348,7 +348,7 @@ bool parseArgs(int argc, char **args) {
 
 // scopic Alan: for MRI testers
 #ifdef MRI_TEST
-    confFilename = "test_config.xml";
+    confFilename = "./test_config.xml";
 #else
   // handle options
   for(int option; (option = cmdOpts ()) != EOF; ) {

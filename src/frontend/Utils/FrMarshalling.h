@@ -21,8 +21,7 @@ bool MarshalToMainThread(FrMarshallingEvent* event);
 // MarshallingEvent can help us here.
 // Event cannot be marshalled to main thread itself but
 // user have to use utility function: bool MarshallToMainThread(FrMarshallingEvent* event) 
-class FrMarshallingEvent : public QEvent 
-{
+class FrMarshallingEvent : public QEvent {
 public:
     // Event identifier
     static int EventType;
@@ -36,13 +35,25 @@ public:
 //
 // This class is used for layer list widget updating
 class FrLayerListWidget;
-class FrLLWMarshalingEvent : public FrMarshallingEvent
-{
+class FrLLWMarshalingEvent : public FrMarshallingEvent {
 public:
-    FrLLWMarshalingEvent(FrLayerListWidget* llw);
+    explicit FrLLWMarshalingEvent(FrLayerListWidget* llw);
     virtual void Execute();
 private:
     FrLayerListWidget* m_layerListWidget;
+};
+
+// this class is used to marshal DataStore notification
+class FrDataStore;
+#include "RtDataID.h"
+class FrDataStoreNotifyMarshallingEvent : public FrMarshallingEvent {
+public:
+    explicit FrDataStoreNotifyMarshallingEvent(FrDataStore* ds, const RtDataID &dataID);
+    virtual void Execute();
+
+private:
+    FrDataStore* m_dataStore;
+    RtDataID     m_dataID;
 };
 
 #endif

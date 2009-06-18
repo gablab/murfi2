@@ -39,7 +39,8 @@ public:
     virtual ~FrDataStore();
 
     // Overrides
-    virtual void notify(const RtDataID &data);
+    virtual void notify(const RtDataID &dataID);
+    void OnNotify(const RtDataID &dataID);
 
     // Properties
     FrGetPropMacro(RtDataStore*, Store);

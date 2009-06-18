@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'QVTKWidget.h'
 **
-** Created: Thu Jun 11 11:09:37 2009
-**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.0)
+** Created: Wed Jun 17 23:04:42 2009
+**      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -10,8 +10,8 @@
 #include "../Widgets/QVTKWidget.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'QVTKWidget.h' doesn't include <QObject>."
-#elif Q_MOC_OUTPUT_REVISION != 59
-#error "This file was generated using the moc from 4.4.0. It"
+#elif Q_MOC_OUTPUT_REVISION != 61
+#error "This file was generated using the moc from 4.5.0. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -20,12 +20,13 @@ QT_BEGIN_MOC_NAMESPACE
 static const uint qt_meta_data_QVTKWidget[] = {
 
  // content:
-       1,       // revision
+       2,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   10, // methods
-       2,   40, // properties
+       6,   12, // methods
+       2,   42, // properties
        0,    0, // enums/sets
+       0,    0, // constructors
 
  // signals: signature, parameters, type, tag, flags
       18,   12,   11,   11, 0x05,
@@ -67,7 +68,7 @@ void *QVTKWidget::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_QVTKWidget))
-	return static_cast<void*>(const_cast< QVTKWidget*>(this));
+        return static_cast<void*>(const_cast< QVTKWidget*>(this));
     return QWidget::qt_metacast(_clname);
 }
 
@@ -84,6 +85,7 @@ int QVTKWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 3: markCachedImageAsDirty(); break;
         case 4: saveImageToCache(); break;
         case 5: internalMacFixRect(); break;
+        default: ;
         }
         _id -= 6;
     }
@@ -140,12 +142,13 @@ void QVTKWidget::cachedImageClean()
 static const uint qt_meta_data_QVTKInteractor[] = {
 
  // content:
-       1,       // revision
+       2,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   10, // methods
+       1,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
+       0,    0, // constructors
 
  // slots: signature, parameters, type, tag, flags
       16,   15,   15,   15, 0x0a,
@@ -171,9 +174,9 @@ void *QVTKInteractor::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_QVTKInteractor))
-	return static_cast<void*>(const_cast< QVTKInteractor*>(this));
+        return static_cast<void*>(const_cast< QVTKInteractor*>(this));
     if (!strcmp(_clname, "vtkRenderWindowInteractor"))
-	return static_cast< vtkRenderWindowInteractor*>(const_cast< QVTKInteractor*>(this));
+        return static_cast< vtkRenderWindowInteractor*>(const_cast< QVTKInteractor*>(this));
     return QObject::qt_metacast(_clname);
 }
 
@@ -185,6 +188,7 @@ int QVTKInteractor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: TimerEvent(); break;
+        default: ;
         }
         _id -= 1;
     }

@@ -240,6 +240,12 @@ TiXmlElement *RtDataImage<T>::serializeAsXML() {
   return element;
 }
 
+// unserialize xml (dummy function)
+template<class T>
+void RtDataImage<T>::unserializeXML(TiXmlElement* element) {
+
+}
+
 // save the image to a file (already set filename)
 //  out
 //   success or failure

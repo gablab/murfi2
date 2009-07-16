@@ -85,6 +85,9 @@ ACE_HOME = /usr
 # boost
 BOOST_HOME = /usr
 
+# vxl
+VXL_HOME = /usr/local
+
 #********************* END SETTABLE FLAGS ***************************#
 
 
@@ -160,8 +163,8 @@ GSL_LIB=-lgsl -lgslcblas
 
 
 # computer vision
-VXL_INC=-I$(PKG_DIR)/include/vxl/core -I$(PKG_DIR)/include/vxl/vcl
-VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(PKG_DIR)/lib
+VXL_INC=-I$(VXL_HOME)/include/vxl/core -I$(VXL_HOME)/include/vxl/vcl
+VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(VXL_HOME)/vxl/lib
 
 # boost
 BOOST_INC=-I$(BOOST_HOME)/include/

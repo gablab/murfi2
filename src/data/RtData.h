@@ -24,55 +24,61 @@
 using namespace std;
 
 // class declaration
-class RtData {
 
+class RtData {
 public:
 
-  //*** constructors/destructors  ***//
-  
-  // default constructor
-  RtData();
+    //*** constructors/destructors  ***//
 
-  // destructor
-  virtual ~RtData();
+    // default constructor
+    RtData();
 
-  // gets and sets
+    // destructor
+    virtual ~RtData();
 
-  // gets the id string for this data
-  //  out
-  //   id string
-  RtDataID &getDataID();
+    // gets and sets
 
-  // gets the id string for this data without modification
-  //  out
-  //   id string
-  RtDataID getDataID() const;
+    // gets the id string for this data
+    //  out
+    //   id string
+    RtDataID &getDataID();
 
-  // set the id string
-  void setDataID(const RtDataID &id);
+    // gets the id string for this data without modification
+    //  out
+    //   id string
+    RtDataID getDataID() const;
 
-  // get the number of elements in this datatype
-  unsigned int getNumEl() const;
+    // set the id string
+    void setDataID(const RtDataID &id);
 
-  // get the underlying datatype this data stores
-  RtElementType getElementType() const { return elType; }
+    // get the number of elements in this datatype
+    unsigned int getNumEl() const;
 
-  // serialize the data as xml for transmission or saving to a file
-  virtual TiXmlElement *serializeAsXML() = 0;
+    // get the underlying datatype this data stores
 
-  // get the creation time
-  //ACE_Date_Time getCreationTime() const;
+    RtElementType getElementType() const {
+        return elType;
+    }
+
+    // serialize the data as xml for transmission or saving to a file
+    virtual TiXmlElement *serializeAsXML() = 0;
+
+    // unserialize the xml data
+    virtual void unserializeXML(TiXmlElement* element) = 0;
+
+    // get the creation time
+    //ACE_Date_Time getCreationTime() const;
 
 protected:
 
-  //*** data members  ***//
+    //*** data members  ***//
 
-  RtDataID dataID;
+    RtDataID dataID;
 
-  // number of distinct elements of data 
-  unsigned int numEl;
+    // number of distinct elements of data
+    unsigned int numEl;
 
-  RtElementType elType;
+    RtElementType elType;
 
 };
 

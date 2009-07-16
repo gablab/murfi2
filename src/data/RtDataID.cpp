@@ -11,13 +11,13 @@
 #include"RtStreamComponent.h"
 #include"RtData.h"
 #include"site_config.h" // for SITE_ID_NUMBER
-
 #include<climits>
 
 // default constructor
+
 RtDataID::RtDataID() {
     siteIDNum = SITE_ID_NUMBER;
-    studyNum =  DATAID_UNSET_VALUE;
+    studyNum = DATAID_UNSET_VALUE;
     seriesNum = DATAID_UNSET_VALUE;
     timePoint = DATAID_UNSET_VALUE;
     history = "";
@@ -29,6 +29,7 @@ RtDataID::RtDataID() {
 }
 
 // constructor with known fields
+
 RtDataID::RtDataID(unsigned int _studyNum,
                    unsigned int _seriesNum,
                    unsigned int _timePoint,
@@ -49,12 +50,14 @@ RtDataID::RtDataID(unsigned int _studyNum,
 }
 
 // copy constructor
+
 RtDataID::RtDataID(const RtDataID &other) {
-  copyFromOtherDataID(other);
+    copyFromOtherDataID(other);
 }
 
 
 // constructor from a data id from a previous module
+
 RtDataID::RtDataID(RtDataID &prevModuleData,
                    const RtStreamComponent &thisModule) {
     setFromInputDataID(prevModuleData, thisModule);
@@ -66,51 +69,54 @@ RtDataID::RtDataID(RtDataID &prevModuleData,
 //
 //}
 
-RtDataID::~RtDataID() {}
+RtDataID::~RtDataID() {
+}
 
 //*** operators ***//
 
 bool RtDataID::operator!=(const RtDataID &other) const {
-    return !(*this==other);
+    return !(*this == other);
 }
 // comparison
 // if either data id has a field blank ("") it is ignored in the comparison
+
 bool RtDataID::operator==(const RtDataID &other) const {
     return
-        (siteIDNum          == other.siteIDNum
-         || siteIDNum       == DATAID_UNSET_VALUE
-         || other.siteIDNum == DATAID_UNSET_VALUE)
+    (siteIDNum == other.siteIDNum
+            || siteIDNum == DATAID_UNSET_VALUE
+            || other.siteIDNum == DATAID_UNSET_VALUE)
 
-        && (studyNum           == other.studyNum
-            || studyNum        == DATAID_UNSET_VALUE
-            || other.studyNum  == DATAID_UNSET_VALUE)
+            && (studyNum == other.studyNum
+            || studyNum == DATAID_UNSET_VALUE
+            || other.studyNum == DATAID_UNSET_VALUE)
 
-        && (seriesNum          == other.seriesNum
-            || seriesNum       == DATAID_UNSET_VALUE
+            && (seriesNum == other.seriesNum
+            || seriesNum == DATAID_UNSET_VALUE
             || other.seriesNum == DATAID_UNSET_VALUE)
 
-        && (timePoint          == other.timePoint
-            || timePoint       == DATAID_UNSET_VALUE
+            && (timePoint == other.timePoint
+            || timePoint == DATAID_UNSET_VALUE
             || other.timePoint == DATAID_UNSET_VALUE)
 
-        && (history            == other.history
-            || history         == ""
-            || other.history   == "")
+            && (history == other.history
+            || history == ""
+            || other.history == "")
 
-        && (moduleID           == other.moduleID
-            || moduleID        == ""
-            || other.moduleID  == "")
+            && (moduleID == other.moduleID
+            || moduleID == ""
+            || other.moduleID == "")
 
-        && (dataName           == other.dataName
-            || dataName        == ""
-            || other.dataName  == "")
+            && (dataName == other.dataName
+            || dataName == ""
+            || other.dataName == "")
 
-        && (roiID              == other.roiID
-            || roiID           == ""
-            || other.roiID     == "");
+            && (roiID == other.roiID
+            || roiID == ""
+            || other.roiID == "");
 }
 
 // less
+
 bool RtDataID::operator<(const RtDataID &other) const {
     /* Logic:
      * if a != b, return whether or not it's a < b or a > b
@@ -240,51 +246,124 @@ bool RtDataID::partless(const RtDataID &other) const {
 // }
 
 // get a string version of the ID
+
 string RtDataID::toString() const {
     stringstream sstr("");
 
     sstr
-    << ":" << siteIDNum
-    << ":" << studyNum
-    << ":" << seriesNum
-    << ":" << timePoint
-    << ":" << history
-    << ":" << moduleID
-    << ":" << dataName
-    << ":" << roiID
-    << ":";
+            << ":" << siteIDNum
+            << ":" << studyNum
+            << ":" << seriesNum
+            << ":" << timePoint
+            << ":" << history
+            << ":" << moduleID
+            << ":" << dataName
+            << ":" << roiID
+            << ":";
     return sstr.str();
 }
 
 // set the ID from a string
-string RtDataID::setFromString(const string &id) {
-    return "not yet implemented";
+
+void RtDataID::setFromString(const string &id) {
+
+    string delim = ":";
+    size_t startAt;
+    size_t foundAt;
+
+    // find and set siteIDNum
+    startAt = 1; // data id string has a : at the beginning
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        unsigned int siteIDNum;
+        RtConfigVal::convert<unsigned int>(siteIDNum, id.substr(startAt, foundAt - startAt));
+        this->setSiteIDNum(siteIDNum);
+    }
+
+    // find and set studyNum
+    startAt = foundAt + 1;
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        unsigned int studyNum;
+        RtConfigVal::convert<unsigned int>(studyNum, id.substr(startAt, foundAt - startAt));
+        this->setStudyNum(studyNum);
+    }
+
+    // find and set seriesNum
+    startAt = foundAt + 1;
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        unsigned int seriesNum;
+        RtConfigVal::convert<unsigned int>(seriesNum, id.substr(startAt, foundAt - startAt));
+        this->setSeriesNum(seriesNum);
+    }
+
+    // find and set timePoint
+    startAt = foundAt + 1;
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        unsigned int timePoint;
+        RtConfigVal::convert<unsigned int>(timePoint, id.substr(startAt, foundAt - startAt));
+        this->setTimePoint(timePoint);
+    }
+
+    // find and set history
+    startAt = foundAt + 1;
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        this->setHistory(id.substr(startAt, foundAt - startAt));
+    }
+
+    // find and set moduleID
+    startAt = foundAt + 1;
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        this->setModuleID(id.substr(startAt, foundAt - startAt));
+    }
+
+    // find and set dataName
+    startAt = foundAt + 1;
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        this->setDataName(id.substr(startAt, foundAt - startAt));
+    }
+
+    // find and set roiID
+    startAt = foundAt + 1;
+    foundAt = id.find(delim, startAt);
+    if (foundAt != string::npos && startAt != foundAt) {
+        this->setRoiID(id.substr(startAt, foundAt - startAt));
+    }
 }
 
 // set from input data
+
 void RtDataID::setFromInputData(RtData &prevModuleData,
                                 const RtStreamComponent &thisModule) {
     setFromInputDataID(prevModuleData.getDataID(), thisModule);
 }
 
 // set from input data
+
 void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
                                   const RtStreamComponent &thisModule) {
-  copyFromOtherDataID(prevModuleDataID);
-  history = history + moduleID;
-  moduleID = thisModule.getID();
-  
-  instantiationTime = getExperimentElapsedTime();
+    copyFromOtherDataID(prevModuleDataID);
+    history = history + moduleID;
+    moduleID = thisModule.getID();
+
+    instantiationTime = getExperimentElapsedTime();
 }
 
 // copy from other data
+
 void RtDataID::copyFromOtherDataID(const RtDataID &otherDataID) {
     (*this) = otherDataID;
     siteIDNum = SITE_ID_NUMBER;
 }
 
 // output to stream
-ostream &operator<<(ostream &out, const RtDataID &id)  {
+
+ostream & operator<<(ostream &out, const RtDataID &id) {
     out << id.toString();
     return out;
 }

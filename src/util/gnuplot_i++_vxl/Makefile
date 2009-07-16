@@ -1,10 +1,11 @@
 PROJECT=gnuplot_i_vxl
 
-VXL_DIR=/usr/local/packages/vxl
+VXL_INC=/usr/local/include/vxl
+PKG_DIR=/usr/local/packages
 
 CFLAGS = -ggdb
 DEFINES = -DDEBUGGA
-INCLUDES = -I$(VXL_DIR)/include/vxl/core -I$(VXL_DIR)/include/vxl/vcl
+INCLUDES = -I$(VXL_INC)/core -I$(VXL_INC)/vcl
 LIBS = -lstdc++ -lvnl
 OBJ = gnuplot_i.o
 EXAMPLE = example.o gnuplot_i_vxl.o
@@ -14,7 +15,7 @@ MAJOR_VER=1
 MINOR_VER=0
 RELEASE_VER=0
 
-INSTALL_TARGET=/usr/local/packages/gnuplot_i_vxl
+INSTALL_TARGET=$(PKG_DIR)/gnuplot_i_vxl
 LIB_DIR=$(INSTALL_TARGET)/lib
 HDR_DIR=$(INSTALL_TARGET)/include
 
@@ -25,7 +26,8 @@ all::	shared
 
 $(PROJECT).o:	$(PROJECT).cpp $(PROJECT).h
 shared: $(PROJECT).o
-	$(CC)  -shared  -Wl,-soname,$(PROJECT).so.$(MAJOR_VER) $(PROJECT).o -o lib$(PROJECT).so.$(MAJOR_VER).$(MINOR_VER).$(RELEASE_VER) $(LIBS) 
+	$(CC)  -shared  -Wl,-soname,lib$(PROJECT).so.$(MAJOR_VER) $(PROJECT).o -o lib$(PROJECT).so.$(MAJOR_VER).$(MINOR_VER).$(RELEASE_VER) $(LIBS) 
+
 install: shared
 	cp $(PROJECT).h $(HDR_DIR)
 	cp lib$(PROJECT).so.$(MAJOR_VER).$(MINOR_VER).$(RELEASE_VER) $(LIB_DIR)

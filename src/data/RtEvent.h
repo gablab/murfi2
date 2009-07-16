@@ -15,33 +15,36 @@
 
 
 // class declaration
-class RtEvent : public RtData {
 
+class RtEvent : public RtData {
 public:
 
-  //*** constructors/destructors  ***//
+    //*** constructors/destructors  ***//
 
-  // default constructor
-  RtEvent();
+    // default constructor
+    RtEvent();
 
-  // construct from data
-  RtEvent(const RtData &dat);
+    // construct from data
+    RtEvent(const RtData &dat);
 
-  // destructor
-  virtual ~RtEvent();
+    // destructor
+    virtual ~RtEvent();
 
-  // serialize as xml (dummy function)
-  virtual TiXmlElement* serializeAsXML();
+    // serialize as xml (dummy function)
+    virtual TiXmlElement* serializeAsXML();
 
-  // set the tr for this event
-  void setTR(int _tr);
+    // unserialize the xml data
+    virtual void unserializeXML(TiXmlElement* element);
 
-  // get the tr for this event
-  int getTR() const;
+    // set the tr for this event
+    void setTR(int _tr);
+
+    // get the tr for this event
+    int getTR() const;
 
 protected:
 
-  int tr;
+    int tr;
 };
 
 #endif

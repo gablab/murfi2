@@ -12,55 +12,59 @@
 #include"tinyxml/tinyxml.h"
 
 static const unsigned int NUM_MOTION_DIMENSIONS = 6;
+
 typedef enum {
-  TRANSLATION_X = 0,
-  TRANSLATION_Y,
-  TRANSLATION_Z,
-  ROTATION_X,  
-  ROTATION_Y,  
-  ROTATION_Z  
-} MotionDimension; 
+    TRANSLATION_X = 0,
+    TRANSLATION_Y,
+    TRANSLATION_Z,
+    ROTATION_X,
+    ROTATION_Y,
+    ROTATION_Z
+} MotionDimension;
 typedef double Motion[NUM_MOTION_DIMENSIONS];
 
 // class declaration
-class RtMotion : public RtData {
 
+class RtMotion : public RtData {
 public:
 
-  //*** constructors/destructors  ***//
+    //*** constructors/destructors  ***//
 
-  // default constructor
-  RtMotion();
+    // default constructor
+    RtMotion();
 
-  // construct with motion
-  RtMotion(double tx, double ty, double tz, double rx, double ry, double rz);
+    // construct with motion
+    RtMotion(double tx, double ty, double tz, double rx, double ry, double rz);
 
-  // destructor
-  virtual ~RtMotion();
+    // destructor
+    virtual ~RtMotion();
 
-  // serialize as xml (dummy function)
-  virtual TiXmlElement* serializeAsXML();
+    // serialize as xml (dummy function)
+    virtual TiXmlElement* serializeAsXML();
 
-  // set the motion vector
-  void setMotion(Motion _motion);
+    // unserialize the xml data
+    virtual void unserializeXML(TiXmlElement* element);
 
-  // set the motion vector
-  void setMotion(double tx, double ty, double tz, 
-		 double rx, double ry, double rz);
+    // set the motion vector
+    void setMotion(Motion _motion);
 
-  // set a single motion dimension
-  void setMotionDimension(double m, MotionDimension d);
+    // set the motion vector
+    void setMotion(double tx, double ty, double tz,
+                   double rx, double ry, double rz);
 
-  // get the motion vector
-  double* const getMotion();
+    // set a single motion dimension
+    void setMotionDimension(double m, MotionDimension d);
 
-  // get a single motion dimension
-  double getMotionDimension(MotionDimension md);
+    // get the motion vector
+    double* const getMotion();
+
+    // get a single motion dimension
+    double getMotionDimension(MotionDimension md);
 
 private:
-  
-  // motion vector
-  Motion motion;
+
+    // motion vector
+    Motion motion;
 };
 
 #endif

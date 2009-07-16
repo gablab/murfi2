@@ -23,81 +23,84 @@ class RtMaskImage;
 using namespace std;
 
 // class declaration
-class RtActivation : public RtDataImage<double> {
 
+class RtActivation : public RtDataImage<double> {
 public:
 
-  // magic numbers for image types
-  const static unsigned int MAGIC_NUMBER = 0x5083;
+    // magic numbers for image types
+    const static unsigned int MAGIC_NUMBER = 0x5083;
 
-  //*** constructors/destructors  ***//
+    //*** constructors/destructors  ***//
 
-  // default constructor
-  RtActivation();
+    // default constructor
+    RtActivation();
 
-  // construct with info from an MRI image
-  RtActivation(RtMRIImage &img);
+    // construct with info from an MRI image
+    RtActivation(RtMRIImage &img);
 
-  // construct with a specified number of elements
-  RtActivation(unsigned int numElements);
+    // construct with a specified number of elements
+    RtActivation(unsigned int numElements);
 
-  // destructor
-  virtual ~RtActivation();
+    // destructor
+    virtual ~RtActivation();
 
-  // serialize the data as xml for transmission or saving to a file
-  virtual TiXmlElement *serializeAsXML();
+    // serialize the data as xml for transmission or saving to a file
+    virtual TiXmlElement *serializeAsXML();
 
-  // print info about this image
-  void printInfo(ostream &os);
+    // unserialize the xml data
+    virtual void unserializeXML(TiXmlElement* element);
 
-  // create a mask by thresholding the activation
-  // in:
-  //  sign of activation to take (POS,NEG,POSNEG)
-  // out:
-  //  binary mask image 
-  RtMaskImage *toMask(Sign direction);
+    // print info about this image
+    void printInfo(ostream &os);
 
-  //********  methods for getting data from the image *******//
+    // create a mask by thresholding the activation
+    // in:
+    //  sign of activation to take (POS,NEG,POSNEG)
+    // out:
+    //  binary mask image
+    RtMaskImage *toMask(Sign direction);
 
-  // get the threshold
-  double getThreshold() const;
+    //********  methods for getting data from the image *******//
 
-  // get the ceiling
-  double getCeiling() const;
+    // get the threshold
+    double getThreshold() const;
 
-  // get the scale inverted flag
-  bool getScaleIsInverted() const;
+    // get the ceiling
+    double getCeiling() const;
 
-  // get a smart contrast level
-  float getAutoContrast();
+    // get the scale inverted flag
+    bool getScaleIsInverted() const;
 
-  // get a smart brightness level
-  float getAutoBrightness();
+    // get a smart contrast level
+    float getAutoContrast();
 
-  //*** sets  ***//
+    // get a smart brightness level
+    float getAutoBrightness();
 
-  // sets the threshold
-  void setThreshold(double thresh);
+    //*** sets  ***//
 
-  // sets the ceiling
-  void setCeiling(double thresh);
+    // sets the threshold
+    void setThreshold(double thresh);
 
-  // set the scale inverted flag
-  void setScaleIsInverted(bool sii);
+    // sets the ceiling
+    void setCeiling(double thresh);
 
-  // set the info based on a generic data image info
-  void setInfo(RtMRIImage &_info);
+    // set the scale inverted flag
+    void setScaleIsInverted(bool sii);
 
-  // reallocate data array based on current number of pixels
-  void reallocateData();
+    // set the info based on a generic data image info
+    void setInfo(RtMRIImage &_info);
+
+    // reallocate data array based on current number of pixels
+    void reallocateData();
 
 protected:
 
-  // for display
-  double threshold;
-  double ceiling;
+    // for display
+    double threshold;
+    double ceiling;
 
-  bool scaleIsInverted; // true for data where near zero is active (two-tailed)
+    bool scaleIsInverted; // true for data where near zero is active (two-tailed)
 
 };
 

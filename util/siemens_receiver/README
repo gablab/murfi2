@@ -82,6 +82,11 @@ matlab.
    I have only experienced this behavior on linux, so if you find it
    happening on windows let me know.
 
+*) If the application is run once with the "-m 1" flag to only save
+   moco images and then again but this time saving all images (without
+   the flag) the application will fail to identify the files written
+   during th previous run and overwrite them.
+
 #######################################################################
 
 

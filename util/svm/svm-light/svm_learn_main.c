@@ -34,13 +34,15 @@ char docfile[200];           /* file with training examples */
 char modelfile[200];         /* file for resulting classifier */
 char restartfile[200];       /* file with initial alphas */
 
+#ifndef NO_SVM_MAIN
 void   read_input_parameters(int, char **, char *, char *, char *, long *, 
 			     LEARN_PARM *, KERNEL_PARM *);
+#endif
 void   wait_any_key();
 void   print_help();
 
 
-
+#ifndef NO_SVM_MAIN
 int main (int argc, char* argv[])
 {  
   DOC **docs;  /* training examples */
@@ -103,13 +105,22 @@ int main (int argc, char* argv[])
 
   return(0);
 }
-
 /*---------------------------------------------------------------------------*/
-
-void read_input_parameters(int argc,char *argv[],char *docfile,char *modelfile,
+void read_input_parameters(int argc,char *argv[],
+			   char *docfile,char *modelfile,
 			   char *restartfile,long *verbosity,
 			   LEARN_PARM *learn_parm,KERNEL_PARM *kernel_parm)
 {
+
+#else
+/*---------------------------------------------------------------------------*/
+void read_input_parameters(int argc,char *argv[],
+			   LEARN_PARM *learn_parm,KERNEL_PARM *kernel_parm)
+{
+  char docfile[1024], modelfile[1024], restartfile[1024];
+  long verb = 0;
+  //long *verbosity = &verb;
+#endif
   long i;
   char type[100];
   
@@ -118,7 +129,7 @@ void read_input_parameters(int argc,char *argv[],char *docfile,char *modelfile,
   strcpy (learn_parm->predfile, "trans_predictions");
   strcpy (learn_parm->alphafile, "");
   strcpy (restartfile, "");
-  (*verbosity)=1;
+  //(*verbosity)=3;
   learn_parm->biased_hyperplane=1;
   learn_parm->sharedslack=0;
   learn_parm->remove_inconsistent=0;
@@ -152,7 +163,7 @@ void read_input_parameters(int argc,char *argv[],char *docfile,char *modelfile,
       { 
       case '?': print_help(); exit(0);
       case 'z': i++; strcpy(type,argv[i]); break;
-      case 'v': i++; (*verbosity)=atol(argv[i]); break;
+      case 'v': i++; verbosity=atol(argv[i]); break;
       case 'b': i++; learn_parm->biased_hyperplane=atol(argv[i]); break;
       case 'i': i++; learn_parm->remove_inconsistent=atol(argv[i]); break;
       case 'f': i++; learn_parm->skip_final_opt_check=!atol(argv[i]); break;
@@ -183,6 +194,7 @@ void read_input_parameters(int argc,char *argv[],char *docfile,char *modelfile,
 	       exit(0);
       }
   }
+#ifndef NO_SVM_MAIN
   if(i>=argc) {
     printf("\nNot enough input parameters!\n\n");
     wait_any_key();
@@ -193,6 +205,7 @@ void read_input_parameters(int argc,char *argv[],char *docfile,char *modelfile,
   if((i+1)<argc) {
     strcpy (modelfile, argv[i+1]);
   }
+#endif
   if(learn_parm->svm_iter_to_shrink == -9999) {
     if(kernel_parm->kernel_type == LINEAR) 
       learn_parm->svm_iter_to_shrink=2;
@@ -297,8 +310,8 @@ void read_input_parameters(int argc,char *argv[],char *docfile,char *modelfile,
 
 void wait_any_key()
 {
-  printf("\n(more)\n");
-  (void)getc(stdin);
+//  printf("\n(more)\n");
+//  (void)getc(stdin);
 }
 
 void print_help()

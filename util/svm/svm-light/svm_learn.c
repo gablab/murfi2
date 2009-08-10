@@ -30,7 +30,7 @@ double *optimize_qp(QP *, double *, long, double *, LEARN_PARM *);
    docs/label. The resulting model is returned in the structure
    model. */
 
-void svm_learn_classification(DOC **docs, double *class, long int
+void svm_learn_classification(DOC **docs, double *classes, long int
 			      totdoc, long int totwords, 
 			      LEARN_PARM *learn_parm, 
 			      KERNEL_PARM *kernel_parm, 
@@ -144,18 +144,18 @@ void svm_learn_classification(DOC **docs, double *class, long int
     lin[i]=0;
     c[i]=0.0;
     unlabeled[i]=0;
-    if(class[i] == 0) {
+    if(classes[i] == 0) {
       unlabeled[i]=1;
       label[i]=0;
       transduction=1;
     }
-    if(class[i] > 0) {
+    if(classes[i] > 0) {
       learn_parm->svm_cost[i]=learn_parm->svm_c*learn_parm->svm_costratio*
 	docs[i]->costfactor;
       label[i]=1;
       trainpos++;
     }
-    else if(class[i] < 0) {
+    else if(classes[i] < 0) {
       learn_parm->svm_cost[i]=learn_parm->svm_c*docs[i]->costfactor;
       label[i]=-1;
       trainneg++;

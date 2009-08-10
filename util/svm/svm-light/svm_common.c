@@ -20,7 +20,7 @@
 # include "svm_common.h"
 # include "kernel.h"           /* this contains a user supplied kernel */
 
-long   verbosity;              /* verbosity level (0-4) */
+long   verbosity = 1;              /* verbosity level (0-4) */
 long   kernel_cache_statistic;
 
 double classify_example(MODEL *model, DOC *ex) 
@@ -470,9 +470,11 @@ double sprod_ns(double *vec_n, SVECTOR *vec_s)
   register double sum=0;
   register WORD *ai;
   ai=vec_s->words;
+  int num = 0;
   while (ai->wnum) {
     sum+=(vec_n[ai->wnum]*ai->weight);
     ai++;
+    num++;
   }
   return(sum);
 }
@@ -781,7 +783,7 @@ int parse_document(char *line, WORD *words, double *label,
     if((line[pos] == '#') && (!(*comment))) {
       line[pos]=0;
       (*comment)=&(line[pos+1]);
-    }
+     }
     if(line[pos] == '\n') { /* strip the CR */
       line[pos]=0;
     }

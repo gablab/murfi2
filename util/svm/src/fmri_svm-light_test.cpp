@@ -9,10 +9,14 @@
 
 #include<svm_common.h>
 
+#include<fstream>
 #include<iostream>
+#include<iomanip>
 #include<limits>
 
 using namespace std;
+
+static bool quiet = false;
 
 ///// parm reading /////
 extern char *optarg;
@@ -35,11 +39,11 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  cout << "reading in test data " << endl;
+  if(!quiet) cout << "reading in test data " << endl;
 
   // get the test data
   if(!createTestingData(parms)) {
-    cerr << "creating test data failed" << endl;
+    if(!quiet) cerr << "creating test data failed" << endl;
     return 0;
   }
 
@@ -50,11 +54,12 @@ int main(int argc, char **argv) {
 
   bool haveTruth = !parms.labelFile.empty();
 
+  // classify each label
   double *results = new double[parms.numExamples];
   int correct = 0, total = 0;
   for(int i = 0; i < parms.numExamples; i++) {
     results[i] = classify_example(&parms.model, parms.docs[i]);
-    cout << "example " << i << ": " << results[i] << endl;
+    if(!quiet) cout << "example " << i << ": " << results[i];
     if(haveTruth) {
       if(results[i] * parms.labels[i] > numeric_limits<double>::epsilon()) {
 	correct++;
@@ -62,12 +67,26 @@ int main(int argc, char **argv) {
       if(abs(parms.labels[i]) > numeric_limits<double>::epsilon()) {
 	total++;
       }
+      if(!quiet) cout << ": " << parms.labels[i];
     }
+    if(!quiet) cout << endl;
   }
 
+  // print performance
   if(haveTruth) {
-    cout << "percent correct: " << correct / total << " (" 
+    if(!quiet) cout << "percent correct: " 
+	 << setprecision(4) << 100 * correct / (double) total << "% (" 
 	 << correct << "/" << total << ")" << endl;
+  }
+
+  // save results
+  if(!parms.resultFile.empty()) {
+    ofstream res(parms.resultFile.c_str(), ios::out);
+    for(int i = 0; i < parms.numExamples; i++) {
+      res << results[i] << " ";
+    }
+    res << endl;
+    res.close();
   }
 
   delete [] results;
@@ -86,6 +105,7 @@ void printUsage(string executename) {
        << " -f fwhm: !!!!fwhm to use for spatial smoothing (default 6mm)" << endl
        << " -p bool: !!!!whether to perform % signal change conversion (default 1)" << endl
        << " -r name: save results filename" << endl
+       << " -q     : quiet (don't print anything)" << endl
        << " -?: print usage" << endl << endl
        << "EXAMPLE:" << endl
        << "fmri_svm-light_test -t fmri_test.nii -l fmri_design.tl \\" << endl
@@ -107,7 +127,7 @@ Parms parseArgs(int argc, char **argv) {
   bool done = false, crossVal = false;
   int ind = 1;
   for(; !done; ind+=2) {
-    opt = getopt_long (argc, argv, "-t:l:m:M:f:p:s:r:v?",
+    opt = getopt_long (argc, argv, "-t:l:m:M:f:p:s:r:q?",
 		       NULL, &option_index);
     if(opt == -1) {
       break;
@@ -151,6 +171,9 @@ Parms parseArgs(int argc, char **argv) {
       break;
     case 'r':
       p.resultFile = optarg;
+      break;
+    case 'q':
+      quiet = true;
       break;
     case '?':
       printUsage(argv[0]);

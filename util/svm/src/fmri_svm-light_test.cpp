@@ -101,9 +101,6 @@ void printUsage(string executename) {
        << " -l name: train data label text file (if known)" << endl
        << " -s name: svm training model file (required)" << endl
        << " -m name: !!!!mask file (default is to use model mask)" << endl
-       << " -M bool: !!!!whether to perform motion correction (default 1)" << endl
-       << " -f fwhm: !!!!fwhm to use for spatial smoothing (default 6mm)" << endl
-       << " -p bool: !!!!whether to perform % signal change conversion (default 1)" << endl
        << " -r name: save results filename" << endl
        << " -q     : quiet (don't print anything)" << endl
        << " -?: print usage" << endl << endl
@@ -127,7 +124,7 @@ Parms parseArgs(int argc, char **argv) {
   bool done = false, crossVal = false;
   int ind = 1;
   for(; !done; ind+=2) {
-    opt = getopt_long (argc, argv, "-t:l:m:M:f:p:s:r:q?",
+    opt = getopt_long (argc, argv, "-t:l:m:s:r:q?",
 		       NULL, &option_index);
     if(opt == -1) {
       break;
@@ -156,15 +153,6 @@ Parms parseArgs(int argc, char **argv) {
       break;
     case 'm':
       p.maskFile = optarg;
-      break;
-    case 'M':
-      p.correctMotion = representsTrue(optarg);
-      break;
-    case 'f':
-      p.smoothFWHM = atof(optarg);
-      break;
-    case 'p':
-      p.convertToPSC = representsTrue(optarg);
       break;
     case 's':
       p.modelFile = optarg;

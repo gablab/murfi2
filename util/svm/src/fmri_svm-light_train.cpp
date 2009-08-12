@@ -89,9 +89,6 @@ void printUsage(string executename) {
        << " -t name: train data nifti filename (required)" << endl
        << " -l name: train data label text file (required)" << endl
        << " -m name: mask file (required)" << endl
-       << " -M bool: whether to perform motion correction (default 1)" << endl
-       << " -f fwhm: fwhm to use for spatial smoothing (default 6mm)" << endl
-       << " -p bool: whether to perform % signal change conversion (default 1)" << endl
        << " -c     : do leave one out cross validation" << endl
        << " -s name: model save filename" << endl
        << " -w name: save weights filename" << endl
@@ -115,7 +112,7 @@ Parms parseArgs(int argc, char **argv) {
   bool done = false, crossVal = false;
   int ind = 1;
   for(; !done; ind+=2) {
-    opt = getopt_long (argc, argv, "-t:l:m:M:f:p:cs:w:v?",
+    opt = getopt_long (argc, argv, "-t:l:m:cs:w:v?",
 		       NULL, &option_index);
     if(opt == -1) {
       break;
@@ -144,15 +141,6 @@ Parms parseArgs(int argc, char **argv) {
       break;
     case 'm':
       p.maskFile = optarg;
-      break;
-    case 'M':
-      p.correctMotion = representsTrue(optarg);
-      break;
-    case 'f':
-      p.smoothFWHM = atof(optarg);
-      break;
-    case 'p':
-      p.convertToPSC = representsTrue(optarg);
       break;
     case 'c':
       crossVal = true;

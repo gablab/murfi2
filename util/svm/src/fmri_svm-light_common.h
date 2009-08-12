@@ -1,6 +1,5 @@
 // common functions used for svm training and cleassification on fmri
-// data using fsl for preprocessing and svm-light for
-// training/classification
+// data using svm-light for training/classification
 //
 // Oliver Hinds <ohinds@mit.edu> 2009-07-15
 
@@ -21,10 +20,6 @@ struct Parms {
 
   // preprocessing parms
   string maskFile;          // 3D nifti mask volume
-  bool   correctMotion;     // whether to correct head motion
-  double smoothFWHM;        // mm of linear dim of isotropic kernel
-  bool   convertToPSC;      // whether to convert timecourses to % signal change
-
 
   // examples
   string exampleFile;       // 4D nifti volume
@@ -49,9 +44,6 @@ struct Parms {
 
   // construct with default vals
   Parms():
-    correctMotion(true),
-    smoothFWHM(6.0),
-    convertToPSC(true),
     docs(NULL),
     labels(NULL),
     numExamples(0),

@@ -146,9 +146,6 @@ bool writeFmriModel(string filename, const Parms &p) {
 
   ms << "fmri_preprocessing_parms" << endl
      << "mask_file:   " << p.maskFile << endl
-     << "motion_cor:  " << p.correctMotion << endl
-     << "smooth_fwhm: " << p.smoothFWHM << endl
-     << "%sc_convert: " << p.convertToPSC << endl
      << "svm_parms "    << endl
      << "kernel_type: " << p.model.kernel_parm.kernel_type << endl
      << "poly_degree: " << p.model.kernel_parm.poly_degree << endl
@@ -174,8 +171,6 @@ bool writeFmriModel(string filename, const Parms &p) {
 
   // reopen in binary mode
   ms.open(filename.c_str(), ios::out | ios::binary | ios::app);
-
-  cout << "HERE" << endl;
 
   // support vecs
   double write_double;
@@ -211,15 +206,6 @@ bool readFmriModel(string filename, Parms &p) {
 
   ms >> trash;
   ms >> p.maskFile;
-
-  ms >> trash;
-  ms >> p.correctMotion;
-
-  ms >> trash;
-  ms >> p.smoothFWHM;
-
-  ms >> trash;
-  ms >> p.convertToPSC;
 
   // read svm parm header
   ms >> trash;

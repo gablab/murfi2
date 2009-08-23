@@ -30,8 +30,8 @@ RtStreamComponent::RtStreamComponent() : super(),
 					 makeCurrentData(false),
 					 inputModuleID(ID_SCANNERIMG),
 					 inputDataName(NAME_SCANNERIMG_EPI),
-					 inputRoiID(""),
-					 maskRoiID("") {
+					 inputRoiID(DATAID_STRING_WILDCARD_VALUE),
+					 maskRoiID(DATAID_STRING_WILDCARD_VALUE) {
   componentID = moduleString;
   
   // algorithm logging
@@ -230,8 +230,8 @@ void RtStreamComponent::addVectorOfOutputs(vector<RtOutput*> &outs) {
 // initialization for prepare to run
 
 RtMaskImage *RtStreamComponent::getMaskFromMessage(const RtStreamMessage &msg) {
-    if (maskRoiID.empty()) {
-        cerr << "WARNING: refusing to search for mask with empty roiid " << endl;
+    if (maskRoiID == DATAID_STRING_WILDCARD_VALUE) {
+        cerr << "WARNING: refusing to search for mask with wildcard roiid " << endl;
         return NULL;
     }
 

@@ -44,18 +44,23 @@ bool RtDataViewer::validateComponentConfig() {
 // process a single acquisition
 int RtDataViewer::process(ACE_Message_Block *mb) {
   ACE_TRACE(("RtDataViewer::process"));
-  cout << " HEREREERE" << endl;
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   // get the current time
   unsigned int time = msg->getCurrentData()->getDataID().getTimePoint();
 
+  // debug
+  //getDataStore().getAvailableData();
+
   RtDataID id;
   // find all data requested
   for(vector<string>::iterator i = dataIds.begin(); i != dataIds.end(); i++) {
     id.setFromString(*i);
-    id.setTimePoint(time);
+    
+    if(id.getTimePoint() != DATAID_NUM_UNSET_VALUE) {
+      id.setTimePoint(time);
+    }
 
     cout << "RtDataViewer::process: searching for " << id << " from " << *i << endl;
 

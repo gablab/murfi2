@@ -43,7 +43,11 @@ public:
   virtual void setData(RtData *data);
 
   // get data by id
-  virtual RtData *getData(const RtDataID &id);
+  // 
+  // NOTE: this function is much more efficient if the requested data is
+  // specified fully, i.e. there are no wildcards in the dataID (see
+  // RtDataID.h) avoid using wildcards if possible
+  virtual RtData *getData(RtDataID id);
 
   // get the version
   //  out: char array that represents the cvs version

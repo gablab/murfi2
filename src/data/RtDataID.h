@@ -10,13 +10,16 @@
 
 #include<ctime>
 #include<climits>
-#define DATAID_UNSET_VALUE UINT_MAX
-
 
 #include<iostream>
 #include<ostream>
 #include<string>
 using namespace std;
+
+const unsigned int DATAID_NUM_UNSET_VALUE = UINT_MAX;
+const unsigned int DATAID_NUM_WILDCARD_VALUE = UINT_MAX - 1;
+const string DATAID_STRING_UNSET_VALUE = "";
+const string DATAID_STRING_WILDCARD_VALUE = "*";
 
 class RtStreamComponent;
 class RtData;
@@ -29,12 +32,12 @@ public:
 
     // constructor from known fields
     RtDataID(unsigned int _studyNum,
-             unsigned int _seriesNum = DATAID_UNSET_VALUE,
-             unsigned int _timePoint = DATAID_UNSET_VALUE,
-             const string &_history = "",
-             const string &_moduleID = "",
-             const string &_dataName = "",
-             const string &_roiID = "");
+             unsigned int _seriesNum = DATAID_NUM_UNSET_VALUE,
+             unsigned int _timePoint = DATAID_NUM_UNSET_VALUE,
+             const string &_history  = DATAID_STRING_UNSET_VALUE,
+             const string &_moduleID = DATAID_STRING_UNSET_VALUE,
+             const string &_dataName = DATAID_STRING_UNSET_VALUE,
+             const string &_roiID    = DATAID_STRING_UNSET_VALUE);
 
     // constructor from a data id from a previous module
     RtDataID(RtDataID &prevModuleData,
@@ -71,6 +74,48 @@ public:
 
     // set the ID from a string
     void setFromString(const string &id);
+
+    // does this id have wildcards?
+    bool hasWildcards() const {
+      return 
+	siteIDNum == DATAID_NUM_WILDCARD_VALUE
+     || studyNum  == DATAID_NUM_WILDCARD_VALUE
+     || seriesNum == DATAID_NUM_WILDCARD_VALUE
+     || timePoint == DATAID_NUM_WILDCARD_VALUE
+     || history   == DATAID_STRING_WILDCARD_VALUE
+     || moduleID  == DATAID_STRING_WILDCARD_VALUE
+     || dataName  == DATAID_STRING_WILDCARD_VALUE
+     || roiID     == DATAID_STRING_WILDCARD_VALUE
+	     ;	
+    }
+
+    // eliminate wildcards by assigning empty non-wildcard values
+    void eliminateWildcards() {
+      if(siteIDNum == DATAID_NUM_WILDCARD_VALUE) {
+	siteIDNum = DATAID_NUM_UNSET_VALUE;
+      }
+      if(studyNum == DATAID_NUM_WILDCARD_VALUE) {
+	studyNum = DATAID_NUM_UNSET_VALUE;
+      }
+      if(seriesNum == DATAID_NUM_WILDCARD_VALUE) {
+	seriesNum = DATAID_NUM_UNSET_VALUE;
+      }
+      if(timePoint == DATAID_NUM_WILDCARD_VALUE) {
+	timePoint = DATAID_NUM_UNSET_VALUE;
+      }
+      if(history == DATAID_STRING_WILDCARD_VALUE) {
+	history = DATAID_STRING_UNSET_VALUE;
+      }
+      if(moduleID == DATAID_STRING_WILDCARD_VALUE) {
+	moduleID = DATAID_STRING_UNSET_VALUE;
+      }
+      if(dataName == DATAID_STRING_WILDCARD_VALUE) {
+	dataName = DATAID_STRING_UNSET_VALUE;
+      }
+      if(roiID == DATAID_STRING_WILDCARD_VALUE) {
+	roiID = DATAID_STRING_UNSET_VALUE;
+      }
+    }
 
     //*** gets ***//
 

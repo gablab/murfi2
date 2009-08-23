@@ -10,10 +10,8 @@
 #include "RtElementAccess.h"
 #include"RtDataIDs.h"
 #include"util/timer/timer.h"
+#include"util/logarithm.h"
 #include<cmath>
-
-// wow, i can't beleive i had to do this. why isn't log in a namespace??
-inline static double logarithm(double d) { return log(d); }
 
 string RtSmoothRoi::moduleString(ID_SMOOTHROI);
 
@@ -26,6 +24,22 @@ RtSmoothRoi::RtSmoothRoi() : RtStreamComponent() {
 
 // destructor
 RtSmoothRoi::~RtSmoothRoi() {}
+
+// process a configuration option
+//  in
+//   name of the option to process
+//   val  text of the option node
+bool RtSmoothRoi::processOption(const string &name, const string &text,
+			       const map<string,string> &attrMap) {
+
+  // look for known options
+  if(name == "fwhm") {
+    return RtConfigVal::convert<double>(fwhm, text);
+  }
+
+  return RtStreamComponent::processOption(name, text, attrMap);
+}
+
 
 // validate the configuration
 bool RtSmoothRoi::validateComponentConfig() {

@@ -104,6 +104,7 @@ int RtMaskGen::process(ACE_Message_Block *mb) {
   maskGen = new RtMaskImage(*img);
   maskGen->getDataID().setFromInputData(*img,*this);
 
+  maskGen->getDataID().setTimePoint(DATAID_NUM_UNSET_VALUE);
   maskGen->getDataID().setModuleID(ID_MASK);
   maskGen->getDataID().setDataName(NAME_MASK);
   maskGen->getDataID().setRoiID(roiID);

@@ -94,8 +94,8 @@ void FrDataStore::AddImageToDocument(RtData* data){
             RtDataID imageDocDataID(ido->GetDataID());
 
             // look for any timepoint (and maybe dataname)
-            imageDocDataID.setTimePoint(DATAID_UNSET_VALUE); 
-            imageDocDataID.setDataName("");
+            imageDocDataID.setTimePoint(DATAID_NUM_WILDCARD_VALUE); 
+            imageDocDataID.setDataName(DATAID_STRING_WILDCARD_VALUE);
 
             if(imageDocDataID == img->getDataID()){
                 // Found!

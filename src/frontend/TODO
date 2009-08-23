@@ -2,9 +2,16 @@
 #
 # Oliver Hinds <ohinds@mit.edu> 2009-02-23
 
-- layers have bad, bad distinction between roi and colormap and base layer. eliminate this.
+- seems like datastore can't handle lots of different image types
+  coming at once. things work ok when you are just looking for scanner
+  images, but when you run a pratical example with a config file that
+  does more processing the processed series come out crazy in the gui.
 
-- allow loading of images into a new layer.
+- very unstable when selecting data for display from the datastore or
+  via graph selection
 
-- configuration of backened
+- frame borders dont match frame size on startup
+
+- slice selection and roi tools seem to be half a volume off?
+
 

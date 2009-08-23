@@ -34,6 +34,9 @@ const string ID_MOSAIC = "mosaic";
 const string ID_UNMOSAIC = "unmosaic";
 // same names as scanner image
 
+const string ID_SMOOTH = "smooth";
+const string NAME_SMOOTH = "smooth-img";
+
 const string ID_SMOOTHROI = "smooth-roi";
 const string NAME_SMOOTHROI = "smooth-roi-img";
 
@@ -93,6 +96,9 @@ const string ID_EVENTTRIGGER_ACTIVATIONDIFF = "event-trigger-activation-diff";
 const string NAME_EVENTTRIGGER_SIGNAL = "signal";
 const string NAME_EVENTTRIGGER_BAD = "bad";
 const string NAME_EVENTTRIGGER_GOOD = "good";
+
+
+const string ID_DATAVIEWER = "dataviewer";
 
 #endif
 

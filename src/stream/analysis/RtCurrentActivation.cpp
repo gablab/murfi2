@@ -132,7 +132,17 @@ int RtCurrentActivation::process(ACE_Message_Block *mb) {
     // get design
     RtDataID tempDataID;
     tempDataID.setDataName(NAME_DESIGN); // TODO this may not work if there are more than one design matrix
+
+    // debug
+    getDataStore().getAvailableData();
+
     RtDesignMatrix *design = static_cast<RtDesignMatrix*> (getDataStore().getData(tempDataID));
+
+    if(design == NULL) {
+      cerr << "error: could not find design matrix in datastore!" << endl;
+      cerr << "searched for design matrix id: " << tempDataID << endl;
+      return 0;
+    }
 
     // allocate a new data image for the stats
     RtActivation *currentActivation = new RtActivation(*dat);

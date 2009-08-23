@@ -17,13 +17,13 @@
 
 RtDataID::RtDataID() {
     siteIDNum = SITE_ID_NUMBER;
-    studyNum = DATAID_UNSET_VALUE;
-    seriesNum = DATAID_UNSET_VALUE;
-    timePoint = DATAID_UNSET_VALUE;
-    history = "";
-    moduleID = "";
-    dataName = "";
-    roiID = "";
+    studyNum  = DATAID_NUM_UNSET_VALUE;
+    seriesNum = DATAID_NUM_UNSET_VALUE;
+    timePoint = DATAID_NUM_UNSET_VALUE;
+    history   = DATAID_STRING_UNSET_VALUE;
+    moduleID  = DATAID_STRING_UNSET_VALUE;
+    dataName  = DATAID_STRING_UNSET_VALUE;
+    roiID     = DATAID_STRING_UNSET_VALUE;
 
     instantiationTime = getExperimentElapsedTime();
 }
@@ -82,37 +82,38 @@ bool RtDataID::operator!=(const RtDataID &other) const {
 
 bool RtDataID::operator==(const RtDataID &other) const {
     return
-    (siteIDNum == other.siteIDNum
-            || siteIDNum == DATAID_UNSET_VALUE
-            || other.siteIDNum == DATAID_UNSET_VALUE)
+    (
+               siteIDNum       == other.siteIDNum
+            || siteIDNum       == DATAID_NUM_WILDCARD_VALUE
+            || other.siteIDNum == DATAID_NUM_WILDCARD_VALUE)
 
-            && (studyNum == other.studyNum
-            || studyNum == DATAID_UNSET_VALUE
-            || other.studyNum == DATAID_UNSET_VALUE)
+            && (studyNum       == other.studyNum
+            || studyNum        == DATAID_NUM_WILDCARD_VALUE
+            || other.studyNum  == DATAID_NUM_WILDCARD_VALUE)
 
-            && (seriesNum == other.seriesNum
-            || seriesNum == DATAID_UNSET_VALUE
-            || other.seriesNum == DATAID_UNSET_VALUE)
+            && (seriesNum      == other.seriesNum
+            || seriesNum       == DATAID_NUM_WILDCARD_VALUE
+            || other.seriesNum == DATAID_NUM_WILDCARD_VALUE)
 
-            && (timePoint == other.timePoint
-            || timePoint == DATAID_UNSET_VALUE
-            || other.timePoint == DATAID_UNSET_VALUE)
+            && (timePoint      == other.timePoint
+            || timePoint       == DATAID_NUM_WILDCARD_VALUE
+            || other.timePoint == DATAID_NUM_WILDCARD_VALUE)
 
-            && (history == other.history
-            || history == ""
-            || other.history == "")
+            && (history        == other.history
+            || history         == DATAID_STRING_WILDCARD_VALUE
+            || other.history   == DATAID_STRING_WILDCARD_VALUE)
 
-            && (moduleID == other.moduleID
-            || moduleID == ""
-            || other.moduleID == "")
+            && (moduleID       == other.moduleID
+            || moduleID        == DATAID_STRING_WILDCARD_VALUE
+            || other.moduleID  == DATAID_STRING_WILDCARD_VALUE)
 
-            && (dataName == other.dataName
-            || dataName == ""
-            || other.dataName == "")
+            && (dataName       == other.dataName
+            || dataName        == DATAID_STRING_WILDCARD_VALUE
+            || other.dataName  == DATAID_STRING_WILDCARD_VALUE)
 
-            && (roiID == other.roiID
-            || roiID == ""
-            || other.roiID == "");
+            && (roiID          == other.roiID
+            || roiID           == DATAID_STRING_WILDCARD_VALUE
+            || other.roiID     == DATAID_STRING_WILDCARD_VALUE);
 }
 
 // less
@@ -176,53 +177,56 @@ bool RtDataID::partless(const RtDataID &other) const {
 
     // siteIDNum
     if (siteIDNum != other.siteIDNum 
-	&& !(siteIDNum == DATAID_UNSET_VALUE
-	     || other.siteIDNum == DATAID_UNSET_VALUE)) {
+	&& !(siteIDNum == DATAID_NUM_WILDCARD_VALUE
+	     || other.siteIDNum == DATAID_NUM_WILDCARD_VALUE)) {
         return (siteIDNum < other.siteIDNum);
     };
 
     // studyNum
     if (studyNum != other.studyNum
-	&& !(studyNum == DATAID_UNSET_VALUE
-	     || other.studyNum == DATAID_UNSET_VALUE)) {
+	&& !(studyNum == DATAID_NUM_WILDCARD_VALUE
+	     || other.studyNum == DATAID_NUM_WILDCARD_VALUE)) {
         return (studyNum < other.studyNum);
     };
 
     // seriesNum
     if (seriesNum != other.seriesNum 
-	&& !(seriesNum == DATAID_UNSET_VALUE
-	     || other.seriesNum == DATAID_UNSET_VALUE)) {
+	&& !(seriesNum == DATAID_NUM_WILDCARD_VALUE
+	     || other.seriesNum == DATAID_NUM_WILDCARD_VALUE)) {
         return (seriesNum < other.seriesNum);
     };
 
     // timePoint
     if (timePoint != other.timePoint 
-	&& !(timePoint == DATAID_UNSET_VALUE
-	     || other.timePoint == DATAID_UNSET_VALUE)) {
+	&& !(timePoint == DATAID_NUM_WILDCARD_VALUE
+	     || other.timePoint == DATAID_NUM_WILDCARD_VALUE)) {
         return (timePoint < other.timePoint);
     };
 
     // history
     if (history != other.history 
-	&& !(history.empty() || other.history.empty())) {
+	&& !(history == DATAID_STRING_WILDCARD_VALUE 
+	     || other.history == DATAID_STRING_WILDCARD_VALUE)) {
         return (history < other.history);
     };
 
     // moduleID
     if (moduleID != other.moduleID 
-	&& !(moduleID.empty() || other.moduleID.empty())) {
+	&& !(moduleID == DATAID_STRING_WILDCARD_VALUE 
+	     || other.moduleID == DATAID_STRING_WILDCARD_VALUE)) {
         return (moduleID < other.moduleID);
     };
 
     // dataName
     if (dataName != other.dataName 
-	&& !(dataName.empty() || other.dataName.empty())) {
+	&& !(dataName == DATAID_STRING_WILDCARD_VALUE 
+	     || other.dataName == DATAID_STRING_WILDCARD_VALUE)) {
         return (dataName < other.dataName);
     };
 
     // roiID
     if (roiID != other.roiID 
-	&& !(roiID.empty() || other.roiID.empty())) {
+	&& !(roiID == DATAID_STRING_WILDCARD_VALUE || other.roiID == DATAID_STRING_WILDCARD_VALUE)) {
         return (roiID < other.roiID);
     };
 
@@ -274,37 +278,75 @@ void RtDataID::setFromString(const string &id) {
     // find and set siteIDNum
     startAt = 1; // data id string has a : at the beginning
     foundAt = id.find(delim, startAt);
+    bool fail;
     if (foundAt != string::npos && startAt != foundAt) {
+      if(id.substr(startAt, foundAt - startAt) == DATAID_STRING_WILDCARD_VALUE) {
+	this->setSiteIDNum(DATAID_NUM_WILDCARD_VALUE);
+	fail = false;
+      }
+      else {
         unsigned int siteIDNum;
-        RtConfigVal::convert<unsigned int>(siteIDNum, id.substr(startAt, foundAt - startAt));
+        fail = !RtConfigVal::convert<unsigned int>(siteIDNum, id.substr(startAt, foundAt - startAt));
         this->setSiteIDNum(siteIDNum);
+      }
+    } else { fail = true; }
+    if(fail) {
+      this->setSiteIDNum(DATAID_NUM_UNSET_VALUE);
     }
+    
 
     // find and set studyNum
     startAt = foundAt + 1;
     foundAt = id.find(delim, startAt);
     if (foundAt != string::npos && startAt != foundAt) {
+      if(id.substr(startAt, foundAt - startAt) == DATAID_STRING_WILDCARD_VALUE) {
+	this->setStudyNum(DATAID_NUM_WILDCARD_VALUE);
+	fail = false;
+      }
+      else {
         unsigned int studyNum;
-        RtConfigVal::convert<unsigned int>(studyNum, id.substr(startAt, foundAt - startAt));
+        fail = !RtConfigVal::convert<unsigned int>(studyNum, id.substr(startAt, foundAt - startAt));
         this->setStudyNum(studyNum);
+      }
+    } else { fail = true; }
+    if(fail) {
+      this->setStudyNum(DATAID_NUM_UNSET_VALUE);
     }
 
     // find and set seriesNum
     startAt = foundAt + 1;
     foundAt = id.find(delim, startAt);
     if (foundAt != string::npos && startAt != foundAt) {
+      if(id.substr(startAt, foundAt - startAt) == DATAID_STRING_WILDCARD_VALUE) {
+	this->setSeriesNum(DATAID_NUM_WILDCARD_VALUE);
+	fail = false;
+      }
+      else {
         unsigned int seriesNum;
-        RtConfigVal::convert<unsigned int>(seriesNum, id.substr(startAt, foundAt - startAt));
+        fail = !RtConfigVal::convert<unsigned int>(seriesNum, id.substr(startAt, foundAt - startAt));
         this->setSeriesNum(seriesNum);
+      }
+    } else { fail = true; }
+    if(fail) {
+      this->setSeriesNum(DATAID_NUM_UNSET_VALUE);
     }
 
     // find and set timePoint
     startAt = foundAt + 1;
     foundAt = id.find(delim, startAt);
     if (foundAt != string::npos && startAt != foundAt) {
+      if(id.substr(startAt, foundAt - startAt) == DATAID_STRING_WILDCARD_VALUE) {
+	this->setTimePoint(DATAID_NUM_WILDCARD_VALUE);
+	fail = false;
+      }
+      else {
         unsigned int timePoint;
-        RtConfigVal::convert<unsigned int>(timePoint, id.substr(startAt, foundAt - startAt));
+        fail = RtConfigVal::convert<unsigned int>(timePoint, id.substr(startAt, foundAt - startAt));
         this->setTimePoint(timePoint);
+      }
+    } else { fail = true; }
+    if(fail) {
+      this->setTimePoint(DATAID_NUM_UNSET_VALUE);
     }
 
     // find and set history
@@ -312,6 +354,10 @@ void RtDataID::setFromString(const string &id) {
     foundAt = id.find(delim, startAt);
     if (foundAt != string::npos && startAt != foundAt) {
         this->setHistory(id.substr(startAt, foundAt - startAt));
+	fail = false;
+    } else { fail = true; }
+    if(fail) {
+      this->setHistory(DATAID_STRING_UNSET_VALUE);
     }
 
     // find and set moduleID
@@ -319,6 +365,10 @@ void RtDataID::setFromString(const string &id) {
     foundAt = id.find(delim, startAt);
     if (foundAt != string::npos && startAt != foundAt) {
         this->setModuleID(id.substr(startAt, foundAt - startAt));
+	fail = false;
+    } else { fail = true; }
+    if(fail) {
+      this->setModuleID(DATAID_STRING_UNSET_VALUE);
     }
 
     // find and set dataName
@@ -326,6 +376,10 @@ void RtDataID::setFromString(const string &id) {
     foundAt = id.find(delim, startAt);
     if (foundAt != string::npos && startAt != foundAt) {
         this->setDataName(id.substr(startAt, foundAt - startAt));
+	fail = false;
+    } else { fail = true; }
+    if(fail) {
+      this->setDataName(DATAID_STRING_UNSET_VALUE);
     }
 
     // find and set roiID
@@ -333,6 +387,10 @@ void RtDataID::setFromString(const string &id) {
     foundAt = id.find(delim, startAt);
     if (foundAt != string::npos && startAt != foundAt) {
         this->setRoiID(id.substr(startAt, foundAt - startAt));
+	fail = false;
+    } else { fail = true; }
+    if(fail) {
+      this->setRoiID(DATAID_STRING_UNSET_VALUE);
     }
 }
 

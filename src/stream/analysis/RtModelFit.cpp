@@ -125,7 +125,7 @@ void RtModelFit::initEstimation(const RtData &dat, RtMaskImage *mask) {
 
     // store the data id as a template
     templateDataID = dat.getDataID();
-    templateDataID.setTimePoint(DATAID_UNSET_VALUE);
+    templateDataID.setTimePoint(DATAID_NUM_UNSET_VALUE);
     design.setTemplateDataID(templateDataID);
 
     needsInit = false;

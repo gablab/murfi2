@@ -77,6 +77,7 @@ bool RtStream::configure(RtConfig &config) {
 #include"RtEventTriggerSynth.h"
 #include"RtEventTriggerActivationSums.h"
 #include"RtEventTriggerActivationDiff.h"
+#include"RtDataViewer.h"
 
 // build a single module
 //  in
@@ -156,6 +157,9 @@ RtStreamComponent *RtStream::buildStreamComponent(const string &type,
     }
     else if (type == RtEventTriggerActivationDiff::moduleString) { // trigger diff
         ACE_NEW_NORETURN(sc, RtEventTriggerActivationDiff());
+    }
+    else if (type == RtDataViewer::moduleString) { // view activation
+        ACE_NEW_NORETURN(sc, RtDataViewer());
     }
     else {
         cerr << "unknown module type: " << type << endl;

@@ -1,13 +1,19 @@
 # bug list for frontend
 # 
-# Oliver Hinds <ohinds@mit.edu> 2009-02-23
+# Oliver Hinds <ohinds@mit.edu> 2009-06-14
 
-- crash when mouse clicked in view pane before image load
+-) voxel selection is displaced in the maniputation tool and roi tool
+(when it works). 
 
-- pixels change value on slice even if slice doesnt change when moving around crosshair
 
-- memory leak when putting new voxels as target for graph
+-) still get this when data streamed from the backend. error occurs just
+as first image comes from datastore.
 
-- roi tools are often one voxel off
+festr: Fatal IO error: client killed
+X Error: BadAccess (attempt to access private resource denied) 10
+  Extension:    128 (Uknown extension)
+  Minor opcode: 5 (Unknown request)
+  Resource id:  0x360001f
 
-- default zoom/pan/crosshair position are really bad
+
+

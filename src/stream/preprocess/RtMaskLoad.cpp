@@ -111,6 +111,7 @@ int RtMaskLoad::process(ACE_Message_Block *mb) {
   maskLoad = new RtMaskImage(*img);
   maskLoad->getDataID().setFromInputData(*img,*this);
 
+  maskLoad->getDataID().setTimePoint(DATAID_NUM_UNSET_VALUE);
   maskLoad->getDataID().setModuleID(ID_MASK);
   maskLoad->getDataID().setDataName(NAME_MASK);
   maskLoad->getDataID().setRoiID(roiID);

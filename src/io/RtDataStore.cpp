@@ -32,6 +32,12 @@ void RtDataStore::setData(RtData *data) {
   
   mut.acquire();
 
+  // don't allow wildcards on insertion
+  RtDataID insert = data->getDataID();
+  if(insert.hasWildcards()) {
+    insert.eliminateWildcards();
+  }
+
   // put data into datastore with its dataID as the key
   store[data->getDataID()] = data;
 
@@ -53,8 +59,10 @@ void RtDataStore::setData(RtData *data) {
 
 void RtDataStore::setAvailableData(RtDataID dataID) {
   
-  // remove timepoint
-  dataID.setTimePoint(DATAID_UNSET_VALUE);
+  // remove timepoint if one is set
+  if(dataID.getTimePoint() != DATAID_NUM_UNSET_VALUE) {
+    dataID.setTimePoint(DATAID_NUM_WILDCARD_VALUE);
+  }
   
   // put data id into available data (insert will only add a unique value)
   // TODO will a position iterator add any efficiency here?
@@ -62,8 +70,54 @@ void RtDataStore::setAvailableData(RtDataID dataID) {
   
 }
 
-// get data by id
-RtData *RtDataStore::getData(const RtDataID &dataID) {
+// get data by id 
+//
+// NOTE: this function is much more efficient if the requested data is
+// specified fully, i.e. there are no wildcards in the dataID (see RtDataID.h)
+// avoid using wildcards if possible
+RtData *RtDataStore::getData(RtDataID dataID) {
+
+  // fill in wildcards (search through available data makes this inefficient)
+  if(dataID.hasWildcards()) {
+    // find corresponding full id by an exhaustive search through available
+    // data
+    for(set<RtDataID>::const_iterator id = availableData.begin(); 
+	id != availableData.end(); id++) {
+      RtDataID avail = (*id);
+
+      // handle potential timepoint-less data
+      unsigned int tp = avail.getTimePoint();
+      if(dataID.getTimePoint() != DATAID_NUM_UNSET_VALUE) {
+	avail.setTimePoint(DATAID_NUM_WILDCARD_VALUE);
+      }
+      else {
+	avail.setTimePoint(DATAID_NUM_UNSET_VALUE);
+
+      }
+
+      
+      if(avail == dataID) { // == respects wildcards
+	// copy, preserving timepoint if not a timepointless datum
+	unsigned int origTp = dataID.getTimePoint();	
+	dataID = avail;
+
+	if(tp != DATAID_NUM_UNSET_VALUE) {
+	  dataID.setTimePoint(origTp);
+	}
+	else {
+	  dataID.setTimePoint(tp);
+	}
+
+
+	break;
+      }
+    }
+
+    if(dataID.hasWildcards()) {
+      cerr << "filling in wildcards failed. no match found." << endl;
+      return NULL;
+    }
+  }
   
   // iterator for map
   map<RtDataID,RtData*,RtDataIDCompare>::const_iterator it;
@@ -89,7 +143,7 @@ set<RtDataID>::const_iterator RtDataStore::getAvailableData() {
 //debug
 //  cout << "availableData contains:";
 //  for ( it=availableData.begin() ; it != availableData.end(); it++ )
-//    cout << " " << *it;
+//    cout << " " << *it << endl;
 //
 //  cout << endl;
 //endebug

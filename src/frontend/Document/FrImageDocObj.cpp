@@ -70,7 +70,7 @@ RtDataID FrImageDocObj::GetDataID() {
 
   if(!m_Images.empty()) {
     result = RtDataID(m_Images[0]->getDataID());
-    result.setTimePoint(DATAID_UNSET_VALUE);
+    result.setTimePoint(DATAID_NUM_WILDCARD_VALUE);
   }
 
   return result;

@@ -112,9 +112,9 @@ RtData *RtStreamMessage::getData(unsigned int index) const {
   return data[index];
 }
 
-// get a data portion by module id, data name, and roi id (returns
-// the first found instance). note that any of these can be "" to
-// match any string for that field
+// get a data portion by module id, data name, and roi id (returns the first
+// found instance). note that any of these can be
+// DATAID_STRING_WILDCARD_VALUE to match any string for that field
 //  in
 //   module id
 //   data name
@@ -124,8 +124,10 @@ RtData *RtStreamMessage::getData(unsigned int index) const {
 RtData *RtStreamMessage::getData(const string &moduleId,
 				 const string &dataName,
 				 const string &roiId) const {
-  RtDataID idTemplate(DATAID_UNSET_VALUE,DATAID_UNSET_VALUE,DATAID_UNSET_VALUE,
-		      "", moduleId, dataName, roiId);
+  RtDataID idTemplate(DATAID_NUM_WILDCARD_VALUE,DATAID_NUM_WILDCARD_VALUE,
+		      DATAID_NUM_WILDCARD_VALUE,
+		      DATAID_STRING_WILDCARD_VALUE,
+		      moduleId, dataName, roiId);
   return getData(idTemplate);
 }
 

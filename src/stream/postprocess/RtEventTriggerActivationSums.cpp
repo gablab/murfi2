@@ -35,6 +35,8 @@ bool RtEventTriggerActivationSums::processOption(const string &name,
 bool RtEventTriggerActivationSums::validateComponentConfig() {
   bool result = true;
 
+  posActivationSumModuleID;
+
   return result;
 }
 

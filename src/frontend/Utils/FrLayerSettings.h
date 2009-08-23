@@ -23,7 +23,7 @@ class FrLayerSettings {
 public:
   FrLayerSettings(const RtDataID &id, QString name){
     this->DataID = RtDataID(id);
-    this->DataID.setTimePoint(DATAID_UNSET_VALUE);
+    this->DataID.setTimePoint(DATAID_NUM_WILDCARD_VALUE);
       this->Name = name;
       this->Opacity = DEF_LAYER_OPACITY;
       this->Visibility = DEF_LAYER_VISIBILITY;

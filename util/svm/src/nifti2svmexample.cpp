@@ -18,7 +18,7 @@ static string outfile;
 static string maskfile;
 static string labelfile;
 static bool splitfiles = false;
-
+static bool deleteZero = false;
 
 ///// parm reading /////
 extern char *optarg;
@@ -37,6 +37,7 @@ void printUsage() {
        << " -m: mask file" << endl
        << " -l: label file" << endl
        << " -s: spilt into single example files" << endl
+       << " -d: delete 0 labeled examples" << endl
        << " -?: print usage" << endl
        << endl;
 }
@@ -49,7 +50,7 @@ bool parseArgs(int argc, char **argv) {
 
   // loop through input arguments
   while(1) {
-    opt = getopt_long (argc, argv, "i:o:m:l:sv?",
+    opt = getopt_long (argc, argv, "i:o:m:l:sdv?",
 		       NULL, &option_index);
     if(opt == -1) {
       break;
@@ -79,6 +80,9 @@ bool parseArgs(int argc, char **argv) {
       break;
     case 's':
       splitfiles = true;
+      break;
+    case 'd':
+      deleteZero = true;
       break;
     case '?':
       printUsage();
@@ -193,7 +197,7 @@ int main(int argc, char **argv) {
 
   for(int t = 0; t < nt; t++) {
     // look for labels to skip
-    if(labels[t] > 100) {
+    if(deleteZero && labels[t] == 0) {
       continue;
     }
 

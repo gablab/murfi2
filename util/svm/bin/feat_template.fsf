@@ -278,7 +278,7 @@ set fmri(confoundevs) 1
 set confoundev_files(1) "/tmp/confound.txt"
 
 # EV 1 title
-set fmri(evtitle1) ""
+set fmri(evtitle1) "title"
 
 # Basic waveform shape (EV 1)
 # 0 : Square
@@ -297,7 +297,7 @@ set fmri(shape1) 0
 # 4 : Gamma basis functions
 # 5 : Sine basis functions
 # 6 : FIR basis functions
-set fmri(convolve1) 2
+set fmri(convolve1) 3
 
 # Convolve phase (EV 1)
 set fmri(convolve_phase1) 0
@@ -309,13 +309,13 @@ set fmri(tempfilt_yn1) 1
 set fmri(deriv_yn1) 1
 
 # Skip (EV 1)
-set fmri(skip1) 0
+set fmri(skip1) 30
 
 # Off (EV 1)
-set fmri(off1) 30
+set fmri(off1) 16
 
 # On (EV 1)
-set fmri(on1) 30
+set fmri(on1) 16
 
 # Phase (EV 1)
 set fmri(phase1) 0

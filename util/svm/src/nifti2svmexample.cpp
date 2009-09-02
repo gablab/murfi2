@@ -132,12 +132,16 @@ int main(int argc, char **argv) {
   // validate type
   bool isshort = false;
   bool isfloat = false;
+  bool isdouble = false;
   switch(img->datatype) {
   case DT_SIGNED_SHORT:
     isshort = true;
     break;
   case DT_FLOAT:
     isfloat = true;
+    break;
+  case DT_DOUBLE:
+    isdouble = true;
     break;
   default:
     cout << "only int16 and float32 images are currently supported, sorry" << endl;
@@ -218,10 +222,13 @@ int main(int argc, char **argv) {
       }
 
       if(isshort) {
-	examplestr << v << ":" << ((short*) img->data)[t*nvox+v] << " ";
+	examplestr << v+1 << ":" << ((short*) img->data)[t*nvox+v] << " ";
+      }
+      else if(isfloat) {
+	examplestr << v+1 << ":" << ((float*) img->data)[t*nvox+v] << " ";
       }
       else {
-	examplestr << v << ":" << ((float*) img->data)[t*nvox+v] << " ";
+	examplestr << v+1 << ":" << ((double*) img->data)[t*nvox+v] << " ";
       }
     }
     examplestr << endl;

@@ -103,7 +103,7 @@ if [ "$skip_feat" == "0" ]; then
     set_feat_var "fmri(tr)" $tr
     
     num_trs=`fslinfo $input_file | sed -n /^dim4/p | sed "s/.*\s\(.*\)$/\1/"`
-    set_feat_var "fmri(npts)" $num_trs
+    set_feat_var "fmri(ntp)" $num_trs
     
     set_feat_var "fmri(ndelete)" $num_skip
     
@@ -131,7 +131,7 @@ if [ "$skip_feat" == "0" ]; then
     else
 	set_feat_var "fmri(confoundevs)" 0
     fi
-
+    
     set_feat_var "feat_files(1)" "$PWD/$input_file"
     
     outdir=`echo "$PWD/$input_file" | sed "s/\..*/.preproc/"`
@@ -157,8 +157,8 @@ if [ "$out_units" == "z" ]; then # z scores
     echo fslroi "$outdir"/stats/res4d "$outdir"/stats/baseline 0 $baseline
     fslroi "$outdir"/stats/res4d "$outdir"/stats/baseline 0 $baseline
 
-    echo fslmaths "$outdir"/stats/baseline -Tstd "$outdir"/stats/baseline -odt double
-    fslmaths "$outdir"/stats/baseline -Tstd "$outdir"/stats/baseline -odt double    
+    echo fslmaths "$outdir"/stats/baseline -Tstd "$outdir"/stats/baseline -odt float
+    fslmaths "$outdir"/stats/baseline -Tstd "$outdir"/stats/baseline -odt float
 
     # transform to zscores
     echo fslmaths "$outdir"/stats/res4d -div "$outdir"/stats/baseline "$output_file"
@@ -169,8 +169,8 @@ elif [ "$out_units" == "psc" ]; then # percent signal change
     tmean=`tempfile`
     echo fslmaths "$outdir"/stats/res4d -Tmean $tmean
     fslmaths "$outdir"/stats/res4d -Tmean $tmean
-    echo fslmaths "$outdir"/stats/res4d -sub $tmean -div $tmean $output_file -mull 100 -odt double
-    fslmaths "$outdir"/stats/res4d -sub $tmean -div $tmean $output_file -mul 100 -odt double
+    echo fslmaths "$outdir"/stats/res4d -sub $tmean -div $tmean $output_file -mull 100 -odt float
+    fslmaths "$outdir"/stats/res4d -sub $tmean -div $tmean $output_file -mul 100 -odt float
 
     to_delete="$to_delete $tmean"
 

@@ -102,8 +102,8 @@ void RtInfoServer::setData(RtData *data) {
 
 // receive an XML message
 // in 
-//  string recieved
-//  stream recieved on
+//  string received
+//  stream received on
 // out XML string response
 
 string RtInfoServer::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
@@ -145,10 +145,6 @@ string RtInfoServer::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
             //                continue;
             //            }
 
-            //            // create a designmatrix node for this request
-            //            TiXmlElement *designmatrixResponse = new TiXmlElement("designmatrix");
-            //            infoResponse->LinkEndChild(designmatrixResponse);
-
             // create data id object from input attribute
             string dataIDString = get->Attribute("dataid");
             RtDataID dataID;
@@ -163,15 +159,14 @@ string RtInfoServer::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
                 continue;
             }
 
-            // call serializeAsXML for retrievedData class
-            TiXmlElement *dataElement = retrievedData->serializeAsXML();
+            // call serializeAsXML for retrievedData class with the element from which it came
+            TiXmlElement *dataElement = retrievedData->serializeAsXML(get);
 
             // set data id attribute and link to inforesponse
-            dataElement->SetAttribute("dataid", dataID.toString());
+            dataElement->SetAttribute("dataid", retrievedData->getDataID().toString());
             infoResponse->LinkEndChild(dataElement);
-
         }
-
+        
         // look for sets
         for (TiXmlElement *set = 0; (set = (TiXmlElement*) info->IterateChildren("set", set));) {
             // check name TODO figure out a way to check the data id string?
@@ -198,7 +193,7 @@ string RtInfoServer::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
             }
 
             // call unserializeXML for retrievedData class
-            retrievedData->unserializeXML(set->FirstChildElement());
+            retrievedData->unserializeXML(set);
         }
     }
     return buildXMLString(response);

@@ -42,8 +42,8 @@ protected:
 
     // receive a message
     // in
-    //  string recieved
-    //  stream recieved on
+    //  string received
+    //  stream received on
     // out  success or failure
     virtual string receiveMessage(string &message, ACE_SOCK_Stream &stream);
 

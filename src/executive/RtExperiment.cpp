@@ -161,8 +161,6 @@ bool initExperiment() {
   char str[] = "yyyyhhmmss";
   sprintf(str, "%04ld%02ld%02ld%02ld",
 	  t.year(), t.hour(), t.minute(), t.second());
-  // ohinds: debug
-  sprintf(str, "2009130141");
   RtConfigVal::convert<unsigned int>(studyID,str);
 
   // parse the configuration

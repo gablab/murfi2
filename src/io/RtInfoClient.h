@@ -51,10 +51,10 @@ protected:
 
   // receive a message
   // in 
-  //  string recieved
-  //  stream recieved on
+  //  string received
+  //  stream received on
   // out  success or failure 
-  virtual string recieveMessage(string &message, ACE_SOCK_Stream &stream);
+  virtual string receiveMessage(string &message, ACE_SOCK_Stream &stream);
 
   // build a string from an XML document
   // in

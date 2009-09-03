@@ -84,7 +84,7 @@ double RtMotion::getMotionDimension(MotionDimension d) {
 
 // serialize as xml (dummy function)
 
-TiXmlElement* RtMotion::serializeAsXML() {
+TiXmlElement* RtMotion::serializeAsXML(TiXmlElement *requestElement) {
     return new TiXmlElement("motion");
 }
 

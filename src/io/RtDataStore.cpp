@@ -44,6 +44,13 @@ void RtDataStore::setData(RtData *data) {
   // add to availableData (needs a hard copy of the dataID)
   setAvailableData(data->getDataID());
 
+  // update value of latestTR
+  if (data->getDataID().getTimePoint() != DATAID_NUM_UNSET_VALUE &&
+      data->getDataID().getTimePoint() != DATAID_NUM_WILDCARD_VALUE) {
+
+      latestTR = data->getDataID().getTimePoint();
+  }
+
   mut.release();
   
   //debug
@@ -94,9 +101,8 @@ RtData *RtDataStore::getData(RtDataID dataID) {
 	avail.setTimePoint(DATAID_NUM_UNSET_VALUE);
 
       }
-
       
-      if(avail == dataID) { // == respects wildcards
+      if (avail == dataID) { // == respects wildcards
 	// copy, preserving timepoint if not a timepointless datum
 	unsigned int origTp = dataID.getTimePoint();	
 	dataID = avail;
@@ -108,9 +114,13 @@ RtData *RtDataStore::getData(RtDataID dataID) {
 	  dataID.setTimePoint(tp);
 	}
 
-
 	break;
       }
+    }
+
+    // finally, handle wildcard in timepoint field by using the latest timepoint
+    if (dataID.getTimePoint() == DATAID_NUM_WILDCARD_VALUE) {
+        dataID.setTimePoint(latestTR);
     }
 
     if(dataID.hasWildcards()) {
@@ -133,6 +143,15 @@ RtData *RtDataStore::getData(RtDataID dataID) {
   mut.release();
 
   return (*it).second;
+}
+
+// get latest data by id
+RtData *RtDataStore::getLatestData(RtDataID dataID) {
+    
+    // set timepoint in dataID
+    dataID.setTimePoint(latestTR);
+
+    return getData(dataID);
 }
 
 // get available data

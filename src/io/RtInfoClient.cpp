@@ -90,7 +90,8 @@ void RtInfoClient::setData(RtData *data) {
     TiXmlElement *infoEl = new TiXmlElement("info");
     response.LinkEndChild(infoEl);
 
-    TiXmlElement *dataEl = data->serializeAsXML();
+    TiXmlElement *element; //TODO this is a dummy thing
+    TiXmlElement *dataEl = data->serializeAsXML(element);
     infoEl->LinkEndChild(dataEl);    
 
     // send the data
@@ -103,10 +104,10 @@ void RtInfoClient::setData(RtData *data) {
 
 // receive an XML message
 // in 
-//  string recieved
-//  stream recieved on
+//  string received
+//  stream received on
 // out XML string response
-string RtInfoClient::recieveMessage(string &message, ACE_SOCK_Stream &stream) {
+string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
   cout << "infoclient received: " << message << endl;
 
   // parse the request

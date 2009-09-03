@@ -31,7 +31,7 @@ public:
     virtual ~RtEvent();
 
     // serialize as xml (dummy function)
-    virtual TiXmlElement* serializeAsXML();
+    virtual TiXmlElement* serializeAsXML(TiXmlElement *requestElement);
 
     // unserialize the xml data
     virtual void unserializeXML(TiXmlElement* element);

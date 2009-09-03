@@ -271,9 +271,9 @@ bool RtDesignMatrix::build() {
     }
 
 
-  // consider each input condition individually
-  for(unsigned int cond = 0; cond < numConditions; cond++) {
-    vnl_vector<double> basis = inputConditions.get_column(cond);
+    // consider each input condition individually
+    for (unsigned int cond = 0; cond < numConditions; cond++) {
+        vnl_vector<double> basis = inputConditions.get_column(cond);
 
         // incorporate condition shift via convolution with shifted delta
         if (conditionShift > 0 && conditionShift < numMeas) {
@@ -283,8 +283,8 @@ bool RtDesignMatrix::build() {
 
 
         // build block-wise condition vectors if required
-    if(modelEachBlock) {
-      unsigned int numBlocks = ceil((double)((numMeas-conditionShift)/blockLen));
+        if (modelEachBlock) {
+            unsigned int numBlocks = ceil((double) ((numMeas - conditionShift) / blockLen));
 
             // create a design matrix column per block
             for (unsigned int block = 0; block <= numBlocks; block++) {
@@ -792,6 +792,33 @@ bool RtDesignMatrix::addArtifact(unsigned int thisTr) {
     return true;
 }
 
+vnl_vector<double> RtDesignMatrix::getArtifactTimepoints() {
+
+    // initialize return vector
+    vnl_vector<double> listOfTr(numArtifacts, 0);
+    unsigned int foundArt = 0;
+
+    // loop through all columns
+    for (unsigned int col = 0; col < getNumColumns(); col++) {
+
+        // look for column name "artifact"
+        if (!strcmp(getColumnName(col).c_str(), "artifact")) {
+
+            vnl_vector<double> curCol = getColumn(col);
+
+            // go through rows to find artifact timepoint
+            for (unsigned int row = 0; row < getNumRows(); row++) {
+                if (curCol[row] == 1) {
+                    listOfTr.put(foundArt, row);
+                    foundArt++;
+                    break; // go to next col
+                }
+            }
+        }
+    }
+    return listOfTr;
+}
+
 // update the design matrix for a new timepoint
 // NOTE: this should be called after all events and  artifacts have been
 // added (through addEvent and addArtifact) and motion has been added to the
@@ -908,74 +935,159 @@ void RtDesignMatrix::print() {
 
 // serialize the data as xml for transmission or saving to a file
 
-TiXmlElement *RtDesignMatrix::serializeAsXML() {
+TiXmlElement *RtDesignMatrix::serializeAsXML(TiXmlElement *requestElement) {
+#define NUM_SIGFIGS 6
 
+    // create a designmatrix element for output
     TiXmlElement *designmatrix = new TiXmlElement("designmatrix");
 
-    // add an element for the matrix
-    TiXmlElement *matrix = new TiXmlElement("matrix");
-    matrix->SetAttribute("rows", getNumRows());
-    matrix->SetAttribute("cols", getNumColumns());
+    // if there are no elements in designmatrix, assume user wants all parts, so
+    // add all parts and then continue to loop.
+    if (requestElement->FirstChild() == NULL) {
+        requestElement->LinkEndChild(new TiXmlElement("designmatrix"));
+        requestElement->FirstChild()->LinkEndChild(new TiXmlElement("matrix"));
+        requestElement->FirstChild()->LinkEndChild(new TiXmlElement("columnnames"));
+        requestElement->FirstChild()->LinkEndChild(new TiXmlElement("isofinterest"));
+        requestElement->FirstChild()->LinkEndChild(new TiXmlElement("artifacts"));
+    }
 
-    // build text string containing all the data separated by spaces
-#define NUM_SIGFIGS 6
-    stringstream matrixStr;
-    matrixStr << fixed << setprecision(NUM_SIGFIGS);
+    // step through request element looking for a designmatrix request node
+    for (TiXmlElement *dm = 0; (dm = (TiXmlElement*) requestElement->IterateChildren("designmatrix", dm));) {
 
-    // loop through design matrix rows
-    for (unsigned int r = 0; r < getNumRows(); r++) {
+        // step through designmatrix request node, checking all nodes for valid part requests
+        for (TiXmlElement *dmPart = 0; (dmPart = (TiXmlElement*) dm->IterateChildren(dmPart));) {
 
-        // pull out row r
-        vnl_vector<double> row = getRow(r);
+            // if matrix was requested, add to designmatrix
+            if (!strcmp(dmPart->Value(), "matrix")) {
 
-        // loop through each column
-        for (unsigned int c = 0; c < getNumColumns(); c++) {
+                // add an element for the matrix output
+                TiXmlElement *matrix = new TiXmlElement("matrix");
+                matrix->SetAttribute("rows", getNumRows());
+                matrix->SetAttribute("cols", getNumColumns());
 
-            // put c-th element of row r onto stream
-            matrixStr << row[c] << " ";
+                // build text string containing the matrix elements separated by spaces
+                stringstream matrixStr;
+                matrixStr << fixed << setprecision(NUM_SIGFIGS);
+
+                // loop through design matrix rows
+                for (unsigned int r = 0; r < getNumRows(); r++) {
+
+                    // pull out row r
+                    vnl_vector<double> row = getRow(r);
+
+                    // loop through each column
+                    for (unsigned int c = 0; c < getNumColumns(); c++) {
+
+                        // put c-th element of row r onto stream
+                        matrixStr << row[c] << " ";
+                    }
+                }
+
+                // put string into xml text node
+                TiXmlText *matrixText = new TiXmlText(matrixStr.str());
+                matrix->LinkEndChild(matrixText);
+
+                // add matrix element to designmatrix
+                designmatrix->LinkEndChild(matrix);
+            }
+
+            // if column names were requested, add to designmatrix
+            if (!strcmp(dmPart->Value(), "columnnames")) {
+                // add an element for the columnnames vector
+                TiXmlElement *columnnames = new TiXmlElement("columnnames");
+
+                // loop through columns
+                stringstream nameStr;
+                for (unsigned int c = 0; c < getNumColumns(); c++) {
+                    nameStr << getColumnName(c) << " ";
+                }
+
+                // put string into xml text node
+                TiXmlText *namesText = new TiXmlText(nameStr.str());
+                columnnames->LinkEndChild(namesText);
+
+                // add columnnames element to designmatrix
+                designmatrix->LinkEndChild(columnnames);
+            }
+
+            // if isofinterest vector was requested, add to designmatrix
+            if (!strcmp(dmPart->Value(), "isofinterest")) {
+                // add an element for the isofinterest vector
+                TiXmlElement *isofinterest = new TiXmlElement("isofinterest");
+
+                // loop through interest vector
+                stringstream interestStr;
+                for (unsigned int c = 0; c < getNumColumns(); c++) {
+                    interestStr << isColumnOfInterest(c) << " ";
+                }
+
+                // put string into next node
+                TiXmlText *interestText = new TiXmlText(interestStr.str());
+                isofinterest->LinkEndChild(interestText);
+
+                // add isofinterest element to designmatrixDesignMatrix
+                designmatrix->LinkEndChild(isofinterest);
+            }
+
+            // if artifacts vector is requested, add them (as a list of TRs) to the designmatrix
+            if (!strcmp(dmPart->Value(), "artifacts")) {
+
+                // add an element for the artifacts
+                TiXmlElement *artifacts = new TiXmlElement("artifacts");
+
+                // get vector of artifact timepoints
+                vnl_vector<double> artTR = getArtifactTimepoints();
+
+                stringstream artStr;
+                artStr << fixed << setprecision(NUM_SIGFIGS);
+
+                // loop through vector of artifact timepoints
+                for (unsigned int a = 0; a < artTR.size(); a++) {
+
+                    // put the a-th element onto the stream
+                    artStr << artTR[a] << " ";
+                }
+
+                // put the string into xml text node
+                TiXmlText *artText = new TiXmlText(artStr.str());
+                artifacts->LinkEndChild(artText);
+
+                // add artifacts element to designmatrix
+                designmatrix->LinkEndChild(artifacts);
+            }
+
+            // if a single column is requested, add it to the designmatrix
+            if (!strcmp(dmPart->Value(), "column")) {
+
+                // add an element for the column output
+                TiXmlElement *column = new TiXmlElement("column");
+
+                // note: don't need number of rows because it's only one column,
+                // so reshaping isn't necessary
+
+                // get the requested column from given name attribute
+                vnl_vector<double> requestedColumn = getColumn(dmPart->Attribute("name"));
+
+                // build text string containing the column elements separated by spaces
+                stringstream columnStr;
+                columnStr << fixed << setprecision(NUM_SIGFIGS);
+
+                // loop through the rows of the selected column
+                for (unsigned int r = 0; r < getNumRows(); r++) {
+
+                    // put the r-th element of column onto stream
+                    columnStr << requestedColumn[r] << " ";
+                }
+
+                // put string into xml text node
+                TiXmlText *columnText = new TiXmlText(columnStr.str());
+                column->LinkEndChild(columnText);
+
+                // add column element to designmatrix
+                designmatrix->LinkEndChild(column);
+            }
         }
     }
-
-    // put string into xml text node
-    TiXmlText *matrixText = new TiXmlText(matrixStr.str());
-    matrix->LinkEndChild(matrixText);
-
-    // add matrix element to designmatrix element
-    designmatrix->LinkEndChild(matrix);
-
-
-    // add an element for the columnnames vector
-    TiXmlElement *columnnames = new TiXmlElement("columnnames");
-
-    // loop through columns
-    stringstream nameStr;
-    for (unsigned int c = 0; c < getNumColumns(); c++) {
-        nameStr << getColumnName(c) << " ";
-    }
-
-    // put string into xml text node
-    TiXmlText *namesText = new TiXmlText(nameStr.str());
-    columnnames->LinkEndChild(namesText);
-
-    // add columnnames element to designmatrix element
-    designmatrix->LinkEndChild(columnnames);
-
-
-    // add an element for the isofinterest vector
-    TiXmlElement *isofinterest = new TiXmlElement("isofinterest");
-
-    // loop through interest vector
-    stringstream interestStr;
-    for (unsigned int c = 0; c < getNumColumns(); c++) {
-        interestStr << isColumnOfInterest(c) << " ";
-    }
-
-    // put string into next node
-    TiXmlText *interestText = new TiXmlText(interestStr.str());
-    isofinterest->LinkEndChild(interestText);
-
-    // add isofinterest element to designmatrix element
-    designmatrix->LinkEndChild(isofinterest);
 
     return designmatrix;
 }
@@ -984,103 +1096,130 @@ TiXmlElement *RtDesignMatrix::serializeAsXML() {
 
 void RtDesignMatrix::unserializeXML(TiXmlElement *element) {
 
-    // look for cell tags (implies setting single element in design matrix via infoserver)
-    for (TiXmlElement *cell = 0; (cell = (TiXmlElement*) element->IterateChildren("cell", cell));) {
+    // step through request element looking for a designmatrix request node
+    for (TiXmlElement *dm = 0; (dm = (TiXmlElement*) element->IterateChildren("designmatrix", dm));) {
 
-        // read cell for row,col,data
-        unsigned int row, col;
-        double cellValue;
+        // step through designmatrix request node, checking all nodes for valid part requests
+        for (TiXmlElement *dmPart = 0; (dmPart = (TiXmlElement*) dm->IterateChildren(dmPart));) {
 
-        const char *attribute = cell->Attribute("row");
-        if (attribute == NULL) {
-            cerr << "Specified row does not exist" << endl;
-            continue;
-        }
-        if (!RtConfigVal::convert<unsigned int>(row, attribute)) {
-            string errString = "error converting row attribute to integer";
-            cerr << errString << endl;
-            continue;
-        }
+            // look for matrix tags (implies setting full matrix via infoserver)
+            if (!strcmp(dmPart->Value(),"matrix")) {
+                //TODO
+            }
 
-        attribute = cell->Attribute("col");
-        if (attribute == NULL) {
-            cerr << "Specified col does not exist" << endl;
-            continue;
-        }
-        if (!RtConfigVal::convert<unsigned int>(col, attribute)) {
-            string errString = "error converting col attribute to integer";
-            cerr << errString << endl;
-            continue;
-        }
+            // look for cell tags (implies setting single element in design matrix via infoserver)
+            if (!strcmp(dmPart->Value(), "cell")) {
 
-        if (!RtConfigVal::convert<double>(cellValue, cell->GetText())) {
-            string errString = "error converting cell value attribute to double";
-            cerr << errString << endl;
-            continue;
-        }
+                TiXmlElement *cell = dmPart;
 
-        // check bounds on row and col values and put new value into design matrix
-        if ((row >= 0 && row < getNumRows()) && (col >= 0 && col < getNumColumns())) {
-            put(row, col, cellValue);
-        }
-        else {
-            cerr << "Invalid number of rows or columns." << endl;
-            continue;
-        }
-    }
+                // read cell for row,col,data
+                unsigned int row, col;
+                double cellValue;
 
-    // look for columninfo tags
-    for (TiXmlElement *columninfo = 0; (columninfo = (TiXmlElement*) element->IterateChildren("columninfo", columninfo));) {
-
-        // declare index
-        unsigned int index;
-
-        // go through columninfo
-        for (TiXmlElement *columnPart = (TiXmlElement*) columninfo->FirstChildElement(); columnPart != NULL;
-                columnPart = (TiXmlElement*) columnPart->NextSiblingElement()) {
-
-            bool isOfInterest;
-
-            //            if (columnParts != NULL) { // already done in the for declaration
-
-            // find index
-            if (!strcmp(columnPart->Value(), "index")) {
-                if (!RtConfigVal::convert<unsigned int>(index, columnPart->GetText())) {
-                    string errString = "error converting index attribute to integer";
+                const char *attribute = cell->Attribute("row");
+                if (attribute == NULL) {
+                    cerr << "Specified row does not exist" << endl;
+                    continue;
+                }
+                if (!RtConfigVal::convert<unsigned int>(row, attribute)) {
+                    string errString = "error converting row attribute to integer";
                     cerr << errString << endl;
                     continue;
                 }
-            }
-            else {
-                // check that index has already been set
-                if (index == NULL) {
-                    cerr << "Index is not set" << endl;
+
+                attribute = cell->Attribute("col");
+                if (attribute == NULL) {
+                    cerr << "Specified col does not exist" << endl;
                     continue;
                 }
-            }
-            // break to next set of columninfo if index is too large
-            if (index > getNumColumns() - 1) {
-                string errString = "Index exceeds design matrix dimensions";
-                cerr << errString << endl;
-                break;
-            }
-
-            // set new name if it is being set
-            if (!strcmp(columnPart->Value(), "name")) {
-                columnNames[index] = columnPart->GetText();
-                continue;
-            }
-
-            // set new isOfInterest value if it is being set
-            if (!strcmp(columnPart->Value(), "isofinterest")) {
-                if (!RtConfigVal::convert<bool>(isOfInterest, columnPart->GetText())) {
-                    string errString = "error converting index attribute to integer";
+                if (!RtConfigVal::convert<unsigned int>(col, attribute)) {
+                    string errString = "error converting col attribute to integer";
                     cerr << errString << endl;
                     continue;
                 }
-                columnOfInterestIndicator[index] = isOfInterest;
+
+                if (!RtConfigVal::convert<double>(cellValue, cell->GetText())) {
+                    string errString = "error converting cell value attribute to double";
+                    cerr << errString << endl;
+                    continue;
+                }
+
+                // check bounds on row and col values and put new value into design matrix
+                if ((row >= 0 && row < getNumRows()) && (col >= 0 && col < getNumColumns())) {
+                    put(row, col, cellValue);
+                }
+                else {
+                    cerr << "Invalid number of rows or columns." << endl;
+                    continue;
+                }
             }
-            //            }
+
+            // set artifact for tr if it is sent
+            if (!strcmp(dmPart->Value(), "artifact")) {
+                TiXmlElement *artifact = dmPart;
+                bool isArtifact;
+                //                }
+                if (!RtConfigVal::convert<bool>(isArtifact, artifact->GetText())) {
+                    string errString = "error converting artifact attribute to boolean";
+                    cerr << errString << endl;
+                    continue;
+                }
+                addArtifact(tr);
+            }
+
+            // look for columninfo tags
+            if (!strcmp(dmPart->Value(), "columninfo")) {
+
+                TiXmlElement *columninfo = dmPart;
+
+                // declare index
+                unsigned int index;
+
+                // go through columninfo
+                for (TiXmlElement *columnPart = (TiXmlElement*) columninfo->FirstChildElement(); columnPart != NULL;
+                        columnPart = (TiXmlElement*) columnPart->NextSiblingElement()) {
+
+                    bool isOfInterest;
+
+                    // find index
+                    if (!strcmp(columnPart->Value(), "index")) {
+                        if (!RtConfigVal::convert<unsigned int>(index, columnPart->GetText())) {
+                            string errString = "error converting index attribute to integer";
+                            cerr << errString << endl;
+                            continue;
+                        }
+                    }
+                    else {
+                        // check that index has already been set
+                        if (index == NULL) {
+                            cerr << "Index is not set" << endl;
+                            continue;
+                        }
+                    }
+                    // break to next set of columninfo if index is too large
+                    if (index > getNumColumns() - 1) {
+                        string errString = "Index exceeds design matrix dimensions";
+                        cerr << errString << endl;
+                        break;
+                    }
+
+                    // set new name if it is being set
+                    if (!strcmp(columnPart->Value(), "name")) {
+                        columnNames[index] = columnPart->GetText();
+                        continue;
+                    }
+
+                    // set new isOfInterest value if it is being set
+                    if (!strcmp(columnPart->Value(), "isofinterest")) {
+                        if (!RtConfigVal::convert<bool>(isOfInterest, columnPart->GetText())) {
+                            string errString = "error converting index attribute to integer";
+                            cerr << errString << endl;
+                            continue;
+                        }
+                        columnOfInterestIndicator[index] = isOfInterest;
+                    }
+                }
+            }
         }
     }
 }

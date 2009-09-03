@@ -341,7 +341,7 @@ void RtDataID::setFromString(const string &id) {
       }
       else {
         unsigned int timePoint;
-        fail = RtConfigVal::convert<unsigned int>(timePoint, id.substr(startAt, foundAt - startAt));
+        fail = !RtConfigVal::convert<unsigned int>(timePoint, id.substr(startAt, foundAt - startAt));
         this->setTimePoint(timePoint);
       }
     } else { fail = true; }
@@ -416,7 +416,7 @@ void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
 
 void RtDataID::copyFromOtherDataID(const RtDataID &otherDataID) {
     (*this) = otherDataID;
-    siteIDNum = SITE_ID_NUMBER;
+    //siteIDNum = SITE_ID_NUMBER;
 }
 
 // output to stream

@@ -231,7 +231,7 @@ void RtDataImage<T>::printInfo(ostream &os) {
 
 // serialize the data as xml for transmission or saving to a file
 template<class T>
-TiXmlElement *RtDataImage<T>::serializeAsXML() {
+TiXmlElement *RtDataImage<T>::serializeAsXML(TiXmlElement *requestElement) {
   TiXmlElement *element = new TiXmlElement( "error" );
 
   TiXmlText *text = new TiXmlText("this is a stub, no data serialization is supported for this type");

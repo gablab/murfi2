@@ -146,6 +146,9 @@ public:
     //   tr of the artifact
     bool addArtifact(unsigned int tr);
 
+    // get a vector of all timepoints with an artifact
+    vnl_vector<double> getArtifactTimepoints();
+
     // build a row of the GLM deign matrix
     // in
     //  current image
@@ -167,7 +170,7 @@ public:
     void print();
 
     // serialize the data as xml for transmission or saving to a file
-    TiXmlElement *serializeAsXML();
+    TiXmlElement *serializeAsXML(TiXmlElement *requestElement);
 
     // unserialize the data received as xml and process
     void unserializeXML(TiXmlElement *element);

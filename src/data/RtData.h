@@ -61,7 +61,7 @@ public:
     }
 
     // serialize the data as xml for transmission or saving to a file
-    virtual TiXmlElement *serializeAsXML() = 0;
+    virtual TiXmlElement *serializeAsXML(TiXmlElement *requestElement) = 0;
 
     // unserialize the xml data
     virtual void unserializeXML(TiXmlElement* element) = 0;

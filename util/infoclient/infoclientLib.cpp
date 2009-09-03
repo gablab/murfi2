@@ -208,9 +208,9 @@ void *listenForData(void *tcpInfo) {
       } while(last != '\n');
 
       // receive the message, store the response
-      string recieved = message.str();
+      string received = message.str();
 
-      handleReceivedXml(recieved);
+      handleReceivedXml(received);
 
       stream.close();
     }

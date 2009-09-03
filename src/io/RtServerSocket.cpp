@@ -59,7 +59,7 @@ bool RtServerSocket::close() {
 }
 
 // receive a message
-// in   string recieved
+// in   string received
 // out  string response
 
 string RtServerSocket::receiveMessage(string &message, ACE_SOCK_Stream &stream) {

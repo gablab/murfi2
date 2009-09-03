@@ -212,7 +212,7 @@ public:
     virtual void printInfo(ostream &os);
 
     // serialize the data as xml for transmission or saving to a file
-    virtual TiXmlElement *serializeAsXML();
+    virtual TiXmlElement *serializeAsXML(TiXmlElement *requestElement);
 
     // unserialize the xml data
     virtual void unserializeXML(TiXmlElement* element);

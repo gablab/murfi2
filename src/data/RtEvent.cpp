@@ -38,7 +38,7 @@ int RtEvent::getTR() const {
 
 // serialize as xml (dummy function)
 
-TiXmlElement* RtEvent::serializeAsXML() {
+TiXmlElement* RtEvent::serializeAsXML(TiXmlElement *requestElement) {
     return new TiXmlElement("event");
 }
 

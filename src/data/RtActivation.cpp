@@ -106,18 +106,19 @@ RtMaskImage *RtActivation::toMask(Sign direction) {
 
 // serialize the data as xml for transmission or saving to a file
 
-TiXmlElement *RtActivation::serializeAsXML() {
+TiXmlElement *RtActivation::serializeAsXML(TiXmlElement *requestElement) {
+    #define NUM_SIGFIGS 6
+
     // add an element for the data
-    TiXmlElement *element = new TiXmlElement("data");
-    element->SetAttribute("name", "activation");
-    element->SetAttribute("roiID", dataID.getRoiID());
+    TiXmlElement *element = new TiXmlElement("activation");
+//    element->SetAttribute("name", "activation");
+    element->SetAttribute("roiid", dataID.getRoiID());
 
     // build text string containing all the data separated by spaces
-#define NUM_SIGFIGS 6
     stringstream dataStr;
     dataStr << fixed << setprecision(NUM_SIGFIGS);
     for (unsigned int i = 0; i < getNumEl(); i++) {
-        dataStr << getPixel(i);
+        dataStr << getPixel(i) << " ";
     }
 
     TiXmlText *text = new TiXmlText(dataStr.str());

@@ -49,6 +49,9 @@ public:
   // RtDataID.h) avoid using wildcards if possible
   virtual RtData *getData(RtDataID id);
 
+  // get latest data
+  virtual RtData *getLatestData(RtDataID id);
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
@@ -71,6 +74,9 @@ public:
 
   // set data ids to availableData
   void setAvailableData(RtDataID);
+
+  // latest tr for which dataStore has data
+  unsigned int latestTR;
 
   // create mutex for datastore lockdown
   ACE_Mutex mut;

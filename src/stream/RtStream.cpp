@@ -70,6 +70,7 @@ bool RtStream::configure(RtConfig &config) {
 #include"RtCurrentActivation.h"
 #include"RtSingleImageCor.h"
 #include"RtFluctuationMonitor.h"
+#include"RtClassifySVM.h"
 #include"RtRoiFeedbackSynth.h"
 #include"RtContrast.h"
 #include"RtRoiCombine.h"
@@ -136,6 +137,9 @@ RtStreamComponent *RtStream::buildStreamComponent(const string &type,
     }
     else if (type == RtFluctuationMonitor::moduleString) { // fluctuation monitor
         ACE_NEW_NORETURN(sc, RtFluctuationMonitor());
+    }
+    else if (type == RtClassifySVM::moduleString) { // svm classification
+        ACE_NEW_NORETURN(sc, RtClassifySVM());
     }
     else if (type == RtContrast::moduleString) { // activation contrast
         ACE_NEW_NORETURN(sc, RtContrast());

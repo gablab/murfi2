@@ -57,6 +57,10 @@ bool RtCurrentActivation::processOption(const string &name, const string &text, 
         return RtConfigVal::convert<int>(numDataPointsForErrEst, text);
     }
 
+    if (name == "saveResult") {
+        return RtConfigVal::convert<bool>(saveResult, text);
+    }
+
     return RtStreamComponent::processOption(name, text, attrMap);
 }
 
@@ -134,7 +138,7 @@ int RtCurrentActivation::process(ACE_Message_Block *mb) {
     tempDataID.setDataName(NAME_DESIGN); // TODO this may not work if there are more than one design matrix
 
     // debug
-    getDataStore().getAvailableData();
+    // getDataStore().getAvailableData();
 
     RtDesignMatrix *design = static_cast<RtDesignMatrix*> (getDataStore().getData(tempDataID));
 
@@ -293,6 +297,15 @@ int RtCurrentActivation::process(ACE_Message_Block *mb) {
       log(logs);
     }
 
+    if(saveResult) {
+      string fn = getExperimentConfig().getVolFilename(
+				       dat->getDataID().getSeriesNum(),
+				       dat->getDataID().getTimePoint());
+      string stem = getExperimentConfig().get("study:volumeFileStem").str();
+      currentActivation->setFilename(fn.replace(fn.rfind(stem), stem.size(), 
+					       "curact"));
+      currentActivation->save();
+    }
 
     return 0;
 }

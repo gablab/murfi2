@@ -59,6 +59,7 @@ const string ID_INCREMENTALGLM = "incremental-glm";
 const string ID_SINGLEIMCOR = "singleimcor";
 const string ID_SLIDEWINCOR = "slidewincor";
 const string ID_FLUCTUATIONMONITOR = "fluctuation-monitor";
+const string ID_CLASSIFYSVM = "classify-svm";
 const string ID_CONTRAST = "contrast";
 const string ID_CURRENTACTIVATION = "current-activation";
 
@@ -73,6 +74,10 @@ const string NAME_ACTIVATION = "activation-img";
 const string NAME_BETA_MEAN = "beta-mean-img";
 const string NAME_BETA_ACT = "beta-activation-img";
 const string NAME_CONTRAST = "contrast-img";
+
+// classification
+const string NAME_CLASSLABEL = "class-label";
+const string NAME_CLASSSCORE = "class-score";
 
 // ROI computations
 const string ID_ROICOMBINE = "roi-combine";

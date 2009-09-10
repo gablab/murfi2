@@ -53,6 +53,9 @@ protected:
 
     // for post-numDataPointsInErrEst residual storage
     RtActivation *steadyStateResidual;
+
+  // whether to save the image result
+  bool saveResult;
 };
 #endif /*RTCURRENTACTIVATION_H_*/
 

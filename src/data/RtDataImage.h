@@ -293,6 +293,9 @@ public:
     // get a copy of the image data
     T *getDataCopy();
 
+    // get a const reference to the image data
+    const T *getDataConst();
+
     //*** sets  ***//
 
     // set pixel dimensions

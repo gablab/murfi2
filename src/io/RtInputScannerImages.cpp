@@ -255,8 +255,14 @@ int RtInputScannerImages::svc() {
 
 
     if(onlyReadMoCo && !ei->bIsMoCo) {
-      //cout << "ignoring non-MoCo image." << endl;
+      cout << "ignoring non-MoCo image." << endl;
       continue;
+    }
+    else if(!ei->bIsMoCo) {
+      cout << "got non-MoCo image." << endl;
+    }
+    else {
+      cout << "got MoCo image." << endl;
     }
 
     imageNum++;

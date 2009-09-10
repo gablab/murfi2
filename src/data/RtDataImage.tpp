@@ -1352,6 +1352,12 @@ T *RtDataImage<T>::getDataCopy() {
   return copy;
 }
 
+// get a const reference to the image data
+template<class T>
+const T *RtDataImage<T>::getDataConst() {
+  return data;
+}
+
 //************ sets *****************//
 
 // set filename

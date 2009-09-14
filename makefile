@@ -88,6 +88,9 @@ BOOST_HOME = /usr
 # vxl
 VXL_HOME = /usr/local
 
+#svm
+SVM_HOME = $(PWD)/util/svm
+
 #********************* END SETTABLE FLAGS ***************************#
 
 
@@ -166,6 +169,17 @@ GSL_LIB=-lgsl -lgslcblas
 VXL_INC=-I$(VXL_HOME)/include/vxl/core -I$(VXL_HOME)/include/vxl/vcl
 VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(VXL_HOME)/vxl/lib
 
+# svm
+SVM_INC=-I$(SVM_HOME)/src -I$(SVM_HOME)/svm-multiclass
+SVM_LIB=$(SVM_HOME)/src/*.o \
+	$(SVM_HOME)/svm-multiclass/svm_struct_api.o \
+	$(SVM_HOME)/svm-multiclass/svm_light/svm_common.o \
+	$(SVM_HOME)/svm-multiclass/svm_light/svm_learn.o \
+	$(SVM_HOME)/svm-multiclass/svm_light/svm_hideo.o \
+	$(SVM_HOME)/svm-multiclass/svm_struct/svm_struct_learn.o \
+	$(SVM_HOME)/svm-multiclass/svm_struct/svm_struct_common.o 
+
+
 # boost
 BOOST_INC=-I$(BOOST_HOME)/include/
 BOOST_LIB=-L$(BOOST_HOME)/lib -lboost_filesystem
@@ -232,6 +246,7 @@ QT_LIB = -lQtCore -lQtGui -lQtXml -lqwt-qt4
 # build compiler flags
 
 C_INC = -I$(SRC_DIR) \
+	$(SVM_INC) \
 	$(INC_SUB_DIRS) \
 	$(GLUT_INC) \
 	$(GSL_INC) \
@@ -253,6 +268,7 @@ C_FLAGS = -Wall \
 	$(C_INC) 
 
 C_LIB = $(MATH_LIB) \
+	$(SVM_LIB) \
 	$(GSL_LIB) \
 	$(ACE_LIB) \
 	$(GLUT_LIB) \

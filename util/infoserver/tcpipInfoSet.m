@@ -23,7 +23,7 @@ try
     % send a set string
     sendstr = String(strParams.requestString);
     out.println(sendstr);
-    repsonse = in.readLine();
+    repsonse = in.readLine(); % listen for any response from the infoserver
     in.close();
     out.close();
     skt.close();

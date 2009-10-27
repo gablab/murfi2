@@ -30,7 +30,6 @@
 #include<vnl/algo/vnl_svd.h>
 
 #include"debug_levels.h"
-
 RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
 
     vnl_matrix<double>::set_size(0, 0);
@@ -58,6 +57,9 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
     loadHrf = false;
     hrfFilename = "unset";
 
+    loadDesignMatrixFromFile = false;
+    designMatrixFilename = "unset";
+    padConditionWithZeros = false;
 
     // nuisance bases
     maxTrendOrder = 1;
@@ -79,9 +81,8 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
 
 
 // configure the design matrix from an xml element
-
 bool RtDesignMatrix::configure(TiXmlElement *designEle,
-                               const RtConfig &config) {
+        const RtConfig &config) {
     string name;
     TiXmlElement *optionElmt;
 
@@ -115,15 +116,13 @@ bool RtDesignMatrix::configure(TiXmlElement *designEle,
 //  in
 //   name of the option to process
 //   val  text of the option node
-
 bool RtDesignMatrix::processOption(const string &name,
-                                   const string &text,
-                                   const map<string, string> &attrMap) {
+        const string &text,
+        const map<string, string> &attrMap) {
 
     if (name == "disabled") {
         return true;
     }
-    // look for known options
     if (name == "condition") { // load the condition vector
         numInputConditions++;
 
@@ -176,14 +175,25 @@ bool RtDesignMatrix::processOption(const string &name,
         // fill the rest of the measurements as periodic stim
         for (; i < numMeas; i++) {
             inputConditions.put(i, numInputConditions - 1,
-                                inputConditions.get(i % blockLen,
-                                                    numInputConditions - 1));
+                    inputConditions.get(i % blockLen,
+                    numInputConditions - 1));
         }
 
         return true;
     }
     if (name == "conditionShift") {
         return RtConfigVal::convert<unsigned int>(conditionShift, text);
+    }
+    if (name == "loadDesignMatrixFromFile") {
+        RtConfigVal::convert<bool>(loadDesignMatrixFromFile, text);
+        return true;
+    }
+    if (name == "designMatrixFilename") {
+        designMatrixFilename = text;
+        return true;
+    }
+    if (name == "padConditionWithZeros") {
+        return RtConfigVal::convert<bool>(padConditionWithZeros, text);
     }
     if (name == "modelEachBlock") {
         return RtConfigVal::convert<bool>(modelEachBlock, text);
@@ -237,14 +247,24 @@ bool RtDesignMatrix::processOption(const string &name,
     return true;
 }
 
-// build the design
+bool RtDesignMatrix::buildDesignMatrix() {
 
-bool RtDesignMatrix::build() {
+    // TODO this will need to get called by unserializeXML as well
 
-    if (numMeas == 0) {
-        cerr << "ERROR: refusing to build() design matrix with zero rows. did you forget to call setNumMeas()?" << endl;
-        return false;
+    // fill the rest of the measurements as periodic stim
+    if (loadDesignMatrixFromFile) {
+        if (padConditionWithZeros) {
+            // TODO
+        }
+        else {
+            unsigned int i = blockLen - 1;
+            for (; i < numMeas; i++) {
+                inputConditions.put(i, numInputConditions - 1, inputConditions.get(i % blockLen, numInputConditions - 1));
+            }
+        }
     }
+    
+    // the rest was originally in build()
 
     // setup the size
     unsigned int numConditions = getNumConditionBases();
@@ -269,7 +289,6 @@ bool RtDesignMatrix::build() {
     else {
         shiftdelta.put(0, 1);
     }
-
 
     // consider each input condition individually
     for (unsigned int cond = 0; cond < numConditions; cond++) {
@@ -301,28 +320,28 @@ bool RtDesignMatrix::build() {
                 RtConfigVal::convertToString<unsigned int>(blockStr, block);
 
                 addColumn(convolveVecWithHrf(blockCol),
-                          inputConditionNames[cond] + "_block" + blockStr,
-                          true);
+                        inputConditionNames[cond] + "_block" + blockStr,
+                        true);
 
                 // add columns for temporal derivatives if required
                 if (modelTemporalDerivatives) {
                     addColumn(convolveVecWithTemporalDerivative(blockCol),
-                              inputConditionNames[cond] + "_block" +
-                              blockStr + "_deriv",
-                              true);
+                            inputConditionNames[cond] + "_block" +
+                            blockStr + "_deriv",
+                            true);
                 }
             }
         }
         else { // no block splitting necessary
             addColumn(convolveVecWithHrf(basis),
-                      inputConditionNames[cond],
-                      true);
+                    inputConditionNames[cond],
+                    true);
 
             // add columns for temporal derivatives if required
             if (modelTemporalDerivatives) {
                 addColumn(convolveVecWithTemporalDerivative(basis),
-                          inputConditionNames[cond] + "_deriv",
-                          true);
+                        inputConditionNames[cond] + "_deriv",
+                        true);
             }
         }
     }
@@ -334,15 +353,15 @@ bool RtDesignMatrix::build() {
         vnl_vector<double> trend(numMeas, 0);
         for (unsigned int j = 0; j < numMeas; j++) {
             switch (i) {
-            case 0: // mean
-                trend.put(j, 1.0);
-                break;
-            case 1: // linear
-                trend.put(j, j + 1);
-                break;
-            default: // higher
-                trend.put(j, pow((double) j - numMeas / 2, (int) i));
-                break;
+                case 0: // mean
+                    trend.put(j, 1.0);
+                    break;
+                case 1: // linear
+                    trend.put(j, j + 1);
+                    break;
+                default: // higher
+                    trend.put(j, pow((double) j - numMeas / 2, (int) i));
+                    break;
             }
         }
 
@@ -381,12 +400,45 @@ bool RtDesignMatrix::build() {
     if (DEBUG_LEVEL & MODERATE) {
         print();
     }
+}
+
+// build the design
+bool RtDesignMatrix::build() {
+
+    if (numMeas == 0) {
+        cerr << "ERROR: refusing to build() design matrix with zero rows. did you forget to call setNumMeas()?" << endl;
+        return false;
+    }
+
+    // try to load design matrix from file
+    if (loadDesignMatrixFromFile) {
+        if (!loadDesignMatrixFile(designMatrixFilename)) {
+            cerr << "WARNING: couldn't load design matrix from " << designMatrixFilename << ". Will wait for infoserver instead." << endl;
+            loadDesignMatrixFromFile = false;
+        }
+        else {
+            // will get here if loading from file was successful
+            buildDesignMatrix();
+
+            // TODO will maybe need call to data store if it's not put into buildDesignMatrix
+        }
+    }
+    // check that condition is filled and then call buildDesignMatrix (for temp. backwards compatibility until all condition
+    // stuff is removed from conf file)
+    else if (numInputConditions > 0) {
+        
+        buildDesignMatrix();
+    }
+    else {
+        cerr << "WARNING: setFromStimulus is true. Design matrix must come from infoserver." << endl;
+    }
+
+    // the stuff that was here is now in buildDesignMatrix()
 
     return true;
 }
 
 // sets the size (old data lost)
-
 bool RtDesignMatrix::set_size(unsigned int row, unsigned int col) {
     vnl_matrix<double>::set_size(row, col);
     columnOfInterestIndicator.assign(col, false);
@@ -396,7 +448,6 @@ bool RtDesignMatrix::set_size(unsigned int row, unsigned int col) {
 }
 
 // get the name of a design matrix column
-
 string RtDesignMatrix::getColumnName(unsigned int col) {
     if (col >= columnNames.size()) {
         return "error: out of bounds";
@@ -406,19 +457,16 @@ string RtDesignMatrix::getColumnName(unsigned int col) {
 }
 
 // get a design matrix column by index
-
 vnl_vector<double> RtDesignMatrix::getColumn(unsigned int index) {
     return get_column(index);
 }
 
 // get a design matrix column by name
-
 vnl_vector<double> RtDesignMatrix::getColumn(const string &name) {
     return get_column(getColumnIndex(name));
 }
 
 // get a design matrix column by name
-
 unsigned int RtDesignMatrix::getColumnIndex(const string &name) {
     unsigned int index = 0;
     for (vector<string>::iterator i = columnNames.begin();
@@ -433,7 +481,6 @@ unsigned int RtDesignMatrix::getColumnIndex(const string &name) {
 }
 
 // compute the number of neural signal bases in this model
-
 unsigned int RtDesignMatrix::getNumConditionBases() {
 
     // take the number of conditions read from config as the base number
@@ -455,7 +502,6 @@ unsigned int RtDesignMatrix::getNumConditionBases() {
 
 
 // compute the number of nuisance bases in this model
-
 unsigned int RtDesignMatrix::getNumNuisanceBases() {
 
     unsigned int numNuisance = maxTrendOrder + 1;
@@ -480,7 +526,6 @@ unsigned int RtDesignMatrix::getNumNuisanceBases() {
 
 // retreive a vector of the indices of columns identified as representing
 // neural signals of interest
-
 vnl_vector<unsigned int> RtDesignMatrix::getColumnOfInterestIndices() {
     vnl_vector<unsigned int> inds;
     int ind = 0;
@@ -496,16 +541,12 @@ vnl_vector<unsigned int> RtDesignMatrix::getColumnOfInterestIndices() {
 
 // determine whether a column is a basis function representing neural
 // signals of interest or not
-
 bool RtDesignMatrix::isColumnOfInterest(unsigned int col) {
     return col >= 0 && col < columnOfInterestIndicator.size()
             && columnOfInterestIndicator[col];
 }
 
-
-
 // get the stored hrf vector for this experiment (or build it)
-
 vnl_vector<double> &RtDesignMatrix::getHrf() {
     // build it if not built
     if (!hrfIsBuilt) {
@@ -517,7 +558,6 @@ vnl_vector<double> &RtDesignMatrix::getHrf() {
 
 // get the stored high temporal resoltion hrf vector for this experiment (or
 // build it)
-
 vnl_vector<double> &RtDesignMatrix::getHiresHrf() {
     // build it if not built
     if (!hrfIsBuilt) {
@@ -527,9 +567,7 @@ vnl_vector<double> &RtDesignMatrix::getHiresHrf() {
     return hiresHrf;
 }
 
-
 // get the stored temporalDerivative vector for this experiment
-
 vnl_vector<double> &RtDesignMatrix::getTemporalDerivativeBasis() {
     // build it if not built
     if (!hrfIsBuilt) {
@@ -540,7 +578,6 @@ vnl_vector<double> &RtDesignMatrix::getTemporalDerivativeBasis() {
 }
 
 // get the stored high temporal resoltion temporalDerivative vector
-
 vnl_vector<double> &RtDesignMatrix::getHiresTemporalDerivativeBasis() {
     // build it if not built
     if (!hrfIsBuilt) {
@@ -551,9 +588,7 @@ vnl_vector<double> &RtDesignMatrix::getHiresTemporalDerivativeBasis() {
 }
 
 // loads an hrf vector from a file
-
-bool RtDesignMatrix::loadHrfFile(vnl_vector<double> &hrf,
-                                 string filename) {
+bool RtDesignMatrix::loadHrfFile(vnl_vector<double> &hrf, string filename) {
     vcl_ifstream in(filename.c_str(), ios::in);
     if (in.fail()) {
         return false;
@@ -579,7 +614,6 @@ bool RtDesignMatrix::loadHrfFile(vnl_vector<double> &hrf,
 
 // build a gamma pdf with shape and scale parms
 // see http://www.itl.nist.gov/div898/handbook/apr/section1/apr165.htm
-
 double gammaPDF(double t, double a, double b) {
     return pow(b, a) / vnl_gamma(a) * pow(t, a - 1) * exp(-b * t);
 }
@@ -587,7 +621,6 @@ double gammaPDF(double t, double a, double b) {
 // builds an hrf vector 
 // NOTE: first file loading is attempted, then if that fails a double gamma
 // cannonical hrf is built
-
 bool RtDesignMatrix::buildHrf() {
 
     // try to load from file
@@ -611,9 +644,9 @@ bool RtDesignMatrix::buildHrf() {
     vnl_vector<double> shiftedHrf(hiresHrf.size(), 0);
     for (unsigned int i = 0; i < hiresHrf.size(); i++) {
         hiresHrf.put(i, gammaPDF(i, hrfTimeToPeakPos, dt)
-                     - gammaPDF(i, hrfTimeToPeakNeg, dt) / hrfPosToNegRatio);
+                - gammaPDF(i, hrfTimeToPeakNeg, dt) / hrfPosToNegRatio);
         shiftedHrf.put(i, gammaPDF(i - 1 / dt, hrfTimeToPeakPos, dt)
-                       - gammaPDF(i - 1 / dt, hrfTimeToPeakNeg, dt) / hrfPosToNegRatio);
+                - gammaPDF(i - 1 / dt, hrfTimeToPeakNeg, dt) / hrfPosToNegRatio);
     }
     hiresHrf /= hiresHrf.sum();
     shiftedHrf /= shiftedHrf.sum();
@@ -630,7 +663,7 @@ bool RtDesignMatrix::buildHrf() {
     for (unsigned int i = 0; i < hrf.size(); i++) {
         hrf.put(i, hiresHrf[static_cast<unsigned int> (rint(i / hrfSamplePeriod))]);
         temporalDerivative.put(i,
-                               hiresTemporalDerivative[static_cast<unsigned int> (rint(i / hrfSamplePeriod))]);
+                hiresTemporalDerivative[static_cast<unsigned int> (rint(i / hrfSamplePeriod))]);
     }
 
     if (DEBUG_LEVEL & MODERATE) {
@@ -664,7 +697,6 @@ bool RtDesignMatrix::buildHrf() {
 }
 
 // convolves a vector with the hrf for this design
-
 vnl_vector<double> RtDesignMatrix::convolveVecWithHrf(const vnl_vector<double> &v) {
     vnl_vector<double> conHiresV(v.size() / hrfSamplePeriod);
 
@@ -689,7 +721,6 @@ vnl_vector<double> RtDesignMatrix::convolveVecWithHrf(const vnl_vector<double> &
 }
 
 // convolves a vector with the temporal derivative response vector
-
 vnl_vector<double> RtDesignMatrix::convolveVecWithTemporalDerivative(const vnl_vector<double> &v) {
     vnl_vector<double> conHiresV(v.size() / hrfSamplePeriod);
 
@@ -717,7 +748,6 @@ vnl_vector<double> RtDesignMatrix::convolveVecWithTemporalDerivative(const vnl_v
 // in
 //   onset (trs) of the event
 //   duration (trs) of the event
-
 bool RtDesignMatrix::addEvent(double onset, double duration) {
     // check bounds
     if (onset >= numMeas) {
@@ -768,7 +798,6 @@ bool RtDesignMatrix::addEvent(double onset, double duration) {
 // add artifact to be modeled
 // in
 //   tr of the artifact
-
 bool RtDesignMatrix::addArtifact(unsigned int thisTr) {
     // check bounds
     if (thisTr >= numMeas) {
@@ -791,7 +820,6 @@ bool RtDesignMatrix::addArtifact(unsigned int thisTr) {
 
     return true;
 }
-
 vnl_vector<double> RtDesignMatrix::getArtifactTimepoints() {
 
     // initialize return vector
@@ -826,7 +854,6 @@ vnl_vector<double> RtDesignMatrix::getArtifactTimepoints() {
 // RtModelFit::process()
 //  in 
 //   tr of the timepoint to update for
-
 bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 
     if (!isBuilt) {
@@ -863,7 +890,6 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 // build a row of the GLM deign matrix
 // in
 //  current image
-
 vnl_vector<double> RtDesignMatrix::getRow(unsigned int timepoint) {
 
     // bounds check
@@ -876,7 +902,6 @@ vnl_vector<double> RtDesignMatrix::getRow(unsigned int timepoint) {
 
 // get the covariance of a contrast given a contrast vector
 // if this matrix is X, this function computes c' pinv(X'X) c
-
 double RtDesignMatrix::computeContrastCovariance(vnl_vector<double> &contrastVector) {
     if (contrastVector.size() != columns()) {
         cerr << "ERROR: number of elements in contrast vector does not match the number of columns in the design matrix" << endl;
@@ -888,7 +913,7 @@ double RtDesignMatrix::computeContrastCovariance(vnl_vector<double> &contrastVec
     // experiment when all regressors are known. it would be nice to compute
     // final values using the known design.
     vnl_matrix<double> convec(contrastVector.data_block(),
-                              contrastVector.size(), 1);
+            contrastVector.size(), 1);
     vnl_svd<double> pinv(transpose() * (*this));
     vnl_matrix<double> result = convec.transpose() * pinv.pinverse() * convec;
     return result.get(0, 0);
@@ -902,10 +927,7 @@ double RtDesignMatrix::computeContrastCovariance(vnl_vector<double> &contrastVec
 //  out
 //   true if assigned
 //   false if index out of bounds
-
-unsigned int RtDesignMatrix::addColumn(const vnl_vector<double> &vals,
-                                       string name,
-                                       bool interest) {
+unsigned int RtDesignMatrix::addColumn(const vnl_vector<double> &vals, string name, bool interest) {
     unsigned int col = numAddedColumns;
 
     if (col >= columns()) { // check bounds
@@ -922,8 +944,102 @@ unsigned int RtDesignMatrix::addColumn(const vnl_vector<double> &vals,
     return numAddedColumns - 1;
 }
 
-// print
+// read design matrix information from a text file
+//  in
+//   filename:  text file with design matrix info, specified in configuration file
+bool RtDesignMatrix::loadDesignMatrixFile(string filename) {
+    // declare file stream
+    ifstream in(filename.c_str(), ifstream::in);
 
+    // check file
+    if (!in.good()) {
+        cout << "Problem opening design matrix file" << endl;
+        return false;
+    }
+
+    unsigned int numTP = UINT_MAX;
+    string cthname = "";
+    unsigned int currentRow = 0;
+
+    while (in) {
+        // declare variables
+        string s;
+        stringstream ss;
+
+        // get line from file and put it into stringstream
+        getline(in, s);
+        ss << s;
+
+        // ignore comment lines
+        if (!strncmp(ss.str().c_str(), "#", 1)) {
+            continue;
+        }
+
+        // read in number of time points and number of conditions
+        if (numTP == UINT_MAX) {
+            ss >> numTP;
+            ss >> numInputConditions;
+
+            // check numTP just for consistency
+            if (numTP != numMeas) {
+                cerr << "warning: number of timepoints specified in design matrix file does not match numMeas set in conf file" << endl;
+                return false;
+            }
+
+            // check declared number of conditions
+            if (numInputConditions > MAX_CONDITIONS) {
+                cerr << "warning: max number of conditions exceeded." << endl;
+                return false;
+            }
+            else if (numInputConditions > 0) {
+                // allocate condition matrix
+                conditionNames.reserve(MAX_CONDITIONS);
+                inputConditions.clear();
+                inputConditions.set_size(numMeas, MAX_CONDITIONS);
+                inputConditions.fill(0);
+                conditionShift = 0; // TODO should this be set somehow?
+            }
+            else {
+                // numInputConditions is zero or less (i.e. a null case)
+            }
+            continue;
+        }
+
+        // read in condition names. Note this assumes each condition has a name
+        if (cthname.empty()) {
+            for (unsigned int c = 0; c < numInputConditions; c++) {
+                ss >> cthname;
+                conditionNames.push_back(cthname);
+
+                // if we've read all of the condition names, continue
+                if (c == numInputConditions - 1) {
+                    continue;
+                }
+            }
+            continue;
+        }
+        // read in condition data
+        double cond;
+        for (unsigned int c = 0; c < numInputConditions; c++) {
+            ss >> cond;
+            inputConditions.put(currentRow, c, cond);
+        }
+        currentRow++;
+
+        // if we are on the last row, set blockLen
+        if (in.eof()) {
+            // set the blockLen if its not been set
+            if (blockLen == 0) {
+                blockLen = currentRow;
+                cout << "auto setting blockLen to " << blockLen << endl;
+            }
+            break;
+        }
+    }
+    return true;
+}
+
+// print
 void RtDesignMatrix::print() {
     for (unsigned int r = 0; r < rows(); r++) {
         for (unsigned int c = 0; c < cols(); c++) {
@@ -934,7 +1050,6 @@ void RtDesignMatrix::print() {
 }
 
 // serialize the data as xml for transmission or saving to a file
-
 TiXmlElement *RtDesignMatrix::serializeAsXML(TiXmlElement *requestElement) {
 #define NUM_SIGFIGS 6
 
@@ -1093,7 +1208,6 @@ TiXmlElement *RtDesignMatrix::serializeAsXML(TiXmlElement *requestElement) {
 }
 
 // unserialize the data received as xml and make appropriate changes to design
-
 void RtDesignMatrix::unserializeXML(TiXmlElement *element) {
 
     // step through request element looking for a designmatrix request node
@@ -1102,9 +1216,212 @@ void RtDesignMatrix::unserializeXML(TiXmlElement *element) {
         // step through designmatrix request node, checking all nodes for valid part requests
         for (TiXmlElement *dmPart = 0; (dmPart = (TiXmlElement*) dm->IterateChildren(dmPart));) {
 
+            // look for condition tags (implies setting design matrix via infoserver
+            if (!strcmp(dmPart->Value(), "condition")) {
+
+                TiXmlElement *condition = dmPart;
+
+                //get condition name TODO put this somewhere meaningful
+                const char *conditionName = condition->Attribute("name");
+                if (conditionName == NULL) {
+                    cerr << "Specified attribute 'condtion name' does not exist" << endl;
+                    continue;
+                }
+
+                // initalize variables to be filled by parsing
+                vector<double> onsets, durations, column, weights;
+
+                // loop through condition node to find parts and act accordingly
+                for (TiXmlElement *condPart = 0; (condPart = (TiXmlElement*) condition->IterateChildren(condPart));) {
+
+                    // read through getText and fill up onsets
+                    if (!strcmp(condPart->Value(), "onsets")) {
+                        stringstream onsetsStr;
+                        onsetsStr << condPart->GetText();
+
+                        // this goes through string and puts each onset into the onset vector
+                        unsigned int i = 0;
+                        while (!onsetsStr.eof()) {
+                            // resize onset vector to hold latest element
+                            onsets.resize(onsets.size() + 1);
+
+                            // puts latest onset into onset vector
+                            onsetsStr >> onsets.at(i);
+
+                            // iterate counter
+                            i++;
+                        }
+                        continue;
+                    }
+
+                    // read through getText and fill up durations
+                    if (!strcmp(condPart->Value(), "durations")) {
+
+                        stringstream durationsString;
+                        durationsString << condPart->GetText();
+
+                        // this goes through string and puts each onset into the onset vector
+                        unsigned int i = 0;
+                        while (!durationsString.eof()) {
+                            // resize vector to hold latest element
+                            durations.resize(durations.size() + 1);
+
+                            // puts latest value into vector
+                            durationsString >> durations.at(i);
+
+                            // iterate counter
+                            i++;
+
+                            // todo note: durations should be either 1 or the same length as onsets.
+                            // this check'll have to be done later probably
+                        }
+                        continue;
+                    }
+
+                    // read through GetText and fill up column
+                    if (!strcmp(condPart->Value(), "column")) {
+                        // read in column and add it
+                        stringstream columnString;
+                        columnString << condPart->GetText();
+
+                        // this goes through string and puts the column into the column vector
+                        unsigned int i = 0;
+                        while (!columnString.eof()) {
+                            // resize vector to hold latest element
+                            column.resize(column.size() + 1);
+
+                            // puts latest value into vector
+                            columnString >> column.at(i);
+
+                            // iterate counter
+                            i++;
+
+                            // todo will need check on number of elements
+                        }
+                        continue;
+                    }
+
+                    // read through GetText and fill up weights
+                    if (!strcmp(condPart->Value(), "weights")) {
+                        stringstream weightsString;
+                        weightsString << condPart->GetText();
+
+                        // this goes through string and puts the column into the column vector
+                        unsigned int i = 0;
+                        while (!weightsString.eof()) {
+                            // resize vector to hold latest element
+                            weights.resize(weights.size() + 1);
+
+                            // puts latest value into vector
+                            weightsString >> weights.at(i);
+
+                            // iterate counter
+                            i++;
+                        }
+                        continue;
+                    }
+                }
+
+                // now that we have either onsets/durations or a column, do appropriate things
+                if (!onsets.empty() && !durations.empty()) {
+                    for (unsigned int ondur = 0; ondur < onsets.size(); ondur++) {
+                        // if there is only one duration, use it for all onsets
+                        // to add events
+                        if (durations.size() == 1) {
+                            addEvent(onsets[ondur], durations[0]);
+                        }
+                        else if (durations.size() == onsets.size()) {
+                            addEvent(onsets[ondur], durations[ondur]);
+                        }
+                        else {
+                            cerr << "mismatch between onsets and durations" << endl;
+                            continue;
+                        }
+                    }
+                }
+                else if (!column.empty()) {
+                    // todo
+                }
+                else {
+                    // something is missing
+                }
+
+            }
+
+            // look for conditionShift (should accompany a condition)
+            if (!strcmp(dmPart->Value(), "conditionShift")) {
+                if (!RtConfigVal::convert<unsigned int>(conditionShift, dmPart->GetText())) {
+                    string errString = "error converting conditionShift";
+                    cerr << errString << endl;
+                    continue;
+                }
+            }
+
             // look for matrix tags (implies setting full matrix via infoserver)
-            if (!strcmp(dmPart->Value(),"matrix")) {
-                //TODO
+            if (!strcmp(dmPart->Value(), "matrix")) {
+
+                TiXmlElement *matrix = dmPart;
+
+                // then loop through rows,cols and fill in each number accordingly
+                unsigned int rows, cols;
+
+                // read rows attribute
+                const char *attribute = matrix->Attribute("rows");
+                if (attribute == NULL) {
+                    cerr << "Specified attribute 'rows' does not exist" << endl;
+                    continue;
+                }
+                if (!RtConfigVal::convert<unsigned int>(rows, attribute)) {
+                    string errString = "error converting rows attribute to integer";
+                    cerr << errString << endl;
+                    continue;
+                }
+
+                // read cols attribute
+                attribute = matrix->Attribute("cols");
+                if (attribute == NULL) {
+                    cerr << "Specified attribute 'cols' does not exist" << endl;
+                    continue;
+                }
+                if (!RtConfigVal::convert<unsigned int>(cols, attribute)) {
+                    string errString = "error converting cols attribute to integer";
+                    cerr << errString << endl;
+                    continue;
+                }
+
+                // allocate space for matrix
+                clear();
+                set_size(rows,cols);
+                fill(0);
+
+                // read matrix data text into string
+                stringstream matrixStr;
+                matrixStr << matrix->GetText();
+
+                // create some iteration variables
+                unsigned int r = 0;
+                unsigned int c = 0;
+
+                // loop through string and read into design matrix
+                while (!matrixStr.eof()) {
+
+                    // read a number from string into design matrix and
+                    // move to next column
+                    matrixStr >> this->operator()(r, c);
+                    c++;
+
+                    // wrap rows when we reach the end of the columns
+                    if (c == cols) {
+                        c = 0;
+                        r++;
+                    }
+
+                    // if we hit the end, break out
+                    if (r > rows) {
+                        cerr << "There is a descrepancy between stated number of rows and actual numbers" << endl;
+                        break;
+                    }
+                }
             }
 
             // look for cell tags (implies setting single element in design matrix via infoserver)
@@ -1232,5 +1549,3 @@ void RtDesignMatrix::unserializeXML(TiXmlElement *element) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

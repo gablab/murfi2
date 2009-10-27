@@ -208,7 +208,12 @@
         <design>
             <option name="disabled"> false </option>
             
-            <option name="setFromXML"> true </option>
+            <option name="loadDesignMatrixFromFile"> true </option>
+            <option name="designMatrixFilename"> designmatrix.txt </option>
+
+            <!-- whether to pad the rest of the condition with zeros or repeat
+            until the end of the scan -->
+            <option name="padConditionWithZeros"> false </option>
             
             <!-- parameters specifying neural conditions of interest -->
 
@@ -216,13 +221,13 @@
            and the rest 0s. if there is a cyclic block pattern then
            only one cycle's worth needs to be specified, the program
            will repeat that pattern until the end of the scan. -->
-            <option name="condition" conditionName="on">
+ <!--           <option name="condition" conditionName="on">
                 0 0 0 0 0
                 1 1 1 1 1
             </option>
             
-            <option name="conditionShift"> 0 </option>
-            
+            <option name="conditionShift"> 0 </option>-->
+
             <!-- whether each block should be independently modeled, or
            whether like conditions should be lumped into one regressor -->
             <option name="modelEachBlock"> false </option>
@@ -244,7 +249,6 @@
             
             <!-- filename from which to load a custom hrf (overrides cannonical) -->
             <option name="hrfFilename"> unset </option>
-            
             
             <!-- parameters specifying nuisance basis functions -->
 

@@ -1,0 +1,15 @@
+# design matrix
+# comment line
+#
+85 1
+on
+0
+0
+0
+0
+0
+1
+1
+1
+1
+1

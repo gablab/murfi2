@@ -252,6 +252,12 @@ protected:
     // convolves a vector with the temporal derivative basis
     vnl_vector<double> convolveVecWithTemporalDerivative(const vnl_vector<double> &v);
 
+    // read design matrix information from a text file
+    bool loadDesignMatrixFile(string filename);
+
+    // do the actual design matrix construction
+    bool buildDesignMatrix();
+
     // data members
     bool isBuilt;
     unsigned int numAddedColumns; // number of columns filled in
@@ -294,6 +300,13 @@ protected:
     double hrfTimeToPeakPos;
     double hrfTimeToPeakNeg;
     double hrfPosToNegRatio;
+
+    // load design matrix from file
+    bool loadDesignMatrixFromFile;
+    string designMatrixFilename;
+
+    // pad with zeros
+    bool padConditionWithZeros;
 
     // load hrf from file (overrides cannonical hrf)
     bool loadHrf;

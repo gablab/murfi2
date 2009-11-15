@@ -38,7 +38,7 @@ bool RtProcessor::configure(RtConfig &config) {
 
     // create the head and tail by passing them up to the superclass
     ACE_NEW_RETURN(tail, Module(ACE_TEXT("end module"), 
-				new RtEndTask(NULL)), -1);
+				new RtEndTask(NULL,true)), -1);
     RtStream::open(NULL, head, tail);
 
     return addModules(config);

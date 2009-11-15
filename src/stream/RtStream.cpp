@@ -48,7 +48,7 @@ bool RtStream::configure(RtConfig &config) {
 
     // create the head and tail by passing them up to the superclass
     ACE_NEW_RETURN(tail, Module(ACE_TEXT("end module"), 
-				new RtEndTask(&openMsgs)), -1);
+				new RtEndTask(&openMsgs, false)), -1);
     super::open(NULL, head, tail);
 
     return addModules(config);

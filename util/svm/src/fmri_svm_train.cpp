@@ -38,7 +38,9 @@ int main(int argc, char **argv) {
   cout << "reading in training data " << endl;
 
   // get the training data
-  createTrainingData(parms);
+  if(!createTrainingData(parms)) {
+    return 1;
+  }
 
   cout << "training model " << endl;
 
@@ -236,4 +238,6 @@ bool createTrainingData(Parms &parms) {
 //		    &parms.strctParm, 
 //		    &parms.learnParm, 
 //		    &parms.kernelParm);
+
+  return true;
 }

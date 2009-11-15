@@ -17,8 +17,8 @@ void usage(char *execname) {
   cerr << "usage: " << execname
        << " niftifile "
        << " ["
-       << "port "
        << "host "
+       << "port "
        << "tr "
        << "]"
        << endl;
@@ -34,8 +34,8 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   // args
   int arg = 1;
   string niifile(argv[arg++]);
-  int port = argc > arg ? atoi(argv[arg++]) : 15000;
   string host(argc > arg ? argv[arg++] : "localhost");
+  int port = argc > arg ? atoi(argv[arg++]) : 15000;
   float inputTr = (argc > arg ? atof(argv[arg++]) : -1);
 
   // Local server address.
@@ -163,7 +163,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     //// send nonmoco image
     cout << "sending img  " << ei->iAcquisitionNumber << endl;
 
-    ei->displayImageInfo();
+    //ei->displayImageInfo();
 
     char *data = new char[ei->iSizeOfRtExternalImageInfo];
     ei->bIsMoCo = false;

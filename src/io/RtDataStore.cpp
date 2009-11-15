@@ -32,6 +32,19 @@ void RtDataStore::setData(RtData *data) {
   
   mut.acquire();
 
+  // special check for processing done
+  if(data->getDataID().getModuleID() == "end-task") {
+    // update value of latestTR
+    if (data->getDataID().getTimePoint() != DATAID_NUM_UNSET_VALUE &&
+	data->getDataID().getTimePoint() != DATAID_NUM_WILDCARD_VALUE) {
+
+      latestTR = data->getDataID().getTimePoint();
+    }
+        
+    mut.release();
+    return;
+  }
+
   // don't allow wildcards on insertion
   RtDataID insert = data->getDataID();
   if(insert.hasWildcards()) {
@@ -43,13 +56,6 @@ void RtDataStore::setData(RtData *data) {
 
   // add to availableData (needs a hard copy of the dataID)
   setAvailableData(data->getDataID());
-
-  // update value of latestTR
-  if (data->getDataID().getTimePoint() != DATAID_NUM_UNSET_VALUE &&
-      data->getDataID().getTimePoint() != DATAID_NUM_WILDCARD_VALUE) {
-
-      latestTR = data->getDataID().getTimePoint();
-  }
 
   mut.release();
   

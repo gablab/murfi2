@@ -12,7 +12,7 @@ FrToolBar::FrToolBar(QWidget* parent, FrActionManager* mngr)
 
 void FrToolBar::Retranslate(){
     this->setWindowTitle(
-        QApplication::translate("MainWindow", "festr", 0, 
+        QApplication::translate("MainWindow", "murfi", 0, 
         QApplication::UnicodeUTF8));
 }
 

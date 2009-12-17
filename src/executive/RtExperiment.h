@@ -31,6 +31,12 @@ int executeRunBlocking(RtConfigFmriRun &conf);
 // get the unique ID number for this study
 unsigned int getExperimentStudyID();
 
+// start the compute timer
+bool startComputeTimer();
+
+// stop the compute timer and return the time
+double stopComputeTimer();
+
 // get the current experiment elapsed time in ms
 double getExperimentElapsedTime();
 

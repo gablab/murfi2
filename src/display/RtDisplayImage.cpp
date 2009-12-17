@@ -72,7 +72,7 @@
 #define DEFAULT_W 600
 #define DEFAULT_H 600
 #define DEFAULT_NUMMEAS 600
-#define DEFAULT_TITLE "festr"
+#define DEFAULT_TITLE "murfi"
 #define DEFAULT_POSOVERLAYID "data.image.activation.voxel-singleimcor"
 #define DEFAULT_POSOVERLAYROIID "unset"
 #define DEFAULT_POSMASKID "data.image.mask"

@@ -76,8 +76,9 @@ static unsigned int studyID;
 // list of mask filenames to align
 static vector<string> masksToAlign;
 
-// experiment timer
+// timers
 static timer experimentTimer;
+static timer computeTimer;
 
 static string execName;
 
@@ -132,6 +133,26 @@ unsigned int getNextUniqueSeriesNum() {
   return uids.size()+numExistingSeries;
 }
 
+// reset and start the compute timer
+bool startComputeTimer() {
+  if(computeTimer.is_running()) {
+    return false;
+  }
+
+  computeTimer.restart();
+  return true;
+}
+
+// stop the compute timer and return the elapsed time
+double stopComputeTimer() {
+  if(!computeTimer.is_running()) {
+    return -1;
+  }
+
+  computeTimer.stop();
+  return computeTimer.elapsed_time();
+}
+  
 // get the current experiment elapsed time in ms
 double getExperimentElapsedTime() {
   return 1000*experimentTimer.elapsed_time();

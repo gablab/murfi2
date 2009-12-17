@@ -16,7 +16,7 @@
 OS=linux
 
 # project name
-PROJECT = festr
+PROJECT = murfi
 
 # whether to compile with the frontend gui
 export FRONTEND = 0

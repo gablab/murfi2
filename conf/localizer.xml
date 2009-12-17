@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- example festr configuration file for functional localizer analysis -->
+<!-- example murfi configuration file for functional localizer analysis -->
 <!--  Oliver Hinds <ohinds@mit.edu> 2009-04-09  -->
 
 <study name="STUDY_NAME">

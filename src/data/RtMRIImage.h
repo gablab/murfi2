@@ -150,7 +150,6 @@ protected:
 
   // received data parms
   bool fromScanner;
-  
 };
 
 

@@ -21,6 +21,7 @@ class timer
   // using 'start' or 'restart'
   timer() : running(false), start_clock(0), start_time(0), acc_time(0) { }
 
+  bool is_running() {return running;}
   double elapsed_time();
   void start(const char* msg = 0);
   void restart(const char* msg = 0);

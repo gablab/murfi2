@@ -97,7 +97,7 @@ void FrMainWindow::SetupUi(QMainWindow* mainWindow){
 void FrMainWindow::RetranslateUi(QMainWindow* mainWindow){
     // Performe retranslation
     mainWindow->setWindowTitle(
-        QApplication::translate("MainWindow", "festr", 0, 
+        QApplication::translate("MainWindow", "murfi", 0, 
         QApplication::UnicodeUTF8));
 
     m_ActionManager->Retranslate();

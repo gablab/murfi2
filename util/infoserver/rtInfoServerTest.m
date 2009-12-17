@@ -1,8 +1,8 @@
 function rtInfoServerTest(varargin)
 %RTINFOSERVERTEST runs connection, setting, and receiving tests for the
-% RtInfoServer in festr.
+% RtInfoServer in murfi.
 %
-% NOTE: currently you have to start festr (with the rtInfoServerTest.xml
+% NOTE: currently you have to start murfi (with the rtInfoServerTest.xml
 % conf file) as well as the example_data/scripts/servedata.sh image server
 % before running this test. 
 
@@ -472,17 +472,17 @@ catch ME
 end
 
 %% leftovers
-% % start up festr
-% fprintf('Starting festr...\n')
-% [status,result] = system('../../bin/festr -f rtInfoServerTest.xml &');
+% % start up murfi
+% fprintf('Starting murfi...\n')
+% [status,result] = system('../../bin/murfi -f rtInfoServerTest.xml &');
 % 
 % % if something broke, print it
 % if status
 %     fprintf(result);
 % end
 % 
-% % let festr warm up a little
-% fprintf('Letting festr warm up...\n')
+% % let murfi warm up a little
+% fprintf('Letting murfi warm up...\n')
 % pause(3);
 % 
 % % start picture server
@@ -492,9 +492,9 @@ end
 % % let pictures run a bit
 % pause(3);
 
-% % kill festr process
-% fprintf('Killing festr...\n')
-% [status,result] = system('kill -9 `ps -o pid h -C festr`');
+% % kill murfi process
+% fprintf('Killing murfi...\n')
+% [status,result] = system('kill -9 `ps -o pid h -C murfi`');
 % TODO need to kill the serving?
 % 
 % % if something broke, print out result

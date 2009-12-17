@@ -329,7 +329,7 @@
     </module>
     
     <module name="dataviewer">
-        <option name="disabled"> true </option>
+        <option name="disabled"> false </option>
         <option name="print"> false </option>
         
         <!--       <option name="dataid"> -->

@@ -228,6 +228,15 @@ int RtInputScannerImages::svc() {
       cout << "connection accepted" << endl;
     }
 
+    if(getExperimentConfig().get("study:timeComputations") == true 
+       && !startComputeTimer()) {
+      cout << "warning: compute timer already started, timing will be inaccurate" 
+	   << endl;
+    }
+    else {
+      cout << "started compute timer" << endl;
+    }
+
     // get the info
     ei = receiveImageInfo(stream);
     if(ei == NULL) {

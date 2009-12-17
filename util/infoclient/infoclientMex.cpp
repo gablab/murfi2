@@ -1,6 +1,6 @@
 /**
  * infoclient is a mex interface to infoclientLib, which provides
- * communication with festr's infoserver
+ * communication with murfi's infoserver
  *
  *    first argument is a command (success indicated with logical 0) :
  *       start:  starts the infoclient.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- example festr configuration file for realtime fMRI task triggering -->
+<!-- example murfi configuration file for realtime fMRI task triggering -->
 <!--  Oliver Hinds <ohinds@mit.edu> 2009-04-09  -->
 
 <study name="STUDY_NAME">

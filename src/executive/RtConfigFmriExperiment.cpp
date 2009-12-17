@@ -26,7 +26,7 @@ using namespace boost::filesystem;
 // defaults
 
 // dirs
-static const string DEFAULT_SOFTWAREDIR(   "/sw/festr/trunk");
+static const string DEFAULT_SOFTWAREDIR(   "/sw/murfi/trunk");
 static const string DEFAULT_VOLUMEDIR(     "img/");
 static const string DEFAULT_MASKDIR(       "mask/");
 static const string DEFAULT_XFMDIR(        "xfm/");

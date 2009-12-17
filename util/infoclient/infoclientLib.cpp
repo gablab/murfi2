@@ -1,5 +1,5 @@
 /**
- * infoclientLib provides an interface to festr's infoserver
+ * infoclientLib provides an interface to murfi's infoserver
  *
  * Oliver Hinds <ohinds@mit.edu> 2009-05-01
  **/

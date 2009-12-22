@@ -5,8 +5,8 @@
 
 <study name="example">
     <!-- this is assuming the run directory is the base directory -->
+    <!--<option name="subjectsDir"> . </option> netbeans-->
     <option name="subjectsDir"> ../../ </option>
-    
     <subject>
         <option name="name">example_data</option>
     </subject>

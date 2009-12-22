@@ -27,23 +27,13 @@ end
 
 % if dataIDString field does not exist or is empty, set to design-matrix
 if ~isfield(strParams,'dataIDString') || isempty(strParams.dataIDString)
-    strParams.dataIDString = ':*:*:*:*:*:*:design-matrix::';
+    strParams.dataIDString = createDataIDString; % no args just returns string to get design-matrix
 end
 
 % if requestString field does not exist or is empty, set to retrieve
 % just the matrix portion of designmatrix
 if ~isfield(strParams,'requestString') || isempty(strParams.requestString)
-    strParams.requestString = sprintf([...
-        '<?xml version="1.0" encoding="UTF-8"?>' ...
-        '<info>' ...
-        ['<get dataid="',':*:*:*:*:*:*:design-matrix::','">']...
-        '<designmatrix>',...
-        '<matrix>',...
-        '</matrix>',...
-        '</designmatrix>',...
-        '</get>' ...
-        '</info>' ...
-        ]);
+    strParams.requestString = createGetRequestString(createDataIDString,'matrix');
 end
 
 % msg termination string
@@ -54,7 +44,7 @@ portnum = strParams.TCP_PORT;
 
 if isATest
     % call dummy infoserver
-    strOut = rtDummyInfoServer(strParams);
+    strOut = dummyInfoServer(strParams);
 else
     % open the socket
     try

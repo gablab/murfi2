@@ -12,6 +12,8 @@ function usage() {
     echo "  -r:            don't make roi masks"
     echo "  -c <int>:      use contrast with this index [default is 1]"
     echo "  -n <roi_name>: name of the roi to save [default is <funcloc_name>]"
+    echo "  -b:            don't make a background roi"
+    echo "  -N:            background roi name [default is <funcloc_name>_background]"
     echo "  -h:            print help"
     echo "  -?:            print help"
     exit
@@ -33,11 +35,13 @@ fi
 do_make_vol=1
 do_run_fsl=1
 do_choose_mask=1
+do_make_background=1
 con_num=1
 mask_name=$anal
+background_mask_name="$anal"_background
 
 # parse options
-while getopts  "mfrc:n:h?" flag
+while getopts  "mfrc:n:bN:h?" flag
 do
     case $flag in
 	m) do_make_vol=0;;
@@ -49,6 +53,8 @@ do
 	       usage;
 	   fi;;
 	n) mask_name=$OPTARG;;
+	b) do_make_background=0;;
+	N) background_mask_name=$OPTARG;;
     [h,?]) usage;;
 	*) echo "unknown option $flag, ignored";;
     esac
@@ -144,7 +150,7 @@ function choose_mask() {
 	    read clust
 	done
 
-	fslmaths "$fn" -thr $clust -uthr $clust -bin nb"$fn" 
+	fslmaths "$fn" -thr $clust -uthr $clust -bin "$fn" 
 	
 	# save/combine
 	save_response=""
@@ -191,6 +197,63 @@ function choose_mask() {
 
 }
 
+function make_background() {
+    echo "creating background mask from analysis $anal contrast $con_num"
+
+    # 
+    want_done=0
+    first_time=1
+    while [ "$want_done" == "0" ]; do
+
+	# allow threshold picking after first time
+	if [ ! $first_time == 1 ]; then
+	    echo "enter the desired upper absolute threshold for creating a background mask region: "
+	    read thresh
+	    while [ ! `echo $thresh | sed "s/[0-9.]//g"` == "" ]; do
+		echo -n "entered threshold is non-numeric, reenter: "
+		read thresh
+	    done
+	else
+	    first_time=0
+	    thresh=0.1;
+	fi
+	
+	# build background mask as the tstats between $thresh and
+	# -$thresh, binarized and brain masked.
+	echo "fslmaths 
+            funcloc/$anal.feat/stats/tstat$con_num 
+	    -uthr $thresh 
+	    -thr -$thresh 
+	    -bin 
+	    -mas funcloc/$anal.feat/mask 
+	    $background_mask_name
+	    -odt float"
+	fslmaths \
+	    funcloc/$anal.feat/stats/tstat$con_num \
+	    -uthr $thresh \
+	    -thr -$thresh \
+	    -bin \
+	    -mas funcloc/$anal.feat/mask \
+	    mask/$background_mask_name \
+	    -odt float
+
+	# display
+	echo "starting fslview with background mask from contrast $con_num from the $anal analysis"
+	fslview funcloc/$anal.feat/example_func mask/$background_mask_name &
+
+	# query for finished
+	done_response=""
+	while [ "$done_response" != "y" -a "$done_response" != "n" ]; do
+	    echo -n "done? [y/n]: "
+	    read done_response
+	done
+	if [ "$done_response" == "y" ]; then
+	    want_done=1
+	fi
+    done
+
+}
+
 ## main
 
 if [ $do_make_vol == "1" ]; then
@@ -203,4 +266,8 @@ fi
 
 if [ $do_choose_mask == "1" ]; then
     choose_mask
+fi
+
+if [ $do_make_background == "1" ]; then
+    make_background
 fi

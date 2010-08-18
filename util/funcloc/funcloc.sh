@@ -31,13 +31,16 @@ if [ ! -f "scripts/$anal.fsf" ]; then
     usage
 fi
 
+export FSLOUTPUTTYPE=NIFTI
+
 # config vars
 do_make_vol=1
 do_run_fsl=1
 do_choose_mask=1
 do_make_background=1
 con_num=1
-mask_name=$anal
+mask_name=$anal.nii
+background_mask_name="$anal"_background.nii
 background_mask_name="$anal"_background
 
 # parse options

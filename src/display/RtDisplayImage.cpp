@@ -11,13 +11,6 @@
 #include"RtDataIDs.h"
 #include"RtExperiment.h"
 
-/*************
- * ohinds: 2009-01-18
-// Alexsid <scopic> 
-// commented since this stuff is not used 
-// int frontend app. (Remove errors).
-**************/
-
 #include<vnl/vnl_vector.h>
 #include "gnuplot_i_vxl.h"
 #include "simple_ls.h"
@@ -765,14 +758,6 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 				       *SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
-//      cout << imageData[i] << " " << threshold 
-//	   << " " << overlay->getCeiling() << " " 
-//	   << overlayImg[4*i+1] << " "
-//	   << overlayImg[4*i+0] << "," 
-//	   << overlayImg[4*i+1] << "," 
-//	   << overlayImg[4*i+2] << "," 
-//	   << overlayImg[4*i+3] << "," 
-//	   << endl;
     }
     else if(!overlay->getScaleIsInverted() 
 	    && imageData[i] < -threshold) {
@@ -782,9 +767,6 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 				       *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
-//      cout << imageData[i] << " " << threshold 
-//	   << " " << overlay->getCeiling() << " " 
-//	   << overlayImg[4*i+1] << endl;
     }
     else if(overlay->getScaleIsInverted() 
 	    && fabs(imageData[i]) < threshold) {
@@ -803,10 +785,6 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
     }
   }
   delete [] imageData;
-
-  // debugging
-//  cout << "thresh=" << threshold << endl 
-//       << "min=" << min << endl << "max=" << max << endl;
 
   /* create the image texture */
   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, *overlayTex);

@@ -9,10 +9,9 @@
 //  See http://www.boost.org/libs/filesystem for documentation.
 
 //  As an example program, we don't want to use any deprecated features
-#define BOOST_FILESYSTEM_NO_DEPRECATED
+//#define BOOST_FILESYSTEM_NO_DEPRECATED
 
 #include "boost/filesystem.hpp"
-//#include "boost/filesystem/path.hpp"
 #include <iostream>
 #include <string>
 

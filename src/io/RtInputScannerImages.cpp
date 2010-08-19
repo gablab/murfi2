@@ -66,7 +66,8 @@ RtInputScannerImages::~RtInputScannerImages() {
 bool RtInputScannerImages::open(RtConfig &config) {
   RtInput::open(config);
 
-  // scopic Alan: check for enabled/disabled (another way scanner is always disabled by default if we use frontend gui)
+  // scopic Alan: check for enabled/disabled (another way scanner is always
+  // disabled by default if we use frontend gui)
   if(config.isSet("scanner:disabled")
      && config.get("scanner:disabled")==false) {
     initialized = true;
@@ -203,7 +204,7 @@ bool RtInputScannerImages::init(RtConfigFmriRun &config) {
   numImagesExpected = config.get("scanner:measurements");
   initialized = true;
 
-  return false;     // Alan: returning false by default because here wasnot any return value
+  return true;
 }
 
 // run the scanner input

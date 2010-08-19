@@ -1,9 +1,9 @@
 PROJECT=gnuplot_i_vxl
 
 VXL_INC=/usr/local/include/vxl
-PKG_DIR=/usr/local/packages
+PKG_DIR=/usr/local/
 
-CFLAGS = -ggdb
+CFLAGS = -ggdb -fPIC
 DEFINES = -DDEBUGGA
 INCLUDES = -I$(VXL_INC)/core -I$(VXL_INC)/vcl
 LIBS = -lstdc++ -lvnl
@@ -15,16 +15,18 @@ MAJOR_VER=1
 MINOR_VER=0
 RELEASE_VER=0
 
-INSTALL_TARGET=$(PKG_DIR)/gnuplot_i_vxl
+INSTALL_TARGET=$(PKG_DIR)/
 LIB_DIR=$(INSTALL_TARGET)/lib
 HDR_DIR=$(INSTALL_TARGET)/include
 
 .cpp.o:
 	$(CC) -c $(CFLAGS) $(DEFINES) $(INCLUDES) $<
 
-all::	shared
+all::	static
 
 $(PROJECT).o:	$(PROJECT).cpp $(PROJECT).h
+static: $(PROJECT).o
+	cp $(PROJECT).o $(OBJ_DIR)
 shared: $(PROJECT).o
 	$(CC)  -shared  -Wl,-soname,lib$(PROJECT).so.$(MAJOR_VER) $(PROJECT).o -o lib$(PROJECT).so.$(MAJOR_VER).$(MINOR_VER).$(RELEASE_VER) $(LIBS) 
 

@@ -25,7 +25,8 @@ SRC_FILES = $(wildcard ./*.cpp)
 TMP_FILES = $(patsubst ./%,$(OBJ_DIR)/%,$(SRC_FILES))
 OBJ_FILES = $(TMP_FILES:.cpp=.o) 
 
-default: $(OBJ_FILES)
+default: 
+	cd gnuplot_i++_vxl && $(MAKE)
 
 ############################### CLEAN ################################
 

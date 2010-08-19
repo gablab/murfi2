@@ -2,7 +2,7 @@
 function psychoTest(dataName, roiName)
 
   if(nargin ~= 2)
-    error('usage: psychoTest(dataNames, roiNames)');
+    error('usage: psychoTest(dataName, roiName)');
   end
   
   DEBUG_smallScreen = true;
@@ -24,7 +24,8 @@ function psychoTest(dataName, roiName)
   
   % start the infoclient
   try
-    infoclient('start',15003,'jerome',15002);
+    [stat host] = system('hostname');
+    infoclient('start',15003,host(1:end-1),15002);
   catch 
     shutdown();
     error('failed to start the infoclient');

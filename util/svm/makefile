@@ -54,6 +54,7 @@ SVM_OBJ_FILES = $(SVM_DIR)/svm_struct/svm_struct_learn.o \
 SVM_LIB = $(SVM_OBJ_FILES)
 
 default: fmri_svm_train fmri_svm_test
+obj_files: $(OBJ_FILES)
 
 fmri_svm_train: $(SRC_DIR)/fmri_svm_train.cpp $(SRC_FILES) $(OBJ_FILES) svm_learn_hideo_noexe svm_struct_noexe
 	$(CC) $(CPP_FLAGS) $(SRC_DIR)/$@.cpp $(OBJ_FILES) $(SVM_LIB) -o $(BIN_DIR)/$@ $(LD_FLAGS)

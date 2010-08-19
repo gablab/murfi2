@@ -156,7 +156,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     status = startInfoclient(info, remoteInfo, errMsg);
 
     if(status == SUCCESS) {
-      mexPrintf("started the infoclient.\n");
+      mexPrintf("started the infoclient on %s:%d, listening for %s:%d.\n", 
+		info.host, info.port, remoteInfo.host, remoteInfo.port);
     }
 
     assignSuccessStatus(nlhs,plhs,status);

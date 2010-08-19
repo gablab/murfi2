@@ -22,16 +22,20 @@ else
 endif
 
 default: 
+	cd ../util/svm && $(MAKE) obj_files
 	cd ./executive && $(MAKE)
 	cd ./io &&        $(MAKE)
+	cd ./util &&        $(MAKE)
 	cd ./data &&      $(MAKE)
 	cd ./stream &&    $(MAKE)
 	$(MAKE_FRONT)
 	$(MAKE_OLDFRONT)
 
 clean: 
+	cd ../util/svm && $(MAKE) clean
 	cd ./executive && $(MAKE) clean
 	cd ./io &&        $(MAKE) clean
+	cd ./util &&        $(MAKE) clean
 	cd ./data &&      $(MAKE) clean
 	cd ./stream &&    $(MAKE) clean
 	cd ./display &&   $(MAKE) clean

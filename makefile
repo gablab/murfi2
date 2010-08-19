@@ -20,7 +20,7 @@ PROJECT = murfi
 
 # whether to compile with the frontend gui
 export FRONTEND = 0
-export OLDFRONTEND = 0
+export OLDFRONTEND = 1
 
 # directories 
 export SRC_DIR = $(PWD)/src
@@ -197,9 +197,6 @@ NIFTI_LIB=-lniftiio -lznz -lz -L/$(NIFTI_HOME)/lib
 ifeq ($(OLDFRONTEND),1)
   GLUT_LIB=-lglut
   GLUT_INC=-I/usr/include/GL
-
-  GNUPLOT_INC=-I$(PKG_DIR)/gnuplot_i_vxl/include
-  GNUPLOT_LIB=-lgnuplot_i_vxl -L$(PKG_DIR)/gnuplot_i_vxl/lib
 endif
 
 # vtk
@@ -253,7 +250,6 @@ C_INC = -I$(SRC_DIR) \
 	$(ACE_INC) $(ACE_FLAGS) \
 	$(TINYXML_FLAGS) \
 	$(VXL_INC) \
-	$(GNUPLOT_INC) \
 	$(NIFTI_INC) \
 	$(BOOST_INC)
 
@@ -273,7 +269,6 @@ C_LIB = $(MATH_LIB) \
 	$(ACE_LIB) \
 	$(GLUT_LIB) \
 	$(VXL_LIB) \
-	$(GNUPLOT_LIB) \
 	$(NIFTI_LIB) \
 	$(BOOST_LIB)
 

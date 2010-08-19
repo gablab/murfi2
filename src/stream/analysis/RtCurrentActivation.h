@@ -49,7 +49,7 @@ protected:
     RtDesignMatrix design;
 
     // number of data actually in the error estimate so far
-    int numDataPointsForErrEst;
+    unsigned int numDataPointsForErrEst;
 
     // for post-numDataPointsInErrEst residual storage
     RtActivation *steadyStateResidual;

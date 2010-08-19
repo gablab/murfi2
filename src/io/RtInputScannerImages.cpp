@@ -477,27 +477,6 @@ bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 			    img.getDataID().getTimePoint()));
 }
 
-//// build a filename for a transform file operating on a given image
-//// number
-////  in
-////   acquisition number
-////  out
-////   absolute file string
-//string RtInputScannerImages::getXfmFilename(int _seriesNum,
-//					    int _acquisitionNum) {
-//  // five digit filename assumption here!
-//  char srnum[6];
-//  char acnum[6];
-//  sprintf(srnum,"%05d",_seriesNum);
-//  sprintf(acnum,"%05d",_acquisitionNum);
-//
-//  stringstream s;
-//  s << xfmSavePath << "-" << srnum << "-" << acnum << "." << xfmFileext;
-//  string ret = s.str();
-//
-//  return s.str();
-//}
-
 // determines if the received image is the first image in a series or not
 // examines the acquisition number for 1
 //  in
@@ -505,28 +484,8 @@ bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 //  out
 //   true if this image is the first in a series
 bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
-  return info.iAcquisitionNumber == SERIES_FIRST_ACQ_NUM;
+  return (unsigned int) info.iAcquisitionNumber == SERIES_FIRST_ACQ_NUM;
 }
-
-// gets the next series number to be saved in the current image directory
-// inspects the series currently in the directory and makes a new one
-//unsigned int RtInputScannerImages::getNextSeriesNum() {
-//  fstream fin;
-//  string fname;
-//
-//  for(unsigned int sn = seriesNum; sn < MAX_SERIESNUM; sn++) {
-//    fname = getImageFilename(sn, 1);
-//    fin.open(fname.c_str());
-//
-//    if(fin.fail() ) {
-//      fin.close();
-//      return sn;
-//    }
-//    fin.close();
-//  }
-//
-//  return MAX_SERIESNUM;
-//}
 
 // gets the version
 //  out:

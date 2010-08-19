@@ -25,8 +25,6 @@
 #include<vector>
 #include<map>
 
-#include "add_functions.h"
-
 using namespace std;
 
 // class declaration

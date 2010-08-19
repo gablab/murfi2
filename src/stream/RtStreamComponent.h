@@ -248,8 +248,6 @@ protected:
   }
 
   int process(ACE_Message_Block* mb) {
-      static bool toggle = false;
-      
     // tell the data store that we are done processing for this TR
     if(isProcessor) {
       RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();

@@ -337,16 +337,9 @@ int executeRunBlocking(RtConfigFmriRun &conf) {
 
 // prints the usage info for the realtime system
 void printUsage() {
-  int w = 15;
-
   cout << "usage: " << endl << execName
        << " [-f conffile | -s confxmlstr]"
        << endl;
-//       << "---------------------------------------------" << endl
-//       << "some useful flags:" << endl
-//       << setiosflags(ios::left)
-//       << setw(w) << endl
-//       << "---------------------------------------------" << endl;
 }
 
 // parse command line args

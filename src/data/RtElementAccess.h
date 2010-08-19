@@ -15,8 +15,6 @@
 #include<limits>
 #include"RtTypes.h"
 
-#include "add_functions.h"
-
 using namespace std;
 
 

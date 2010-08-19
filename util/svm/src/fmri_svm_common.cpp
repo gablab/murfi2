@@ -213,6 +213,8 @@ bool writeFmriModel(string filename, const Parms &p) {
   }
 
   ms.close();
+
+  return true;
 }
 
 

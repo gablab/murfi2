@@ -882,7 +882,7 @@ void print_percent_progress(long *progress, long maximum,
 {
   if((percentperdot*(*progress-1)/maximum) 
      != (percentperdot*(*progress)/maximum)) {
-    printf(symbol);
+    printf("%s",symbol);
     fflush(stdout);
   }
   (*progress)++;

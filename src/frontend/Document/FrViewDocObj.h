@@ -8,7 +8,7 @@
 #include "vtkImageData.h"
 
 //#include "FrUtils.h"
-#include "add_functions.h"
+//#include "add_functions.h"
 
 //#define BAD_LAYER_ID  0
 //#define ALL_LAYER_ID  1

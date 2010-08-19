@@ -81,7 +81,7 @@ protected:
     int numDataPointsCount;
 
     // the amount of data to use in the estimation of the error
-    int numDataPointsForErrEst;
+    unsigned int numDataPointsForErrEst;
 
     // whether errors should only be estimated in baseline
     bool onlyEstErrInBaseline;

@@ -264,7 +264,7 @@ public:
     vector<double> &getPixDims();
 
     // get voxel dimensions
-    double getPixDim(int i);
+    double getPixDim(unsigned int i);
 
     // get vxl2ras
     vnl_matrix_fixed<double, 4, 4 > &getVxl2Ras();

@@ -18,7 +18,7 @@
 #include <Qt/qfile.h>
 #include <Qt/qstring.h>
 
-#include "add_functions.h"
+//#include "add_functions.h"
 
 #define MY_PI 3.1415926854
 

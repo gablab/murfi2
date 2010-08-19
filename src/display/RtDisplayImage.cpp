@@ -131,6 +131,8 @@ RtDisplayImage::RtDisplayImage() {
   initialNegMaskFilename = "";
   flipInitialNegMask = false;
 
+  gnuPlot = Gnuplot("lines");
+
   posOverlayID = DEFAULT_POSOVERLAYID;
   posOverlayRoiID = DEFAULT_POSOVERLAYROIID;
   negOverlayID = DEFAULT_NEGOVERLAYID;
@@ -310,6 +312,13 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
 
   numMeas = config.isSet("scanner:measurements")
     ? config.get("scanner:measurements") : DEFAULT_NUMMEAS;
+
+  // resize the vectors to take the new number of measurements
+  postc.set_size(numMeas);
+  postc.fill(0.0);
+
+  negtc.set_size(numMeas);
+  negtc.fill(0.0);
 
   if(config.isSet("oldgui:initialImage")) {
     initialImageFilename = config.get("oldgui:initialImage").str();
@@ -499,10 +508,6 @@ int RtDisplayImage::svc() {
 void RtDisplayImage::notify(const RtDataID &id) {
   ACE_TRACE(("RtDisplayImage::notify"));
 
-  // plot activation sum over time // DEBUGGING ONLY
-  static vnl_vector<double> postc(numMeas+1,0.0);
-  static vnl_vector<double> negtc(numMeas+1,0.0);
-  static Gnuplot gp = Gnuplot("lines");
 
   if(DEBUG_LEVEL & BASIC) {
     cout << "got data: " << id << endl;
@@ -519,10 +524,13 @@ void RtDisplayImage::notify(const RtDataID &id) {
     }
 
     // plot the sum
-    postc.put(id.getTimePoint(),((RtActivation*)getDataStore().getData(id))->getPixel(0));
+    if(id.getTimePoint() < postc.size()) {
+      postc.put(id.getTimePoint(),
+		((RtActivation*)getDataStore().getData(id))->getPixel(0));
+    }
 
-    gp.reset_plot();
-    gp.plot_x(postc.extract(id.getTimePoint(),1),posActivationSumRoiID.c_str());
+    gnuPlot.reset_plot();
+    gnuPlot.plot_x(postc.extract(id.getTimePoint(),1),posActivationSumRoiID.c_str());
 
     return;
   }
@@ -537,9 +545,13 @@ void RtDisplayImage::notify(const RtDataID &id) {
     }
 
     // plot the sum
-    negtc.put(id.getTimePoint(),((RtActivation*)getDataStore().getData(id))->getPixel(0));
+    if(id.getTimePoint() < negtc.size()) {
+	negtc.put(id.getTimePoint(),
+		  ((RtActivation*)getDataStore().getData(id))->getPixel(0));
+    }
+
     //gp.reset_plot();
-    gp.plot_x(negtc.extract(id.getTimePoint(),1),negActivationSumRoiID.c_str());
+    gnuPlot.plot_x(negtc.extract(id.getTimePoint(),1),negActivationSumRoiID.c_str());
     //numTimepoints++;
     return;
   }

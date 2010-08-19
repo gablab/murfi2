@@ -60,7 +60,7 @@ bool RtSingleImageCor::processOption(const string &name, const string &text,
 
     // look for known options
     if (name == "numDataPointsForErrEst") {
-        return RtConfigVal::convert<int>(numDataPointsForErrEst, text);
+        return RtConfigVal::convert<unsigned int>(numDataPointsForErrEst, text);
     }
     if (name == "errorNorm") {
         if (text == "l1" || text == "L1") {
@@ -210,7 +210,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
 
     if (DEBUG_LEVEL & MODERATE) {
         cout << " xrow " << numTimepoints << ":";
-        for (int i = 0; i < Xrow.size(); i++) {
+        for (unsigned int i = 0; i < Xrow.size(); i++) {
             cout << Xrow[i] << " ";
         }
         cout << endl;
@@ -356,7 +356,7 @@ int RtSingleImageCor::process(ACE_Message_Block *mb) {
                     << err << " "
                     << dev << " "
                     << stat->getPixel(*i) << " ";
-            for (int b = 0; b < design.getNumColumns(); b++) {
+            for (unsigned int b = 0; b < design.getNumColumns(); b++) {
                 dumpFile << beta[b] << " ";
             }
             dumpFile << endl;
@@ -393,7 +393,7 @@ void RtSingleImageCor::startDumpAlgoVarsFile() {
             << "residual "
             << "std_dev "
             << "feedback ";
-    for (int b = 0; b < design.getNumColumns(); b++) {
+    for (unsigned int b = 0; b < design.getNumColumns(); b++) {
         dumpFile << "beta[" << b << "] ";
     }
 

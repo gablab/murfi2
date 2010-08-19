@@ -68,7 +68,7 @@ protected:
   int numDataInErrSum;
 
   // the amount of data to use in the estimation of the error
-  int numDataPointsForErrEst;
+  unsigned int numDataPointsForErrEst;
 
   // for task triggering based on activation sum
   bool triggerStim;

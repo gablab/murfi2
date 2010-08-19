@@ -27,6 +27,8 @@ export SRC_DIR = $(PWD)/src
 export FSRC_DIR = $(PWD)/src/frontend
 export BIN_DIR = $(PWD)/bin
 export OBJ_DIR = $(PWD)/obj
+INSTALL_DIR = /usr/local/bin/
+INSTALL_BINARY = ./bin/$(PROJECT)
 
 # whether to compile with debug, optimize flags
 DEBUG = 1
@@ -254,6 +256,7 @@ C_INC = -I$(SRC_DIR) \
 	$(BOOST_INC)
 
 C_FLAGS = -Wall \
+	-Wno-write-strings \
 	$(FRONT_FLAG) \
 	$(OLDFRONT_FLAG) \
 	$(MTRACE_FLAG) \
@@ -317,6 +320,9 @@ OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
 
 default: $(PROJECT)
 all:     $(PROJECT)
+
+install: 
+	install $(INSTALL_BINARY) $(INSTALL_DIR)
 
 debug:	 
 	$(MAKE) DEBUG=1 OPTIM=0 STRIP=0 $(subst debug,$(BLANK),$(MAKECMDGOALS))

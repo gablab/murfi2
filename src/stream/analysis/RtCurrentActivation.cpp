@@ -24,7 +24,6 @@ RtCurrentActivation::RtCurrentActivation() : RtStreamComponent() {
     componentID = moduleString;
     steadyStateResidual = NULL;
     numDataPointsForErrEst = std::numeric_limits<unsigned int>::max();
-
 }
 
 // destructor
@@ -54,7 +53,7 @@ bool RtCurrentActivation::processOption(const string &name, const string &text, 
     }
 
     if (name == "numDataPointsForErrEst") {
-        return RtConfigVal::convert<int>(numDataPointsForErrEst, text);
+        return RtConfigVal::convert<unsigned int>(numDataPointsForErrEst, text);
     }
 
     if (name == "saveResult") {
@@ -263,7 +262,7 @@ int RtCurrentActivation::process(ACE_Message_Block *mb) {
 	  << residual->getPixel(*it) << " "
 	  << dev << " "
 	  << currentActivation->getPixel(*it) << " ";
-	for (int b = 0; b < design->getNumColumns(); b++) {
+	for (unsigned int b = 0; b < design->getNumColumns(); b++) {
 	  dumpFile << betavals[b] << " ";
 	}
 	dumpFile << endl;

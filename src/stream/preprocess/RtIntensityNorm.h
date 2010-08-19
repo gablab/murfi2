@@ -16,7 +16,6 @@
 #include"RtDataImage.h"
 
 #include <float.h>
-#include "add_functions.h"
 
 // scopic alexsid: #define WIN32
 #ifdef WIN32

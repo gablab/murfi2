@@ -12,8 +12,6 @@
 #include"RtStreamComponent.h"
 #include"RtDataImage.h"
 
-#include "add_functions.h"
-
 // class declaration
 class RtMean : public RtStreamComponent {
 

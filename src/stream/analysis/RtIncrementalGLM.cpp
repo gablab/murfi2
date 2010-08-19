@@ -180,7 +180,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 	  << y << " "
 	  << row[0] << " "
 	  << residual->getPixel(*it) << " ";
-	for(int b = 0; b < design.getNumColumns(); b++) {
+	for(unsigned int b = 0; b < design.getNumColumns(); b++) {
 	  dumpFile << beta[b] << " ";
 	}
 	dumpFile << endl;
@@ -230,7 +230,7 @@ void RtIncrementalGLM::startDumpAlgoVarsFile() {
 	   << "voxel_intensity "
 	   << "regressor "
 	   << "residual ";
-  for(int b = 0; b < design.getNumColumns(); b++) {
+  for(unsigned int b = 0; b < design.getNumColumns(); b++) {
     dumpFile << "beta[" << b << "] ";
   }
 

@@ -42,8 +42,8 @@ bool RtConfigFmriRun::validateConfig() {
 
   // check image receiver
   if(get("scanner:disabled")==false) {
-    if((int) get("scanner:port") < 1 
-       || (int) get("scanner:port") > MAX_TCPIP_PORT_NUM) {
+    if((unsigned int) get("scanner:port") < 1 
+       || (unsigned int) get("scanner:port") > MAX_TCPIP_PORT_NUM) {
       cerr << "WARNING: invalid port number for receiving scanner images"
 	   << endl;
       set("scanner:receiveImages",false);

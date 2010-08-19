@@ -22,7 +22,7 @@ RtFluctuationMonitor::RtFluctuationMonitor() : RtIncrementalGLM() {
 
   absEstErrSum = NULL;
   numDataInErrSum = 0;
-  numDataPointsForErrEst = INT_MAX;
+  numDataPointsForErrEst = std::numeric_limits<unsigned int>::max();
 
   numTimepoints = 0;
 
@@ -68,7 +68,7 @@ bool RtFluctuationMonitor::processOption(const string &name, const string &text,
     return RtConfigVal::convert<int>(afterTriggerSkip,text);
   }
   if(name == "numDataPointsForErrEst") {
-    return RtConfigVal::convert<int>(numDataPointsForErrEst,text);    
+    return RtConfigVal::convert<unsigned int>(numDataPointsForErrEst,text);    
   }
 
   return RtIncrementalGLM::processOption(name, text, attrMap);
@@ -203,7 +203,7 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 	<< fluct->getPixel(i) << " "
 	<< isTriggered << " "
 	<< dontInclude;
-      for(int b = 0; b < row.size(); b++) {
+      for(unsigned int b = 0; b < row.size(); b++) {
 	dumpFile << beta[b] << " ";
       }
       dumpFile << endl;
@@ -231,7 +231,7 @@ void RtFluctuationMonitor::startDumpAlgoVarsFile() {
 	   << "fluctuation "
 	   << "trigerred "
 	   << "skipping ";
-  for(int b = 0; b < design.getNumColumns(); b++) {
+  for(unsigned int b = 0; b < design.getNumColumns(); b++) {
     string bstr;
     RtConfigVal::convertToString<int>(bstr,b);
     dumpFile << string("beta") + bstr + " ";

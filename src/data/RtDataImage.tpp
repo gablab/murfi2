@@ -969,8 +969,8 @@ bool RtDataImage<T>::unmosaicUnlocked() {
 
 
   // build a new dim array
-  int width = dims[0];
-  int height = dims[1];
+  unsigned int width = dims[0];
+  unsigned int height = dims[1];
 
   dims.clear();
   dims.reserve(4);
@@ -1184,7 +1184,7 @@ template<class T>
 bool RtDataImage<T>::seemsMosaic() {
   // see whether there are only two dimensions
   bool onlyTwo = dims[0] >= 2;
-  for(int i = 2; i < dims.size(); i++) {
+  for(unsigned int i = 2; i < dims.size(); i++) {
     if(dims[i] > 1) {
       onlyTwo = false;
       break;
@@ -1284,10 +1284,10 @@ vector<double> &RtDataImage<T>::getPixDims() {
 
 // get vox dimensions
 template<class T>
-double RtDataImage<T>::getPixDim(int i) {
+double RtDataImage<T>::getPixDim(unsigned int i) {
   double ret;
   lock(); {
-    ret = pixdims.size() > i && i >= 0 ? pixdims[i] : -1; 
+    ret = pixdims.size() > i && i >= 0 ? pixdims[i] : 1; 
   }  unlock();
   return ret;
 }

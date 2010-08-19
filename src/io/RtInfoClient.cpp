@@ -90,7 +90,7 @@ void RtInfoClient::setData(RtData *data) {
     TiXmlElement *infoEl = new TiXmlElement("info");
     response.LinkEndChild(infoEl);
 
-    TiXmlElement *element; //TODO this is a dummy thing
+    TiXmlElement *element = NULL; //TODO this is a dummy thing
     TiXmlElement *dataEl = data->serializeAsXML(element);
     infoEl->LinkEndChild(dataEl);    
 

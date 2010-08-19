@@ -400,6 +400,8 @@ bool RtDesignMatrix::buildDesignMatrix() {
     if (DEBUG_LEVEL & MODERATE) {
         print();
     }
+
+    return true;
 }
 
 // build the design

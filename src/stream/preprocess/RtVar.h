@@ -13,8 +13,6 @@
 #include"RtStreamComponent.h"
 #include"RtActivation.h"
 
-#include "add_functions.h"
-
 // class declaration
 class RtVar : public RtStreamComponent {
 

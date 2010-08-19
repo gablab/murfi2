@@ -217,7 +217,7 @@ bool RtMRIImage::readInfo(istream &is) {
   is.read((char*) &boolcon, sizeof(char));
   swapReadPhase = (bool) boolcon;
   
-  unsigned int uint_tmp;
+  unsigned int uint_tmp = 0;
 
   is.read((char*) uint_tmp, sizeof(unsigned int));
   dataID.setSeriesNum(uint_tmp);

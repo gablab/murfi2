@@ -67,8 +67,8 @@ void RtOutputSocket::setData(RtData *data) {
   TiXmlDeclaration decl( "1.0", "", "" );
   serializedDataDoc.LinkEndChild(&decl);
 
-  TiXmlElement *element; //TODO this is a dummy thing
-  TiXmlElement *serializedData  = data->serializeAsXML(element);
+  TiXmlElement *element = NULL; //TODO this is a dummy thing
+  TiXmlElement *serializedData = data->serializeAsXML(element);
   if(serializedData == NULL) {
     cerr << "couldn't serialize data, not sending" << endl;    
     return;

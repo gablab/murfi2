@@ -11,15 +11,14 @@
 #include"RtData.h"
 #include"tinyxml/tinyxml.h"
 
-static const unsigned int NUM_MOTION_DIMENSIONS = 6;
-
 typedef enum {
     TRANSLATION_X = 0,
     TRANSLATION_Y,
     TRANSLATION_Z,
     ROTATION_X,
     ROTATION_Y,
-    ROTATION_Z
+    ROTATION_Z,
+    NUM_MOTION_DIMENSIONS
 } MotionDimension;
 typedef double Motion[NUM_MOTION_DIMENSIONS];
 

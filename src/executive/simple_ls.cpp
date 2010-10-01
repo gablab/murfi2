@@ -46,8 +46,10 @@ int simple_ls(string dir, string ext)
 	    ++dir_itr )
 	{
 	  string name = dir_itr->path().leaf();
-	  if(!ext.empty() 
-	     && ext != name.substr(name.size()-ext.size())) {
+	  if(!ext.empty() 	     
+	     && (name.size() <= ext.size() 
+		 || ext != name.substr(name.size()-ext.size()))	     
+	     ) {
 	    continue;
 	  }
 

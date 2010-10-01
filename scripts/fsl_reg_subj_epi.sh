@@ -33,7 +33,7 @@ parse_args() {
 		;;
 	    o ) output="$OPTARG"
 		;;
-	    s ) savexfmfile="$OPTARG"
+	    s ) xfmfile="$OPTARG"
 		;;
 	    r ) xfmfile="$OPTARG"
 		;;
@@ -68,7 +68,7 @@ apply_reg() {
 	otype=short
     fi
 
-    echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
+   echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
     flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
 }
 
@@ -79,6 +79,7 @@ if [ ! "$1" ]; then
 fi
 
 ## defaults
+export FSLOUTPUTTYPE=NIFTI
 interp=nearestneighbour
 
 parse_args "$@"

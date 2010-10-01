@@ -49,6 +49,7 @@ SUB_DIRS = executive \
 	   stream/preprocess \
 	   stream/postprocess \
 	   util \
+	   util/gnuplot_i++_vxl/ \
 	   frontend
 
 ifeq ($(OLDFRONTEND),1)

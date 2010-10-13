@@ -72,6 +72,28 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
     (getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
   dataID.setTimePoint(extinfo.iAcquisitionNumber);
 
+  // setup geometry
+  if(getExperimentConfig().isSet("scanner:matrixSize")) {
+    matrixSize = getExperimentConfig().get("scanner:matrixSize");
+  }
+  if(getExperimentConfig().isSet("scanner:slices")) {
+    numSlices = getExperimentConfig().get("scanner:slices");
+  }
+  if(getExperimentConfig().isSet("scanner:voxdim1")) {
+    setPixDim(0,getExperimentConfig().get("scanner:voxdim1"));
+  }
+  if(getExperimentConfig().isSet("scanner:voxdim2")) {
+    setPixDim(1,getExperimentConfig().get("scanner:voxdim2"));
+  }
+  if(getExperimentConfig().isSet("scanner:voxdim3")) {
+    double sliceDist = getExperimentConfig().get("scanner:voxdim3");
+    if(getExperimentConfig().isSet("scanner:sliceGap")) {
+      sliceDist 
+		+= static_cast<double>(getExperimentConfig().get("scanner:sliceGap"));
+	}
+    setPixDim(2,sliceDist);
+  }
+
   // allocate and copy the img data
   if(DEBUG_LEVEL & ALLOC) {
     cerr << "mr1 allocating data for " << this << endl; cerr.flush();

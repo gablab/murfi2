@@ -280,9 +280,6 @@ int RtInputScannerImages::svc() {
     // build data class
     rti = new RtMRIImage(*ei,img);
 
-    rti->setMatrixSize(matrixSize);
-    rti->setNumSlices(numSlices);
-
     if(unmosaicInputImages) {
       rti->unmosaic();
     }

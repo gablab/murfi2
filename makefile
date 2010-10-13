@@ -1,9 +1,8 @@
 ##########################################################################
 # 
-# master makefile for the real-time fMRI system
+# master makefile for the real-time fMRI system murfi
 #
 # Oliver Hinds <ohinds@mit.edu> 2007-08-14
-# Alexey Sidorov scopicsoftware 2008-10-30
 #
 ##########################################################################
 
@@ -49,7 +48,6 @@ SUB_DIRS = executive \
 	   stream/preprocess \
 	   stream/postprocess \
 	   util \
-	   util/gnuplot_i++_vxl/ \
 	   frontend
 
 ifeq ($(OLDFRONTEND),1)

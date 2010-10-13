@@ -29,7 +29,6 @@ RtMaskGen::RtMaskGen() : RtStreamComponent(),
 
 // destructor
 RtMaskGen::~RtMaskGen() {
-  //cout << "destroyed" << endl;
 }
 
 // process a configuration option

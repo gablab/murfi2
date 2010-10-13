@@ -17,11 +17,12 @@
 #include"RtDataListener.h"
 #include"glutmaster/glutWindow.h"
 #include"glutmaster/glutMaster.h"
-#include"gnuplot_i_vxl.h"
 
 #include"ace/Task.h"
 #include"ace/Asynch_IO.h"
 //#include "add_functions.h"
+
+class Gnuplot;
 
 // class declaration
 class RtDisplayImage 
@@ -136,7 +137,7 @@ protected:
   // holds activation sum over time
   vnl_vector<double> postc;
   vnl_vector<double> negtc;
-  Gnuplot gnuPlot; // plots activation sums
+  Gnuplot *gnuPlot; // plots activation sums
 
   // data ids to watch for in setData
   string imageDisplayType;

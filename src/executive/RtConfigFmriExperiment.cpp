@@ -292,7 +292,8 @@ string RtConfigFmriExperiment::getSeriesXfmFilename(unsigned int series) {
 string RtConfigFmriExperiment::getSeriesXfmOutputFilename(unsigned int series,
 						string input) {
   size_t ext = input.rfind('.');
-  if(ext == string::npos) {
+  size_t slashLoc = input.rfind('/');
+  if(ext == string::npos || slashLoc > ext) {
     ext = input.size();
   }
 

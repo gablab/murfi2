@@ -12,9 +12,8 @@
 #include"RtExperiment.h"
 
 #include<vnl/vnl_vector.h>
-#include "gnuplot_i_vxl.h"
 #include "simple_ls.h"
-
+#include"gnuplot_i.hpp"
 
 #include"ace/Mutex.h"
 
@@ -131,7 +130,7 @@ RtDisplayImage::RtDisplayImage() {
   initialNegMaskFilename = "";
   flipInitialNegMask = false;
 
-  gnuPlot = Gnuplot("lines");
+  gnuPlot = new Gnuplot("lines");
 
   posOverlayID = DEFAULT_POSOVERLAYID;
   posOverlayRoiID = DEFAULT_POSOVERLAYROIID;
@@ -151,6 +150,7 @@ RtDisplayImage::RtDisplayImage() {
   framePrefix = "/tmp/real_frame_";
   curFrame = 0;
   screenShotCommand = "xwd -screen -root ";
+
 }
 
 // constructor with stuff
@@ -211,6 +211,8 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   screenShotCommand = "xwd -screen -root ";
 
   strcpy(title,_title);
+
+  delete gnuPlot;
 }
 
 // destructor
@@ -529,8 +531,8 @@ void RtDisplayImage::notify(const RtDataID &id) {
 		((RtActivation*)getDataStore().getData(id))->getPixel(0));
     }
 
-    gnuPlot.reset_plot();
-    gnuPlot.plot_x(postc.extract(id.getTimePoint(),1),posActivationSumRoiID.c_str());
+    gnuPlot->reset_plot();
+    gnuPlot->plot_x(postc.extract(id.getTimePoint(),1),posActivationSumRoiID.c_str());
 
     return;
   }
@@ -551,7 +553,7 @@ void RtDisplayImage::notify(const RtDataID &id) {
     }
 
     //gp.reset_plot();
-    gnuPlot.plot_x(negtc.extract(id.getTimePoint(),1),negActivationSumRoiID.c_str());
+    gnuPlot->plot_x(negtc.extract(id.getTimePoint(),1),negActivationSumRoiID.c_str());
     //numTimepoints++;
     return;
   }

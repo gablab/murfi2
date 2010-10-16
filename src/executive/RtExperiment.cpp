@@ -11,6 +11,11 @@
 #include"RtConfigFmriExperiment.h"
 #include"RtConfigFmriRun.h"
 
+// app includes
+#ifdef USE_APP
+  #include"RtQtWindow.h"
+#endif
+
 // frontend gui includes
 #ifdef USE_FRONTEND
  #include"FrApplication.h"
@@ -430,8 +435,18 @@ int ACE_TMAIN(int argc, char **args) {
 
   int result = 0;
 
-  // if the gui frontend is being used, give it control
-  if(config.isSet("gui:disabled") &&
+  // if the app frontend is being used, give it control
+  if(config.isSet("app:disabled") &&
+     config.get("app:disabled")==false) { 
+
+#ifdef USE_APP
+	RtQtWindow::run(argc, args);
+#else
+    cerr << "ERROR: this build does not support the app frontend" << endl;
+#endif
+  }
+  // if the gui frontend is being used, give it control (confused yet?)
+  else if(config.isSet("gui:disabled") &&
      config.get("gui:disabled")==false) { 
 
 #ifdef USE_FRONTEND

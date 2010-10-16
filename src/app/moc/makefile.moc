@@ -1,0 +1,33 @@
+##########################################################################
+# 
+# qt moc makefile for the app controller of real-time fMRI system
+#
+# Oliver Hinds <ohinds@mit.edu> 2010-10-15
+#
+##########################################################################
+
+############################## SUFFIXES ##############################
+
+.DELETE_ON_ERROR:
+.SUFFIXES:
+.SUFFIXES: .cpp .h
+
+%_moc.cpp: ../%.h
+	$(MOC) $< -o $@
+
+HDR_FILES = $(wildcard ../*.h)
+TMP_HDR_FILES = $(notdir $(HDR_FILES))
+MOC_FILES = $(patsubst %.h, %_moc.cpp, $(TMP_HDR_FILES))
+
+default: $(MOC_FILES)
+
+
+clean:
+
+######################################################################
+### $Source$
+### Local Variables:
+### mode: makefile
+### fill-column: 76
+### comment-column: 0
+### End: 

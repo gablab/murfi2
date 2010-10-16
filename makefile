@@ -17,7 +17,8 @@ OS=linux
 # project name
 PROJECT = murfi
 
-# whether to compile with the frontend gui
+# whether to compile with various guis
+export APP = 0
 export FRONTEND = 0
 export OLDFRONTEND = 1
 
@@ -41,6 +42,7 @@ MTRACE = 0
 
 # directories containing code and headers
 SUB_DIRS = executive \
+	   app \
 	   data \
 	   io \
 	   stream \
@@ -60,7 +62,7 @@ endif
 export RM = /bin/rm -v
 export ECHO = /bin/echo
 export CC = /usr/bin/g++
-export MOC = /usr/bin/moc-qt4
+export MOC = /usr/bin/moc-qt3
 
 ### LIBS AND LIB CONFIG
 
@@ -99,6 +101,10 @@ SVM_HOME = $(PWD)/util/svm
 ################################ FLAG ################################
 
 # build with frontend flag
+ifeq ($(APP),1)
+	APP_FLAG = -DUSE_APP
+endif
+
 ifeq ($(FRONTEND),1)
 	FRONT_FLAG = -DUSE_FRONTEND
 endif
@@ -193,6 +199,7 @@ TINYXML_FLAGS=-DTIXML_USE_STL
 NIFTI_INC=-I/$(NIFTI_HOME)/include/nifti
 NIFTI_LIB=-lniftiio -lznz -lz -L/$(NIFTI_HOME)/lib
 
+GL_LIB=-lGL -lGLU
 
 # oldgui libs
 ifeq ($(OLDFRONTEND),1)
@@ -231,15 +238,19 @@ VTK_LIB = -lglut -L$(VTK_HOME)/lib/vtk \
 #	-lvtkalglib \
 
 # qt
-QT_INC = \
-	-I$(QT_HOME)/include/qt4 \
-	-I$(QT_HOME)/include/qwt-qt4 \
-	-I$(QT_HOME)/include/qt4/Qt \
-	-I$(QT_HOME)/include/qt4/QtCore \
-	-I$(QT_HOME)/include/qt4/QtGui \
+ifeq ($(FRONTEND),1)
+	QT_INC = \
+		-I$(QT_HOME)/include/qt4 \
+		-I$(QT_HOME)/include/qwt-qt4 \
+		-I$(QT_HOME)/include/qt4/Qt \
+		-I$(QT_HOME)/include/qt4/QtCore \
+		-I$(QT_HOME)/include/qt4/QtGui \
 
-QT_LIB = -lQtCore -lQtGui -lQtXml -lqwt-qt4
-
+	QT_LIB = -lQtCore -lQtGui -lQtXml -lqwt-qt4
+else
+	QT_INC=-I$(QT_HOME)/include/qt3
+	QT_LIB=-lqt-mt
+endif
 
 # build compiler flags
 
@@ -256,6 +267,7 @@ C_INC = -I$(SRC_DIR) \
 
 C_FLAGS = -Wall \
 	-Wno-write-strings \
+	$(APP_FLAG) \
 	$(FRONT_FLAG) \
 	$(OLDFRONT_FLAG) \
 	$(MTRACE_FLAG) \
@@ -274,6 +286,11 @@ C_LIB = $(MATH_LIB) \
 	$(NIFTI_LIB) \
 	$(BOOST_LIB)
 
+# add qt app includes
+ifeq ($(APP),1)
+	C_INC += $(QT_INC)
+	C_LIB += $(QT_LIB) $(GL_LIB)
+endif
 
 # add gui libs if building frontend
 ifeq ($(FRONTEND),1)

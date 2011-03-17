@@ -1051,6 +1051,23 @@ void RtDesignMatrix::print() {
     }
 }
 
+// save the matrix to a file
+bool RtDesignMatrix::save(const string& filename) const {
+  ofstream out(filename.c_str());
+  if(!out.good()) {
+    return false;
+  }
+
+  for(unsigned int r = 0; r < rows(); r++) {
+    for(unsigned int c = 0; c < cols(); c++) {
+      out << data[r][c] << " ";
+    }
+    out << endl;
+  }
+
+  out.close();
+}
+
 // serialize the data as xml for transmission or saving to a file
 TiXmlElement *RtDesignMatrix::serializeAsXML(TiXmlElement *requestElement) {
 #define NUM_SIGFIGS 6

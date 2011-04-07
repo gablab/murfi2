@@ -25,182 +25,185 @@ class RtStreamComponent;
 class RtData;
 
 class RtDataID {
-public:
+ public:
 
-    // default constructor
-    RtDataID();
+  // default constructor
+  RtDataID();
 
-    // constructor from known fields
-    RtDataID(unsigned int _studyNum,
-             unsigned int _seriesNum = DATAID_NUM_UNSET_VALUE,
-             unsigned int _timePoint = DATAID_NUM_UNSET_VALUE,
-             const string &_history  = DATAID_STRING_UNSET_VALUE,
-             const string &_moduleID = DATAID_STRING_UNSET_VALUE,
-             const string &_dataName = DATAID_STRING_UNSET_VALUE,
-             const string &_roiID    = DATAID_STRING_UNSET_VALUE);
+  // constructor from known fields
+  RtDataID(unsigned int _studyNum,
+           unsigned int _seriesNum = DATAID_NUM_UNSET_VALUE,
+           unsigned int _timePoint = DATAID_NUM_UNSET_VALUE,
+           const string &_history  = DATAID_STRING_UNSET_VALUE,
+           const string &_moduleID = DATAID_STRING_UNSET_VALUE,
+           const string &_dataName = DATAID_STRING_UNSET_VALUE,
+           const string &_roiID    = DATAID_STRING_UNSET_VALUE);
 
-    // constructor from a data id from a previous module
-    RtDataID(RtDataID &prevModuleData,
-             const RtStreamComponent &thisModule);
+  // constructor from a data id from a previous module
+  RtDataID(RtDataID &prevModuleData,
+           const RtStreamComponent &thisModule);
 
-    // copy constructor
-    RtDataID(const RtDataID &other);
+  // copy constructor
+  RtDataID(const RtDataID &other);
 
-    virtual ~RtDataID();
+  virtual ~RtDataID();
 
-    //*** operators ***//
+  // initialize contents to wildcards
+  void initializeToWildCards();
+  
+  //*** operators ***//
 
-    // comparison
-    bool operator==(const RtDataID &other) const;
-    bool operator!=(const RtDataID &other) const;
+  // comparison
+  bool operator==(const RtDataID &other) const;
+  bool operator!=(const RtDataID &other) const;
 
-    // less
-    bool operator<(const RtDataID &other) const;
-    bool partless(const RtDataID &other) const;
+  // less
+  bool operator<(const RtDataID &other) const;
+  bool partless(const RtDataID &other) const;
 
-    // get a string version of the ID
-    string toString() const;
+  // get a string version of the ID
+  string toString() const;
 
-    // set info from a data id of the input data
-    void setFromInputDataID(RtDataID &prevModuleDataID,
-                            const RtStreamComponent &thisModule);
-
-    // set info from input data
-    void setFromInputData(RtData &prevModuleData,
+  // set info from a data id of the input data
+  void setFromInputDataID(RtDataID &prevModuleDataID,
                           const RtStreamComponent &thisModule);
 
-    // copy from other data
-    void copyFromOtherDataID(const RtDataID &otherDataID);
+  // set info from input data
+  void setFromInputData(RtData &prevModuleData,
+                        const RtStreamComponent &thisModule);
 
-    // set the ID from a string
-    void setFromString(const string &id);
+  // copy from other data
+  void copyFromOtherDataID(const RtDataID &otherDataID);
 
-    // does this id have wildcards?
-    bool hasWildcards() const {
-      return 
-	siteIDNum == DATAID_NUM_WILDCARD_VALUE
-     || studyNum  == DATAID_NUM_WILDCARD_VALUE
-     || seriesNum == DATAID_NUM_WILDCARD_VALUE
-     || timePoint == DATAID_NUM_WILDCARD_VALUE
-     || history   == DATAID_STRING_WILDCARD_VALUE
-     || moduleID  == DATAID_STRING_WILDCARD_VALUE
-     || dataName  == DATAID_STRING_WILDCARD_VALUE
-     || roiID     == DATAID_STRING_WILDCARD_VALUE
-	     ;	
+  // set the ID from a string
+  void setFromString(const string &id);
+
+  // does this id have wildcards?
+  bool hasWildcards() const {
+    return 
+        siteIDNum == DATAID_NUM_WILDCARD_VALUE
+        || studyNum  == DATAID_NUM_WILDCARD_VALUE
+        || seriesNum == DATAID_NUM_WILDCARD_VALUE
+        || timePoint == DATAID_NUM_WILDCARD_VALUE
+        || history   == DATAID_STRING_WILDCARD_VALUE
+        || moduleID  == DATAID_STRING_WILDCARD_VALUE
+        || dataName  == DATAID_STRING_WILDCARD_VALUE
+        || roiID     == DATAID_STRING_WILDCARD_VALUE
+        ; 
+  }
+
+  // eliminate wildcards by assigning empty non-wildcard values
+  void eliminateWildcards() {
+    if(siteIDNum == DATAID_NUM_WILDCARD_VALUE) {
+      siteIDNum = DATAID_NUM_UNSET_VALUE;
     }
-
-    // eliminate wildcards by assigning empty non-wildcard values
-    void eliminateWildcards() {
-      if(siteIDNum == DATAID_NUM_WILDCARD_VALUE) {
-	siteIDNum = DATAID_NUM_UNSET_VALUE;
-      }
-      if(studyNum == DATAID_NUM_WILDCARD_VALUE) {
-	studyNum = DATAID_NUM_UNSET_VALUE;
-      }
-      if(seriesNum == DATAID_NUM_WILDCARD_VALUE) {
-	seriesNum = DATAID_NUM_UNSET_VALUE;
-      }
-      if(timePoint == DATAID_NUM_WILDCARD_VALUE) {
-	timePoint = DATAID_NUM_UNSET_VALUE;
-      }
-      if(history == DATAID_STRING_WILDCARD_VALUE) {
-	history = DATAID_STRING_UNSET_VALUE;
-      }
-      if(moduleID == DATAID_STRING_WILDCARD_VALUE) {
-	moduleID = DATAID_STRING_UNSET_VALUE;
-      }
-      if(dataName == DATAID_STRING_WILDCARD_VALUE) {
-	dataName = DATAID_STRING_UNSET_VALUE;
-      }
-      if(roiID == DATAID_STRING_WILDCARD_VALUE) {
-	roiID = DATAID_STRING_UNSET_VALUE;
-      }
+    if(studyNum == DATAID_NUM_WILDCARD_VALUE) {
+      studyNum = DATAID_NUM_UNSET_VALUE;
     }
-
-    //*** gets ***//
-
-    unsigned int getSiteIDNum() const {
-        return siteIDNum;
+    if(seriesNum == DATAID_NUM_WILDCARD_VALUE) {
+      seriesNum = DATAID_NUM_UNSET_VALUE;
     }
-
-    unsigned int getStudyNum() const {
-        return studyNum;
+    if(timePoint == DATAID_NUM_WILDCARD_VALUE) {
+      timePoint = DATAID_NUM_UNSET_VALUE;
     }
-
-    unsigned int getSeriesNum() const {
-        return seriesNum;
+    if(history == DATAID_STRING_WILDCARD_VALUE) {
+      history = DATAID_STRING_UNSET_VALUE;
     }
-
-    unsigned int getTimePoint() const {
-        return timePoint;
+    if(moduleID == DATAID_STRING_WILDCARD_VALUE) {
+      moduleID = DATAID_STRING_UNSET_VALUE;
     }
-
-    string getHistory() const {
-        return history;
+    if(dataName == DATAID_STRING_WILDCARD_VALUE) {
+      dataName = DATAID_STRING_UNSET_VALUE;
     }
-
-    string getModuleID() const {
-        return moduleID;
+    if(roiID == DATAID_STRING_WILDCARD_VALUE) {
+      roiID = DATAID_STRING_UNSET_VALUE;
     }
+  }
 
-    string getDataName() const {
-        return dataName;
-    }
+  //*** gets ***//
 
-    string getRoiID() const {
-        return roiID;
-    }
+  unsigned int getSiteIDNum() const {
+    return siteIDNum;
+  }
 
-    time_t getInstantiationTime() const {
-        return instantiationTime;
-    }
+  unsigned int getStudyNum() const {
+    return studyNum;
+  }
 
-    //*** sets ***//
+  unsigned int getSeriesNum() const {
+    return seriesNum;
+  }
 
-    void setSiteIDNum(unsigned int n) {
-        siteIDNum = n;
-    }
+  unsigned int getTimePoint() const {
+    return timePoint;
+  }
 
-    void setStudyNum(unsigned int n) {
-        studyNum = n;
-    }
+  string getHistory() const {
+    return history;
+  }
 
-    void setSeriesNum(unsigned int n) {
-        seriesNum = n;
-    }
+  string getModuleID() const {
+    return moduleID;
+  }
 
-    void setTimePoint(unsigned int n) {
-        timePoint = n;
-    }
+  string getDataName() const {
+    return dataName;
+  }
 
-    void setHistory(string s) {
-        history = s;
-    }
+  string getRoiID() const {
+    return roiID;
+  }
 
-    void setModuleID(string s) {
-        moduleID = s;
-    }
+  time_t getInstantiationTime() const {
+    return instantiationTime;
+  }
 
-    void setDataName(string s) {
-        dataName = s;
-    }
+  //*** sets ***//
 
-    void setRoiID(string s) {
-        roiID = s;
-    }
+  void setSiteIDNum(unsigned int n) {
+    siteIDNum = n;
+  }
 
-protected:
+  void setStudyNum(unsigned int n) {
+    studyNum = n;
+  }
 
-    // fields
-    unsigned int siteIDNum; // id of study site
-    unsigned int studyNum; // study number (date and time study started)
-    unsigned int seriesNum; // image series (count up from 1)
-    unsigned int timePoint; // image number (count up from 1)
-    string history; // ids of modules already used on this data
-    string moduleID; // id of this processing module
-    string dataName; // name indicating the particular data kind
-    string roiID; // if this was processed on a particular ROI
-    time_t instantiationTime; // time this data was first constructed
+  void setSeriesNum(unsigned int n) {
+    seriesNum = n;
+  }
+
+  void setTimePoint(unsigned int n) {
+    timePoint = n;
+  }
+
+  void setHistory(string s) {
+    history = s;
+  }
+
+  void setModuleID(string s) {
+    moduleID = s;
+  }
+
+  void setDataName(string s) {
+    dataName = s;
+  }
+
+  void setRoiID(string s) {
+    roiID = s;
+  }
+
+ protected:
+
+  // fields
+  unsigned int siteIDNum; // id of study site
+  unsigned int studyNum; // study number (date and time study started)
+  unsigned int seriesNum; // image series (count up from 1)
+  unsigned int timePoint; // image number (count up from 1)
+  string history; // ids of modules already used on this data
+  string moduleID; // id of this processing module
+  string dataName; // name indicating the particular data kind
+  string roiID; // if this was processed on a particular ROI
+  time_t instantiationTime; // time this data was first constructed
 };
 
 
@@ -210,17 +213,17 @@ ostream &operator<<(ostream &out, const RtDataID &id);
 // comparison class for storing ids in a map (see RtDataStore.h)
 
 class RtDataIDCompare {
-public:
+ public:
 
-    bool operator()(const RtDataID &one, const RtDataID &two) const {
-        return (one) < (two);
-    }
+  bool operator()(const RtDataID &one, const RtDataID &two) const {
+    return (one) < (two);
+  }
 };
 
 // comparison class for storing ids in a map or set when unset values
 // are not considered in the ordering
 class RtDataIDPartialCompare {
-public:
+ public:
   bool operator()(const RtDataID &one, const RtDataID &two) const {
     //cout << "comparing: " << one << " " << two << (one < two) << endl;
     return one.partless(two);

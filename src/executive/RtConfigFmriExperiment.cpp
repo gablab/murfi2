@@ -40,6 +40,8 @@ static const string DEFAULT_VOLUMEFORMAT(  "nii");
 static const string DEFAULT_VOLUMEFILESTEM("img");
 static const string DEFAULT_LOGNAME(       "log");
 static const string DEFAULT_LOGFILEEXT(    "rtl");
+static const string DESIGN_NAME(           "design");
+static const string DESIGN_EXT(            "mat");
 static const string DEFAULT_STUDYREFNAME(  "study_ref");
 static const string DEFAULT_XFMFILEEXT(    "xfm");
 static const string DEFAULT_SERIESXFMMOD(  "series");
@@ -49,7 +51,7 @@ static const unsigned int DEFAULT_INFOSERVERPORT(15001);
 
 // copy constructor (called often)
 RtConfigFmriExperiment::RtConfigFmriExperiment(const RtConfigFmriExperiment &other) 
-  : RtConfig(other) {
+    : RtConfig(other) {
 }
 
 // set default config info
@@ -88,12 +90,12 @@ bool RtConfigFmriExperiment::validateConfig() {
 
   // check for existance of studyDir
   p.operator=(get("study:subjectsDir").filepath() 
-	      / get("study:subject:name").str());
+              / get("study:subject:name").str());
   set("study:directory",p.string());
   path studyDir(p); // for local use
 
   if(!( exists(p) && is_directory(p) )) { 
-   cerr << "ERROR: study directory " << p.string() << " is bad" << endl;
+    cerr << "ERROR: study directory " << p.string() << " is bad" << endl;
     valid = false;
   }
 
@@ -214,7 +216,7 @@ bool RtConfigFmriExperiment::validateConfig() {
   else { // check that the secified format is valid
     if(get("study:volumeFormat").str() != DEFAULT_VOLUMEFORMAT) {
       cerr << "ERROR: unsupported volume format " 
-	   << get("study:volumeFormat") << endl;
+           << get("study:volumeFormat") << endl;
       valid = false;
     }
   }
@@ -231,7 +233,7 @@ bool RtConfigFmriExperiment::validateConfig() {
   if(get("study:log:disabled")==false) {
     if(!isSet("study:log:filename")) {
       p.operator=(get("study:log:directory").filepath()
-		  / (DEFAULT_LOGNAME + "." + DEFAULT_LOGFILEEXT));
+                  / (DEFAULT_LOGNAME + "." + DEFAULT_LOGFILEEXT));
       cout << "using default logfile name " << p.string() << endl;
       set("study:log:filename",p.string());
     }
@@ -240,8 +242,8 @@ bool RtConfigFmriExperiment::validateConfig() {
   // study reference volume
   if(!isSet("study:xfm:referenceVol")) {
     p.operator=(get("study:xfm:directory").filepath()
-		/ (DEFAULT_STUDYREFNAME + "." 
-		   + get("study:volumeFormat").str()));
+                / (DEFAULT_STUDYREFNAME + "." 
+                   + get("study:volumeFormat").str()));
     cout << "using default study reference volume name " << p.string() << endl;
     set("study:xfm:referenceVol",p.string());
   }
@@ -257,7 +259,7 @@ bool RtConfigFmriExperiment::validateConfig() {
     if((unsigned int) get("infoserver:port") < 1 
        || (unsigned int) get("infoserver:port") > MAX_TCPIP_PORT_NUM) {
       cerr << "WARNING: invalid port number for infoserver, disabling"
-	   << endl;
+           << endl;
       set("infoserver:disabled",true);
     }
   }
@@ -290,7 +292,7 @@ string RtConfigFmriExperiment::getSeriesXfmFilename(unsigned int series) {
 // get the filename of a file transformed by using the series xfm on
 // an input file
 string RtConfigFmriExperiment::getSeriesXfmOutputFilename(unsigned int series,
-						string input) {
+                                                          string input) {
   size_t ext = input.rfind('.');
   size_t slashLoc = input.rfind('/');
   if(ext == string::npos || slashLoc > ext) {
@@ -307,7 +309,7 @@ string RtConfigFmriExperiment::getSeriesXfmOutputFilename(unsigned int series,
 
 // get the filename for the mask volume for a single series
 string RtConfigFmriExperiment::getSeriesMaskFilename(unsigned int series,
-						     string roiID) {
+                                                     string roiID) {
   stringstream ss;
   ss << "series" << series << "_" << roiID << "." 
      << get("study:volumeFormat").str();
@@ -337,10 +339,26 @@ string RtConfigFmriExperiment::getVolFilename(int _seriesNum,int _timepoint) {
   sprintf(acnum,"%05d",_timepoint);
 
   path p(get("study:volumeDir").filepath() 
-	 / (get("study:volumeFileStem").str()
-	    + "-" + srnum 
-	    + "-" + acnum 
-	    + "." + get("study:volumeFormat").str()));
+         / (get("study:volumeFileStem").str()
+            + "-" + srnum 
+            + "-" + acnum 
+            + "." + get("study:volumeFormat").str()));
+
+  return p.string();
+}
+
+// build a filename for a design matrix in this experiment
+//  in
+//   series number
+//  out
+//   absolute file string
+string RtConfigFmriExperiment::getDesignFilename(int _seriesNum) {
+  // five digit filename assumption here!
+  char srnum[6];
+  sprintf(srnum,"%05d",_seriesNum);
+
+  path p(get("study:volumeDir").filepath() 
+         / (DESIGN_NAME + "-" + srnum + "." + DESIGN_EXT));
 
   return p.string();
 }

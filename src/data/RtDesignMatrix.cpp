@@ -18,14 +18,15 @@
 #include"RtLimit.h"
 
 #include<vcl_istream.h>
+
+#include<algorithm>
 #include<fstream>
 #include<limits>
 #include<iostream>
 #include<iomanip>
-
+#include<string>
 
 #include<vnl/algo/vnl_convolve.h>
-#include"gsl/gsl_cdf.h"
 #include<vnl/vnl_gamma.h>
 #include<vnl/algo/vnl_svd.h>
 
@@ -131,6 +132,7 @@ bool RtDesignMatrix::processOption(const string &name,
             inputConditions.set_size(numMeas, MAX_CONDITIONS);
             inputConditions.fill(0);
             conditionNames.reserve(MAX_CONDITIONS);
+            conditionInterestIndicator.reserve(MAX_CONDITIONS);
         }
         else if (numInputConditions > MAX_CONDITIONS) {
             cerr << "warning: max number of conditions exceeded." << endl;
@@ -147,6 +149,22 @@ bool RtDesignMatrix::processOption(const string &name,
         }
         else {
             conditionNames.push_back((*condName).second);
+        }
+
+        // find if this condition is of interest for feedback
+        map<string, string>::const_iterator condType
+                = attrMap.find("conditionType");
+
+        // if condition type missing, assume it's of interest
+        if(condType == attrMap.end()) {
+            conditionInterestIndicator.push_back(true);
+        }
+        else {
+            string typeVal = (*condType).second;
+            transform(typeVal.begin(), typeVal.end(),
+                      typeVal.begin(), ::tolower);
+            conditionInterestIndicator.push_back(
+                (*condType).second != "nuisance");
         }
 
         // parse the text string into a condition vector
@@ -321,27 +339,27 @@ bool RtDesignMatrix::buildDesignMatrix() {
 
                 addColumn(convolveVecWithHrf(blockCol),
                         inputConditionNames[cond] + "_block" + blockStr,
-                        true);
+                        conditionInterestIndicator[cond]);
 
                 // add columns for temporal derivatives if required
                 if (modelTemporalDerivatives) {
                     addColumn(convolveVecWithTemporalDerivative(blockCol),
                             inputConditionNames[cond] + "_block" +
                             blockStr + "_deriv",
-                            true);
+                            conditionInterestIndicator[cond]);
                 }
             }
         }
         else { // no block splitting necessary
             addColumn(convolveVecWithHrf(basis),
                     inputConditionNames[cond],
-                    true);
+                    conditionInterestIndicator[cond]);
 
             // add columns for temporal derivatives if required
             if (modelTemporalDerivatives) {
                 addColumn(convolveVecWithTemporalDerivative(basis),
                         inputConditionNames[cond] + "_deriv",
-                        true);
+                        conditionInterestIndicator[cond]);
             }
         }
     }
@@ -996,6 +1014,7 @@ bool RtDesignMatrix::loadDesignMatrixFile(string filename) {
             else if (numInputConditions > 0) {
                 // allocate condition matrix
                 conditionNames.reserve(MAX_CONDITIONS);
+                conditionInterestIndicator.reserve(MAX_CONDITIONS);
                 inputConditions.clear();
                 inputConditions.set_size(numMeas, MAX_CONDITIONS);
                 inputConditions.fill(0);
@@ -1012,6 +1031,10 @@ bool RtDesignMatrix::loadDesignMatrixFile(string filename) {
             for (unsigned int c = 0; c < numInputConditions; c++) {
                 ss >> cthname;
                 conditionNames.push_back(cthname);
+
+                // TODO(ohinds): modify file format to allow conditions to
+                // be nuisance
+                conditionInterestIndicator.push_back(true);
 
                 // if we've read all of the condition names, continue
                 if (c == numInputConditions - 1) {
@@ -1058,6 +1081,14 @@ bool RtDesignMatrix::save(const string& filename) const {
     return false;
   }
 
+  // write header
+  out << "# ";
+  for(unsigned int c = 0; c < columnNames.size(); c++)
+  {
+    out << columnNames[c] << "(" << columnOfInterestIndicator[c] << ") ";
+  }
+  out << endl;
+  
   for(unsigned int r = 0; r < rows(); r++) {
     for(unsigned int c = 0; c < cols(); c++) {
       out << data[r][c] << " ";
@@ -1066,6 +1097,8 @@ bool RtDesignMatrix::save(const string& filename) const {
   }
 
   out.close();
+
+  return true;
 }
 
 // serialize the data as xml for transmission or saving to a file

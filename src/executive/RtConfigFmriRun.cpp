@@ -45,7 +45,7 @@ bool RtConfigFmriRun::validateConfig() {
     if((unsigned int) get("scanner:port") < 1 
        || (unsigned int) get("scanner:port") > MAX_TCPIP_PORT_NUM) {
       cerr << "WARNING: invalid port number for receiving scanner images"
-	   << endl;
+           << endl;
       set("scanner:receiveImages",false);
     }
   }
@@ -88,8 +88,8 @@ bool RtConfigFmriRun::validateConfig() {
   if(!isSet("study:xfm:referenceVol")) {
     path p;
     p.operator=(get("study:xfm:directory").filepath()
-		/ (DEFAULT_STUDYREFNAME + "." 
-		   + get("study:volumeFormat").str()));
+                / (DEFAULT_STUDYREFNAME + "." 
+                   + get("study:volumeFormat").str()));
     cout << "using default study reference volume name " << p.string() << endl;
     set("study:xfm:referenceVol",p.string());
   }

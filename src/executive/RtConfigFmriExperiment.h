@@ -66,6 +66,13 @@ public:
   //   absolute file string
   string getVolFilename(int _seriesNum,int _timepoint);  
 
+  // build a filename for a design matrix in this experiment
+  //  in
+  //   series number
+  //  out
+  //   absolute file string
+  string getDesignFilename(int _seriesNum);
+
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();  

@@ -8,14 +8,18 @@
 static char *VERSION = "$Id$";
 
 #include"RtInputScannerImages.h"
+
+#include<fstream>
+
 #include"site_config.h"
-#include"RtDataIDs.h"
-#include"RtExperiment.h"
+
 #include"RtConfigFmriExperiment.h"
+#include"RtDataIDs.h"
+#include"RtDesignMatrix.h"
+#include"RtExperiment.h"
 
 #include<vnl/vnl_matrix_fixed.h>
 #include<vnl/vnl_vector.h>
-#include<fstream>
 
 using namespace std;
 
@@ -33,8 +37,8 @@ static bool verbose = false;
 
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
-  :  port(DEFAULT_PORT),
-     seriesNum(1)
+    :  port(DEFAULT_PORT),
+       seriesNum(1)
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
@@ -78,14 +82,14 @@ bool RtInputScannerImages::open(RtConfig &config) {
 
   // get port from the config and try to open the socket
   port = config.isSet("scanner:port")
-    ? config.get("scanner:port") : DEFAULT_PORT;
+      ? config.get("scanner:port") : DEFAULT_PORT;
 
   // build the address
   ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
   
   if(acceptor.open(address,1) == -1) {
     cerr << "failed to open acceptor for scanner images on port "
-	 << port << endl;
+         << port << endl;
     isOpen = false;
     return false;
   }
@@ -124,7 +128,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
 
   // see if we should unmosaic the images
   if(config.isSet("scanner:unmosaic")) {
-      unmosaicInputImages = (bool) config.get("scanner:unmosaic");
+    unmosaicInputImages = (bool) config.get("scanner:unmosaic");
   }
 
   // see if we should save images to a file
@@ -218,7 +222,7 @@ int RtInputScannerImages::svc() {
 
   // continuously try to accept connections
   for(; isOpen
-	&& acceptor.accept(stream) != -1;) {
+          && acceptor.accept(stream) != -1;) {
 
     if(!initialized) {
       cerr << "ERROR: accepting images when scanner image input not initialized!" << endl;
@@ -232,7 +236,7 @@ int RtInputScannerImages::svc() {
     if(getExperimentConfig().get("study:timeComputations") == true 
        && !startComputeTimer()) {
       cout << "warning: compute timer already started, timing will be inaccurate" 
-	   << endl;
+           << endl;
     }
     else {
       cout << "started compute timer" << endl;
@@ -245,7 +249,7 @@ int RtInputScannerImages::svc() {
       continue;
     }
     ei->iAcquisitionNumber = std::max(ei->iAcquisitionNumber-num2Discard,
-				      (unsigned int) 1);
+                                      (unsigned int) 1);
 
     if(verbose) {
       cout << "image info recived" << endl;
@@ -287,22 +291,20 @@ int RtInputScannerImages::svc() {
     // if its the first image in a series save it no matter what
     if(!haveSeriesRefVol) { // && isFirstInSeries(*ei)) {
       rti->write(getExperimentConfig()
-		 .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
+                 .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
       haveSeriesRefVol = true;
 
       // register with reference
       if(alignSeries) {
         RtFSLInterface::registerSameSubjEPI(
-	     getExperimentConfig()
-		 .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()),
-	     getExperimentConfig()
-	         .get("study:xfm:referenceVol"),
-	     getExperimentConfig()
-	         .getSeriesXfmFilename(rti->getDataID().getSeriesNum()),
-		 true);
+            getExperimentConfig()
+            .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()),
+            getExperimentConfig()
+            .get("study:xfm:referenceVol"),
+            getExperimentConfig()
+            .getSeriesXfmFilename(rti->getDataID().getSeriesNum()),
+            true);
       }
-
-
     }
 
     if(numDiscarded < num2Discard) {
@@ -315,11 +317,11 @@ int RtInputScannerImages::svc() {
     // if there is motion info add it
     if(ei->bIsMoCo) {
       RtMotion *mot = new RtMotion(ei->dMoCoTransX,
-				   ei->dMoCoTransY,
-				   ei->dMoCoTransZ,
-				   ei->dMoCoRotX,
-				   ei->dMoCoRotY,
-				   ei->dMoCoRotZ);
+                                   ei->dMoCoTransY,
+                                   ei->dMoCoTransZ,
+                                   ei->dMoCoRotX,
+                                   ei->dMoCoRotY,
+                                   ei->dMoCoRotZ);
       getDataStore().setData(mot);
     }
 
@@ -340,12 +342,12 @@ int RtInputScannerImages::svc() {
        ) {
 
       if(!getExperimentConfig().getStudyRefVolExists()) {
-	if(rti->write(getExperimentConfig().get("study:xfm:referenceVol"))) {
-	  haveStudyRefVol = true;
-	}
+        if(rti->write(getExperimentConfig().get("study:xfm:referenceVol"))) {
+          haveStudyRefVol = true;
+        }
       }
       else {
-	haveStudyRefVol = true;
+        haveStudyRefVol = true;
       }
     }
 
@@ -358,20 +360,20 @@ int RtInputScannerImages::svc() {
     // log that we received the image
     infos.str("");
     infos << "received image from scanner: series " 
-	  << rti->getDataID().getSeriesNum()
-	  << " acquisition " << ei->iAcquisitionNumber << endl;
+          << rti->getDataID().getSeriesNum()
+          << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
 
     if(print) {
       cout << "received image from scanner: series " 
-	   << rti->getDataID().getSeriesNum()
-	   << " acquisition " << rti->getDataID().getTimePoint() << endl;
+           << rti->getDataID().getSeriesNum()
+           << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
 
 
-//    cout << "started processing image at ";
-//    printNow(cout);
-//    cout << endl;
+    //    cout << "started processing image at ";
+    //    printNow(cout);
+    //    cout << endl;
 
     // clean up
     delete ei;
@@ -407,9 +409,9 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
-      rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
-      rec += rec_delta; 
-      if(rec_delta <= 0) break;
+    rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
+    rec += rec_delta; 
+    if(rec_delta <= 0) break;
   }
   //rec += stream.recv_n(buffer, EXTERNALSENDERSIZEOF);
 
@@ -443,7 +445,7 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 //  out
 //   image data on successful read (NULL otherwise)
 short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
-						   const RtExternalImageInfo &info) {
+                                          const RtExternalImageInfo &info) {
 
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
 
@@ -470,8 +472,8 @@ bool RtInputScannerImages::saveImage(RtMRIImage &img) {
   //cout << "writing image number " << img.getDataID().getSeriesNum() << ":" << img.getDataID().getTimePoint() << endl;
 
   return img.write(getExperimentConfig().getVolFilename(
-			    img.getDataID().getSeriesNum(),
-			    img.getDataID().getTimePoint()));
+                       img.getDataID().getSeriesNum(),
+                       img.getDataID().getTimePoint()));
 }
 
 // determines if the received image is the first image in a series or not

@@ -39,56 +39,56 @@ RtModelFit::~RtModelFit() {
 //   xml module node from which to read <option>s
 
 bool RtModelFit::init(TiXmlElement *module, RtConfig *config, RtConductor *_conductor) {
-    ACE_TRACE(("RtModelFit::init"));
+  ACE_TRACE(("RtModelFit::init"));
 
-    bool ret = true;
-    // set the tr and number of measurements
-    if (config->isSet("scanner:disabled")
-            && config->get("scanner:disabled") == false
-            && !config->isSet("scanner:tr")) {
-        cerr << "ERROR: tr has not been set" << endl;
-        ret = false;
+  bool ret = true;
+  // set the tr and number of measurements
+  if (config->isSet("scanner:disabled")
+      && config->get("scanner:disabled") == false
+      && !config->isSet("scanner:tr")) {
+    cerr << "ERROR: tr has not been set" << endl;
+    ret = false;
+  }
+  else {
+    design.setTR(config->get("scanner:tr"));
+  }
+
+  if (config->isSet("scanner:disabled")
+      && config->get("scanner:disabled") == false
+      && !config->isSet("scanner:measurements")) {
+    cerr << "ERROR: number of measurements has not been set" << endl;
+    ret = false;
+  }
+  else {
+    design.setNumMeas(config->get("scanner:measurements"));
+  }
+
+  // find the design and process it
+  TiXmlNode *designNode = module->FirstChild("design");
+  if (designNode == NULL) {
+    cerr << "ERROR: no model design configuration found" << endl;
+    ret = false;
+  }
+  else if (designNode->Type() != TiXmlNode::ELEMENT) {
+    cerr << "ERROR: model design is not an xml element" << endl;
+    ret = false;
+  }
+  TiXmlElement *designElmt = (TiXmlElement*) designNode;
+  if (!design.configure(designElmt, *config)) {
+    cerr << "ERROR: error in model design configuration" << endl;
+    ret = false;
+  }
+  else {
+    if (!design.build()) {
+      cerr << "ERROR: error in model design configuration" << endl;
+      ret = false;
     }
     else {
-        design.setTR(config->get("scanner:tr"));
+      getDataStore().setData(&design);
     }
+  }
 
-    if (config->isSet("scanner:disabled")
-            && config->get("scanner:disabled") == false
-            && !config->isSet("scanner:measurements")) {
-        cerr << "ERROR: number of measurements has not been set" << endl;
-        ret = false;
-    }
-    else {
-        design.setNumMeas(config->get("scanner:measurements"));
-    }
-
-    // find the design and process it
-    TiXmlNode *designNode = module->FirstChild("design");
-    if (designNode == NULL) {
-        cerr << "ERROR: no model design configuration found" << endl;
-        ret = false;
-    }
-    else if (designNode->Type() != TiXmlNode::ELEMENT) {
-        cerr << "ERROR: model design is not an xml element" << endl;
-        ret = false;
-    }
-    TiXmlElement *designElmt = (TiXmlElement*) designNode;
-    if (!design.configure(designElmt, *config)) {
-        cerr << "ERROR: error in model design configuration" << endl;
-        ret = false;
-    }
-    else {
-        if (!design.build()) {
-            cerr << "ERROR: error in model design configuration" << endl;
-            ret = false;
-        }
-        else {
-            getDataStore().setData(&design);
-        }
-    }
-
-    return RtStreamComponent::init(module, config, _conductor) && ret;
+  return RtStreamComponent::init(module, config, _conductor) && ret;
 }
 
 // process a configuration option
@@ -100,20 +100,20 @@ bool RtModelFit::processOption(const string &name,
                                const string &text,
                                const map<string, string> &attrMap) {
 
-    return RtStreamComponent::processOption(name, text, attrMap);
+  return RtStreamComponent::processOption(name, text, attrMap);
 }
 
 // validate the configuration
 
 bool RtModelFit::validateComponentConfig() {
-    bool result = true;
+  bool result = true;
 
-    if (maskRoiID == "unset") {
-        cerr << "ERROR: maskRoiID must be set to do intensity normalization" << endl;
-        result = false;
-    }
+  if (maskRoiID == "unset") {
+    cerr << "ERROR: maskRoiID must be set to do intensity normalization" << endl;
+    result = false;
+  }
 
-    return result;
+  return result;
 }
 
 
@@ -123,12 +123,16 @@ bool RtModelFit::validateComponentConfig() {
 
 void RtModelFit::initEstimation(const RtData &dat, RtMaskImage *mask) {
 
-    // store the data id as a template
-    templateDataID = dat.getDataID();
-    templateDataID.setTimePoint(DATAID_NUM_UNSET_VALUE);
-    design.setTemplateDataID(templateDataID);
+  // store the data id as a template
+  templateDataID = dat.getDataID();
+  templateDataID.setTimePoint(DATAID_NUM_UNSET_VALUE);
+  design.setTemplateDataID(templateDataID);
 
-    needsInit = false;
+  // save the series design matrix
+  design.save(getExperimentConfig().getDesignFilename(
+                  dat.getDataID().getSeriesNum()));
+  
+  needsInit = false;
 }
 
 /*****************************************************************************

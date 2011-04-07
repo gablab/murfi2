@@ -13,8 +13,8 @@ string RtIncrementalGLM::moduleString(ID_INCREMENTALGLM);
 
 // default constructor
 RtIncrementalGLM::RtIncrementalGLM() : RtModelFit(), 
-				       numSolvers(0),
-				       solvers (NULL) {
+                                       numSolvers(0),
+                                       solvers (NULL) {
   componentID = moduleString;
 }
 
@@ -24,7 +24,7 @@ RtIncrementalGLM::~RtIncrementalGLM() {
   if(solvers != NULL) {
     for(unsigned int i = 0; i < numSolvers; i++) {
       if(solvers[i] != NULL) {
-	delete solvers[i];
+        delete solvers[i];
       }
     }
     delete solvers;
@@ -36,7 +36,7 @@ RtIncrementalGLM::~RtIncrementalGLM() {
 //   name of the option to process
 //   val  text of the option node
 bool RtIncrementalGLM::processOption(const string &name, const string &text,
-				     const map<string,string> &attrMap) {
+                                     const map<string,string> &attrMap) {
   // look for known options
 
   return RtModelFit::processOption(name, text, attrMap);
@@ -54,7 +54,7 @@ bool RtIncrementalGLM::validateComponentConfig() {
 // in
 //  first acquired image to use as a template for parameter inits
 void RtIncrementalGLM::initEstimation(const RtData &dat, 
-				      RtMaskImage *mask) {
+                                      RtMaskImage *mask) {
 
   if(mask) { // set the number of solvers (one per voxel)
     numSolvers = mask->getNumberOfOnVoxels();
@@ -107,7 +107,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
     if(logOutput) {
       stringstream logs("");
       logs << "RtIncrementalGLM::process: mask is NULL at tr " 
-	   << dat->getDataID().getTimePoint() << endl;
+           << dat->getDataID().getTimePoint() << endl;
       log(logs);
     }
 
@@ -130,8 +130,8 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
     // setup the data id
     betas[b]->getDataID().setFromInputData(*dat,*this);
     betas[b]->getDataID().setDataName(string(NAME_BETA)
-				      + "_" + 
-				      design.getColumnName(b));
+                                      + "_" + 
+                                      design.getColumnName(b));
     betas[b]->getDataID().setRoiID(mask->getDataID().getRoiID());
     betas[b]->initToNans();
   }
@@ -156,10 +156,10 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
       it++, curSolver++) {
 
     double y = dat->getElement(*it);
-// debug
-//    if(curSolver == 0) {
-//      cout << "pix: " << dat->getPixel(*it) << endl;
-//    }
+    // debug
+    //    if(curSolver == 0) {
+    //      cout << "pix: " << dat->getPixel(*it) << endl;
+    //    }
 
     solvers[curSolver]->include(&y,row.data_block(),1.0);
 
@@ -169,23 +169,23 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 
       // save beta and res
       for(unsigned int j = 0; j < design.getNumColumns(); j++) {
-	betas[j]->setPixel(*it,beta[j]);
+        betas[j]->setPixel(*it,beta[j]);
       }
       residual->setPixel(*it, solvers[curSolver]->getTotalSquaredError(0));
 
       if(dumpAlgoVars && dat->getDataID().getTimePoint() > 2) {
-	dumpFile 
-	  << dat->getDataID().getTimePoint() << " " 
-	  << *it << " " 
-	  << y << " "
-	  << row[0] << " "
-	  << residual->getPixel(*it) << " ";
-	for(unsigned int b = 0; b < design.getNumColumns(); b++) {
-	  dumpFile << beta[b] << " ";
-	}
-	dumpFile << endl;
+        dumpFile 
+            << dat->getDataID().getTimePoint() << " " 
+            << *it << " " 
+            << y << " "
+            << row[0] << " "
+            << residual->getPixel(*it) << " ";
+        for(unsigned int b = 0; b < design.getNumColumns(); b++) {
+          dumpFile << beta[b] << " ";
+        }
+        dumpFile << endl;
       }
-	  
+    
       
       delete beta;
     }
@@ -201,19 +201,19 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   if(printTiming) {
     tim.stop();
     cout << "RtIncrementalGLM process at tr " 
-	 << dat->getDataID().getTimePoint()
-	 << " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
+         << dat->getDataID().getTimePoint()
+         << " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
   }
 
   if(print) {
     cout << "RtIncrementalGLM: done at tr " 
-	 << dat->getDataID().getTimePoint() << endl;
+         << dat->getDataID().getTimePoint() << endl;
   }
 
   if(logOutput) {
     stringstream logs("");
     logs << "RtIncrementalGLM: done at tr " 
-	 << dat->getDataID().getTimePoint() << endl;
+         << dat->getDataID().getTimePoint() << endl;
     log(logs);
   }
 
@@ -225,11 +225,11 @@ void RtIncrementalGLM::startDumpAlgoVarsFile() {
   dumpFile << "started at ";
   printNow(dumpFile);
   dumpFile << endl
-	   << "time_point "
-	   << "voxel_index "
-	   << "voxel_intensity "
-	   << "regressor "
-	   << "residual ";
+           << "time_point "
+           << "voxel_index "
+           << "voxel_intensity "
+           << "regressor "
+           << "residual ";
   for(unsigned int b = 0; b < design.getNumColumns(); b++) {
     dumpFile << "beta[" << b << "] ";
   }

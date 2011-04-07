@@ -30,48 +30,48 @@ using namespace std;
 // class declaration
 
 class RtModelFit : public RtStreamComponent {
-public:
+ public:
 
-    static string moduleString;
+  static string moduleString;
 
-    //*** constructors/destructors  ***//
+  //*** constructors/destructors  ***//
 
-    // default constructor
-    RtModelFit();
+  // default constructor
+  RtModelFit();
 
-    // destructor
-    ~RtModelFit();
+  // destructor
+  ~RtModelFit();
 
-protected:
+ protected:
 
-    // process a single acquisition
-    virtual int process(ACE_Message_Block *mb) = 0;
+  // process a single acquisition
+  virtual int process(ACE_Message_Block *mb) = 0;
 
-    // process an option
-    //  in
-    //   name of the option to process
-    //   attr map bettwen attribute names and values
-    virtual bool processOption(const string &name, const string &text,
-                               const map<string, string> &attr);
+  // process an option
+  //  in
+  //   name of the option to process
+  //   attr map bettwen attribute names and values
+  virtual bool processOption(const string &name, const string &text,
+                             const map<string, string> &attr);
 
-    // make sure config is right
-    virtual bool validateComponentConfig();
+  // make sure config is right
+  virtual bool validateComponentConfig();
 
-    // configure this stream component
-    //  in
-    //   xml module node from which to read <option>s
-    virtual bool init(TiXmlElement *module, RtConfig *config, RtConductor *_conductor);
+  // configure this stream component
+  //  in
+  //   xml module node from which to read <option>s
+  virtual bool init(TiXmlElement *module, RtConfig *config, RtConductor *_conductor);
 
-    // initialize the estimation algorithm for a particular image size
-    // in
-    //  first acquired image to use as a template for parameter inits
-    virtual void initEstimation(const RtData &dat, RtMaskImage *mask);
+  // initialize the estimation algorithm for a particular image size
+  // in
+  //  first acquired image to use as a template for parameter inits
+  virtual void initEstimation(const RtData &dat, RtMaskImage *mask);
 
-    // template data id of the data volumes
-    RtDataID templateDataID;
+  // template data id of the data volumes
+  RtDataID templateDataID;
 
-    // design matrix
-    RtDesignMatrix design;
+  // design matrix
+  RtDesignMatrix design;
 
 };
 

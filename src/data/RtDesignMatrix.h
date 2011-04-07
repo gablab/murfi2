@@ -194,17 +194,6 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // retreive the number of nuisance bases in this model
   virtual unsigned int getNumNuisanceBases();
 
-  //   // a column to the design matrix
-  //   //  in
-  //   //   vals:     desired values
-  //   //   interest: whether this column is a basis function representing neural
-  //   //             activation of interest
-  //   //  out
-  //   //   index of column added, or UINT_MAX otherwise
-  //   unsigned int addColumn(double  const * const vals,
-  //       string name,
-  //       bool interest = false);
-
   // a column to the design matrix
   //  in
   //   vals:     desired values
@@ -275,6 +264,8 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 
   // neural signal basis parms
   vector<string> conditionNames; // vector of condition names
+  vector<bool> conditionInterestIndicator; // whether conditions should be
+                                           // included in feedback signal
   unsigned int conditionShift; // insert this many zeros at the
   // begining of the design (allows
   // estimation algo to stabilize)

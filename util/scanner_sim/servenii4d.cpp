@@ -1,3 +1,6 @@
+// serve a 4d nifti image file simulating the scanner for murfi
+//
+// Oliver Hinds <ohinds@mit.edu> 2011-04-14
 
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Connector.h"
@@ -19,7 +22,7 @@ void usage(char *execname) {
        << " ["
        << "host "
        << "port "
-       << "tr "
+       << "tr (seconds)"
        << "]"
        << endl;
 }
@@ -49,7 +52,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   nifti_image *vols = nifti_image_read(niifile.c_str(), 0);
   if(vols == NULL) {
     cerr << "could not open " << niifile << " for reading a nifti image"
-	 << endl;
+         << endl;
     usage(argv[0]);
     return 1;
   }
@@ -88,15 +91,15 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   for(; i < numImgs && !connector.connect (stream, my_addr); i++) {
     cout << "made connection, sending image " << i+1 << endl;
 
-//    nifti_image *vol;
-//    copyTrToVol(vols,i,vol);
+    //    nifti_image *vol;
+    //    copyTrToVol(vols,i,vol);
 
     // mosaic and send
 
     RtExternalImageInfo *ei = new RtExternalImageInfo();
 
     unsigned int mosaicSide = (int) sqrt(matrixSize*matrixSize
-					 *pow(ceil(sqrt((double)numSlices)),2));
+                                         *pow(ceil(sqrt((double)numSlices)),2));
     ei->nCol = matrixSize;
     ei->nLin = matrixSize;
 
@@ -108,10 +111,10 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     ei->dThick = vols->pixdim[3];
 
     cout 
-      << "nCol " <<  ei->nCol << " "
-      << "nLin " <<  ei->nLin << " "
-      << "iNoOfImagesInMosaic " <<  ei->iNoOfImagesInMosaic << " "
-      << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl;
+        << "nCol " <<  ei->nCol << " "
+        << "nLin " <<  ei->nLin << " "
+        << "iNoOfImagesInMosaic " <<  ei->iNoOfImagesInMosaic << " "
+        << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl;
 
     ei->dRowSag = vols->sto_xyz.m[0][0];
     ei->dRowCor = vols->sto_xyz.m[0][1];
@@ -135,7 +138,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     // mosaic
     short *newdata = new short[numPix];
     short *imgdata 
-      = (short*) vols->data + i*vols->dim[1]*vols->dim[2]*vols->dim[3];
+        = (short*) vols->data + i*vols->dim[1]*vols->dim[2]*vols->dim[3];
 
     unsigned int newrow, newcol, oldslc, newind;
     unsigned int sqMatrixSize = matrixSize*matrixSize;
@@ -150,10 +153,10 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
       // copy if within slices
       if(oldslc < numSlices) {
-	newdata[newind] = imgdata[p];
+        newdata[newind] = imgdata[p];
       }
       else { // fill the blank panels with zeros
-	newdata[newind] = 0;
+        newdata[newind] = 0;
       }
     }
     
@@ -179,8 +182,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     stream.close();
 
-//    //// send moco image
-//
+    //    //// send moco image
     if(connector.connect (stream, my_addr)) {
       break;
     }

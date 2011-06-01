@@ -316,10 +316,10 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
       ? config.get("scanner:measurements") : DEFAULT_NUMMEAS;
 
   // resize the vectors to take the new number of measurements
-  postc.set_size(numMeas);
+  postc.set_size(numMeas + 1);
   postc.fill(0.0);
 
-  negtc.set_size(numMeas);
+  negtc.set_size(numMeas + 1);
   negtc.fill(0.0);
 
   if(config.isSet("oldgui:initialImage")) {

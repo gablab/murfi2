@@ -32,7 +32,7 @@ int simple_ls(string dir, string ext)
 
   if ( !fs::exists( full_path ) )
     {
-      std::cout << "\nNot found: " << full_path.file_string() << std::endl;
+      std::cout << "\nNot found: " << full_path.string() << std::endl;
       return 1;
     }
 
@@ -45,7 +45,7 @@ int simple_ls(string dir, string ext)
 	    dir_itr != end_iter;
 	    ++dir_itr )
 	{
-	  string name = dir_itr->path().leaf();
+	  string name = dir_itr->path().string();
 	  if(!ext.empty() 	     
 	     && (name.size() <= ext.size() 
 		 || ext != name.substr(name.size()-ext.size()))	     
@@ -85,7 +85,7 @@ int simple_ls(string dir, string ext)
     }
   else // must be a file
     {
-      std::cout << "\nFound: " << full_path.file_string() << "\n";    
+      std::cout << "\nFound: " << full_path.string() << "\n";    
     }
   return 0;
 }

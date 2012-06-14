@@ -89,7 +89,7 @@ ACE_HOME = /usr
 BOOST_HOME = /usr
 
 # vxl
-VXL_HOME = /usr/local
+VXL_HOME = /usr
 
 #svm
 SVM_HOME = $(PWD)/util/svm
@@ -189,7 +189,7 @@ SVM_LIB=$(SVM_HOME)/src/*.o \
 
 # boost
 BOOST_INC=-I$(BOOST_HOME)/include/
-BOOST_LIB=-L$(BOOST_HOME)/lib -lboost_filesystem
+BOOST_LIB=-L$(BOOST_HOME)/lib -lboost_filesystem -lboost_system
 
 # xml libs
 TINYXML_FLAGS=-DTIXML_USE_STL

@@ -24,24 +24,24 @@ parse_args() {
    # get the options
     while getopts ":t:m:i:o:s:r:h?" Option
     do
-		case $Option in
-			t ) targ="$OPTARG"
-				;;
-			m ) move="$OPTARG"
-				;;
-			i ) input="$OPTARG"
-				;;
-			o ) output="$OPTARG"
-				;;
-			s ) xfmfile="$OPTARG"
-				;;
-			r ) xfmfile="$OPTARG"
-				;;
-			F ) fslpath="$OPTARG"
-				;;
-			* ) usage;
-				exit;;
-		esac
+    case $Option in
+      t ) targ="$OPTARG"
+        ;;
+      m ) move="$OPTARG"
+        ;;
+      i ) input="$OPTARG"
+        ;;
+      o ) output="$OPTARG"
+        ;;
+      s ) xfmfile="$OPTARG"
+        ;;
+      r ) xfmfile="$OPTARG"
+        ;;
+      F ) fslpath="$OPTARG"
+        ;;
+      * ) usage;
+        exit;;
+    esac
     done
     shift $(($OPTIND - 1))
 }
@@ -61,14 +61,14 @@ apply_reg() {
     # set the desired datatype (short or double or float)
     dtype=`nifti_tool -quiet -disp_hdr -fields datatype -infiles "$in" | sed "s/.* //"`;
     if [ "$dtype" == 16 ]; then
-		otype=float
+    otype=float
     elif [ "$dtype" == 64 ]; then
-		otype=double
+    otype=double
     else
-		otype=short
+    otype=short
     fi
 
-	echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
+  echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
     flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
 }
 
@@ -137,11 +137,11 @@ for file in $input; do
     transfiles="$transfiles $file"
 
     if [ "$output" ]; then
-		of=`echo $output | sed "s/\([^*]\) .*/\1/"`
-		output=`echo $output | sed "s/[^*] \(.*\)/\1/"`
+    of=`echo $output | sed "s/\([^*]\) .*/\1/"`
+    output=`echo $output | sed "s/[^*] \(.*\)/\1/"`
     else
-		ostem=`echo $file | sed "s|.*/||; s|\(.*.*\)\..*$|\1|"`
-		of="$movedir""$ostem"2"$targstem"
+    ostem=`echo $file | sed "s|.*/||; s|\(.*.*\)\..*$|\1|"`
+    of="$movedir""$ostem"2"$targstem"
     fi
 
     apply_reg "$savexfmfile" "$file" "$targ" "$of"

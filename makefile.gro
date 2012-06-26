@@ -31,7 +31,7 @@ INSTALL_DIR = /usr/local/bin/
 INSTALL_BINARY = ./bin/$(PROJECT)
 
 # whether to compile with debug, optimize flags
-DEBUG = 1
+DEBUG = 0
 PROF = 0
 OPTIM = 0
 STRIP = 0
@@ -67,8 +67,8 @@ export MOC = /usr/bin/moc-qt3
 ### LIBS AND LIB CONFIG
 
 # global package directory
-#export PKG_DIR = /software/fastr/packages
-export PKG_DIR = /usr/local/
+export PKG_DIR = /sw/packages/
+#export PKG_DIR = /usr/local/
 
 #NIFTI_HOME=/software/fastr/packages/nifticlib-1.1.0
 NIFTI_HOME=/usr
@@ -89,7 +89,7 @@ ACE_HOME = /usr
 BOOST_HOME = /usr
 
 # vxl
-VXL_HOME = /usr
+VXL_HOME = /sw/packages/
 
 #svm
 SVM_HOME = $(PWD)/util/svm
@@ -173,7 +173,7 @@ GSL_LIB=-lgsl -lgslcblas
 
 
 # computer vision
-VXL_INC=-I$(VXL_HOME)/include/vxl/core -I$(VXL_HOME)/include/vxl/vcl
+VXL_INC=-I$(VXL_HOME)/vxl/include/vxl/core -I$(VXL_HOME)/vxl/include/vxl/vcl
 VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(VXL_HOME)/vxl/lib
 
 # svm
@@ -189,7 +189,7 @@ SVM_LIB=$(SVM_HOME)/src/*.o \
 
 # boost
 BOOST_INC=-I$(BOOST_HOME)/include/
-BOOST_LIB=-L$(BOOST_HOME)/lib -lboost_filesystem -lboost_system
+BOOST_LIB=-L$(BOOST_HOME)/lib -lboost_filesystem-mt
 
 # xml libs
 TINYXML_FLAGS=-DTIXML_USE_STL

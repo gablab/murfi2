@@ -19,25 +19,25 @@
 
 // scopic alexsid: #define WIN32
 #ifndef RT_DISPLAY_IMAGE_TEXTURE
-  #ifdef WIN32 
-    #define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_2D
-  #else
-     #ifdef GL_TEXTURE_RECTANGLE_EXT
-       #ifndef GL_TEXTURE_RECTANGLE_NV
-         #define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_RECTANGLE_EXT
-       #endif
-     #else
-       #ifdef GL_TEXTURE_RECTANGLE_NV
-         #ifndef GL_TEXTURE_RECTANGLE_EXT
-           #define GL_TEXTURE_RECTANGLE_EXT GL_TEXTURE_RECTANGLE_NV
-         #endif
-     //#else
-     //#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
-     //#define GL_TEXTURE_2D GL_TEXTURE_2D
-       #endif
-     #endif
-   #define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_RECTANGLE_EXT
-  #endif
+#ifdef WIN32 
+#define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_2D
+#else
+#ifdef GL_TEXTURE_RECTANGLE_EXT
+#ifndef GL_TEXTURE_RECTANGLE_NV
+#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_RECTANGLE_EXT
+#endif
+#else
+#ifdef GL_TEXTURE_RECTANGLE_NV
+#ifndef GL_TEXTURE_RECTANGLE_EXT
+#define GL_TEXTURE_RECTANGLE_EXT GL_TEXTURE_RECTANGLE_NV
+#endif
+//#else
+//#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
+//#define GL_TEXTURE_2D GL_TEXTURE_2D
+#endif
+#endif
+#define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_RECTANGLE_EXT
+#endif
 #endif
 
 // debuging
@@ -161,8 +161,8 @@ RtDisplayImage::RtDisplayImage() {
 //   _h: initial height of the window
 //   _title: title string of the window
 RtDisplayImage::RtDisplayImage(int _x, int _y,
-			       int _w, int _h,
-			       char *_title) {
+                               int _w, int _h,
+                               char *_title) {
   initialized = false;
 
   x = _x;
@@ -229,19 +229,19 @@ bool RtDisplayImage::open(RtConfig &config) {
   ACE_TRACE(("RtDisplayImage::open"));
 
   x = config.isSet("oldgui:winX")
-    ? config.get("oldgui:winX") : DEFAULT_X;
+      ? config.get("oldgui:winX") : DEFAULT_X;
 
   y = config.isSet("oldgui:winY")
-    ? config.get("oldgui:winY") : DEFAULT_Y;
+      ? config.get("oldgui:winY") : DEFAULT_Y;
 
   width = config.isSet("oldgui:winW")
-    ? config.get("oldgui:winW") : DEFAULT_W;
+      ? config.get("oldgui:winW") : DEFAULT_W;
 
   height = config.isSet("oldgui:winH")
-    ? config.get("oldgui:winH") : DEFAULT_H;
+      ? config.get("oldgui:winH") : DEFAULT_H;
 
   strcpy(title, config.isSet("oldgui:winTitle")
-	 ? config.get("oldgui:winTitle").str().c_str() : DEFAULT_TITLE);
+         ? config.get("oldgui:winTitle").str().c_str() : DEFAULT_TITLE);
 
 
   return init();
@@ -313,13 +313,13 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
   // configuration
 
   numMeas = config.isSet("scanner:measurements")
-    ? config.get("scanner:measurements") : DEFAULT_NUMMEAS;
+      ? config.get("scanner:measurements") : DEFAULT_NUMMEAS;
 
   // resize the vectors to take the new number of measurements
-  postc.set_size(numMeas);
+  postc.set_size(numMeas + 1);
   postc.fill(0.0);
 
-  negtc.set_size(numMeas);
+  negtc.set_size(numMeas + 1);
   negtc.fill(0.0);
 
   if(config.isSet("oldgui:initialImage")) {
@@ -363,14 +363,14 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
   }
 
   posOverlayRoiID = config.isSet("oldgui:posOverlayRoiID")
-	 ? config.get("oldgui:posOverlayRoiID").str() :DEFAULT_POSOVERLAYROIID;
+      ? config.get("oldgui:posOverlayRoiID").str() :DEFAULT_POSOVERLAYROIID;
 
   if(config.isSet("oldgui:negOverlayID")) {
     negOverlayID = config.get("oldgui:negOverlayID").str();
   }
 
   negOverlayRoiID = config.isSet("oldgui:negOverlayRoiID")
-	 ? config.get("oldgui:negOverlayRoiID").str() :DEFAULT_NEGOVERLAYROIID;
+      ? config.get("oldgui:negOverlayRoiID").str() :DEFAULT_NEGOVERLAYROIID;
 
   if(config.isSet("oldgui:posMaskID")) {
     posMaskID = config.get("oldgui:posMaskID").str();
@@ -378,7 +378,7 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
   }
 
   posMaskRoiID = config.isSet("oldgui:posMaskRoiID")
-	 ? config.get("oldgui:posMaskRoiID").str() : DEFAULT_POSMASKROIID;
+      ? config.get("oldgui:posMaskRoiID").str() : DEFAULT_POSMASKROIID;
 
   if(config.isSet("oldgui:negMaskID")) {
     negMaskID = config.get("oldgui:negMaskID").str();
@@ -386,21 +386,21 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
   }
 
   negMaskRoiID = config.isSet("oldgui:negMaskRoiID")
-	 ? config.get("oldgui:negMaskRoiID").str() : DEFAULT_NEGMASKROIID;
+      ? config.get("oldgui:negMaskRoiID").str() : DEFAULT_NEGMASKROIID;
 
   posActivationSumID = config.isSet("oldgui:posActivationSumID")
-	 ? config.get("oldgui:posActivationSumID").str() 
-    : DEFAULT_POSACTIVATIONSUMID;
+      ? config.get("oldgui:posActivationSumID").str() 
+      : DEFAULT_POSACTIVATIONSUMID;
   posActivationSumRoiID = config.isSet("oldgui:posActivationSumRoiID")
-	 ? config.get("oldgui:posActivationSumRoiID").str() 
-    : DEFAULT_POSACTIVATIONSUMROIID;
+      ? config.get("oldgui:posActivationSumRoiID").str() 
+      : DEFAULT_POSACTIVATIONSUMROIID;
 
   negActivationSumID = config.isSet("oldgui:negActivationSumID")
-	 ? config.get("oldgui:negActivationSumID").str() 
-    : DEFAULT_NEGACTIVATIONSUMID;
+      ? config.get("oldgui:negActivationSumID").str() 
+      : DEFAULT_NEGACTIVATIONSUMID;
   negActivationSumRoiID = config.isSet("oldgui:negActivationSumRoiID")
-	 ? config.get("oldgui:negActivationSumRoiID").str() 
-    : DEFAULT_NEGACTIVATIONSUMROIID;
+      ? config.get("oldgui:negActivationSumRoiID").str() 
+      : DEFAULT_NEGACTIVATIONSUMROIID;
 
   // movie stuff
   if(config.isSet("oldgui:makeMovie") 
@@ -442,7 +442,7 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
     else { // success
       // unmosaic?
       if(img->isMosaic()) {
-	img->mosaic();
+        img->mosaic();
       }
       newTex = true;
     }
@@ -456,10 +456,10 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
     else { // success
       // unmosaic?
       if(posMask->isMosaic()) {
-	posMask->mosaic();
+        posMask->mosaic();
       }
       if(flipInitialPosMask) {
-	posMask->flipLR();
+        posMask->flipLR();
       }
       newPosMask = true;
     }
@@ -473,10 +473,10 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
     else { // success
       // unmosaic?
       if(negMask->isMosaic()) {
-	negMask->mosaic();
+        negMask->mosaic();
       }
       if(flipInitialNegMask) {
-	negMask->flipLR();
+        negMask->flipLR();
       }
       newNegMask = true;
     }
@@ -521,14 +521,14 @@ void RtDisplayImage::notify(const RtDataID &id) {
 
     if(DEBUG_LEVEL & BASIC) {
       cout << "display got a pos activation sum: " 
-	   << ((RtActivation*)getDataStore().getData(id))->getPixel(0)
-	   << " " << id.getTimePoint() << endl;
+           << ((RtActivation*)getDataStore().getData(id))->getPixel(0)
+           << " " << id.getTimePoint() << endl;
     }
 
     // plot the sum
     if(id.getTimePoint() < postc.size()) {
       postc.put(id.getTimePoint(),
-		((RtActivation*)getDataStore().getData(id))->getPixel(0));
+                ((RtActivation*)getDataStore().getData(id))->getPixel(0));
     }
 
     gnuPlot->reset_plot();
@@ -542,14 +542,14 @@ void RtDisplayImage::notify(const RtDataID &id) {
 
     if(DEBUG_LEVEL & BASIC) {
       cout << "display got a neg activation sum: " 
-	   << ((RtActivation*)getDataStore().getData(id))->getPixel(0) 
-	   << endl;
+           << ((RtActivation*)getDataStore().getData(id))->getPixel(0) 
+           << endl;
     }
 
     // plot the sum
     if(id.getTimePoint() < negtc.size()) {
-	negtc.put(id.getTimePoint(),
-		  ((RtActivation*)getDataStore().getData(id))->getPixel(0));
+      negtc.put(id.getTimePoint(),
+                ((RtActivation*)getDataStore().getData(id))->getPixel(0));
     }
 
     //gp.reset_plot();
@@ -622,10 +622,10 @@ void RtDisplayImage::notify(const RtDataID &id) {
   if(id.getModuleID() != imageDisplayType) {
     if(DEBUG_LEVEL & BASIC) {
       cout << "ignoring image of type " 
-	   << id.getModuleID() 
-	   << " because its not " 
-	   << imageDisplayType
-	   << endl;
+           << id.getModuleID() 
+           << " because its not " 
+           << imageDisplayType
+           << endl;
     }
     ACE_DEBUG((LM_DEBUG, "ignoring image of type %s\n", id.getModuleID()));
     return;
@@ -695,20 +695,20 @@ void RtDisplayImage::makeTexture() {
 
   // unmosaic if needed
   short *imageData;
-//  if(!img->isMosaic()) {
-//    imageData = img->getMosaicedCopy();
-//    imageW = img->getMosaicedWidth();
-//    imageH = img->getMosaicedHeight();
-//  }
-//  else {
-    imageData = new short[img->getNumEl()];
-    imageW = img->getDim(0);
-    imageH = img->getDim(1);
-    imageData = img->getDataCopy();
-//  }
+  //  if(!img->isMosaic()) {
+  //    imageData = img->getMosaicedCopy();
+  //    imageW = img->getMosaicedWidth();
+  //    imageH = img->getMosaicedHeight();
+  //  }
+  //  else {
+  imageData = new short[img->getNumEl()];
+  imageW = img->getDim(0);
+  imageH = img->getDim(1);
+  imageData = img->getDataCopy();
+  //  }
 
   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, imageW, imageH,
-	       0, GL_LUMINANCE, GL_SHORT, imageData);
+               0, GL_LUMINANCE, GL_SHORT, imageData);
 
   if(!glIsTexture(imageTex)) {
     cerr << "ERROR: could not generate a new texture" << endl;
@@ -756,38 +756,38 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 
   for(int i = 0; i < numImageData; i++) {
     // debugging
-      if(min > imageData[i]) {
-	min = imageData[i];
-      }
-      if(max < imageData[i]) {
-	max = imageData[i];
-      }
+    if(min > imageData[i]) {
+      min = imageData[i];
+    }
+    if(max < imageData[i]) {
+      max = imageData[i];
+    }
 
     // use a cheap heat colormap
     if(!overlay->getScaleIsInverted() 
        && imageData[i] > threshold) {
       overlayImg[4*i+0] = SHRT_MAX; // r
       overlayImg[4*i+1] = (short) rint(min(1,((imageData[i]
-			     -threshold)/overlay->getCeiling()))
-				       *SHRT_MAX); // g
+                                               -threshold)/overlay->getCeiling()))
+                                       *SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
     else if(!overlay->getScaleIsInverted() 
-	    && imageData[i] < -threshold) {
+            && imageData[i] < -threshold) {
       overlayImg[4*i+0] = 0; // r
       overlayImg[4*i+1] = (short) rint(min(1,-1*((imageData[i]
-			     +threshold)/overlay->getCeiling()))
-				       *SHRT_MAX); // g
+                                                  +threshold)/overlay->getCeiling()))
+                                       *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
     else if(overlay->getScaleIsInverted() 
-	    && fabs(imageData[i]) < threshold) {
+            && fabs(imageData[i]) < threshold) {
       overlayImg[4*i+0] = SHRT_MAX; // r
       overlayImg[4*i+1] = (short) 
-	(1 - (fabs(imageData[i])/threshold))
-	*SHRT_MAX; // g
+          (1 - (fabs(imageData[i])/threshold))
+          *SHRT_MAX; // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
@@ -808,7 +808,7 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, imageW, imageH, 0, GL_RGBA,
-	       GL_SHORT, overlayImg);
+               GL_SHORT, overlayImg);
 
   delete overlayImg;
 
@@ -867,7 +867,7 @@ void RtDisplayImage::makePosMaskTexture() {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, imageW, imageH, 0, GL_RGBA,
-	       GL_SHORT, posMaskImg);
+               GL_SHORT, posMaskImg);
 
   delete posMaskImg;
 
@@ -926,7 +926,7 @@ void RtDisplayImage::makeNegMaskTexture() {
   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 4, imageW, imageH, 0, GL_RGBA,
-	       GL_SHORT, negMaskImg);
+               GL_SHORT, negMaskImg);
 
   delete negMaskImg;
 
@@ -1014,32 +1014,32 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     drawString(10,10,"no image loaded",1,0,0);
 
     // debug
-//    makeTextures(width,height);
-//    
-//  /* turn on texture mapping */
-//  glEnable(RT_DISPLAY_IMAGE_TEXTURE);
-//
-//  /* draw the main texture */
-//  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
-//
-//  int w = width;
-//  int h = height;
-//  double tw = width;
-//  double th = height;
-//
-//  /* make a quadrilateral and provide texture coords */
-//  glBegin(GL_QUADS); {
-//    glTexCoord2d(0.0,0.0);
-//    glVertex3f(0, h, 0.0);
-//    glTexCoord2d(tw,0.0);
-//    glVertex3f(w, h, 0.0);
-//    glTexCoord2d(tw,th);
-//    glVertex3f(w, 0, 0.0);
-//    glTexCoord2d(0,th);
-//    glVertex3f(0, 0, 0.0);
-//  } glEnd();
-//
-//  glDisable(RT_DISPLAY_IMAGE_TEXTURE);
+    //    makeTextures(width,height);
+    //    
+    //  /* turn on texture mapping */
+    //  glEnable(RT_DISPLAY_IMAGE_TEXTURE);
+    //
+    //  /* draw the main texture */
+    //  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
+    //
+    //  int w = width;
+    //  int h = height;
+    //  double tw = width;
+    //  double th = height;
+    //
+    //  /* make a quadrilateral and provide texture coords */
+    //  glBegin(GL_QUADS); {
+    //    glTexCoord2d(0.0,0.0);
+    //    glVertex3f(0, h, 0.0);
+    //    glTexCoord2d(tw,0.0);
+    //    glVertex3f(w, h, 0.0);
+    //    glTexCoord2d(tw,th);
+    //    glVertex3f(w, 0, 0.0);
+    //    glTexCoord2d(0,th);
+    //    glVertex3f(0, 0, 0.0);
+    //  } glEnd();
+    //
+    //  glDisable(RT_DISPLAY_IMAGE_TEXTURE);
 
     glutSwapBuffers();
     return;
@@ -1047,8 +1047,8 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   //  ACE_DEBUG((LM_DEBUG, "showing image %d\n", img->getAcquisitionNum()));
 
-//  int imgw = img->getDim(1);
-//  int imgh = img->getDim(0);
+  //  int imgw = img->getDim(1);
+  //  int imgh = img->getDim(0);
 
   /* turn on texture mapping */
   glEnable(RT_DISPLAY_IMAGE_TEXTURE);
@@ -1164,7 +1164,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     // build command
     stringstream cmd;
     cmd << screenShotCommand
-	<< " -out " << framePrefix;
+        << " -out " << framePrefix;
     cmd.fill('0');
     cmd.width(5);
     cmd << curFrame++;
@@ -1181,15 +1181,15 @@ void RtDisplayImage::CallBackReshapeFunc(int w, int h){
   if(width != w || height != h) {
     glutReshapeWindow(width,height);
   }
-//
-//   width = w;
-//   height= h;
-//
-//   cout << w << " " << h << endl;
-//
-//   glViewport(0, 0, width, height);
-//
-//   CallBackDisplayFunc();
+  //
+  //   width = w;
+  //   height= h;
+  //
+  //   cout << w << " " << h << endl;
+  //
+  //   glViewport(0, 0, width, height);
+  //
+  //   CallBackDisplayFunc();
 }
 
 
@@ -1244,59 +1244,59 @@ void RtDisplayImage::action(int code) {
   string response;
 
   switch(code) {
-  case 'q': // quit
-    glutMaster.CallGlutLeaveMainLoop();
-    break;
-  case 'r': // run
-    cout << endl;
-    simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
-    cout << endl;
+    case 'q': // quit
+      glutMaster.CallGlutLeaveMainLoop();
+      break;
+    case 'r': // run
+      cout << endl;
+      simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
+      cout << endl;
 
-    // ask for a config file name 
-    cout << "enter the config file name for the fmri run (q to quit): ";
-    cin >> response;
-    runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
-			      + response);
-    prepareRun(runConfig);
-    executeRun(runConfig);    
+      // ask for a config file name 
+      cout << "enter the config file name for the fmri run (q to quit): ";
+      cin >> response;
+      runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
+                                + response);
+      prepareRun(runConfig);
+      executeRun(runConfig);    
+      break;
+    case 's': // scanner image
+      imageDisplayType = ID_MOSAIC;
+      break;
+    case 'd': // difference image
+      imageDisplayType = ID_TEMPDIFF;
+      break;
+    case 'm': // mean image
+      imageDisplayType = ID_TEMPMEAN;
+      break;
+    case '=': // pos mask
+    case '+':
+        posMaskOn = !posMaskOn;
     break;
-  case 's': // scanner image
-    imageDisplayType = ID_MOSAIC;
+    case '-': // neg mask
+    case '_':
+        negMaskOn = !negMaskOn;
     break;
-  case 'd': // difference image
-    imageDisplayType = ID_TEMPDIFF;
-    break;
-  case 'm': // mean image
-    imageDisplayType = ID_TEMPMEAN;
-    break;
-  case '=': // pos mask
-  case '+':
-    posMaskOn = !posMaskOn;
-    break;
-  case '-': // neg mask
-  case '_':
-    negMaskOn = !negMaskOn;
-    break;
-  case 'n': // inorm
-    imageDisplayType = ID_SPATIALINTENSITYNORM;
-    break;
-  case 'v': // variance image
-    imageDisplayType = ID_TEMPVAR;
-    break;
-  case 't': // threshold val down
-    threshold /= thresholdModAmount;
-    cout << "new display stat threshold " << threshold << endl;
-    break;
-  case 'T': // threshold val up
-    threshold *= thresholdModAmount;
-    cout << "new display stat threshold " << threshold << endl;
-    break;
-  case 'z': // positive overlay
-    posOverlayOn = !posOverlayOn;
-    break;
-  case 'Z': // negative overlay
-    negOverlayOn = !negOverlayOn;
-    break;
+    case 'n': // inorm
+      imageDisplayType = ID_SPATIALINTENSITYNORM;
+      break;
+    case 'v': // variance image
+      imageDisplayType = ID_TEMPVAR;
+      break;
+    case 't': // threshold val down
+      threshold /= thresholdModAmount;
+      cout << "new display stat threshold " << threshold << endl;
+      break;
+    case 'T': // threshold val up
+      threshold *= thresholdModAmount;
+      cout << "new display stat threshold " << threshold << endl;
+      break;
+    case 'z': // positive overlay
+      posOverlayOn = !posOverlayOn;
+      break;
+    case 'Z': // negative overlay
+      negOverlayOn = !negOverlayOn;
+      break;
   }
 
   // signal if we are displaying a new type of image
@@ -1371,7 +1371,7 @@ void RtDisplayImage::drawString(GLint x, GLint y, const char* s, float r, float 
 
 /*************
  * ohinds: 2009-01-18
-**************/
+ **************/
 #endif //#ifndef USE_FRONTEND
 
 /*****************************************************************************

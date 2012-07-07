@@ -139,11 +139,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     info.port = (int) mxGetScalar(prhs[1]);
 
     // get the remotehost
-    if(mxGetString(prhs[2],remoteInfo.host,MAX_STR_LEN)) {
+    if(mxGetString(prhs[2],tmpChars, MAX_STR_LEN)) {
       mexErrMsgTxt("remotehost name can't be converted to a string.");
       assignSuccessStatus(nlhs,plhs,FAILURE);
       return;
     }
+    remoteInfo.host = string(tmpChars);
 
     // get the remoteport
     if(!mxIsNumeric(prhs[3])) {
@@ -157,7 +158,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
     if(status == SUCCESS) {
       mexPrintf("started the infoclient on %s:%d, listening for %s:%d.\n", 
-		info.host, info.port, remoteInfo.host, remoteInfo.port);
+		info.host.c_str(), info.port, remoteInfo.host.c_str(), remoteInfo.port);
     }
 
     assignSuccessStatus(nlhs,plhs,status);
@@ -282,11 +283,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
 
     // get the host
-    if(mxGetString(prhs[2],info.host,MAX_STR_LEN)) {
+    if(mxGetString(prhs[2],tmpChars,MAX_STR_LEN)) {
       mexErrMsgTxt("host name can't be converted to a string.");
       assignSuccessStatus(nlhs,plhs,FAILURE);
       return;
     }
+    info.host = string(tmpChars);
 
     // get the port
     if(!mxIsNumeric(prhs[3])) {

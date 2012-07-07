@@ -320,7 +320,7 @@ int startInfoclient(const TcpInfo &tcpInfo,
     threadRunning = true;
   }
 
-  remoteAddress.set(remoteTcpInfo.port, remoteTcpInfo.host);
+  remoteAddress.set(remoteTcpInfo.port, remoteTcpInfo.host.c_str());
 
   return SUCCESS;
 }
@@ -429,7 +429,7 @@ int stopInfoclient(string &errMsg) {
  * send a message to a remote client
  */
 int sendMessage(const string &message, const TcpInfo &info, string &errMsg) {
-  ACE_INET_Addr addr(info.port, info.host);
+  ACE_INET_Addr addr(info.port, info.host.c_str());
   ACE_SOCK_Stream stream;
   ACE_SOCK_Connector connector;
 

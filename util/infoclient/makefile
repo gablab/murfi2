@@ -3,7 +3,6 @@ MATLAB  = /software/matlab_versions/2010b/bin/
 NAME 	=		infoclient
 
 SRC	=		infoclientLib.cpp \
-	                infoclientMex.cpp \
 	                tinyxml/tinyxml.cpp \
 	                tinyxml/tinyxmlerror.cpp \
 	                tinyxml/tinyxmlparser.cpp 
@@ -15,31 +14,40 @@ OBJDIR	= obj
 ################
 IPATH   = 
 OBJOPT  = 
-EXEOPT  = -output $(NAME) -lACE
+EXEOPT  = -lACE
 LPATH   = 
 DEFS	= -DTIXML_USE_STL
 
 
 #####################
-CXX 	= $(MATLAB)mex
+CC      = g++
+MEX 	= $(MATLAB)mex
 MAKE 	= make
 SHELL	= /bin/sh
 TMPOBJS = $(SRC:.cpp=.o) 
 OBJS 	= $(TMPOBJS:%/=) 
 RM 	= /bin/rm -f 	
 
-CFLAGS  = -g $(OBJOPT) $(IPATH) $(DEFS)
+CFLAGS  = -g $(OBJOPT) $(IPATH) $(DEFS) -fPIC
 LDFLAGS = $(EXEOPT) $(LPATH)
 
 ##############################
 
-all:	$(NAME)
-$(NAME): $(OBJS) $(SRC) $(INCL)  
-	mv *.o $(OBJDIR)
-	$(CXX) $(OBJDIR)/*.o $(LDFLAGS) 
+all:	mex python $(NAME)
+
+$(NAME): $(OBJS) $(SRC) $(INCL)
+	$(CC) -o $(NAME) test_infoclient.cpp $(OBJDIR)/*.o $(LDFLAGS)
+
+mex: $(OBJS)
+	$(MEX) infoclientMex.cpp $(OBJDIR)/*.o $(LDFLAGS)
+
+python: $(OBJS)
+	ar rcs lib$(NAME).a $(OBJDIR)/infoclientLib.o $(OBJDIR)/tinyxml*.o
+	python setup.py build_ext -i
 
 clean:
-	-$(RM) $(NAME) $(OBJS) *~
+	-$(RM) $(NAME) $(OBJS) $(OBJDIR)/*.o *.so *.mexa64 *~ *.a
 
 .cpp.o:
-	$(CXX) $(CFLAGS) -c $< 
+	$(CC) $(CFLAGS) -c $<
+	mv *.o $(OBJDIR)

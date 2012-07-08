@@ -155,6 +155,7 @@ void handleReceivedXml(const string &xml) {
 	info.value = atof(val);
 	info.changed = true;
 
+    cout << "receiving data" << endl;
 	// add it to the changed queue
 	changedData.push(info);
       }
@@ -386,6 +387,7 @@ int removeInfoclient(const string &dataName, const string &roiName,
 int checkInfoclient(vector<Info> &changed, string &errMsg) {
   changed.clear();
 
+  cout << changedData.size() << endl;
   // empty changed queue
   while(!changedData.empty()) {
     changed.push_back(changedData.front());

@@ -1,4 +1,4 @@
-MATLAB  = /home/software/matlab2008a/bin/
+MATLAB  = /software/matlab_versions/2010b/bin/
 
 NAME 	=		infoclient
 

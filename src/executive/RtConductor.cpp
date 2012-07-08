@@ -21,6 +21,7 @@ RtConductor::RtConductor(const RtConfigFmriRun &_config) : ACE_Task_Base(),
   ACE_TRACE(("RtConductor::RtConductor"));
 
   configure(config);
+  infoClient = NULL;
 }
 
 // destructor
@@ -63,6 +64,8 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
   if(config.isSet("infoclient:disabled") 
      && config.get("infoclient:disabled") == false) {
 
+    cout << "configuring infoclient" << endl;
+
     if(!config.isSet("infoclient:localPort") 
        ||!config.isSet("infoclient:remoteHost") 
        || !config.isSet("infoclient:remotePort")) {
@@ -71,12 +74,14 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
       return false;
     }
 
-    RtInfoClient *infoClient 
+    infoClient 
       = new RtInfoClient((unsigned int) config.get("infoclient:localPort"),
 			 config.get("infoclient:remoteHost").str(),
 			 (unsigned int) config.get("infoclient:remotePort"));
     addOutput(infoClient);
     infoClient->activate();
+
+    cout << "infoclient configured" << endl;
   }
 
   // attach code numbers to outputs
@@ -326,21 +331,27 @@ int RtConductor::svc() {
 void RtConductor::receiveCode(unsigned int code, RtData *data) {
   ACE_TRACE(("RtConductor::receiveCode"));
 
+  cout << code << ": " << data << endl;
+
   // handle based on the thrower
   if(code == SHUTDOWN) {
     cout << "shutdown signal " << code << " received" << endl;
     running = false;
   }
   else if(code == START_CODE_STREAM) { // stream component has data
-    //cout << "caught data " << data << " available signal from a stream component" << endl;
+    cout << "caught data " << data << " available signal from a stream component" << endl;
 
     // make data available to all output processes
     for(vector<RtOutput*>::iterator i = outputs.begin(); 
 	i != outputs.end(); i++) {
-      (*i)->setData(data);
-    }
+      if(*i == infoClient) {
+	cout << "setting data on info client" << endl;
+      }
 
-    return;
+      (*i)->setData(data);
+
+      return;
+    }
   }
   else if(code < START_CODE_OUTPUTS) { // this is an input
     //cout << "caught data " << data << " as input to the stream" << endl;
@@ -348,10 +359,10 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     // let the stream decide if it should spawn a new processing instance 
     stream.setInput(code,data);
 
-    //cout << "sent ready signal" << endl;
+    cout << "sent ready signal" << endl;
   }
   else { // this is an output
-    //cout << "caught a ready signal from an output" << endl;
+    cout << "caught a ready signal from an output" << endl;
 
     // dont need to do much here
   }

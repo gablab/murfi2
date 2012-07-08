@@ -22,6 +22,8 @@
 #include"RtStream.h"
 #include"RtCode.h"
 
+#include "RtInfoClient.h"
+
 using namespace std;
 
 // class declaration
@@ -179,6 +181,9 @@ protected:
 
   // vector of output objects
   vector<RtOutput*> outputs;
+
+  // TEMP debugging
+  RtInfoClient* infoClient;
 
   // whether we are ready to run
   bool configured;

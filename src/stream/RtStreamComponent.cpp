@@ -297,6 +297,7 @@ void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
 
     passData(data);
     storeData(data);
+    conductor->receiveCode(START_CODE_STREAM, data);
 }
 
 // close a stream component

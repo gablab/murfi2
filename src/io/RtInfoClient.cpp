@@ -42,7 +42,7 @@ bool RtInfoClient::addListenData(const string &dataName,
   templ.setDataName(dataName);
   templ.setRoiID(roiName);
 
-  cout << "adding " << templ << endl;
+  cout << "adding data listener " << templ << endl;
 
   // insert
   listenData.insert(templ);
@@ -75,9 +75,9 @@ bool RtInfoClient::acknowledgeListenData(const string &dataName,
 
 // set some data
 void RtInfoClient::setData(RtData *data) {  
-//  cout << "found " << data->getDataID() << endl
-//       << "looking for " << (*listenData.begin()) << endl
-//       << "==? " << (data->getDataID() == (*listenData.begin())) << endl;
+  cout << "found " << data->getDataID() << endl
+       << "looking for " << (*listenData.begin()) << endl
+       << "==? " << (data->getDataID() == (*listenData.begin())) << endl;
 
 
     set<RtDataID, RtDataIDPartialCompare>::iterator i = listenData.find(data->getDataID());
@@ -95,6 +95,7 @@ void RtInfoClient::setData(RtData *data) {
     infoEl->LinkEndChild(dataEl);    
 
     // send the data
+    cout << "infoclient: sending messge" << data->getDataID() << endl;
     sendMessageToServer(buildXMLString(response));
   }
   else {

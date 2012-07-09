@@ -300,6 +300,7 @@ void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
 
     passData(data);
     storeData(data);
+    sendCode(data);
 }
 
 // close a stream component

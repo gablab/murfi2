@@ -60,7 +60,7 @@ static string confXmlStr;
 static RtDataStore dataStore;
 
 // tcpip interface to experiment information
-static RtInfoServer infoServer;
+static RtInfoServer *infoServer = NULL;
 
 // tcpip interface to scanner input
 static RtInputScannerImages scannerInput;
@@ -232,18 +232,19 @@ bool initExperiment() {
   // start info server
   if(config.isSet("infoserver:disabled")
      && config.get("infoserver:disabled")==false) {
-    if(!infoServer.open(config)) {
+    infoServer = new RtInfoServer();
+    if(!infoServer->open(config)) {
       cerr << "ERROR: could not initialize info server" << endl;
     }
     else {
-      infoServer.activate(); // start the info server thread
+      infoServer->activate(); // start the info server thread
     }
   }
 
   // start scanner listener
   if(config.isSet("scanner:disabled")
      && config.get("scanner:disabled")==false) {
-    if(!scannerInput.open(config)) {    
+    if(!scannerInput.open(config)) {
       cerr << "ERROR: could not add scanner input" << endl;
     }
     else {
@@ -258,14 +259,14 @@ bool initExperiment() {
 // deinitialize the experiment (call after last run is complete)
 // returns true for success
 bool deinitExperiment() {
-  
+
   cout << "deintializing experiment" << endl;
 
   // set the start time of the experiment
   experimentTimer.stop();
 
   // stop info server
-  if(!infoServer.close()) {
+  if(NULL != infoServer && !infoServer->close()) {
     cerr << "ERROR: could not deinitialize info server" << endl;
   }
   else {
@@ -280,6 +281,10 @@ bool deinitExperiment() {
     cout << "stopped the scanner image listener" << endl;
   }
 
+  // delete stuff
+  delete conductor;
+  delete infoServer;
+
   return true;
 }
 
@@ -293,6 +298,7 @@ int executeRun(RtConfigFmriRun &conf) {
   }
   else if(conductor != NULL) {
     delete conductor;
+    conductor = NULL;
   }
 
   // reinitialize scanner listener
@@ -305,7 +311,11 @@ int executeRun(RtConfigFmriRun &conf) {
 
   // add the inputs and outputs to the conductor
   conductor->addExistingInput(&scannerInput);
-  conductor->addExistingOutput(&infoServer);
+
+  if(NULL != infoServer) {
+    conductor->addExistingOutput(infoServer);
+  }
+
   conductor->configure(conf);
 
   conductor->activate();
@@ -323,6 +333,7 @@ int executeRunBlocking(RtConfigFmriRun &conf) {
   }
   else if(conductor != NULL) {
     delete conductor;
+    conductor = NULL;
   }
 
   // reinitialize scanner listener
@@ -332,7 +343,11 @@ int executeRunBlocking(RtConfigFmriRun &conf) {
 
   // add the inputs and outputs to the conductor
   conductor->addExistingInput(&scannerInput);
-  conductor->addExistingOutput(&infoServer);
+
+  if(NULL != infoServer) {
+    conductor->addExistingOutput(infoServer);
+  }
+
   conductor->configure(conf);
 
   conductor->svc();
@@ -496,7 +511,10 @@ int ACE_TMAIN(int argc, char **args) {
     scannerInput.init(runConf);
 
     conductor->addExistingInput(&scannerInput);
-    conductor->addExistingOutput(&infoServer);
+
+    if(NULL != infoServer) {
+      conductor->addExistingOutput(infoServer);
+    }
 
     conductor->configure(runConf);
     result = conductor->svc();

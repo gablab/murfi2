@@ -72,33 +72,33 @@ bool RtInfoClient::acknowledgeListenData(const string &dataName,
   return true;
 }
 
-
 // set some data
 void RtInfoClient::setData(RtData *data) {
-//  cout << "found " << data->getDataID() << endl
-//       << "looking for " << (*listenData.begin()) << endl
-//       << "==? " << (data->getDataID() == (*listenData.begin())) << endl;
+  for(set<RtDataID, RtDataIDPartialCompare>::iterator i = listenData.begin();
+      i != listenData.end(); i++) {
+    cout << "found " << data->getDataID() << endl
+         << "looking for " << (*i) << endl;
 
+    if(i->getDataName() == data->getDataID().getDataName()
+       && i->getRoiID() == data->getDataID().getRoiID()) {
 
-    set<RtDataID, RtDataIDPartialCompare>::iterator i = listenData.find(data->getDataID());
-  if(i != listenData.end()) { // find the appropriate data in the listened
+      cout << "match" << endl;
 
-    // build an xml document to send the data
-    TiXmlDocument response;
-    TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
-    response.LinkEndChild(decl);
-    TiXmlElement *infoEl = new TiXmlElement("info");
-    response.LinkEndChild(infoEl);
+      // build an xml document to send the data
+      TiXmlDocument response;
+      TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
+      response.LinkEndChild(decl);
+      TiXmlElement *infoEl = new TiXmlElement("info");
+      response.LinkEndChild(infoEl);
 
-    TiXmlElement *element = NULL; //TODO this is a dummy thing
-    TiXmlElement *dataEl = data->serializeAsXML(element);
-    infoEl->LinkEndChild(dataEl);
+      TiXmlElement *element = NULL; //TODO this is a dummy thing
+      TiXmlElement *dataEl = data->serializeAsXML(element);
+      infoEl->LinkEndChild(dataEl);
 
-    // send the data
-    sendMessageToServer(buildXMLString(response));
-  }
-  else {
-    cout << "infoclient: ignoring a " << data->getDataID() << endl;
+      // send the data
+      sendMessageToServer(buildXMLString(response));
+      break;
+    }
   }
 }
 

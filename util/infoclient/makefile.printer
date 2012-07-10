@@ -1,0 +1,39 @@
+NAME = infoclient_printer
+
+SRC = infoclientLib.cpp \
+      infoclient_printer.cpp \
+      tinyxml/tinyxml.cpp \
+      tinyxml/tinyxmlerror.cpp \
+      tinyxml/tinyxmlparser.cpp 
+
+INCL = infoclientLib.h 
+
+OBJDIR = obj
+
+################
+EXEOPT  = -output $(NAME)
+DEFS = -DTIXML_USE_STL
+
+
+#####################
+CXX = g++
+MAKE = make
+TMPOBJS = $(SRC:.cpp=.o) 
+OBJS = $(TMPOBJS:%/=) 
+RM = /bin/rm -f
+
+CFLAGS  = -g $(DEFS)
+LDFLAGS = -lACE
+
+##############################
+
+all: $(NAME)
+$(NAME): $(OBJS) $(SRC) $(INCL)  
+	mv *.o $(OBJDIR)
+	$(CXX) $(OBJDIR)/*.o $(LDFLAGS) -o $(NAME)
+
+clean:
+	-$(RM) $(NAME) $(OBJS) *~
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -c $< 

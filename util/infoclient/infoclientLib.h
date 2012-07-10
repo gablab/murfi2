@@ -73,20 +73,20 @@ struct TcpInfo {
  * start the infoclient 
  */
 int startInfoclient(const TcpInfo &tcpInfo, 
-		    const TcpInfo &remoteTcpInfo, 
-		    string &errMsg);
+        const TcpInfo &remoteTcpInfo, 
+        string &errMsg);
 
 /**
  * add data to the infoclient data listener 
  */
 int addInfoclient(const string &dataName, const string &roiName, 
-		  string &errMsg);
+      string &errMsg);
 
 /**
  * remove  data from  the infoclient data listener 
  */
 int removeInfoclient(const string &dataName, const string &roiName, 
-		     string &errMsg);
+         string &errMsg);
 
 /**
  * check for new data on the infoclient data listener 

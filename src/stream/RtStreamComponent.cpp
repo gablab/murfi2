@@ -18,35 +18,38 @@ string RtStreamComponent::moduleString(ID_STREAM);
 
 // default constructor
 
-RtStreamComponent::RtStreamComponent() : super(),
-					 disabled(false),
-					 logOutput(true),
-					 print(false),
-					 printTiming(false),
-					 needsInit(true),
-					 passer(NULL),
-					 conductor(NULL),
-					 putResultOnMessage(false),
-					 makeCurrentData(false),
-					 inputModuleID(ID_SCANNERIMG),
-					 inputDataName(NAME_SCANNERIMG_EPI),
-					 inputRoiID(DATAID_STRING_WILDCARD_VALUE),
-					 maskRoiID(DATAID_STRING_WILDCARD_VALUE) {
+RtStreamComponent::RtStreamComponent() :
+    super(),
+    disabled(false),
+    logOutput(true),
+    print(false),
+    printTiming(false),
+    needsInit(true),
+    passer(NULL),
+    conductor(NULL),
+    putResultOnMessage(false),
+    makeCurrentData(false),
+    inputModuleID(ID_SCANNERIMG),
+    inputDataName(NAME_SCANNERIMG_EPI),
+    inputRoiID(DATAID_STRING_WILDCARD_VALUE),
+    maskRoiID(DATAID_STRING_WILDCARD_VALUE) {
   componentID = moduleString;
-  
+
   // algorithm logging
   dumpAlgoVars = false;
   dumpAlgoVarsFilename = "log/model_fit_dump.txt";
+
+  setCodeNum(START_CODE_STREAM);
 }
 
 // destructor
 
 RtStreamComponent::~RtStreamComponent() {
-    ofile.close();
+  ofile.close();
 
-    if (dumpAlgoVars) {
-        dumpFile.close();
-    }
+  if (dumpAlgoVars) {
+    dumpFile.close();
+  }
 }
 
 //*** initialization routines  ***//
@@ -297,6 +300,7 @@ void RtStreamComponent::setResult(RtStreamMessage *msg, RtData *data) {
 
     passData(data);
     storeData(data);
+    sendCode(data);
 }
 
 // close a stream component

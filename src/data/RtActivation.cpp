@@ -110,9 +110,10 @@ TiXmlElement *RtActivation::serializeAsXML(TiXmlElement *requestElement) {
     #define NUM_SIGFIGS 6
 
     // add an element for the data
-    TiXmlElement *element = new TiXmlElement("activation");
-//    element->SetAttribute("name", "activation");
-    element->SetAttribute("roiid", dataID.getRoiID());
+    TiXmlElement *element = new TiXmlElement("data");
+    element->SetAttribute("name", dataID.getDataName());
+    element->SetAttribute("roi", dataID.getRoiID());
+    element->SetAttribute("tr", dataID.getTimePoint());
 
     // build text string containing all the data separated by spaces
     stringstream dataStr;
@@ -258,5 +259,3 @@ void RtActivation::reallocateData() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

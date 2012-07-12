@@ -1,5 +1,5 @@
 /**
- * infoclientLib provides an interface to murfi's infoserver
+ * infoclientLib provides an interface to murfi's infoclient
  *
  * Oliver Hinds <ohinds@mit.edu> 2009-05-01
  **/
@@ -7,10 +7,10 @@
 #include"infoclientLib.h"
 
 #ifdef WIN32
-  #include<windows.h> /* for threading */
+#include<windows.h> /* for threading */
 #else
-  #include<pthread.h> /* for threading */
-  #include<unistd.h> /* for sleep */
+#include<pthread.h> /* for threading */
+#include<unistd.h> /* for sleep */
 #endif
 
 #include<iostream>
@@ -21,10 +21,10 @@
 using namespace std;
 
 #ifdef WIN32
-  #include<windows.h> /* for threading */
+#include<windows.h> /* for threading */
 #else
-  #include<pthread.h> /* for threading */
-  #include<unistd.h> /* for sleep */
+#include<pthread.h> /* for threading */
+#include<unistd.h> /* for sleep */
 #endif
 
 #include"ace/Date_Time.h"
@@ -49,7 +49,7 @@ static bool threadRunning = false;
 #ifdef WIN32
 
 #else
-  static pthread_t thread;
+static pthread_t thread;
 #endif
 
 // data
@@ -95,7 +95,7 @@ int openDataListener(unsigned short port, string &errMsg) {
   if(acceptor.open(address,1) == -1) {
     stringstream err;
     err << "couldn't open acceptor to listen on port "
-	<< address.get_port_number() << endl;
+        << address.get_port_number() << endl;
     errMsg = err.str();
     return FAILURE;
   }
@@ -119,45 +119,42 @@ void handleReceivedXml(const string &xml) {
   }
 
   // search for info tags
-  for(TiXmlNode *info = 0; (info = doc.IterateChildren("info", info)); ) {
+  for(TiXmlElement *data = 0;
+      (data = (TiXmlElement*) doc.IterateChildren("data", data)); ) {
+    const char *dnAttr = data->Attribute("name");
+    const char *rnAttr = data->Attribute("roi");
 
-    // iterate over children looking for added data
-    for(TiXmlElement *data = 0;
-	data = (TiXmlElement*) info->IterateChildren("data", data); ) {
+    if(dnAttr == NULL || rnAttr == NULL) {
+      cerr << "name or roi attributes are null!" << endl;
+      continue;
+    }
 
-      const char *dnAttr = data->Attribute("name");
-      const char *rnAttr = data->Attribute("roi");
+    Info info;
+    info.dataName = dnAttr;
+    info.roiName = rnAttr;
 
-      if(dnAttr == NULL || rnAttr == NULL) {
-	cerr << "name or roi attributes are null!" << endl;
-	continue;
+    cout << info.dataName << " " << info.roiName << endl;
+
+    // find this data in the database
+    set<Info>::iterator i = dataBase.find(info);
+    if(i != dataBase.end()) { // if found, update the info in the set
+      ACE_Date_Time time;
+
+      const char *trAttr = data->Attribute("tr");
+      const char *val = data->FirstChild()->Value();
+
+      if(trAttr == NULL || val == NULL) {
+        cerr << "tr attribute or value are null!" << endl;
+        continue;
       }
 
-      Info info;
-      info.dataName = dnAttr;
-      info.roiName = rnAttr;
+      info.tr =  atoi(trAttr);
+      info.time = timeToLong(time);
+      info.value = atof(val);
+      info.changed = true;
 
-      // find this data in the database
-      set<Info>::iterator i = dataBase.find(info);
-      if(i != dataBase.end()) { // if found, update the info in the set
-	ACE_Date_Time time;
-
-	const char *trAttr = data->Attribute("tr");
-	const char *val = data->FirstChild()->Value();
-
-	if(trAttr == NULL || val == NULL) {
-	  cerr << "tr attribute or value are null!" << endl;
-	  continue;
-	}
-
-	info.tr =  atoi(trAttr);
-	info.time = timeToLong(time);
-	info.value = atof(val);
-	info.changed = true;
-
-	// add it to the changed queue
-	changedData.push(info);
-      }
+      // add it to the changed queue
+      changedData.push(info);
     }
   }
 }
@@ -200,16 +197,15 @@ void *listenForData(void *tcpInfo) {
       // get characters until null character
       char last;
       do {
-	if(0 == stream.recv_n(&last,1)) {
-	  break;
-	}
+        if(0 == stream.recv_n(&last,1)) {
+          break;
+        }
 
-	message << last;
+        message << last;
       } while(last != '\n');
 
       // receive the message, store the response
       string received = message.str();
-
       handleReceivedXml(received);
 
       stream.close();
@@ -232,12 +228,12 @@ int sendAddMessage(const Info &info) {
     // build add message
     stringstream xml;
     xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-	<< "<info>"
-	<< "<add name=\"" << info.dataName
-	<< "\" roi=\"" << info.roiName
-	<< "\">"
-	<< "</add>"
-	<< "</info>";
+        << "<info>"
+        << "<add name=\"" << info.dataName
+        << "\" roi=\"" << info.roiName
+        << "\">"
+        << "</add>"
+        << "</info>";
 
     unsigned int sent = stream.send_n(xml.str().c_str(), xml.str().length());
     if(sent < xml.str().length()) {
@@ -269,12 +265,12 @@ int sendRemoveMessage(const Info &info) {
     // build remove message
     stringstream xml;
     xml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-	<< "<info>"
-	<< "<remove name=\"" << info.dataName
-	<< "\" roi=\"" << info.roiName
-	<< "\">"
-	<< "</remove>"
-	<< "</info>";
+        << "<info>"
+        << "<remove name=\"" << info.dataName
+        << "\" roi=\"" << info.roiName
+        << "\">"
+        << "</remove>"
+        << "</info>";
 
     unsigned int sent = stream.send_n(xml.str().c_str(), xml.str().length());
     if(sent < xml.str().length()) {
@@ -299,8 +295,8 @@ int sendRemoveMessage(const Info &info) {
  * start the infoclient
  */
 int startInfoclient(const TcpInfo &tcpInfo,
-		    const TcpInfo &remoteTcpInfo,
-		    string &errMsg) {
+                    const TcpInfo &remoteTcpInfo,
+                    string &errMsg) {
   errMsg = "";
 
   // check if we have already started
@@ -320,7 +316,7 @@ int startInfoclient(const TcpInfo &tcpInfo,
     threadRunning = true;
   }
 
-  remoteAddress.set(remoteTcpInfo.port, remoteTcpInfo.host);
+  remoteAddress.set(remoteTcpInfo.port, remoteTcpInfo.host.c_str());
 
   return SUCCESS;
 }
@@ -329,7 +325,7 @@ int startInfoclient(const TcpInfo &tcpInfo,
  * add data to the infoclient data listener
  */
 int addInfoclient(const string &dataName, const string &roiName,
-		  string &errMsg) {
+                  string &errMsg) {
   if(!threadRunning || !serverRunning) {
     errMsg = "must start the infoclient before adding or removing data.";
     return FAILURE;
@@ -344,9 +340,9 @@ int addInfoclient(const string &dataName, const string &roiName,
   // send add message
   sendAddMessage(info);
 
-//  cout << "inserted " << (*i.first).dataName << ":" << (*i.first).roiName << " "
-//       << i.second << endl;
-//
+  //  cout << "inserted " << (*i.first).dataName << ":" << (*i.first).roiName << " "
+  //       << i.second << endl;
+  //
 
   return SUCCESS;
 }
@@ -355,7 +351,7 @@ int addInfoclient(const string &dataName, const string &roiName,
  * remove data from the infoclient data listener
  */
 int removeInfoclient(const string &dataName, const string &roiName,
-		     string &errMsg) {
+                     string &errMsg) {
   if(!threadRunning || !serverRunning) {
     errMsg = "must start the infoclient before adding or removing data.";
     return FAILURE;
@@ -386,6 +382,7 @@ int removeInfoclient(const string &dataName, const string &roiName,
 int checkInfoclient(vector<Info> &changed, string &errMsg) {
   changed.clear();
 
+  cout << changedData.size() << endl;
   // empty changed queue
   while(!changedData.empty()) {
     changed.push_back(changedData.front());
@@ -429,7 +426,7 @@ int stopInfoclient(string &errMsg) {
  * send a message to a remote client
  */
 int sendMessage(const string &message, const TcpInfo &info, string &errMsg) {
-  ACE_INET_Addr addr(info.port, info.host);
+  ACE_INET_Addr addr(info.port, info.host.c_str());
   ACE_SOCK_Stream stream;
   ACE_SOCK_Connector connector;
 

@@ -4,24 +4,7 @@ function psychoTest(dataName, roiName)
   if(nargin ~= 2)
     error('usage: psychoTest(dataName, roiName)');
   end
-  
-  DEBUG_smallScreen = true;
-  
-  oldSyncLevel = Screen('Preference', 'SkipSyncTests', 2);
-  Screen('Preference','Verbosity',0);
-  Screen('Preference', 'VisualDebugLevel', 0);
 
-  DisableKeysForKbCheck([175]);
-  ListenChar(2);
-  
-  myScr = max(Screen('Screens'));
-
-  if(DEBUG_smallScreen)
-    [w,rect] = Screen('OpenWindow',myScr,128,[0 100 800 600]);
-  else
-    [w,rect] = Screen('OpenWindow',myScr,128);
-  end
-  
   % start the infoclient
   try
     [stat host] = system('hostname');
@@ -32,9 +15,6 @@ function psychoTest(dataName, roiName)
   end
   
   infoclient('add',dataName,roiName);
-
-  DrawFormattedText(w,'waiting...','center','center');
-  Screen('Flip',w);
 
   % run a loop forever
   bCont = true;
@@ -49,20 +29,7 @@ function psychoTest(dataName, roiName)
       newdat(end) = [];            
     end
     if(~isempty(str))
-      DrawFormattedText(w,str,'center','center');
-      Screen('Flip',w);      
-    end
-
-    [keyIsDown, secs, keyCode] = KbCheck;
-    if(keyIsDown)
-      sKey = KbName(find(keyCode));
-
-      if(~isempty(sKey))
-	sKey = sKey(1);
-	if(strcmp(sKey, 'q'))
-	  bCont = false;
-	end
-      end
+      str
     end
 
     WaitSecs(0.01);
@@ -94,6 +61,5 @@ function str = makeDataString(data)
 return
 
 function shutdown()
-  sca;
   infoclient('stop');
 return

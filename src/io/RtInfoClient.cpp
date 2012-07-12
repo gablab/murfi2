@@ -1,8 +1,8 @@
 /******************************************************************************
  * RtInfoClient.cpp declares a class for serving info about real to clients
- * 
+ *
  * Oliver Hinds <ohinds@mit.edu> 2008-02-11
- * 
+ *
  *****************************************************************************/
 
 #include"RtInfoClient.h"
@@ -18,15 +18,15 @@ static char *VERSION = "$Id: RtInfoServer.cpp 415 2009-02-11 22:20:24Z ohinds $"
 //// default constructor
 //RtInfoClient::RtInfoClient() : RtServerSocket(), RtClientSocket() {
 //  addToID(":infoclient");
-//} 
-  
+//}
+
 // constructor with port and host
-RtInfoClient::RtInfoClient(unsigned short localPortNum, 
-			   const string &remoteHost, 
-			   unsigned short remotePortNum) 
+RtInfoClient::RtInfoClient(unsigned short localPortNum,
+         const string &remoteHost,
+         unsigned short remotePortNum)
   : RtServerSocket(localPortNum), RtClientSocket(remoteHost,remotePortNum) {
 
-  addToID(":infoclient");  
+  addToID(":infoclient");
 }
 
 // destructor
@@ -35,14 +35,14 @@ RtInfoClient::~RtInfoClient() {
 }
 
 // add data to listen for
-bool RtInfoClient::addListenData(const string &dataName, 
-				 const string &roiName) {
+bool RtInfoClient::addListenData(const string &dataName,
+         const string &roiName) {
 
   RtDataID templ;
   templ.setDataName(dataName);
   templ.setRoiID(roiName);
 
-  cout << "adding " << templ << endl;
+  cout << "adding data listener " << templ << endl;
 
   // insert
   listenData.insert(templ);
@@ -51,8 +51,8 @@ bool RtInfoClient::addListenData(const string &dataName,
 }
 
 // remove data from the listener
-bool RtInfoClient::removeListenData(const string &dataName, 
-				    const string &roiName) {
+bool RtInfoClient::removeListenData(const string &dataName,
+            const string &roiName) {
   RtDataID templ;
   templ.setDataName(dataName);
   templ.setRoiID(roiName);
@@ -64,46 +64,38 @@ bool RtInfoClient::removeListenData(const string &dataName,
 }
 
 // acknowledge receipt of data from the server
-bool RtInfoClient::acknowledgeListenData(const string &dataName, 
-					 const string &roiName, 
-					 unsigned int tr) {
+bool RtInfoClient::acknowledgeListenData(const string &dataName,
+           const string &roiName,
+           unsigned int tr) {
   cerr << "data acknowledgement is not yet implemented" << endl;
 
   return true;
 }
 
-
 // set some data
-void RtInfoClient::setData(RtData *data) {  
-//  cout << "found " << data->getDataID() << endl
-//       << "looking for " << (*listenData.begin()) << endl
-//       << "==? " << (data->getDataID() == (*listenData.begin())) << endl;
+void RtInfoClient::setData(RtData *data) {
+  for(set<RtDataID, RtDataIDPartialCompare>::iterator i = listenData.begin();
+      i != listenData.end(); i++) {
+    if(i->getDataName() == data->getDataID().getDataName()
+       && i->getRoiID() == data->getDataID().getRoiID()) {
+      // build an xml document to send the data
+      TiXmlDocument response;
+      TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
+      response.LinkEndChild(decl);
+      TiXmlElement *element = NULL; //TODO this is a dummy thing
+      TiXmlElement *dataEl = data->serializeAsXML(element);
+      response.LinkEndChild(dataEl);
 
-
-    set<RtDataID, RtDataIDPartialCompare>::iterator i = listenData.find(data->getDataID());
-  if(i != listenData.end()) { // find the appropriate data in the listened
-
-    // build an xml document to send the data
-    TiXmlDocument response;
-    TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
-    response.LinkEndChild(decl);
-    TiXmlElement *infoEl = new TiXmlElement("info");
-    response.LinkEndChild(infoEl);
-
-    TiXmlElement *element = NULL; //TODO this is a dummy thing
-    TiXmlElement *dataEl = data->serializeAsXML(element);
-    infoEl->LinkEndChild(dataEl);    
-
-    // send the data
-    sendMessageToServer(buildXMLString(response));
-  }
-  else {
-    cout << "infoclient: ignoring a " << data->getDataID() << endl;
+      // send the data
+      sendMessageToServer(buildXMLString(response));
+      cout << "infoclient sent: " << response << endl;
+      break;
+    }
   }
 }
 
 // receive an XML message
-// in 
+// in
 //  string received
 //  stream received on
 // out XML string response
@@ -117,7 +109,7 @@ string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
     string errString = "could not parse request XML";
     cerr << errString << endl;
     return "";
-  }  
+  }
   // search for info tags
   for(TiXmlNode *info = 0; (info = request.IterateChildren("info", info)); ) {
     //// find specific tags
@@ -127,7 +119,7 @@ string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
       // get the dataName and roiName
       string dataName(add->Attribute("name"));
       string roiName(add->Attribute("roi"));
-      
+
       // add it!
       addListenData(dataName, roiName);
     }
@@ -137,7 +129,7 @@ string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
       // get the dataName and roiName
       string dataName(remove->Attribute("name"));
       string roiName(remove->Attribute("roi"));
-      
+
       // remove it!
       removeListenData(dataName, roiName);
     }
@@ -148,18 +140,18 @@ string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
       string dataName(acknowledge->Attribute("name"));
       string roiName(acknowledge->Attribute("roi"));
       unsigned int tr = atoi(acknowledge->Attribute("tr"));
-      
+
       // acknowledge it!
       acknowledgeListenData(dataName, roiName, tr);
     }
   }
-  
+
   return "";
 }
 
 // build a string from an XML document
 // in
-//  XML document 
+//  XML document
 // out
 //  string representation
 string RtInfoClient::buildXMLString(TiXmlDocument &doc) {
@@ -184,5 +176,3 @@ char *RtInfoClient::getVersionString() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

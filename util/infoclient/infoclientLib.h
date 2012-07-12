@@ -63,7 +63,7 @@ struct InfoCompare {
 };
 
 struct TcpInfo {
-  char host[MAX_STR_LEN];
+  string host;
   int port;
 };
 

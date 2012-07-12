@@ -281,7 +281,7 @@ bool RtDesignMatrix::buildDesignMatrix() {
             }
         }
     }
-    
+
     // the rest was originally in build()
 
     // setup the size
@@ -446,7 +446,7 @@ bool RtDesignMatrix::build() {
     // check that condition is filled and then call buildDesignMatrix (for temp. backwards compatibility until all condition
     // stuff is removed from conf file)
     else if (numInputConditions > 0) {
-        
+
         buildDesignMatrix();
     }
     else {
@@ -638,7 +638,7 @@ double gammaPDF(double t, double a, double b) {
     return pow(b, a) / vnl_gamma(a) * pow(t, a - 1) * exp(-b * t);
 }
 
-// builds an hrf vector 
+// builds an hrf vector
 // NOTE: first file loading is attempted, then if that fails a double gamma
 // cannonical hrf is built
 bool RtDesignMatrix::buildHrf() {
@@ -872,7 +872,7 @@ vnl_vector<double> RtDesignMatrix::getArtifactTimepoints() {
 // added (through addEvent and addArtifact) and motion has been added to the
 // datastore for this timepoint. usually this function will be called from
 // RtModelFit::process()
-//  in 
+//  in
 //   tr of the timepoint to update for
 bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 
@@ -1088,7 +1088,7 @@ bool RtDesignMatrix::save(const string& filename) const {
     out << columnNames[c] << "(" << columnOfInterestIndicator[c] << ") ";
   }
   out << endl;
-  
+
   for(unsigned int r = 0; r < rows(); r++) {
     for(unsigned int c = 0; c < cols(); c++) {
       out << data[r][c] << " ";
@@ -1106,7 +1106,8 @@ TiXmlElement *RtDesignMatrix::serializeAsXML(TiXmlElement *requestElement) {
 #define NUM_SIGFIGS 6
 
     // create a designmatrix element for output
-    TiXmlElement *designmatrix = new TiXmlElement("designmatrix");
+    TiXmlElement *designmatrix = new TiXmlElement("data");
+    designmatrix->SetAttribute("name", "designmatrix");
 
     // if there are no elements in designmatrix, assume user wants all parts, so
     // add all parts and then continue to loop.

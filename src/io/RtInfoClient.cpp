@@ -76,24 +76,15 @@ bool RtInfoClient::acknowledgeListenData(const string &dataName,
 void RtInfoClient::setData(RtData *data) {
   for(set<RtDataID, RtDataIDPartialCompare>::iterator i = listenData.begin();
       i != listenData.end(); i++) {
-    // cout << "found " << data->getDataID() << endl
-    //      << "looking for " << (*i) << endl;
-
     if(i->getDataName() == data->getDataID().getDataName()
        && i->getRoiID() == data->getDataID().getRoiID()) {
-
-      // cout << "match" << endl;
-
       // build an xml document to send the data
       TiXmlDocument response;
       TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
       response.LinkEndChild(decl);
-      TiXmlElement *infoEl = new TiXmlElement("info");
-      response.LinkEndChild(infoEl);
-
       TiXmlElement *element = NULL; //TODO this is a dummy thing
       TiXmlElement *dataEl = data->serializeAsXML(element);
-      infoEl->LinkEndChild(dataEl);
+      response.LinkEndChild(dataEl);
 
       // send the data
       sendMessageToServer(buildXMLString(response));

@@ -78,8 +78,8 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   // scaling matrix
   vnl_matrix_fixed<double,4,4> InvscaleMat;
   InvscaleMat.set_identity();
-  InvscaleMat.put(0,0, 1/voxDim[0]);
-  InvscaleMat.put(1,1, 1/voxDim[1]);
+  InvscaleMat.put(0,0, -1/voxDim[0]);
+  InvscaleMat.put(1,1, -1/voxDim[1]);
   InvscaleMat.put(2,2, 1/voxDim[2]);
 
 
@@ -87,23 +87,24 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   vnl_matrix_fixed<double,4,4> vxl2rasMat;
   vxl2rasMat.set_identity();
 
-  vxl2rasMat.put(0,0, vols->sto_xyz.m[0][0]);
-  vxl2rasMat.put(0,1, vols->sto_xyz.m[0][1]);
-  vxl2rasMat.put(0,2, vols->sto_xyz.m[0][2]);
-  vxl2rasMat.put(0,3, vols->sto_xyz.m[0][3]);
+  vxl2rasMat.put(0,0, vols->qto_xyz.m[0][0]);
+  vxl2rasMat.put(0,1, vols->qto_xyz.m[0][1]);
+  vxl2rasMat.put(0,2, vols->qto_xyz.m[0][2]);
+  //vxl2rasMat.put(0,3, vols->qto_xyz.m[0][3]);
 
-  vxl2rasMat.put(1,0, vols->sto_xyz.m[1][0]);
-  vxl2rasMat.put(1,1, vols->sto_xyz.m[1][1]);
-  vxl2rasMat.put(1,2, vols->sto_xyz.m[1][2]);
-  vxl2rasMat.put(1,3, vols->sto_xyz.m[1][3]);
+  vxl2rasMat.put(1,0, vols->qto_xyz.m[1][0]);
+  vxl2rasMat.put(1,1, vols->qto_xyz.m[1][1]);
+  vxl2rasMat.put(1,2, vols->qto_xyz.m[1][2]);
+  //vxl2rasMat.put(1,3, vols->qto_xyz.m[1][3]);
 
-  vxl2rasMat.put(2,0, vols->sto_xyz.m[2][0]);
-  vxl2rasMat.put(2,1, vols->sto_xyz.m[2][1]);
-  vxl2rasMat.put(2,2, vols->sto_xyz.m[2][2]);
-  vxl2rasMat.put(2,3, vols->sto_xyz.m[2][3]);
+  vxl2rasMat.put(2,0, vols->qto_xyz.m[2][0]);
+  vxl2rasMat.put(2,1, vols->qto_xyz.m[2][1]);
+  vxl2rasMat.put(2,2, vols->qto_xyz.m[2][2]);
+  //vxl2rasMat.put(2,3, vols->qto_xyz.m[2][3]);
 
   vnl_matrix_fixed<double,4,4> rotMat;
-  rotMat = InvscaleMat*vxl2rasMat; 
+  rotMat = InvscaleMat*vxl2rasMat.transpose(); 
+  //rotMat = rotMat.transpose();
 
   cout << "Inverse scale mat: " << endl;
   printVnl44Mat(InvscaleMat);
@@ -191,10 +192,10 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     ei->dNorCor = rotMat[2][1];
     ei->dNorTra = rotMat[2][2];
 
-    ei->dPosSag = rotMat[0][3];
-    cout << "dPosSag " << rotMat[0][3] << endl;
-    ei->dPosCor = rotMat[1][3];
-    ei->dPosTra = rotMat[2][3];
+    ei->dPosSag = vols->qto_xyz.m[0][3];
+    cout << "dPosSag " << vols->qto_xyz.m[0][3] << endl;
+    ei->dPosCor = vols->qto_xyz.m[1][3];
+    ei->dPosTra = vols->qto_xyz.m[2][3];
 
     ei->lImageDataLength = vols->nbyper*numPix;
     ei->lNumberOfPixels = numPix;

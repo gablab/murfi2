@@ -392,7 +392,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   // scaling matrix
   vnl_matrix_fixed<double,4,4> scaleMat;
   scaleMat.set_identity();
-  scaleMat.put(0,0, info.dFOVread/info.nLin);
+  scaleMat.put(0,0, -info.dFOVread/info.nLin);
   scaleMat.put(1,1, info.dFOVphase/info.nCol);
   scaleMat.put(2,2, info.dThick * (1+sliceGap));
 
@@ -401,23 +401,20 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   rotMat.set_identity();
 
   rotMat.put(0,0, info.dRowSag);
-  rotMat.put(0,1, info.dRowCor);
-  rotMat.put(0,2, info.dRowTra);
-  rotMat.put(0,3, info.dPosSag);
+  rotMat.put(1,0, info.dRowCor);
+  rotMat.put(2,0, info.dRowTra);
 
-  rotMat.put(1,0, info.dColSag);
+  rotMat.put(0,1, info.dColSag);
   rotMat.put(1,1, info.dColCor);
-  rotMat.put(1,2, info.dColTra);
-  rotMat.put(1,3, info.dPosCor);
+  rotMat.put(2,1, info.dColTra);
 
-  rotMat.put(2,0, info.dNorSag);
-  rotMat.put(2,1, info.dNorCor);
+  rotMat.put(0,2, info.dNorSag);
+  rotMat.put(1,2, info.dNorCor);
   rotMat.put(2,2, info.dNorTra);
-  rotMat.put(2,3, info.dPosTra);
 
 
   vxl2ras = scaleMat*rotMat;
-
+  vxl2ras = vxl2ras.transpose();
   // debugging
     cout << "scale" << endl;
     printVnl44Mat(scaleMat);

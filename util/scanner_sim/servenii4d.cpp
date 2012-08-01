@@ -103,8 +103,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   //vxl2rasMat.put(2,3, vols->qto_xyz.m[2][3]);
 
   vnl_matrix_fixed<double,4,4> rotMat;
-  rotMat = InvscaleMat*vxl2rasMat.transpose(); 
-  //rotMat = rotMat.transpose();
+  rotMat = InvscaleMat*vxl2rasMat;
 
   cout << "Inverse scale mat: " << endl;
   printVnl44Mat(InvscaleMat);

@@ -255,7 +255,7 @@ int RtInputScannerImages::svc() {
       cout << "image info recived" << endl;
     }
     // DEBUGGING
-    //ei->displayImageInfo();
+    ei->displayImageInfo();
     //ei->iAcquisitionNumber = imageNum++;
 
     // get the image
@@ -334,7 +334,7 @@ int RtInputScannerImages::svc() {
     // signal that we got an image
     //cout << "sending event with code number " << codeNum << endl;
 
-    //rti->printInfo(cout);
+    rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
     if(!haveStudyRefVol

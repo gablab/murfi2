@@ -416,9 +416,9 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   rotMat.put(1,2, info.dNorCor);
   rotMat.put(2,2, info.dNorTra);
 
-
-  vxl2ras = scaleMat*rotMat;
-  vxl2ras = vxl2ras.transpose();
+  //  vxl2ras = scaleMat*rotMat;
+  //  vxl2ras = vxl2ras.transpose();
+  vxl2ras = scaleMat*rotMat.transpose();
   vxl2ras.put(0,3, info.dPosSag);
   vxl2ras.put(1,3, info.dPosCor);
   vxl2ras.put(2,3, info.dPosTra);

@@ -168,6 +168,11 @@ RtConfigFmriExperiment &getExperimentConfig() {
   return config;
 }
 
+// get the configuration filename for this experiment
+string getExperimentConfigFile() {
+  return confFilename;
+}
+
 // get the data store for this experiment
 RtDataStore &getDataStore() {
   return dataStore;

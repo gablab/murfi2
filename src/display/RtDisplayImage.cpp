@@ -1248,15 +1248,21 @@ void RtDisplayImage::action(int code) {
       glutMaster.CallGlutLeaveMainLoop();
       break;
     case 'r': // run
-      cout << endl;
-      simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
-      cout << endl;
+      // REMOVED SASEN@MIT.EDU 08/02/2012, NOT NEEDED FOR TEXAS PROJECT
+      // JUST WANT TO RUN THE CONFIG WE PASSED IN, BUT STILL HAVE DISPLAY.
+      //
+      // cout << endl;
+      // simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
+      // cout << endl;
 
-      // ask for a config file name 
-      cout << "enter the config file name for the fmri run (q to quit): ";
-      cin >> response;
-      runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
-                                + response);
+      // // ask for a config file name 
+      // cout << "enter the config file name for the fmri run (q to quit): ";
+      // cin >> response;
+      // runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
+      //                           + response);
+      cout << getExperimentConfigFile();
+      cout << endl; 
+      runConfig.parseConfigFile(getExperimentConfigFile());
       prepareRun(runConfig);
       executeRun(runConfig);    
       break;

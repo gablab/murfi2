@@ -43,6 +43,9 @@ double getExperimentElapsedTime();
 // get the configuration for this experiment
 RtConfigFmriExperiment &getExperimentConfig();
 
+// get the configuration filename for this experiment
+string getExperimentConfigFile();
+
 // get the data store for this experiment
 RtDataStore &getDataStore();
 

@@ -342,7 +342,7 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
     memcpy(img->data, data, img->nbyper*img->nvox);
 
     // debugging
-    nifti_image_infodump(img);
+    // nifti_image_infodump(img);
 
     // write the file
     nifti_image_write(img);

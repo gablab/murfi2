@@ -285,15 +285,15 @@ bool RtDisplayImage::init() {
 
   glutAddMenuEntry("'q' quit",'q');
   glutAddMenuEntry("'r' fmri run", 'r');
-  glutAddMenuEntry("'s' show live scanner images", 's');
-  glutAddMenuEntry("'d' show difference images", 'd');
-  glutAddMenuEntry("'m' show mean image", 'm');
-  glutAddMenuEntry("'v' show variance image", 'n');
-  glutAddMenuEntry("'n' show intensity norm image", 'n');
-  glutAddMenuEntry("'=/+' toggle positive mask visibility", '=');
-  glutAddMenuEntry("'-/_' toggle negative mask visibility", '-');
-  glutAddMenuEntry("'z' toggle positive overlay visibility", 'z');
-  glutAddMenuEntry("'Z' toggle negative overlay visibility", 'Z');
+  // glutAddMenuEntry("'s' show live scanner images", 's');
+  // glutAddMenuEntry("'d' show difference images", 'd');
+  // glutAddMenuEntry("'m' show mean image", 'm');
+  // glutAddMenuEntry("'v' show variance image", 'n');
+  // glutAddMenuEntry("'n' show intensity norm image", 'n');
+  // glutAddMenuEntry("'=/+' toggle positive mask visibility", '=');
+  // glutAddMenuEntry("'-/_' toggle negative mask visibility", '-');
+  // glutAddMenuEntry("'z' toggle positive overlay visibility", 'z');
+  // glutAddMenuEntry("'Z' toggle negative overlay visibility", 'Z');
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);

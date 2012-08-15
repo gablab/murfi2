@@ -121,14 +121,14 @@ default_options=""
 if [ ! -f "$xfmfile" ]; then
     of="$movedir""$newstem"
 
-    echo mcflirt $default_options -in "$move" -out "$of" -reffile "$targ" -mats
-    mcflirt $default_options -in "$move" -out "$of" -reffile "$targ" -mats
+    echo flirt $default_options -in "$move" -out "$of" -ref "$targ" -omat "$xfmfile" -dof 6 -datatype short -searchrx -180 180 -searchry -180 180 -searchrz -180 180
+    flirt $default_options -in "$move" -out "$of" -ref "$targ" -omat "$xfmfile" -dof 6 -datatype short -searchrx -180 180 -searchry -180 180 -searchrz -180 180
 
-    echo mv "$of".mat/MAT_0000 "$xfmfile"
-    mv "$of".mat/MAT_0000 "$xfmfile"
+    #  echo mv "$of".mat/MAT_0000 "$xfmfile"
+    # mv "$of".mat/MAT_0000 "$xfmfile"
 
-    echo rmdir "$of".mat
-    rmdir "$of".mat
+    # echo rmdir "$of".mat
+    # rmdir "$of".mat
 fi
 savexfmfile=$xfmfile
 

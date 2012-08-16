@@ -357,13 +357,17 @@ RtMRIImage::~RtMRIImage() {
 //}
 
 // DEBUGGGING
-//#include"printVnl44Mat.cpp"
+#include"printVnl44Mat.cpp"
 
 
 // set info struct
 //  in
 //   _info: struct to copy
-void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
+void RtMRIImage::setInfo(RtExternalImageInfo &info) {
+
+  // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
+  //                (if any)
+  info.displayImageInfo();
 
   // determine the dimensions and voxel size
   dims.resize(2);
@@ -415,14 +419,14 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   vxl2ras = scaleMat*rotMat;
 
   // debugging
-//  cout << "scale" << endl;
-//  printVnl44Mat(scaleMat);
+  cout << "scale" << endl;
+  printVnl44Mat(scaleMat);
 //
-//  cout << "rot" << endl;
-//  printVnl44Mat(rotMat);
+  cout << "rot" << endl;
+  printVnl44Mat(rotMat);
 //
-//  cout << "xform" << endl;
-//  printVnl44Mat(vxl2ras);
+  cout << "xform" << endl;
+  printVnl44Mat(vxl2ras);
 
   // build RAS 2 REF transformation matrix
   ras2ref.set_identity();

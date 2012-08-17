@@ -285,15 +285,15 @@ bool RtDisplayImage::init() {
 
   glutAddMenuEntry("'q' quit",'q');
   glutAddMenuEntry("'r' fmri run", 'r');
-  glutAddMenuEntry("'s' show live scanner images", 's');
-  glutAddMenuEntry("'d' show difference images", 'd');
-  glutAddMenuEntry("'m' show mean image", 'm');
-  glutAddMenuEntry("'v' show variance image", 'n');
-  glutAddMenuEntry("'n' show intensity norm image", 'n');
-  glutAddMenuEntry("'=/+' toggle positive mask visibility", '=');
-  glutAddMenuEntry("'-/_' toggle negative mask visibility", '-');
-  glutAddMenuEntry("'z' toggle positive overlay visibility", 'z');
-  glutAddMenuEntry("'Z' toggle negative overlay visibility", 'Z');
+  // glutAddMenuEntry("'s' show live scanner images", 's');
+  // glutAddMenuEntry("'d' show difference images", 'd');
+  // glutAddMenuEntry("'m' show mean image", 'm');
+  // glutAddMenuEntry("'v' show variance image", 'n');
+  // glutAddMenuEntry("'n' show intensity norm image", 'n');
+  // glutAddMenuEntry("'=/+' toggle positive mask visibility", '=');
+  // glutAddMenuEntry("'-/_' toggle negative mask visibility", '-');
+  // glutAddMenuEntry("'z' toggle positive overlay visibility", 'z');
+  // glutAddMenuEntry("'Z' toggle negative overlay visibility", 'Z');
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -1248,15 +1248,21 @@ void RtDisplayImage::action(int code) {
       glutMaster.CallGlutLeaveMainLoop();
       break;
     case 'r': // run
-      cout << endl;
-      simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
-      cout << endl;
+      // REMOVED SASEN@MIT.EDU 08/02/2012, NOT NEEDED FOR TEXAS PROJECT
+      // JUST WANT TO RUN THE CONFIG WE PASSED IN, BUT STILL HAVE DISPLAY.
+      //
+      // cout << endl;
+      // simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
+      // cout << endl;
 
-      // ask for a config file name 
-      cout << "enter the config file name for the fmri run (q to quit): ";
-      cin >> response;
-      runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
-                                + response);
+      // // ask for a config file name 
+      // cout << "enter the config file name for the fmri run (q to quit): ";
+      // cin >> response;
+      // runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
+      //                           + response);
+      cout << getExperimentConfigFile();
+      cout << endl; 
+      runConfig.parseConfigFile(getExperimentConfigFile());
       prepareRun(runConfig);
       executeRun(runConfig);    
       break;

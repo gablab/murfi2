@@ -339,13 +339,13 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     running = false;
   }
   else if(code == START_CODE_STREAM) { // stream component has data
-    cout << "caught data " << data << " available signal from a stream component" << endl;
+    //cout << "caught data " << data << " available signal from a stream component" << endl;
 
     // make data available to all output processes
     for(vector<RtOutput*>::iterator i = outputs.begin(); 
 	i != outputs.end(); i++) {
       if(*i == infoClient) {
-	cout << "setting data on info client" << endl;
+	//cout << "setting data on info client" << endl;
       }
 
       (*i)->setData(data);

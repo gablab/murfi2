@@ -65,7 +65,7 @@ public:
   // set info struct
   //  in
   //   _info: struct to copy
-  void setInfo(RtExternalImageInfo &_info);
+  void setInfo(const RtExternalImageInfo &_info);
 
   // set this image based on a passed image info and data
   //  in

@@ -363,7 +363,7 @@ RtMRIImage::~RtMRIImage() {
 // set info struct
 //  in
 //   _info: struct to copy
-void RtMRIImage::setInfo(RtExternalImageInfo &info) {
+void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
   // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
   //                (if any)

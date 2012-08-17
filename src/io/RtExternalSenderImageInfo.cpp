@@ -543,7 +543,7 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
 // print info about a received image
 //  in
 //   info:   the last read image info struct
-void RtExternalImageInfo::displayImageInfo() {
+void RtExternalImageInfo::displayImageInfo() const {
   char myID[5];
   memcpy (myID, chID, 4);
   myID[4] = '\0';

@@ -342,7 +342,7 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
     memcpy(img->data, data, img->nbyper*img->nvox);
 
     // debugging
-    //nifti_image_infodump(img);
+    // nifti_image_infodump(img);
 
     // write the file
     nifti_image_write(img);
@@ -783,7 +783,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   // info
   hdr->iname_offset = 348;
   hdr->swapsize = 0;
-  //hdr->analyze75_orient = a75_transverse_unflipped;
+  //hdr->analyze75_orient = a75_transverse_unflipped; 
 
   // filename
   hdr->fname = (char*) malloc((filename.length()+1)*sizeof(char));
@@ -867,7 +867,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   }
 
   hdr->sform_code = 1;
-  hdr->qform_code = 0;
+  hdr->qform_code = 0; 
   hdr->quatern_b = 0;
   hdr->quatern_c = 0;
   hdr->quatern_d = 0;

@@ -252,16 +252,16 @@ int RtInputScannerImages::svc() {
                                       (unsigned int) 1);
 
     if(verbose) {
-      cout << "image info recived" << endl;
+      cout << "image info received" << endl;
     }
     // DEBUGGING
-    //ei->displayImageInfo();
+    // ei->displayImageInfo();
     //ei->iAcquisitionNumber = imageNum++;
 
     // get the image
     img = receiveImage(stream, *ei);
     if(verbose) {
-      cout << "image recived" << endl;
+      cout << "image received" << endl;
     }
 
     // close the stream (scanner connects anew for each image)
@@ -334,7 +334,7 @@ int RtInputScannerImages::svc() {
     // signal that we got an image
     //cout << "sending event with code number " << codeNum << endl;
 
-    //rti->printInfo(cout);
+    rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
     if(!haveStudyRefVol

@@ -357,7 +357,7 @@ RtMRIImage::~RtMRIImage() {
 //}
 
 // DEBUGGGING
-//#include"printVnl44Mat.cpp"
+#include"printVnl44Mat.cpp"
 
 
 // set info struct
@@ -385,7 +385,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   // set geometry info
   setPixDim(0,info.dFOVread/info.nLin);
   setPixDim(1,info.dFOVphase/info.nCol);
-  setPixDim(2,info.dThick * sliceGap);
+  setPixDim(2,info.dThick * (1+sliceGap));
 
   // build xform (no translations included yet, just scales and rotations)
 
@@ -394,35 +394,45 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   scaleMat.set_identity();
   scaleMat.put(0,0, -info.dFOVread/info.nLin);
   scaleMat.put(1,1, -info.dFOVphase/info.nCol);
-  scaleMat.put(2,2,  info.dThick * (1+sliceGap));
+  scaleMat.put(2,2, info.dThick * (1+sliceGap));
 
   // rotation matrix
   vnl_matrix_fixed<double,4,4> rotMat;
   rotMat.set_identity();
 
   rotMat.put(0,0, info.dRowSag);
-  rotMat.put(0,1, info.dRowCor);
-  rotMat.put(0,2, info.dRowTra);
+  rotMat.put(1,0, info.dRowCor);
+  rotMat.put(2,0, info.dRowTra);
 
-  rotMat.put(1,0, info.dColSag);
+  cout << "dPosSag: " << info.dPosSag << endl;
+  cout << "dPosCor: " << info.dPosCor << endl;
+  cout << "dPosTra: " << info.dPosTra << endl;
+
+  rotMat.put(0,1, info.dColSag);
   rotMat.put(1,1, info.dColCor);
-  rotMat.put(1,2, info.dColTra);
+  rotMat.put(2,1, info.dColTra);
 
-  rotMat.put(2,0, info.dNorSag);
-  rotMat.put(2,1, info.dNorCor);
+  rotMat.put(0,2, info.dNorSag);
+  rotMat.put(1,2, info.dNorCor);
   rotMat.put(2,2, info.dNorTra);
 
-  vxl2ras = scaleMat*rotMat;
+  //  vxl2ras = scaleMat*rotMat;
+  //  vxl2ras = vxl2ras.transpose();
+  vxl2ras = scaleMat*rotMat.transpose();
+  vxl2ras.put(0,3, info.dPosSag);
+  vxl2ras.put(1,3, info.dPosCor);
+  vxl2ras.put(2,3, info.dPosTra);
+  
 
   // debugging
-//  cout << "scale" << endl;
-//  printVnl44Mat(scaleMat);
-//
-//  cout << "rot" << endl;
-//  printVnl44Mat(rotMat);
-//
-//  cout << "xform" << endl;
-//  printVnl44Mat(vxl2ras);
+    cout << "scale" << endl;
+    printVnl44Mat(scaleMat);
+  //
+    cout << "rot" << endl;
+    printVnl44Mat(rotMat);
+  //
+    cout << "xform" << endl;
+    printVnl44Mat(vxl2ras);
 
   // build RAS 2 REF transformation matrix
   ras2ref.set_identity();

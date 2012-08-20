@@ -5,6 +5,9 @@
 #include<strstream>
 #include<iostream>
 
+#include<X11/Xlib.h>
+#include<X11/keysym.h>
+
 #include"nifti1_io.h"
 
 #include"../../src/io/RtExternalSenderImageInfo.h"
@@ -34,6 +37,31 @@ nifti_image *loadNextInSeries(string niiStem, int series) {
   return img;
 }
 
+XKeyEvent createKeyEvent(Display *display, Window &win, Window &winRoot,
+                         bool press, int keycode, int modifiers){
+  XKeyEvent event;
+
+  event.display     = display;
+  event.window      = win;
+  event.root        = winRoot;
+  event.subwindow   = None;
+  event.time        = CurrentTime;
+  event.x           = 1;
+  event.y           = 1;
+  event.x_root      = 1;
+  event.y_root      = 1;
+  event.same_screen = True;
+  event.keycode     = XKeysymToKeycode(display, keycode);
+  event.state       = modifiers;
+
+  if(press)
+    event.type = KeyPress;
+   else
+     event.type = KeyRelease;
+
+  return event;
+}
+
 int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   // args
   string niiStem(argc > 1 ? argv[1] : "/data/subjects/realtime/ss_mini/img");
@@ -44,6 +72,8 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   long tr = 1000*(argc > 6 ? atof(argv[6]) : 1000);
   int port = argc > 7 ? atoi(argv[7]) : 15000;
   string host(argc > 8 ? argv[8] : "localhost");
+
+  #define KEYCODE XK_KP_1
 
   cout << "1 using niiStem=" << niiStem << endl;
   cout << "2 using series=" << series << endl;
@@ -60,6 +90,18 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   ACE_SOCK_Stream stream;
   // Initialize the connector.
   ACE_SOCK_Connector connector;
+
+  // Obtain the X11 display.
+  Display *display = XOpenDisplay(0);
+  if(display == NULL)
+    return -1;
+
+  // Get the root window for the current display.
+  Window winRoot = XDefaultRootWindow(display);
+
+  Window winFocus;
+  int    revert;
+  XKeyEvent event;
 
   // keep making new connections while we havent sent the whole series
   nifti_image* img;
@@ -119,6 +161,15 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     stream.send_n(img->data, ei->lImageDataLength);
 
+  // Find the window which has the current keyboard focus.
+  XGetInputFocus(display, &winFocus, &revert);
+  // Send a fake key press event to the window.
+  event = createKeyEvent(display, winFocus, winRoot, true, KEYCODE, 0);
+  XSendEvent(event.display, event.window, True, KeyPressMask, (XEvent *)&event);
+
+  // Send a fake key release event to the window.
+  event = createKeyEvent(display, winFocus, winRoot, false, KEYCODE, 0);
+  XSendEvent(event.display, event.window, True, KeyPressMask, (XEvent *)&event);
     usleep(tr);
 
     stream.close();
@@ -133,6 +184,10 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   else {
     cout << "failed to connect" << endl;
   }
+
+  // Done.
+  XCloseDisplay(display);
+  return 0;
 
   return 0;
 }

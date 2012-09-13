@@ -89,7 +89,9 @@ ACE_HOME = /usr
 BOOST_HOME = /usr
 
 # vxl
-VXL_HOME = /usr
+# VXL_HOME = /usr
+# PW 2012/09/13: To compile in ubuntu 12.04
+VXL_HOME = /usr/local
 
 #svm
 SVM_HOME = $(PWD)/util/svm

@@ -368,6 +368,8 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
   //                (if any)
   info.displayImageInfo();
+  cout << "------------------------------------" << endl;
+  cout << "Slice Gap                         = " << sliceGap << endl;
 
   // determine the dimensions and voxel size
   dims.resize(2);
@@ -396,8 +398,8 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   // scaling matrix
   vnl_matrix_fixed<double,4,4> scaleMat;
   scaleMat.set_identity();
-  scaleMat.put(0,0, -info.dFOVread/info.nLin);
-  scaleMat.put(1,1, -info.dFOVphase/info.nCol);
+  scaleMat.put(0,0, info.dFOVread/info.nLin);
+  scaleMat.put(1,1, info.dFOVphase/info.nCol);
   scaleMat.put(2,2, info.dThick * (1+sliceGap));
 
   // rotation matrix
@@ -408,10 +410,6 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   rotMat.put(1,0, info.dRowCor);
   rotMat.put(2,0, info.dRowTra);
 
-  cout << "dPosSag: " << info.dPosSag << endl;
-  cout << "dPosCor: " << info.dPosCor << endl;
-  cout << "dPosTra: " << info.dPosTra << endl;
-
   rotMat.put(0,1, info.dColSag);
   rotMat.put(1,1, info.dColCor);
   rotMat.put(2,1, info.dColTra);
@@ -420,23 +418,66 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   rotMat.put(1,2, info.dNorCor);
   rotMat.put(2,2, info.dNorTra);
 
-  //  vxl2ras = scaleMat*rotMat;
-  //  vxl2ras = vxl2ras.transpose();
-  vxl2ras = scaleMat*rotMat.transpose();
-  vxl2ras.put(0,3, info.dPosSag);
-  vxl2ras.put(1,3, info.dPosCor);
-  vxl2ras.put(2,3, info.dPosTra);
+  // PW 2012/10/03: Seimens coordinate system is LPS
+  // we need to conver to RAS
+  vnl_matrix_fixed<double,4,4> lps2ras;
+  lps2ras.set_identity();
+  lps2ras.put(0,0,-1);
+  lps2ras.put(1,1,-1);
+
+  vxl2ras = scaleMat*rotMat.transpose()*lps2ras;
+  vxl2ras = vxl2ras.transpose();
   
+  // vxl2ras = scaleMat*rotMat.transpose();
+  //vxl2ras = scaleMat*rotMat;
+  
+  // PW 2012/10/03: Calculating offset to center of k-space
+  // See http://www.nmr.mgh.harvard.edu/~rudolph/software/vox2ras/download/vox2ras_ksolve.html
+  vnl_matrix_fixed<double,3,1> Vc_x = vxl2ras.extract(3,1,0,0);
+  vnl_matrix_fixed<double,3,1> Vc_y = vxl2ras.extract(3,1,0,1);
+  vnl_matrix_fixed<double,3,1> Vc_z = vxl2ras.extract(3,1,0,2);
+  vnl_matrix_fixed<double,3,1> Vc_Ps;
+  double xoff = info.nLin / 2.0;
+  double yoff = info.nCol / 2.0;
+  double zoff = info.iMosaicGridSize / 2.0;
+  Vc_Ps.put(0,0, info.dPosSag);
+  Vc_Ps.put(1,0, info.dPosCor);
+  Vc_Ps.put(2,0, info.dPosTra);
+  vnl_matrix_fixed<double,3,1> Vc_Pe1 = -1.0 * (Vc_Ps + (xoff*Vc_x + yoff*Vc_y + zoff*Vc_z));
+  vnl_matrix_fixed<double,3,1> Vc_Pe2 = (Vc_Ps - (xoff*Vc_x + yoff*Vc_y + zoff*Vc_z));
+  vxl2ras.put(0,3, Vc_Pe1.get(0,0));
+  vxl2ras.put(1,3, Vc_Pe1.get(1,0));
+  vxl2ras.put(2,3, Vc_Pe2.get(2,0));
+
+/*
+%% Solve for the k-space center:
+%% The first two components are found by moving along the direction cosines
+Vc_Pe1        =  - (Vc_Ps + (xoff*Vc_x + yoff*Vc_y + zoff*Vc_z));
+%% and the last component is found by moving against the direction cosines
+Vc_Pe2        = (Vc_Ps - (xoff*Vc_x + yoff*Vc_y + zoff*Vc_z));
+Vc_Pe(1)    = Vc_Pe1(1) -0.67;        %% a strange correction?
+Vc_Pe(2)    = Vc_Pe1(2);
+Vc_Pe(3)    = Vc_Pe2(3);
+M_V(1:3, 4)    = Vc_Pe';
+*/
 
   // debugging
   cout << "scale" << endl;
   printVnl44Mat(scaleMat);
-//
   cout << "rot" << endl;
   printVnl44Mat(rotMat);
-//
-  cout << "xform" << endl;
+  cout << "vxl2ras" << endl;
   printVnl44Mat(vxl2ras);
+  cout << "Vc_x" << endl;
+  cout << Vc_x.get(0,0) << " " << Vc_x.get(1,0) << " " << Vc_x.get(2,0) << endl;
+  cout << "Vc_y" << endl;
+  cout << Vc_y.get(0,0) << " " << Vc_y.get(1,0) << " " << Vc_y.get(2,0) << endl;
+  cout << "Vc_z" << endl;
+  cout << Vc_z.get(0,0) << " " << Vc_z.get(1,0) << " " << Vc_z.get(2,0) << endl;
+  cout << "Vc_Pe1" << endl;
+  cout << Vc_Pe1.get(0,0) << " " << Vc_Pe1.get(1,0) << " " << Vc_Pe1.get(2,0) << endl;
+  cout << "Vc_Pe2" << endl;
+  cout << Vc_Pe2.get(0,0) << " " << Vc_Pe2.get(1,0) << " " << Vc_Pe2.get(2,0) << endl;
 
   // build RAS 2 REF transformation matrix
   ras2ref.set_identity();

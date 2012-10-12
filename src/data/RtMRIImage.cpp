@@ -285,22 +285,21 @@ void RtMRIImage::printInfo(ostream &os) {
   os << setiosflags(ios::left);
 
   os << setw(wid) << "slice" << slice << endl 
-     << setw(wid) << "readFOV phaseFOV" 
-     << readFOV << " " << phaseFOV << endl
+     << setw(wid) << "readFOV phaseFOV" << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "swapReadPhase" << swapReadPhase << endl
      << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
      << setw(wid) << "timeAfterStart" << timeAfterStart << endl
-     << setw(wid) << "te / tr / ti" << te << " / " 
-     << tr << " / " << ti << endl
+     << setw(wid) << "te / tr / ti" << te << " / " << tr << " / " << ti << endl
      << setw(wid) << "triggerTime" << triggerTime << endl
      << setw(wid) << "time" << ACE_Date_Time2SiemensTime(time) << endl
-     << setw(wid) << "refFrameTime" 
-     << ACE_Date_Time2SiemensTime(refFrameTime) << endl
+     << setw(wid) << "refFrameTime" << ACE_Date_Time2SiemensTime(refFrameTime) << endl
      << setw(wid) << "reconDelay" << reconDelay << endl
      << setw(wid) << "distCorrect2D" << distCorrect2D << endl
      << setw(wid) << "moco" << moco << endl
      << setw(wid) << "fromScanner" << fromScanner << endl
+     << setw(wid) << "MatrixSize" << getMatrixSize() << endl
+     << setw(wid) << "NumSlices" << getNumSlices() << endl
      << "---------------------------" << endl;
 }
 
@@ -367,16 +366,21 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
   // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
   //                (if any)
-  /*
-  info.displayImageInfo();
-  cout << "------------------------------------" << endl;
-  cout << "Slice Gap                         = " << sliceGap << endl;
-  */
+  //info.displayImageInfo();
 
-  // determine the dimensions and voxel size
-  dims.resize(2);
-  dims[0] = info.nLin*info.iMosaicGridSize;
-  dims[1] = info.nCol*info.iMosaicGridSize;
+  // PW 2012/10/11: Trying to get murfi to save unmosaiced niftis
+  if (info.iNoOfImagesInMosaic == 0) {
+    // volume is not mosaiced
+    dims.resize(3);
+    dims[0] = info.nLin;
+    dims[1] = info.nCol;
+    dims[2] = info.nSli;
+  } else {
+    // determine the dimensions and voxel size
+    dims.resize(2);
+    dims[0] = info.nLin*info.iMosaicGridSize;
+    dims[1] = info.nCol*info.iMosaicGridSize;
+  }
 
   pixdims.resize(3);
   pixdims[0] = info.dFOVread / info.nLin;
@@ -462,6 +466,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   */
 
   // build RAS 2 REF transformation matrix
+  // PW 2012/10/12 TODO!
   ras2ref.set_identity();
 
   // image info

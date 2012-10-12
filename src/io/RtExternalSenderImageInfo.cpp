@@ -15,6 +15,7 @@ RtExternalImageInfo::RtExternalImageInfo()
   dThick(5),
   nCol(256),
   nLin(256),
+  nSli(1),
   lImageDataLength(294912),
   lNumberOfPixels(147456),
   lBytesPerPixel(2),
@@ -93,9 +94,10 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   char trash[TRASHSIZE];
   char *readptr = data;
 
-// DEBUGGING
-//  ofstream of("/tmp/dat.hdr");
-//  of.write(data,len);
+  // DEBUGGING
+  //ofstream of("/tmp/dat.hdr");
+  //of.write(data,len);
+  //of.close();
 
   // check that we have enough data to read iSizeOfExternalImageInfo
   if(len < 4*CHARSIZE + LONGSIZE + INTSIZE) {
@@ -131,8 +133,10 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(&nCol, readptr, INTSIZE);
   readptr += INTSIZE;
 
-
   memcpy(&nLin, readptr, INTSIZE);
+  readptr += INTSIZE;
+
+  memcpy(&nSli, readptr, INTSIZE);
   readptr += INTSIZE;
 
   memcpy(&lImageDataLength, readptr, LONGSIZE);
@@ -353,8 +357,10 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
   memcpy(writeptr, &nCol, INTSIZE);
   writeptr += INTSIZE;
 
-
   memcpy(writeptr, &nLin, INTSIZE);
+  writeptr += INTSIZE;
+
+  memcpy(writeptr, &nSli, INTSIZE);
   writeptr += INTSIZE;
 
   memcpy(writeptr, &lImageDataLength, LONGSIZE);
@@ -554,32 +560,37 @@ void RtExternalImageInfo::displayImageInfo() const {
   //cout << "Patient position:"  << chPatientPosition << endl;
   cout << "-----------------------------" << endl;
   //cout << "Sequence name : " << cSequenceName << endl;
-  cout << "ID -->" << myID << "<-- Version" << lVersion << endl;
-  cout << "nlin / ncol / FOVread / FOVphase  = " << nLin << " / " << nCol << " / " << dFOVread << " / " << dFOVphase << endl;
-  cout << "Slice Thickness                   = " << dThick << endl;
-  cout << "Slice Position Sag / Cor / Tra    = " << dPosSag << " / " << dPosCor << " / " << dPosTra << endl;
-  cout << "Slice Normal   Sag / Cor / Tra    = " << dNorSag << " / " << dNorCor << " / " << dNorTra << endl;
-  cout << "Slice Phase En Sag / Cor / Tra    = " << dPhaSag << " / " << dPhaCor << " / " << dPhaTra << endl;
-  cout << "Slice Row Vect Sag / Cor / Tra    = " << dRowSag << " / " << dRowCor << " / " << dRowTra << endl;
-  cout << "Slice Col Vect Sag / Cor / Tra    = " << dColSag << " / " << dColCor << " / " << dColTra << endl;
-  cout << "isMoCo                            = " << bIsMoCo << endl;
-  cout << "numMosaicImages / mosaicGridSize  = " << iNoOfImagesInMosaic << " / " << iMosaicGridSize << endl;
-  cout << "seriesInstanceUID                 = " << cSeriesInstanceUID << endl;
-  cout << "iAcqNo / TimeAfterStart / TrigTi  = " << iAcquisitionNumber << " / " << dTimeAfterStart << " / " << dTriggerTime << endl;
-  cout << "TE / TR / TI                      = " << dTE << " / " << dTR << " / " << dTI << endl;
-  cout << "AcquisitionDate                   = " << chAcquisitionDate << endl;
-  cout << "AcquisitionTime                   = " << chAcquisitionTime << endl;
-  cout << "Number of pixels / dataLength     = " << lNumberOfPixels   << " / " << lImageDataLength << endl;
-  cout << "Bytes per pixel                   = " << lBytesPerPixel << endl;
-  cout << "Current Slice Index               = " << lSliceIndex <<  endl;
-  cout << "Window Width                      = " << iWindowWidth << endl;
-  cout << "Window Center                     = " << iWindowCenter << endl;
-  cout << "Trigger Time                      = " << dTriggerTime << endl;
-  cout << "ImageTypeValue4[0]                = " << chImageTypeValue4[0] << endl;
-  cout << "AbsTablePosition                  = " << lAbsTablePosition << endl;
-  cout << "Data Source                       = " << iDataSource << endl;
-  cout << "Frame Of Reference                = " << chframeOfReference << endl;
-  cout << "Time Delay                        = " << dTimeDelay << endl;
+  cout << "sID:                                    " << myID << endl
+       << "lVersion:                               " << lVersion << endl
+       << "nlin / ncol / nsli / FOVread / FOVphase " << nLin << " / " << nCol << " / " << nSli << " / " << dFOVread << " / " << dFOVphase << endl
+       << "Slice Thickness                         " << dThick << endl
+       << "Slice Position Sag / Cor / Tra          " << dPosSag << " / " << dPosCor << " / " << dPosTra << endl
+       << "Slice Normal   Sag / Cor / Tra          " << dNorSag << " / " << dNorCor << " / " << dNorTra << endl
+       << "Slice Phase En Sag / Cor / Tra          " << dPhaSag << " / " << dPhaCor << " / " << dPhaTra << endl
+       << "Slice Row Vect Sag / Cor / Tra          " << dRowSag << " / " << dRowCor << " / " << dRowTra << endl
+       << "Slice Col Vect Sag / Cor / Tra          " << dColSag << " / " << dColCor << " / " << dColTra << endl
+       << "isMoCo                                  " << bIsMoCo << endl
+       << "MoCoTrans        X / Y / Z              " << dMoCoTransX << " / " << dMoCoTransY << " / " << dMoCoTransZ << endl
+       << "MoCoRot          X / Y / Z              " << dMoCoRotX << " / " << dMoCoRotY << " / " << dMoCoRotZ << endl
+       << "numMosaicImages / mosaicGridSize        " << iNoOfImagesInMosaic << " / " << iMosaicGridSize << endl
+       << "seriesInstanceUID                       " << cSeriesInstanceUID << endl
+       << "AcqNo / TimeAfterStart / TrigTi         " << iAcquisitionNumber << " / " << dTimeAfterStart << " / " << dTriggerTime << endl
+       << "TE / TR / TI                            " << dTE << " / " << dTR << " / " << dTI << endl
+       << "AcquisitionDate                         " << chAcquisitionDate << endl
+       << "AcquisitionTime                         " << chAcquisitionTime << endl
+       << "Header Size                             " << iSizeOfRtExternalImageInfo << endl
+       << "Number of pixels / dataLength           " << lNumberOfPixels   << " / " << lImageDataLength << endl
+       << "Bytes per pixel                         " << lBytesPerPixel << endl
+       << "Current Slice Index                     " << lSliceIndex <<  endl
+       << "Window Width                            " << iWindowWidth << endl
+       << "Window Center                           " << iWindowCenter << endl       
+       << "ImageTypeValue4[0]                      " << chImageTypeValue4[0] << endl
+       << "AbsTablePosition                        " << lAbsTablePosition << endl
+       << "Data Source                             " << iDataSource << endl
+       << "Frame Of Reference                      " << chframeOfReference << endl
+       << "Time Delay                              " << dTimeDelay << endl
+       << "SwapReadPhase                           " << bSwapReadPhase << endl
+       << "SliceIndex                              " << lSliceIndex << endl;
   /*
     for  (int i = 0; i < (sizeof(m_mylReserved)/sizeof(long)); i++)
     {

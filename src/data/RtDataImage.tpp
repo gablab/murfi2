@@ -341,7 +341,7 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
     img->data = (void*) malloc(img->nbyper*img->nvox);
     memcpy(img->data, data, img->nbyper*img->nvox);
 
-    // debugging
+    // PW 2012/10/12: debugging
     // nifti_image_infodump(img);
 
     // write the file
@@ -793,6 +793,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 
   // dims
   hdr->ndim = (dims.size() >= 4) ? dims.size() : 4;
+  
   hdr->dim[0] = hdr->ndim;
   for(int ind = 1; ind < 8; ind++) {
     hdr->dim[ind] = 1;
@@ -803,6 +804,15 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
     hdr->dim[ind] = dims[ind-1];
     hdr->pixdim[ind] = pixdims[ind-1];
   }
+
+  // PW 2012/10/12 -- Debugging...
+  /*
+  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->ndim = " << hdr->ndim << endl;
+  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[0] = " << hdr->pixdim[0] << endl;
+  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[1] = " << hdr->pixdim[1] << endl;
+  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[2] = " << hdr->pixdim[2] << endl;
+  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[3] = " << hdr->pixdim[3] << endl;
+  */
 
   // crappy
   switch(hdr->ndim) {
@@ -1082,6 +1092,8 @@ bool RtDataImage<T>::mosaicUnlocked() {
   // set the matrix size and number of slices
   matrixSize = dims[0];
   numSlices = dims[2];
+
+  cout << "PW  RtDataImage<T>::mosaicUnlocked() -- MatrixSize: " << matrixSize << " numSlices: " << numSlices << endl;
 
   dims.clear();
   dims.reserve(2);

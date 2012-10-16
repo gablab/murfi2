@@ -366,7 +366,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
   // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
   //                (if any)
-  //info.displayImageInfo();
+  info.displayImageInfo();
 
   // PW 2012/10/11: Trying to get murfi to save unmosaiced niftis
   if (info.iNoOfImagesInMosaic == 0) {
@@ -382,9 +382,28 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
     dims[1] = info.nCol*info.iMosaicGridSize;
   }
 
+  // PW 2012/10/16: This is most definitly the WRONG place to put this... But
+  //                for some reason the constructor was getting called *after*
+  //                setInfo(), so sliceGap wasn't being set correctly.
+  if(getExperimentConfig().isSet("scanner:sliceGap")) {
+    sliceGap = getExperimentConfig().get("scanner:sliceGap");    
+  }
+
   pixdims.resize(3);
   pixdims[0] = info.dFOVread / info.nLin;
   pixdims[1] = info.dFOVphase / info.nCol;
+  pixdims[2] = info.dThick / info.nSli * (1+sliceGap);
+
+  // set geometry info
+  setPixDim(0,pixdims[0]);
+  setPixDim(1,pixdims[1]);
+  setPixDim(2,pixdims[2]);
+
+  cout << "**********************************" << endl;
+  cout << "info.dThick: " << info.dThick << endl;
+  cout << "info.dThick: " << info.nSli << endl;
+  cout << "sliceGap: " << sliceGap << endl;
+  cout << "**********************************" << endl;
 
   // calculate image size
   imgDataLen = bytesPerPix;
@@ -394,19 +413,12 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
     numPix *= (*i);
   }
 
-  // set geometry info
-  setPixDim(0,info.dFOVread/info.nLin);
-  setPixDim(1,info.dFOVphase/info.nCol);
-  setPixDim(2,info.dThick * (1+sliceGap));
-
-  // build xform (no translations included yet, just scales and rotations)
-
   // scaling matrix
   vnl_matrix_fixed<double,4,4> scaleMat;
   scaleMat.set_identity();
-  scaleMat.put(0,0, info.dFOVread/info.nLin);
-  scaleMat.put(1,1, info.dFOVphase/info.nCol);
-  scaleMat.put(2,2, info.dThick * (1+sliceGap));
+  scaleMat.put(0,0, pixdims[0]);
+  scaleMat.put(1,1, pixdims[1]);
+  scaleMat.put(2,2, pixdims[2]);
 
   // rotation matrix
   vnl_matrix_fixed<double,4,4> rotMat;
@@ -456,14 +468,12 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   vxl2ras.put(2,3, Vc_Pe2.get(2,0));
 
   // debugging
-  /*
   cout << "scale" << endl;
   printVnl44Mat(scaleMat);
   cout << "rot" << endl;
   printVnl44Mat(rotMat);  
   cout << "vxl2ras" << endl;
   printVnl44Mat(vxl2ras);
-  */
 
   // build RAS 2 REF transformation matrix
   // PW 2012/10/12 TODO!

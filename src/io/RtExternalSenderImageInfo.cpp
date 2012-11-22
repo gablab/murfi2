@@ -94,11 +94,18 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   char trash[TRASHSIZE];
   char *readptr = data;
 
+  // PW 2012/11/21: long's are sent as 'uint32_t so read them into a temporary placeholder,
+  //                before casting them to the proper place in the structure
+  //                Ideally, the actual class should change long->uint32_t, but then you'd
+  //                need to hunt down all the references all over the code and cast accordingly
+  int32_t longtemp;
+
   // DEBUGGING
   //ofstream of("/tmp/dat.hdr");
   //of.write(data,len);
   //of.close();
-
+  //exit(0);
+  
   // check that we have enough data to read iSizeOfExternalImageInfo
   if(len < 4*CHARSIZE + LONGSIZE + INTSIZE) {
     return;
@@ -107,7 +114,9 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(chID, readptr, 4*CHARSIZE);
   readptr += 4*CHARSIZE;
   
-  memcpy(&lVersion, readptr, LONGSIZE);
+  //memcpy(&lVersion, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lVersion = long(longtemp);
   readptr += LONGSIZE;
 
   memcpy(&iSizeOfRtExternalImageInfo, readptr, INTSIZE);
@@ -139,13 +148,19 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(&nSli, readptr, INTSIZE);
   readptr += INTSIZE;
 
-  memcpy(&lImageDataLength, readptr, LONGSIZE);
+  //memcpy(&lImageDataLength, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lImageDataLength = long(longtemp);  
   readptr += LONGSIZE;
 
-  memcpy(&lNumberOfPixels, readptr, LONGSIZE);
+  //memcpy(&lNumberOfPixels, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lNumberOfPixels = long(longtemp);  
   readptr += LONGSIZE;
 
-  memcpy(&lBytesPerPixel, readptr, LONGSIZE);
+  //memcpy(&lBytesPerPixel, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lBytesPerPixel = long(longtemp);
   readptr += LONGSIZE;
 
   memcpy(trash, readptr, INTSIZE);
@@ -279,18 +294,23 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(chAcquisitionTime, readptr, ACQUISITION_TIME_LEN*CHARSIZE);
   readptr += ACQUISITION_TIME_LEN*CHARSIZE;
   
-  memcpy(&lSliceIndex, readptr, LONGSIZE);
+  //memcpy(&lSliceIndex, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lSliceIndex = long(longtemp);
   readptr += LONGSIZE;
   
-  memcpy(&lNumTrackCha, readptr, LONGSIZE);
+  //memcpy(&lNumTrackCha, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lNumTrackCha = long(longtemp);
   readptr += LONGSIZE;
   
-  memcpy(&lCurrentTrackCha, readptr, LONGSIZE);
+  //memcpy(&lCurrentTrackCha, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lCurrentTrackCha = long(longtemp);
   readptr += LONGSIZE;
 
   memcpy(trash, readptr, 3);
   readptr += 3;
-
 
   memcpy(&iWindowCenter, readptr, INTSIZE);
   readptr += INTSIZE;
@@ -301,8 +321,9 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(chImageTypeValue4, readptr, _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
   readptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
 
-
-  memcpy(&lAbsTablePosition, readptr, LONGSIZE);
+  //memcpy(&lAbsTablePosition, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lAbsTablePosition = (long)longtemp;
   readptr += LONGSIZE;
 
   memcpy(chframeOfReference, readptr, FOR_ARRAY_LEN*CHARSIZE);

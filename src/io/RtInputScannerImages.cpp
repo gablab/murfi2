@@ -255,9 +255,9 @@ int RtInputScannerImages::svc() {
       cout << "image info received" << endl;
     }
     // DEBUGGING
-    //cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
-    //ei->displayImageInfo();
-    //cout << "------------------------------------------------------" << endl;    
+    cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
+    ei->displayImageInfo();
+    cout << "------------------------------------------------------" << endl;    
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -424,6 +424,11 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
+
+  // PW 2012/11/21: Zeroing the buffer before reading header.  Trying to track down
+  // annoying os-dependent bug
+  memset(buffer, 0, MAX_BUFSIZ);
+
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
     rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
     rec += rec_delta; 

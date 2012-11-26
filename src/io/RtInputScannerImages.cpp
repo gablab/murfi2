@@ -255,9 +255,9 @@ int RtInputScannerImages::svc() {
       cout << "image info received" << endl;
     }
     // DEBUGGING
-    cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
-    ei->displayImageInfo();
-    cout << "------------------------------------------------------" << endl;    
+    //cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
+    //ei->displayImageInfo();
+    //cout << "------------------------------------------------------" << endl;    
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -332,13 +332,19 @@ int RtInputScannerImages::svc() {
     // set the image id for handling
     //rti->addToID("scanner");
 
+    // PW 2012/11/26: Debug
+    cout << "---------------------------------------------" << endl;
+    cout << "getDataStore().getAvailableData():" << endl;    
+    getDataStore().getAvailableData();
+    cout << "---------------------------------------------" << endl;
+
     // append this to a vector of gathered images
     getDataStore().setData(rti);
 
     // signal that we got an image
     //cout << "sending event with code number " << codeNum << endl;
 
-    rti->printInfo(cout);
+    //rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
     if(!haveStudyRefVol
@@ -358,11 +364,11 @@ int RtInputScannerImages::svc() {
     // PW 2012/10/12: If it's not a mosaic'd image (ie MPRAGE) don't fire off
     //                the murfi processing pipeline (segfault are bad, m'kay?)
     if (ei->iNoOfImagesInMosaic==0) {
+      cout << "MPRAGE received.  Not going to do all that murfi sillyness, just saving the file. (TODO: fix!)" << endl;
+    } else {
       cout << "Sending code..." << endl;
       sendCode(rti);
       cout << "   ...done!" << endl;
-    } else {
-      cout << "MPRAGE received.  Not going to do all that murfi sillyness, just saving the file. (TODO: fix!)" << endl;
     }
 
     if(saveImagesToFile) {

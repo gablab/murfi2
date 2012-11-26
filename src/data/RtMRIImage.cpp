@@ -366,7 +366,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
   // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
   //                (if any)
-  info.displayImageInfo();
+  //info.displayImageInfo();
 
   // PW 2012/10/11: Trying to get murfi to save unmosaiced niftis
   if (info.iNoOfImagesInMosaic == 0) {
@@ -399,11 +399,11 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   setPixDim(1,pixdims[1]);
   setPixDim(2,pixdims[2]);
 
-  cout << "**********************************" << endl;
-  cout << "info.dThick: " << info.dThick << endl;
-  cout << "info.dThick: " << info.nSli << endl;
-  cout << "sliceGap: " << sliceGap << endl;
-  cout << "**********************************" << endl;
+  //cout << "**********************************" << endl;
+  //cout << "info.dThick: " << info.dThick << endl;
+  //cout << "info.dThick: " << info.nSli << endl;
+  //cout << "sliceGap: " << sliceGap << endl;
+  //cout << "**********************************" << endl;
 
   // calculate image size
   imgDataLen = bytesPerPix;
@@ -468,12 +468,12 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   vxl2ras.put(2,3, Vc_Pe2.get(2,0));
 
   // debugging
-  cout << "scale" << endl;
-  printVnl44Mat(scaleMat);
-  cout << "rot" << endl;
-  printVnl44Mat(rotMat);  
-  cout << "vxl2ras" << endl;
-  printVnl44Mat(vxl2ras);
+  //cout << "scale" << endl;
+  //printVnl44Mat(scaleMat);
+  //cout << "rot" << endl;
+  //printVnl44Mat(rotMat);  
+  //cout << "vxl2ras" << endl;
+  //printVnl44Mat(vxl2ras);
 
   // build RAS 2 REF transformation matrix
   // PW 2012/10/12 TODO!

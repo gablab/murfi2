@@ -5,112 +5,22 @@ Installation Instructions
 *************************
 Requirements:
 *************************
-  -cvs
   -libraries
     -libace-dev
     -freeglut3-dev
     -libgsl0-dev
-    -cmake (needed to build vxl)
     -libxi-dev
     -libxmu-dev
     -gnuplot
     -vxl
     -libniftiio
-  -in .bashrc file:
-    -export CVSROOT=:ext:user@her.mit.edu:/home/rtcvs
-    -export CVS_RSH=ssh
-    -export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 *************************
 Installation/Compilation:
 *************************
 
--- first install required packages.
-this command will install all the apt-get-able packages you need:
+$ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev
 
-$ sudo apt-get install cvs g++ cmake libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev libniftiio1-dev gnuplot libboost-filesystem-dev libnifti1-dev libqt4-dev libqwt-dev libvtk5-qt4-dev
+then
 
-<snip>
-Media change: please insert the disc labeled
- 'Ubuntu 7.10 _Gutsy Gibbon_ - Release amd64 (20071016)'
-in the drive '/cdrom/' and press enter
-
-[Note: If you get the above message, cd to /etc/apt, comment "deb cdrom" line in sources.list, and rerun apt-get]
-
-
--- now check out the system
-$ cvs -d :ext:user@her.mit.edu/home/rtcvs co system
-
-
--- Add "#define _REENTRANT" in /usr/include/ace/config-lite.h above "#include "ace/config.h""
-
-
--download/build VXL (vxl.sourceforge.net)
-  -steps
-    $ cd /usr/local
-    $ sudo mkdir vxl
-    $ sudo chown user:user ./vxl/
-    $ cd vxl
-    $ ccmake ~/Desktop/vxl-1.10.0/ #this is the downloaded file
-    $ sudo make install
-
-
--- shouldn't need this anymore (hopefully)
-For 64-bit machines, make the following changes:
-1: ~/realtime/system/src/stream/analysis/RtActivationEstimator.cpp
-
-94c94
-<     for(unsigned int i1 = 0, i2 = text.find(" "); 1;
----
->     for(unsigned long i1 = 0, i2 = text.find(" "); 1;
-
-2: ~/realtime/system/src/stream/analysis/RtImageSlideWinCor.cpp
-
-34c34
-<     for(unsigned int i1 = 0, i2 = text.find(" "); 1;
----
->     for(unsigned long i1 = 0, i2 = text.find(" "); 1;
-
--- make the realtime system
-
-$ cd system
 $ make
-
-make: building real for linux...
-<snip>
-############################################
-make: built [real] successfully!
-############################################
-
-13. atighe@atighe:~/realtime/system$ cd src/util/gnuplot_i++_vxl
-Make the following changes to Makefile:
-
-22c22
-<       $(CC) -c $(CFLAGS) $(DEFINES) $(INCLUDES) $<
----
->       $(CC) -fPIC -c $(CFLAGS) $(DEFINES) $(INCLUDES) $<
-28c28
-<       $(CC)  -shared  -Wl,-soname,$(PROJECT).so.$(MAJOR_VER) $(PROJECT).o -o lib$(PROJECT).so.$(MAJOR_VER).$(MINOR_VER).$(RELEASE_VER) $(LIBS)
----
->       $(CC)  -shared  -Wl,-soname,lib$(PROJECT).so.$(MAJOR_VER) $(PROJECT).o -o lib$(PROJECT).so.$(MAJOR_VER).$(MINOR_VER).$(RELEASE_VER) $(LIBS)
-
-14. atighe@atighe:~/realtime/system/src/util/gnuplot_i++_vxl$ sudo make g++  -shared  -Wl,-soname,libgnuplot_i_vxl.so.1 gnuplot_i_vxl.o -o libgnuplot_i_vxl.so.1.0.0 -lstdc++ -lvnl
-
-15. atighe@atighe:~/realtime/system/src/util/gnuplot_i++_vxl$ cd ../../..; make
-make: building real for linux...
-<snip>
-############################################
-make: built [real] successfully!
-############################################
-
-16. atighe@atighe:~/realtime/system$ sudo mkdir -p /data/subjects/foobar/
-17. atighe@atighe:~/realtime/system$ sudo chown -R atighe:atighe data
-18. atighe@atighe:~/realtime/system$ bin/real
-[should run]
-
-
-oliver's notes:
---------------
-
-2008-03-15 had to modify /usr/include/dirent.h to workaround both
-nifti libs and direct defining DT_UNKNOWN

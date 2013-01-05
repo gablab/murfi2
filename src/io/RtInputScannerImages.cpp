@@ -255,8 +255,9 @@ int RtInputScannerImages::svc() {
       cout << "image info received" << endl;
     }
     // DEBUGGING
-    // ei->displayImageInfo();
-    //ei->iAcquisitionNumber = imageNum++;
+    //cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
+    //ei->displayImageInfo();
+    //cout << "------------------------------------------------------" << endl;    
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -285,7 +286,10 @@ int RtInputScannerImages::svc() {
     rti = new RtMRIImage(*ei,img);
 
     if(unmosaicInputImages) {
+      cout << "Source image is mosaic'd; unmosaicing..." << endl;
       rti->unmosaic();
+    } else {
+      cout << "Source image is not mosaic'd; no need for unmosaicing..." << endl;
     }
 
     // if its the first image in a series save it no matter what
@@ -328,13 +332,19 @@ int RtInputScannerImages::svc() {
     // set the image id for handling
     //rti->addToID("scanner");
 
+    // PW 2012/11/26: Debug
+    cout << "---------------------------------------------" << endl;
+    cout << "getDataStore().getAvailableData():" << endl;    
+    getDataStore().getAvailableData();
+    cout << "---------------------------------------------" << endl;
+
     // append this to a vector of gathered images
     getDataStore().setData(rti);
 
     // signal that we got an image
     //cout << "sending event with code number " << codeNum << endl;
 
-    rti->printInfo(cout);
+    //rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
     if(!haveStudyRefVol
@@ -351,10 +361,20 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    sendCode(rti);
+    // PW 2012/10/12: If it's not a mosaic'd image (ie MPRAGE) don't fire off
+    //                the murfi processing pipeline (segfault are bad, m'kay?)
+    if (ei->iNoOfImagesInMosaic==0) {
+      cout << "MPRAGE received.  Not going to do all that murfi sillyness, just saving the file. (TODO: fix!)" << endl;
+    } else {
+      cout << "Sending code..." << endl;
+      sendCode(rti);
+      cout << "   ...done!" << endl;
+    }
 
     if(saveImagesToFile) {
+      cout << "Saving image to file..." << endl;
       saveImage(*rti);
+      cout << "   ...done!" << endl;
     }
 
     // log that we received the image
@@ -376,8 +396,10 @@ int RtInputScannerImages::svc() {
     //    cout << endl;
 
     // clean up
+    cout << "Cleaning up..." << endl;
     delete ei;
     delete [] img;
+    cout << "   ... done!" << endl;
 
     if(imageNum == numImagesExpected) {
       cout << "received last image" << endl;
@@ -408,6 +430,11 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 
   // read until we have all the bytes we need
   // ADD ERROR HANDLING HERE!!!
+
+  // PW 2012/11/21: Zeroing the buffer before reading header.  Trying to track down
+  // annoying os-dependent bug
+  memset(buffer, 0, MAX_BUFSIZ);
+
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
     rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
     rec += rec_delta; 
@@ -449,11 +476,13 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
 
+  // PW 2012/10/11: Modified to grab numPix from header (to support MEMPRAGE)
+  //int numPix = (int) pow((double)info.iMosaicGridSize,2) * info.nLin * info.nCol;
+  long numPix = info.lNumberOfPixels;
   if(verbose) {
-    cout << "receiving image " << info.iAcquisitionNumber << endl;
+    cout << "receiving image " << info.iAcquisitionNumber << " (" << numPix << " pixels; " << numPix*sizeof(short) << "bytes)..." << endl;
   }
 
-  int numPix = (int) pow((double)info.iMosaicGridSize,2) * info.nLin * info.nCol;
   for(unsigned int rec = 0; rec < numPix*sizeof(short);
       rec += stream.recv_n (buffer+rec, numPix*sizeof(short)-rec)) {
   }

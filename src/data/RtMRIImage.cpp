@@ -285,22 +285,21 @@ void RtMRIImage::printInfo(ostream &os) {
   os << setiosflags(ios::left);
 
   os << setw(wid) << "slice" << slice << endl 
-     << setw(wid) << "readFOV phaseFOV" 
-     << readFOV << " " << phaseFOV << endl
+     << setw(wid) << "readFOV phaseFOV" << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "swapReadPhase" << swapReadPhase << endl
      << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
      << setw(wid) << "timeAfterStart" << timeAfterStart << endl
-     << setw(wid) << "te / tr / ti" << te << " / " 
-     << tr << " / " << ti << endl
+     << setw(wid) << "te / tr / ti" << te << " / " << tr << " / " << ti << endl
      << setw(wid) << "triggerTime" << triggerTime << endl
      << setw(wid) << "time" << ACE_Date_Time2SiemensTime(time) << endl
-     << setw(wid) << "refFrameTime" 
-     << ACE_Date_Time2SiemensTime(refFrameTime) << endl
+     << setw(wid) << "refFrameTime" << ACE_Date_Time2SiemensTime(refFrameTime) << endl
      << setw(wid) << "reconDelay" << reconDelay << endl
      << setw(wid) << "distCorrect2D" << distCorrect2D << endl
      << setw(wid) << "moco" << moco << endl
      << setw(wid) << "fromScanner" << fromScanner << endl
+     << setw(wid) << "MatrixSize" << getMatrixSize() << endl
+     << setw(wid) << "NumSlices" << getNumSlices() << endl
      << "---------------------------" << endl;
 }
 
@@ -365,14 +364,46 @@ RtMRIImage::~RtMRIImage() {
 //   _info: struct to copy
 void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
-  // determine the dimensions and voxel size
-  dims.resize(2);
-  dims[0] = info.nLin*info.iMosaicGridSize;
-  dims[1] = info.nCol*info.iMosaicGridSize;
+  // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
+  //                (if any)
+  //info.displayImageInfo();
+
+  // PW 2012/10/11: Trying to get murfi to save unmosaiced niftis
+  if (info.iNoOfImagesInMosaic == 0) {
+    // volume is not mosaiced
+    dims.resize(3);
+    dims[0] = info.nLin;
+    dims[1] = info.nCol;
+    dims[2] = info.nSli;
+  } else {
+    // determine the dimensions and voxel size
+    dims.resize(2);
+    dims[0] = info.nLin*info.iMosaicGridSize;
+    dims[1] = info.nCol*info.iMosaicGridSize;
+  }
+
+  // PW 2012/10/16: This is most definitly the WRONG place to put this... But
+  //                for some reason the constructor was getting called *after*
+  //                setInfo(), so sliceGap wasn't being set correctly.
+  if(getExperimentConfig().isSet("scanner:sliceGap")) {
+    sliceGap = getExperimentConfig().get("scanner:sliceGap");    
+  }
 
   pixdims.resize(3);
   pixdims[0] = info.dFOVread / info.nLin;
   pixdims[1] = info.dFOVphase / info.nCol;
+  pixdims[2] = info.dThick / info.nSli * (1+sliceGap);
+
+  // set geometry info
+  setPixDim(0,pixdims[0]);
+  setPixDim(1,pixdims[1]);
+  setPixDim(2,pixdims[2]);
+
+  //cout << "**********************************" << endl;
+  //cout << "info.dThick: " << info.dThick << endl;
+  //cout << "info.dThick: " << info.nSli << endl;
+  //cout << "sliceGap: " << sliceGap << endl;
+  //cout << "**********************************" << endl;
 
   // calculate image size
   imgDataLen = bytesPerPix;
@@ -382,19 +413,12 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
     numPix *= (*i);
   }
 
-  // set geometry info
-  setPixDim(0,info.dFOVread/info.nLin);
-  setPixDim(1,info.dFOVphase/info.nCol);
-  setPixDim(2,info.dThick * (1+sliceGap));
-
-  // build xform (no translations included yet, just scales and rotations)
-
   // scaling matrix
   vnl_matrix_fixed<double,4,4> scaleMat;
   scaleMat.set_identity();
-  scaleMat.put(0,0, -info.dFOVread/info.nLin);
-  scaleMat.put(1,1, -info.dFOVphase/info.nCol);
-  scaleMat.put(2,2, info.dThick * (1+sliceGap));
+  scaleMat.put(0,0, pixdims[0]);
+  scaleMat.put(1,1, pixdims[1]);
+  scaleMat.put(2,2, pixdims[2]);
 
   // rotation matrix
   vnl_matrix_fixed<double,4,4> rotMat;
@@ -404,10 +428,6 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   rotMat.put(1,0, info.dRowCor);
   rotMat.put(2,0, info.dRowTra);
 
-  cout << "dPosSag: " << info.dPosSag << endl;
-  cout << "dPosCor: " << info.dPosCor << endl;
-  cout << "dPosTra: " << info.dPosTra << endl;
-
   rotMat.put(0,1, info.dColSag);
   rotMat.put(1,1, info.dColCor);
   rotMat.put(2,1, info.dColTra);
@@ -416,25 +436,47 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   rotMat.put(1,2, info.dNorCor);
   rotMat.put(2,2, info.dNorTra);
 
-  //  vxl2ras = scaleMat*rotMat;
-  //  vxl2ras = vxl2ras.transpose();
-  vxl2ras = scaleMat*rotMat.transpose();
-  vxl2ras.put(0,3, info.dPosSag);
-  vxl2ras.put(1,3, info.dPosCor);
-  vxl2ras.put(2,3, info.dPosTra);
+  // PW 2012/10/03: Seimens' logical coordinate system is LPS
+  // we want coords in RAS
+  vnl_matrix_fixed<double,4,4> lps2ras;
+  lps2ras.set_identity();
+  lps2ras.put(0,0,-1);
+  lps2ras.put(1,1,-1);
+
+  vxl2ras = (lps2ras*rotMat)*scaleMat;
   
+  // PW 2012/10/03: Calculating offset to center of k-space
+  // See http://www.nmr.mgh.harvard.edu/~rudolph/software/vox2ras/download/vox2ras_ksolve.html
+  // With a slight modification.  Since info.dPos.. is the offset to slice #zero, we don't need to traverse
+  // in the slice direction (we are already there) only in the phase encode and readout directions
+  // This should probably tested with a few more volumes (and definitly with patient orientations other
+  // than HFS)
+  vnl_matrix_fixed<double,3,1> Vc_x = vxl2ras.extract(3,1,0,0);
+  vnl_matrix_fixed<double,3,1> Vc_y = vxl2ras.extract(3,1,0,1);
+  vnl_matrix_fixed<double,3,1> Vc_z = vxl2ras.extract(3,1,0,2);
+  vnl_matrix_fixed<double,3,1> Vc_Ps;
+  double xoff = info.nLin / 2.0;
+  double yoff = info.nCol / 2.0;
+  //double zoff = info.iMosaicGridSize / 2.0;
+  Vc_Ps.put(0,0, info.dPosSag);
+  Vc_Ps.put(1,0, info.dPosCor);
+  Vc_Ps.put(2,0, info.dPosTra);
+  vnl_matrix_fixed<double,3,1> Vc_Pe1 = lps2ras.extract(3,3)*(Vc_Ps + (xoff*Vc_x + yoff*Vc_y));
+  vnl_matrix_fixed<double,3,1> Vc_Pe2 = lps2ras.extract(3,3)*(Vc_Ps - (xoff*Vc_x + yoff*Vc_y));
+  vxl2ras.put(0,3, Vc_Pe1.get(0,0));
+  vxl2ras.put(1,3, Vc_Pe1.get(1,0));
+  vxl2ras.put(2,3, Vc_Pe2.get(2,0));
 
   // debugging
-    cout << "scale" << endl;
-    printVnl44Mat(scaleMat);
-  //
-    cout << "rot" << endl;
-    printVnl44Mat(rotMat);
-  //
-    cout << "xform" << endl;
-    printVnl44Mat(vxl2ras);
+  //cout << "scale" << endl;
+  //printVnl44Mat(scaleMat);
+  //cout << "rot" << endl;
+  //printVnl44Mat(rotMat);  
+  //cout << "vxl2ras" << endl;
+  //printVnl44Mat(vxl2ras);
 
   // build RAS 2 REF transformation matrix
+  // PW 2012/10/12 TODO!
   ras2ref.set_identity();
 
   // image info
@@ -454,13 +496,10 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   ti = info.dTI;
   triggerTime = info.dTriggerTime;
 
-
-
   // actual acquision info parms
   time = siemensTime2ACE_Date_Time(info.chAcquisitionTime);
   refFrameTime = siemensTime2ACE_Date_Time(info.chframeOfReference);
   reconDelay = info.dTimeDelay;
-
 
   // scanner online post-processing parms
   distCorrect2D = false;

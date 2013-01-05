@@ -1,5 +1,5 @@
 ##########################################################################
-# 
+#
 # master makefile for the real-time fMRI system murfi
 #
 # Oliver Hinds <ohinds@mit.edu> 2007-08-14
@@ -22,7 +22,7 @@ export APP = 0
 export FRONTEND = 0
 export OLDFRONTEND = 1
 
-# directories 
+# directories
 export SRC_DIR = $(PWD)/src
 export FSRC_DIR = $(PWD)/src/frontend
 export BIN_DIR = $(PWD)/bin
@@ -35,7 +35,7 @@ DEBUG = 1
 PROF = 0
 OPTIM = 0
 STRIP = 0
-BLANK := 
+BLANK :=
 
 # for memory leak tracing
 MTRACE = 0
@@ -53,7 +53,7 @@ SUB_DIRS = executive \
 	   frontend
 
 ifeq ($(OLDFRONTEND),1)
-  SUB_DIRS += display 
+  SUB_DIRS += display
 endif
 
 
@@ -184,7 +184,7 @@ SVM_LIB=$(SVM_HOME)/src/*.o \
 	$(SVM_HOME)/svm-multiclass/svm_light/svm_learn.o \
 	$(SVM_HOME)/svm-multiclass/svm_light/svm_hideo.o \
 	$(SVM_HOME)/svm-multiclass/svm_struct/svm_struct_learn.o \
-	$(SVM_HOME)/svm-multiclass/svm_struct/svm_struct_common.o 
+	$(SVM_HOME)/svm-multiclass/svm_struct/svm_struct_common.o
 
 
 # boost
@@ -275,7 +275,7 @@ C_FLAGS = -Wall \
 	$(DEBUG_FLAG) \
 	$(OPTIM_FLAG) \
 	$(STRIP_FLAG) \
-	$(C_INC) 
+	$(C_INC)
 
 C_LIB = $(MATH_LIB) \
 	$(SVM_LIB) \
@@ -296,7 +296,7 @@ endif
 ifeq ($(FRONTEND),1)
 	FRONT_DIR = $(SRC_DIR)/frontend/
 	FRONT_SUB_DIRS = \
-	        Actors \
+                Actors \
 		Commands \
 		Commands/MaskCommands \
 		Controllers \
@@ -337,38 +337,38 @@ OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
 default: $(PROJECT)
 all:     $(PROJECT)
 
-install: 
+install:
 	install $(INSTALL_BINARY) $(INSTALL_DIR)
 
-debug:	 
+debug:
 	$(MAKE) DEBUG=1 OPTIM=0 STRIP=0 $(subst debug,$(BLANK),$(MAKECMDGOALS))
 
-profile:	 
+profile:
 	$(MAKE) DEBUG=1 PROF=1 OPTIM=0 STRIP=0 $(PROJECT)
 
-dirs: 
+dirs:
 	mkdir -p $(OBJ_DIR)
 	mkdir -p $(BIN_DIR)
 
 $(PROJECT): dirs $(OBJ_FILES)
 	@$(ECHO) 'make: building $@ for $(OS)...'
 	cd $(SRC_DIR) && $(MAKE)
-	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS) 
+	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS)
 	@$(ECHO) '############################################'
 	@$(ECHO) 'make: built [$@] successfully!'
 	@$(ECHO) '############################################'
 
 # make the project with frontend support
-front: 
+front:
 	$(MAKE) FRONTEND=1 go_front
 
 
 # make the project with frontend support
-go_front: 
+go_front:
 	@$(ECHO) 'make: building $@ for $(OS)...'
-	cd $(SRC_DIR) && $(MAKE) 
+	cd $(SRC_DIR) && $(MAKE)
 	cd $(SRC_DIR)/frontend && $(MAKE) front
-	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS) 
+	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS)
 	@$(ECHO) '############################################'
 	@$(ECHO) 'make: built [$@] successfully!'
 	@$(ECHO) '############################################'
@@ -387,4 +387,4 @@ clean:
 ### mode: makefile
 ### fill-column: 76
 ### comment-column: 0
-### End: 
+### End:

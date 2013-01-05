@@ -15,6 +15,7 @@ RtExternalImageInfo::RtExternalImageInfo()
   dThick(5),
   nCol(256),
   nLin(256),
+  nSli(1),
   lImageDataLength(294912),
   lNumberOfPixels(147456),
   lBytesPerPixel(2),
@@ -93,10 +94,18 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   char trash[TRASHSIZE];
   char *readptr = data;
 
-// DEBUGGING
-//  ofstream of("/tmp/dat.hdr");
-//  of.write(data,len);
+  // PW 2012/11/21: long's are sent as 'uint32_t so read them into a temporary placeholder,
+  //                before casting them to the proper place in the structure
+  //                Ideally, the actual class should change long->uint32_t, but then you'd
+  //                need to hunt down all the references all over the code and cast accordingly
+  int32_t longtemp;
 
+  // DEBUGGING
+  //ofstream of("/tmp/dat.hdr");
+  //of.write(data,len);
+  //of.close();
+  //exit(0);
+  
   // check that we have enough data to read iSizeOfExternalImageInfo
   if(len < 4*CHARSIZE + LONGSIZE + INTSIZE) {
     return;
@@ -105,7 +114,9 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(chID, readptr, 4*CHARSIZE);
   readptr += 4*CHARSIZE;
   
-  memcpy(&lVersion, readptr, LONGSIZE);
+  //memcpy(&lVersion, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lVersion = long(longtemp);
   readptr += LONGSIZE;
 
   memcpy(&iSizeOfRtExternalImageInfo, readptr, INTSIZE);
@@ -131,17 +142,25 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(&nCol, readptr, INTSIZE);
   readptr += INTSIZE;
 
-
   memcpy(&nLin, readptr, INTSIZE);
   readptr += INTSIZE;
 
-  memcpy(&lImageDataLength, readptr, LONGSIZE);
+  memcpy(&nSli, readptr, INTSIZE);
+  readptr += INTSIZE;
+
+  //memcpy(&lImageDataLength, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lImageDataLength = long(longtemp);  
   readptr += LONGSIZE;
 
-  memcpy(&lNumberOfPixels, readptr, LONGSIZE);
+  //memcpy(&lNumberOfPixels, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lNumberOfPixels = long(longtemp);  
   readptr += LONGSIZE;
 
-  memcpy(&lBytesPerPixel, readptr, LONGSIZE);
+  //memcpy(&lBytesPerPixel, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lBytesPerPixel = long(longtemp);
   readptr += LONGSIZE;
 
   memcpy(trash, readptr, INTSIZE);
@@ -275,18 +294,23 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(chAcquisitionTime, readptr, ACQUISITION_TIME_LEN*CHARSIZE);
   readptr += ACQUISITION_TIME_LEN*CHARSIZE;
   
-  memcpy(&lSliceIndex, readptr, LONGSIZE);
+  //memcpy(&lSliceIndex, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lSliceIndex = long(longtemp);
   readptr += LONGSIZE;
   
-  memcpy(&lNumTrackCha, readptr, LONGSIZE);
+  //memcpy(&lNumTrackCha, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lNumTrackCha = long(longtemp);
   readptr += LONGSIZE;
   
-  memcpy(&lCurrentTrackCha, readptr, LONGSIZE);
+  //memcpy(&lCurrentTrackCha, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lCurrentTrackCha = long(longtemp);
   readptr += LONGSIZE;
 
   memcpy(trash, readptr, 3);
   readptr += 3;
-
 
   memcpy(&iWindowCenter, readptr, INTSIZE);
   readptr += INTSIZE;
@@ -297,8 +321,9 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(chImageTypeValue4, readptr, _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
   readptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
 
-
-  memcpy(&lAbsTablePosition, readptr, LONGSIZE);
+  //memcpy(&lAbsTablePosition, readptr, LONGSIZE);
+  memcpy(&longtemp, readptr, LONGSIZE);
+  lAbsTablePosition = (long)longtemp;
   readptr += LONGSIZE;
 
   memcpy(chframeOfReference, readptr, FOR_ARRAY_LEN*CHARSIZE);
@@ -353,8 +378,10 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
   memcpy(writeptr, &nCol, INTSIZE);
   writeptr += INTSIZE;
 
-
   memcpy(writeptr, &nLin, INTSIZE);
+  writeptr += INTSIZE;
+
+  memcpy(writeptr, &nSli, INTSIZE);
   writeptr += INTSIZE;
 
   memcpy(writeptr, &lImageDataLength, LONGSIZE);
@@ -543,7 +570,7 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
 // print info about a received image
 //  in
 //   info:   the last read image info struct
-void RtExternalImageInfo::displayImageInfo() {
+void RtExternalImageInfo::displayImageInfo() const {
   char myID[5];
   memcpy (myID, chID, 4);
   myID[4] = '\0';
@@ -554,32 +581,37 @@ void RtExternalImageInfo::displayImageInfo() {
   //cout << "Patient position:"  << chPatientPosition << endl;
   cout << "-----------------------------" << endl;
   //cout << "Sequence name : " << cSequenceName << endl;
-  cout << "ID -->" << myID << "<-- Version" << lVersion << endl;
-  cout << "nlin / ncol / FOVread / FOVphase  = " << nLin << " / " << nCol << " / " << dFOVread << " / " << dFOVphase << endl;
-  cout << "Slice Thickness                   = " << dThick << endl;
-  cout << "Slice Position Sag / Cor / Tra    = " << dPosSag << " / " << dPosCor << " / " << dPosTra << endl;
-  cout << "Slice Normal   Sag / Cor / Tra    = " << dNorSag << " / " << dNorCor << " / " << dNorTra << endl;
-  cout << "Slice Phase En Sag / Cor / Tra    = " << dPhaSag << " / " << dPhaCor << " / " << dPhaTra << endl;
-  cout << "Slice Row Vect Sag / Cor / Tra    = " << dRowSag << " / " << dRowCor << " / " << dRowTra << endl;
-  cout << "Slice Col Vect Sag / Cor / Tra    = " << dColSag << " / " << dColCor << " / " << dColTra << endl;
-  cout << "isMoCo                            = " << bIsMoCo << endl;
-  cout << "numMosaicImages / mosaicGridSize  = " << iNoOfImagesInMosaic << " / " << iMosaicGridSize << endl;
-  cout << "seriesInstanceUID                 = " << cSeriesInstanceUID << endl;
-  cout << "iAcqNo / TimeAfterStart / TrigTi  = " << iAcquisitionNumber << " / " << dTimeAfterStart << " / " << dTriggerTime << endl;
-  cout << "TE / TR / TI                      = " << dTE << " / " << dTR << " / " << dTI << endl;
-  cout << "AcquisitionDate                   = " << chAcquisitionDate << endl;
-  cout << "AcquisitionTime                   = " << chAcquisitionTime << endl;
-  cout << "Number of pixels / dataLength     = " << lNumberOfPixels   << " / " << lImageDataLength << endl;
-  cout << "Bytes per pixel                   = " << lBytesPerPixel << endl;
-  cout << "Current Slice Index               = " << lSliceIndex <<  endl;
-  cout << "Window Width                      = " << iWindowWidth << endl;
-  cout << "Window Center                     = " << iWindowCenter << endl;
-  cout << "Trigger Time                      = " << dTriggerTime << endl;
-  cout << "ImageTypeValue4[0]                = " << chImageTypeValue4[0] << endl;
-  cout << "AbsTablePosition                  = " << lAbsTablePosition << endl;
-  cout << "Data Source                       = " << iDataSource << endl;
-  cout << "Frame Of Reference                = " << chframeOfReference << endl;
-  cout << "Time Delay                        = " << dTimeDelay << endl;
+  cout << "sID:                                    " << myID << endl
+       << "lVersion:                               " << lVersion << endl
+       << "nlin / ncol / nsli / FOVread / FOVphase " << nLin << " / " << nCol << " / " << nSli << " / " << dFOVread << " / " << dFOVphase << endl
+       << "Slice Thickness                         " << dThick << endl
+       << "Slice Position Sag / Cor / Tra          " << dPosSag << " / " << dPosCor << " / " << dPosTra << endl
+       << "Slice Normal   Sag / Cor / Tra          " << dNorSag << " / " << dNorCor << " / " << dNorTra << endl
+       << "Slice Phase En Sag / Cor / Tra          " << dPhaSag << " / " << dPhaCor << " / " << dPhaTra << endl
+       << "Slice Row Vect Sag / Cor / Tra          " << dRowSag << " / " << dRowCor << " / " << dRowTra << endl
+       << "Slice Col Vect Sag / Cor / Tra          " << dColSag << " / " << dColCor << " / " << dColTra << endl
+       << "isMoCo                                  " << bIsMoCo << endl
+       << "MoCoTrans        X / Y / Z              " << dMoCoTransX << " / " << dMoCoTransY << " / " << dMoCoTransZ << endl
+       << "MoCoRot          X / Y / Z              " << dMoCoRotX << " / " << dMoCoRotY << " / " << dMoCoRotZ << endl
+       << "numMosaicImages / mosaicGridSize        " << iNoOfImagesInMosaic << " / " << iMosaicGridSize << endl
+       << "seriesInstanceUID                       " << cSeriesInstanceUID << endl
+       << "AcqNo / TimeAfterStart / TrigTi         " << iAcquisitionNumber << " / " << dTimeAfterStart << " / " << dTriggerTime << endl
+       << "TE / TR / TI                            " << dTE << " / " << dTR << " / " << dTI << endl
+       << "AcquisitionDate                         " << chAcquisitionDate << endl
+       << "AcquisitionTime                         " << chAcquisitionTime << endl
+       << "Header Size                             " << iSizeOfRtExternalImageInfo << endl
+       << "Number of pixels / dataLength           " << lNumberOfPixels   << " / " << lImageDataLength << endl
+       << "Bytes per pixel                         " << lBytesPerPixel << endl
+       << "Current Slice Index                     " << lSliceIndex <<  endl
+       << "Window Width                            " << iWindowWidth << endl
+       << "Window Center                           " << iWindowCenter << endl       
+       << "ImageTypeValue4[0]                      " << chImageTypeValue4[0] << endl
+       << "AbsTablePosition                        " << lAbsTablePosition << endl
+       << "Data Source                             " << iDataSource << endl
+       << "Frame Of Reference                      " << chframeOfReference << endl
+       << "Time Delay                              " << dTimeDelay << endl
+       << "SwapReadPhase                           " << bSwapReadPhase << endl
+       << "SliceIndex                              " << lSliceIndex << endl;
   /*
     for  (int i = 0; i < (sizeof(m_mylReserved)/sizeof(long)); i++)
     {

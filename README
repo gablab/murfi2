@@ -1,8 +1,6 @@
 # README for a software system supporting real-time fMRI experiments.
 #
-# Oliver Hinds <oph@bu.edu> 2007-08-21
-# Last Updated: $Date: 2007-08-21 09:25:46 -0400 (Tue, 21 Aug 2007) $
-# Latest Version: 0.15
+# Oliver Hinds <ohinds@mit.edu> 2013-01-06
 
 __________________________________________________________________________
 
@@ -20,8 +18,3 @@ __________________________________________________________________________
 Questions and comments can be directed to Oliver Hinds <ohinds@mit.edu>.
 
 __________________________________________________________________________
-$Id$
-
- LocalWords:  CVCNS README surfCon neuroscientific MRI MATLAB Geomview JPEG VTK
- LocalWords:  PNM PPM MGH jpg demofiles txt pos Ctrl gyrus numlock lesioned oph
- LocalWords:  Exp VolumeProcessingLibrary DICOM ie jpeg alt Unselect OBJ obj

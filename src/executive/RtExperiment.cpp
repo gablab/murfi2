@@ -1,8 +1,8 @@
 /******************************************************************************
- * definition of a class that holds information about the loaded experiment 
+ * definition of a class that holds information about the loaded experiment
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-09-02 
- * 
+ * Oliver Hinds <ohinds@mit.edu> 2008-09-02
+ *
  *****************************************************************************/
 
 #include"RtExperiment.h"
@@ -11,21 +11,8 @@
 #include"RtConfigFmriExperiment.h"
 #include"RtConfigFmriRun.h"
 
-// app includes
-#ifdef USE_APP
-  #include"RtQtWindow.h"
-#endif
-
-// frontend gui includes
-#ifdef USE_FRONTEND
- #include"FrApplication.h"
- #include"FrMainWindow.h"
- #include"FrMainDocument.h"
- #include"FrMainController.h"
-#endif
-
 // old gui includes
-#ifdef USE_OLDFRONTEND
+#ifdef USE_FRONTEND
     #include"RtDisplayImage.h"
 #endif
 
@@ -70,7 +57,7 @@ static RtConductor *conductor = NULL;
 
 // raw data identifiers that we've seen (need for knowing which data
 // streams are novel)
-static map<string, unsigned int> uids;  
+static map<string, unsigned int> uids;
 
 // number of unique input data series we've seen
 static unsigned int numExistingSeries;
@@ -96,16 +83,16 @@ unsigned int getExperimentStudyID() {
 }
 
 // get the unique ID number for this image series UID
-// checks if this uid exists 
+// checks if this uid exists
 //  if so returns its index+1
 //  if not adds it to the end and returns the length for the list
 unsigned int getSeriesNumFromUID(char *uid) {
   // serach for the uid
   map<string, unsigned int>::iterator i = uids.find(uid);
-  
+
   unsigned int seriesNum = 0;
 
-  if(i == uids.end()) { // not found 
+  if(i == uids.end()) { // not found
     string s(uid);
     uids[s] = uids.size()+1+numExistingSeries;
     seriesNum = uids.size()+numExistingSeries;
@@ -115,7 +102,7 @@ unsigned int getSeriesNumFromUID(char *uid) {
   }
 
   if(DEBUG_LEVEL & ADVANCED) {
-    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end()) << " series num=" << seriesNum << endl; 
+    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end()) << " series num=" << seriesNum << endl;
   }
 
   return seriesNum;
@@ -131,7 +118,7 @@ unsigned int getNextUniqueSeriesNum() {
       max = (*i).first;
     }
   }
-  
+
   // add "A" to the max string
   string s(max + "A");
   uids[s] = uids.size()+1+numExistingSeries;
@@ -157,12 +144,12 @@ double stopComputeTimer() {
   computeTimer.stop();
   return computeTimer.elapsed_time();
 }
-  
+
 // get the current experiment elapsed time in ms
 double getExperimentElapsedTime() {
   return 1000*experimentTimer.elapsed_time();
 }
-  
+
 // get the configuration for this experiment
 RtConfigFmriExperiment &getExperimentConfig() {
   return config;
@@ -181,7 +168,7 @@ RtDataStore &getDataStore() {
 // initialize the experiment (call before the first run is prepared)
 // returns true for success
 bool initExperiment() {
-  
+
   cout << "intializing experiment" << endl;
 
   // set the start time of the experiment
@@ -223,7 +210,7 @@ bool initExperiment() {
   }
 
   // count existing series for this experiment
-  cout << "searching for existing series... " << endl;  
+  cout << "searching for existing series... " << endl;
   numExistingSeries = -1;
   path p;
   do {
@@ -376,7 +363,7 @@ bool parseArgs(int argc, char **args) {
   // set up short options
   static const ACE_TCHAR options[] = ACE_TEXT (":f:c:s:h?");
   ACE_Get_Opt cmdOpts(argc, args, options, 1, 0,
-		      ACE_Get_Opt::PERMUTE_ARGS, 1);
+                      ACE_Get_Opt::PERMUTE_ARGS, 1);
 
   // set up long options
   cmdOpts.long_option("conffile",   'f', ACE_Get_Opt::ARG_REQUIRED);
@@ -385,10 +372,6 @@ bool parseArgs(int argc, char **args) {
   cmdOpts.long_option("help",       'h', ACE_Get_Opt::NO_ARG);
   cmdOpts.long_option("help",       '?', ACE_Get_Opt::NO_ARG);
 
-// scopic Alan: for MRI testers
-#ifdef MRI_TEST
-    confFilename = "./test_config.xml";
-#else
   // handle options
   for(int option; (option = cmdOpts ()) != EOF; ) {
     if(DEBUG_LEVEL & MODERATE) {
@@ -412,8 +395,8 @@ bool parseArgs(int argc, char **args) {
       return false; // automatically prints usage
 
     case ':':
-      cerr << "ERROR: -" << cmdOpts.opt_opt() 
-	   << " requires an argument" << endl;
+      cerr << "ERROR: -" << cmdOpts.opt_opt()
+           << " requires an argument" << endl;
       return false;
 
     default:
@@ -421,7 +404,6 @@ bool parseArgs(int argc, char **args) {
       return false;
     }
   }
-#endif
 
   // parse the xml config (file or string)
   if(confFilename.empty() && confXmlStr.empty()) {
@@ -436,7 +418,7 @@ bool parseArgs(int argc, char **args) {
   return true;
 }
 
-// main entry function 
+// main entry function
 int ACE_TMAIN(int argc, char **args) {
   ACE_TRACE(("ACE_TMAIN"));
 
@@ -448,52 +430,20 @@ int ACE_TMAIN(int argc, char **args) {
 
   // initialize experiment
   if(!initExperiment()) {
-    cerr << "ERROR: experiment initialization failed. check your config" 
+    cerr << "ERROR: experiment initialization failed. check your config"
 	 << endl;
     return 1;
   }
 
   int result = 0;
 
-  // if the app frontend is being used, give it control
-  if(config.isSet("app:disabled") &&
-     config.get("app:disabled")==false) { 
-
-#ifdef USE_APP
-	RtQtWindow::run(argc, args);
-#else
-    cerr << "ERROR: this build does not support the app frontend" << endl;
-#endif
-  }
   // if the gui frontend is being used, give it control (confused yet?)
-  else if(config.isSet("gui:disabled") &&
-     config.get("gui:disabled")==false) { 
+  if((config.isSet("gui:disabled") &&
+      config.get("gui:disabled")==false) ||
+     (config.isSet("oldgui:disabled") && // "backward" compatibility
+     config.get("oldgui:disabled")==false)) {
 
 #ifdef USE_FRONTEND
-    FrApplication application(argc, args);
-
-    // Create main view and document of app
-    FrMainWindow* mainWindow = new FrMainWindow();
-    FrMainDocument* document = new FrMainDocument();
-
-    // Create main controller.
-    FrMainController controller(mainWindow, document);
-    controller.Initialize();
-
-    int result = 0;
-    if(!application.exec()){
-      result = 1;
-    }
-#else
-    cerr << "ERROR: this build does not support the gui frontend" << endl;
-#endif
-  }
-  else if(config.isSet("oldgui:disabled")
-	  && config.get("oldgui:disabled")==false) { 
-    
-// scopic Alan: old image display was removed from Frontend project on windows
-// ohinds: 2009-05-10 used a makefile flag instead of the win32 define
-#ifdef USE_OLDFRONTEND
     // start a display
     RtDisplayImage dispImg;
     if(!dispImg.open(config)) {
@@ -502,7 +452,7 @@ int ACE_TMAIN(int argc, char **args) {
     }
     result = dispImg.svc();
 #else
-    cerr << "ERROR: this build does not support the old gui frontend" << endl;
+    cerr << "ERROR: this build does not support the gui frontend" << endl;
 #endif
 
   }
@@ -527,12 +477,10 @@ int ACE_TMAIN(int argc, char **args) {
 
   // deinitialize experiment
   if(!deinitExperiment()) {
-    cerr << "ERROR: experiment deinitialization failed." 
-	 << endl;
+    cerr << "ERROR: experiment deinitialization failed."
+         << endl;
     result = 1;
   }
 
   return result;
 }
-
-

@@ -56,12 +56,6 @@
 </scanner>
 
 <gui>
-
-  <option name="disabled">true</option>
-
-</gui>
-
-<oldgui>
     <option name="disabled">     false </option>
 
     <option name="winX">         300 </option>
@@ -85,7 +79,7 @@
     <option name="negActivationSumID"> data.image.activation.activation-sum </option>
     <option name="negActivationSumRoiID"> deactive </option>
 
-</oldgui>
+</gui>
 
 <infoserver>
   <option name="disabled"> false </option>
@@ -106,7 +100,7 @@
          and the data store -->
     <option name="roiID"> roi1 </option>
 
-    <!-- filename to load the mask from relative to subject mask directory 
+    <!-- filename to load the mask from relative to subject mask directory
 	 (if present, overrides generation parms below) -->
     <option name="filename"> active_mask.nii </option>
 
@@ -208,9 +202,9 @@
     <option name="disabled"> false </option>
 
     <output>display</output>
-    
+
     <option name="disabled"> false </option>
-    
+
 
     <!-- design matrix -->
     <design>
@@ -224,14 +218,14 @@
            will repeat that pattern until the end of the scan. -->
       <option name="condition" conditionName="descriptive_name_1">
 	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0 
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
+	0 0 0 0 0 0 0 0
       </option>
 
       <option name="condition" conditionName="descriptive_name_2">
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
 	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
       </option>
 
       <!-- number of trs to shift start of experiment by. this is
@@ -261,7 +255,7 @@
       <!-- filename from which to load a custom hrf (overrides cannonical) -->
       <option name="hrfFilename"> unset </option>
 
-      
+
       <!-- parameters specifying nuisance basis functions -->
 
       <!-- trend regressors will be added up to the order specified here -->
@@ -269,7 +263,7 @@
 
       <!-- model subject head motion -->
       <option name="modelMotionParameters"> false </option>
-      
+
       <!-- model temporal derivatives of neural conditions -->
       <option name="modelTemporalDerivatives"> false </option>
 
@@ -286,18 +280,18 @@
            estimation a lil, specifying too few will result in
            unmodeled events. count proper.  -->
       <option name="maxNumEvents"> 0 </option>
-      
+
       <!-- duration of each event (tr) -->
       <option name="eventDuration"> 0 </option>
 
-      
+
       <!-- these nuisance regressors model artifacts in the image
            timeseries. -->
       <option name="modelArtifacts"> false </option>
       <option name="maxNumArtifacts"> 0 </option>
 
     </design>
-    
+
   </module>
 
 
@@ -313,9 +307,9 @@
 
     <!-- contrast vector via condition name/weight pairs -->
     <contrastVector contrastName="descriptive_name" type="pairs">
-      <weight condition="condition1"> 0.5 </weight> 
-      <weight condition="condition2"> -1.0 </weight> 
-      <weight condition="condition3"> 0.5 </weight> 
+      <weight condition="condition1"> 0.5 </weight>
+      <weight condition="condition2"> -1.0 </weight>
+      <weight condition="condition3"> 0.5 </weight>
     </contrastVector>
 
 
@@ -326,12 +320,12 @@
 
     <option name="saveTVol">1</option>
     <option name="saveTVolName">mask/active_t.nii</option>
-    
+
     <option name="savePosAsMask">1</option>
     <option name="saveNegAsMask">1</option>
     <option name="savePosAsMaskFilename">mask/active_mask.nii</option>
     <option name="saveNegAsMaskFilename">mask/background_mask.nii</option>
-    
+
   </module>
 
   <!-- deviation of voxel intensity from expected value  -->
@@ -344,7 +338,7 @@
     <option name="baselineThreshold">0.00001</option>
 
     <option name="maskRoiID">active</option>
-    
+
     <option name="dumpAlgoVars">false</option>
     <option name="dumpAlgoVarsFilename">log/algovars.txt</option>
 
@@ -361,14 +355,14 @@
            will repeat that pattern until the end of the scan. -->
       <option name="condition" conditionName="descriptive_name_1">
 	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0 
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
+	0 0 0 0 0 0 0 0
       </option>
 
       <option name="condition" conditionName="descriptive_name_2">
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
 	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
       </option>
 
       <!-- number of trs to shift start of experiment by. this is
@@ -398,7 +392,7 @@
       <!-- filename from which to load a custom hrf (overrides cannonical) -->
       <option name="hrfFilename"> unset </option>
 
-      
+
       <!-- parameters specifying nuisance basis functions -->
 
       <!-- trend regressors will be added up to the order specified here -->
@@ -406,7 +400,7 @@
 
       <!-- model subject head motion -->
       <option name="modelMotionParameters"> false </option>
-      
+
       <!-- model temporal derivatives of neural conditions -->
       <option name="modelTemporalDerivatives"> false </option>
 
@@ -423,11 +417,11 @@
            estimation a lil, specifying too few will result in
            unmodeled events. count proper.  -->
       <option name="maxNumEvents"> 0 </option>
-      
+
       <!-- duration of each event (tr) -->
       <option name="eventDuration"> 0 </option>
 
-      
+
       <!-- these nuisance regressors model artifacts in the image
            timeseries. -->
       <option name="modelArtifacts"> false </option>
@@ -435,7 +429,7 @@
 
     </design>
 
-    
+
   </module>
 
 
@@ -462,14 +456,14 @@
            will repeat that pattern until the end of the scan. -->
       <option name="condition" conditionName="descriptive_name_1">
 	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0 
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
+	0 0 0 0 0 0 0 0
       </option>
 
       <option name="condition" conditionName="descriptive_name_2">
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
 	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0 
+	0 0 0 0 0 0 0 0
       </option>
 
       <!-- number of trs to shift start of experiment by. this is
@@ -499,7 +493,7 @@
       <!-- filename from which to load a custom hrf (overrides cannonical) -->
       <option name="hrfFilename"> unset </option>
 
-      
+
       <!-- parameters specifying nuisance basis functions -->
 
       <!-- trend regressors will be added up to the order specified here -->
@@ -507,7 +501,7 @@
 
       <!-- model subject head motion -->
       <option name="modelMotionParameters"> false </option>
-      
+
       <!-- model temporal derivatives of neural conditions -->
       <option name="modelTemporalDerivatives"> false </option>
 
@@ -524,11 +518,11 @@
            estimation a lil, specifying too few will result in
            unmodeled events. count proper.  -->
       <option name="maxNumEvents"> 0 </option>
-      
+
       <!-- duration of each event (tr) -->
       <option name="eventDuration"> 0 </option>
 
-      
+
       <!-- these nuisance regressors model artifacts in the image
            timeseries. -->
       <option name="modelArtifacts"> false </option>
@@ -617,4 +611,3 @@
 
 
 </processor>
-

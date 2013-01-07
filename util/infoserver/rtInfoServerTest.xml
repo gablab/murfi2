@@ -10,23 +10,23 @@
     <subject>
         <option name="name">example_data</option>
     </subject>
-    
-    
+
+
     <terminal>
         <option name="verbose"> true </option>
         <option name="debug"> false </option>
     </terminal>
-    
+
     <log>
         <option name="filename"> log.rtl </option>
         <option name="disabled"> false </option>
     </log>
-    
+
     <errlog>
         <option name="filename"> log.rtl </option>
         <option name="disabled"> false </option>
     </errlog>
-    
+
 </study>
 
 <!-- setup for connecting to and receiving images from the MRI scanner -->
@@ -36,16 +36,16 @@
     <option name="receiveImages"> true </option>
     <option name="saveImages">    false </option>
     <option name="print"> true </option>
-    
-    
+
+
     <!-- acquisition type -->
     <option name="imageType">     epi </option>
-    
+
     <!-- receiving parameters -->
     <option name="port">          15000 </option>
     <option name="onlyReadMoco">  true </option>
     <option name="unmosaic">      true </option>
-    
+
     <!-- acquistion parameters -->
     <option name="tr"> 3.0 </option>
     <option name="measurements">   85  </option>
@@ -54,23 +54,19 @@
     <option name="voxdim1">       3.4375 </option>
     <option name="voxdim2">       3.4375 </option>
     <option name="voxdim3">       4.0  </option>
-    
+
 </scanner>
 
 <gui>
-    <option name="disabled"> true </option>
-</gui>
-
-<oldgui>
     <option name="disabled">     true </option>
-    
+
     <option name="winX">         300 </option>
     <option name="winY">         0 </option>
     <option name="winW">         1000 </option>
     <option name="winH">         1000 </option>
-    
+
     <option name="displayType">  mosaic </option>
-    
+
     <!--     <option name="posOverlayID"> contrast-img_sensory </option> -->
     <option name="posOverlayID"> activation-img </option>
     <!--     <option name="posOverlayID"> beta-img_on </option> -->
@@ -80,48 +76,49 @@
 
     <option name="posMaskID"> mask-img </option>
     <option name="posMaskRoiID"> active </option>
-    
+
     <option name="posActivationSumID"> roi-weightedave </option>
-<option name="posActivationSumRoiID"> active </option></oldgui>
+    <option name="posActivationSumRoiID"> active </option>
+</gui>
 
 <infoserver>
-    
+
     <option name="disabled"> false </option>
     <option name="port"> 15001 </option>
     <option name="posActivationDataID"> active </option>
-    
+
 </infoserver>
 
 <infoclient>
-    
+
     <option name="disabled"> true </option>
     <option name="localPort"> 15002 </option>
     <option name="remoteHost"> localhost </option>
     <option name="remotePort"> 15003 </option>
-    
+
 </infoclient>
 
 <!-- processing steps -->
 <processor>
     <!--   <output>display</output> -->
     <option name="disabled"> false </option>
-    
+
     <module name="mosaic">
         <option name="disabled"> false </option>
         <output>display</output>
         <output>log</output>
     </module>
-    
+
     <!-- roi mask loading -->
     <module name="mask-load">
         <option name="disabled"> false </option>
         <option name="makeavail">true</option>
-        
+
         <!-- the roi name this mask can be referenced by in later modules
          and the data store -->
         <option name="roiID"> active </option>
-        
-        <!-- filename to load the mask from relative to subject mask directory 
+
+        <!-- filename to load the mask from relative to subject mask directory
 	 (if present, overrides generation parms below) -->
         <option name="filename"> sm </option>
         <!--     <option name="filename"> one_voxel </option> -->
@@ -129,52 +126,52 @@
         <!-- whether to align the mask to the series reference after
          reading it in -->
         <option name="align"> false </option>
-        
+
         <!-- whether to unmosaic the mask after reading it in -->
         <option name="unmosaic"> false </option>
-        
+
         <!-- whether to mosaic the mask after reading it in -->
         <option name="mosaic"> false </option>
-        
+
         <!-- whether to flip the mask L/R after reading it in -->
         <option name="flipLR"> false </option>
-        
+
         <!-- whether to update the mask with each incoming image or to
          keep constant over the run -->
         <option name="dynamic"> false </option>
-        
+
         <!-- whether to save the mask to a file (good idea) -->
         <option name="save"> true </option>
     </module>
-    
-    
-    
+
+
+
     <module name="mask-gen">
         <option name="disabled"> false </option>
         <option name="makeavail">true</option>
-        
+
         <!-- the roi name this mask can be referenced by in later modules
          and the data store -->
         <option name="roiID"> brain </option>
-        
+
         <!-- threshold at a proportion of the mean image intensity -->
         <option name="threshold"> 0.5 </option>
-        
+
         <!-- whether to use FSL's brain extraction tool (bet) to find the mask -->
         <option name="useBet"> false </option>
-        
+
         <!-- command line paramters to use for bet -->
         <option name="betParms">-f 0.5 -g 0 -n -m</option>
-        
+
         <!-- whether to update the mask with each incoming image or to
          keep constant over the run -->
         <option name="dynamic"> false </option>
-        
+
         <!-- whether to save the mask to a file (good idea) -->
         <option name="save"> true </option>
     </module>
-    
-    
+
+
     <!--    <module name="smooth-roi">
         <option name="disabled"> false </option>
         <option name="makeavail"> true </option>
@@ -193,28 +190,28 @@
     <!-- deviation of voxel intensity from expected value  -->
     <module name="incremental-glm">
         <option name="disabled"> false </option>
-        
+
         <option name="makeavail">true</option>
         <output>display</output>
-        
+
         <!--         <option name="maskRoiID">brain</option> -->
         <option name="maskRoiID">brain</option>
-        
+
         <option name="dumpAlgoVars">true</option>
         <option name="dumpAlgoVarsFilename">log/incrglmdump.txt</option>
-        
-        
+
+
         <!-- design matrix -->
         <design>
             <option name="disabled"> false </option>
-            
+
             <option name="loadDesignMatrixFromFile"> true </option>
             <option name="designMatrixFilename"> designmatrix.txt </option>
 
             <!-- whether to pad the rest of the condition with zeros or repeat
             until the end of the scan -->
             <option name="padConditionWithZeros"> false </option>
-            
+
             <!-- parameters specifying neural conditions of interest -->
 
             <!-- each condition should have its own vector of "on" trs as 1s
@@ -225,86 +222,86 @@
                 0 0 0 0 0
                 1 1 1 1 1
             </option>
-            
+
             <option name="conditionShift"> 0 </option>-->
 
             <!-- whether each block should be independently modeled, or
            whether like conditions should be lumped into one regressor -->
             <option name="modelEachBlock"> false </option>
-            
+
             <!-- temporal precision of hrf sampling (s)-->
             <option name="hrfSamplePeriod"> 0.0625 </option>
-            
+
             <!-- length of hrf (s) -->
             <option name="hrfLength"> 32 </option>
-            
+
             <!-- time to positive peak of hrf (s) -->
             <option name="hrfTimeToPeakPos"> 6 </option>
-            
+
             <!-- time to negative peak of hrf (s) -->
             <option name="hrfTimeToPeakNeg"> 16 </option>
-            
+
             <!-- hrf ratio of positive to negative gammas -->
             <option name="hrfPosToNegRatio"> 6 </option>
-            
+
             <!-- filename from which to load a custom hrf (overrides cannonical) -->
             <option name="hrfFilename"> unset </option>
-            
+
             <!-- parameters specifying nuisance basis functions -->
 
             <!-- trend regressors will be added up to the order specified here -->
             <option name="maxTrendOrder"> 1 </option>
-            
+
             <!-- model subject head motion -->
             <option name="modelMotionParameters"> false </option>
-            
+
             <!-- model temporal derivatives of neural conditions -->
             <option name="modelTemporalDerivatives"> false </option>
-            
-            
+
+
             <!-- these nuisance regressors model neural events of no
            interest for your real-time analysis.  for example, in a
            brain state triggering experiment you do not want the
            evoked response from the triggered stimulus to go as
            unaccounted for variance. -->
             <option name="modelEvents"> false </option>
-            
+
             <!-- needed to know how many columns to reserve for the design
            matrix. adding unnecessary columns will slow down
            estimation a lil, specifying too few will result in
            unmodeled events. count proper.  -->
             <option name="maxNumEvents"> 0 </option>
-            
+
             <!-- duration of each event (tr) -->
             <option name="eventDuration"> 0 </option>
-            
-            
+
+
             <!-- these nuisance regressors model artifacts in the image
            timeseries. -->
             <option name="modelArtifacts"> true </option>
             <option name="maxNumArtifacts"> 10 </option>
-            
+
         </design>
     </module>
-    
+
     <!-- compute current activation -->
     <module name="current-activation">
-        
+
         <option name="disabled"> false </option>
         <output>display</output>
         <option name="makeavail">true</option>
-        
+
         <option name="modelFitModuleID"> incremental-glm </option>
         <option name="modelFitRoiID"> brain </option>
         <option name="maskRoiID"> brain </option>
-        
+
         <option name="dumpAlgoVars">false</option>
         <option name="dumpAlgoVarsFilename">log/curactdump.txt</option>
-        
+
         <option name="numDataPointsForErrEst">20</option>
-        
+
     </module>
-    
+
     <!-- compute feedback -->
 
     <module name="roi-combine">
@@ -312,26 +309,26 @@
         <option name="print"> true </option>
         <output>infoserver</output>
         <output>infoclient</output>
-        
+
         <option name="makeavail">true</option>
-        
+
         <option name="method"> weighted-ave </option>
-        
+
         <option name="maskRoiID">active</option>
-        
+
         <option name="inputModuleID"> current-activation </option>
         <option name="inputDataName"> activation-img </option>
         <option name="inputRoiID"> brain </option>
-        
+
         <option name="weightModuleID"> incremental-glm </option>
         <option name="weightDataName"> residual_mse-img </option>
-        
+
     </module>
-    
+
     <module name="dataviewer">
         <option name="disabled"> false </option>
         <option name="print"> false </option>
-        
+
         <!--       <option name="dataid"> -->
         <!--    :*:*:*:*:*:*:*:*: -->
         <!--       </option> -->
@@ -340,5 +337,5 @@
             :*:*:*:*:*:current-activation:activation-img:brain:
         </option>
     </module>
-    
+
 </processor>

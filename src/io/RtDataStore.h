@@ -20,9 +20,6 @@ using namespace std;
 
 // class declaration
 class RtDataStore : public RtOutput  {
-#if USE_FRONTEND // Need to access stuff from frontend
-  friend class FrDataStore;
-#endif
 
 public:
 
@@ -43,7 +40,7 @@ public:
   virtual void setData(RtData *data);
 
   // get data by id
-  // 
+  //
   // NOTE: this function is much more efficient if the requested data is
   // specified fully, i.e. there are no wildcards in the dataID (see
   // RtDataID.h) avoid using wildcards if possible
@@ -57,7 +54,7 @@ public:
   virtual char *getVersionString();
 
   // get a list of the available data in the data store
-  // note: this returns a list of the unique data ids excepting timepoint. 
+  // note: this returns a list of the unique data ids excepting timepoint.
   set<RtDataID>::const_iterator getAvailableData();
 
   protected:
@@ -68,7 +65,7 @@ public:
   // hash map to store pointers to acquired data
   map<RtDataID,RtData*,RtDataIDCompare> store;
 
-  // list of the data ids we currently have in the data 
+  // list of the data ids we currently have in the data
   // store (excepting timepoiint)
   set<RtDataID> availableData;
 
@@ -93,5 +90,3 @@ public:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

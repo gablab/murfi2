@@ -56,10 +56,6 @@
 </scanner>
 
 <gui>
-  <option name="disabled"> true </option>
-</gui>
-
-<oldgui>
     <option name="disabled">     false </option>
 
     <option name="winX">         300 </option>
@@ -75,7 +71,7 @@
     <option name="posMaskID"> mask </option>
     <option name="posMaskRoiID"> brain </option>
 
-</oldgui>
+</gui>
 
 <infoserver>
 
@@ -129,7 +125,7 @@
     <output>display</output>
 
     <option name="maskRoiID">brain</option>
-    
+
     <!-- design matrix -->
     <!-- NOTE: THIS EXAMPLE IS FROM A PPA LOCALIZER, BUT YOU NEED TO
          CHANGE THE CONDITIONS TO REFLECT THE NAMES AND TIMING FOR
@@ -196,7 +192,7 @@
       <!-- filename from which to load a custom hrf (overrides cannonical) -->
       <option name="hrfFilename"> unset </option>
 
-      
+
       <!-- parameters specifying nuisance basis functions -->
 
       <!-- trend regressors will be added up to the order specified here -->
@@ -204,7 +200,7 @@
 
       <!-- model subject head motion -->
       <option name="modelMotionParameters"> false </option>
-      
+
       <!-- model temporal derivatives of neural conditions -->
       <option name="modelTemporalDerivatives"> false </option>
 
@@ -221,11 +217,11 @@
            estimation a lil, specifying too few will result in
            unmodeled events. count proper.  -->
       <option name="maxNumEvents"> 0 </option>
-      
+
       <!-- duration of each event (tr) -->
       <option name="eventDuration"> 0 </option>
 
-      
+
       <!-- these nuisance regressors model artifacts in the image
            timeseries. -->
       <option name="modelArtifacts"> false </option>
@@ -233,7 +229,7 @@
 
     </design>
 
-    
+
   </module>
 
 
@@ -257,8 +253,7 @@
       <weight condition="obj"> -1</weight>
       <weight condition="face"> -1</weight>
     </contrastVector>
-    
+
   </module>
 
 </processor>
-

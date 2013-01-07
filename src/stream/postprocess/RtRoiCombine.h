@@ -11,17 +11,6 @@
 
 #include"RtStreamComponent.h"
 
-// scopic alexsid: #define WIN32
-#ifdef WIN32
-    // MS VS2005 provides _isnan function not isnan
-    // as it is in *nix system. So add this fix.
-    #ifndef isnan
-        #define isnan(x) _isnan(x)
-    #endif
-
-    #define isinf(x) (!_finite(3))
-#endif
-
 // how can we combine the data
 enum RtRoiCombineMethod {
   RT_ROI_UNKNOWN,
@@ -88,11 +77,11 @@ protected:
 
   // data
   RtRoiCombineMethod method;
-  
+
   // if its a weighted average we have to retreive the weights
   string weightsModuleID;
   string weightsDataName;
-  
+
 };
 
 #endif
@@ -105,5 +94,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

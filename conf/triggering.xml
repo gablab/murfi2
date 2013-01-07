@@ -56,10 +56,6 @@
 </scanner>
 
 <gui>
-  <option name="disabled"> true </option>
-</gui>
-
-<oldgui>
     <option name="disabled">     false </option>
 
     <option name="winX">         300 </option>
@@ -81,7 +77,7 @@
     <option name="negMaskID"> mask </option>
     <option name="negMaskRoiID"> neg </option>
 
-</oldgui>
+</gui>
 
 <infoserver>
 
@@ -135,7 +131,7 @@
          and the data store -->
     <option name="roiID"> pos </option>
 
-    <!-- filename to load the mask from relative to subject mask directory 
+    <!-- filename to load the mask from relative to subject mask directory
 	 (if present, overrides generation parms below) -->
     <option name="filename"> pos_mask.nii </option>
 
@@ -169,7 +165,7 @@
          and the data store -->
     <option name="roiID"> neg </option>
 
-    <!-- filename to load the mask from relative to subject mask directory 
+    <!-- filename to load the mask from relative to subject mask directory
 	 (if present, overrides generation parms below) -->
     <option name="filename"> neg_mask.nii </option>
 
@@ -203,7 +199,7 @@
     <output>display</output>
 
     <option name="maskRoiID">brain</option>
-    
+
     <!-- design matrix -->
     <design>
       <option name="disabled"> false </option>
@@ -226,7 +222,7 @@
       <!-- filename from which to load a custom hrf (overrides cannonical) -->
       <option name="hrfFilename"> unset </option>
 
-      
+
       <!-- parameters specifying nuisance basis functions -->
 
       <!-- trend regressors will be added up to the order specified here -->
@@ -234,7 +230,7 @@
 
       <!-- model subject head motion -->
       <option name="modelMotionParameters"> false </option>
-      
+
       <!-- model temporal derivatives of neural conditions -->
       <option name="modelTemporalDerivatives"> false </option>
 
@@ -253,11 +249,11 @@
       <!-- NOTE: YOU MUST COMPUTE THIS AND ENTER IT SPECIFIC TO YOUR
            IMAGING PARAMETERS -->
       <option name="maxNumEvents"> 20 </option>
-      
+
       <!-- duration of each event (tr) -->
       <option name="eventDuration"> 0 </option>
 
-      
+
       <!-- these nuisance regressors model artifacts in the image
            timeseries. -->
       <option name="modelArtifacts"> false </option>
@@ -265,7 +261,7 @@
 
     </design>
 
-    
+
   </module>
 
 
@@ -280,7 +276,7 @@
     <option name="maskRoiID"> brain </option>
 
     <option name="numDataPointsForErrEst"> 20 </option>
-    
+
   </module>
 
   <!-- compute feedback -->
@@ -305,4 +301,3 @@
   </module>
 
 </processor>
-

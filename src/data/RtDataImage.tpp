@@ -1,8 +1,8 @@
 /******************************************************************************
  * template class definition for a data image
- * 
- * Oliver Hinds <ohinds@mit.edu> 2008-09-03 
- * 
+ *
+ * Oliver Hinds <ohinds@mit.edu> 2008-09-03
+ *
  *****************************************************************************/
 
 #include"ace/Log_Msg.h"
@@ -14,14 +14,14 @@ using namespace std;
 // default constructor
 template<class T>
 RtDataImage<T>::RtDataImage() : RtData(),
-				magicNumber(MAGIC_NUMBER),
-				filename(""),
-				alignOnRead(false),
-				mosaicOnRead(false),
-				unMosaicOnRead(false),
-				flipLROnRead(false),
-				imgDataLen(0),
-				numPix(0) {
+        magicNumber(MAGIC_NUMBER),
+        filename(""),
+        alignOnRead(false),
+        mosaicOnRead(false),
+        unMosaicOnRead(false),
+        flipLROnRead(false),
+        imgDataLen(0),
+        numPix(0) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage()"));
 
   //addToID("image");
@@ -40,15 +40,15 @@ RtDataImage<T>::RtDataImage() : RtData(),
 // constructor that accepts a filename to read an image from
 template<class T>
 RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
-						      magicNumber(MAGIC_NUMBER),
-						      filename(""),
-						      alignOnRead(false),
-						      mosaicOnRead(false),
-						      unMosaicOnRead(false),
-						      flipLROnRead(false),
-						      imgDataLen(0),
-						      numPix(0),
-						      bytesPerPix(sizeof(unsigned short)) {
+                  magicNumber(MAGIC_NUMBER),
+                  filename(""),
+                  alignOnRead(false),
+                  mosaicOnRead(false),
+                  unMosaicOnRead(false),
+                  flipLROnRead(false),
+                  imgDataLen(0),
+                  numPix(0),
+                  bytesPerPix(sizeof(unsigned short)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
   isMosaiced = false;
@@ -284,7 +284,7 @@ bool RtDataImage<T>::writeRaw(const string &_filename) {
 
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for writing an image\n"),
-				  _filename));
+          _filename));
     imgFile.close();
     return false;
   }
@@ -467,7 +467,7 @@ bool RtDataImage<T>::read(const string &_filename) {
   if(suc && flipLROnRead) {
     flipLR();
   }
-  
+
   return suc;
 }
 
@@ -505,7 +505,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
 
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for reading an image\n"),
-				  _filename));
+          _filename));
     imgFile.close();
     return false;
   }
@@ -515,7 +515,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     // read the image info
     if(!readInfo(imgFile)) {
       ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image info from %s\n"),
-		 _filename));
+     _filename));
       imgFile.close();
       return false;
     }
@@ -529,7 +529,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     // read the image data
     if(!readData(imgFile)) {
       ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image data from %s\n"),
-		 _filename));
+     _filename));
       imgFile.close();
       return false;
     }
@@ -559,15 +559,15 @@ bool RtDataImage<T>::readNiftiHeader(const string &_filename) {
   nifti_image *img = nifti_image_read(_filename.c_str(), 0);
   if(img == NULL) {
     cerr << "could not open " << _filename << " for reading a nifti image"
-	 << endl; 
+   << endl;
     return false;
   }
 
   // validate the datatype
   if(img->nbyper != sizeof(T)) {
     cerr << _filename << " has " << img->nbyper
-	 << " bytes/voxel but i was expecting " << sizeof(T)
-	 << endl;
+   << " bytes/voxel but i was expecting " << sizeof(T)
+   << endl;
     return false;
   }
 
@@ -579,7 +579,7 @@ bool RtDataImage<T>::readNiftiHeader(const string &_filename) {
   lock(); {
     // transform nifti header into our image info struct
     setInfo(img);
-  } unlock(); 
+  } unlock();
 
   nifti_image_free(img);
 
@@ -599,15 +599,15 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
   nifti_image *img = nifti_image_read(_filename.c_str(), 0);
   if(img == NULL) {
     cerr << "could not open " << _filename << " for reading a nifti image"
-	 << endl; 
+   << endl;
     return false;
   }
 
   // validfate the datatype
   if(img->nbyper != sizeof(T)) {
     cerr << _filename << " has " << img->nbyper
-	 << " bytes/voxel but i was expecting " << sizeof(T)
-	 << endl;
+   << " bytes/voxel but i was expecting " << sizeof(T)
+   << endl;
     return false;
   }
 
@@ -636,9 +636,8 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
 
   }  unlock();
 
-  // SCOPIC added to fix memory leakage  
   nifti_image_free(img);
-    
+
   // store filename if its not set
   if(filename.empty()) {
     filename = _filename;
@@ -783,7 +782,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   // info
   hdr->iname_offset = 348;
   hdr->swapsize = 0;
-  //hdr->analyze75_orient = a75_transverse_unflipped; 
+  //hdr->analyze75_orient = a75_transverse_unflipped;
 
   // filename
   hdr->fname = (char*) malloc((filename.length()+1)*sizeof(char));
@@ -793,7 +792,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 
   // dims
   hdr->ndim = (dims.size() >= 4) ? dims.size() : 4;
-  
+
   hdr->dim[0] = hdr->ndim;
   for(int ind = 1; ind < 8; ind++) {
     hdr->dim[ind] = 1;
@@ -877,7 +876,7 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
   }
 
   hdr->sform_code = 1;
-  hdr->qform_code = 0; 
+  hdr->qform_code = 0;
   hdr->quatern_b = 0;
   hdr->quatern_c = 0;
   hdr->quatern_d = 0;
@@ -925,9 +924,9 @@ bool RtDataImage<T>::flipLR() {
 
     for(unsigned int row = 0; row < getNumPix()/matrixSize; row++) {
       for(unsigned int j = 0, begInd = row*matrixSize; j < matrixSize/2; j++) {
-	T tmp = data[begInd+j];
-	data[begInd+j] = data[begInd+matrixSize-1-j];
-	data[begInd+matrixSize-1-j] = tmp;
+  T tmp = data[begInd+j];
+  data[begInd+j] = data[begInd+matrixSize-1-j];
+  data[begInd+matrixSize-1-j] = tmp;
       }
     }
 
@@ -943,13 +942,13 @@ bool RtDataImage<T>::unmosaic() {
   // validate
   if(!seemsMosaic()) { // dims
     cerr << "can't unmosaic an image that seemsMosaic()"
-	 << endl;
+   << endl;
     return false;
   }
 
   if(matrixSize == 0) { // matrix size set
     cerr << "can't unmosaic an image if i don't know the matrix size"
-	 << endl;
+   << endl;
     return false;
   }
 
@@ -967,13 +966,13 @@ bool RtDataImage<T>::unmosaicUnlocked() {
   // validate
   if(!seemsMosaic()) { // dims
     cerr << "can't unmosaic an image that seemsMosaic()"
-	 << endl;
+   << endl;
     return false;
   }
 
   if(matrixSize == 0) { // matrix size set
     cerr << "can't unmosaic an image if i don't know the matrix size"
-	 << endl;
+   << endl;
     return false;
   }
 
@@ -996,7 +995,6 @@ bool RtDataImage<T>::unmosaicUnlocked() {
   }
 
   // build a new pixdim
-  // scopic: mosaic image have might not to have 3rd dim
   if(pixdims.size() == 2) pixdims.push_back(0);
   pixdims[2] = sliceThick*(1+sliceGap);
 
@@ -1044,7 +1042,7 @@ bool RtDataImage<T>::unmosaicUnlocked() {
     cerr << "4 allocating data for " << this << endl; cerr.flush();
   }
   data = newdata;
-  isMosaiced = false;  
+  isMosaiced = false;
 
   return true;
 }
@@ -1055,13 +1053,13 @@ bool RtDataImage<T>::mosaic() {
   // validate
   if(seemsMosaic()) {
     cerr << "can't mosaic an image that already seems to be"
-	 << endl;
+   << endl;
     return false;
   }
 
   if(dims[0] != dims[1]) { // must be same size
     cerr << "can't mosaic an image with different row and column sizes"
-	 << endl;
+   << endl;
     return false;
   }
 
@@ -1079,13 +1077,13 @@ bool RtDataImage<T>::mosaicUnlocked() {
   // validate
   if(seemsMosaic()) {
     cerr << "can't mosaic an image that already seems to be"
-	 << endl;
+   << endl;
     return false;
   }
 
   if(dims[0] != dims[1]) { // must be same size
     cerr << "can't mosaic an image with different row and column sizes"
-	 << endl;
+   << endl;
     return false;
   }
 
@@ -1144,7 +1142,7 @@ bool RtDataImage<T>::mosaicUnlocked() {
 }
 
 
-// get a copy of the data in mosaiced format 
+// get a copy of the data in mosaiced format
 // (use getMosaicedWidth/Height to get size)
 //  out
 //   copy: pointer to the data that will be created
@@ -1170,8 +1168,8 @@ unsigned int RtDataImage<T>::getMosaicedWidth() {
     return 0;
   }
 
-  return (int) sqrt( matrixSize*matrixSize 
-		     * pow(ceil(sqrt((double)numSlices)), 2) );
+  return (int) sqrt( matrixSize*matrixSize
+         * pow(ceil(sqrt((double)numSlices)), 2) );
 }
 
 // get the height of a potential mosaiced version of this data
@@ -1181,8 +1179,8 @@ unsigned int RtDataImage<T>::getMosaicedHeight() {
     return 0;
   }
 
-  return (int) matrixSize * ceil((double)numSlices 
-				 / (getMosaicedWidth() / matrixSize));
+  return (int) matrixSize * ceil((double)numSlices
+         / (getMosaicedWidth() / matrixSize));
 }
 
 // test for a mosaic representation
@@ -1208,14 +1206,13 @@ bool RtDataImage<T>::seemsMosaic() {
 
   // see if the two dimensions look like mosaiced dimensions
   // assumptions: if the matrix size is 32, 64, or 128 assume its a single slice
-  // scopic: dims from 0 to 2
-  return (dims[1] != dims[0]) 
+  return (dims[1] != dims[0])
     || !(dims[1] == 32 || dims[1] == 64 || dims[1] == 128);
 }
 
 // get the unique data id
 template<class T>
-RtDataID &RtDataImage<T>::getDataID() { 
+RtDataID &RtDataImage<T>::getDataID() {
   return dataID;
 }
 
@@ -1243,10 +1240,10 @@ void RtDataImage<T>::initToNans() {
   lock(); {
     for(unsigned int i = 0; i < numPix; i++) {
       if(std::numeric_limits<T>::has_quiet_NaN) {
-	data[i] = std::numeric_limits<T>::quiet_NaN();
+  data[i] = std::numeric_limits<T>::quiet_NaN();
       }
       else {
-	data[i] = 0;
+  data[i] = 0;
       }
     }
   }  unlock();
@@ -1299,7 +1296,7 @@ template<class T>
 double RtDataImage<T>::getPixDim(unsigned int i) {
   double ret;
   lock(); {
-    ret = pixdims.size() > i && i >= 0 ? pixdims[i] : 1; 
+    ret = pixdims.size() > i && i >= 0 ? pixdims[i] : 1;
   }  unlock();
   return ret;
 }
@@ -1335,7 +1332,7 @@ template<class T>
 T RtDataImage<T>::getPixel(unsigned int i) {
   T ret;
   lock(); {
-    ret = i < numPix ? data[i] : 0; 
+    ret = i < numPix ? data[i] : 0;
   }  unlock();
   return ret;
 }
@@ -1351,7 +1348,7 @@ template<class T>
 unsigned int RtDataImage<T>::getImgDataLen() {
   unsigned int ret;
   lock(); {
-    ret = imgDataLen; 
+    ret = imgDataLen;
   }  unlock();
   return ret;
 }
@@ -1437,14 +1434,14 @@ void RtDataImage<T>::getRASfrom1D(unsigned int i, double &r, double &a, double &
 // transform 2D index into RAS world coords
 template<class T>
 void RtDataImage<T>::getRASfrom2D(unsigned int i, unsigned int j,
-		  double &r, double &a, double &s) {
+      double &r, double &a, double &s) {
 
 }
 
 // transform 3D index into RAS world coords
 template<class T>
 void RtDataImage<T>::getRASfrom3D(unsigned int i, unsigned int j, unsigned int k,
-		  double &r, double &a, double &s) {
+      double &r, double &a, double &s) {
 
 }
 
@@ -1533,21 +1530,21 @@ void RtDataImage<T>::get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned i
 // transform 3D index into 2D index
 template<class T>
 void RtDataImage<T>::get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D,
-		 unsigned int &i2D, unsigned int &j2D) {
+     unsigned int &i2D, unsigned int &j2D) {
 
 }
 
 // transform 1D index into 3D index
 template<class T>
 void RtDataImage<T>::get3Dfrom1D(unsigned int i1D,
-		 unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
+     unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
 
 }
 
 // transform 2D index into 3D index
 template<class T>
 void RtDataImage<T>::get2Dfrom2D(unsigned int i1D, unsigned int j1D,
-		 unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
+     unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
 
 }
 
@@ -1569,10 +1566,8 @@ template<class T>
 string RtDataImage<T>::ACE_Date_Time2SiemensTime(const ACE_Date_Time &t) {
   char str[] = "hhmmss.xxxxxx";
   sprintf(str,"%02ld%02ld%02ld.%06ld",
-	  t.hour(), t.minute(), t.second(), t.microsec());
+    t.hour(), t.minute(), t.second(), t.microsec());
 
   string s(str);
   return s;
 }
-
-

@@ -17,15 +17,6 @@
 
 #include <float.h>
 
-// scopic alexsid: #define WIN32
-#ifdef WIN32
-    // MS VS2005 provides _isnan function not isnan
-    // as it is in *nix system. So add this fix.
-    #ifndef isnan
-        #define isnan(x) _isnan(x)
-    #endif
-#endif
-
 // class declaration
 class RtIntensityNorm : public RtStreamComponent {
 
@@ -51,12 +42,12 @@ protected:
 
   // initialize processing
   bool initINorm(RtMRIImage *img);
-  
+
   // process an option
-  //  in 
+  //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
+  virtual bool processOption(const string &name, const string &text,
 			     const map<string,string> &attr);
 
   double meanIntensity; // intensity to normalize to
@@ -72,5 +63,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

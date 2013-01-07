@@ -70,8 +70,6 @@ RtInputScannerImages::~RtInputScannerImages() {
 bool RtInputScannerImages::open(RtConfig &config) {
   RtInput::open(config);
 
-  // scopic Alan: check for enabled/disabled (another way scanner is always
-  // disabled by default if we use frontend gui)
   if(config.isSet("scanner:disabled")
      && config.get("scanner:disabled")==false) {
     initialized = true;
@@ -86,7 +84,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
 
   // build the address
   ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
-  
+
   if(acceptor.open(address,1) == -1) {
     cerr << "failed to open acceptor for scanner images on port "
          << port << endl;
@@ -200,7 +198,7 @@ bool RtInputScannerImages::init(RtConfigFmriRun &config) {
   numDiscarded = 0;
   if(config.isSet("scanner:discard")) {
     num2Discard = config.get("scanner:discard");
-  } 
+  }
   else {
     num2Discard = 0;
   }
@@ -233,9 +231,9 @@ int RtInputScannerImages::svc() {
       cout << "connection accepted" << endl;
     }
 
-    if(getExperimentConfig().get("study:timeComputations") == true 
+    if(getExperimentConfig().get("study:timeComputations") == true
        && !startComputeTimer()) {
-      cout << "warning: compute timer already started, timing will be inaccurate" 
+      cout << "warning: compute timer already started, timing will be inaccurate"
            << endl;
     }
     else {
@@ -257,7 +255,7 @@ int RtInputScannerImages::svc() {
     // DEBUGGING
     //cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
     //ei->displayImageInfo();
-    //cout << "------------------------------------------------------" << endl;    
+    //cout << "------------------------------------------------------" << endl;
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -334,7 +332,7 @@ int RtInputScannerImages::svc() {
 
     // PW 2012/11/26: Debug
     cout << "---------------------------------------------" << endl;
-    cout << "getDataStore().getAvailableData():" << endl;    
+    cout << "getDataStore().getAvailableData():" << endl;
     getDataStore().getAvailableData();
     cout << "---------------------------------------------" << endl;
 
@@ -379,13 +377,13 @@ int RtInputScannerImages::svc() {
 
     // log that we received the image
     infos.str("");
-    infos << "received image from scanner: series " 
+    infos << "received image from scanner: series "
           << rti->getDataID().getSeriesNum()
           << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
 
     if(print) {
-      cout << "received image from scanner: series " 
+      cout << "received image from scanner: series "
            << rti->getDataID().getSeriesNum()
            << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
@@ -437,7 +435,7 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
     rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
-    rec += rec_delta; 
+    rec += rec_delta;
     if(rec_delta <= 0) break;
   }
   //rec += stream.recv_n(buffer, EXTERNALSENDERSIZEOF);
@@ -530,5 +528,3 @@ char *RtInputScannerImages::getVersionString() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

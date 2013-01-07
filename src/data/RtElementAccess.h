@@ -2,8 +2,8 @@
  * RtElementAccess.h declares a class that can retreive and set elements in
  * RtDataImages of double or short template type
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-02-16 
- * 
+ * Oliver Hinds <ohinds@mit.edu> 2009-02-16
+ *
  *****************************************************************************/
 
 #ifndef RTELEMENTACCESS_H
@@ -16,16 +16,6 @@
 #include"RtTypes.h"
 
 using namespace std;
-
-
-// scopic alexsid: #define WIN32
-#ifdef WIN32
-    // MS VS2005 provides _isnan function not isnan
-    // as it is in *nix system. So add this fix.
-    #ifndef isnan
-        #define isnan(x) _isnan(x)
-    #endif
-#endif
 
 // class declaration
 class RtElementAccess {
@@ -59,17 +49,17 @@ public:
 
   // get the element indices (from mask if there is one)
   vector<unsigned int> getElementIndices();
-  
+
 protected:
 
-  template<class T> 
+  template<class T>
   void buildElementIndices();
 
   //*** data members  ***//
 
   RtData *data;
   RtMaskImage *mask;
-  
+
   // if there is no mask we store our own (non-NaN) indices
   vector<unsigned int> elementIndices;
 };
@@ -84,5 +74,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

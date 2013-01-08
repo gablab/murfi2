@@ -1,71 +1,63 @@
-<!-- examples of protocol used to request info from real -->
+<!-- examples of protocol used to request info from murfi -->
 
-<!-- trigger info -->
+<!-- send this to infoserver to change design matrix -->
+<info>
+    <set dataid="dataidstring">
+        <designmatrix>
+            <cell row="2" col="3">
+                0.513479
+            </cell>
+        </designmatrix>
+    </set>
+</info>
 
-  <!-- send this -->
-  <info>
-    <trigger time="last">
-    </trigger>
-  </info>
-  
-  <!-- receive this -->
-  <info>
-    <trigger time="last" type="[good|bad]" tr="32">
-    </trigger>
-  </info>
+<!-- send this to infoserver to change conditions -->
+<info>
+    <set dataid="dataidstring">
+        <designmatrix>
+            <columninfo>
+                <index>3</index>
+                <name>cond</name>
+                <isofinterest>true</isofinterest>
+        <!-- may need other things here in the future, but these should be good for now-->
+            </columninfo>
+        </designmatrix>
+    </set>
+</info>
 
+<!-- to retrieve design matrix from infoserver send this -->
+<info>
+    <get dataid="dataidstring">
+    </get>
+</info>
 
-<!-- roi info -->
+<!-- and get this -->
+<info>
+    <designmatrix dataid="dataidstring">
+        <matrix rows="4" cols="4">
+        1 0 0 0
+        0 1 0 0
+        0 0 1 0
+        0 0 0 1
+        </matrix>
+        <columnnames>
+            colname1 colname2 colname3 colname4
+        </columnnames>
+        <isofinterest>
+            1 1 0 1
+        </isofinterest>
+    </designmatrix>
+</info>
 
-  <!-- activation -->
-
-    <!-- last tr -->
-
-      <!-- send this -->
-      <info>
-        <roi id="roi_id">
-          <get name="activation" trfirst="last">
-          </get>
-        </roi>
-      </info>
-      
-      <!-- receive this -->
-      <info>
-        <roi id="roi_id">
-          <data name="activation" tr="32">
-	    3.14159
-          </data>
-        </roi>
-      </info>
-      
-  <!-- tr range -->
-
-    <!-- send this -->
-      <info>
-        <roi id="roi_id">
-          <get name="activation" trfirst="32" trlast="35">
-          </get>
-        </roi>
-      </info>
-      
-    <!-- receive this -->
-      <info>
-        <roi id="roi_id">
-          <data name="activation" tr="32">
-	    3.14159
-          </data>
-          <data name="activation" tr="33">
-	    4.14159
-          </data>
-          <data name="activation" tr="34">
-	    5.14159
-          </data>
-          <data name="activation" tr="35">
-	    6.14159
-          </data>
-        </roi>
-      </info>
-      
+<!-- to retrieve current dataid from inforserver send this
+<info>
+    <get dataid="current">
+    </get>
+</info>
 
 
-
+<info>
+    <dataid>
+        dataid
+    </dataid>
+</info> -->

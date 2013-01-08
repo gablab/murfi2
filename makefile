@@ -243,8 +243,8 @@ OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
 
 ############################## TARGETS ###############################
 
-default: $(PROJECT)
-all:     $(PROJECT)
+default: $(PROJECT) scanner_sim
+all:     $(PROJECT) scanner_sim
 
 install:
 	install $(INSTALL_BINARY) $(INSTALL_DIR)
@@ -267,12 +267,16 @@ $(PROJECT): dirs $(OBJ_FILES)
 	@$(ECHO) 'make: built [$@] successfully!'
 	@$(ECHO) '############################################'
 
+scanner_sim:
+		cd util/scanner_sim && $(MAKE)
+
 ############################### CLEAN ################################
 
 clean:
 	@$(ECHO) 'make: removing object and autosave files'
 	-cd $(SRC_DIR) && $(MAKE) clean
 	-cd $(OBJ_DIR) && $(RM) -f *.o *~
+	-cd util/scanner_sim && $(MAKE) clean
 
 ######################################################################
 ### $Source$

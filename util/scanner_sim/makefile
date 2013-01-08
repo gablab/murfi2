@@ -19,3 +19,6 @@ servedicoms: servedicoms.cpp
 
 servenii: servenii.cpp
 	g++ -g -o servenii servenii.cpp $(OBJ_DIR)/RtExternalSenderImageInfo.o -lACE -lniftiio -I/usr/include/nifti -D_REENTRANT -lX11
+
+clean:
+	rm servenii servenii4d

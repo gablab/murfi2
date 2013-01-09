@@ -1,8 +1,8 @@
 /******************************************************************************
  * RtData.h declares a base class for data classes
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
+ * Oliver Hinds <ohinds@mit.edu> 2007-08-14
+ *
  *****************************************************************************/
 
 #ifndef RTDATA_H
@@ -26,59 +26,59 @@ using namespace std;
 // class declaration
 
 class RtData {
-public:
+ public:
 
-    //*** constructors/destructors  ***//
+  //*** constructors/destructors  ***//
 
-    // default constructor
-    RtData();
+  // default constructor
+  RtData();
 
-    // destructor
-    virtual ~RtData();
+  // destructor
+  virtual ~RtData();
 
-    // gets and sets
+  // gets and sets
 
-    // gets the id string for this data
-    //  out
-    //   id string
-    RtDataID &getDataID();
+  // gets the id string for this data
+  //  out
+  //   id string
+  RtDataID &getDataID();
 
-    // gets the id string for this data without modification
-    //  out
-    //   id string
-    RtDataID getDataID() const;
+  // gets the id string for this data without modification
+  //  out
+  //   id string
+  RtDataID getDataID() const;
 
-    // set the id string
-    void setDataID(const RtDataID &id);
+  // set the id string
+  void setDataID(const RtDataID &id);
 
-    // get the number of elements in this datatype
-    unsigned int getNumEl() const;
+  // get the number of elements in this datatype
+  unsigned int getNumEl() const;
 
-    // get the underlying datatype this data stores
+  // get the underlying datatype this data stores
 
-    RtElementType getElementType() const {
-        return elType;
-    }
+  RtElementType getElementType() const {
+    return elType;
+  }
 
-    // serialize the data as xml for transmission or saving to a file
-    virtual TiXmlElement *serializeAsXML(TiXmlElement *requestElement) = 0;
+  // serialize the data as xml for transmission or saving to a file
+  virtual TiXmlElement *serializeAsXML(TiXmlElement *requestElement) = 0;
 
-    // unserialize the xml data
-    virtual void unserializeXML(TiXmlElement* element) = 0;
+  // unserialize the xml data
+  virtual void unserializeXML(TiXmlElement* element) = 0;
 
-    // get the creation time
-    //ACE_Date_Time getCreationTime() const;
+  // get the creation time
+  //ACE_Date_Time getCreationTime() const;
 
-protected:
+ protected:
 
-    //*** data members  ***//
+  //*** data members  ***//
 
-    RtDataID dataID;
+  RtDataID dataID;
 
-    // number of distinct elements of data
-    unsigned int numEl;
+  // number of distinct elements of data
+  unsigned int numEl;
 
-    RtElementType elType;
+  RtElementType elType;
 
 };
 
@@ -92,5 +92,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

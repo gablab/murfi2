@@ -13,18 +13,18 @@ using namespace std;
 
 // default constructor
 template<class T>
-RtDataImage<T>::RtDataImage() : RtData(),
-        magicNumber(MAGIC_NUMBER),
-        filename(""),
-        alignOnRead(false),
-        mosaicOnRead(false),
-        unMosaicOnRead(false),
-        flipLROnRead(false),
-        imgDataLen(0),
-        numPix(0) {
+RtDataImage<T>::RtDataImage()
+  : RtData(),
+    magicNumber(MAGIC_NUMBER),
+    filename(""),
+    alignOnRead(false),
+    mosaicOnRead(false),
+    unMosaicOnRead(false),
+    flipLROnRead(false),
+    imgDataLen(0),
+    numPix(0) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage()"));
 
-  //addToID("image");
   data = NULL;
   bytesPerPix = sizeof(T);
   matrixSize = 64;
@@ -39,16 +39,18 @@ RtDataImage<T>::RtDataImage() : RtData(),
 
 // constructor that accepts a filename to read an image from
 template<class T>
-RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
-                  magicNumber(MAGIC_NUMBER),
-                  filename(""),
-                  alignOnRead(false),
-                  mosaicOnRead(false),
-                  unMosaicOnRead(false),
-                  flipLROnRead(false),
-                  imgDataLen(0),
-                  numPix(0),
-                  bytesPerPix(sizeof(unsigned short)) {
+RtDataImage<T>::RtDataImage(const string &filename)
+  : RtData(),
+    data(NULL),
+    magicNumber(MAGIC_NUMBER),
+    filename(""),
+    alignOnRead(false),
+    mosaicOnRead(false),
+    unMosaicOnRead(false),
+    flipLROnRead(false),
+    imgDataLen(0),
+    numPix(0),
+    bytesPerPix(sizeof(unsigned short)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
   isMosaiced = false;
@@ -58,7 +60,6 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
   sliceGap = 0.1;
   dims.reserve(4);
   pixdims.reserve(4);
-  //addToID("image");
   bytesPerPix = sizeof(T);
   data = NULL;
 
@@ -69,57 +70,6 @@ RtDataImage<T>::RtDataImage(const string &filename) : RtData(), data(NULL),
 
   isMosaiced = false;
 }
-
-// construct from raw bytes sent by RtInputScannerImages
-// BE CAREFUL WITH THIS
-//template<class T>
-//RtDataImage<T>::RtDataImage(char *bytes, unsigned int len) : RtData(),
-//       magicNumber(MAGIC_NUMBER),
-//       filename(""),
-//       imgDataLen(0),
-//       numPix(0),
-//       bytesPerPix(sizeof(unsigned short)),
-//       vxl2ras(gsl_matrix_calloc(4,4)),
-//       ras2ref(gsl_matrix_calloc(4,4)) {
-//  ACE_TRACE(("RtDataImage<T>::RtDataImage(char*,unsigned int)"));
-//
-//  addToID("image");
-//
-//  // try to do some checks
-//  if(len < sizeof(RtDataImageInfo)) {
-//    return;
-//  }
-//
-//  // extract the info
-//  memcpy(&info,bytes,sizeof(RtDataImageInfo));
-//
-//  // check if we have enough for the image data
-//  if(len-sizeof(RtDataImageInfo) != info.imgDataLen) {
-//    return;
-//  }
-//
-//  data = new T[info.numPix];
-//  memcpy(data,bytes+sizeof(RtDataImageInfo),info.imgDataLen);
-//}
-
-
-// construct from an image info struct and (possibly blank) data
-//template<class T>
-//RtDataImage<T>::RtDataImage(RtDataImageInfo &_info, T *_data)
-//    : RtData(),
-//       magicNumber(MAGIC_NUMBER),
-//       filename(""),
-//       imgDataLen(0),
-//       numPix(0),
-//       bytesPerPix(sizeof(unsigned short)),
-//       vxl2ras(gsl_matrix_calloc(4,4)),
-//       ras2ref(gsl_matrix_calloc(4,4))  {
-//  ACE_TRACE(("RtDataImage<T>::RtDataImage(RtDataImageInfo,T*)"));
-//
-//  addToID("image");
-//
-//  setImage(_info, _data);
-//}
 
 // construct from another image (deep copy)
 // only use this with like datatypes
@@ -234,7 +184,8 @@ template<class T>
 TiXmlElement *RtDataImage<T>::serializeAsXML(TiXmlElement *requestElement) {
   TiXmlElement *element = new TiXmlElement( "error" );
 
-  TiXmlText *text = new TiXmlText("this is a stub, no data serialization is supported for this type");
+  TiXmlText *text = new TiXmlText(
+      "this is a stub, no data serialization is supported for this type");
   element->LinkEndChild(text);
 
   return element;
@@ -284,7 +235,7 @@ bool RtDataImage<T>::writeRaw(const string &_filename) {
 
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for writing an image\n"),
-          _filename));
+               _filename));
     imgFile.close();
     return false;
   }
@@ -300,7 +251,8 @@ bool RtDataImage<T>::writeRaw(const string &_filename) {
 
     // write data
     if(!writeData(imgFile)) {
-      ACE_DEBUG((LM_DEBUG,ACE_TEXT("couldnt write img data to %s\n"),_filename));
+      ACE_DEBUG((LM_DEBUG,ACE_TEXT("couldnt write img data to %s\n"),
+                 _filename));
       imgFile.close();
       return false;
     }
@@ -442,7 +394,6 @@ bool RtDataImage<T>::load() {
   return ret;
 }
 
-
 // read the image from a file
 //  in
 //   filename: string filename
@@ -505,7 +456,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
 
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for reading an image\n"),
-          _filename));
+               _filename));
     imgFile.close();
     return false;
   }
@@ -515,7 +466,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     // read the image info
     if(!readInfo(imgFile)) {
       ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image info from %s\n"),
-     _filename));
+                 _filename));
       imgFile.close();
       return false;
     }
@@ -529,7 +480,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     // read the image data
     if(!readData(imgFile)) {
       ACE_DEBUG((LM_DEBUG, ACE_TEXT("error reading image data from %s\n"),
-     _filename));
+                 _filename));
       imgFile.close();
       return false;
     }
@@ -559,15 +510,15 @@ bool RtDataImage<T>::readNiftiHeader(const string &_filename) {
   nifti_image *img = nifti_image_read(_filename.c_str(), 0);
   if(img == NULL) {
     cerr << "could not open " << _filename << " for reading a nifti image"
-   << endl;
+         << endl;
     return false;
   }
 
   // validate the datatype
   if(img->nbyper != sizeof(T)) {
     cerr << _filename << " has " << img->nbyper
-   << " bytes/voxel but i was expecting " << sizeof(T)
-   << endl;
+         << " bytes/voxel but i was expecting " << sizeof(T)
+         << endl;
     return false;
   }
 
@@ -586,7 +537,6 @@ bool RtDataImage<T>::readNiftiHeader(const string &_filename) {
   return true;
 }
 
-
 // read the image from a nifti1 file
 //  in
 //   filename: string filename
@@ -599,15 +549,15 @@ bool RtDataImage<T>::readNifti(const string &_filename) {
   nifti_image *img = nifti_image_read(_filename.c_str(), 0);
   if(img == NULL) {
     cerr << "could not open " << _filename << " for reading a nifti image"
-   << endl;
+         << endl;
     return false;
   }
 
   // validfate the datatype
   if(img->nbyper != sizeof(T)) {
     cerr << _filename << " has " << img->nbyper
-   << " bytes/voxel but i was expecting " << sizeof(T)
-   << endl;
+         << " bytes/voxel but i was expecting " << sizeof(T)
+         << endl;
     return false;
   }
 
@@ -688,10 +638,6 @@ bool RtDataImage<T>::readInfo(istream &is) {
   is.read((char*) &imgDataLen, sizeof(unsigned long));
   is.read((char*) &numPix, sizeof(unsigned long));
   is.read((char*) &bytesPerPix, sizeof(unsigned short));
-
-  // matrices
-  //is.read((char*) gsl_matrix_ptr(vxl2ras,0,0), 4*4*sizeof(double));
-  //is.read((char*) gsl_matrix_ptr(ras2ref,0,0), 4*4*sizeof(double));
 
   // min/max info
   char mmset;
@@ -804,41 +750,32 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
     hdr->pixdim[ind] = pixdims[ind-1];
   }
 
-  // PW 2012/10/12 -- Debugging...
-  /*
-  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->ndim = " << hdr->ndim << endl;
-  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[0] = " << hdr->pixdim[0] << endl;
-  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[1] = " << hdr->pixdim[1] << endl;
-  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[2] = " << hdr->pixdim[2] << endl;
-  cout << "PW 2012/10/11: RtDataImage<T>::copyInfo() -- hdr->pixdim[3] = " << hdr->pixdim[3] << endl;
-  */
-
   // crappy
   switch(hdr->ndim) {
-  case 7:
-    hdr->nw = hdr->dim[7];
-    hdr->dw = hdr->pixdim[7];
-  case 6:
-    hdr->nv = hdr->dim[6];
-    hdr->dv = hdr->pixdim[6];
-  case 5:
-    hdr->nu = hdr->dim[5];
-    hdr->du = hdr->pixdim[5];
-  case 4:
-    hdr->nt = hdr->dim[4];
-    hdr->dt = hdr->pixdim[4];
-  case 3:
-    hdr->nz = hdr->dim[3];
-    hdr->dz = hdr->pixdim[3];
-  case 2:
-    hdr->ny = hdr->dim[2];
-    hdr->dy = hdr->pixdim[2];
-  case 1:
-    hdr->nx = hdr->dim[1];
-    hdr->dx = hdr->pixdim[1];
-    break;
-  default:
-    break;
+    case 7:
+      hdr->nw = hdr->dim[7];
+      hdr->dw = hdr->pixdim[7];
+    case 6:
+      hdr->nv = hdr->dim[6];
+      hdr->dv = hdr->pixdim[6];
+    case 5:
+      hdr->nu = hdr->dim[5];
+      hdr->du = hdr->pixdim[5];
+    case 4:
+      hdr->nt = hdr->dim[4];
+      hdr->dt = hdr->pixdim[4];
+    case 3:
+      hdr->nz = hdr->dim[3];
+      hdr->dz = hdr->pixdim[3];
+    case 2:
+      hdr->ny = hdr->dim[2];
+      hdr->dy = hdr->pixdim[2];
+    case 1:
+      hdr->nx = hdr->dim[1];
+      hdr->dx = hdr->pixdim[1];
+      break;
+    default:
+      break;
   }
 
   // img data info
@@ -847,18 +784,15 @@ bool RtDataImage<T>::copyInfo(nifti_image *hdr) {
 
   // data type
   switch(bytesPerPix) {
-//  case sizeof(bool):
-//    hdr->datatype = DT_BINARY;
-//    break;
-  case sizeof(short):
-    hdr->datatype = DT_SIGNED_SHORT;
-    break;
-  case sizeof(double):
-    hdr->datatype = DT_DOUBLE;
-    break;
-  default:
-    hdr->datatype = DT_DOUBLE;
-    break;
+    case sizeof(short):
+      hdr->datatype = DT_SIGNED_SHORT;
+      break;
+    case sizeof(double):
+      hdr->datatype = DT_DOUBLE;
+      break;
+    default:
+      hdr->datatype = DT_DOUBLE;
+      break;
   }
 
   // nifti type (NIFTI-1 (1 file)
@@ -924,14 +858,13 @@ bool RtDataImage<T>::flipLR() {
 
     for(unsigned int row = 0; row < getNumPix()/matrixSize; row++) {
       for(unsigned int j = 0, begInd = row*matrixSize; j < matrixSize/2; j++) {
-  T tmp = data[begInd+j];
-  data[begInd+j] = data[begInd+matrixSize-1-j];
-  data[begInd+matrixSize-1-j] = tmp;
+        T tmp = data[begInd+j];
+        data[begInd+j] = data[begInd+matrixSize-1-j];
+        data[begInd+matrixSize-1-j] = tmp;
       }
     }
 
   }  unlock();
-
 
   return true;
 }
@@ -942,13 +875,13 @@ bool RtDataImage<T>::unmosaic() {
   // validate
   if(!seemsMosaic()) { // dims
     cerr << "can't unmosaic an image that seemsMosaic()"
-   << endl;
+         << endl;
     return false;
   }
 
   if(matrixSize == 0) { // matrix size set
     cerr << "can't unmosaic an image if i don't know the matrix size"
-   << endl;
+         << endl;
     return false;
   }
 
@@ -966,13 +899,13 @@ bool RtDataImage<T>::unmosaicUnlocked() {
   // validate
   if(!seemsMosaic()) { // dims
     cerr << "can't unmosaic an image that seemsMosaic()"
-   << endl;
+         << endl;
     return false;
   }
 
   if(matrixSize == 0) { // matrix size set
     cerr << "can't unmosaic an image if i don't know the matrix size"
-   << endl;
+         << endl;
     return false;
   }
 
@@ -1007,7 +940,7 @@ bool RtDataImage<T>::unmosaicUnlocked() {
   unsigned int sqMatrixSize = matrixSize*matrixSize;
   for(unsigned int i = 0; i < width*height; i++) {
     slc = (i%width)/matrixSize +
-      (i/(matrixSize*width))*(width/matrixSize);
+        (i/(matrixSize*width))*(width/matrixSize);
     row = (i/width)%matrixSize;
     col = i%matrixSize;
 
@@ -1016,21 +949,12 @@ bool RtDataImage<T>::unmosaicUnlocked() {
     }
 
     newind = slc*sqMatrixSize+row*matrixSize+col;
-    //    fprintf(stdout,"%d %d %d %d %d %d\n", data[i], newind, i, slc, row, col);
     if(slc >= numSlices) {
       continue;
     }
 
     newdata[newind] = data[i];
   }
-
-  //  ofstream of;
-  //  of.open("/tmp/imgarr.txt");
-  //  for(unsigned int i=0; i < numPix; i++) {
-  //    of << newdata[i] << endl;
-  //    //cout << newdata[i] << endl;
-  //  }
-  //  of.close();
 
   if(DEBUG_LEVEL & ALLOC) {
     cerr << "4 deleting data for " << this << endl; cerr.flush();
@@ -1053,13 +977,13 @@ bool RtDataImage<T>::mosaic() {
   // validate
   if(seemsMosaic()) {
     cerr << "can't mosaic an image that already seems to be"
-   << endl;
+         << endl;
     return false;
   }
 
   if(dims[0] != dims[1]) { // must be same size
     cerr << "can't mosaic an image with different row and column sizes"
-   << endl;
+         << endl;
     return false;
   }
 
@@ -1077,21 +1001,19 @@ bool RtDataImage<T>::mosaicUnlocked() {
   // validate
   if(seemsMosaic()) {
     cerr << "can't mosaic an image that already seems to be"
-   << endl;
+         << endl;
     return false;
   }
 
   if(dims[0] != dims[1]) { // must be same size
     cerr << "can't mosaic an image with different row and column sizes"
-   << endl;
+         << endl;
     return false;
   }
 
   // set the matrix size and number of slices
   matrixSize = dims[0];
   numSlices = dims[2];
-
-  cout << "PW  RtDataImage<T>::mosaicUnlocked() -- MatrixSize: " << matrixSize << " numSlices: " << numSlices << endl;
 
   dims.clear();
   dims.reserve(2);
@@ -1169,7 +1091,7 @@ unsigned int RtDataImage<T>::getMosaicedWidth() {
   }
 
   return (int) sqrt( matrixSize*matrixSize
-         * pow(ceil(sqrt((double)numSlices)), 2) );
+                     * pow(ceil(sqrt((double)numSlices)), 2) );
 }
 
 // get the height of a potential mosaiced version of this data
@@ -1180,7 +1102,7 @@ unsigned int RtDataImage<T>::getMosaicedHeight() {
   }
 
   return (int) matrixSize * ceil((double)numSlices
-         / (getMosaicedWidth() / matrixSize));
+                                 / (getMosaicedWidth() / matrixSize));
 }
 
 // test for a mosaic representation
@@ -1207,7 +1129,7 @@ bool RtDataImage<T>::seemsMosaic() {
   // see if the two dimensions look like mosaiced dimensions
   // assumptions: if the matrix size is 32, 64, or 128 assume its a single slice
   return (dims[1] != dims[0])
-    || !(dims[1] == 32 || dims[1] == 64 || dims[1] == 128);
+      || !(dims[1] == 32 || dims[1] == 64 || dims[1] == 128);
 }
 
 // get the unique data id
@@ -1240,10 +1162,10 @@ void RtDataImage<T>::initToNans() {
   lock(); {
     for(unsigned int i = 0; i < numPix; i++) {
       if(std::numeric_limits<T>::has_quiet_NaN) {
-  data[i] = std::numeric_limits<T>::quiet_NaN();
+        data[i] = std::numeric_limits<T>::quiet_NaN();
       }
       else {
-  data[i] = 0;
+        data[i] = 0;
       }
     }
   }  unlock();
@@ -1427,21 +1349,23 @@ void RtDataImage<T>::setMinMax() {
 
 // transform 1D index into RAS world coords
 template<class T>
-void RtDataImage<T>::getRASfrom1D(unsigned int i, double &r, double &a, double &s) {
+void RtDataImage<T>::getRASfrom1D(
+    unsigned int i, double &r, double &a, double &s) {
 
 }
 
 // transform 2D index into RAS world coords
 template<class T>
-void RtDataImage<T>::getRASfrom2D(unsigned int i, unsigned int j,
-      double &r, double &a, double &s) {
+void RtDataImage<T>::getRASfrom2D(
+    unsigned int i, unsigned int j, double &r, double &a, double &s) {
 
 }
 
 // transform 3D index into RAS world coords
 template<class T>
-void RtDataImage<T>::getRASfrom3D(unsigned int i, unsigned int j, unsigned int k,
-      double &r, double &a, double &s) {
+void RtDataImage<T>::getRASfrom3D(
+    unsigned int i, unsigned int j, unsigned int k, double &r,
+    double &a, double &s) {
 
 }
 
@@ -1450,34 +1374,35 @@ template<class T>
 unsigned int RtDataImage<T>::get1Dfrom2D(unsigned int i, unsigned int j) {
   // different answers based on how many dimensions the image is
   switch(dims.size()) {
-  case 0:
-    return 0;
-  case 1:
-    return i;
-  case 2:
-    return i*dims[1]+j;
-  case 3:
-    return i*dims[1]*ceil(sqrt(dims[2]))+j;
-  default:
-    return i;
+    case 0:
+      return 0;
+    case 1:
+      return i;
+    case 2:
+      return i*dims[1]+j;
+    case 3:
+      return i*dims[1]*ceil(sqrt(dims[2]))+j;
+    default:
+      return i;
   }
 }
 
 // transform 3D index into 1D index
 template<class T>
-unsigned int RtDataImage<T>::get1Dfrom3D(unsigned int i, unsigned int j, unsigned int k) {
+unsigned int RtDataImage<T>::get1Dfrom3D(
+    unsigned int i, unsigned int j, unsigned int k) {
   // different answers based on how many dimensions the image is
   switch(dims.size()) {
-  case 0:
-    return 0;
-  case 1:
-    return i;
-  case 2:
-    return i*dims[1]+j;
-  case 3:
-    return i*dims[1]*dims[2]+j*dims[2];
-  default:
-    return i;
+    case 0:
+      return 0;
+    case 1:
+      return i;
+    case 2:
+      return i*dims[1]+j;
+    case 3:
+      return i*dims[1]*dims[2]+j*dims[2];
+    default:
+      return i;
   }
 }
 
@@ -1502,49 +1427,52 @@ unsigned int RtDataImage<T>::get1DfromRAS(double r, double a, double s) {
 
 // transform 1D index into 2D index
 template<class T>
-void RtDataImage<T>::get2Dfrom1D(unsigned int i1D, unsigned int &i2D, unsigned int &j2D) {
+void RtDataImage<T>::get2Dfrom1D(
+    unsigned int i1D, unsigned int &i2D, unsigned int &j2D) {
   // different answers based on how many dimensions the image is
   switch(dims.size()) {
-  case 0:
-    i2D = 0;
-    j2D = 0;
-    break;
-  case 1:
-    i2D = i1D;
-    j2D = 0;
-    break;
-  case 2:
-    i2D = i1D/dims[1];
-    j2D = i1D%dims[1];
-    break;
-  case 3:
-    i2D = i1D/(dims[1]*ceil(sqrt(dims[2])));
-    j2D = floor(fmod(i1D,(dims[1]*ceil(sqrt(dims[2])))));
-  default:
-    i2D = 0;
-    j2D = 0;
-    break;
+    case 0:
+      i2D = 0;
+      j2D = 0;
+      break;
+    case 1:
+      i2D = i1D;
+      j2D = 0;
+      break;
+    case 2:
+      i2D = i1D/dims[1];
+      j2D = i1D%dims[1];
+      break;
+    case 3:
+      i2D = i1D/(dims[1]*ceil(sqrt(dims[2])));
+      j2D = floor(fmod(i1D,(dims[1]*ceil(sqrt(dims[2])))));
+    default:
+      i2D = 0;
+      j2D = 0;
+      break;
   }
 }
 
 // transform 3D index into 2D index
 template<class T>
-void RtDataImage<T>::get2Dfrom3D(unsigned int i1D, unsigned int j1D, unsigned int k1D,
-     unsigned int &i2D, unsigned int &j2D) {
+void RtDataImage<T>::get2Dfrom3D(
+    unsigned int i1D, unsigned int j1D, unsigned int k1D,
+    unsigned int &i2D, unsigned int &j2D) {
 
 }
 
 // transform 1D index into 3D index
 template<class T>
-void RtDataImage<T>::get3Dfrom1D(unsigned int i1D,
-     unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
+void RtDataImage<T>::get3Dfrom1D(
+    unsigned int i1D, unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
 
 }
 
 // transform 2D index into 3D index
 template<class T>
-void RtDataImage<T>::get2Dfrom2D(unsigned int i1D, unsigned int j1D,
-     unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
+void RtDataImage<T>::get2Dfrom2D(
+    unsigned int i1D, unsigned int j1D,
+    unsigned int &i3D, unsigned int &j3D, unsigned int &k3D) {
 
 }
 
@@ -1566,7 +1494,7 @@ template<class T>
 string RtDataImage<T>::ACE_Date_Time2SiemensTime(const ACE_Date_Time &t) {
   char str[] = "hhmmss.xxxxxx";
   sprintf(str,"%02ld%02ld%02ld.%06ld",
-    t.hour(), t.minute(), t.second(), t.microsec());
+          t.hour(), t.minute(), t.second(), t.microsec());
 
   string s(str);
   return s;

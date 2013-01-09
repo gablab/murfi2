@@ -2,7 +2,7 @@
  * RtMRIImage.h declares a class for an MR image
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-10-08
- * 
+ *
  *****************************************************************************/
 
 #include"RtMRIImage.h"
@@ -14,46 +14,20 @@
 #include<fstream>
 
 using namespace std;
-  
+
 // default constructor
 RtMRIImage::RtMRIImage() : RtDataImage<short>() {
-  ACE_TRACE(("RtMRIImage::RtMRIImage()")); 
+  ACE_TRACE(("RtMRIImage::RtMRIImage()"));
 
   dataID.setModuleID("mri");
 
   elType = RT_SHORT_TYPE;
 
   magicNumber = MAGIC_NUMBER;
-
-//  // init motion parms
-//  for(int i = 0; i < 6; i++) {
-//    motionParameters[i] = 0.0;
-//  }
 }
 
-// constructor that accepts a filename to read an image from
-//RtMRIImage::RtMRIImage(const string &filename) {
-//  ACE_TRACE(("RtMRIImage::RtMRIImage(string)"));
-//  addToID("mri");
-//  
-//  data = NULL;
-//
-//  info.setBytesPerPix(sizeof(short));
-//
-//  read(filename);
-//}
-//
-//// construct from raw bytes sent by RtInputScannerImages
-//// BE CAREFUL WITH THIS
-//RtMRIImage::RtMRIImage(char *bytes, unsigned int len) 
-//    : RtDataImage<short>(bytes,len) {
-//  ACE_TRACE(("RtMRIImage::RtMRIImage(char*,unsigned int)"));
-//
-//  addToID("mri");
-//}
-
 // construct from an image info struct and some byte data
-RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes) 
+RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
     : RtDataImage<short>() {
   ACE_TRACE(("RtMRIImage::RtMRIImage(RtExternalImageInfo,short*)"));
 
@@ -69,7 +43,7 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
 
   dataID.setStudyNum(getExperimentStudyID());
   dataID.setSeriesNum
-    (getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
+      (getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
   dataID.setTimePoint(extinfo.iAcquisitionNumber);
 
   // setup geometry
@@ -88,9 +62,9 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   if(getExperimentConfig().isSet("scanner:voxdim3")) {
     double sliceDist = getExperimentConfig().get("scanner:voxdim3");
     if(getExperimentConfig().isSet("scanner:sliceGap")) {
-      sliceDist 
-		+= static_cast<double>(getExperimentConfig().get("scanner:sliceGap"));
-	}
+      sliceDist
+          += static_cast<double>(getExperimentConfig().get("scanner:sliceGap"));
+    }
     setPixDim(2,sliceDist);
   }
 
@@ -106,29 +80,18 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   }
 }
 
-
-//// construct from an image info struct and (possibly blank) data
-//RtMRIImage::RtMRIImage(RtMRIImageInfo &_info, short  *_data) 
-//    : RtDataImage<short>() {
-//  ACE_TRACE(("RtMRIImage::RtMRIImage(RtMRIImageInfo,T*)"));
-//  addToID("mri");
-//  magicNumber = MAGIC_NUMBER;
-//
-//  setImage(_info, _data);
-//}
-
 // construct from another image (deep copy)
 // only use this with like datatypes
 RtMRIImage::RtMRIImage(RtMRIImage &img) {
   ACE_TRACE(("RtMRIImage::RtMRIImage(RtMRIImage)"));
-  
+
   elType = RT_SHORT_TYPE;
 
   (*this) = img;
 
   magicNumber = MAGIC_NUMBER;
 
-  // copy the data 
+  // copy the data
   if(DEBUG_LEVEL & ALLOC) {
     cerr << "mr2 allocating data for " << this << endl; cerr.flush();
   }
@@ -136,25 +99,6 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
   data = new short[numPix];
   memcpy(data, img.data, imgDataLen);
 }
-
-// set this image based on a passed image info and data
-//  in
-//   info: struct
-//   data: array (optional, image data will be  allocated and set
-//         to all zeros if null) 
-//void RtMRIImage::setImage(RtMRIImageInfo &_info, short *_data) {
-//  info = _info;
-//  data = new short[info.numPix];
-//
-//  if(_data != NULL) {
-//    memcpy(data, _data, info.imgDataLen);
-//  }
-//  else {
-//    for(unsigned int i = 0; i < info.numPix; i++) {
-//      data[i] = 0;
-//    }
-//  }
-//}
 
 // write the info (all but data) to a stream
 //  in
@@ -175,10 +119,10 @@ bool RtMRIImage::writeInfo(ostream &os) {
   os.write((char*) &sliceThick, sizeof(double));
 
   char boolcon;
-  
+
   boolcon = (char) swapReadPhase;
   os.write((char*) &boolcon, sizeof(char));
-  
+
   unsigned int uint_tmp;
 
   uint_tmp = dataID.getSeriesNum();
@@ -235,10 +179,10 @@ bool RtMRIImage::readInfo(istream &is) {
   is.read((char*) &sliceThick, sizeof(double));
 
   char boolcon;
-  
+
   is.read((char*) &boolcon, sizeof(char));
   swapReadPhase = (bool) boolcon;
-  
+
   unsigned int uint_tmp = 0;
 
   is.read((char*) uint_tmp, sizeof(unsigned int));
@@ -284,7 +228,7 @@ void RtMRIImage::printInfo(ostream &os) {
 
   os << setiosflags(ios::left);
 
-  os << setw(wid) << "slice" << slice << endl 
+  os << setw(wid) << "slice" << slice << endl
      << setw(wid) << "readFOV phaseFOV" << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "swapReadPhase" << swapReadPhase << endl
@@ -293,7 +237,8 @@ void RtMRIImage::printInfo(ostream &os) {
      << setw(wid) << "te / tr / ti" << te << " / " << tr << " / " << ti << endl
      << setw(wid) << "triggerTime" << triggerTime << endl
      << setw(wid) << "time" << ACE_Date_Time2SiemensTime(time) << endl
-     << setw(wid) << "refFrameTime" << ACE_Date_Time2SiemensTime(refFrameTime) << endl
+     << setw(wid) << "refFrameTime" << ACE_Date_Time2SiemensTime(refFrameTime)
+     << endl
      << setw(wid) << "reconDelay" << reconDelay << endl
      << setw(wid) << "distCorrect2D" << distCorrect2D << endl
      << setw(wid) << "moco" << moco << endl
@@ -303,70 +248,15 @@ void RtMRIImage::printInfo(ostream &os) {
      << "---------------------------" << endl;
 }
 
-
 // destructor
 RtMRIImage::~RtMRIImage() {
   ACE_TRACE(("RtMRIImage::~RtMRIImage"));
-
-  // notify our locker that we are being deleted
-//  if(lock != NULL) {
-//    lock->beingDeleted();
-//  }
-
-  // don't need this cause our parent will delete the data
-//  if(data != NULL) {
-//    delete [] data;
-//    data = NULL;
-//  }
 }
-
-
-
-// get the acquisition number
-//string RtMRIImage::getCreationTime() const {
-//  return ACE_Date_Time2SiemensTime(creationTime);
-//}
-
-// get the acquisition number
-//unsigned int RtMRIImage::getAcquisitionNum() const {
-//  return acqNum;
-//}
-
-// get the series number
-//unsigned int RtMRIImage::getSeriesNum() {
-//  return getDataID().getSeriesNum();
-//}
-
-//// get a motion parameter
-//double RtMRIImage::getMotionParameter(MotionDimension d) const {
-//  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
-//    return 0.0;
-//  }
-//  
-//  return motionParameters[d];
-//}
-//
-//// set a motion parameter
-//void RtMRIImage::setMotionParameter(MotionDimension d, double m) {
-//  if(d < 0 || d >= NUM_MOTION_DIMENSIONS) {
-//    return;
-//  }
-//  
-//  motionParameters[d] = m;
-//}
-
-// DEBUGGGING
-#include"printVnl44Mat.cpp"
-
 
 // set info struct
 //  in
 //   _info: struct to copy
 void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
-
-  // PW 2012/08/21: Trying to determine the differences between the MGH and MIT VSend functors
-  //                (if any)
-  //info.displayImageInfo();
 
   // PW 2012/10/11: Trying to get murfi to save unmosaiced niftis
   if (info.iNoOfImagesInMosaic == 0) {
@@ -386,7 +276,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   //                for some reason the constructor was getting called *after*
   //                setInfo(), so sliceGap wasn't being set correctly.
   if(getExperimentConfig().isSet("scanner:sliceGap")) {
-    sliceGap = getExperimentConfig().get("scanner:sliceGap");    
+    sliceGap = getExperimentConfig().get("scanner:sliceGap");
   }
 
   pixdims.resize(3);
@@ -398,12 +288,6 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   setPixDim(0,pixdims[0]);
   setPixDim(1,pixdims[1]);
   setPixDim(2,pixdims[2]);
-
-  //cout << "**********************************" << endl;
-  //cout << "info.dThick: " << info.dThick << endl;
-  //cout << "info.dThick: " << info.nSli << endl;
-  //cout << "sliceGap: " << sliceGap << endl;
-  //cout << "**********************************" << endl;
 
   // calculate image size
   imgDataLen = bytesPerPix;
@@ -444,13 +328,15 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   lps2ras.put(1,1,-1);
 
   vxl2ras = (lps2ras*rotMat)*scaleMat;
-  
+
   // PW 2012/10/03: Calculating offset to center of k-space
-  // See http://www.nmr.mgh.harvard.edu/~rudolph/software/vox2ras/download/vox2ras_ksolve.html
-  // With a slight modification.  Since info.dPos.. is the offset to slice #zero, we don't need to traverse
-  // in the slice direction (we are already there) only in the phase encode and readout directions
-  // This should probably tested with a few more volumes (and definitly with patient orientations other
-  // than HFS)
+  // See
+  // http://www.nmr.mgh.harvard.edu/~rudolph/software/vox2ras/download/vox2ras_ksolve.html
+  // With a slight modification.  Since info.dPos.. is the offset to slice
+  // #zero, we don't need to traverse in the slice direction (we are already
+  // there) only in the phase encode and readout directions This should
+  // probably tested with a few more volumes (and definitly with patient
+  // orientations other than HFS)
   vnl_matrix_fixed<double,3,1> Vc_x = vxl2ras.extract(3,1,0,0);
   vnl_matrix_fixed<double,3,1> Vc_y = vxl2ras.extract(3,1,0,1);
   vnl_matrix_fixed<double,3,1> Vc_z = vxl2ras.extract(3,1,0,2);
@@ -461,8 +347,10 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   Vc_Ps.put(0,0, info.dPosSag);
   Vc_Ps.put(1,0, info.dPosCor);
   Vc_Ps.put(2,0, info.dPosTra);
-  vnl_matrix_fixed<double,3,1> Vc_Pe1 = lps2ras.extract(3,3)*(Vc_Ps + (xoff*Vc_x + yoff*Vc_y));
-  vnl_matrix_fixed<double,3,1> Vc_Pe2 = lps2ras.extract(3,3)*(Vc_Ps - (xoff*Vc_x + yoff*Vc_y));
+  vnl_matrix_fixed<double,3,1> Vc_Pe1 =
+      lps2ras.extract(3,3)*(Vc_Ps + (xoff*Vc_x + yoff*Vc_y));
+  vnl_matrix_fixed<double,3,1> Vc_Pe2 =
+      lps2ras.extract(3,3)*(Vc_Ps - (xoff*Vc_x + yoff*Vc_y));
   vxl2ras.put(0,3, Vc_Pe1.get(0,0));
   vxl2ras.put(1,3, Vc_Pe1.get(1,0));
   vxl2ras.put(2,3, Vc_Pe2.get(2,0));
@@ -471,7 +359,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   //cout << "scale" << endl;
   //printVnl44Mat(scaleMat);
   //cout << "rot" << endl;
-  //printVnl44Mat(rotMat);  
+  //printVnl44Mat(rotMat);
   //cout << "vxl2ras" << endl;
   //printVnl44Mat(vxl2ras);
 
@@ -488,7 +376,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   sliceThick = info.dThick;
   seriesInstanceUID = info.cSeriesInstanceUID;
 
-  swapReadPhase = info.bSwapReadPhase;       
+  swapReadPhase = info.bSwapReadPhase;
   dataID.setTimePoint(info.iAcquisitionNumber);
   timeAfterStart = info.dTimeAfterStart;
   te = info.dTE;
@@ -503,8 +391,8 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
   // scanner online post-processing parms
   distCorrect2D = false;
-  moco = info.bIsMoCo;  
-  
+  moco = info.bIsMoCo;
+
   // received data parms
   fromScanner = info.iDataSource == 0;
 }
@@ -532,7 +420,7 @@ unsigned int RtMRIImage::getNumSlices() {
 // get a smart contrast level
 float RtMRIImage::getAutoContrast() {
   ACE_TRACE(("RtMRIImage::getAutoContrast"));
-  
+
   if(!minMaxSet) {
     setMinMax();
   }
@@ -553,13 +441,6 @@ float RtMRIImage::getAutoBrightness() {
 
 }
 
-
-// set the series number
-//void RtMRIImage::setSeriesNum(unsigned int sn) {
-//  seriesNum = sn;
-//}
-
-
 /*****************************************************************************
  * $Source$
  * Local Variables:
@@ -568,5 +449,3 @@ float RtMRIImage::getAutoBrightness() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

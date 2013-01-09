@@ -17,34 +17,34 @@
 // class declaration
 
 class RtEvent : public RtData {
-public:
+ public:
 
-    //*** constructors/destructors  ***//
+  //*** constructors/destructors  ***//
 
-    // default constructor
-    RtEvent();
+  // default constructor
+  RtEvent();
 
-    // construct from data
-    RtEvent(const RtData &dat);
+  // construct from data
+  RtEvent(const RtData &dat);
 
-    // destructor
-    virtual ~RtEvent();
+  // destructor
+  virtual ~RtEvent();
 
-    // serialize as xml (dummy function)
-    virtual TiXmlElement* serializeAsXML(TiXmlElement *requestElement);
+  // serialize as xml (dummy function)
+  virtual TiXmlElement* serializeAsXML(TiXmlElement *requestElement);
 
-    // unserialize the xml data
-    virtual void unserializeXML(TiXmlElement* element);
+  // unserialize the xml data
+  virtual void unserializeXML(TiXmlElement* element);
 
-    // set the tr for this event
-    void setTR(int _tr);
+  // set the tr for this event
+  void setTR(int _tr);
 
-    // get the tr for this event
-    int getTR() const;
+  // get the tr for this event
+  int getTR() const;
 
-protected:
+ protected:
 
-    int tr;
+  int tr;
 };
 
 #endif
@@ -57,5 +57,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

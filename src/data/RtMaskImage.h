@@ -2,7 +2,7 @@
  * RtMaskImage.h declares a class for an MR image
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-10-08
- * 
+ *
  *****************************************************************************/
 
 #ifndef RTMASKIMAGE_H
@@ -19,14 +19,14 @@ class RtActivation;
 
 // class declaration
 class RtMaskImage : public RtDataImage<short> {
-public:
+ public:
 
   const static unsigned int MAGIC_NUMBER = 0x5084;
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtMaskImage(); 
+  RtMaskImage();
 
   // destructor
   virtual ~RtMaskImage();
@@ -37,14 +37,14 @@ public:
   // construct by thresholding mean intensity of an MRI image
   // in:
   //  img:       image to build mask from
-  //  threshold: mean intensity multiplier to threshold at (set to 
+  //  threshold: mean intensity multiplier to threshold at (set to
   //             zero to leave mask allocated but uninitialized)
   RtMaskImage(RtMRIImage &img, double threshold = 0.0);
 
   // construct by thresholding mean intensity of an activation image
   // in:
   //  img:       image to build mask from
-  //  threshold: mean intensity multiplier to threshold at (set to 
+  //  threshold: mean intensity multiplier to threshold at (set to
   //             zero to leave mask allocated but uninitialized)
   RtMaskImage(RtActivation &img, double threshold = 0.0);
 
@@ -60,7 +60,8 @@ public:
   // in:
   //  img:    image to build mask from
   //  thresh: mean intensity multiplier to threshold at
-  unsigned int initByMeanIntensityThreshold(RtActivation &img, double threshold);
+  unsigned int initByMeanIntensityThreshold(RtActivation &img,
+                                            double threshold);
 
   // set the info based on an activation's image info
   // NOTE: will change mask geometry to match the img
@@ -74,7 +75,7 @@ public:
   //  img:    image to build mask from
   void setInfo(RtMRIImage &img);
 
-  // sets all voxels 
+  // sets all voxels
   // in:
   //  val: value to set all voxels to
   void setAll(short val);
@@ -95,7 +96,7 @@ public:
   //   success or failure
   bool read(const string &_filename);
 
-protected:
+ protected:
 
   // "on" voxel indices
   vector<unsigned int> onIndices;
@@ -113,5 +114,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

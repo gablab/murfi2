@@ -12,11 +12,11 @@
 // default constructor
 
 RtEvent::RtEvent() : RtData() {
-    ACE_TRACE(("RtMRIImage::RtEvent()"));
+  ACE_TRACE(("RtMRIImage::RtEvent()"));
 
-    dataID.setModuleID("event");
+  dataID.setModuleID("event");
 
-    tr = -1;
+  tr = -1;
 }
 
 // destructor
@@ -27,19 +27,19 @@ RtEvent::~RtEvent() {
 // set the tr for this event
 
 void RtEvent::setTR(int _tr) {
-    tr = _tr;
+  tr = _tr;
 }
 
 // get the tr for this event
 
 int RtEvent::getTR() const {
-    return tr;
+  return tr;
 }
 
 // serialize as xml (dummy function)
 
 TiXmlElement* RtEvent::serializeAsXML(TiXmlElement *requestElement) {
-    return new TiXmlElement("event");
+  return new TiXmlElement("event");
 }
 
 // unserialize xml (dummy function)
@@ -56,5 +56,3 @@ void RtEvent::unserializeXML(TiXmlElement* element) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

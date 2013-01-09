@@ -2,7 +2,7 @@
  * RtMaskImage.cpp defines a class for an MR image
  *
  * Oliver Hinds <ohinds@mit.edu> 2007-10-08
- * 
+ *
  *****************************************************************************/
 
 #include"RtMaskImage.h"
@@ -16,8 +16,8 @@ using namespace std;
 
 // default constructor
 RtMaskImage::RtMaskImage() : RtDataImage<short>() {
-  ACE_TRACE(("RtMaskImage::RtMaskImage()")); 
-   
+  ACE_TRACE(("RtMaskImage::RtMaskImage()"));
+
   dataID.setModuleID(ID_MASK);
   dataID.setDataName(NAME_MASK);
 
@@ -34,12 +34,12 @@ RtMaskImage::~RtMaskImage() {
 // only use this with like datatypes
 RtMaskImage::RtMaskImage(RtMaskImage &img) {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
-  
+
   (*this) = img;
 
   magicNumber = MAGIC_NUMBER;
 
-  // copy the data 
+  // copy the data
   data = new short[numPix];
   imgDataLen = numPix*sizeof(short);
   memcpy(data, img.data, imgDataLen);
@@ -48,12 +48,12 @@ RtMaskImage::RtMaskImage(RtMaskImage &img) {
 
 
 // construct from an mri image
-RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold) 
+RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold)
     : RtDataImage<short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
 
   dataID.setHistory
-    (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
+      (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
   dataID.setModuleID(ID_MASK);
   dataID.setDataName(NAME_MASK);
 
@@ -67,15 +67,15 @@ RtMaskImage::RtMaskImage(RtMRIImage &img, double threshold)
     initByMeanIntensityThreshold(img,threshold);
   }
 }
-  
+
 
 // construct from an activation image
-RtMaskImage::RtMaskImage(RtActivation &img, double threshold) 
+RtMaskImage::RtMaskImage(RtActivation &img, double threshold)
     : RtDataImage<short>() {
   ACE_TRACE(("RtMaskImage::RtMaskImage(RtMaskImage)"));
 
   dataID.setHistory
-    (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
+      (img.getDataID().getHistory() + "." + img.getDataID().getModuleID());
   dataID.setModuleID(ID_MASK);
   dataID.setDataName(NAME_MASK);
 
@@ -89,7 +89,7 @@ RtMaskImage::RtMaskImage(RtActivation &img, double threshold)
     initByMeanIntensityThreshold(img,threshold);
   }
 }
-  
+
 
 // initialize mask by mean intensity threshold of another image
 // in:
@@ -97,8 +97,8 @@ RtMaskImage::RtMaskImage(RtActivation &img, double threshold)
 //  thresh: mean intensity multiplier to threshold at
 // out:
 //  the number of voxels in the new mask
-unsigned int RtMaskImage::initByMeanIntensityThreshold(RtMRIImage &image, 
-						       double threshold) {
+unsigned int RtMaskImage::initByMeanIntensityThreshold(RtMRIImage &image,
+                                                       double threshold) {
   // validate size
   if(getNumPix() != image.getNumPix()) {
     setInfo(image);
@@ -126,7 +126,7 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtMRIImage &image,
       setPixel(i,0);
     }
   }
-  
+
   return onIndices.size();
 }
 
@@ -136,8 +136,8 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtMRIImage &image,
 //  thresh: mean intensity multiplier to threshold at
 // out:
 //  the number of voxels in the new mask
-unsigned int RtMaskImage::initByMeanIntensityThreshold(RtActivation &image, 
-						       double threshold) {
+unsigned int RtMaskImage::initByMeanIntensityThreshold(RtActivation &image,
+                                                       double threshold) {
   // validate size
   if(getNumPix() != image.getNumPix()) {
     setInfo(image);
@@ -165,7 +165,7 @@ unsigned int RtMaskImage::initByMeanIntensityThreshold(RtActivation &image,
       setPixel(i,0);
     }
   }
-  
+
   return onIndices.size();
 }
 
@@ -186,7 +186,7 @@ void RtMaskImage::updateOnVoxelIndices() {
     if(getElement(i)) {
       onIndices.push_back(i);
     }
-  }  
+  }
 }
 
 // read the image from a file
@@ -202,7 +202,7 @@ bool RtMaskImage::read(const string &_filename) {
 }
 
 
-// sets all voxels 
+// sets all voxels
 // in:
 //  val: value to set all voxels to
 void RtMaskImage::setAll(short val) {
@@ -261,5 +261,3 @@ void RtMaskImage::setInfo(RtActivation &img) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

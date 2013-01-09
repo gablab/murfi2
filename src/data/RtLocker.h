@@ -14,7 +14,7 @@
 // class declaration
 class RtLocker {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
 
@@ -27,7 +27,7 @@ public:
   // called when locked data is destructed
   virtual void beingDeleted() {}
 
-protected:
+ protected:
 
 
 };
@@ -44,5 +44,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

@@ -50,7 +50,7 @@ class RtDataID {
 
   // initialize contents to wildcards
   void initializeToWildCards();
-  
+
   //*** operators ***//
 
   // comparison
@@ -80,7 +80,7 @@ class RtDataID {
 
   // does this id have wildcards?
   bool hasWildcards() const {
-    return 
+    return
         siteIDNum == DATAID_NUM_WILDCARD_VALUE
         || studyNum  == DATAID_NUM_WILDCARD_VALUE
         || seriesNum == DATAID_NUM_WILDCARD_VALUE
@@ -89,7 +89,7 @@ class RtDataID {
         || moduleID  == DATAID_STRING_WILDCARD_VALUE
         || dataName  == DATAID_STRING_WILDCARD_VALUE
         || roiID     == DATAID_STRING_WILDCARD_VALUE
-        ; 
+        ;
   }
 
   // eliminate wildcards by assigning empty non-wildcard values
@@ -229,7 +229,5 @@ class RtDataIDPartialCompare {
     return one.partless(two);
   }
 };
-
-
 
 #endif

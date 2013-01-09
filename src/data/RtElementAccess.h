@@ -20,7 +20,7 @@ using namespace std;
 // class declaration
 class RtElementAccess {
 
-public:
+ public:
 
   // setup to access elements of this image and compute the indices of
   // non-NaN elements (O(n))
@@ -50,7 +50,7 @@ public:
   // get the element indices (from mask if there is one)
   vector<unsigned int> getElementIndices();
 
-protected:
+ protected:
 
   template<class T>
   void buildElementIndices();

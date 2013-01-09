@@ -9,83 +9,71 @@
 
 //*** constructors/destructors  ***//
 
-// default constructor
-
 RtMotion::RtMotion() : RtData() {
-    ACE_TRACE(("RtMRIImage::RtMotion()"));
+  ACE_TRACE(("RtMRIImage::RtMotion()"));
 
-    dataID.setModuleID("motion");
+  dataID.setModuleID("motion");
 
-    motion[TRANSLATION_X] = motion[TRANSLATION_Y] = motion[TRANSLATION_Z] =
-            motion[ROTATION_X] = motion[ROTATION_Y] = motion[ROTATION_Z] = 0.0;
+  motion[TRANSLATION_X] = motion[TRANSLATION_Y] = motion[TRANSLATION_Z] =
+      motion[ROTATION_X] = motion[ROTATION_Y] = motion[ROTATION_Z] = 0.0;
 }
 
 // construct with motion
-
 RtMotion::RtMotion(double tx, double ty, double tz,
                    double rx, double ry, double rz) {
-    ACE_TRACE(("RtMRIImage::RtMotion()"));
+  ACE_TRACE(("RtMRIImage::RtMotion()"));
 
-    dataID.setModuleID("motion");
+  dataID.setModuleID("motion");
 
-    setMotion(tx, ty, tz, rx, ry, rz);
+  setMotion(tx, ty, tz, rx, ry, rz);
 }
-
-
-// destructor
 
 RtMotion::~RtMotion() {
 }
 
 
 // set the motion vector
-
 void RtMotion::setMotion(Motion _motion) {
-    memcpy(motion, _motion, NUM_MOTION_DIMENSIONS * sizeof (double));
+  memcpy(motion, _motion, NUM_MOTION_DIMENSIONS * sizeof (double));
 }
 
 // set the motion vector
-
 void RtMotion::setMotion(double tx, double ty, double tz,
                          double rx, double ry, double rz) {
-    motion[TRANSLATION_X] = tx;
-    motion[TRANSLATION_Y] = ty;
-    motion[TRANSLATION_Z] = tz;
-    motion[ROTATION_X] = rx;
-    motion[ROTATION_Y] = ry;
-    motion[ROTATION_Z] = rz;
+  motion[TRANSLATION_X] = tx;
+  motion[TRANSLATION_Y] = ty;
+  motion[TRANSLATION_Z] = tz;
+  motion[ROTATION_X] = rx;
+  motion[ROTATION_Y] = ry;
+  motion[ROTATION_Z] = rz;
 }
 
 // set a single motion dimension
-
 void RtMotion::setMotionDimension(double m, MotionDimension d) {
-    if (d < 0 || d >= NUM_MOTION_DIMENSIONS) {
-        return;
-    }
+  if (d < 0 || d >= NUM_MOTION_DIMENSIONS) {
+    return;
+  }
 
-    motion[d] = m;
+  motion[d] = m;
 }
 
 // get the motion vector
-
 double* const RtMotion::getMotion() {
-    return motion;
+  return motion;
 }
 
 // get a single motion dimension
-
 double RtMotion::getMotionDimension(MotionDimension d) {
-    if (d < 0 || d >= NUM_MOTION_DIMENSIONS) {
-        return 0.0;
-    }
+  if (d < 0 || d >= NUM_MOTION_DIMENSIONS) {
+    return 0.0;
+  }
 
-    return motion[d];
+  return motion[d];
 }
 
 // serialize as xml (dummy function)
-
 TiXmlElement* RtMotion::serializeAsXML(TiXmlElement *requestElement) {
-    return new TiXmlElement("motion");
+  return new TiXmlElement("motion");
 }
 
 // unserialize xml (dummy function)
@@ -102,5 +90,3 @@ void RtMotion::unserializeXML(TiXmlElement* element) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

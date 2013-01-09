@@ -13,8 +13,6 @@
 #include"site_config.h" // for SITE_ID_NUMBER
 #include<climits>
 
-// default constructor
-
 RtDataID::RtDataID() {
   siteIDNum = SITE_ID_NUMBER;
   studyNum  = DATAID_NUM_UNSET_VALUE;
@@ -27,8 +25,6 @@ RtDataID::RtDataID() {
 
   instantiationTime = getExperimentElapsedTime();
 }
-
-// constructor with known fields
 
 RtDataID::RtDataID(unsigned int _studyNum,
                    unsigned int _seriesNum,
@@ -49,25 +45,16 @@ RtDataID::RtDataID(unsigned int _studyNum,
   instantiationTime = getExperimentElapsedTime();
 }
 
-// copy constructor
-
 RtDataID::RtDataID(const RtDataID &other) {
   copyFromOtherDataID(other);
 }
 
 
 // constructor from a data id from a previous module
-
 RtDataID::RtDataID(RtDataID &prevModuleData,
                    const RtStreamComponent &thisModule) {
   setFromInputDataID(prevModuleData, thisModule);
 }
-
-
-// constructor from another data id
-//RtDataID::RtDataID(const RtDataID &other) {
-//
-//}
 
 RtDataID::~RtDataID() {
 }
@@ -91,9 +78,8 @@ void RtDataID::initializeToWildCards() {
 bool RtDataID::operator!=(const RtDataID &other) const {
   return !(*this == other);
 }
-// comparison
-// if either data id has a field blank ("") it is ignored in the comparison
 
+// if either data id has a field blank ("") it is ignored in the comparison
 bool RtDataID::operator==(const RtDataID &other) const {
   return
       (
@@ -131,12 +117,13 @@ bool RtDataID::operator==(const RtDataID &other) const {
 }
 
 // less
-
 bool RtDataID::operator<(const RtDataID &other) const {
   /* Logic:
    * if a != b, return whether or not it's a < b or a > b
    * if a == b, continue to next field
-   * NOTE: If fields are added to the DataID in the future, another logic block needs to be added*/
+   * NOTE: If fields are added to the DataID in the future,
+   * another logic block needs to be added
+   */
 
   // siteIDNum
   if (siteIDNum != other.siteIDNum) {
@@ -187,10 +174,12 @@ bool RtDataID::partless(const RtDataID &other) const {
   /* Logic:
    * if a != b, return whether or not it's a < b or a > b
    * if a == b, continue to next field
-   * NOTE: If fields are added to the DataID in the future, another logic block needs to be added*/
+   * NOTE: If fields are added to the DataID in the future, another logic
+   * block needs to be added
+   */
 
   // siteIDNum
-  if (siteIDNum != other.siteIDNum 
+  if (siteIDNum != other.siteIDNum
       && !(siteIDNum == DATAID_NUM_WILDCARD_VALUE
            || other.siteIDNum == DATAID_NUM_WILDCARD_VALUE)) {
     return (siteIDNum < other.siteIDNum);
@@ -204,42 +193,42 @@ bool RtDataID::partless(const RtDataID &other) const {
   };
 
   // seriesNum
-  if (seriesNum != other.seriesNum 
+  if (seriesNum != other.seriesNum
       && !(seriesNum == DATAID_NUM_WILDCARD_VALUE
            || other.seriesNum == DATAID_NUM_WILDCARD_VALUE)) {
     return (seriesNum < other.seriesNum);
   };
 
   // timePoint
-  if (timePoint != other.timePoint 
+  if (timePoint != other.timePoint
       && !(timePoint == DATAID_NUM_WILDCARD_VALUE
            || other.timePoint == DATAID_NUM_WILDCARD_VALUE)) {
     return (timePoint < other.timePoint);
   };
 
   // history
-  if (history != other.history 
-      && !(history == DATAID_STRING_WILDCARD_VALUE 
+  if (history != other.history
+      && !(history == DATAID_STRING_WILDCARD_VALUE
            || other.history == DATAID_STRING_WILDCARD_VALUE)) {
     return (history < other.history);
   };
 
   // moduleID
-  if (moduleID != other.moduleID 
-      && !(moduleID == DATAID_STRING_WILDCARD_VALUE 
+  if (moduleID != other.moduleID
+      && !(moduleID == DATAID_STRING_WILDCARD_VALUE
            || other.moduleID == DATAID_STRING_WILDCARD_VALUE)) {
     return (moduleID < other.moduleID);
   };
 
   // dataName
-  if (dataName != other.dataName 
-      && !(dataName == DATAID_STRING_WILDCARD_VALUE 
+  if (dataName != other.dataName
+      && !(dataName == DATAID_STRING_WILDCARD_VALUE
            || other.dataName == DATAID_STRING_WILDCARD_VALUE)) {
     return (dataName < other.dataName);
   };
 
   // roiID
-  if (roiID != other.roiID 
+  if (roiID != other.roiID
       && !(roiID == DATAID_STRING_WILDCARD_VALUE || other.roiID == DATAID_STRING_WILDCARD_VALUE)) {
     return (roiID < other.roiID);
   };
@@ -248,23 +237,7 @@ bool RtDataID::partless(const RtDataID &other) const {
   return false;
 }
 
-// output to a stream
-// ostream &RtDataID::operator<<(ostream &out) const {
-//   out
-//     << ":" << siteIDNum
-//     << ":" << studyNum
-//     << ":" << seriesNum
-//     << ":" << timePoint
-//     << ":" << history
-//     << ":" << moduleID
-//     << ":" << dataName
-//     << ":" << roiID
-//     << ":";
-//   return out;
-// }
-
 // get a string version of the ID
-
 string RtDataID::toString() const {
   stringstream sstr("");
 
@@ -282,7 +255,6 @@ string RtDataID::toString() const {
 }
 
 // set the ID from a string
-
 void RtDataID::setFromString(const string &id) {
 
   string delim = ":";
@@ -300,14 +272,15 @@ void RtDataID::setFromString(const string &id) {
     }
     else {
       unsigned int siteIDNum;
-      fail = !RtConfigVal::convert<unsigned int>(siteIDNum, id.substr(startAt, foundAt - startAt));
+      fail = !RtConfigVal::convert<unsigned int>(
+          siteIDNum, id.substr(startAt, foundAt - startAt));
       this->setSiteIDNum(siteIDNum);
     }
   } else { fail = true; }
   if(fail) {
     this->setSiteIDNum(DATAID_NUM_UNSET_VALUE);
   }
-    
+
 
   // find and set studyNum
   startAt = foundAt + 1;
@@ -319,7 +292,8 @@ void RtDataID::setFromString(const string &id) {
     }
     else {
       unsigned int studyNum;
-      fail = !RtConfigVal::convert<unsigned int>(studyNum, id.substr(startAt, foundAt - startAt));
+      fail = !RtConfigVal::convert<unsigned int>(
+          studyNum, id.substr(startAt, foundAt - startAt));
       this->setStudyNum(studyNum);
     }
   } else { fail = true; }
@@ -337,7 +311,8 @@ void RtDataID::setFromString(const string &id) {
     }
     else {
       unsigned int seriesNum;
-      fail = !RtConfigVal::convert<unsigned int>(seriesNum, id.substr(startAt, foundAt - startAt));
+      fail = !RtConfigVal::convert<unsigned int>(
+          seriesNum, id.substr(startAt, foundAt - startAt));
       this->setSeriesNum(seriesNum);
     }
   } else { fail = true; }
@@ -355,7 +330,8 @@ void RtDataID::setFromString(const string &id) {
     }
     else {
       unsigned int timePoint;
-      fail = !RtConfigVal::convert<unsigned int>(timePoint, id.substr(startAt, foundAt - startAt));
+      fail = !RtConfigVal::convert<unsigned int>(
+          timePoint, id.substr(startAt, foundAt - startAt));
       this->setTimePoint(timePoint);
     }
   } else { fail = true; }
@@ -409,14 +385,12 @@ void RtDataID::setFromString(const string &id) {
 }
 
 // set from input data
-
 void RtDataID::setFromInputData(RtData &prevModuleData,
                                 const RtStreamComponent &thisModule) {
   setFromInputDataID(prevModuleData.getDataID(), thisModule);
 }
 
 // set from input data
-
 void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
                                   const RtStreamComponent &thisModule) {
   copyFromOtherDataID(prevModuleDataID);
@@ -427,14 +401,12 @@ void RtDataID::setFromInputDataID(RtDataID &prevModuleDataID,
 }
 
 // copy from other data
-
 void RtDataID::copyFromOtherDataID(const RtDataID &otherDataID) {
   (*this) = otherDataID;
-  //siteIDNum = SITE_ID_NUMBER;
+  // TODO: stomp siteId?
 }
 
 // output to stream
-
 ostream & operator<<(ostream &out, const RtDataID &id) {
   out << id.toString();
   return out;

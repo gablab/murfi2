@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtDataImage.h declares a base class for a generic image
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -404,7 +404,7 @@ class RtDataImage : public RtData {
 };
 
 
-// definition of template class here due to gcc template compilation limitations
+// make definitions of templated functions available at compile time.
 #include"RtDataImage.tpp"
 
 

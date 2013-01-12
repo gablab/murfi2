@@ -1,14 +1,26 @@
-/******************************************************************************
- * RtDesignMatrix.cpp defines a class that represents a model's basis
- * functions
+/*=========================================================================
+ *  RtDesignMatrix.cpp defines a class that represents a model's basis
+ *  functions
+ * 
+ *  NOTE: much of the funcitonality is inhereted from vnl_matrix, so see this
+ *  help page for usage of this class:
+ *  http://public.kitware.com/vxl/doc/release/core/vnl/html/classvnl__matrix.html
+ * 
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- * NOTE: much of the funcitonality is inhereted from vnl_matrix, so see this
- * help page for usage of this class:
- * http://public.kitware.com/vxl/doc/release/core/vnl/html/classvnl__matrix.html
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-01-21
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
  *
- *****************************************************************************/
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtDesignMatrix.h"
 

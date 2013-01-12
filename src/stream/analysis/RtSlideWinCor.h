@@ -1,10 +1,9 @@
-/******************************************************************************
- * RtSlideWinCor.h is the header for a class that estimates the
- * instantaneous activation at each voxel in an image using a sliding
- * window correlation analysis from Gembris 2000
- *
- *****************************************************************************/
-
+/*=========================================================================
+ *  RtSlideWinCor.h is the header for a class that estimates the
+ *  instantaneous activation at each voxel in an image using a sliding
+ *  window correlation analysis from Gembris 2000
+ * 
+ * ****************************************************************************/
 #ifndef RTSLIDEWINCOR_
 #define RTSLIDEWINCOR_
 

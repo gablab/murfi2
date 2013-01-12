@@ -1,10 +1,9 @@
-/******************************************************************************
- * RtSlideWinCor.cpp is the implementation of a class that estimates the
- * instantaneous activation at each voxel in an image using a sliding
- * window correlation analysis from Gembris 2000
- *
- *****************************************************************************/
-
+/*=========================================================================
+ *  RtSlideWinCor.cpp is the implementation of a class that estimates the
+ *  instantaneous activation at each voxel in an image using a sliding
+ *  window correlation analysis from Gembris 2000
+ * 
+ * ****************************************************************************/
 #include"RtSlideWinCor.h"
 #include"RtMRIImage.h"
 #include"gsl/gsl_cdf.h"

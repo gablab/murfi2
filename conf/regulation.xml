@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- example murfi configuration file for realtime feedback analysis -->
-<!--  Oliver Hinds <ohinds@mit.edu> 2009-04-09  -->
 
 <study name="STUDY_NAME">
   <option name="subjectsDir"> SUBJECTS_DIR </option>
@@ -132,7 +131,7 @@
          and the data store -->
     <option name="roiID"> active </option>
 
-    <!-- filename to load the mask from relative to subject mask directory 
+    <!-- filename to load the mask from relative to subject mask directory
 	 (if present, overrides generation parms below) -->
     <option name="filename"> active_mask.nii </option>
 
@@ -166,7 +165,7 @@
     <output>display</output>
 
     <option name="maskRoiID">brain</option>
-    
+
     <option name="dumpAlgoVars"> false </option>
     <option name="dumpAlgoVarsFilename"> log/incrglmdump.txt </option>
 
@@ -222,7 +221,7 @@
       <!-- filename from which to load a custom hrf (overrides cannonical) -->
       <option name="hrfFilename"> unset </option>
 
-      
+
       <!-- parameters specifying nuisance basis functions -->
 
       <!-- trend regressors will be added up to the order specified here -->
@@ -230,7 +229,7 @@
 
       <!-- model subject head motion -->
       <option name="modelMotionParameters"> false </option>
-      
+
       <!-- model temporal derivatives of neural conditions -->
       <option name="modelTemporalDerivatives"> false </option>
 
@@ -247,11 +246,11 @@
            estimation a lil, specifying too few will result in
            unmodeled events. count proper.  -->
       <option name="maxNumEvents"> 0 </option>
-      
+
       <!-- duration of each event (tr) -->
       <option name="eventDuration"> 0 </option>
 
-      
+
       <!-- these nuisance regressors model artifacts in the image
            timeseries. -->
       <option name="modelArtifacts"> false </option>
@@ -259,7 +258,7 @@
 
     </design>
 
-    
+
   </module>
 
 
@@ -274,7 +273,7 @@
     <option name="maskRoiID"> brain </option>
 
     <option name="numDataPointsForErrEst"> 20 </option>
-    
+
   </module>
 
   <!-- compute feedback -->
@@ -298,4 +297,3 @@
   </module>
 
 </processor>
-

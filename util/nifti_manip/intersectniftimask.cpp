@@ -1,4 +1,3 @@
-// Oliver Hinds <ohinds@mit.edu> 2008-03-21
 // intersect nifti masks
 
 #include<nifti1_io.h>
@@ -42,13 +41,13 @@ int main(int argc, char **argv) {
     }
 
     if(nextmask->datatype != mask->datatype) {
-      cout << "error: trying to compare masks of two different datatypes" 
+      cout << "error: trying to compare masks of two different datatypes"
 	   << endl;
       continue;
     }
 
     if(nextmask->nvox != mask->nvox) {
-      cout << "error: masks of two different sizes: " 
+      cout << "error: masks of two different sizes: "
 	   << nextmask->nvox << " != " << mask->nvox << endl
 	   << "trying to continue" << endl;
       continue;
@@ -56,21 +55,21 @@ int main(int argc, char **argv) {
 
     nifti_image_load(nextmask);
     short *nextdata = (short*) nextmask->data;
-    
+
     for(int j = 0; j < nextmask->nvox; j++) {
       if(!nextdata[j]) {
 	data[j] = 0;
       }
     }
 
-    nifti_image_free(nextmask); 
+    nifti_image_free(nextmask);
   }
 
   // debugging
   //nifti_image_infodump(mask);
 
   // write the file
-  strcpy(mask->fname,argv[1]); 
+  strcpy(mask->fname,argv[1]);
   nifti_image_write(mask);
   //nifti_image_free(mask);
 

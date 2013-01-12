@@ -1,6 +1,4 @@
 // convert a nifti file into an svm example file
-//
-// Oliver Hinds <ohinds@mit.edu> 2009-07-15
 
 #include<fstream>
 #include<iostream>
@@ -97,7 +95,7 @@ bool parseArgs(int argc, char **argv) {
 
 
 
-// main 
+// main
 int main(int argc, char **argv) {
   executename = argv[0];
   if(!parseArgs(argc,argv)) {
@@ -158,7 +156,7 @@ int main(int argc, char **argv) {
     cerr << "failed to open label file " << labelfile << endl;
     return 1;
   }
-  
+
 
   vector<int> labels;
   int label;
@@ -188,7 +186,7 @@ int main(int argc, char **argv) {
     }
 
     // read the mask data
-    nifti_image_load(mask);    
+    nifti_image_load(mask);
   }
   short *maskdat = (short*) mask->data;
 
@@ -208,7 +206,7 @@ int main(int argc, char **argv) {
     if(splitfiles) {
       stringstream thisfile;
       thisfile << t << '.' << outfile;
-      
+
       examplestr.open(thisfile.str().c_str());
     }
 
@@ -243,4 +241,3 @@ int main(int argc, char **argv) {
 
   return 0;
 }
-

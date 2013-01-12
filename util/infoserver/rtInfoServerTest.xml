@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- configuration file for the example dataset -->
-<!--  Oliver Hinds <ohinds@mit.edu> 2008-08-11  -->
 
 <study name="example">
     <!-- this is assuming the run directory is the base directory -->

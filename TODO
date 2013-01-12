@@ -1,21 +1,20 @@
-# Oliver Hinds <ohinds@mit.edu>
-# 2007-09-28
+# -*- org -*-
 
-NOWNOWNOW
-- integrate registration methods. 
-- add roi viewing/editing to gui (viewing done)
-- add conditions to info server
-- fix incremental GLM (DONE)
-- look into image saving (DONE)
+* critical
+ - integrate registration methods.
+ - add roi viewing/editing to gui (viewing done)
+ - add conditions to info server
+ - fix incremental GLM (DONE)
+ - look into image saving (DONE)
 
 * config:
  - allow spec of input data ids in module names
 
 * logging:
  - adapt ace logger framework to allow writing to files and screen
-   simultaneously. 
+   simultaneously.
  - provide nice interface for logging
- - add auto logging code to processing 
+ - add auto logging code to processing
 
 * streams:
  - work on serial/parallel processing dependencies
@@ -25,7 +24,7 @@ NOWNOWNOW
 
 * data
  - enforce directory structure (make structure as well)
- - make standardized interface to serialize data using XML. 
+ - make standardized interface to serialize data using XML.
  - clean up setInfo parts of RtActivation and RtMaskImage (for
    creation based on geometry of other images)
  - add interator type interface for mask image
@@ -40,21 +39,20 @@ NOWNOWNOW
    iterator method to choose like data
  - think about id stuff (make id strings consistent '-','_', etc.)
  - add nifti reading/writing (DONE)
- - add (un)mosaic 
+ - add (un)mosaic
 
 * data structures
  - fill out functionality in RtDataImage.h and turn it into a .txx
- - roi 
- - RtMaskImage has duplicated functionality to handle RtMRIImage 
+ - roi
+ - RtMaskImage has duplicated functionality to handle RtMRIImage
    and RtActivation
-
 
 * algorithms
  - cox (1995) accumulative correlation (DONE, but sux)
  - indiv voxel least squares solver (DONE, but adapt to voxel unspecific calcs)
  - gembris (2000) sliding window correlation
  - kalman filter (rouche 2004)
- - hinds (2008) single image correlation 
+ - hinds (2008) single image correlation
    first implementation done. method needs to be extended
    to allow arbitrary contrasts
  - add baseline scans at beginning to let stabilize (DONE)
@@ -63,7 +61,7 @@ NOWNOWNOW
  - completely general ROI sum arithmetic
  - hooks for external apps
   + motion correction
-  + intensity normalization 
+  + intensity normalization
   + registration
   + brain mask computation (DONE)
 
@@ -74,4 +72,3 @@ NOWNOWNOW
 
 * simple gui
  - overlay (z-scores on epi) (DONE, but need fixed)
-

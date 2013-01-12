@@ -1,4 +1,3 @@
-// Oliver Hinds <ohinds@mit.edu> 2008-03-21
 // unmosaic a nifti file
 
 #include<nifti1_io.h>
@@ -46,7 +45,7 @@ bool unmosaic(nifti_image *img, int matrixSize, int numSlices, double sliceVoxDi
   img->dim[3] = numSlices;
   img->nz = numSlices;
   img->nt = img->nu = img->nv = img->nw = 1;
-  
+
   for(int i = 4; i < 8; i++) {
     img->dim[i] = 1;
   }
@@ -89,7 +88,7 @@ bool unmosaic(nifti_image *img, int matrixSize, int numSlices, double sliceVoxDi
   img->data = (void*) newdata;
 
   //nifti_image_infodump(img);
-  
+
 
   return true;
 }
@@ -116,7 +115,7 @@ void printUsage() {
        << " -o: output filename (required)" << endl
        << " -m: matrix size (default 64)" << endl
        << " -n: number of slices (default 32)" << endl
-       << " -s: slice direction voxel size (mm, default 3.85)" << endl    
+       << " -s: slice direction voxel size (mm, default 3.85)" << endl
        << " -v: verbose" << endl
        << " -?: print usage" << endl
        << endl;
@@ -180,7 +179,7 @@ bool parseArgs(int argc, char **argv) {
 
 
 
-// main 
+// main
 int main(int argc, char **argv) {
   executeName = argv[0];
   parseArgs(argc,argv);
@@ -213,7 +212,7 @@ int main(int argc, char **argv) {
   }
 
   // modify the header to change the filename
-  strcpy(img->fname, outfile.c_str());  
+  strcpy(img->fname, outfile.c_str());
 
   // debugging
   //nifti_image_infodump(img);

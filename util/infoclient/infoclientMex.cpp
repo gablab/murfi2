@@ -4,7 +4,7 @@
  *
  *    first argument is a command (success indicated with logical 0) :
  *       start:  starts the infoclient.
- *               usage: success 
+ *               usage: success
  *                   = infoclient('start', localport, remotehost, remoteport)
  *
  *       add:    adds a data id to the notify list.
@@ -17,7 +17,7 @@
  *               new data, otherwise it is empty.
  *               usage: dataStructArray = infoclient('check')
  *
- *       acknlg: acknowledges reciept of data. 
+ *       acknlg: acknowledges reciept of data.
  *               usage: success = infoclient('acknowledge', dataStruct)
  *
  *       stop:   stops the infoclient.
@@ -25,9 +25,6 @@
  *
  *       send:   sends a message independent of the infoclient
  *               usage: success = infoclient('send',message,host,port)
- *
- *
- * Oliver Hinds <ohinds@mit.edu> 2009-05-01
  **/
 
 #include"infoclientLib.h"
@@ -72,7 +69,7 @@ mxArray *createInfoStructArray(vector<Info> &infov) {
   dims[1] = infov.size() == 0 ? 0 : 1;
 
   // create array
-  mxArray *arr = mxCreateStructArray(2, dims, 
+  mxArray *arr = mxCreateStructArray(2, dims,
 			   infoNumFields, (const char**) infoFieldNames);
   if(arr == NULL) {
     mexErrMsgTxt("couldn't create struct array.");
@@ -84,7 +81,7 @@ mxArray *createInfoStructArray(vector<Info> &infov) {
   for(vector<Info>::iterator i = infov.begin(); i != infov.end(); i++, ind++) {
     setInfoFields(arr, ind, (*i));
   }
-  
+
   return arr;
 }
 
@@ -119,7 +116,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   // different behavior based on command
   int status;
   string errMsg;
-  if(command == "start") {  // find host and port from args 
+  if(command == "start") {  // find host and port from args
     TcpInfo info;
     TcpInfo remoteInfo;
 
@@ -157,13 +154,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     status = startInfoclient(info, remoteInfo, errMsg);
 
     if(status == SUCCESS) {
-      mexPrintf("started the infoclient on %s:%d, listening for %s:%d.\n", 
+      mexPrintf("started the infoclient on %s:%d, listening for %s:%d.\n",
 		info.host.c_str(), info.port, remoteInfo.host.c_str(), remoteInfo.port);
     }
 
     assignSuccessStatus(nlhs,plhs,status);
   }
-  else if(command == "add") { // 
+  else if(command == "add") { //
 
     // check number of parameters
     if(nrhs != 3) {
@@ -191,13 +188,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     status = addInfoclient(dataName, roiName, errMsg);
 
     if(status == SUCCESS) {
-      mexPrintf("listening for %s:%s on the infoclient.\n", 
+      mexPrintf("listening for %s:%s on the infoclient.\n",
 		dataName.c_str(), roiName.c_str());
     }
 
     assignSuccessStatus(nlhs,plhs,status);
   }
-  else if(command == "remove") { // 
+  else if(command == "remove") { //
 
     // check number of parameters
     if(nrhs != 3) {
@@ -225,7 +222,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     status = removeInfoclient(dataName, roiName, errMsg);
 
     if(status == SUCCESS) {
-      mexPrintf("removed %s:%s from the infoclient.\n", 
+      mexPrintf("removed %s:%s from the infoclient.\n",
 		dataName.c_str(), roiName.c_str());
     }
 
@@ -239,7 +236,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
       assignSuccessStatus(nlhs,plhs,FAILURE);
       return;
     }
-    
+
     vector<Info> changed;
     status = checkInfoclient(changed,errMsg);
 
@@ -308,11 +305,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     errMsg = err.str();
     assignSuccessStatus(nlhs,plhs,FAILURE);
   }
-  
+
   if(status == FAILURE) {
     mexErrMsgTxt(errMsg.c_str());
   }
 
   return;
 }
-

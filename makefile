@@ -2,8 +2,6 @@
 #
 # master makefile for the real-time fMRI system murfi
 #
-# Oliver Hinds <ohinds@mit.edu> 2007-08-14
-#
 ##########################################################################
 
 

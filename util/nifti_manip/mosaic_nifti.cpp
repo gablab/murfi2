@@ -1,4 +1,3 @@
-// Oliver Hinds <ohinds@mit.edu> 2008-03-21
 // mosaic a nifti file
 
 #include<nifti1_io.h>
@@ -140,7 +139,7 @@ bool parseArgs(int argc, char **argv) {
 
 
 
-// main 
+// main
 int main(int argc, char **argv) {
   executeName = argv[0];
   if(!parseArgs(argc,argv)) {
@@ -175,7 +174,7 @@ int main(int argc, char **argv) {
   }
 
   // modify the header to change the filename
-  strcpy(img->fname, outfile.c_str());  
+  strcpy(img->fname, outfile.c_str());
 
   // debugging
   nifti_image_infodump(img);

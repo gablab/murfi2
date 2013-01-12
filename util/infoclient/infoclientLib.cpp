@@ -1,7 +1,5 @@
 /**
  * infoclientLib provides an interface to murfi's infoclient
- *
- * Oliver Hinds <ohinds@mit.edu> 2009-05-01
  **/
 
 #include"infoclientLib.h"

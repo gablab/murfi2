@@ -1,6 +1,5 @@
 #!/bin/bash
 # make a brain mask using bet
-# Oliver Hinds <ohinds@mit.edu> 2008-03-20
 
 usage() {
     echo "$0 <nifti_file> <mask_file> [bet_flags]"
@@ -33,4 +32,3 @@ source $FSLDIR/etc/fslconf/fsl.sh
 # run bet
 echo bet $infile $maskfile $betflags &
 bet $infile $maskfile $betflags &
-

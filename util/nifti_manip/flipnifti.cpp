@@ -1,4 +1,3 @@
-// Oliver Hinds <ohinds@mit.edu> 2008-03-21
 // threshold a nifti file
 
 #include<nifti1_io.h>
@@ -101,7 +100,7 @@ int main(int argc, char **argv) {
   }
 
   // modify the header to change the filename
-  strcpy(img->fname, outfile.c_str());  
+  strcpy(img->fname, outfile.c_str());
 
   // debugging
   nifti_image_infodump(img);

@@ -1,6 +1,4 @@
 //serve a 4d nifti image file simulating the scanner for murfi
-//
-// Oliver Hinds <ohinds@mit.edu> 2011-04-14
 
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Connector.h"
@@ -156,7 +154,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     ei->dThick = vols->pixdim[3]/1.1;
 
-    cout 
+    cout
         << "nCol " <<  ei->nCol << " "
         << "nLin " <<  ei->nLin << " "
         << "iNoOfImagesInMosaic " <<  ei->iNoOfImagesInMosaic << " "
@@ -178,7 +176,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     ei->dPosCor = vols->sto_xyz.m[3][1];
     ei->dPosTra = vols->sto_xyz.m[3][2];
 */
-  
+
     ei->dRowSag = rotMat[0][0];
     ei->dRowCor = rotMat[0][1];
     ei->dRowTra = rotMat[0][2];
@@ -202,7 +200,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     // mosaic
     short *newdata = new short[numPix];
-    short *imgdata 
+    short *imgdata
         = (short*) vols->data + i*vols->dim[1]*vols->dim[2]*vols->dim[3];
 
     unsigned int newrow, newcol, oldslc, newind;
@@ -224,7 +222,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
         newdata[newind] = 0;
       }
     }
-    
+
 
     ei->iAcquisitionNumber = i+1;
 

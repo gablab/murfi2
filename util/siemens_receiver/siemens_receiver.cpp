@@ -1,8 +1,6 @@
 /******************************************************************************
  * program to save images sent from a scanner using the external
  * sender ice functor
- *
- * Oliver Hinds <ohinds@mit.edu> 2009-05-31
  *****************************************************************************/
 
 #include"ExternalImageInfo.h"
@@ -11,7 +9,7 @@
 #ifdef WIN32
   #include <winsock.h>
   #define CLOSE closesocket
-  typedef int socklen_t; 
+  typedef int socklen_t;
 #else
   #include <sys/socket.h>
   #include <sys/types.h>
@@ -66,7 +64,7 @@ bool fileExist(const string &filename);
 ExternalImageInfo *readImageInfo(SOCKET sock);
 short *readImageData(SOCKET sock, const ExternalImageInfo &info);
 int saveImage(const Params &p, const ExternalImageInfo &info, short *data);
-int saveRawImage(const string &filename, 
+int saveRawImage(const string &filename,
 		 const ExternalImageInfo &info, short *data);
 int closeSocket(SOCKET sock);
 void onTerminate(int param);
@@ -239,7 +237,7 @@ short *readImageData(SOCKET sock, const ExternalImageInfo &info) {
     }
     else {
       rec += recNow;
-    } 
+    }
   }
 
   // error check
@@ -276,7 +274,7 @@ int saveImage(const Params &p, const ExternalImageInfo &info, short *data) {
   filename = getImageFilename(p,runNum,imgNum,info);
 
   if(!saveRawImage(filename, info, data) && !p.quiet) {
-    cout << "saved raw image " << filename << " of " 
+    cout << "saved raw image " << filename << " of "
 	 << info.iImageDataLength << " bytes" << endl;
   }
 
@@ -297,10 +295,10 @@ string getImageFilename(const Params &p, int runNum, int imgNum, const ExternalI
     name << "_moco";
   }
 
-  name << "-" 
-       << setw(5) << setfill('0') << runNum 
-       << "-" 
-       << setw(5) << setfill('0') << imgNum 
+  name << "-"
+       << setw(5) << setfill('0') << runNum
+       << "-"
+       << setw(5) << setfill('0') << imgNum
        << ".raw";
 
   return name.str();
@@ -311,7 +309,7 @@ string getImageFilename(const Params &p, int runNum, int imgNum, const ExternalI
 // number of image dimensions (unsigned int 32)
 // size of each dimension (unsigned int 32)
 // data (short 16)
-int saveRawImage(const string &filename, 
+int saveRawImage(const string &filename,
 		 const ExternalImageInfo &info, short *data) {
 
   ofstream os(filename.c_str(), ios::out | ios::binary);
@@ -448,17 +446,17 @@ void onTerminate(int param) {
 
 // check if file exists on either windoze or posix
 bool fileExist(const string &filename) {
-  #ifdef WIN32 
+  #ifdef WIN32
   {
     DWORD fileattr;
-    
+
     fileattr = GetFileAttributes(filename.c_str());
     if(fileattr == 0xFFFFFFFF) {
       return false;
     }
     return true;
-  } 
-  #else 
+  }
+  #else
   {
     ifstream intest(filename.c_str());
     return !intest.fail();

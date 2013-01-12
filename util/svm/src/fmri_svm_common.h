@@ -1,7 +1,5 @@
 // common functions used for svm training and cleassification on fmri
 // data using svm-multiclass for training/classification
-//
-// Oliver Hinds <ohinds@mit.edu> 2009-07-15
 
 #ifndef FMRI_SVM_COMMON
 #define FMRI_SVM_COMMON
@@ -39,7 +37,7 @@ struct Parms {
   string modelFile;            // filename to store trained model in
   string weightFile;           // filename to store model weights in
   string resultFile;           // filename to store test results in
-  STRUCTMODEL model;           // svm-struct model 
+  STRUCTMODEL model;           // svm-struct model
   double *alpha;               // alpha parm array
 
   bool   error;                // error flag
@@ -49,7 +47,7 @@ struct Parms {
     numWords(0),
     alpha(NULL),
     error(false) {
-      
+
       sample.n = 0;
       sample.examples = NULL;
 
@@ -78,8 +76,8 @@ bool readSample(
 
 // create a single pattern from input data
 template<class T>
-PATTERN createPattern(unsigned int curDoc, 
-		      unsigned int numOnVox, 
+PATTERN createPattern(unsigned int curDoc,
+		      unsigned int numOnVox,
 		      unsigned int totNumVox,
 		      const T*     data,
 		      const short* maskData);

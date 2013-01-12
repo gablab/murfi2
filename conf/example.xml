@@ -2,7 +2,6 @@
 
 <!--  example configuration file for the realtime fMRI system       -->
 <!--  NOTE... ':' characters are not allowed in any names or values -->
-<!--  Oliver Hinds <ohinds@mit.edu> 2007-09-12                      -->
 
 <!-- basic setup of the study and subject -->
 <study name="foo">

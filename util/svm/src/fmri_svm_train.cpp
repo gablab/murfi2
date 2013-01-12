@@ -1,6 +1,4 @@
 // run svm on fmri data
-//
-// Oliver Hinds <ohinds@mit.edu> 2009-07-15
 
 #include"fmri_svm_train.h"
 #include"fmri_svm_common.h"
@@ -45,16 +43,16 @@ int main(int argc, char **argv) {
   cout << "training model " << endl;
 
   // train
-  svm_learn_struct_joint(parms.sample, 
+  svm_learn_struct_joint(parms.sample,
 			 &parms.strctParm,
-			 &parms.learnParm, 
-			 &parms.kernelParm, 
-			 &parms.model, 
+			 &parms.learnParm,
+			 &parms.kernelParm,
+			 &parms.model,
 			 ONESLACK_DUAL_CACHE_ALG);
 
 //  if(!parms.weightFile.empty()) {
 //    add_weight_vector_to_linear_model(parms.model.svm_model);
-//    float *weights 
+//    float *weights
 //      = convertDoubleArrayToFloatArray(parms.model.svm_model->lin_weights,
 //				       maxWnum);
 //    saveNifti(parms.maskFile, parms.weightFile, weights);
@@ -223,9 +221,9 @@ bool createTrainingData(Parms &parms) {
   // read data
 
   // training input
-  if(!readSample(parms.exampleFile, 
-		 parms.labelFile, 
-		 maskdat, 
+  if(!readSample(parms.exampleFile,
+		 parms.labelFile,
+		 maskdat,
 		 numOnVox,
 		 parms.sample)) {
     cerr << "error reading training examples" << endl;
@@ -233,10 +231,10 @@ bool createTrainingData(Parms &parms) {
   }
 
   // initialize the model
-//  init_struct_model(parms.sample, 
-//		    &parms.model, 
-//		    &parms.strctParm, 
-//		    &parms.learnParm, 
+//  init_struct_model(parms.sample,
+//		    &parms.model,
+//		    &parms.strctParm,
+//		    &parms.learnParm,
 //		    &parms.kernelParm);
 
   return true;

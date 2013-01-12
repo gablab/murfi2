@@ -1,6 +1,4 @@
 #!/bin/bash
-#
-# Oliver Hinds <ohinds@mit.edu> 2008-09-23
 
 usage() {
     echo $0
@@ -146,4 +144,3 @@ for file in $input; do
 
     apply_reg "$savexfmfile" "$file" "$targ" "$of"
 done
-

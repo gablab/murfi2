@@ -1,6 +1,4 @@
 // classify fmri data using a model trained using fmri_svm-light_train
-//
-// Oliver Hinds <ohinds@mit.edu> 2009-07-15
 
 #include"fmri_svm_test.h"
 #include"fmri_svm_common.h"
@@ -60,7 +58,7 @@ int main(int argc, char **argv) {
   LABEL *results = new LABEL[parms.sample.n];
   int correct = 0, total = 0;
   for(int i = 0; i < parms.sample.n; i++) {
-    results[i] = classify_struct_example(parms.sample.examples[i].x, 
+    results[i] = classify_struct_example(parms.sample.examples[i].x,
 					 &parms.model, &parms.strctParm);
     if(!quiet) cout << "example " << i << ": " << results[i].cls;
     if(haveTruth) {
@@ -77,8 +75,8 @@ int main(int argc, char **argv) {
 
   // print performance
   if(haveTruth) {
-    if(!quiet) cout << "percent correct: " 
-	 << setprecision(4) << 100 * correct / (double) total << "% (" 
+    if(!quiet) cout << "percent correct: "
+	 << setprecision(4) << 100 * correct / (double) total << "% ("
 	 << correct << "/" << total << ")" << endl;
   }
 
@@ -204,7 +202,7 @@ bool createTestingData(Parms &parms) {
   // read the model
   if(!readFmriModel(parms.modelFile, parms)) {
     cerr << "could not read trained model file " << parms.modelFile << endl;
-    return false;    
+    return false;
   }
 
   nifti_image *mask = NULL;

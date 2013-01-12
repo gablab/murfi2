@@ -3,8 +3,6 @@
 # makefile in the src dir for the real-time fMRI system
 # all this does is tell each subdirectory to make itself
 #
-# Oliver Hinds <ohinds@mit.edu> 2007-08-14
-#
 ##########################################################################
 
 CFLAGS += $(FRONT_FLAG)

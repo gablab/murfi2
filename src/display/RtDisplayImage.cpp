@@ -276,20 +276,10 @@ bool RtDisplayImage::init() {
   // make a menu
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-  // TODO: don't require 'r', still require 'q' so the experimenter knows
-  // that the run finished succesfully.
   glutAddMenuEntry("'q' quit",'q');
-  glutAddMenuEntry("'r' fmri run", 'r');
-
-  // glutAddMenuEntry("'s' show live scanner images", 's');
-  // glutAddMenuEntry("'d' show difference images", 'd');
-  // glutAddMenuEntry("'m' show mean image", 'm');
-  // glutAddMenuEntry("'v' show variance image", 'n');
-  // glutAddMenuEntry("'n' show intensity norm image", 'n');
-  // glutAddMenuEntry("'=/+' toggle positive mask visibility", '=');
-  // glutAddMenuEntry("'-/_' toggle negative mask visibility", '-');
-  // glutAddMenuEntry("'z' toggle positive overlay visibility", 'z');
-  // glutAddMenuEntry("'Z' toggle negative overlay visibility", 'Z');
+  glutAddMenuEntry("'s' show live scanner images", 's');
+  glutAddMenuEntry("'t' decrease the z-score threshold for display", 't');
+  glutAddMenuEntry("'T' increase the z-score threshold for display", 'T');
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -297,6 +287,11 @@ bool RtDisplayImage::init() {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0.0, (double) width, 0.0, (double) height, 1.0, -1.0);
+
+  RtConfigFmriRun runConfig;
+  runConfig.parseConfigFile(getExperimentConfigFile());
+  prepareRun(runConfig);
+  executeRun(runConfig);
 
   initialized = true;
 
@@ -1136,57 +1131,14 @@ void RtDisplayImage::action(int code) {
   string oldImageDisplayType = imageDisplayType;
 
   // for running
-  RtConfigFmriRun runConfig;
   string response;
 
   switch(code) {
     case 'q': // quit
       glutMaster.CallGlutLeaveMainLoop();
       break;
-    case 'r': // run
-      // TODO: skip the requirement to press 'r' at all. Don't wait for an
-      // action to load the config file, just do it in init().
-      //
-      // REMOVED SASEN@MIT.EDU 08/02/2012, NOT NEEDED FOR TEXAS PROJECT
-      // JUST WANT TO RUN THE CONFIG WE PASSED IN, BUT STILL HAVE DISPLAY.
-      //
-      // cout << endl;
-      // simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
-      // cout << endl;
-
-      // // ask for a config file name
-      // cout << "enter the config file name for the fmri run (q to quit): ";
-      // cin >> response;
-      // runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str()
-      //                           + response);
-      cout << getExperimentConfigFile();
-      cout << endl;
-      runConfig.parseConfigFile(getExperimentConfigFile());
-      prepareRun(runConfig);
-      executeRun(runConfig);
-      break;
     case 's': // scanner image
       imageDisplayType = ID_MOSAIC;
-      break;
-    case 'd': // difference image
-      imageDisplayType = ID_TEMPDIFF;
-      break;
-    case 'm': // mean image
-      imageDisplayType = ID_TEMPMEAN;
-      break;
-    case '=': // pos mask
-    case '+':
-      posMaskOn = !posMaskOn;
-      break;
-    case '-': // neg mask
-    case '_':
-      negMaskOn = !negMaskOn;
-      break;
-    case 'n': // inorm
-      imageDisplayType = ID_SPATIALINTENSITYNORM;
-      break;
-    case 'v': // variance image
-      imageDisplayType = ID_TEMPVAR;
       break;
     case 't': // threshold val down
       threshold /= thresholdModAmount;
@@ -1195,12 +1147,6 @@ void RtDisplayImage::action(int code) {
     case 'T': // threshold val up
       threshold *= thresholdModAmount;
       cout << "new display stat threshold " << threshold << endl;
-      break;
-    case 'z': // positive overlay
-      posOverlayOn = !posOverlayOn;
-      break;
-    case 'Z': // negative overlay
-      negOverlayOn = !negOverlayOn;
       break;
   }
 

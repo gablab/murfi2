@@ -1,8 +1,6 @@
 /*=========================================================================
  *  RtDataImage.cpp defines a class for an MR image.
- *  EXCEPT YOU CAN"T DEFINE TEMPLATE FUNCTIONS OUTSIDE HEADERS.
- *  SO SEE RtDataImage.h
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +17,7 @@
  *
  *=========================================================================*/
 
-// SEE RtDataImage.h
+// SEE RtDataImage.tpp
 #include<RtDataImage.h>
 
 /*****************************************************************************
@@ -30,5 +28,3 @@
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtDisplayImage.cpp defines a class for displaying single images
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -271,13 +271,16 @@ bool RtDisplayImage::init() {
   glViewport(0, 0, width, height);
   glutMaster.EnableTimerFunction();
   glutMaster.SetTimerToCurrentWindow();
-  //glutMaster.SetTimerPeriod(1000);
+  glutMaster.SetTimerPeriod(100);
 
   // make a menu
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 
+  // TODO: don't require 'r', still require 'q' so the experimenter knows
+  // that the run finished succesfully.
   glutAddMenuEntry("'q' quit",'q');
   glutAddMenuEntry("'r' fmri run", 'r');
+
   // glutAddMenuEntry("'s' show live scanner images", 's');
   // glutAddMenuEntry("'d' show difference images", 'd');
   // glutAddMenuEntry("'m' show mean image", 'm');
@@ -303,6 +306,7 @@ bool RtDisplayImage::init() {
 // perpare for a single run
 bool RtDisplayImage::prepareRun(RtConfig &config) {
 
+  // TODO: this needs a serious rethinking
   // configuration
 
   numMeas = config.isSet("scanner:measurements")
@@ -525,7 +529,8 @@ void RtDisplayImage::notify(const RtDataID &id) {
     }
 
     gnuPlot->reset_plot();
-    gnuPlot->plot_x(postc.extract(id.getTimePoint(),1),posActivationSumRoiID.c_str());
+    gnuPlot->plot_x(postc.extract(id.getTimePoint(),1),
+                    posActivationSumRoiID.c_str());
 
     return;
   }
@@ -546,7 +551,8 @@ void RtDisplayImage::notify(const RtDataID &id) {
     }
 
     //gp.reset_plot();
-    gnuPlot->plot_x(negtc.extract(id.getTimePoint(),1),negActivationSumRoiID.c_str());
+    gnuPlot->plot_x(negtc.extract(id.getTimePoint(),1),
+                    negActivationSumRoiID.c_str());
     //numTimepoints++;
     return;
   }
@@ -634,11 +640,12 @@ void RtDisplayImage::notify(const RtDataID &id) {
 
   img = (RtMRIImage*) getDataStore().getData(id);
 
-  ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getDataID().getTimePoint()));
-  //cout << "display got an image " << img->getID() << endl;
+  ACE_DEBUG((LM_DEBUG, "display got an image %d\n",
+             img->getDataID().getTimePoint()));
 
   // set the info strings
-  bottomStr = img->getDataID().getModuleID() + " " + img->getDataID().getDataName();
+  bottomStr = img->getDataID().getModuleID() + " " +
+      img->getDataID().getDataName();
 
   stringstream s;
   s << img->getDataID().getTimePoint();
@@ -671,8 +678,6 @@ void RtDisplayImage::makeTexture() {
     glPixelTransferf(GL_RED_BIAS,   brightness);
     glPixelTransferf(GL_GREEN_BIAS, brightness);
     glPixelTransferf(GL_BLUE_BIAS,  brightness);
-
-    //cout << "image " << img->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
 
     newImageType = false;
   }
@@ -760,18 +765,18 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
     if(!overlay->getScaleIsInverted()
        && imageData[i] > threshold) {
       overlayImg[4*i+0] = SHRT_MAX; // r
-      overlayImg[4*i+1] = (short) rint(min(1,((imageData[i]
-                                               -threshold)/overlay->getCeiling()))
-                                       *SHRT_MAX); // g
+      overlayImg[4*i+1] = (short) rint(
+          min(1, ((imageData[i]-threshold)/overlay->getCeiling()))
+          *SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
     else if(!overlay->getScaleIsInverted()
             && imageData[i] < -threshold) {
       overlayImg[4*i+0] = 0; // r
-      overlayImg[4*i+1] = (short) rint(min(1,-1*((imageData[i]
-                                                  +threshold)/overlay->getCeiling()))
-                                       *SHRT_MAX); // g
+      overlayImg[4*i+1] = (short) rint(
+          min(1,-1*((imageData[i]+threshold)/overlay->getCeiling()))
+          *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
@@ -930,49 +935,6 @@ void RtDisplayImage::makeNegMaskTexture() {
   needsRepaint = true;
 }
 
-// debug
-// GLuint tex;
-//
-// /**
-//  * makes the textures for display from the current volume
-//  */
-// void makeTextures(int width, int height) {
-//   GLuint format = GL_LUMINANCE;
-//   GLenum type = GL_SHORT;
-//   int bpp = 8*sizeof(short);
-//
-//   /* delete the old texture if there is one */
-//   if(tex != 0) {
-//     return;
-//     //glDeleteTextures(1, &tex);
-//   }
-//
-//   short *img = (short*) malloc(width*height*sizeof(short));
-//   for(int i = 0; i < width*height; i++) {
-//     img[i] = i;
-//   }
-//
-//   /* perform texture init */
-//   glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-//
-//
-//   /* get the id for the textures */
-//   glGenTextures(1, &tex);
-//
-//   if(!glIsTexture(tex)) {
-//     printf("texture id %d\n",tex);
-//   }
-//
-//   /* create the image texture */
-//   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, width, height, 0, format, type, img);
-//   free(img);
-// }
-
 void RtDisplayImage::CallBackDisplayFunc(void) {
   ACE_TRACE(("RtDisplayImage::CallBackDisplayFunc"));
 
@@ -982,12 +944,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   glDepthFunc(GL_LEQUAL);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
-
-  //glAlphaFunc(GL_GREATER,0.1);
-  //glEnable(GL_ALPHA_TEST);
-  //glEnable(GL_CULL_FACE);
-
-  //glClear(GL_COLOR_BUFFER_BIT);
 
   /* gl init stuff */
   glPushMatrix();
@@ -1005,51 +961,15 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   // if there is no image yet, draw a message and return
   if(!glIsTexture(imageTex) || img == NULL) {
     drawString(10,10,"no image loaded",1,0,0);
-
-    // debug
-    //    makeTextures(width,height);
-    //
-    //  /* turn on texture mapping */
-    //  glEnable(RT_DISPLAY_IMAGE_TEXTURE);
-    //
-    //  /* draw the main texture */
-    //  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
-    //
-    //  int w = width;
-    //  int h = height;
-    //  double tw = width;
-    //  double th = height;
-    //
-    //  /* make a quadrilateral and provide texture coords */
-    //  glBegin(GL_QUADS); {
-    //    glTexCoord2d(0.0,0.0);
-    //    glVertex3f(0, h, 0.0);
-    //    glTexCoord2d(tw,0.0);
-    //    glVertex3f(w, h, 0.0);
-    //    glTexCoord2d(tw,th);
-    //    glVertex3f(w, 0, 0.0);
-    //    glTexCoord2d(0,th);
-    //    glVertex3f(0, 0, 0.0);
-    //  } glEnd();
-    //
-    //  glDisable(RT_DISPLAY_IMAGE_TEXTURE);
-
     glutSwapBuffers();
     return;
   }
-
-  //  ACE_DEBUG((LM_DEBUG, "showing image %d\n", img->getAcquisitionNum()));
-
-  //  int imgw = img->getDim(1);
-  //  int imgh = img->getDim(0);
 
   /* turn on texture mapping */
   glEnable(RT_DISPLAY_IMAGE_TEXTURE);
 
   /* draw the main texture */
   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, imageTex);
-
-  //cout << "drawing image tex: " << imageTex << endl;
 
   /* make a quadrilateral and provide texture coords */
   glBegin(GL_QUADS); {
@@ -1066,8 +986,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the negMask texture */
   if(negMaskOn && glIsTexture(negMaskTex)) {
-    //cout << "drawing neg mask tex: " << negMaskTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negMaskTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1086,8 +1004,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the posMask texture */
   if(posMaskOn && glIsTexture(posMaskTex)) {
-    //cout << "drawing pos mask tex: " << posMaskTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posMaskTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1106,8 +1022,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the pos overlay texture */
   if(posOverlayOn && glIsTexture(posOverlayTex)) {
-    //cout << "drawing pos overlay tex: " << posOverlayTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posOverlayTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1126,8 +1040,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the neg overlay texture */
   if(negOverlayOn && glIsTexture(negOverlayTex)) {
-    //cout << "drawing neg overlay tex: " << negOverlayTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negOverlayTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1174,15 +1086,6 @@ void RtDisplayImage::CallBackReshapeFunc(int w, int h){
   if(width != w || height != h) {
     glutReshapeWindow(width,height);
   }
-  //
-  //   width = w;
-  //   height= h;
-  //
-  //   cout << w << " " << h << endl;
-  //
-  //   glViewport(0, 0, width, height);
-  //
-  //   CallBackDisplayFunc();
 }
 
 
@@ -1241,6 +1144,9 @@ void RtDisplayImage::action(int code) {
       glutMaster.CallGlutLeaveMainLoop();
       break;
     case 'r': // run
+      // TODO: skip the requirement to press 'r' at all. Don't wait for an
+      // action to load the config file, just do it in init().
+      //
       // REMOVED SASEN@MIT.EDU 08/02/2012, NOT NEEDED FOR TEXAS PROJECT
       // JUST WANT TO RUN THE CONFIG WE PASSED IN, BUT STILL HAVE DISPLAY.
       //
@@ -1270,12 +1176,12 @@ void RtDisplayImage::action(int code) {
       break;
     case '=': // pos mask
     case '+':
-        posMaskOn = !posMaskOn;
-    break;
+      posMaskOn = !posMaskOn;
+      break;
     case '-': // neg mask
     case '_':
-        negMaskOn = !negMaskOn;
-    break;
+      negMaskOn = !negMaskOn;
+      break;
     case 'n': // inorm
       imageDisplayType = ID_SPATIALINTENSITYNORM;
       break;
@@ -1323,7 +1229,8 @@ void RtDisplayImage::drawBlackBoxForString(const char *str, GLint x, GLint y) {
 }
 
 //draws a string at the specified coordinates
-void RtDisplayImage::drawString(GLint x, GLint y, const char* s, float r, float g, float b) {
+void RtDisplayImage::drawString(
+    GLint x, GLint y, const char* s, float r, float g, float b) {
   unsigned int lines, i;
 
   glMatrixMode(GL_PROJECTION);

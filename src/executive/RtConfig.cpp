@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtConfig.cpp defines a class that controls configuration of a a
  *  real-time fMRI session.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,8 +36,8 @@ const RtConfigVal RtConfig::unset;
 //*** constructors/destructors  ***//
 
 // copy constructor (called often)
-RtConfig::RtConfig(const RtConfig &other) 
-  : parms(other.parms) {
+RtConfig::RtConfig(const RtConfig &other)
+    : parms(other.parms) {
   // nothing to do here
 }
 
@@ -139,17 +139,17 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     // "name" attribute
     while((text = elmt->IterateChildren(childName, text))) {
       if(text->Type() == TiXmlNode::TEXT) {
-	return RtConfigVal(text->ValueStr());
+        return RtConfigVal(text->ValueStr());
       }
     }
 
     while((text = elmt->IterateChildren("option", text))) {
-      if(text->ToElement() != NULL 
-	 && TIXML_SUCCESS 
-	   == text->ToElement()->QueryValueAttribute("name",&optionName)
-	 && optionName == childName) {
-	
-	return RtConfigVal(text->ToElement()->GetText());
+      if(text->ToElement() != NULL
+         && TIXML_SUCCESS
+         == text->ToElement()->QueryValueAttribute("name",&optionName)
+         && optionName == childName) {
+
+        return RtConfigVal(text->ToElement()->GetText());
       }
     }
 
@@ -160,7 +160,7 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     TiXmlNode *me;
     while((me = node->IterateChildren(node->FirstChild()))) {
       if(me->Type() == TiXmlNode::TEXT) {
-	return RtConfigVal(me->ValueStr());
+        return RtConfigVal(me->ValueStr());
       }
     }
     return unset;
@@ -174,22 +174,22 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
   while((child = elmt->IterateChildren(childName, child))) {
     string val = get(rest,child);
 
-    // FIGURE OUT WHAT TO DO IF WE'RE EMPTY (COULD MEAN TO BE EMPTY)
+    // TODO figure out what to do if we're empty (could mean to be empty)
     if(!val.empty()) {
       return RtConfigVal(val);
     }
   }
 
   while((child = elmt->IterateChildren("option", child))) {
-    if(child->ToElement() != NULL 
-       && TIXML_SUCCESS 
-         == child->ToElement()->QueryValueAttribute("name",&optionName)
+    if(child->ToElement() != NULL
+       && TIXML_SUCCESS
+       == child->ToElement()->QueryValueAttribute("name",&optionName)
        && optionName == childName) {
       string val = get(rest,child);
-	
-      // FIGURE OUT WHAT TO DO IF WE'RE EMPTY (COULD MEAN TO BE EMPTY)
+
+      // TODO figure out what to do if we're empty (could mean to be empty)
       if(!val.empty()) {
-	return RtConfigVal(val);
+        return RtConfigVal(val);
       }
     }
   }
@@ -235,7 +235,7 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
     TiXmlNode *text = 0;
     while((text = elmt->IterateChildren(childName, text))) {
       if(text->Type() == TiXmlNode::TEXT) {
-	return text;
+        return text;
       }
     }
 
@@ -246,7 +246,7 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
     TiXmlNode *me;
     while((me = node->IterateChildren(node->FirstChild()))) {
       if(me->Type() == TiXmlNode::TEXT) {
-	return me;
+        return me;
       }
     }
     return NULL;
@@ -256,12 +256,12 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
   }
 
   // look though each child with name, return the first non NULL
-  bool searchAllChildren = (childName == "*"); 
+  bool searchAllChildren = (childName == "*");
   TiXmlNode *child = 0;
-  while((child = (searchAllChildren 
-		  ? elmt->IterateChildren(child)
-		  : elmt->IterateChildren(childName, child)
-		  ))) {
+  while((child = (searchAllChildren
+                  ? elmt->IterateChildren(child)
+                  : elmt->IterateChildren(childName, child)
+                  ))) {
     TiXmlNode *ret = getNode(rest,child);
     if(ret != NULL) {
       return ret;
@@ -289,7 +289,7 @@ bool RtConfig::isSet(const string &name) {
 //   node:  the xml node to start from
 //  out: success or failure
 bool RtConfig::set(const string &name, const string &value,
-		      TiXmlNode *node) {
+                   TiXmlNode *node) {
   if(node == NULL) {
     return "";
   }
@@ -369,7 +369,7 @@ void RtConfig::dumpConfig(ostream &os) {
 
 // get the attribute with a certain name
 TiXmlAttribute *RtConfig::getElementAttribute(TiXmlElement *elmt,
-					      const string &name) {
+                                              const string &name) {
   if(elmt == NULL) {
     return NULL;
   }
@@ -387,17 +387,17 @@ TiXmlAttribute *RtConfig::getElementAttribute(TiXmlElement *elmt,
 // build a map between attribute names and values
 map<string,string> RtConfig::getAttributeMap(TiXmlElement &ele) {
   map<string,string> attrMap;
-  
+
   // find all attributes
   for(TiXmlAttribute *attr = ele.FirstAttribute(); attr; attr = attr->Next()) {
     string name = attr->Name();
     attrMap[name] = attr->ValueStr();
   }
-  
+
   return attrMap;
 }
 
-// get the indent for printing 
+// get the indent for printing
 const char *RtConfig::getIndent(unsigned int numIndents) {
   static const char *pINDENT="                                      + ";
   static const unsigned int LENGTH=strlen(pINDENT);
@@ -418,7 +418,7 @@ const char * RtConfig::getIndentAlt(unsigned int numIndents) {
 }
 
 int RtConfig::dumpNodeAttribs(TiXmlElement* pElement, ostream &os,
-				 unsigned int indent) {
+                              unsigned int indent) {
   if(!pElement) return 0;
 
   TiXmlAttribute* pAttrib=pElement->FirstAttribute();
@@ -429,12 +429,11 @@ int RtConfig::dumpNodeAttribs(TiXmlElement* pElement, ostream &os,
     i++;
     pAttrib=pAttrib->Next();
   }
-  //if(i) os << endl;
   return i;
 }
 
 void RtConfig::dumpNode(TiXmlNode* pParent, ostream &os,
-			   unsigned int indent) {
+                        unsigned int indent) {
   if(!pParent) return;
 
   TiXmlNode* pChild;
@@ -451,22 +450,22 @@ void RtConfig::dumpNode(TiXmlNode* pParent, ostream &os,
   os << getIndent(indent);
 
   switch(t) {
-  case TiXmlNode::DOCUMENT:
-    //
-    break;
+    case TiXmlNode::DOCUMENT:
+      //
+      break;
 
-  case TiXmlNode::ELEMENT:
-    os << pParent->Value() << endl;
-    dumpNodeAttribs(pParent->ToElement(), os, indent+1);
-    break;
+    case TiXmlNode::ELEMENT:
+      os << pParent->Value() << endl;
+      dumpNodeAttribs(pParent->ToElement(), os, indent+1);
+      break;
 
-  case TiXmlNode::TEXT:
-    pText = pParent->ToText();
-    os << pText->Value() << endl;;
-    break;
+    case TiXmlNode::TEXT:
+      pText = pParent->ToText();
+      os << pText->Value() << endl;;
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   for(pChild = pParent->FirstChild(); pChild != 0;
@@ -485,5 +484,3 @@ void RtConfig::dumpNode(TiXmlNode* pParent, ostream &os,
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

@@ -1,6 +1,6 @@
 /*=========================================================================
  *  definition of a class that holds information about the loaded experiment
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@
 
 // old gui includes
 #ifdef USE_FRONTEND
-    #include"RtDisplayImage.h"
+#include"RtDisplayImage.h"
 #endif
 
 // site specific defines (siteID, etc)
@@ -114,7 +114,8 @@ unsigned int getSeriesNumFromUID(char *uid) {
   }
 
   if(DEBUG_LEVEL & ADVANCED) {
-    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end()) << " series num=" << seriesNum << endl;
+    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end())
+         << " series num=" << seriesNum << endl;
   }
 
   return seriesNum;
@@ -190,7 +191,7 @@ bool initExperiment() {
   ACE_Date_Time t;
   char str[] = "yyyyhhmmss";
   sprintf(str, "%04ld%02ld%02ld%02ld",
-	  t.year(), t.hour(), t.minute(), t.second());
+          t.year(), t.hour(), t.minute(), t.second());
   RtConfigVal::convert<unsigned int>(studyID,str);
 
   // parse the configuration
@@ -229,7 +230,7 @@ bool initExperiment() {
     numExistingSeries++;
     p.operator=(config.getVolFilename(numExistingSeries+1,1));
   } while(exists(p) && is_regular(p)
-	  && numExistingSeries < TOO_MANY_EXISTING_SERIES);
+          && numExistingSeries < TOO_MANY_EXISTING_SERIES);
   cout << "found " << numExistingSeries << " existing series" << endl;
 
 
@@ -297,7 +298,8 @@ int executeRun(RtConfigFmriRun &conf) {
 
   // make sure only one backend is running at a time
   if(conductor != NULL && conductor->isRunning()) {
-    cerr << "an instance of the backend computation is already running. can't start another" << endl;
+    cerr << "an instance of the backend computation is already running. "
+         << "can't start another" << endl;
     return 1;
   }
   else if(conductor != NULL) {
@@ -332,7 +334,8 @@ int executeRunBlocking(RtConfigFmriRun &conf) {
 
   // make sure only one backend is running at a time
   if(conductor != NULL && conductor->isRunning()) {
-    cerr << "an instance of the backend computation is already running. can't start another" << endl;
+    cerr << "an instance of the backend computation is already running. "
+         << "can't start another" << endl;
     return 1;
   }
   else if(conductor != NULL) {
@@ -392,28 +395,28 @@ bool parseArgs(int argc, char **args) {
 
     switch(option) {
 
-    case 'f':
-    case 'c':
-      confFilename = cmdOpts.opt_arg();
-      break;
+      case 'f':
+      case 'c':
+        confFilename = cmdOpts.opt_arg();
+        break;
 
-    case 's':
-      confXmlStr = cmdOpts.opt_arg();
-      break;
+      case 's':
+        confXmlStr = cmdOpts.opt_arg();
+        break;
 
-    case 'h':
-    case '?':
-      cout << "here" << endl;
-      return false; // automatically prints usage
+      case 'h':
+      case '?':
+        cout << "here" << endl;
+        return false; // automatically prints usage
 
-    case ':':
-      cerr << "ERROR: -" << cmdOpts.opt_opt()
-           << " requires an argument" << endl;
-      return false;
+      case ':':
+        cerr << "ERROR: -" << cmdOpts.opt_opt()
+             << " requires an argument" << endl;
+        return false;
 
-    default:
-      cerr << "ERROR: unknown command line parameter: " << option << endl;
-      return false;
+      default:
+        cerr << "ERROR: unknown command line parameter: " << option << endl;
+        return false;
     }
   }
 
@@ -424,7 +427,7 @@ bool parseArgs(int argc, char **args) {
   }
   else if(DEBUG_LEVEL & BASIC) {
     cout << "config file is: " << confFilename << endl
-	 << "config str is: " << confXmlStr << endl;
+         << "config str is: " << confXmlStr << endl;
   }
 
   return true;
@@ -443,7 +446,7 @@ int ACE_TMAIN(int argc, char **args) {
   // initialize experiment
   if(!initExperiment()) {
     cerr << "ERROR: experiment initialization failed. check your config"
-	 << endl;
+         << endl;
     return 1;
   }
 
@@ -453,7 +456,7 @@ int ACE_TMAIN(int argc, char **args) {
   if((config.isSet("gui:disabled") &&
       config.get("gui:disabled")==false) ||
      (config.isSet("oldgui:disabled") && // "backward" compatibility
-     config.get("oldgui:disabled")==false)) {
+      config.get("oldgui:disabled")==false)) {
 
 #ifdef USE_FRONTEND
     // start a display

@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtConductor.h is the header for a class that oversees and coordinates all
  *  operations during a real-time fMRI session.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,16 +41,16 @@ using namespace std;
 // class declaration
 class RtConductor : public ACE_Task_Base {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
   // haha, you can't call this
-  RtConductor() : ACE_Task_Base(), configured(false), running(false) {}; 
+  RtConductor() : ACE_Task_Base(), configured(false), running(false) {};
 
   // constructor with config
-  explicit RtConductor(const RtConfigFmriRun &conf); 
+  explicit RtConductor(const RtConfigFmriRun &conf);
 
   // destructor
   virtual ~RtConductor();
@@ -59,7 +59,7 @@ public:
 
   // retreive configuration
   RtConfig &getConfig() { return config; }
- 
+
   // initialize config and prepare to run
   // NOTE: this function must me called before each call to run(), but its
   // called from the constructor taking a config class, too.
@@ -86,7 +86,7 @@ public:
   //   true (for success) or false
   bool addExistingInput(RtInput *in);
 
-   // adds a vector of inputs
+  // adds a vector of inputs
   //  in:
   //   in: vector of input object
   //  out:
@@ -116,7 +116,7 @@ public:
   bool addVectorOfOutputs(vector<RtOutput*> &outs);
 
   //*** operation routines  ***//
-  
+
   // begins execution of a realtime fMRI session
   //  out:
   //   0 (for success) or error code
@@ -141,21 +141,21 @@ public:
   // get an input by its name
   //  in
   //   name: name of input to get
-  //  out 
+  //  out
   //   pointer to the input object
   RtInput *getInputByName(const string &name);
 
   // get an output by its name
   //  in
   //   name: name of output to get
-  //  out 
+  //  out
   //   pointer to the output object
   RtOutput *getOutputByName(const string &name);
 
   // get all the outputs with a name
   //  in
   //   name: name of output to get
-  //  out 
+  //  out
   //   vector of pointers to the output objects
   vector<RtOutput*> getAllOutputsWithName(const string &name);
 
@@ -163,11 +163,11 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-protected:
+ protected:
 
   //*** methods ***//
 
-  // builds the processing stream 
+  // builds the processing stream
   //  out:
   //   true (for success) or false
   bool buildStream();
@@ -180,14 +180,14 @@ protected:
   // the data processing stream
   RtStream stream;
 
-  // output object to log 
+  // output object to log
   RtOutputFile outputLog;
 
   // these vectors store the objects that handle io
-  // note that their indexing is related to the code number they throw when 
+  // note that their indexing is related to the code number they throw when
   // processing is complete. the index is related by the START_CODE_?????
   // static class members
-  
+
   // vector of input objects
   vector<RtInput*> inputs;
 
@@ -203,7 +203,7 @@ protected:
   // whether we are running
   bool running;
 
-private:
+ private:
 
 };
 
@@ -217,5 +217,3 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtConfigFmriExperiment.cpp defines a class that controls configuration of
  *  an entire real-time fMRI experimental session.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,7 +62,8 @@ static const string DEFAULT_SERIESXFMMOD(  "series");
 static const unsigned int DEFAULT_INFOSERVERPORT(15001);
 
 // copy constructor (called often)
-RtConfigFmriExperiment::RtConfigFmriExperiment(const RtConfigFmriExperiment &other)
+RtConfigFmriExperiment::RtConfigFmriExperiment(
+    const RtConfigFmriExperiment &other)
     : RtConfig(other) {
 }
 

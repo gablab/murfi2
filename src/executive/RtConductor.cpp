@@ -1,7 +1,7 @@
 /*=========================================================================
  *  Conductor.cpp defines a class that oversees and coordinates all
  *  operations during a single real-time fMRI session.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,10 @@ static char *VERSION = "$Id$";
 #include<iostream>
 
 // constructor with config
-RtConductor::RtConductor(const RtConfigFmriRun &_config) : ACE_Task_Base(), 
-							   configured(false),
-							   running(false) {
+RtConductor::RtConductor(const RtConfigFmriRun &_config)
+  : ACE_Task_Base(),
+    configured(false),
+    running(false) {
   ACE_TRACE(("RtConductor::RtConductor"));
 
   configure(config);
@@ -39,7 +40,6 @@ RtConductor::RtConductor(const RtConfigFmriRun &_config) : ACE_Task_Base(),
 // destructor
 RtConductor::~RtConductor() {
   ACE_TRACE(("RtConductor::~RtConductor"));
-
 }
 
 //*** initialization routines  ***//
@@ -59,7 +59,7 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
   // attach code numbers to inputs
   curCodeNum = START_CODE_INPUTS;
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end();
-	curCodeNum++, i++) {
+      curCodeNum++, i++) {
     (*i)->setConductor(this);
     (*i)->setCodeNum(curCodeNum);
   }
@@ -68,28 +68,28 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
   if(config.get("study:log:disabled")==false) {
     if(!outputLog.open(config)) {
       cerr << "ERROR: could not open logfile \""
-	   << config.get("study:log:filename") << "\"" << endl;
+           << config.get("study:log:filename") << "\"" << endl;
     }
   }
 
   // look for infoclient
-  if(config.isSet("infoclient:disabled") 
+  if(config.isSet("infoclient:disabled")
      && config.get("infoclient:disabled") == false) {
 
     cout << "configuring infoclient" << endl;
 
-    if(!config.isSet("infoclient:localPort") 
-       ||!config.isSet("infoclient:remoteHost") 
+    if(!config.isSet("infoclient:localPort")
+       ||!config.isSet("infoclient:remoteHost")
        || !config.isSet("infoclient:remotePort")) {
-      cerr << "ERROR: localPort, remoteHost and remotePort are required options for infoclient" 
-	   << endl;
+      cerr << "ERROR: localPort, remoteHost and remotePort are required options for infoclient"
+           << endl;
       return false;
     }
 
-    infoClient 
-      = new RtInfoClient((unsigned int) config.get("infoclient:localPort"),
-			 config.get("infoclient:remoteHost").str(),
-			 (unsigned int) config.get("infoclient:remotePort"));
+    infoClient
+        = new RtInfoClient((unsigned int) config.get("infoclient:localPort"),
+                           config.get("infoclient:remoteHost").str(),
+                           (unsigned int) config.get("infoclient:remotePort"));
     addOutput(infoClient);
     infoClient->activate();
 
@@ -99,7 +99,7 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
   // attach code numbers to outputs
   curCodeNum = START_CODE_OUTPUTS;
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end();
-	curCodeNum++, i++) {    
+      curCodeNum++, i++) {
     (*i)->setConductor(this);
     (*i)->setCodeNum(curCodeNum);
   }
@@ -107,7 +107,7 @@ bool RtConductor::configure(const RtConfigFmriRun &_config) {
   // build the stream and its components
   if(!buildStream()) {
     cerr << "ERROR: failed to build the processing stream for the conductor"
-	 << endl;
+         << endl;
     return false;
   }
 
@@ -145,7 +145,7 @@ void RtConductor::deconfigure() {
   configured = false;
 }
 
-// builds the processing stream 
+// builds the processing stream
 //  in:
 //   config: configuration
 //  out:
@@ -182,10 +182,10 @@ bool RtConductor::addInput(RtInput *in) {
     in->setActivatable(true);
     in->setDeleteable(true);
   }
-  
+
   inputs.push_back(in);
   cout << "added input: " << in->getID() << endl;
-  
+
   return true;
 }
 
@@ -237,7 +237,7 @@ bool RtConductor::addOutput(RtOutput *out) {
   }
 
   outputs.push_back(out);
-  
+
 
   cout << "added output: " << out->getID() << endl;
 
@@ -282,45 +282,38 @@ bool RtConductor::addVectorOfOutputs(vector<RtOutput*> &outs) {
 //   true (for success) or false
 int RtConductor::svc() {
   ACE_TRACE(("RtConductor::svc"));
- 
+
   if(!configured) {
     cerr << "ERROR: the conductor for this run has not been configured"
- 	 << endl;
+         << endl;
     return false;
   }
- 
+
   // print start time to log file
   outputLog << "began running at ";
   outputLog.printNow();
   outputLog << "\n";
- 
+
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     if((*i)->isActivatable()) {
       (*i)->activate();
     }
   }
- 
+
   running = true;
-  while(running) { 
+  while(running) {
 #ifdef WIN32
-      Sleep(10);
+    Sleep(10);
 #else
-      usleep(10000); 
+    usleep(10000);
 #endif
   }
-
-  // wait for all threads to complete
-//  for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
-//    (*i)->wait();
-//  }
-//
-//  running = false;
 
   cout << "conductor waiting for stream to complete processing...";
   while(stream.isProcessing()) {
 #ifdef WIN32
-      Sleep(10000000);
+    Sleep(10000000);
 #else
     sleep(10000);
 #endif
@@ -351,13 +344,11 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     running = false;
   }
   else if(code == START_CODE_STREAM) { // stream component has data
-    //cout << "caught data " << data << " available signal from a stream component" << endl;
-
     // make data available to all output processes
-    for(vector<RtOutput*>::iterator i = outputs.begin(); 
-	i != outputs.end(); i++) {
+    for(vector<RtOutput*>::iterator i = outputs.begin();
+        i != outputs.end(); i++) {
       if(*i == infoClient) {
-	//cout << "setting data on info client" << endl;
+        //cout << "setting data on info client" << endl;
       }
 
       (*i)->setData(data);
@@ -366,9 +357,7 @@ void RtConductor::receiveCode(unsigned int code, RtData *data) {
     }
   }
   else if(code < START_CODE_OUTPUTS) { // this is an input
-    //cout << "caught data " << data << " as input to the stream" << endl;
-
-    // let the stream decide if it should spawn a new processing instance 
+    // let the stream decide if it should spawn a new processing instance
     stream.setInput(code,data);
 
     cout << "sent ready signal" << endl;
@@ -393,7 +382,7 @@ void RtConductor::log(stringstream &s) {
 // get an input by its name
 //  in
 //   name: name of input to get
-//  out 
+//  out
 //   pointer to the input object
 RtInput *RtConductor::getInputByName(const string &name) {
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
@@ -401,14 +390,14 @@ RtInput *RtConductor::getInputByName(const string &name) {
       return *i;
     }
   }
-  
+
   return NULL;
 }
 
 // get an output by its name
 //  in
 //   name: name of output to get
-//  out 
+//  out
 //   pointer to the output object (the first with the specified name)
 RtOutput *RtConductor::getOutputByName(const string &name) {
   for(vector<RtOutput*>::iterator i = outputs.begin(); i != outputs.end(); i++){
@@ -424,7 +413,7 @@ RtOutput *RtConductor::getOutputByName(const string &name) {
 // get all the outputs with a name
 //  in
 //   name: name of output to get
-//  out 
+//  out
 //   vector of pointers to the output objects
 vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
   vector<RtOutput*> outs;
@@ -454,5 +443,3 @@ char *RtConductor::getVersionString() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

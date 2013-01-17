@@ -1,8 +1,8 @@
 /*=========================================================================
  *  RtConfig.h is the header for a virtual base class that controls xml
  *  configuration reading. this class must be extended for particular types
- *  of configuration (setDefaults() and validateConfig() must be implemented). 
- * 
+ *  of configuration (setDefaults() and validateConfig() must be implemented).
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,15 +48,15 @@ class RtConductor;
 // class declaration
 class RtConfig {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtConfig() { }; 
+  RtConfig() { };
 
   // copy constructor (called often)
-  RtConfig(const RtConfig &other); 
+  RtConfig(const RtConfig &other);
 
   // destructor
   virtual ~RtConfig();
@@ -150,7 +150,7 @@ public:
   // utility function to build a map between attribute names and values
   static map<string,string> getAttributeMap(TiXmlElement &ele);
 
-protected:
+ protected:
 
   // sets some default configuration info
   // MUST OVERRIDE THIS IN SUBCLASS
@@ -174,7 +174,7 @@ protected:
   //**************************************************//
   // stuff to support printing to a stream
   // taken from the tinyXml examples
-  // 
+  //
 
   TiXmlAttribute *getElementAttribute(TiXmlElement *elmt, const string &name);
   const static unsigned int  NUM_INDENTS_PER_SPACE=2;
@@ -196,5 +196,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

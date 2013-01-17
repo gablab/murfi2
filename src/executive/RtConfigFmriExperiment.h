@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtConfigFmri.h is the header for class that controls xml configuration
  *  reading specific to an fmri experiment.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,12 +27,12 @@
 // class declaration
 class RtConfigFmriExperiment : public RtConfig {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtConfigFmriExperiment() : RtConfig() {}; 
+  RtConfigFmriExperiment() : RtConfig() {};
 
   // copy constructor (called often)
   RtConfigFmriExperiment(const RtConfigFmriExperiment &other);
@@ -49,10 +49,10 @@ public:
   virtual bool validateConfig();
 
 
-//******* computed values must have special functions
+  //******* computed values must have special functions
 
-// get the filename for the transformation file that takes the
-// experiment reference volume into the space of the current series
+  // get the filename for the transformation file that takes the
+  // experiment reference volume into the space of the current series
   string getSeriesXfmFilename(unsigned int series);
 
   // get the filename of a file transformed by using the series xfm on
@@ -76,7 +76,7 @@ public:
   //   timepoint
   //  out
   //   absolute file string
-  string getVolFilename(int _seriesNum,int _timepoint);  
+  string getVolFilename(int _seriesNum,int _timepoint);
 
   // build a filename for a design matrix in this experiment
   //  in
@@ -87,10 +87,10 @@ public:
 
   // get the version
   //  out: char array that represents the cvs version
-  virtual char *getVersionString();  
+  virtual char *getVersionString();
 
-protected:
-  
+ protected:
+
 };
 
 
@@ -104,5 +104,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

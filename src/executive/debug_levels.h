@@ -1,6 +1,6 @@
 /*=========================================================================
  *  debug levels
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
  *
  *=========================================================================*/
 
-#ifndef	DEBUG_LEVELS_H
+#ifndef DEBUG_LEVELS_H
 #define DEBUG_LEVELS_H
 
 #define NONE     ((unsigned int) (0))
@@ -28,11 +28,11 @@
 #define ADVANCED ((unsigned int) (1 << 4))
 #define TIMER    ((unsigned int) (1 << 5))
 
+#define DEBUG_LEVEL (TEMP)
 //#define DEBUG_LEVEL (TEMP | BASIC | MODERATE | ALLOC | ADVANCED)
 //#define DEBUG_LEVEL (BASIC | ADVANCED)
 //#define DEBUG_LEVEL (MODERATE)
 //#define DEBUG_LEVEL (BASIC)
-#define DEBUG_LEVEL (TEMP)
 //#define DEBUG_LEVEL (NONE)
 
 #endif

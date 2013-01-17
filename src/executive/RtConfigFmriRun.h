@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtConfigFmriRun.h is the header for class that controls xml configuration
  *  reading specific to a single run of an fmri experiment.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,13 +28,13 @@
 // class declaration
 class RtConfigFmriRun : public RtConfig {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
   RtConfigFmriRun() : RtConfig() {
-    
+
   };
 
   // copy constructor (called often)
@@ -58,10 +58,10 @@ public:
 
   // get the version
   //  out: char array that represents the cvs version
-  virtual char *getVersionString();  
+  virtual char *getVersionString();
 
-protected:
-  
+ protected:
+
 };
 
 #endif
@@ -74,5 +74,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

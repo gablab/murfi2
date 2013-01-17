@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtCode.h is the header for an abstract class that 
- * 
+ *  RtCode.h is the header for an abstract class that
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,13 +38,13 @@ class RtConductor;
 
 class RtCode {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
   RtCode();
-  
+
   // constructor w/ codenum
   RtCode(RtConductor *_conductor, int _codeNum);
 
@@ -66,7 +66,7 @@ public:
     return "$Id$";
   }
 
-protected:
+ protected:
 
   // send the code to the handler
   void sendCode(RtData *data);
@@ -95,5 +95,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

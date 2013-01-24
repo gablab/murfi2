@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtInfoSever.h declares a class for serving info about real to clients
- *  
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,68 +27,68 @@ using namespace std;
 // class declaration
 
 class RtInfoServer : public RtServerSocket {
-public:
+ public:
 
-    //*** constructors/destructors  ***//
+  //*** constructors/destructors  ***//
 
-    // default constructor
-    RtInfoServer();
+  // default constructor
+  RtInfoServer();
 
-    // constructor with port and host
-    RtInfoServer(unsigned short portNum);
+  // constructor with port and host
+  RtInfoServer(unsigned short portNum);
 
-    // destructor
-    virtual ~RtInfoServer();
+  // destructor
+  virtual ~RtInfoServer();
 
-    // open and start accepting
-    virtual bool open(RtConfig &config);
+  // open and start accepting
+  virtual bool open(RtConfig &config);
 
-    // hand of some data to be output
-    virtual void setData(RtData *data);
+  // hand of some data to be output
+  virtual void setData(RtData *data);
 
-    // get the version
-    //  out: char array that represents the cvs version
-    virtual char *getVersionString();
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
-protected:
+ protected:
 
-    // receive a message
-    // in
-    //  string received
-    //  stream received on
-    // out  success or failure
-    virtual string receiveMessage(string &message, ACE_SOCK_Stream &stream);
+  // receive a message
+  // in
+  //  string received
+  //  stream received on
+  // out  success or failure
+  virtual string receiveMessage(string &message, ACE_SOCK_Stream &stream);
 
-    // build a string from an XML document
-    // in
-    //  XML document
-    // out
-    //  string representation
-    string buildXMLString(TiXmlDocument &doc);
+  // build a string from an XML document
+  // in
+  //  XML document
+  // out
+  //  string representation
+  string buildXMLString(TiXmlDocument &doc);
 
-    // build an error element
-    // in
-    //  name of the error
-    // out
-    //  XML element containing error info
-    TiXmlElement *createErrorElement(string error);
+  // build an error element
+  // in
+  //  name of the error
+  // out
+  //  XML element containing error info
+  TiXmlElement *createErrorElement(string error);
 
-    // database
-    // NOTE: now this only stores activation sums by tr.
-    // TODO: reconfigure this to access the data store
-    RtData** posAct;
-    RtData** negAct;
+  // database
+  // NOTE: now this only stores activation sums by tr.
+  // TODO: reconfigure this to access the data store
+  RtData** posAct;
+  RtData** negAct;
 
-    unsigned int numPos;
-    unsigned int numNeg;
+  unsigned int numPos;
+  unsigned int numNeg;
 
-    // the last good trigger time
-    int lastGoodTriggerTR;
+  // the last good trigger time
+  int lastGoodTriggerTR;
 
-    // the last bad trigger time
-    int lastBadTriggerTR;
+  // the last bad trigger time
+  int lastBadTriggerTR;
 
-private:
+ private:
 
 };
 
@@ -102,5 +102,3 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

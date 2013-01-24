@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtInput.h declares a class that implements input operations 
- * 
+ *  RtInput.h declares a class that implements input operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,16 +31,16 @@
 // class declaration
 class RtInput : public RtIO, public ACE_Task_Base {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtInput(); 
+  RtInput();
 
   // destructor
   virtual ~RtInput();
-  
+
   // set the activatable property
   void setActivatable(bool _activatable) { activatable = _activatable; }
 
@@ -70,13 +70,13 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-protected:
+ protected:
 
   //*** private data members  ***//
 
   // callback to receive the input
   //sigc::signal<void, RtData&> callback;
-  
+
   string inputID;
   bool activatable;
 
@@ -92,5 +92,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

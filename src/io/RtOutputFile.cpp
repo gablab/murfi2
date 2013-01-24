@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtOutputfile.cpp defines a class that implements output operations
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,7 @@ bool RtOutputFile::open(RtConfig &config) {
   if(config.get("study:log:disabled")==true) {
     return true;
   }
-  
+
   // open the file for output
   string logname = config.get("study:log:filename");
 
@@ -58,29 +58,30 @@ bool RtOutputFile::open(RtConfig &config) {
   else if(logname.substr(0,1) != "/") {
     stringstream fs;
     fs << getExperimentConfig().get("study:log:directory") << "/"  << logname;
-  
+
     logname = fs.str();
   }
 
   cout << "opening logfile " << logname << endl;
   outfp.open(logname.c_str(), fstream::out | fstream::app);
 
-  // check 
+  // check
   if(outfp.fail()) {
-    cerr << "ERROR: could not open log file " << logname << " for output" << endl;
+    cerr << "ERROR: could not open log file " << logname << " for output"
+         << endl;
     return false;
   }
 
   // write a header
   ACE_Mutex mutx;
   mutx.acquire();
-  
+
   outfp << "################################################################"
-	<< endl << endl
-	<< "# realtime system log file" << endl
-	<< "# " << getVersionString() << endl
-	<< "# " << config.getVersionString() << endl
-	<< "created ";
+        << endl << endl
+        << "# realtime system log file" << endl
+        << "# " << getVersionString() << endl
+        << "# " << config.getVersionString() << endl
+        << "created ";
   printNow();
   outfp  << endl << endl;
 
@@ -127,7 +128,7 @@ bool RtOutputFile::close() {
   outfp << endl;
 
   outfp << "################################################################"
-	<< endl << endl;
+        << endl << endl;
 
   outfp.close();
 
@@ -151,8 +152,8 @@ void RtOutputFile::writeConfig(RtConfig &config) {
   // make sure noone else writes while we are
   mutx.acquire();
 
-  outfp << "configuration:" << endl 
-	<< "--------------" << endl;
+  outfp << "configuration:" << endl
+        << "--------------" << endl;
   config.dumpConfig(outfp);
   outfp << "--------------" << endl << endl;
 
@@ -175,5 +176,3 @@ char *RtOutputFile::getVersionString() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

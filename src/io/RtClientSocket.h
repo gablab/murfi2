@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtClientSocket.h declares a class that implements client io operations on a
  *  socket
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,12 +30,12 @@ using namespace std;
 // class declaration
 class RtClientSocket {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // constructor with port and host
-  RtClientSocket(const string &host, unsigned short portNum); 
+  RtClientSocket(const string &host, unsigned short portNum);
 
   // destructor
   virtual ~RtClientSocket();
@@ -51,7 +51,7 @@ public:
   //  success or failure
   virtual bool sendMessageToServer(const string &message);
 
-protected:
+ protected:
 
   // client address
   ACE_INET_Addr address;
@@ -65,8 +65,8 @@ protected:
   // termination character
   char messageTerminationChar;
 
-private:
-  RtClientSocket(); // never called  
+ private:
+  RtClientSocket(); // never called
 
 };
 
@@ -80,5 +80,3 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

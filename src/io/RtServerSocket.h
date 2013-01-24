@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtServerSocket.h declares a class that implements server io operations on a
  *  socket
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,32 +32,32 @@ using namespace std;
 // acceptor to allow connections from the scanner
 
 class RtSocketAcceptor : public ACE_SOCK_Acceptor {
-public:
+ public:
 
-    RtSocketAcceptor() : isOpen(false) {
-    }
+  RtSocketAcceptor() : isOpen(false) {
+  }
 
-    // called when connection is closed
+  // called when connection is closed
 
-    int close() {
-        isOpen = false;
-        return ACE_SOCK_Acceptor::close();
-    }
+  int close() {
+    isOpen = false;
+    return ACE_SOCK_Acceptor::close();
+  }
 
-    // accept a new connection
-    // just pass all the arguments along and set isOpen true
+  // accept a new connection
+  // just pass all the arguments along and set isOpen true
 
-    int accept(ACE_SOCK_Stream &new_stream, ACE_Addr *remote_addr = 0,
-               ACE_Time_Value *timeout = 0, int restart = 1,
-               int reset_new_handle = 0) {
-        int ret = ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout,
-                                            restart, reset_new_handle = 0);
-        isOpen = ret == 0;
-        return ret;
-    }
+  int accept(ACE_SOCK_Stream &new_stream, ACE_Addr *remote_addr = 0,
+             ACE_Time_Value *timeout = 0, int restart = 1,
+             int reset_new_handle = 0) {
+    int ret = ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout,
+                                        restart, reset_new_handle = 0);
+    isOpen = ret == 0;
+    return ret;
+  }
 
-    // keep track if we are currently open
-    bool isOpen;
+  // keep track if we are currently open
+  bool isOpen;
 };
 
 
@@ -65,62 +65,62 @@ public:
 // class declaration
 
 class RtServerSocket : public ACE_Task_Base, public RtOutput {
-public:
+ public:
 
-    //*** constructors/destructors  ***//
+  //*** constructors/destructors  ***//
 
-    // constructor with port and host
-    RtServerSocket(unsigned short portNum);
+  // constructor with port and host
+  RtServerSocket(unsigned short portNum);
 
-    // destructor
-    virtual ~RtServerSocket();
+  // destructor
+  virtual ~RtServerSocket();
 
-    // open and start accepting
-    virtual bool open(RtConfig &config);
+  // open and start accepting
+  virtual bool open(RtConfig &config);
 
-    // close and clean up
-    virtual bool close();
+  // close and clean up
+  virtual bool close();
 
-    // get the version
-    //  out: char array that represents the cvs version
-    virtual char *getVersionString();
+  // get the version
+  //  out: char array that represents the cvs version
+  virtual char *getVersionString();
 
-protected:
+ protected:
 
-    // receive a message
-    // in
-    //    string received
-    //    stream received on
-    // out  string response
-    virtual string receiveMessage(string &message, ACE_SOCK_Stream &stream);
+  // receive a message
+  // in
+  //    string received
+  //    stream received on
+  // out  string response
+  virtual string receiveMessage(string &message, ACE_SOCK_Stream &stream);
 
-    // send a message to a client
-    // in
-    //  message to send
-    //  stream to send on
-    // out
-    //  success or failure
-    virtual bool sendMessage(const string &message, ACE_SOCK_Stream &stream);
+  // send a message to a client
+  // in
+  //  message to send
+  //  stream to send on
+  // out
+  //  success or failure
+  virtual bool sendMessage(const string &message, ACE_SOCK_Stream &stream);
 
-    // run the scanner input
-    virtual int svc();
+  // run the scanner input
+  virtual int svc();
 
-    // client address
-    ACE_INET_Addr address;
+  // client address
+  ACE_INET_Addr address;
 
-    // data transfer object
-    ACE_SOCK_Stream stream;
+  // data transfer object
+  ACE_SOCK_Stream stream;
 
-    // connector
-    RtSocketAcceptor acceptor;
+  // connector
+  RtSocketAcceptor acceptor;
 
-    // termination character
-    char messageTerminationChar;
+  // termination character
+  char messageTerminationChar;
 
-private:
-  
+ private:
+
   // default constructor
-  RtServerSocket(); 
+  RtServerSocket();
 
 };
 
@@ -134,5 +134,3 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

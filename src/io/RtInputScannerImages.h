@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtInputScannerImages.h declares a class that implements scanner
  *  image communication operations
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,12 +32,12 @@
 // controls input operations to receive scanner images
 class RtInputScannerImages : public RtInput {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtInputScannerImages(); 
+  RtInputScannerImages();
 
   // destructor
   virtual ~RtInputScannerImages();
@@ -56,13 +56,13 @@ public:
   bool close();
 
   // run the scanner input
-  virtual int svc(); 
+  virtual int svc();
 
   // get the version
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-protected:
+ protected:
 
   // read the scanner image info from a socket stream
   // NOTE: performes blocking read
@@ -79,21 +79,13 @@ protected:
   //   info:   the last read image info struct
   //  out
   //   image data on successful read (NULL otherwise)
-  short *receiveImage(ACE_SOCK_Stream &stream, 
-			       const RtExternalImageInfo &info);
+  short *receiveImage(ACE_SOCK_Stream &stream,
+                      const RtExternalImageInfo &info);
 
   // saves an image
   //  in
   //   img: image to save
   bool saveImage(RtMRIImage &img);
-
-  // build a filename for a given acquisition number for the current series
-  // number
-  //  in
-  //   acquisition number
-  //  out
-  //   absolute file string
-  //string getImageFilename(int seriesNum, int acquisitionNum);
 
   // build a filename for a transform file operating on a given image
   // number
@@ -103,21 +95,12 @@ protected:
   //   absolute file string
   string getXfmFilename(int _seriesNum, int _acquisitionNum);
 
-  // gets the next series number to be saved in the current image directory
-  // inspects the series currently in the directory and makes a new one
-  //unsigned int getNextSeriesNum();
-
-  // sends an image to a event handler
-  //  in
-  //   img: image to send
-  //bool sendImageToReader(RtDataImage &img);
-
   // deleted some received images
   //  in
   //   deleteNum: maximum number of images to delete
   void deleteReceivedImages(int deleteNum);
 
-protected:
+ protected:
 
   // determines if the received image is the first image in a series or not
   // examines the acquisition number for 1
@@ -131,8 +114,8 @@ protected:
 
   // port to listen on
   unsigned short port;
-  RtSocketAcceptor acceptor;   
-  ACE_SOCK_Stream stream;   
+  RtSocketAcceptor acceptor;
+  ACE_SOCK_Stream stream;
 
   // whether to only read moco images
   bool onlyReadMoCo;
@@ -142,10 +125,6 @@ protected:
   // parms for image saving to disk
   bool   saveImagesToFile;
   bool unmosaicInputImages;
-//  string savePath;
-//  string saveDir;
-//  string saveFilestem;
-//  string saveFileext;
 
   // scanner parms
   unsigned int matrixSize;
@@ -168,7 +147,7 @@ protected:
 
   unsigned int num2Discard;
   unsigned int numDiscarded;
-  
+
   bool haveStudyRefVol;
   bool haveSeriesRefVol;
 };
@@ -183,4 +162,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-

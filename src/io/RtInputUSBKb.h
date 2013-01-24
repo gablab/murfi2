@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtInputUSB.h declares a class that implements usb keyboard input operations 
- * 
+ *  RtInputUSB.h declares a class that implements usb keyboard input operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,12 +25,12 @@
 // class declaration
 class RtInputUSBKb : public RtInput {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtInputUSBKb(); 
+  RtInputUSBKb();
 
   // destructor
   virtual ~RtInputUSBKb();
@@ -46,7 +46,7 @@ public:
   virtual char *getVersionString();
 
 
-private:
+ private:
 
   //*** private data members  ***//
 
@@ -63,5 +63,3 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

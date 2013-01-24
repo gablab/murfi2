@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtInfoClient.cpp declares a class for serving info about real to clients
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,9 +34,9 @@ static char *VERSION = "$Id: RtInfoServer.cpp 415 2009-02-11 22:20:24Z ohinds $"
 
 // constructor with port and host
 RtInfoClient::RtInfoClient(unsigned short localPortNum,
-         const string &remoteHost,
-         unsigned short remotePortNum)
-  : RtServerSocket(localPortNum), RtClientSocket(remoteHost,remotePortNum) {
+                           const string &remoteHost,
+                           unsigned short remotePortNum)
+    : RtServerSocket(localPortNum), RtClientSocket(remoteHost,remotePortNum) {
 
   addToID(":infoclient");
 }
@@ -48,7 +48,7 @@ RtInfoClient::~RtInfoClient() {
 
 // add data to listen for
 bool RtInfoClient::addListenData(const string &dataName,
-         const string &roiName) {
+                                 const string &roiName) {
 
   RtDataID templ;
   templ.setDataName(dataName);
@@ -64,7 +64,7 @@ bool RtInfoClient::addListenData(const string &dataName,
 
 // remove data from the listener
 bool RtInfoClient::removeListenData(const string &dataName,
-            const string &roiName) {
+                                    const string &roiName) {
   RtDataID templ;
   templ.setDataName(dataName);
   templ.setRoiID(roiName);
@@ -77,8 +77,8 @@ bool RtInfoClient::removeListenData(const string &dataName,
 
 // acknowledge receipt of data from the server
 bool RtInfoClient::acknowledgeListenData(const string &dataName,
-           const string &roiName,
-           unsigned int tr) {
+                                         const string &roiName,
+                                         unsigned int tr) {
   cerr << "data acknowledgement is not yet implemented" << endl;
 
   return true;
@@ -127,7 +127,8 @@ string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
     //// find specific tags
 
     // add
-    for(TiXmlElement *add = 0; (add = (TiXmlElement*) info->IterateChildren("add", add)); ) {
+    for(TiXmlElement *add = 0;
+        (add = (TiXmlElement*) info->IterateChildren("add", add)); ) {
       // get the dataName and roiName
       string dataName(add->Attribute("name"));
       string roiName(add->Attribute("roi"));
@@ -137,7 +138,8 @@ string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
     }
 
     // remove
-    for(TiXmlElement *remove = 0; (remove = (TiXmlElement*) info->IterateChildren("remove", remove)); ) {
+    for(TiXmlElement *remove = 0;
+        (remove = (TiXmlElement*) info->IterateChildren("remove", remove)); ) {
       // get the dataName and roiName
       string dataName(remove->Attribute("name"));
       string roiName(remove->Attribute("roi"));
@@ -147,7 +149,9 @@ string RtInfoClient::receiveMessage(string &message, ACE_SOCK_Stream &stream) {
     }
 
     // acknowledge tags
-    for(TiXmlElement *acknowledge = 0; (acknowledge = (TiXmlElement*) info->IterateChildren("acknowledge", acknowledge)); ) {
+    for(TiXmlElement *acknowledge = 0;
+        (acknowledge =
+         (TiXmlElement*) info->IterateChildren("acknowledge", acknowledge)); ) {
       // get the dataName and roiName
       string dataName(acknowledge->Attribute("name"));
       string roiName(acknowledge->Attribute("roi"));

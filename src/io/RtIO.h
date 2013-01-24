@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtIO.h declares a base class for input and output operations 
- * 
+ *  RtIO.h declares a base class for input and output operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,18 +27,18 @@
 // class declaration
 class RtIO : public RtCode {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtIO(); 
+  RtIO();
 
   // destructor
   virtual ~RtIO();
 
   //*** initialization routines  ***//
-  
+
   // opens an io object and initialize it
   //  out:
   //   true (for success) or false
@@ -48,7 +48,7 @@ public:
   //  out:
   //   true (for success) or false
   virtual bool close();
-  
+
   // set the deleteable property
   void setDeleteable(bool _deleteable) { deleteable = _deleteable; }
 
@@ -61,15 +61,15 @@ public:
   // get the id string
   string getID();
 
-  // prints the current time 
+  // prints the current time
   void printNow(ostream &os);
 
   // gets the version
   //  out:
   //   cvs version string for this class
   virtual char *getVersionString();
-  
-protected:
+
+ protected:
 
   bool isOpen;
   ACE_Date_Time now;
@@ -87,5 +87,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

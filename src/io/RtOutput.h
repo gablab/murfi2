@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtOutput.h declares a class that implements output operations 
- * 
+ *  RtOutput.h declares a class that implements output operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,12 +28,12 @@
 // class declaration
 class RtOutput : public RtIO {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtOutput(); 
+  RtOutput();
 
   // destructor
   virtual ~RtOutput();
@@ -57,7 +57,7 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-protected:
+ protected:
 
   //*** private data members  ***//
 
@@ -75,5 +75,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

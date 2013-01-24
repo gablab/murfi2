@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtOutputfile.h declares a class that implements output operations 
- * 
+ *  RtOutputfile.h declares a class that implements output operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,12 +28,12 @@ using namespace std;
 // class declaration
 class RtOutputFile : public RtOutput {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtOutputFile(); 
+  RtOutputFile();
 
   // destructor
   virtual ~RtOutputFile();
@@ -50,7 +50,7 @@ public:
   // close and clean up
   bool close();
 
-  // write to the file 
+  // write to the file
   template<class T>
   RtOutputFile &operator<<(const T &t) {
     if(isOpen) {
@@ -62,7 +62,7 @@ public:
   // outstream operator
   void writeConfig(RtConfig &config);
 
-  // prints the current time 
+  // prints the current time
   void printNow();
 
   // get the version
@@ -70,7 +70,7 @@ public:
   virtual char *getVersionString();
 
 
-protected:
+ protected:
 
   //*** private data members  ***//
   ofstream outfp;
@@ -87,5 +87,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

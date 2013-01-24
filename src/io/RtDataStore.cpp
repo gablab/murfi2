@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtDataStore.cpp defines a class for data storage and retreival
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -174,17 +174,7 @@ RtData *RtDataStore::getLatestData(RtDataID dataID) {
 
 // get available data
 set<RtDataID>::const_iterator RtDataStore::getAvailableData() {
-
   set<RtDataID>::const_iterator it = availableData.begin();
-
-  //debug
-  cout << "availableData contains:";
-  for ( it=availableData.begin() ; it != availableData.end(); it++ )
-    cout << " " << *it << endl;
-
-  cout << endl;
-  //endebug
-
   return it;
 }
 
@@ -202,4 +192,3 @@ char *RtDataStore::getVersionString() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-

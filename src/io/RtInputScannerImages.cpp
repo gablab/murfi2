@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtInputScannerImages.cpp defines a class that implements scanner
  *  image communication operations
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,8 +38,6 @@ using namespace std;
 
 // defaults
 static const int    DEFAULT_PORT = 15000;
-//static const char*  DEFAULT_SAVESTEM = "img";
-//static const char*  DEFAULT_SAVEEXT  = "nii";
 
 // increase this size for highres acquisitions
 #define MAX_BUFSIZ 256*256*256*2
@@ -236,7 +234,8 @@ int RtInputScannerImages::svc() {
           && acceptor.accept(stream) != -1;) {
 
     if(!initialized) {
-      cerr << "ERROR: accepting images when scanner image input not initialized!" << endl;
+      cerr << "ERROR: accepting images when scanner input not initialized!"
+           << endl;
       continue;
     }
 
@@ -246,7 +245,8 @@ int RtInputScannerImages::svc() {
 
     if(getExperimentConfig().get("study:timeComputations") == true
        && !startComputeTimer()) {
-      cout << "warning: compute timer already started, timing will be inaccurate"
+      cout << "warning: compute timer already started, "
+           << "timing will be inaccurate"
            << endl;
     }
     else {
@@ -265,10 +265,6 @@ int RtInputScannerImages::svc() {
     if(verbose) {
       cout << "image info received" << endl;
     }
-    // DEBUGGING
-    //cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
-    //ei->displayImageInfo();
-    //cout << "------------------------------------------------------" << endl;
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -297,14 +293,14 @@ int RtInputScannerImages::svc() {
     rti = new RtMRIImage(*ei,img);
 
     if(unmosaicInputImages) {
-      cout << "Source image is mosaic'd; unmosaicing..." << endl;
+      cout << "Source image is mosaic'd; unmosaicing." << endl;
       rti->unmosaic();
     } else {
-      cout << "Source image is not mosaic'd; no need for unmosaicing..." << endl;
+      cout << "Source image is not mosaic'd; no need for unmosaicing." << endl;
     }
 
     // if its the first image in a series save it no matter what
-    if(!haveSeriesRefVol) { // && isFirstInSeries(*ei)) {
+    if(!haveSeriesRefVol) {
       rti->write(getExperimentConfig()
                  .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
       haveSeriesRefVol = true;
@@ -372,10 +368,13 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    // PW 2012/10/12: If it's not a mosaic'd image (ie MPRAGE) don't fire off
-    //                the murfi processing pipeline (segfault are bad, m'kay?)
+    // If it's not a mosaic'd image (eg MPRAGE) don't fire off the murfi
+    // processing pipeline.
+    //
+    // TODO make this a dedicated flag?
     if (ei->iNoOfImagesInMosaic==0) {
-      cout << "MPRAGE received.  Not going to do all that murfi sillyness, just saving the file. (TODO: fix!)" << endl;
+      cout << "Non-mosaic image (eg MPRAGE) received. refusing to process it."
+           << endl;
     } else {
       cout << "Sending code..." << endl;
       sendCode(rti);
@@ -401,11 +400,6 @@ int RtInputScannerImages::svc() {
            << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
 
-
-    //    cout << "started processing image at ";
-    //    printNow(cout);
-    //    cout << endl;
-
     // clean up
     cout << "Cleaning up..." << endl;
     delete ei;
@@ -417,15 +411,10 @@ int RtInputScannerImages::svc() {
       sendCode(NULL);
       initialized = false;
     }
-
-    //delete rti;
-
-    //cout << "waiting for another image" << endl;
   }
 
   return 0;
 }
-
 
 // read the scanner image info from a socket stream
 // NOTE: performes blocking read
@@ -433,17 +422,14 @@ int RtInputScannerImages::svc() {
 //   stream: a socket stream to receive on
 //  out
 //   image info struct on successful read (NULL otherwise)
-RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &stream) {
+RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
+    ACE_SOCK_Stream &stream) {
   int rec, rec_delta;
-
-  //static int acnum = 1;
-  //acnum++;
-
   // read until we have all the bytes we need
-  // ADD ERROR HANDLING HERE!!!
+  // TODO add error handling here
 
-  // PW 2012/11/21: Zeroing the buffer before reading header.  Trying to track down
-  // annoying os-dependent bug
+  // PW 2012/11/21: Zeroing the buffer before reading header. Trying to
+  // track down annoying os-dependent bug
   memset(buffer, 0, MAX_BUFSIZ);
 
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
@@ -451,27 +437,15 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
     rec += rec_delta;
     if(rec_delta <= 0) break;
   }
-  //rec += stream.recv_n(buffer, EXTERNALSENDERSIZEOF);
+  // TODO validate that the correct number of bytes was received.
 
-  // arbitrary limit
+  // arbitrary lower limit
   if(rec < 100) {
     return NULL;
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
-  //cout << "received header of size " << rec << endl;
-
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
-
-  //info->iAcquisitionNumber = acnum++;
-
-  // if this is the first acquisition, get the series number
-  //if(isFirstInSeries(*info)) {
-  //  seriesNum = getNextSeriesNum();
-  //}
-
-  //ACE_DEBUG((LM_DEBUG, "received info for %d:%d\n", seriesNum, info->iAcquisitionNumber));
-
   return info;
 }
 
@@ -485,13 +459,14 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
                                           const RtExternalImageInfo &info) {
 
-  ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
+  ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum,
+             info.iAcquisitionNumber));
 
   // PW 2012/10/11: Modified to grab numPix from header (to support MEMPRAGE)
-  //int numPix = (int) pow((double)info.iMosaicGridSize,2) * info.nLin * info.nCol;
   long numPix = info.lNumberOfPixels;
   if(verbose) {
-    cout << "receiving image " << info.iAcquisitionNumber << " (" << numPix << " pixels; " << numPix*sizeof(short) << "bytes)..." << endl;
+    cout << "receiving image " << info.iAcquisitionNumber << " ("
+         << numPix << " pixels; " << numPix*sizeof(short) << "bytes)" << endl;
   }
 
   for(unsigned int rec = 0; rec < numPix*sizeof(short);
@@ -508,9 +483,6 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 //  in
 //   img: image to save
 bool RtInputScannerImages::saveImage(RtMRIImage &img) {
-
-  //cout << "writing image number " << img.getDataID().getSeriesNum() << ":" << img.getDataID().getTimePoint() << endl;
-
   return img.write(getExperimentConfig().getVolFilename(
                        img.getDataID().getSeriesNum(),
                        img.getDataID().getTimePoint()));

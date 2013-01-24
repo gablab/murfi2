@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtDataListener.h declares a class that provides an interface for
  *  data availability notification
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +23,11 @@
 
 #include"RtDataID.h"
 
-// pure virtual listener class 
+// pure virtual listener class
 // TODO: impement mechanism to selectively notify (only certain data)
 class RtDataListener {
 
-public:
+ public:
 
   RtDataListener() {};
   virtual ~RtDataListener() {};
@@ -46,4 +46,3 @@ public:
  * comment-column: 0
  * End:
  *****************************************************************************/
-

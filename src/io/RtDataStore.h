@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtDataStore.h declares a class for data storage and retreival
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ using namespace std;
 // class declaration
 class RtDataStore : public RtOutput  {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
 
@@ -70,7 +70,7 @@ public:
   // note: this returns a list of the unique data ids excepting timepoint.
   set<RtDataID>::const_iterator getAvailableData();
 
-  protected:
+ protected:
 
   // list of outputs to be notified when new data arrives
   vector<RtDataListener*> notifyList;

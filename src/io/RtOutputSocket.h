@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtOutputSocket.h declares a class that implements output operations on a
  *  socket
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,12 +30,12 @@ using namespace std;
 // class declaration
 class RtOutputSocket : public RtOutput {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtOutputSocket(); 
+  RtOutputSocket();
 
   // destructor
   virtual ~RtOutputSocket();
@@ -54,7 +54,7 @@ public:
   virtual char *getVersionString();
 
 
-protected:
+ protected:
 
   // client address
   ACE_INET_Addr address;
@@ -64,7 +64,7 @@ protected:
 
   // connector
   ACE_SOCK_Connector connector;
-  
+
 };
 
 #endif
@@ -77,5 +77,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

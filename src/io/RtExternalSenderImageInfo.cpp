@@ -1,5 +1,5 @@
 /*=========================================================================
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,57 +19,57 @@
 #include<RtExternalSenderImageInfo.h>
 
 RtExternalImageInfo::RtExternalImageInfo()
-  :
-  lVersion(0),
-  iSizeOfRtExternalImageInfo(EXTERNALSENDERSIZEOF),
-  dFOVread(200),
-  dFOVphase(200),
-  dThick(5),
-  nCol(256),
-  nLin(256),
-  nSli(1),
-  lImageDataLength(294912),
-  lNumberOfPixels(147456),
-  lBytesPerPixel(2),
-  dPosSag(0),
-  dPosCor(0),
-  dPosTra(0),
-  dNorSag(0),
-  dNorCor(0),
-  dNorTra(0),
-  dPhaSag(0),
-  dPhaCor(0),
-  dPhaTra(0),
-  dRowSag(0),
-  dRowCor(0),
-  dRowTra(0),
-  dColSag(0),
-  dColCor(0),
-  dColTra(0),
-  dMoCoTransX(0.0),
-  dMoCoTransY(0.0),
-  dMoCoTransZ(0.0),
-  dMoCoRotX(0.0),
-  dMoCoRotY(0.0),
-  dMoCoRotZ(0.0),
-  bIsMoCo(false),
-  iNoOfImagesInMosaic(1),
-  iMosaicGridSize(1),
-  bSwapReadPhase(0),
-  iAcquisitionNumber(1),
-  dTimeAfterStart(0),
-  dTE(30),
-  dTR(3000),
-  dTI(0),
-  dTriggerTime(0),
-  lSliceIndex(0),
-  lNumTrackCha(0),
-  lCurrentTrackCha(0),
-  iWindowCenter(737),
-  iWindowWidth(1694),
-  lAbsTablePosition(0),
-  iDataSource(0),
-  dTimeDelay(0)
+    :
+    lVersion(0),
+    iSizeOfRtExternalImageInfo(EXTERNALSENDERSIZEOF),
+    dFOVread(200),
+    dFOVphase(200),
+    dThick(5),
+    nCol(256),
+    nLin(256),
+    nSli(1),
+    lImageDataLength(294912),
+    lNumberOfPixels(147456),
+    lBytesPerPixel(2),
+    dPosSag(0),
+    dPosCor(0),
+    dPosTra(0),
+    dNorSag(0),
+    dNorCor(0),
+    dNorTra(0),
+    dPhaSag(0),
+    dPhaCor(0),
+    dPhaTra(0),
+    dRowSag(0),
+    dRowCor(0),
+    dRowTra(0),
+    dColSag(0),
+    dColCor(0),
+    dColTra(0),
+    dMoCoTransX(0.0),
+    dMoCoTransY(0.0),
+    dMoCoTransZ(0.0),
+    dMoCoRotX(0.0),
+    dMoCoRotY(0.0),
+    dMoCoRotZ(0.0),
+    bIsMoCo(false),
+    iNoOfImagesInMosaic(1),
+    iMosaicGridSize(1),
+    bSwapReadPhase(0),
+    iAcquisitionNumber(1),
+    dTimeAfterStart(0),
+    dTE(30),
+    dTR(3000),
+    dTI(0),
+    dTriggerTime(0),
+    lSliceIndex(0),
+    lNumTrackCha(0),
+    lCurrentTrackCha(0),
+    iWindowCenter(737),
+    iWindowWidth(1694),
+    lAbsTablePosition(0),
+    iDataSource(0),
+    dTimeDelay(0)
 {
   strcpy((char*) chID, "IFEI");
 
@@ -87,7 +87,7 @@ RtExternalImageInfo::RtExternalImageInfo()
   cSeriesInstanceUID[0] = '\0';
 }
 
-// constructor for data 
+// constructor for data
 RtExternalImageInfo::RtExternalImageInfo(char *data) {
   memcpy(this,data,sizeof(RtExternalImageInfo));
 }
@@ -96,9 +96,9 @@ RtExternalImageInfo::RtExternalImageInfo(char *data) {
 //using namespace std;
 
 // constructor for data from physical scanner
-// this function does selective memcpy through the passed data because the 
-// scanner sends packed data with a few trash spots, which were identified 
-// manually with plenty of frustration. 
+// this function does selective memcpy through the passed data because the
+// scanner sends packed data with a few trash spots, which were identified
+// manually with plenty of frustration.
 //  in
 //   data: byte data to read the structure from
 //   len:  number of bytes we have
@@ -106,18 +106,12 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   char trash[TRASHSIZE];
   char *readptr = data;
 
-  // PW 2012/11/21: long's are sent as 'uint32_t so read them into a temporary placeholder,
-  //                before casting them to the proper place in the structure
-  //                Ideally, the actual class should change long->uint32_t, but then you'd
-  //                need to hunt down all the references all over the code and cast accordingly
+  // PW 2012/11/21: long's are sent as 'uint32_t so read them into a temporary
+  // placeholder, before casting them to the proper place in the structure
+  // Ideally, the actual class should change long->uint32_t, but then you'd need
+  // to hunt down all the references all over the code and cast accordingly
   int32_t longtemp;
 
-  // DEBUGGING
-  //ofstream of("/tmp/dat.hdr");
-  //of.write(data,len);
-  //of.close();
-  //exit(0);
-  
   // check that we have enough data to read iSizeOfExternalImageInfo
   if(len < 4*CHARSIZE + LONGSIZE + INTSIZE) {
     return;
@@ -125,7 +119,7 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(chID, readptr, 4*CHARSIZE);
   readptr += 4*CHARSIZE;
-  
+
   //memcpy(&lVersion, readptr, LONGSIZE);
   memcpy(&longtemp, readptr, LONGSIZE);
   lVersion = long(longtemp);
@@ -160,17 +154,14 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(&nSli, readptr, INTSIZE);
   readptr += INTSIZE;
 
-  //memcpy(&lImageDataLength, readptr, LONGSIZE);
   memcpy(&longtemp, readptr, LONGSIZE);
-  lImageDataLength = long(longtemp);  
+  lImageDataLength = long(longtemp);
   readptr += LONGSIZE;
 
-  //memcpy(&lNumberOfPixels, readptr, LONGSIZE);
   memcpy(&longtemp, readptr, LONGSIZE);
-  lNumberOfPixels = long(longtemp);  
+  lNumberOfPixels = long(longtemp);
   readptr += LONGSIZE;
 
-  //memcpy(&lBytesPerPixel, readptr, LONGSIZE);
   memcpy(&longtemp, readptr, LONGSIZE);
   lBytesPerPixel = long(longtemp);
   readptr += LONGSIZE;
@@ -265,7 +256,7 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(cSeriesInstanceUID, readptr, 65*CHARSIZE);
   readptr += 65*CHARSIZE;
-    
+
 
   memcpy(&bSwapReadPhase, readptr, sizeof(bool));
   readptr += sizeof(bool);
@@ -273,7 +264,7 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(trash, readptr, 2);
   readptr += 2;
 
- 
+
   memcpy(&iAcquisitionNumber, readptr, INTSIZE);
   readptr += INTSIZE;
 
@@ -302,21 +293,18 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(chAcquisitionDate, readptr, ACQUISITION_DATE_LEN*CHARSIZE);
   readptr += ACQUISITION_DATE_LEN*CHARSIZE;
-  
+
   memcpy(chAcquisitionTime, readptr, ACQUISITION_TIME_LEN*CHARSIZE);
   readptr += ACQUISITION_TIME_LEN*CHARSIZE;
-  
-  //memcpy(&lSliceIndex, readptr, LONGSIZE);
+
   memcpy(&longtemp, readptr, LONGSIZE);
   lSliceIndex = long(longtemp);
   readptr += LONGSIZE;
-  
-  //memcpy(&lNumTrackCha, readptr, LONGSIZE);
+
   memcpy(&longtemp, readptr, LONGSIZE);
   lNumTrackCha = long(longtemp);
   readptr += LONGSIZE;
-  
-  //memcpy(&lCurrentTrackCha, readptr, LONGSIZE);
+
   memcpy(&longtemp, readptr, LONGSIZE);
   lCurrentTrackCha = long(longtemp);
   readptr += LONGSIZE;
@@ -333,7 +321,6 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   memcpy(chImageTypeValue4, readptr, _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
   readptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
 
-  //memcpy(&lAbsTablePosition, readptr, LONGSIZE);
   memcpy(&longtemp, readptr, LONGSIZE);
   lAbsTablePosition = (long)longtemp;
   readptr += LONGSIZE;
@@ -346,19 +333,19 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(trash, readptr, 16*LONGSIZE);
   readptr += 16*LONGSIZE;
-  
+
   memcpy(trash, readptr, 16*DOUBLESIZE);
   readptr += 16*DOUBLESIZE;
-  
+
   memcpy(trash, readptr, 32*CHARSIZE);
   readptr += 32*CHARSIZE;
-  
+
 }
 
 // build data to send as the physical scanner would
-// this function does selective memcpy through the passed data because the 
-// scanner sends packed data with a few trash spots, which were identified 
-// manually with plenty of frustration. 
+// this function does selective memcpy through the passed data because the
+// scanner sends packed data with a few trash spots, which were identified
+// manually with plenty of frustration.
 //  out
 //   array of data that conforms to the ExternalImageSender format
 char *RtExternalImageInfo::convertToScannerDataArray() {
@@ -368,7 +355,7 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
 
   memcpy(writeptr, chID, 4*CHARSIZE);
   writeptr += 4*CHARSIZE;
-  
+
   memcpy(writeptr, &lVersion, LONGSIZE);
   writeptr += LONGSIZE;
 
@@ -502,7 +489,7 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
   memcpy(writeptr, trash, 2);
   writeptr += 2;
 
- 
+
   memcpy(writeptr, &iAcquisitionNumber, INTSIZE);
   writeptr += INTSIZE;
 
@@ -530,16 +517,16 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
 
   memcpy(writeptr, chAcquisitionDate, ACQUISITION_DATE_LEN*CHARSIZE);
   writeptr += ACQUISITION_DATE_LEN*CHARSIZE;
-  
+
   memcpy(writeptr, chAcquisitionTime, ACQUISITION_TIME_LEN*CHARSIZE);
   writeptr += ACQUISITION_TIME_LEN*CHARSIZE;
-  
+
   memcpy(writeptr, &lSliceIndex, LONGSIZE);
   writeptr += LONGSIZE;
-  
+
   memcpy(writeptr, &lNumTrackCha, LONGSIZE);
   writeptr += LONGSIZE;
-  
+
   memcpy(writeptr, &lCurrentTrackCha, LONGSIZE);
   writeptr += LONGSIZE;
 
@@ -553,7 +540,8 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
   memcpy(writeptr, &iWindowWidth, INTSIZE);
   writeptr += INTSIZE;
 
-  memcpy(writeptr, chImageTypeValue4, _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
+  memcpy(writeptr, chImageTypeValue4,
+         _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
   writeptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
 
 
@@ -568,13 +556,13 @@ char *RtExternalImageInfo::convertToScannerDataArray() {
 
   memcpy(writeptr, trash, 16*LONGSIZE);
   writeptr += 16*LONGSIZE;
-  
+
   memcpy(writeptr, trash, 16*DOUBLESIZE);
   writeptr += 16*DOUBLESIZE;
-  
+
   memcpy(writeptr, trash, 32*CHARSIZE);
   writeptr += 32*CHARSIZE;
-  
+
   free(trash);
   return data;
 }
@@ -589,10 +577,7 @@ void RtExternalImageInfo::displayImageInfo() const {
   cout << "-----------------------------" << endl;
   cout << "Dumping RtExternalImageInfo         " << endl;
   cout << "Data:"  << sizeof (RtExternalImageInfo) << " Bytes used" << endl;
-  //cout << "Patient name    :"  << chPatientName << endl;
-  //cout << "Patient position:"  << chPatientPosition << endl;
   cout << "-----------------------------" << endl;
-  //cout << "Sequence name : " << cSequenceName << endl;
   cout << "sID:                                    " << myID << endl
        << "lVersion:                               " << lVersion << endl
        << "nlin / ncol / nsli / FOVread / FOVphase " << nLin << " / " << nCol << " / " << nSli << " / " << dFOVread << " / " << dFOVphase << endl
@@ -616,7 +601,7 @@ void RtExternalImageInfo::displayImageInfo() const {
        << "Bytes per pixel                         " << lBytesPerPixel << endl
        << "Current Slice Index                     " << lSliceIndex <<  endl
        << "Window Width                            " << iWindowWidth << endl
-       << "Window Center                           " << iWindowCenter << endl       
+       << "Window Center                           " << iWindowCenter << endl
        << "ImageTypeValue4[0]                      " << chImageTypeValue4[0] << endl
        << "AbsTablePosition                        " << lAbsTablePosition << endl
        << "Data Source                             " << iDataSource << endl
@@ -624,46 +609,4 @@ void RtExternalImageInfo::displayImageInfo() const {
        << "Time Delay                              " << dTimeDelay << endl
        << "SwapReadPhase                           " << bSwapReadPhase << endl
        << "SliceIndex                              " << lSliceIndex << endl;
-  /*
-    for  (int i = 0; i < (sizeof(m_mylReserved)/sizeof(long)); i++)
-    {
-    cout << "lReserved				= " << lReserved[i] << endl;
-    }
-
-    for  (i = 0; i < (sizeof(m_mydReserved)/sizeof(double)); i++)
-    {
-    cout << "dReserved				= " << dReserved[i] << endl;
-    }
-
-    for  (i = 0; i < (sizeof(m_mychReserved)/sizeof(char)); i++)
-    {
-    cout << "chReserved				= " << chReserved[i] << endl;
-    }
-  */
-  // cout << "Number of Tracking Channels/current= " << lNumTrackCha << " / " << lCurrentTrackCha << endl;
-  //cout << "Current Slice Index / # of slices = " << lSliceIndex << " / " << lNumberOfSlices << endl;
-  // cout << "Current Repet Index / # of reps   = " << lMeasurementIndex << " / " << lNumberOfMeasurements << endl;
-  //cout << "lReserved                         = " << lReserved << endl;
-  /*#ifdef TMAP
-    cout << "-------------- TMapping features -----------------------\n";
-    cout << "Image type:                         "<< ThisKindOfImage.eImageType
-    << "Image context: "<< ThisKindOfImage.eImageContext
-    << "Mosaic image: " << ThisKindOfImage.eIsThisAMosaicImage << endl;
-    cout << "Image temperatures:               = "<< ThisTempRange.dT_Min << "   to   "<< ThisTempRange.dT_Max<< endl;
-
-    cout << " Windowing: width/center/level/slope/intercept: "<<  WindowingOfThisImage.iWindowWidth << " / "
-    <<  WindowingOfThisImage.iWindowCenter << " / " <<  WindowingOfThisImage.dWindowLevel << " / "
-    <<  WindowingOfThisImage.dWindowSlope  << " / " <<  WindowingOfThisImage.dWindowIntercept << endl;
-    #endif
-  */
-  /*cout << "Device Coordinate System:"<< endl;
-    cout << "Slice Position X / Y / Z    ;		   " << dPosX << " / " << dPosY << " / " << dPosZ << endl;
-    cout << "Slice Normal   X / Y / Z    ;		   " << dNorX << " / " << dNorY << " / " << dNorZ << endl;
-    cout << "Slice Phase En X / Y / Z    ;		   " << dPhaX << " / " << dPhaY << " / " << dPhaZ << endl;
-    cout << "Slice Row Vect X / Y / Z    ;		   " << dRowX << " / " << dRowY << " / " << dRowZ << endl;
-    cout << "Slice Col Vect X / Y / Z    ;		   " << dColX << " / " << dColY << " / " << dColZ << endl;
-  */
 }
-
-
-

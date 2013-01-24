@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtInfoClient.h declares a class that sends new data to a remote server
- *  
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,14 +31,14 @@ using namespace std;
 // class declaration
 class RtInfoClient : public RtServerSocket, RtClientSocket  {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // constructor with port and host
-  explicit RtInfoClient(unsigned short localPortNum, 
-			const string &remoteHost, 
-			unsigned short remotePortNum);
+  explicit RtInfoClient(unsigned short localPortNum,
+                        const string &remoteHost,
+                        unsigned short remotePortNum);
 
   // destructor
   virtual ~RtInfoClient();
@@ -50,7 +50,8 @@ public:
   bool removeListenData(const string &dataName, const string &roiName);
 
   // acknowledge receipt of data from the server
-  bool acknowledgeListenData(const string &dataName, const string &roiName, unsigned int tr);
+  bool acknowledgeListenData(
+      const string &dataName, const string &roiName, unsigned int tr);
 
   // hand of some data to be output
   virtual void setData(RtData *data);
@@ -59,18 +60,18 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-protected:
+ protected:
 
   // receive a message
-  // in 
+  // in
   //  string received
   //  stream received on
-  // out  success or failure 
+  // out  success or failure
   virtual string receiveMessage(string &message, ACE_SOCK_Stream &stream);
 
   // build a string from an XML document
   // in
-  //  XML document 
+  //  XML document
   // out
   //  string representation
   string buildXMLString(TiXmlDocument &doc);
@@ -80,8 +81,8 @@ protected:
   // list of dataids to listen for
   set<RtDataID,RtDataIDPartialCompare> listenData;
 
-private:
-  RtInfoClient();   
+ private:
+  RtInfoClient();
 
 };
 
@@ -95,5 +96,3 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

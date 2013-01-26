@@ -106,10 +106,10 @@ RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
   char trash[TRASHSIZE];
   char *readptr = data;
 
-  // PW 2012/11/21: long's are sent as 'uint32_t so read them into a temporary
-  // placeholder, before casting them to the proper place in the structure
-  // Ideally, the actual class should change long->uint32_t, but then you'd need
-  // to hunt down all the references all over the code and cast accordingly
+  // long's are sent as 'uint32_t so read them into a temporary placeholder,
+  // before casting them to the proper place in the structure Ideally, the
+  // actual class should change long->uint32_t, but then you'd need to hunt down
+  // all the references all over the code and cast accordingly
   int32_t longtemp;
 
   // check that we have enough data to read iSizeOfExternalImageInfo

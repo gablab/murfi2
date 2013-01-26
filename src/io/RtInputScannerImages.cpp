@@ -336,22 +336,8 @@ int RtInputScannerImages::svc() {
       getDataStore().setData(mot);
     }
 
-    // set the image id for handling
-    //rti->addToID("scanner");
-
-    // PW 2012/11/26: Debug
-    cout << "---------------------------------------------" << endl;
-    cout << "getDataStore().getAvailableData():" << endl;
-    getDataStore().getAvailableData();
-    cout << "---------------------------------------------" << endl;
-
     // append this to a vector of gathered images
     getDataStore().setData(rti);
-
-    // signal that we got an image
-    //cout << "sending event with code number " << codeNum << endl;
-
-    //rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
     if(!haveStudyRefVol
@@ -428,10 +414,6 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
   // read until we have all the bytes we need
   // TODO add error handling here
 
-  // PW 2012/11/21: Zeroing the buffer before reading header. Trying to
-  // track down annoying os-dependent bug
-  memset(buffer, 0, MAX_BUFSIZ);
-
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
     rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
     rec += rec_delta;
@@ -462,7 +444,7 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum,
              info.iAcquisitionNumber));
 
-  // PW 2012/10/11: Modified to grab numPix from header (to support MEMPRAGE)
+  // grab numPix from header (to support MEMPRAGE)
   long numPix = info.lNumberOfPixels;
   if(verbose) {
     cout << "receiving image " << info.iAcquisitionNumber << " ("

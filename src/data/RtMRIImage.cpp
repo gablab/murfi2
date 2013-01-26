@@ -270,7 +270,6 @@ RtMRIImage::~RtMRIImage() {
 //   _info: struct to copy
 void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
-  // PW 2012/10/11: Trying to get murfi to save unmosaiced niftis
   if (info.iNoOfImagesInMosaic == 0) {
     // volume is not mosaiced
     dims.resize(3);
@@ -284,9 +283,9 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
     dims[1] = info.nCol*info.iMosaicGridSize;
   }
 
-  // PW 2012/10/16: This is most definitly the WRONG place to put this... But
-  //                for some reason the constructor was getting called *after*
-  //                setInfo(), so sliceGap wasn't being set correctly.
+  // TODO This is most definitly the WRONG place to put this... But for some
+  // reason the constructor was getting called *after* setInfo(), so sliceGap
+  // wasn't being set correctly.
   if(getExperimentConfig().isSet("scanner:sliceGap")) {
     sliceGap = getExperimentConfig().get("scanner:sliceGap");
   }
@@ -332,8 +331,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   rotMat.put(1,2, info.dNorCor);
   rotMat.put(2,2, info.dNorTra);
 
-  // PW 2012/10/03: Seimens' logical coordinate system is LPS
-  // we want coords in RAS
+  // Seimens' logical coordinate system is LPS we want coords in RAS
   vnl_matrix_fixed<double,4,4> lps2ras;
   lps2ras.set_identity();
   lps2ras.put(0,0,-1);
@@ -341,7 +339,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
   vxl2ras = (lps2ras*rotMat)*scaleMat;
 
-  // PW 2012/10/03: Calculating offset to center of k-space
+  // Calculate the offset to center of k-space
   // See
   // http://www.nmr.mgh.harvard.edu/~rudolph/software/vox2ras/download/vox2ras_ksolve.html
   // With a slight modification.  Since info.dPos.. is the offset to slice
@@ -367,16 +365,8 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   vxl2ras.put(1,3, Vc_Pe1.get(1,0));
   vxl2ras.put(2,3, Vc_Pe2.get(2,0));
 
-  // debugging
-  //cout << "scale" << endl;
-  //printVnl44Mat(scaleMat);
-  //cout << "rot" << endl;
-  //printVnl44Mat(rotMat);
-  //cout << "vxl2ras" << endl;
-  //printVnl44Mat(vxl2ras);
-
   // build RAS 2 REF transformation matrix
-  // PW 2012/10/12 TODO!
+  // TODO set this properly
   ras2ref.set_identity();
 
   // image info

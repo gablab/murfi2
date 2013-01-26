@@ -306,9 +306,6 @@ bool RtDataImage<T>::writeNifti(const string &_filename) {
     img->data = (void*) malloc(img->nbyper*img->nvox);
     memcpy(img->data, data, img->nbyper*img->nvox);
 
-    // PW 2012/10/12: debugging
-    // nifti_image_infodump(img);
-
     // write the file
     nifti_image_write(img);
   } unlock();

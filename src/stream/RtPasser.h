@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtPasser.h is the header for a class that passes data from an
  *  stream to output
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,21 +28,15 @@
 // class declaration
 class RtPasser: public RtStreamComponent  {
 
-public:
+ public:
 
   static string moduleString;
 
   //*** constructors/destructors  ***//
 
   // default constructor
-  // all data that 
+  // all data that
   RtPasser();
-
-  // string with id constructor
-  //  in
-  //   dataID is a string that constrains what type of data we send, if its
-  //   empty we send all the data
-  //RtPasser(string _dataID);
 
   // id constructor
   //  in
@@ -51,14 +45,8 @@ public:
   //   the outputs or not. Empty fields are not matched and filled fields are
   RtPasser(const RtDataID &idTemplate);
 
-  // char* with id constructor
-  //  in
-  //   dataID is a string that constrains what type of data we send, if its
-  //   empty we send all the data
-  //RtPasser(char *_dataID);
-
   // destructor
-  ~RtPasser();
+  virtual ~RtPasser();
 
   //*** initialization routines  ***//
   void addOutput(RtOutput *out);
@@ -66,7 +54,7 @@ public:
   // process a single acquisition
   void sendToOutputs(RtData *d);
 
-protected:
+ protected:
 
   // validation configuration
   bool validateComponentConfig() { return true; }
@@ -79,7 +67,7 @@ protected:
 
   // only pass data of this id
   RtDataID passDataID;
-  
+
 };
 
 #endif
@@ -92,5 +80,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

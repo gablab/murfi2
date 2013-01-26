@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtProcessor.h is the header for a class for a processing stream
  *  component for a real-time fMRI.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,15 +28,15 @@
 // class declaration
 class RtProcessor : public RtStreamComponent, public RtStream {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
   RtProcessor();
 
   // destructor
-  ~RtProcessor();
+  virtual ~RtProcessor();
 
   //*** initialization routines  ***//
 
@@ -54,9 +54,7 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString() const;
 
-  
-
-protected:
+ protected:
 
   // pure virtual for validation of component configuration
   bool validateComponentConfig();
@@ -76,5 +74,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

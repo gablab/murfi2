@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtStreamMessage.h is the header for a class that passes messages
  *  between stream components.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@
 
 // class declaration
 class RtStreamMessage  {
-public:
+ public:
 
   RtStreamMessage()  {
     numData = 0;
@@ -38,7 +38,7 @@ public:
   }
 
   // add a peice of data to the message
-  //  in 
+  //  in
   //   pointer to the data
   //   bool for setting data as current data
   //  out
@@ -79,22 +79,22 @@ public:
   //   pointer to the data or NULL, if such data doesnt exist
   RtData *getData(const RtDataID &idTemplate) const;
 
-  // get a data portion by module id, data name, and roi id (returns 
+  // get a data portion by module id, data name, and roi id (returns
   // the first found instance). note that any of these can be "" to
   // match any string for that field
   //  in
   //   module id
-  //   data name 
+  //   data name
   //   roi id
   //  out
   //   pointer to the data or NULL, if such data doesnt exist
-  RtData *getData(const string &moduleId, 
-		  const string &dataName = "",
-		  const string &roiId = "") const;
+  RtData *getData(const string &moduleId,
+                  const string &dataName = "",
+                  const string &roiId = "") const;
 
   // get the current data (original data plus any desired processing up to
-  // this point) 
-  //  out 
+  // this point)
+  //  out
   //   pointer to the current data or NULL, if none
   RtData *getCurrentData() const;
 
@@ -102,15 +102,6 @@ public:
   //  out
   //   pointer to the last data or NULL, if none
   RtData *getLastData() const;
-
-
-  // get data by data id and roi id (returns the first found instance)
-  //  in
-  //   dataid id of data
-  //   roiid  id of roi
-  //  out
-  //   pointer to the data or NULL, if id doesnt exist
-  //RtData *getDataByIDAndRoiID(const string &dataid, const string &roiid);
 
   // get number of data objects currently stored
   unsigned int getNumData() const;
@@ -121,7 +112,7 @@ public:
   // set the pointer to our conductor
   void init(RtConductor *_conductor);
 
-protected:
+ protected:
 
   // pointers to data
   RtData *data[MAX_MSGDATAS];
@@ -136,7 +127,7 @@ protected:
   // pointer to conductor
   RtConductor *conductor;
 
-private:
+ private:
 
   // create mutex for use by addData
   ACE_Mutex mut;
@@ -153,5 +144,3 @@ private:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

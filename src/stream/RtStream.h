@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtStream.h is the header for a class that controls execution of a
  *  single data processing stream during a real-time fMRI session.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,14 +26,8 @@
 
 #include"ace/Stream.h"
 
-//#include"RtConductor.h"
-//#include"RtCode.h"
-//#include"RtData.h"
-//#include"RtStreamComponent.h"
-//#include"RtStreamMessage.h"
 #include"RtConfig.h"
 #include"RtOutput.h"
-//#include"util/timer/timer.h"
 
 #include<set>
 
@@ -45,18 +39,18 @@ using namespace std;
 // class declaration
 class RtStream : public ACE_Stream<ACE_MT_SYNCH> {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // constructor
-  RtStream(); 
+  RtStream();
 
   // destructor
   virtual ~RtStream();
 
   //*** initialization routines  ***//
-  
+
   // set the conductor for this stream
   //  in
   //   conductor pointer
@@ -81,15 +75,15 @@ public:
 
   // adds outputs to a stream component (needs to be here so that we have
   // access to the conductor to get pointers to the outputs)
-  //  in 
+  //  in
   //   config: configuration info
-  virtual void addOutputsToComponent(RtStreamComponent *sc, 
-				     vector<string> &outNames);
+  virtual void addOutputsToComponent(RtStreamComponent *sc,
+                                     vector<string> &outNames);
 
   // build a vector of ids of outputs from an xml node's children
   //  in
   //   module element
-  //  out 
+  //  out
   //   vector of string output ids
   void buildOutputNames(TiXmlElement *module, vector<string> &names);
 
@@ -97,7 +91,7 @@ public:
 
   // accept new data received from an input
   //  in
-  //   data: data 
+  //   data: data
   virtual void setInput(unsigned int code, RtData *data);
 
   // adds all 'module' nodes that are children of the passed node as modules
@@ -112,7 +106,7 @@ public:
   //   out: optional output to pass the result of this module to
   //   text: optional text to be associated with the module
   RtStreamComponent *buildStreamComponent(const string &type,
-					  const string &text = "");
+                                          const string &text = "");
 
   // add a single module to the stack
   //  in
@@ -129,15 +123,15 @@ public:
   //  out: char array that represents the cvs version
   virtual char *getVersionString();
 
-protected:
-  
+ protected:
+
   // superclass
   typedef ACE_Stream<ACE_MT_SYNCH> super;
 
   // processing module
   typedef ACE_Module<ACE_MT_SYNCH> Module;
 
-  // pointer to conductor 
+  // pointer to conductor
   RtConductor *streamConductor;
 
   // stack of moules to be added
@@ -158,5 +152,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

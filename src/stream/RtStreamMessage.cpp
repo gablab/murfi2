@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtStreamMessage.cpp defines a class that passes messages between stream
  *  components.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ bool RtStreamMessage::addData(RtData *_data, bool _makeCurrentData) {
   ACE_TRACE(("RtStreamMessage::addData"));
 
   mut.acquire();
-  
+
   if(numData >= MAX_MSGDATAS) {
     return false;
   }
@@ -38,13 +38,13 @@ bool RtStreamMessage::addData(RtData *_data, bool _makeCurrentData) {
   ACE_DEBUG((LM_DEBUG, "adding data to msg: %d\n", numData));
 
   data[numData++] = _data;
-  
+
   if(_makeCurrentData) {
     this->setLastDataAsCurrent();
   }
-  
+
   mut.release();
-  
+
   return true;
 }
 
@@ -134,12 +134,12 @@ RtData *RtStreamMessage::getData(unsigned int index) const {
 //  out
 //   pointer to the data or NULL, if such data doesnt exist
 RtData *RtStreamMessage::getData(const string &moduleId,
-				 const string &dataName,
-				 const string &roiId) const {
+                                 const string &dataName,
+                                 const string &roiId) const {
   RtDataID idTemplate(DATAID_NUM_WILDCARD_VALUE,DATAID_NUM_WILDCARD_VALUE,
-		      DATAID_NUM_WILDCARD_VALUE,
-		      DATAID_STRING_WILDCARD_VALUE,
-		      moduleId, dataName, roiId);
+                      DATAID_NUM_WILDCARD_VALUE,
+                      DATAID_STRING_WILDCARD_VALUE,
+                      moduleId, dataName, roiId);
   return getData(idTemplate);
 }
 
@@ -149,14 +149,12 @@ RtData *RtStreamMessage::getData(const string &moduleId,
 //  out
 //   pointer to the data or NULL, if such data doesnt exist
 RtData *RtStreamMessage::getData(const RtDataID &idTemplate) const {
-  //cout << "serching for " << idTemplate << endl;
-
   for(unsigned int i = 0; i < numData; i++) {
     if(DEBUG_LEVEL & MODERATE) {
       cout << data[i] << " " << data[i]->getDataID() << endl;
     }
     if(idTemplate == data[i]->getDataID()) {
-       return data[i];
+      return data[i];
     }
   }
 
@@ -189,5 +187,3 @@ void RtStreamMessage::init(RtConductor *_conductor) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

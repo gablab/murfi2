@@ -1,1 +1,0 @@
-double rint( double x);

@@ -1,6 +1,6 @@
 /*=========================================================================
  *  types.h defines utility types (enums, typedefs)
- *  
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,12 +31,5 @@ enum RtElementType {
   RT_SHORT_TYPE,
   RT_DOUBLE_TYPE
 };
-
-// deleted functionality
-// typedef enum {
-//   TREND = 0,
-//   MOTION,
-//   EVENT
-// } Nuisance;
 
 #endif

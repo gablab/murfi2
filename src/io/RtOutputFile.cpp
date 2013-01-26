@@ -166,13 +166,3 @@ void RtOutputFile::writeConfig(RtConfig &config) {
 char *RtOutputFile::getVersionString() {
   return VERSION;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

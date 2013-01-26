@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtInputSynth.cpp defines a class that implements scanner
  *  image communication operations
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,7 +81,7 @@ int RtInputSynth::svc() {
     infos.str("");
     infos << "generatred synthetic data at tr " << curTr << endl;
     log(infos);
-        
+
     cout << "generatred synthetic data at tr " << curTr << endl;
 
 #ifdef WIN32
@@ -100,14 +100,3 @@ int RtInputSynth::svc() {
 char *RtInputSynth::getVersionString() {
   return VERSION;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

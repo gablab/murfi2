@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtClientSocket.cpp defines a class that implements client io operations on a
  *  socket
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,6 @@
 
 #include<iostream>
 
-static char *VERSION = "$Id: RtClientSocket.cpp 195 2008-08-29 22:40:54Z ohinds $";
-
 // constructor with port and host
 RtClientSocket::RtClientSocket(const string &host, unsigned short portNum) {
   messageTerminationChar = '\n';
@@ -42,7 +40,7 @@ bool RtClientSocket::sendMessageToServer(const string &message) {
       cerr << "incomplete send" << endl;
       return false;
     }
-  
+
     stream.send_n(&messageTerminationChar,1);
 
     stream.close();
@@ -51,20 +49,3 @@ bool RtClientSocket::sendMessageToServer(const string &message) {
   }
   return false;
 }
-
-// get the version
-//  out: char array that represents the cvs version
-char *RtClientSocket::getVersionString() {
-  return VERSION;
-}
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

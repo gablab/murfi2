@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtEvent.h declares a class for an event image
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,12 +60,3 @@ class RtEvent : public RtData {
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

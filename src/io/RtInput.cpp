@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtInput.cpp defines a class that implements input operations 
- * 
+ *  RtInput.cpp defines a class that implements input operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ RtInput::~RtInput() {
 // init
 bool RtInput::open(RtConfig &config) {
   // set up the callback
-  
+
   return true;
 }
 
@@ -72,15 +72,3 @@ string RtInput::getID() {
 char *RtInput::getVersionString() {
   return VERSION;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

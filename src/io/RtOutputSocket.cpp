@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtOutputsocket.cpp defines a class that implements output operations
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,7 +54,7 @@ bool RtOutputSocket::open(RtConfig &config) {
   if(config.isSet("host")) {
     host = config.get("host").str();
   }
-  
+
   cout << "opened output socket: host " << host << ":" << port << endl;
 
   // setup the socket address
@@ -83,7 +83,7 @@ void RtOutputSocket::setData(RtData *data) {
   TiXmlElement *element = NULL; //TODO this is a dummy thing
   TiXmlElement *serializedData = data->serializeAsXML(element);
   if(serializedData == NULL) {
-    cerr << "couldn't serialize data, not sending" << endl;    
+    cerr << "couldn't serialize data, not sending" << endl;
     return;
   }
 
@@ -99,12 +99,12 @@ void RtOutputSocket::setData(RtData *data) {
   TiXmlPrinter printer;
   printer.SetStreamPrinting();
   serializedDataDoc.Accept(&printer);
-  char *serializedStr = new char[printer.Size()+1]; 
+  char *serializedStr = new char[printer.Size()+1];
   strcpy(serializedStr, printer.CStr());
 
   // lock the socket
   ACE_Mutex mutx;
-  mutx.acquire();  
+  mutx.acquire();
 
   cout << "connected to server, sending data " << endl << serializedStr;
 
@@ -123,15 +123,3 @@ void RtOutputSocket::setData(RtData *data) {
 char *RtOutputSocket::getVersionString() {
   return VERSION;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

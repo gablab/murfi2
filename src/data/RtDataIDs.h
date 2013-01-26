@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtDataIDs.h contains defines for data id strings
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,14 +118,3 @@ const string NAME_EVENTTRIGGER_GOOD = "good";
 const string ID_DATAVIEWER = "dataviewer";
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

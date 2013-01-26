@@ -24,14 +24,6 @@
 #include"RtDataIDs.h"
 #include"tinyxml/tinyxml.h"
 
-
-static char *VERSION = "$Id: RtInfoServer.cpp 415 2009-02-11 22:20:24Z ohinds $";
-
-//// default constructor
-//RtInfoClient::RtInfoClient() : RtServerSocket(), RtClientSocket() {
-//  addToID(":infoclient");
-//}
-
 // constructor with port and host
 RtInfoClient::RtInfoClient(unsigned short localPortNum,
                            const string &remoteHost,
@@ -177,18 +169,3 @@ string RtInfoClient::buildXMLString(TiXmlDocument &doc) {
   doc.Accept(&printer);
   return printer.Str();
 }
-
-// get the version
-//  out: char array that represents the cvs version
-char *RtInfoClient::getVersionString() {
-  return VERSION;
-}
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

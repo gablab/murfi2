@@ -142,12 +142,3 @@ void RtModelFit::initEstimation(const RtData &dat, RtMaskImage *mask) {
 
   needsInit = false;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

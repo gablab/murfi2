@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtData.cpp defines a base class for data classes
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 
 #include"RtData.h"
 
-  
+
 // default constructor
 RtData::RtData() : numEl(0), elType(RT_UNKNOWN_TYPE) {}
 
@@ -53,14 +53,3 @@ void RtData::setDataID(const RtDataID &id) {
 unsigned int RtData::getNumEl() const {
   return numEl;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

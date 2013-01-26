@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtOutput.cpp defines a class that implements output operations 
- * 
+ *  RtOutput.cpp defines a class that implements output operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ static char *VERSION = "$Id$";
 // default constructor
 RtOutput::RtOutput() {
   outputID = "output";
-} 
+}
 
 // destructor
 RtOutput::~RtOutput() {
@@ -42,7 +42,7 @@ bool RtOutput::open(RtConfig &config) {
 
 // hand off some data to be output
 void RtOutput::setData(RtData *data) {
-  // 
+  //
 }
 
 // set the id string
@@ -59,7 +59,7 @@ void RtOutput::addToID(string add) {
 string RtOutput::getID() {
   return outputID;
 }
- 
+
 
 // gets the version
 //  out:
@@ -67,14 +67,3 @@ string RtOutput::getID() {
 char *RtOutput::getVersionString() {
   return VERSION;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

@@ -83,12 +83,3 @@ class RtInput : public RtIO, public ACE_Task_Base {
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

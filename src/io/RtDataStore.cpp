@@ -17,8 +17,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtDataStore.h"
 
 #define INITIAL_NOTIFY_LIST_LEN 128
@@ -177,18 +175,3 @@ set<RtDataID>::const_iterator RtDataStore::getAvailableData() {
   set<RtDataID>::const_iterator it = availableData.begin();
   return it;
 }
-
-// get the version
-//  out: char array that represents the cvs version
-char *RtDataStore::getVersionString() {
-  return VERSION;
-}
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

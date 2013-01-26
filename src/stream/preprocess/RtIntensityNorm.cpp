@@ -138,13 +138,3 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
 
   return 0;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

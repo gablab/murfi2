@@ -60,12 +60,3 @@ class RtCurrentActivation : public RtStreamComponent {
   bool saveResult;
 };
 #endif /*RTCURRENTACTIVATION_H_*/
-
-/*****************************************************************************
- * $Source:  $
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

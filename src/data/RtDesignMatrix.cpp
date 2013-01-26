@@ -1,11 +1,11 @@
 /*=========================================================================
  *  RtDesignMatrix.cpp defines a class that represents a model's basis
  *  functions
- * 
+ *
  *  NOTE: much of the funcitonality is inhereted from vnl_matrix, so see this
  *  help page for usage of this class:
  *  http://public.kitware.com/vxl/doc/release/core/vnl/html/classvnl__matrix.html
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -1654,12 +1654,3 @@ void RtDesignMatrix::unserializeXML(TiXmlElement *element) {
     }
   }
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

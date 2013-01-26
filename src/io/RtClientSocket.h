@@ -40,10 +40,6 @@ class RtClientSocket {
   // destructor
   virtual ~RtClientSocket();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
   // send a message to a server
   // in
   //  message to send
@@ -71,12 +67,3 @@ class RtClientSocket {
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

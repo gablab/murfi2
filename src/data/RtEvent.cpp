@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtEvent.cpp defines a class for an activation image
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,12 +59,3 @@ TiXmlElement* RtEvent::serializeAsXML(TiXmlElement *requestElement) {
 void RtEvent::unserializeXML(TiXmlElement* element) {
 
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

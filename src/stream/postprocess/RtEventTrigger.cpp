@@ -83,12 +83,3 @@ bool RtEventTrigger::validateComponentConfig() {
 
   return  result;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

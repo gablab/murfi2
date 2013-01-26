@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtMRIImage.h declares a class for an MR image
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -452,12 +452,3 @@ float RtMRIImage::getAutoBrightness() {
   return (float) minVal;
 
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

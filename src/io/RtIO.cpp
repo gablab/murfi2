@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtIO.cpp defines a base class for input and output operations 
- * 
+ *  RtIO.cpp defines a base class for input and output operations
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ bool RtIO::close() {
   return true;
 }
 
-// prints the current time 
+// prints the current time
 void RtIO::printNow(ostream &os) {
   now.update();
 
@@ -61,15 +61,3 @@ void RtIO::printNow(ostream &os) {
 char *RtIO::getVersionString() {
   return VERSION;
 }
-  
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

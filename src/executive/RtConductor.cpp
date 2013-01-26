@@ -433,13 +433,3 @@ vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
 char *RtConductor::getVersionString() {
   return VERSION;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

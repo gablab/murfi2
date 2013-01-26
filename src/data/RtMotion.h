@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtMotion.h declares a class to store subject head motion
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,12 +75,3 @@ class RtMotion : public RtData {
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

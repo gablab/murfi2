@@ -177,13 +177,3 @@ void RtStreamMessage::init(RtConductor *_conductor) {
   numData = 0;
   conductor = _conductor;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

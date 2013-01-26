@@ -73,13 +73,3 @@ int RtPasser::process(ACE_Message_Block* mb) {
   sendToOutputs(img);
   return 0;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

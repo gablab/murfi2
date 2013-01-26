@@ -473,14 +473,3 @@ void RtConfig::dumpNode(TiXmlNode* pParent, ostream &os,
     dumpNode(pChild, os, indent+1);
   }
 }
-
-//**************************************************//
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

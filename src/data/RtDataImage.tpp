@@ -1,6 +1,6 @@
 /*=========================================================================
  *  template class definition for a data image
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");

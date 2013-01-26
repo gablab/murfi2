@@ -62,10 +62,6 @@ class RtDataStore : public RtOutput  {
   // get latest data
   virtual RtData *getLatestData(RtDataID id);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
   // get a list of the available data in the data store
   // note: this returns a list of the unique data ids excepting timepoint.
   set<RtDataID>::const_iterator getAvailableData();
@@ -94,12 +90,3 @@ class RtDataStore : public RtOutput  {
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

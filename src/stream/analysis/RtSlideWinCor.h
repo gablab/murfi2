@@ -42,11 +42,6 @@ class RtSlideWinCor : public RtModelFit {
   // make sure we are configured properly
   virtual bool validateComponentConfig();
 
-  // initialize estimation on first image
-  // in
-  //  first acquired image to use as a template for parameter inits
-  //void initEstimation(const RtData &dat, RtMaskImage *mask);
-
   // start a logfile
   virtual void startDumpAlgoVarsFile();
 
@@ -81,12 +76,3 @@ class RtSlideWinCor : public RtModelFit {
 };
 
 #endif /*RTSLIDEWINCOR_*/
-
-/*****************************************************************************
- * $Source:  $
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

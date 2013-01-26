@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtLocker.h declares a base class for data locker classes
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +17,8 @@
  *
  *=========================================================================*/
 
-#if 0
-
 #ifndef RTLOCKER_H
 #define RTLOCKER_H
-
 
 // class declaration
 class RtLocker {
@@ -45,14 +42,3 @@ class RtLocker {
 };
 
 #endif
-
-#endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

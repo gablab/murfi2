@@ -56,10 +56,6 @@ class RtInfoClient : public RtServerSocket, RtClientSocket  {
   // hand of some data to be output
   virtual void setData(RtData *data);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
  protected:
 
   // receive a message
@@ -87,12 +83,3 @@ class RtInfoClient : public RtServerSocket, RtClientSocket  {
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

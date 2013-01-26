@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtUnmosaic.cpp is the implementation of a class that converts
  *  from a flat mosaic representation into a 3D volume
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,6 @@ RtUnmosaic::RtUnmosaic() : RtStreamComponent() {
 
 // destructor
 RtUnmosaic::~RtUnmosaic() {
-  //cout << "destroyed" << endl;
 }
 
 // validate the configuration
@@ -62,9 +61,6 @@ int RtUnmosaic::process(ACE_Message_Block *mb) {
 
   unmosaic->unmosaic();
 
-  // set the image id for handling
-  //unmosaic->addToID("unmosaic");
-
   setResult(msg,unmosaic);
 
   return 0;
@@ -79,4 +75,3 @@ int RtUnmosaic::process(ACE_Message_Block *mb) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-

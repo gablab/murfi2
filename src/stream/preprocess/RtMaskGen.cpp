@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtMaskGen.cpp is the implementation of a stream module that generates a mask
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,16 +28,16 @@ static const string DEFAULT_BET_PARMS("-f 0.5 -g 0 -n -m");
 
 // default constructor
 RtMaskGen::RtMaskGen() : RtStreamComponent(),
-			 roiID("unset"),
-			 threshold(0.125),
-			 dynamic(false),
-			 useBet(false),
-			 betParms(DEFAULT_BET_PARMS),
-			 save(true),
-			 computingMask(false),
-			 maskGen(NULL) {
+                         roiID("unset"),
+                         threshold(0.125),
+                         dynamic(false),
+                         useBet(false),
+                         betParms(DEFAULT_BET_PARMS),
+                         save(true),
+                         computingMask(false),
+                         maskGen(NULL) {
   componentID = moduleString;
-}
+                         }
 
 // destructor
 RtMaskGen::~RtMaskGen() {
@@ -48,7 +48,7 @@ RtMaskGen::~RtMaskGen() {
 //   name of the option to process
 //   val  text of the option node
 bool RtMaskGen::processOption(const string &name, const string &text,
-			      const map<string,string> &attrMap) {
+                              const map<string,string> &attrMap) {
 
   // look for known options
   if(name == "roiID") {
@@ -83,7 +83,7 @@ bool RtMaskGen::validateComponentConfig() {
     cout << "ERROR: mask-gen requires an roiID" << endl;
     result = false;
 
-  }  
+  }
   return result;
 }
 
@@ -111,7 +111,7 @@ int RtMaskGen::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  // allocate a new mask image 
+  // allocate a new mask image
   maskGen = new RtMaskImage(*img);
   maskGen->getDataID().setFromInputData(*img,*this);
 
@@ -126,25 +126,26 @@ int RtMaskGen::process(ACE_Message_Block *mb) {
     if(!computingMask) {
       // execute commands to make the mask
       maskJobID = RtFSLInterface::makeBrainMask(
-			getExperimentConfig().getSeriesRefVolFilename(
-				   img->getDataID().getSeriesNum()), 
-			maskGen->getFilename(),
-			betParms);
-	
+          getExperimentConfig().getSeriesRefVolFilename(
+              img->getDataID().getSeriesNum()),
+          maskGen->getFilename(),
+          betParms);
+
       computingMask = true;
-      
+
       return 0;
     }
-    else if(computingMask 
-	    && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_FINISHED) {
+    else if(computingMask
+            && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_FINISHED) {
 
       computingMask = false;
       maskGen->load();
     }
-    else if(computingMask 
-	    && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_ERROR) {	
+    else if(computingMask
+            && RtFSLInterface::getJobStatus(maskJobID) == FSL_JOB_ERROR) {
       computingMask = false;
-      cerr << "RtIntensityNorm: error computing brain mask. guessing by threshold" << endl;
+      cerr << "RtIntensityNorm: error computing brain mask. "
+           << "guessing by threshold" << endl;
       maskGen->initByMeanIntensityThreshold(*img, threshold);
     }
     else {
@@ -163,14 +164,14 @@ int RtMaskGen::process(ACE_Message_Block *mb) {
   // save to a file if we should
   if(needsInit && save) {
     maskGen->setFilename(getExperimentConfig().getSeriesMaskFilename(
-                   img->getDataID().getSeriesNum(),roiID));
+                             img->getDataID().getSeriesNum(),roiID));
     maskGen->save();
 
     if(logOutput) {
       stringstream logs("");
-      logs << "maskgen: produced mask " << roiID << " of " 
-	   << maskGen->getNumberOfOnVoxels() << " voxels and saved to "
-	   << maskGen->getFilename() << endl;
+      logs << "maskgen: produced mask " << roiID << " of "
+           << maskGen->getNumberOfOnVoxels() << " voxels and saved to "
+           << maskGen->getFilename() << endl;
       log(logs);
     }
   }
@@ -189,4 +190,3 @@ int RtMaskGen::process(ACE_Message_Block *mb) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-

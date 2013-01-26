@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtDiff.h is the header for a class that computes the difference
  *  between two images
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,20 +54,19 @@ int RtDiff::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  if(last == NULL || last->getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
+  if(last == NULL
+     || last->getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "differencing found first image\n"));
 
     last = img;
     return 0;
   }
-  
-//  ACE_DEBUG((LM_DEBUG, "differencing images %d and %d\n", 
-//	     img->getAcquisitionNum(), last->getAcquisitionNum()));
-  
+
   // validate sizes
   if(img->getNumPix() != last->getNumPix()) {
-    ACE_DEBUG((LM_INFO, "RtDiff:process: last image is different size than this one\n"));
-    return -1;    
+    ACE_DEBUG((LM_INFO,
+               "RtDiff:process: last image is different size than this one\n"));
+    return -1;
   }
 
   // allocate a new data image for the difference
@@ -81,29 +80,8 @@ int RtDiff::process(ACE_Message_Block *mb) {
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     unsigned short d = absdiff(img->getPixel(i),last->getPixel(i));
 
-    diff->setPixel(i, d);    
-  }  
-
-  // set the image id for handling
-  //diff->addToID("voxel-difference");
-
-//  string fn;
-//
-//  fn = "/tmp/voxdiff";
-//  //  fn += img->getAcquisitionNum();
-//  fn += ".dat";
-//  diff->write(fn);
-//  
-//  fn = "/tmp/last";
-//  //  fn += last->getAcquisitionNum();
-//  fn += ".dat";
-//  last->write(fn);
-//  
-//  fn = "/tmp/img";
-//  //  fn += img->getAcquisitionNum();
-//  fn += ".dat";
-//  img->write(fn);
-  
+    diff->setPixel(i, d);
+  }
 
   // store this as last image
   last = img;
@@ -122,5 +100,3 @@ int RtDiff::process(ACE_Message_Block *mb) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtMean.h is the implementation of a class that computes the mean
  *  of a set of images incrementally
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@ RtMean::~RtMean() {
 // validate the configuration
 bool RtMean::validateComponentConfig() {
   bool result = true;
-  
+
   return result;
 }
 
@@ -60,14 +60,16 @@ int RtMean::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  if(numTimePoints == 0 || storemean.getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
+  if(numTimePoints == 0 || storemean.getDataID().getSeriesNum()
+     != img->getDataID().getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "mean found first image\n"));
     storemean = (*img);
   }
 
   // validate sizes
   if(img->getNumPix() != storemean.getNumPix()) {
-    ACE_DEBUG((LM_INFO, "RtMean::process: storemean is different size than this one\n"));
+    ACE_DEBUG((LM_INFO, "RtMean::process: storemean is different size "
+               << "than this one\n"));
     return -1;
   }
 
@@ -88,13 +90,12 @@ int RtMean::process(ACE_Message_Block *mb) {
     int thispix = (int) img->getPixel(i);
 
     int newmean = pixmean
-      + (int) rint( (thispix-pixmean) / (double)numTimePoints);
+        + (int) rint( (thispix-pixmean) / (double)numTimePoints);
     storemean.setPixel(i, (unsigned short) newmean);
     mean->setPixel(i, (unsigned short) newmean);
   }
 
   // set the image id for handling
-  //mean->addToID("voxel-mean");
   setResult(msg,mean);
 
   return 0;
@@ -109,4 +110,3 @@ int RtMean::process(ACE_Message_Block *mb) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-

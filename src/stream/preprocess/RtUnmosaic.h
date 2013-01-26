@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtUnmosaic.h is the header for a class that converts from a flat mosaiced
  *  representation to a 3D volume
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@
 // class declaration
 class RtUnmosaic : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -37,9 +37,9 @@ public:
   RtUnmosaic();
 
   // destructor
-  ~RtUnmosaic();
+  virtual ~RtUnmosaic();
 
-protected:
+ protected:
 
   // make sure we are configured properly
   bool validateComponentConfig();
@@ -59,5 +59,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

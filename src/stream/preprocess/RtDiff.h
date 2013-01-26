@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtDiff.h is the header for a class that computes the difference
  *  between two images
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@
 // class declaration
 class RtDiff : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -37,9 +37,9 @@ public:
   RtDiff();
 
   // destructor
-  ~RtDiff();
+  virtual ~RtDiff();
 
-protected:
+ protected:
 
   // validate the configuration
   bool validateComponentConfig();
@@ -47,7 +47,7 @@ protected:
   // process a single acquisition
   int process(ACE_Message_Block *mb);
 
-  // pointer to the last data we got 
+  // pointer to the last data we got
   RtMRIImage *last;
 
 };
@@ -62,5 +62,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtMean.h is the header for a class that computes the mean over a
  *  set of images. incrementally
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@
 // class declaration
 class RtMean : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -37,9 +37,9 @@ public:
   RtMean();
 
   // destructor
-  ~RtMean();
+  virtual ~RtMean();
 
-protected:
+ protected:
 
   // make sure we are configured properly
   bool validateComponentConfig();
@@ -63,5 +63,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

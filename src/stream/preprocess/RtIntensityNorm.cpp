@@ -2,7 +2,7 @@
  *  RtIntensityNorm.cpp is the implementation of a class that normalizes the
  *  intensity of subsequent images in a timeseries to match the global signal
  *  of the first.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,6 @@ RtIntensityNorm::RtIntensityNorm() : RtStreamComponent() {
 
 // destructor
 RtIntensityNorm::~RtIntensityNorm() {
-  //cout << "destroyed" << endl;
 }
 
 // process a configuration option
@@ -42,12 +41,12 @@ RtIntensityNorm::~RtIntensityNorm() {
 //   name of the option to process
 //   val  text of the option node
 bool RtIntensityNorm::processOption(const string &name, const string &text,
-				      const map<string,string> &attrMap) {
+                                    const map<string,string> &attrMap) {
 
   // look for known options
   if(name == "maskRoiID") {
     maskRoiID = text;
-    return true; 
+    return true;
   }
 
   return RtStreamComponent::processOption(name, text, attrMap);
@@ -58,17 +57,18 @@ bool RtIntensityNorm::validateComponentConfig() {
   bool result = true;
 
   if(maskRoiID == "") {
-    cerr << "ERROR: maskRoiID must be set to do intensity normalization" << endl;
+    cerr << "ERROR: maskRoiID must be set to do intensity normalization"
+         << endl;
     result = false;
   }
-  
+
   return result;
 }
 
 // process a single acquisition
 int RtIntensityNorm::process(ACE_Message_Block *mb) {
   double sum = 0;
-  
+
   ACE_TRACE(("RtIntensityNorm::process"));
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
@@ -92,12 +92,12 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   // look for first image, compute mean intensity to norm further images by
   if(needsInit) {
     ACE_DEBUG((LM_DEBUG, "intensity normalization found first image\n"));
-    
+
     // iterate over pixels accumulating intensity
     double sum = 0;
     for(unsigned int i = 0; i < img->getNumPix(); i++) {
       if(mask->getPixel(i)) {
-	sum += img->getPixel(i);
+        sum += img->getPixel(i);
       }
     }
 
@@ -106,10 +106,7 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
 
     needsInit = false;
   }
-  
-//  ACE_DEBUG((LM_DEBUG, "intensity normalizing image %d\n", 
-//	     img->getAcquisitionNum()));
-  
+
   // compute the mean intensity in the mask for this image
 
   // iterate over pixels accumulating intensity
@@ -121,23 +118,22 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
   }
 
   // norm factor
-  short intensityDiff 
-    = (short) rint(sum/mask->getNumberOfOnVoxels() - meanIntensity);
-  
+  short intensityDiff
+      = (short) rint(sum/mask->getNumberOfOnVoxels() - meanIntensity);
+
   // allocate a new data image for normalized image
   RtMRIImage *inorm = new RtMRIImage(*img);
-  
+
   inorm->getDataID().setFromInputData(*img,*this);
   inorm->getDataID().setDataName(NAME_SPATIALINTENSITYNORM_IMG);
 
   // subtract the difference for each voxel
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     inorm->setPixel(i, (img->getPixel(i) - intensityDiff > 0)
-		    ? (img->getPixel(i) - intensityDiff) : 0);
-  }  
+                    ? (img->getPixel(i) - intensityDiff) : 0);
+  }
 
   // set the image id for handling
-  //inorm->addToID("intensity-norm");
   setResult(msg,inorm);
 
   return 0;
@@ -152,4 +148,3 @@ int RtIntensityNorm::process(ACE_Message_Block *mb) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-

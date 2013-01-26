@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtMaskLoad.h is the header for a stream module that loads a mask  
- * 
+ *  RtMaskLoad.h is the header for a stream module that loads a mask
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@
 // class declaration
 class RtMaskLoad : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -35,16 +35,16 @@ public:
   RtMaskLoad();
 
   // destructor
-  ~RtMaskLoad();
+  virtual ~RtMaskLoad();
 
-protected:
+ protected:
 
   // process an option
-  //  in 
+  //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
-			     const map<string,string> &attr);
+  virtual bool processOption(const string &name, const string &text,
+                             const map<string,string> &attr);
 
   // make sure we are configured properly
   virtual bool validateComponentConfig();
@@ -76,5 +76,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

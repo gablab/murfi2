@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtMosaic.cpp is the implementation of a class that converts a volume into
  *  a flat mosaic representation
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,14 +30,13 @@ RtMosaic::RtMosaic() : RtStreamComponent() {
 
 // destructor
 RtMosaic::~RtMosaic() {
-  //cout << "destroyed" << endl;
 }
 
 // validate the configuration
 bool RtMosaic::validateComponentConfig() {
   bool result = true;
 
-  
+
   return result;
 }
 
@@ -63,14 +62,11 @@ int RtMosaic::process(ACE_Message_Block *mb) {
 
   mosaic->mosaic();
 
-  // set the image id for handling
-  //mosaic->addToID("mosaic");
-
   setResult(msg,mosaic);
 
   if(print) {
-    cout << "RtMosaic: done at tr " 
-	 << img->getDataID().getTimePoint() << endl;
+    cout << "RtMosaic: done at tr "
+         << img->getDataID().getTimePoint() << endl;
   }
 
   return 0;
@@ -85,4 +81,3 @@ int RtMosaic::process(ACE_Message_Block *mb) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-

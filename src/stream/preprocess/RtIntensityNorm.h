@@ -2,7 +2,7 @@
  *  RtIntensityNorm.h is the header for a class that normalizes the intensity
  *  of subsequent images in a timeseries to match the global signal of the
  *  first.
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@
 // class declaration
 class RtIntensityNorm : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -42,9 +42,9 @@ public:
   RtIntensityNorm();
 
   // destructor
-  ~RtIntensityNorm();
+  virtual ~RtIntensityNorm();
 
-protected:
+ protected:
 
   // make sure we are configured properly
   bool validateComponentConfig();
@@ -60,7 +60,7 @@ protected:
   //   name of the option to process
   //   attr map bettwen attribute names and values
   virtual bool processOption(const string &name, const string &text,
-			     const map<string,string> &attr);
+                             const map<string,string> &attr);
 
   double meanIntensity; // intensity to normalize to
 };

@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtModelFit.h is the header for a base class for any method for model
  *  estimation
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +52,7 @@ class RtModelFit : public RtStreamComponent {
   RtModelFit();
 
   // destructor
-  ~RtModelFit();
+  virtual ~RtModelFit();
 
  protected:
 
@@ -97,5 +97,3 @@ class RtModelFit : public RtStreamComponent {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

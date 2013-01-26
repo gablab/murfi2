@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtContrast.h is the implementation of a class that computes
  *  activation stats based on a model fit
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ string RtContrast::moduleString(ID_CONTRAST);
 
 // default constructor
 RtContrast::RtContrast() : RtStreamComponent(),
-			   numInputConditions(0) {
+                           numInputConditions(0) {
   componentID = moduleString;
 }
 
@@ -42,21 +42,22 @@ RtContrast::~RtContrast() { }
 // configure this stream component
 //  in
 //   xml module node from which to read <option>s
-bool RtContrast::init(TiXmlElement *module, RtConfig *config, RtConductor *_conductor) {
+bool RtContrast::init(TiXmlElement *module, RtConfig *config,
+                      RtConductor *_conductor) {
   ACE_TRACE(("RtContrast::init"));
 
   // find the design and process it
   TiXmlNode *convec = module->FirstChild("contrastVector");
   if(convec == NULL) {
     cerr << "ERROR: no contrast vector found" << endl;
-    return false;    
+    return false;
   }
   else if(convec->Type() != TiXmlNode::ELEMENT) {
     cerr << "ERROR: contrastVector is not an xml element" << endl;
     return false;
   }
   TiXmlElement *convecElmt = (TiXmlElement*) convec;
-  
+
   // prepare the input vector (needed to store the vector temporarily
   // because the design matrix won't be built yet. see init() for real
   // building of the vector
@@ -67,8 +68,10 @@ bool RtContrast::init(TiXmlElement *module, RtConfig *config, RtConductor *_cond
 
   // find the name
   string getName;
-  if(TIXML_SUCCESS != convecElmt->QueryValueAttribute("contrastName", getName)) {
-    cerr << "ERROR: contrastName is a required attribute of the contrastVector option" << endl;
+  if(TIXML_SUCCESS !=
+     convecElmt->QueryValueAttribute("contrastName", getName)) {
+    cerr << "ERROR: contrastName is a required attribute of the "
+         << "contrastVector option" << endl;
     return false;
   }
   contrastName = getName;
@@ -77,8 +80,9 @@ bool RtContrast::init(TiXmlElement *module, RtConfig *config, RtConductor *_cond
   string type;
   if(!(TIXML_SUCCESS == convecElmt->QueryValueAttribute("type", type)
        && (type != "vect" || type != "pairs" ))) {
-    cerr << "ERROR: the \"type\" attribute of the contrastVector must be either \"vect\" or \"pairs\"" << endl;
-      return false;
+    cerr << "ERROR: the \"type\" attribute of the contrastVector must "
+         << "be either \"vect\" or \"pairs\"" << endl;
+    return false;
   }
 
   // handle a single double contrast vector input
@@ -90,15 +94,15 @@ bool RtContrast::init(TiXmlElement *module, RtConfig *config, RtConductor *_cond
     numInputConditions = 0;
     size_t i = 0;
     for(size_t i1 = 0, i2 = text.find(" ", 0); i2 <= text.size();
-	i++, i1 = i2+1, i2 = text.find(" ", i1), numInputConditions++) {
+        i++, i1 = i2+1, i2 = text.find(" ", i1), numInputConditions++) {
 
-      if(!RtConfigVal::convert<double>(el,
-	       text.substr(i1,i2 >= text.size() ? text.size()-i1 : i2-i1))) {
-	continue;
+      if(!RtConfigVal::convert<double>(
+             el, text.substr(i1,i2 >= text.size() ? text.size()-i1 : i2-i1))) {
+        continue;
       }
       inputContrastVec.put(i,el);
-    }   
-  } 
+    }
+  }
   // handle a set of name/weight pairs
   else if(type == "pairs") {
     // iterate over weights
@@ -106,15 +110,16 @@ bool RtContrast::init(TiXmlElement *module, RtConfig *config, RtConductor *_cond
     double condWeight;
     TiXmlElement *weightElmt;
     for(TiXmlNode *weight = 0;
-	(weight = convecElmt->IterateChildren("weight", weight)); 
-	numInputConditions++) {
+        (weight = convecElmt->IterateChildren("weight", weight));
+        numInputConditions++) {
       if(weight->Type() != TiXmlNode::ELEMENT)
-	continue;
+        continue;
 
       weightElmt = (TiXmlElement*) weight;
 
-      if(TIXML_SUCCESS != weightElmt->QueryValueAttribute("condition", condName)) {
-	continue;
+      if(TIXML_SUCCESS != weightElmt->QueryValueAttribute("condition",
+                                                          condName)) {
+        continue;
       }
 
       // assign the name to the end
@@ -124,9 +129,9 @@ bool RtContrast::init(TiXmlElement *module, RtConfig *config, RtConductor *_cond
       RtConfigVal::convert<double>(condWeight, weightElmt->GetText());
       inputContrastVec.put(inputConditionNames.size()-1,condWeight);
     }
-    
+
   }
-    
+
   return RtStreamComponent::init(module, config, _conductor);
 }
 
@@ -135,7 +140,7 @@ bool RtContrast::init(TiXmlElement *module, RtConfig *config, RtConductor *_cond
 //   name of the option to process
 //   val  text of the option node
 bool RtContrast::processOption(const string &name, const string &text,
-				     const map<string,string> &attrMap) {
+                               const map<string,string> &attrMap) {
   // look for known options
   if(name == "estimationModuleID") {
     estimationModuleID = text;
@@ -150,15 +155,16 @@ bool RtContrast::validateComponentConfig() {
   bool result = true;
 
   if(estimationModuleID.empty()) {
-    cerr << "ERROR: estimationModuleID must be set to compute contrasts" << endl;
+    cerr << "ERROR: estimationModuleID must be set to compute contrasts"
+         << endl;
     result = false;
   }
-  
+
   if(maskRoiID.empty()) {
     cerr << "ERROR: maskRoiID must be set to compute contrasts" << endl;
     result = false;
   }
-  
+
   return result;
 }
 
@@ -173,20 +179,22 @@ bool RtContrast::initContrast(RtMRIImage &image) {
   desID.setDataName(NAME_DESIGN);
   designMatrix = (RtDesignMatrix*) getDataStore().getData(desID);
   if(designMatrix == NULL) {
-    cerr << "ERROR: RtContrast could not load the experimental design matrix. bailing." << endl;
+    cerr << "ERROR: RtContrast could not load the experimental design "
+         << "matrix. bailing." << endl;
     return false;
   }
 
   // resolve inputs to build a contrast vector
-  
+
   // find the names associated with each nonzero weight
   contrastVector.reserve(numInputConditions);
   for(unsigned int c = 0; c < numInputConditions; c++) {
     if(abs(inputContrastVec[c]) > std::numeric_limits<double>::epsilon()) {
-      string condName = (inputConditionNames.size() > c) 
-	? inputConditionNames[c]       
-	: designMatrix->getColumnName(c);
-      contrastVector.push_back(RtContrastVecEntry(condName,inputContrastVec[c]));
+      string condName = (inputConditionNames.size() > c)
+          ? inputConditionNames[c]
+          : designMatrix->getColumnName(c);
+      contrastVector.push_back(RtContrastVecEntry(condName,
+                                                  inputContrastVec[c]));
     }
   }
 
@@ -196,7 +204,8 @@ bool RtContrast::initContrast(RtMRIImage &image) {
       i != contrastVector.end(); i++) {
     unsigned int index = designMatrix->getColumnIndex((*i).name);
     if(index == std::numeric_limits<unsigned int>::max()) {
-      cerr << "ERROR: column " << (*i).name << " does not exist, skipping" << endl;
+      cerr << "ERROR: column " << (*i).name << " does not exist, skipping"
+           << endl;
       continue;
     }
 
@@ -243,8 +252,8 @@ int RtContrast::process(ACE_Message_Block *mb) {
   }
 
   // retreive the betas and residual map
-  RtActivation *resMs = (RtActivation*) msg->getData(estimationModuleID, 
-						     NAME_RESIDUAL_MSE);
+  RtActivation *resMs = (RtActivation*) msg->getData(estimationModuleID,
+                                                     NAME_RESIDUAL_MSE);
 
   if(resMs == NULL) {
     cout << "RtContrast::process:  no residual image found" << endl;
@@ -254,21 +263,21 @@ int RtContrast::process(ACE_Message_Block *mb) {
   // vector for betas of interest
   vector<RtActivation*> betas;
   betas.reserve(contrastVector.size());
-  for(vector<RtContrastVecEntry>::iterator i = contrastVector.begin(); 
+  for(vector<RtContrastVecEntry>::iterator i = contrastVector.begin();
       i != contrastVector.end(); i++) {
-    RtActivation *beta = (RtActivation*) msg->getData(estimationModuleID, 
-					      NAME_BETA + "_" + (*i).name);
+    RtActivation *beta = (RtActivation*) msg->getData(
+        estimationModuleID, NAME_BETA + "_" + (*i).name);
     if(beta) {
       betas.push_back(beta);
     }
     else {
-      cout << "RtContrast::process:  no beta image found for condition " 
-	   << (*i).name << endl;
+      cout << "RtContrast::process:  no beta image found for condition "
+           << (*i).name << endl;
       return 0;
     }
   }
 
-  // allocate data images for con and stats 
+  // allocate data images for con and stats
   RtActivation *con = new RtActivation(*dat);
   con->getDataID().setFromInputData(*dat,*this);
   con->getDataID().setDataName(string(NAME_CONTRAST) + "_" + contrastName);
@@ -285,26 +294,28 @@ int RtContrast::process(ACE_Message_Block *mb) {
   //// compute weighted sum for each voxel
   RtElementAccess elAc(resMs, mask);
   vector<unsigned int> inds = elAc.getElementIndices();
-  for(vector<unsigned int>::iterator it = inds.begin(); it != inds.end(); it++) {
+  for(vector<unsigned int>::iterator it = inds.begin();
+      it != inds.end(); it++) {
 
     // compute the contrast value
     double sum = 0;
     vector<RtActivation*>::iterator image = betas.begin();
-    vector<RtContrastVecEntry>::iterator vector = contrastVector.begin(); 
-    for(; vector != contrastVector.end() && image != betas.end(); 
-	vector++, image++) {
+    vector<RtContrastVecEntry>::iterator vector = contrastVector.begin();
+    for(; vector != contrastVector.end() && image != betas.end();
+        vector++, image++) {
       sum += (*vector).weight * (*image)->getElement(*it);
     }
     con->setPixel(*it, sum);
 
     // compute the t stat
     double numerator = sum;
-    double denominator = resMs->getElement(*it) 
-      / (timePoint-designMatrix->getNumColumns())
-      * contrastCov;
+    double denominator = resMs->getElement(*it)
+        / (timePoint-designMatrix->getNumColumns())
+        * contrastCov;
 
     if((DEBUG_LEVEL & MODERATE) && *it == 31472) {
-      cout << numerator << " / " << denominator << " = " << numerator / denominator << endl;
+      cout << numerator << " / " << denominator
+           << " = " << numerator / denominator << endl;
     }
 
 
@@ -318,14 +329,14 @@ int RtContrast::process(ACE_Message_Block *mb) {
 
 
   if(print) {
-    cout << "RtContrast: done at tr " 
-	 << dat->getDataID().getTimePoint() << endl;
+    cout << "RtContrast: done at tr "
+         << dat->getDataID().getTimePoint() << endl;
   }
 
   if(logOutput) {
     stringstream logs("");
-    logs << "RtContrast: done at tr " 
-	 << dat->getDataID().getTimePoint() << endl;
+    logs << "RtContrast: done at tr "
+         << dat->getDataID().getTimePoint() << endl;
     log(logs);
   }
 
@@ -342,4 +353,3 @@ int RtContrast::process(ACE_Message_Block *mb) {
  * comment-column: 0
  * End:
  *****************************************************************************/
-

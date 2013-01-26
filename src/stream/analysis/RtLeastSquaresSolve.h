@@ -1,6 +1,6 @@
 /*=========================================================================
  *  c++ wrapper for gentleman's least squares computation
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@
 
 class RtLeastSquaresSolve {
 
-public:
+ public:
 
   // constructors
   RtLeastSquaresSolve();
@@ -56,26 +56,26 @@ public:
   // in:
   //  meas is the index of the observation to regress on
   // out:
-  //  residual 
+  //  residual
   double *getSquaredError(unsigned int meas);
 
   // compute and return the total squared error
   // in:
   //  meas is the index of the observation to regress on
   // out:
-  //  residual 
+  //  residual
   double getTotalSquaredError(unsigned int meas);
 
-protected:
+ protected:
 
   // init all the variables
   void init();
-  
+
   unsigned int numMeas; // number of observations at each time point
   unsigned int numCols; // number of columns in the design matrix
   double **d;           // entries of the diagonal scaling matrix D
   double **rbar;        // unrolled superdiagonal entries of R.
-                        // the Cholesky decomp is D^(1/2)*R
+  // the Cholesky decomp is D^(1/2)*R
   double **thetabar;    // D^(1/2)*thetabar is the orthogonal coefficients
   double *sserr;        // sum of the squared error
 

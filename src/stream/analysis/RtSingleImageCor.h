@@ -2,7 +2,7 @@
  *  RtSingleImageCor.h is the header for a class that estimates the
  *  activation at each voxel in a single image using a GLM-based
  *  correlation analysis based on Hinds, et al., 2008
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,72 +35,72 @@ using namespace std;
 // class declaration
 
 class RtSingleImageCor : public RtIncrementalGLM {
-public:
+ public:
 
-    static string moduleString;
+  static string moduleString;
 
-    //*** constructors/destructors  ***//
+  //*** constructors/destructors  ***//
 
-    // default constructor
-    RtSingleImageCor();
+  // default constructor
+  RtSingleImageCor();
 
-    // destructor
-    ~RtSingleImageCor();
+  // destructor
+  virtual ~RtSingleImageCor();
 
-protected:
+ protected:
 
-    // deallocate internal data
-    void freeEstErrSum();
+  // deallocate internal data
+  void freeEstErrSum();
 
-    // process a single acquisition
-    virtual int process(ACE_Message_Block *mb);
+  // process a single acquisition
+  virtual int process(ACE_Message_Block *mb);
 
-    // process an option
-    //  in
-    //   name of the option to process
-    //   attr map bettwen attribute names and values
-    virtual bool processOption(const string &name, const string &text,
-                               const map<string, string> &attr);
+  // process an option
+  //  in
+  //   name of the option to process
+  //   attr map bettwen attribute names and values
+  virtual bool processOption(const string &name, const string &text,
+                             const map<string, string> &attr);
 
-    // make sure we are configured properly
-    bool validateComponentConfig();
+  // make sure we are configured properly
+  bool validateComponentConfig();
 
-    // initialize the estimation algorithm for a particular image size
-    // in
-    //  first acquired image to use as a template for parameter inits
-    void initEstimation(RtMRIImage &dat, RtMaskImage *mask);
+  // initialize the estimation algorithm for a particular image size
+  // in
+  //  first acquired image to use as a template for parameter inits
+  void initEstimation(RtMRIImage &dat, RtMaskImage *mask);
 
-    // start a logfile
-    virtual void startDumpAlgoVarsFile();
+  // start a logfile
+  virtual void startDumpAlgoVarsFile();
 
-    //// parameters of the activation estimation algorithm
+  //// parameters of the activation estimation algorithm
 
-    // whether to include the condition mean in the stat computation
-    bool includeConditionMean;
+  // whether to include the condition mean in the stat computation
+  bool includeConditionMean;
 
-    //// error estimation params
+  //// error estimation params
 
-    // error norm method
-    Norm errorNorm;
+  // error norm method
+  Norm errorNorm;
 
-    // store the per pixel sum of absolute error for the single image model fit
-    RtActivation *estErrSum;
+  // store the per pixel sum of absolute error for the single image model fit
+  RtActivation *estErrSum;
 
-    // number of timepoints
+  // number of timepoints
   unsigned int numTimepoints;
 
-    // number of data actually in the error estimate so far
-    int numDataPointsCount;
+  // number of data actually in the error estimate so far
+  int numDataPointsCount;
 
-    // the amount of data to use in the estimation of the error
-    unsigned int numDataPointsForErrEst;
+  // the amount of data to use in the estimation of the error
+  unsigned int numDataPointsForErrEst;
 
-    // whether errors should only be estimated in baseline
-    bool onlyEstErrInBaseline;
+  // whether errors should only be estimated in baseline
+  bool onlyEstErrInBaseline;
 
-    bool dumpAlgoVars;
-    string dumpAlgoVarsFilename;
-    ofstream dumpFile;
+  bool dumpAlgoVars;
+  string dumpAlgoVarsFilename;
+  ofstream dumpFile;
 };
 
 #endif
@@ -113,5 +113,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

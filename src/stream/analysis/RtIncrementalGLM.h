@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtIncrementalGLM.h is the header for a class that estimates the
  *  activation at each voxel incrementally using Gentleman's method
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ class RtIncrementalGLM : public RtModelFit {
   RtIncrementalGLM();
 
   // destructor
-  ~RtIncrementalGLM();
+  virtual ~RtIncrementalGLM();
 
  protected:
 
@@ -54,16 +54,16 @@ class RtIncrementalGLM : public RtModelFit {
   virtual int process(ACE_Message_Block *mb);
 
   // process an option
-  //  in 
+  //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
+  virtual bool processOption(const string &name, const string &text,
                              const map<string,string> &attr);
 
-  // start a logfile 
+  // start a logfile
   virtual void startDumpAlgoVarsFile();
 
-  // one solver for each voxel 
+  // one solver for each voxel
   unsigned int numSolvers;
   RtLeastSquaresSolve **solvers;
 
@@ -79,5 +79,3 @@ class RtIncrementalGLM : public RtModelFit {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

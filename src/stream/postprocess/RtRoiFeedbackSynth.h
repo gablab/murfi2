@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtRoiFeedbackSynth.h is the header for a class that synthesizes roi
  *  activations
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 // class declaration
 class RtRoiFeedbackSynth : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -36,17 +36,17 @@ public:
   RtRoiFeedbackSynth();
 
   // destructor
-  ~RtRoiFeedbackSynth();
+  virtual ~RtRoiFeedbackSynth();
 
-protected:
+ protected:
 
   // process an option
   //  in
   //   name of the option to process
   //   val  text of the option node
   bool processOption(const string &name,
-		     const string &text,
-		     const map<string,string> &attrMap);
+                     const string &text,
+                     const map<string,string> &attrMap);
 
   // validate config
   bool validateComponentConfig();

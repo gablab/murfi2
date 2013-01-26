@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtEventTriggerSynth.h is the header for a class to
  *  simulated a event trigger sequence
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 // class declaration
 class RtEventTriggerSynth : public RtEventTrigger {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -38,14 +38,14 @@ public:
   // destructor
   ~RtEventTriggerSynth();
 
-protected:
+ protected:
 
   // process an option
-  //  in 
+  //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
-			     const map<string,string> &attr);
+  virtual bool processOption(const string &name, const string &text,
+                             const map<string,string> &attr);
 
   // validate config
   bool validateComponentConfig();
@@ -56,7 +56,7 @@ protected:
   // average number of trs between triggers
   float meanISI;
   float sdISI;
-  
+
 };
 
 #endif
@@ -69,5 +69,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

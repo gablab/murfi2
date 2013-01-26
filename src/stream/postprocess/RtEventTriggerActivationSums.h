@@ -1,7 +1,7 @@
 /*=========================================================================
- *  RtEventTriggerActivationSums.h is the header for a class to trigger an event based on
- *  activation sums
- * 
+ *  RtEventTriggerActivationSums.h is the header for a class to trigger an
+ *  event based on activation sums
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 // class declaration
 class RtEventTriggerActivationSums : public RtEventTrigger {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -36,16 +36,16 @@ public:
   RtEventTriggerActivationSums();
 
   // destructor
-  ~RtEventTriggerActivationSums();
+  virtual ~RtEventTriggerActivationSums();
 
-protected:
+ protected:
 
   // process an option
-  //  in 
+  //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
-  virtual bool processOption(const string &name, const string &text, 
-			     const map<string,string> &attr);
+  virtual bool processOption(const string &name, const string &text,
+                             const map<string,string> &attr);
 
   // process a single acquisition
   int process(ACE_Message_Block *mb);
@@ -83,5 +83,3 @@ protected:
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

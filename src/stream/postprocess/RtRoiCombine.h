@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtRoiCombine.h is the header for a base class for combining roi
  *  activations to result in a feedback signal
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ enum RtRoiCombineMethod {
 // class declaration
 class RtRoiCombine : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -49,16 +49,16 @@ public:
   RtRoiCombine();
 
   // destructor
-  ~RtRoiCombine();
+  virtual ~RtRoiCombine();
 
-protected:
+ protected:
 
   // process an option
   //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
   virtual bool processOption(const string &name, const string &text,
-			     const map<string,string> &attr);
+                             const map<string,string> &attr);
 
   // make sure we are configured properly
   bool validateComponentConfig();

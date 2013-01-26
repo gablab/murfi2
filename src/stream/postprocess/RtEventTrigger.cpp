@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtEventTrigger.cpp triggers an event based on activation sums
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,11 +43,11 @@ RtEventTrigger::RtEventTrigger() : RtStreamComponent() {
 RtEventTrigger::~RtEventTrigger() {}
 
 // process an option
-//  in 
+//  in
 //   name of the option to process
 //   val  text of the option node
 bool RtEventTrigger::processOption(const string &name, const string &text,
-				   const map<string,string> &attrMap) {
+                                   const map<string,string> &attrMap) {
   if(name == "posRoiID") {
     posRoiID = text;
     return true;
@@ -61,7 +61,7 @@ bool RtEventTrigger::processOption(const string &name, const string &text,
   }
   if(name == "monitorNeg") {
     return RtConfigVal::convert<bool>(monitorNeg,text);
-  }  
+  }
   if(name == "posThresh") {
     return RtConfigVal::convert<double>(posThresh,text);
   }
@@ -75,7 +75,7 @@ bool RtEventTrigger::processOption(const string &name, const string &text,
     return RtConfigVal::convert<int>(initialSkipTRs,text);
   }
   return RtStreamComponent::processOption(name, text, attrMap);
-}  
+}
 
 // validate the configuration
 bool RtEventTrigger::validateComponentConfig() {
@@ -92,5 +92,3 @@ bool RtEventTrigger::validateComponentConfig() {
  * comment-column: 0
  * End:
  *****************************************************************************/
-
-

@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtDataID.h declares a class for identifying data uniquely
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ class RtDataID {
   // copy constructor
   RtDataID(const RtDataID &other);
 
-  virtual ~RtDataID();
+  ~RtDataID();
 
   // initialize contents to wildcards
   void initializeToWildCards();

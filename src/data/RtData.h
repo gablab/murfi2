@@ -1,6 +1,6 @@
 /*=========================================================================
  *  RtData.h declares a base class for data classes
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ class RtData {
   RtData();
 
   // destructor
-  virtual ~RtData();
+  ~RtData();
 
   // gets and sets
 

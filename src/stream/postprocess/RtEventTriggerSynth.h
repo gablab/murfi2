@@ -36,7 +36,7 @@ class RtEventTriggerSynth : public RtEventTrigger {
   RtEventTriggerSynth();
 
   // destructor
-  ~RtEventTriggerSynth();
+  virtual ~RtEventTriggerSynth();
 
  protected:
 

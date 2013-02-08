@@ -82,7 +82,6 @@ int RtVar::process(ACE_Message_Block *mb) {
   }
 
   // get the mean
-  //cout << "getting mean data with id " << meanDataID << endl;
   RtMRIImage *mean = (RtMRIImage*)msg->getData(meanModuleID,meanDataName);
 
   if(mean == NULL) {

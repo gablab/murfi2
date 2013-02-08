@@ -38,7 +38,6 @@ RtMaskLoad::RtMaskLoad() : RtStreamComponent(),
 
 // destructor
 RtMaskLoad::~RtMaskLoad() {
-  //cout << "destroyed" << endl;
 }
 
 // process a configuration option

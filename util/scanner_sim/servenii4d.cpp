@@ -13,7 +13,6 @@
 #include<vnl/vnl_matrix.h>
 #include<vnl/vnl_vector.h>
 #include<vnl/vnl_matrix_fixed.h>
-#include"../../src/util/printVnl44Mat.cpp"
 
 using namespace std;
 
@@ -88,29 +87,17 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   vxl2rasMat.put(0,0, vols->qto_xyz.m[0][0]);
   vxl2rasMat.put(0,1, vols->qto_xyz.m[0][1]);
   vxl2rasMat.put(0,2, vols->qto_xyz.m[0][2]);
-  //vxl2rasMat.put(0,3, vols->qto_xyz.m[0][3]);
 
   vxl2rasMat.put(1,0, vols->qto_xyz.m[1][0]);
   vxl2rasMat.put(1,1, vols->qto_xyz.m[1][1]);
   vxl2rasMat.put(1,2, vols->qto_xyz.m[1][2]);
-  //vxl2rasMat.put(1,3, vols->qto_xyz.m[1][3]);
 
   vxl2rasMat.put(2,0, vols->qto_xyz.m[2][0]);
   vxl2rasMat.put(2,1, vols->qto_xyz.m[2][1]);
   vxl2rasMat.put(2,2, vols->qto_xyz.m[2][2]);
-  //vxl2rasMat.put(2,3, vols->qto_xyz.m[2][3]);
 
   vnl_matrix_fixed<double,4,4> rotMat;
   rotMat = InvscaleMat*vxl2rasMat;
-
-  cout << "Inverse scale mat: " << endl;
-  printVnl44Mat(InvscaleMat);
-
-  cout << "vxl2ras mat: " << endl;
-  printVnl44Mat(vxl2rasMat);
-
-  cout << "rotation matrix: " << endl;
-  printVnl44Mat(rotMat);
 
   float tr = (inputTr < 0) ? vols->pixdim[4] : inputTr;
 
@@ -134,10 +121,6 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   unsigned int i = 0;
   for(; i < numImgs && !connector.connect (stream, my_addr); i++) {
     cout << "made connection, sending image " << i+1 << endl;
-
-    //    nifti_image *vol;
-    //    copyTrToVol(vols,i,vol);
-
     // mosaic and send
 
     RtExternalImageInfo *ei = new RtExternalImageInfo();
@@ -159,23 +142,6 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
         << "nLin " <<  ei->nLin << " "
         << "iNoOfImagesInMosaic " <<  ei->iNoOfImagesInMosaic << " "
         << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl;
-/*
-    ei->dRowSag = vols->sto_xyz.m[0][0];
-    ei->dRowCor = vols->sto_xyz.m[0][1];
-    ei->dRowTra = vols->sto_xyz.m[0][2];
-
-    ei->dColSag = vols->sto_xyz.m[1][0];
-    ei->dColCor = vols->sto_xyz.m[1][1];
-    ei->dColTra = vols->sto_xyz.m[1][2];
-
-    ei->dNorSag = vols->sto_xyz.m[2][0];
-    ei->dNorCor = vols->sto_xyz.m[2][1];
-    ei->dNorTra = vols->sto_xyz.m[2][2];
-
-    ei->dPosSag = vols->sto_xyz.m[3][0];
-    ei->dPosCor = vols->sto_xyz.m[3][1];
-    ei->dPosTra = vols->sto_xyz.m[3][2];
-*/
 
     ei->dRowSag = rotMat[0][0];
     ei->dRowCor = rotMat[0][1];
@@ -210,7 +176,8 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
       // these expressions are bracketed carefully to truncate
       // DO NOT SIMPLIFY THESE EXPRESSIONS
-      newrow = (p/matrixSize)%matrixSize + matrixSize*(p/(mosaicSide*matrixSize));
+      newrow = (p/matrixSize)%matrixSize +
+          matrixSize*(p/(mosaicSide*matrixSize));
       newcol = (matrixSize*(p/sqMatrixSize) + (p%matrixSize))%mosaicSide;
       newind = newrow*mosaicSide+newcol;
 
@@ -229,8 +196,6 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     //// send nonmoco image
     cout << "sending img  " << ei->iAcquisitionNumber << endl;
 
-    //ei->displayImageInfo();
-
     char *data = new char[ei->iSizeOfRtExternalImageInfo];
     ei->bIsMoCo = false;
     data = ei->convertToScannerDataArray();
@@ -245,7 +210,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     stream.close();
 
-    //    //// send moco image
+    // send moco image
     if(connector.connect (stream, my_addr)) {
       break;
     }

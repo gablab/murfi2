@@ -34,7 +34,6 @@ RtMean::RtMean() : RtStreamComponent() {
 
 // destructor
 RtMean::~RtMean() {
-  //cout << "destroyed" << endl;
 }
 
 // validate the configuration

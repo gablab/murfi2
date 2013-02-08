@@ -406,7 +406,6 @@ bool parseArgs(int argc, char **args) {
 
       case 'h':
       case '?':
-        cout << "here" << endl;
         return false; // automatically prints usage
 
       case ':':

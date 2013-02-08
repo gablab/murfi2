@@ -237,7 +237,6 @@ class RtDataIDCompare {
 class RtDataIDPartialCompare {
  public:
   bool operator()(const RtDataID &one, const RtDataID &two) const {
-    //cout << "comparing: " << one << " " << two << (one < two) << endl;
     return one.partless(two);
   }
 };

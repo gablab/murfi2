@@ -40,17 +40,6 @@ class RtInputUSBKb : public RtInput {
 
   // close and clean up
   bool close();
-
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
-
- private:
-
-  //*** private data members  ***//
-
-
 };
 
 #endif

@@ -53,10 +53,6 @@ class RtOutput : public RtIO {
   // get the id string
   string getID();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
  protected:
 
   //*** private data members  ***//

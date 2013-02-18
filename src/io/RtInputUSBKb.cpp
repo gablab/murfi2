@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtInputUSBKb.h"
 
 //*** constructors/destructors  ***//
@@ -46,11 +44,4 @@ bool RtInputUSBKb::init(const RtConfig &config) {
 // close and clean up
 bool RtInputUSBKb::close() {
   return true;
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtInputUSBKb::getVersionString() {
-  return VERSION;
 }

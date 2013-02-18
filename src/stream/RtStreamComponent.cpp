@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtStreamComponent.h"
 #include"RtDataIDs.h"
 #include"RtExperiment.h"
@@ -369,12 +367,6 @@ int RtStreamComponent::svc() {
 int RtStreamComponent::nextStep(ACE_Message_Block *mb) {
   ACE_TRACE(("RtStreamComponent::next_step"));
   return this->put_next(mb);
-}
-
-// get the version
-//  out: char array that represents the cvs version
-char *RtStreamComponent::getVersionString() const {
-  return VERSION;
 }
 
 // gets whether this component is disabled

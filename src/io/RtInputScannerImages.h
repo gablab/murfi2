@@ -58,10 +58,6 @@ class RtInputScannerImages : public RtInput {
   // run the scanner input
   virtual int svc();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
  protected:
 
   // read the scanner image info from a socket stream

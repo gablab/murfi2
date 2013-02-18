@@ -17,8 +17,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtProcessor.h"
 #include"RtDataIDs.h"
 #include"RtDiff.h"
@@ -99,10 +97,4 @@ int RtProcessor::process(ACE_Message_Block *mb) {
   RtStream::put(mb);
 
   return 0;
-}
-
-// get the version
-//  out: char array that represents the cvs version
-char *RtProcessor::getVersionString() const {
-  return VERSION;
 }

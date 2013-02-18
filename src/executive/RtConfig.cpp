@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtConfig.h"
 
 #include"ace/Get_Opt.h"
@@ -347,14 +345,6 @@ void RtConfig::print(const char *name) {
 template <class T> inline bool RtConfig::convert(T &t, const string& s) {
   istringstream iss(s);
   return !(iss >> dec >> t).fail();
-}
-
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtConfig::getVersionString() {
-  return VERSION;
 }
 
 // print the name/value pairs to the screen

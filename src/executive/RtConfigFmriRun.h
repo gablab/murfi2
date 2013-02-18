@@ -55,13 +55,6 @@ class RtConfigFmriRun : public RtConfig {
   // checks for valid setup of different parts of the program
   // returns true for success
   virtual bool validateConfig();
-
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
- protected:
-
 };
 
 #endif

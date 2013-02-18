@@ -17,9 +17,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
-
 #include"RtOutputSocket.h"
 #include"tinyxml/tinyxml.h"
 
@@ -115,11 +112,4 @@ void RtOutputSocket::setData(RtData *data) {
 
   delete [] serializedStr;
   delete serializedData;  // ??
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtOutputSocket::getVersionString() {
-  return VERSION;
 }

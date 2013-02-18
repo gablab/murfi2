@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id: RtConfig.cpp 268 2008-10-13 19:54:35Z ohinds $";
-
 #include"RtConfigFmriExperiment.h"
 
 #include"RtExperiment.h"
@@ -364,11 +362,4 @@ string RtConfigFmriExperiment::getDesignFilename(int _seriesNum) {
          / (DESIGN_NAME + "-" + srnum + "." + DESIGN_EXT));
 
   return p.string();
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtConfigFmriExperiment::getVersionString() {
-  return VERSION;
 }

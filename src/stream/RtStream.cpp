@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtStream.h"
 #include"RtCode.h"
 #include"RtProcessor.h"
@@ -357,11 +355,4 @@ bool RtStream::pushAllModules() {
   }
 
   return true;
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtStream::getVersionString() {
-  return VERSION;
 }

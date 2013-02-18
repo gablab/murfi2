@@ -46,10 +46,6 @@ class RtInfoServer : public RtServerSocket {
   // hand of some data to be output
   virtual void setData(RtData *data);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
  protected:
 
   // receive a message

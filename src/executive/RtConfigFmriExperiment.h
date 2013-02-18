@@ -84,13 +84,6 @@ class RtConfigFmriExperiment : public RtConfig {
   //  out
   //   absolute file string
   string getDesignFilename(int _seriesNum);
-
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
- protected:
-
 };
 
 

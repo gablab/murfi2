@@ -64,11 +64,6 @@ class RtIO : public RtCode {
   // prints the current time
   void printNow(ostream &os);
 
-  // gets the version
-  //  out:
-  //   cvs version string for this class
-  virtual char *getVersionString();
-
  protected:
 
   bool isOpen;

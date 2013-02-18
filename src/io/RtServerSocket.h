@@ -81,10 +81,6 @@ class RtServerSocket : public ACE_Task_Base, public RtOutput {
   // close and clean up
   virtual bool close();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
  protected:
 
   // receive a message

@@ -49,11 +49,6 @@ class RtOutputSocket : public RtOutput {
   // close and clean up
   bool close();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
-
  protected:
 
   // client address

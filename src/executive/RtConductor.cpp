@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtConductor.h"
 #include"RtExperiment.h"
 #include"RtInputSynth.h"
@@ -425,11 +423,4 @@ vector<RtOutput*> RtConductor::getAllOutputsWithName(const string &name) {
   }
 
   return outs;
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtConductor::getVersionString() {
-  return VERSION;
 }

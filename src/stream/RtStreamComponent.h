@@ -99,10 +99,6 @@ class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH>, public RtOutput {
   // run the stream
   virtual int svc();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString() const;
-
   // gets whether this component is disabled
   bool getDisabled() const;
 

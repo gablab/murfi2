@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtInputScannerImages.h"
 
 #include<fstream>
@@ -478,11 +476,4 @@ bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 //   true if this image is the first in a series
 bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
   return (unsigned int) info.iAcquisitionNumber == SERIES_FIRST_ACQ_NUM;
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtInputScannerImages::getVersionString() {
-  return VERSION;
 }

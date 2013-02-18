@@ -27,8 +27,6 @@
 #include"tinyxml/tinyxml.h"
 #include<vnl/vnl_matrix.h>
 
-static char *VERSION = "$Id$";
-
 const unsigned short DEFAULT_PORT_NUM = 15001;
 
 // default constructor
@@ -215,11 +213,4 @@ TiXmlElement *RtInfoServer::createErrorElement(string error) {
   errEl->SetAttribute("name", "error");
   errEl->SetAttribute("type", error);
   return errEl;
-}
-
-// get the version
-//  out: char array that represents the cvs version
-
-char *RtInfoServer::getVersionString() {
-  return VERSION;
 }

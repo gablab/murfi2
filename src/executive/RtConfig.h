@@ -140,10 +140,6 @@ class RtConfig {
 
   //*** general ***//
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
   // print the name/value pairs to the screen
   void dumpConfig(ostream &os = cout);
 

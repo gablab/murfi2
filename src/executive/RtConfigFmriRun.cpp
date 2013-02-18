@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id: RtConfig.cpp 268 2008-10-13 19:54:35Z ohinds $";
-
 #include"RtConfigFmriRun.h"
 #include"RtLimit.h"
 
@@ -107,11 +105,4 @@ bool RtConfigFmriRun::validateConfig() {
   }
 
   return valid;
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtConfigFmriRun::getVersionString() {
-  return VERSION;
 }

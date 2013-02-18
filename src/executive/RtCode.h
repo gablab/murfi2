@@ -60,12 +60,6 @@ class RtCode {
   // get the code number
   int getCodeNum();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString() {
-    return "$Id$";
-  }
-
  protected:
 
   // send the code to the handler

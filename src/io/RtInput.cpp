@@ -17,8 +17,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include"RtInput.h"
 
 // default constructor
@@ -63,12 +61,4 @@ void RtInput::addToID(string add) {
 // get the id string
 string RtInput::getID() {
   return inputID;
-}
-
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtInput::getVersionString() {
-  return VERSION;
 }

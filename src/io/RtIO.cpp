@@ -17,8 +17,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
 #include<RtIO.h>
 
 //*** constructors/destructors  ***//
@@ -53,11 +51,4 @@ void RtIO::printNow(ostream &os) {
   os << now.year() << "/" << now.month() << "/" << now.day() << " "
      << now.hour() << ":" << now.minute() << ":" << now.second()
      << "." << now.microsec();
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtIO::getVersionString() {
-  return VERSION;
 }

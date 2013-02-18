@@ -17,9 +17,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id$";
-
-
 #include"RtOutputFile.h"
 #include"RtExperiment.h"
 #include<iostream>
@@ -79,8 +76,6 @@ bool RtOutputFile::open(RtConfig &config) {
   outfp << "################################################################"
         << endl << endl
         << "# realtime system log file" << endl
-        << "# " << getVersionString() << endl
-        << "# " << config.getVersionString() << endl
         << "created ";
   printNow();
   outfp  << endl << endl;
@@ -158,11 +153,4 @@ void RtOutputFile::writeConfig(RtConfig &config) {
   outfp << "--------------" << endl << endl;
 
   mutx.release();
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtOutputFile::getVersionString() {
-  return VERSION;
 }

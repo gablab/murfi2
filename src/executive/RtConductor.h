@@ -159,10 +159,6 @@ class RtConductor : public ACE_Task_Base {
   //   vector of pointers to the output objects
   vector<RtOutput*> getAllOutputsWithName(const string &name);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
  protected:
 
   //*** methods ***//

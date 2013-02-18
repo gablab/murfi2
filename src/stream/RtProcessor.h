@@ -50,10 +50,6 @@ class RtProcessor : public RtStreamComponent, public RtStream {
   //   config: configuration info
   bool addModules(RtConfig &config);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString() const;
-
  protected:
 
   // pure virtual for validation of component configuration

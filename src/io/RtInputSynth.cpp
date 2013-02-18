@@ -18,8 +18,6 @@
  *
  *=========================================================================*/
 
-static char *VERSION = "$Id: RtInputSynth.cpp 383 2009-01-14 14:12:45Z alan $";
-
 #include"RtInputSynth.h"
 #include"RtDataIDs.h"
 #include"RtActivation.h"
@@ -92,11 +90,4 @@ int RtInputSynth::svc() {
 
   }
   return 0;
-}
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtInputSynth::getVersionString() {
-  return VERSION;
 }

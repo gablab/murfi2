@@ -20,8 +20,6 @@
 
 #include"RtServerSocket.h"
 
-static char *VERSION = "$Id$";
-
 // constructor with port and host
 RtServerSocket::RtServerSocket(unsigned short portNum) {
   messageTerminationChar = '\n';
@@ -117,11 +115,4 @@ int RtServerSocket::svc() {
   acceptor.isOpen = false;
 
   return 0;
-}
-
-// get the version
-//  out: char array that represents the cvs version
-
-char *RtServerSocket::getVersionString() {
-  return VERSION;
 }

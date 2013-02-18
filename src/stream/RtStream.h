@@ -119,10 +119,6 @@ class RtStream : public ACE_Stream<ACE_MT_SYNCH> {
   //   true for success
   bool pushAllModules();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
  protected:
 
   // superclass

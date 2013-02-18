@@ -49,7 +49,7 @@ bool RtProcessor::configure(RtConfig &config) {
 
   // create the head and tail by passing them up to the superclass
   ACE_NEW_RETURN(tail, Module(ACE_TEXT("end module"),
-                              new RtEndTask(NULL,true)), -1);
+                              new RtEndTask(&openMsgs, true)), -1);
   RtStream::open(NULL, head, tail);
 
   return addModules(config);
@@ -62,11 +62,6 @@ bool RtProcessor::configure(RtConfig &config) {
 //   success or failure
 bool RtProcessor::addModules(RtConfig &config) {
   ACE_TRACE(("RtProcessor::addModules"));
-
-  // make sure the stack is empty
-  while(!addMod.empty()) {
-    addMod.pop();
-  }
 
   // get the node for preprocessing
   TiXmlNode *procNode = config.getNode("processor");

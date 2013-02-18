@@ -405,3 +405,45 @@ void RtStreamComponent::startDumpAlgoVarsFile() {
            << "print variable names here separated by spaces "
            << "end" << endl;
 }
+
+RtEndTask::RtEndTask(set<ACE_Message_Block*> *_openMsgs,
+                     bool _isProcessor)
+    : RtStreamComponent(),
+      isProcessor(_isProcessor) {
+  componentID = "end-task";
+
+  // end processing marker setup
+  endTaskData.getDataID().setModuleID(componentID);
+
+  openMsgs = _openMsgs;
+}
+
+int RtEndTask::process(ACE_Message_Block* mb) {
+  // tell the data store that we are done processing for this TR
+  if(isProcessor) {
+    RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
+    if(msg) {
+      RtMRIImage *dat = static_cast<RtMRIImage*>(msg->getCurrentData());
+      if(dat) {
+        endTaskData.getDataID().setTimePoint(dat->getDataID().getTimePoint());
+        storeData(&endTaskData);
+      }
+    }
+  }
+
+  if(DEBUG_LEVEL & TIMER) {
+    cout << "RtStream elapsed time: "
+         << getExperimentElapsedTime() << endl;
+  }
+
+  openMsgs->erase(mb);
+
+  if(DEBUG_LEVEL & MODERATE) {
+    if(openMsgs != NULL) {
+      cout << "RtEndTask: mb is "
+           << mb << " openMsgs->size() is " << openMsgs->size() << endl;
+    }
+  }
+
+  return 0;
+}

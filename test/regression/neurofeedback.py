@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
+# TODO figure out what changed between
+# ed2f3e8eb003b9fa840444a415b7a7c2d58e053a and 0543da7 that broke TR
+# 85.
+
 import multiprocessing
 import os
+import pickle
 import re
 import subprocess
 import sys
@@ -45,8 +50,25 @@ def main():
                 tr, len(tr_data))
             tr_data.append(float(tr_match.groups()[1]))
 
-    # read the regression standard data
+    regr_tr_data = pickle.load(open("neurofeedback.rgr"))
+    if len(regr_tr_data) != len(tr_data):
+        print "ERROR: new and old data have different lengths (%d != %d)" % (
+            len(tr_data), len(regr_tr_data))
+        return 1
 
+    success = True
+    for i in xrange(0, len(tr_data)):
+        if tr_data[i] != regr_tr_data[i]:
+            success = False
+            print "ERROR: new and old are different at TR %d (%f != %f)" % (
+                i + 1, tr_data[i], regr_tr_data[i])
+
+    if success:
+        print "passed"
+    else:
+        print "TEST FAILED"
+
+    return 0 if success else 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

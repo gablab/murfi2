@@ -334,8 +334,6 @@ int RtConductor::svc() {
 void RtConductor::receiveCode(unsigned int code, RtData *data) {
   ACE_TRACE(("RtConductor::receiveCode"));
 
-  cout << code << ": " << data << endl;
-
   // handle based on the thrower
   if(code == SHUTDOWN) {
     cout << "shutdown signal " << code << " received" << endl;

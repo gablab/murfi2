@@ -159,6 +159,11 @@ class RtConductor : public ACE_Task_Base {
   //   vector of pointers to the output objects
   vector<RtOutput*> getAllOutputsWithName(const string &name);
 
+  // get the number of expected timepoints in this run
+  int getNumExpectedTimePoints() {
+    return config.get("scanner:measurements");
+  }
+
  protected:
 
   //*** methods ***//

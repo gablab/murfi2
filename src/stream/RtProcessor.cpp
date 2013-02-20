@@ -19,6 +19,7 @@
 
 #include"RtProcessor.h"
 #include"RtDataIDs.h"
+#include"RtEndTask.h"
 #include"RtDiff.h"
 #include"RtVar.h"
 
@@ -41,13 +42,13 @@ RtProcessor::~RtProcessor() {
 // initialize stream and prepare to run
 //  out:
 //   true (for success) or false
-bool RtProcessor::configure(RtConfig &config) {
+bool RtProcessor::configure(RtConfig &config, RtStream* stream) {
 
   Module *head = 0, *tail = 0;
 
   // create the head and tail by passing them up to the superclass
   ACE_NEW_RETURN(tail, Module(ACE_TEXT("end module"),
-                              new RtEndTask(NULL,true)), -1);
+                              new RtEndTask(NULL, stream, true)), -1);
   RtStream::open(NULL, head, tail);
 
   return addModules(config);

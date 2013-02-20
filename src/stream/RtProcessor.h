@@ -43,7 +43,7 @@ class RtProcessor : public RtStreamComponent, public RtStream {
   // initialize stream and prepare to run
   //  out:
   //   true (for success) or false
-  bool configure(RtConfig &config);
+  bool configure(RtConfig &config, RtStream* stream);
 
   // adds all modules to the stream
   //  in

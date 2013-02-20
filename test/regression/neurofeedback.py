@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-# TODO figure out what changed between
-# ed2f3e8eb003b9fa840444a415b7a7c2d58e053a and 0543da7 that broke TR
-# 85.
-
 import multiprocessing
 import os
 import pickle

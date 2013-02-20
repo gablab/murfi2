@@ -82,12 +82,7 @@ int RtInputSynth::svc() {
 
     cout << "generatred synthetic data at tr " << curTr << endl;
 
-#ifdef WIN32
-    Sleep(1000*tr);
-#else
     usleep(1000000*tr);
-#endif
-
   }
   return 0;
 }

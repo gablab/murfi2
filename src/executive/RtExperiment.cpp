@@ -178,6 +178,11 @@ RtDataStore &getDataStore() {
   return dataStore;
 }
 
+// get the conductor for this experiment
+RtConductor &getConductor() {
+  return *conductor;
+}
+
 // initialize the experiment (call before the first run is prepared)
 // returns true for success
 bool initExperiment() {

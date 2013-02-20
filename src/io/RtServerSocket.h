@@ -51,7 +51,7 @@ class RtSocketAcceptor : public ACE_SOCK_Acceptor {
              ACE_Time_Value *timeout = 0, int restart = 1,
              int reset_new_handle = 0) {
     int ret = ACE_SOCK_Acceptor::accept(new_stream, remote_addr, timeout,
-                                        restart, reset_new_handle = 0);
+                                        restart, (reset_new_handle = 0));
     isOpen = ret == 0;
     return ret;
   }

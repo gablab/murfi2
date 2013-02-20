@@ -21,12 +21,13 @@
 #include"RtStream.h"
 #include"RtCode.h"
 #include"RtProcessor.h"
+#include"RtEndTask.h"
 
 #include"RtDataIDs.h"
 
 // default constructor
 RtStream::RtStream() : super() {
-
+  processing = false;
 }
 
 // destructor
@@ -55,7 +56,7 @@ bool RtStream::configure(RtConfig &config) {
 
   // create the head and tail by passing them up to the superclass
   ACE_NEW_RETURN(tail, Module(ACE_TEXT("end module"),
-                              new RtEndTask(&openMsgs, false)), -1);
+                              new RtEndTask(&openMsgs, NULL, false)), -1);
   super::open(NULL, head, tail);
 
   return addModules(config);
@@ -207,7 +208,7 @@ bool RtStream::addModules(RtConfig &config) {
   ACE_NEW_RETURN(procMod, Module(ACE_TEXT("processing module"), proc), -1);
 
   proc->setStreamConductor(streamConductor);
-  proc->configure(config);
+  proc->configure(config, this);
 
   if (this->push(procMod) == -1) {
     cerr << "ERROR: failed to add processing modules" << endl;

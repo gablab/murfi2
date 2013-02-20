@@ -241,8 +241,7 @@ OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
 
 ############################## TARGETS ###############################
 
-default: $(PROJECT) scanner_sim
-all:     $(PROJECT) scanner_sim
+default: $(PROJECT)
 
 install:
 	install $(INSTALL_BINARY) $(INSTALL_DIR)
@@ -260,13 +259,11 @@ dirs:
 $(PROJECT): dirs $(OBJ_FILES)
 	@$(ECHO) 'make: building $@ for $(OS)...'
 	cd $(SRC_DIR) && $(MAKE)
+	cd util/scanner_sim && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS)
 	@$(ECHO) '############################################'
 	@$(ECHO) 'make: built [$@] successfully!'
 	@$(ECHO) '############################################'
-
-scanner_sim:
-		cd util/scanner_sim && $(MAKE)
 
 ############################### CLEAN ################################
 

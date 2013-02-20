@@ -292,6 +292,9 @@ int RtConductor::svc() {
   outputLog.printNow();
   outputLog << "\n";
 
+  stream.startProcessing();
+  running = true;
+
   // start up the threads that listen for input
   for(vector<RtInput*>::iterator i = inputs.begin(); i != inputs.end(); i++) {
     if((*i)->isActivatable()) {
@@ -299,24 +302,12 @@ int RtConductor::svc() {
     }
   }
 
-  running = true;
   while(running) {
-#ifdef WIN32
-    Sleep(10);
-#else
-    usleep(10000);
-#endif
+    usleep(1000);
   }
 
   cout << "conductor waiting for stream to complete processing...";
-  while(stream.isProcessing()) {
-#ifdef WIN32
-    Sleep(10000000);
-#else
-    sleep(10000);
-#endif
-
-  }
+  stream.waitForProcessingToComplete();
   cout << "done" << endl;
 
 

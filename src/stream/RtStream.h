@@ -61,10 +61,24 @@ class RtStream : public ACE_Stream<ACE_MT_SYNCH> {
   //   true (for success) or false
   bool configure(RtConfig &config);
 
-  // whether this stream is still processing
+  // tell the stream it has begun processing
   //  out:
   //   true  or false
-  bool isProcessing() { return !openMsgs.empty(); };
+  void startProcessing() { processing = true; };
+
+  // tell the stream it is done processing
+  //  out:
+  //   true  or false
+  void doneProcessing() { processing = false; };
+
+  // tell the stream someone is waiting for processing to complete.
+  //  out:
+  //   true  or false
+  void waitForProcessingToComplete() {
+    while(processing) {
+      usleep(1000);
+    }
+  };
 
   // adds all modules to the stream
   //  in
@@ -135,6 +149,8 @@ class RtStream : public ACE_Stream<ACE_MT_SYNCH> {
 
   // map of messages and the completion status
   set<ACE_Message_Block*> openMsgs;
+
+  bool processing;
 };
 
 

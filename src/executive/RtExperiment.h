@@ -1,7 +1,7 @@
 /*=========================================================================
  *  header file for the top level and main function for a real-time
  *  experiment
- * 
+ *
  *  Copyright 2007-2013, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,9 @@ string getExperimentConfigFile();
 
 // get the data store for this experiment
 RtDataStore &getDataStore();
+
+// get the conductor for the experiment
+RtConductor &getConductor();
 
 // get the unique ID number for this image series UID
 unsigned int getSeriesNumFromUID(char *uid);

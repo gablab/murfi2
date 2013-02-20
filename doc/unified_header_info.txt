@@ -13,9 +13,9 @@ Notes on AFNI compatibility
 - DATUM is computable from datatype
 - XYZAXES is computable from the direction of the normal vector
 
-magic: uchar8_t[4]
+magic: uchar8_t[5]
 Must be "ERTI". The header reading code should assert that this string
-is always correctly in the header.
+is always correct in the header.
 
 headerVersion: int32_t
 Version of this header.
@@ -23,35 +23,17 @@ Version of this header.
 scanType: uchar8_t[64]
 String identifying the type of scan. Examples are "MPRAGE" and "EPI"
 
+imageType: char8_t[16]
+String specifying the type of image that is being sent. Valid values:
+- 2Dz: A single volume one slice at a time
+- 2Dzt: Multiple volumes, each one slice at a time
+- 3D: A single volume all at once
+- 3Dt: Multiple volumes, one full volume at a time
+
 note: uchar8_t[256]
 Text string. Suggested contents are the scanner make and model, pulse
 sequence name, and version information about the software sending the
 image data from the scanner.
-
-pixelSpacingRead: float64_t
-pixelSpacingPhase: float64_t
-pixelSpacingSlice: float64_t
-sliceGap: float64_t
-Pixel spacing in the three orthogonal acquisition directions, and the
-gap between slice excitations.
-
-numPixelsRead: int32_t
-numPixelsPhase: int32_t
-numSlices: int32_t
-The number of pixels in the three orthogonal acquisition directions.
-
-repetitionTimeMS: int32_t
-Time of one volume acquisition in milliseconds.
-
-repetitionDelayMS: int32_t
-Time between acquisitions in milliseconds.
-
-currentTR: int32_t
-totalTR: int32_t
-Current and total expected TRs.
-
-isMosaic: bool
-True if the images are sent in a mosaiced format.
 
 datatype: uchar8_t[16]
 String specifying the datatype of the associated image data. Valid
@@ -73,40 +55,54 @@ values are listed below. A "c_" prefix indicates complex data.
 - float64_t
 - c_float64_t
 
-sagittalPosition: float64_t
-coronalPosition: float64_t
-transversePosition: float64_t
-Vector defining the center of the acquired volume.
+isLittleEndian: bool
+True if the image data is in little endian byte order.
 
-sagittalNormal: float64_t
-coronalNormal: float64_t
-transverseNormal: float64_t
-Vector normal to what?
+isMosaic: bool
+True if the images are sent in a mosaiced format. This only applies in
+the case of 3D or 3Dt imageTypes.
 
-sagittalPhase: float64_t
-coronalPhase: float64_t
-transversePhase: float64_t
-Vector defining a direction?
+pixelSpacingRead: float64_t
+pixelSpacingPhase: float64_t
+pixelSpacingSlice: float64_t
+sliceGap: float64_t
+Pixel spacing in the three orthogonal acquisition directions, and the
+gap between slice excitations.
 
-sagittalRow: float64_t
-coronalRow: float64_t
-transverseRow: float64_t
-Vector defining a direction?
+numPixelsRead: int32_t
+numPixelsPhase: int32_t
+numSlices: int32_t
+The number of pixels in the three orthogonal acquisition directions.
 
-sagittalColumn: float64_t
-coronalColumn: float64_t
-transverseColumn: float64_t
-Vector defining a direction?
+voxelToWorldMatrix: float32_t[4][4]
+Transformation matrix that takes voxel indices to world
+coordinates. The storage is row-major.
 
-isMoCo: bool
+repetitionTimeMS: int32_t
+Time of one volume acquisition in milliseconds.
+
+repetitionDelayMS: int32_t
+Time between acquisitions in milliseconds.
+
+currentTR: int32_t
+totalTR: int32_t
+Current and total expected TRs.
+
+isMotionCorrected: bool
 True if this volume has been motion corrected.
 
-moCoTranslationX: float64_t
-moCoTranslationY: float64_t
-moCoTranslationZ: float64_t
-Translation motion correction applied.
+mcTranslationX: float64_t
+mcTranslationY: float64_t
+mcTranslationZ: float64_t
+Translation that was applied by motion correction.
 
-moCoRotationX: float64_t
-moCoRotationY: float64_t
-moCoRotationZ: float64_t
-Rotation motion correction applied.
+mcRotationX: float64_t
+mcRotationY: float64_t
+mcRotationZ: float64_t
+Rotation that was applied by motion correction.
+
+mcOrder: uchar8_t[5]
+String indicating the order in which the rotations and translation
+were applied by the motion correction algorithm. Examples are "YXZT"
+for rotation in Y, then X, then Z, then translation, or "TZYX" for
+translation, then rotation in Z, then Y, then X.

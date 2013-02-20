@@ -241,7 +241,15 @@ class RtEndTask : public RtStreamComponent {
  public:
 
   RtEndTask(set<ACE_Message_Block*> *_openMsgs = NULL,
-            bool _isProcessor = false);
+            bool _isProcessor = false) : RtStreamComponent(),
+                                         isProcessor(_isProcessor) {
+    componentID = "end-task";
+
+    // end processing marker setup
+    endTaskData.getDataID().setModuleID(componentID);
+
+    openMsgs = _openMsgs;
+  }
 
  protected:
 
@@ -249,7 +257,34 @@ class RtEndTask : public RtStreamComponent {
     return true;
   }
 
-  int process(ACE_Message_Block* mb);
+  int process(ACE_Message_Block* mb) {
+    // tell the data store that we are done processing for this TR
+    if(isProcessor) {
+      RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
+      if(msg) {
+        RtMRIImage *dat = static_cast<RtMRIImage*>(msg->getCurrentData());
+        if(dat) {
+          endTaskData.getDataID().setTimePoint(dat->getDataID().getTimePoint());
+          storeData(&endTaskData);
+        }
+      }
+    }
+
+    if(DEBUG_LEVEL & TIMER) {
+      cout << "RtStream elapsed time: "
+           << getExperimentElapsedTime() << endl;
+    }
+
+    if(DEBUG_LEVEL & MODERATE) {
+      if(openMsgs != NULL) {
+        cout << "RtEndTask: mb is "
+             << mb << " openMsgs->size() is " << openMsgs->size() << endl;
+        openMsgs->erase(mb);
+      }
+    }
+
+    return 0;
+  }
 
   int nextStep(ACE_Message_Block *) {
 

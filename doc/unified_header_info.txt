@@ -17,21 +17,34 @@ magic: uchar8_t[4]
 Must be "ERTI". The header reading code should assert that this string
 is always correctly in the header.
 
-version: int64_t
-Version identifier of the scanner software sending the images.
+headerVersion: int32_t
+Version of this header.
 
-manufacturer: uchar8_t[256]
-Name of the scanner manufacturer.
+scanType: uchar8_t[64]
+String identifying the type of scan. Examples are "MPRAGE" and "EPI"
+
+note: uchar8_t[256]
+Text string. Suggested contents are the scanner make and model, pulse
+sequence name, and version information about the software sending the
+image data from the scanner.
 
 pixelSpacingRead: float64_t
 pixelSpacingPhase: float64_t
 pixelSpacingSlice: float64_t
-Pixel spacing in the three orthogonal acquisition directions.
+sliceGap: float64_t
+Pixel spacing in the three orthogonal acquisition directions, and the
+gap between slice excitations.
 
 numPixelsRead: int32_t
 numPixelsPhase: int32_t
 numSlices: int32_t
 The number of pixels in the three orthogonal acquisition directions.
+
+repetitionTimeMS: int32_t
+Time of one volume acquisition in milliseconds.
+
+repetitionDelayMS: int32_t
+Time between acquisitions in milliseconds.
 
 currentTR: int32_t
 totalTR: int32_t
@@ -42,15 +55,23 @@ True if the images are sent in a mosaiced format.
 
 datatype: uchar8_t[16]
 String specifying the datatype of the associated image data. Valid
-values are:
+values are listed below. A "c_" prefix indicates complex data.
 - char8_t
+- c_char8_t
 - uchar8_t
+- c_uchar8_t
 - int16_t
+- c_int16_t
 - uint16_t
+- c_uint16_t
 - int32_t
+- c_int32_t
 - uint32_t
+- c_uint32_t
 - float32_t
+- c_float32_t
 - float64_t
+- c_float64_t
 
 sagittalPosition: float64_t
 coronalPosition: float64_t

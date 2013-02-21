@@ -13,14 +13,14 @@ Notes on AFNI compatibility
 - DATUM is computable from datatype
 - XYZAXES is computable from the direction of the normal vector
 
-magic: uchar8_t[5]
+magic: char8_t[5]
 Must be "ERTI". The header reading code should assert that this string
 is always correct in the header.
 
 headerVersion: int32_t
 Version of this header.
 
-scanType: uchar8_t[64]
+scanType: char8_t[64]
 String identifying the type of scan. Examples are "MPRAGE" and "EPI"
 
 imageType: char8_t[16]
@@ -30,12 +30,12 @@ String specifying the type of image that is being sent. Valid values:
 - 3D: A single volume all at once
 - 3Dt: Multiple volumes, one full volume at a time
 
-note: uchar8_t[256]
+note: char8_t[256]
 Text string. Suggested contents are the scanner make and model, pulse
 sequence name, and version information about the software sending the
 image data from the scanner.
 
-datatype: uchar8_t[16]
+datatype: char8_t[16]
 String specifying the datatype of the associated image data. Valid
 values are listed below. A "c_" prefix indicates complex data.
 - char8_t
@@ -101,7 +101,7 @@ mcRotationY: float64_t
 mcRotationZ: float64_t
 Rotation that was applied by motion correction.
 
-mcOrder: uchar8_t[5]
+mcOrder: char8_t[5]
 String indicating the order in which the rotations and translation
 were applied by the motion correction algorithm. Examples are "YXZT"
 for rotation in Y, then X, then Z, then translation, or "TZYX" for

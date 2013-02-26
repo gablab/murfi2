@@ -62,12 +62,12 @@ isMosaic: bool
 True if the images are sent in a mosaiced format. This only applies in
 the case of 3D or 3Dt imageTypes.
 
-pixelSpacingRead: float64_t
-pixelSpacingPhase: float64_t
-pixelSpacingSlice: float64_t
-sliceGap: float64_t
+pixelSpacingReadMM: float64_t
+pixelSpacingPhaseMM: float64_t
+pixelSpacingSliceMM: float64_t
+sliceGapMM: float64_t
 Pixel spacing in the three orthogonal acquisition directions, and the
-gap between slice excitations.
+gap between slice excitations. Specified in millimeters.
 
 numPixelsRead: int32_t
 numPixelsPhase: int32_t
@@ -91,15 +91,15 @@ Current and total expected TRs.
 isMotionCorrected: bool
 True if this volume has been motion corrected.
 
-mcTranslationX: float64_t
-mcTranslationY: float64_t
-mcTranslationZ: float64_t
-Translation that was applied by motion correction.
+mcTranslationXMM: float64_t
+mcTranslationYMM: float64_t
+mcTranslationZMM: float64_t
+Translation that was applied by motion correction, in millimeters.
 
-mcRotationX: float64_t
-mcRotationY: float64_t
-mcRotationZ: float64_t
-Rotation that was applied by motion correction.
+mcRotationXRAD: float64_t
+mcRotationYRAD: float64_t
+mcRotationZRAD: float64_t
+Rotation that was applied by motion correction, in radians.
 
 mcOrder: char8_t[5]
 String indicating the order in which the rotations and translation

@@ -1,7 +1,7 @@
-/******************************************************************************
- * RtClassifySVM.h is the header for a class that 
+/*=========================================================================
+ *  RtClassifySVM.h is the header for a class that
  *
- *****************************************************************************/
+ * ****************************************************************************/
 #ifndef RTCLASSIFYSVM_H_
 #define RTCLASSIFYSVM_H_
 
@@ -13,24 +13,24 @@
 // class declaration
 
 class RtClassifySVM : public RtStreamComponent {
-public:
+ public:
   static string moduleString;
 
   // default constructor
   RtClassifySVM();
 
   // destructor
-  ~RtClassifySVM();
+  virtual ~RtClassifySVM();
 
-protected:
+ protected:
 
   // initialize the estimation algorithm for a particular image size
   //void initEstimation(RtMRIImage &dat, RtMaskImage *mask);
 
   // process an option in name of the option to process val text of the
   // option node
-  virtual bool processOption(const string &name, const string &text, 
-			     const map<string, string> &attrMap);
+  virtual bool processOption(const string &name, const string &text,
+                             const map<string, string> &attrMap);
 
   // make sure we are configured properly
   virtual bool validateComponentConfig();
@@ -48,17 +48,8 @@ protected:
   // svm parameters
   Parms svmParms;
 
-  
+
 
 };
 
 #endif /*RTCLASSIFYSVM_H_*/
-
-/*****************************************************************************
- * $Source:  $
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

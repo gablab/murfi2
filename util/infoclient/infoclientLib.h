@@ -1,7 +1,5 @@
 /**
  * infoclientLib provides an interface to murfi's infoserver
- *
- * Oliver Hinds <ohinds@mit.edu> 2009-05-01
  **/
 
 #ifndef INFOCLIENT_LIB_H
@@ -31,15 +29,15 @@ struct Info {
   unsigned int tr;
   unsigned long time;
   bool changed;
-  
+
   // comparison operator
   bool operator==(const Info &other) const {
 
     return
       dataName == other.dataName
-      && 
+      &&
       roiName  == other.roiName;
-  }  
+  }
 
   // less than operator
   bool operator<(const Info &other) const {
@@ -70,31 +68,31 @@ struct TcpInfo {
 // functions
 
 /**
- * start the infoclient 
+ * start the infoclient
  */
-int startInfoclient(const TcpInfo &tcpInfo, 
-        const TcpInfo &remoteTcpInfo, 
+int startInfoclient(const TcpInfo &tcpInfo,
+        const TcpInfo &remoteTcpInfo,
         string &errMsg);
 
 /**
- * add data to the infoclient data listener 
+ * add data to the infoclient data listener
  */
-int addInfoclient(const string &dataName, const string &roiName, 
+int addInfoclient(const string &dataName, const string &roiName,
       string &errMsg);
 
 /**
- * remove  data from  the infoclient data listener 
+ * remove  data from  the infoclient data listener
  */
-int removeInfoclient(const string &dataName, const string &roiName, 
+int removeInfoclient(const string &dataName, const string &roiName,
          string &errMsg);
 
 /**
- * check for new data on the infoclient data listener 
+ * check for new data on the infoclient data listener
  */
 int checkInfoclient(vector<Info> &changed, string &errMsg);
 
 /**
- * acknowledge receipt of data on the infoclient data listener 
+ * acknowledge receipt of data on the infoclient data listener
  */
 int acknowledgeInfoclient(const Info &info, string &errMsg);
 

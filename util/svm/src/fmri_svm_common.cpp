@@ -1,7 +1,5 @@
 // run svm on fmri data
 // this is an interface to svm_multiclass, by Thorsten Joachims
-//
-// Oliver Hinds <ohinds@mit.edu> 2009-07-15
 
 #include"fmri_svm_common.h"
 
@@ -87,10 +85,10 @@ bool readSample(
     numOnVox = img->nvox;
   }
 
-  
+
 
   // make the examples
-  sample.n = readLabels ? numLabeledTR-1 : img->nt;  
+  sample.n = readLabels ? numLabeledTR-1 : img->nt;
   sample.examples = new EXAMPLE[sample.n];
   long curDoc = 0;
   unsigned int nvox = img->nx*img->ny*img->nz;
@@ -104,7 +102,7 @@ bool readSample(
     sample.examples[curDoc].y.scores = NULL;
     sample.examples[curDoc].y.num_classes = numClasses;
 
-    if(isshort) { 
+    if(isshort) {
       sample.examples[curDoc++].x = createPattern<short>(
 					curDoc,
 					numOnVox,
@@ -149,7 +147,7 @@ bool readSample(
 // delete a sample
 void deleteSample(SAMPLE &sample) {
   for(int i = 0; i < sample.n; i++) {
-    deletePattern(sample.examples[i].x);   
+    deletePattern(sample.examples[i].x);
   }
   delete [] sample.examples;
 }
@@ -326,8 +324,8 @@ bool readFmriModel(string filename, Parms &p) {
 
 // create a single pattern from input data
 template<class T>
-PATTERN createPattern(unsigned int curDoc, 
-		      unsigned int numOnVox, 
+PATTERN createPattern(unsigned int curDoc,
+		      unsigned int numOnVox,
 		      unsigned int totNumVox,
 		      const T      *data,
 		      const short  *maskData) {

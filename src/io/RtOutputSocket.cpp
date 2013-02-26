@@ -1,11 +1,21 @@
-/******************************************************************************
- * RtOutputsocket.cpp defines a class that implements output operations
+/*=========================================================================
+ *  RtOutputsocket.cpp defines a class that implements output operations
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
- *****************************************************************************/
-static char *VERSION = "$Id$";
-
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtOutputSocket.h"
 #include"tinyxml/tinyxml.h"
@@ -41,7 +51,7 @@ bool RtOutputSocket::open(RtConfig &config) {
   if(config.isSet("host")) {
     host = config.get("host").str();
   }
-  
+
   cout << "opened output socket: host " << host << ":" << port << endl;
 
   // setup the socket address
@@ -70,7 +80,7 @@ void RtOutputSocket::setData(RtData *data) {
   TiXmlElement *element = NULL; //TODO this is a dummy thing
   TiXmlElement *serializedData = data->serializeAsXML(element);
   if(serializedData == NULL) {
-    cerr << "couldn't serialize data, not sending" << endl;    
+    cerr << "couldn't serialize data, not sending" << endl;
     return;
   }
 
@@ -86,12 +96,12 @@ void RtOutputSocket::setData(RtData *data) {
   TiXmlPrinter printer;
   printer.SetStreamPrinting();
   serializedDataDoc.Accept(&printer);
-  char *serializedStr = new char[printer.Size()+1]; 
+  char *serializedStr = new char[printer.Size()+1];
   strcpy(serializedStr, printer.CStr());
 
   // lock the socket
   ACE_Mutex mutx;
-  mutx.acquire();  
+  mutx.acquire();
 
   cout << "connected to server, sending data " << endl << serializedStr;
 
@@ -103,22 +113,3 @@ void RtOutputSocket::setData(RtData *data) {
   delete [] serializedStr;
   delete serializedData;  // ??
 }
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtOutputSocket::getVersionString() {
-  return VERSION;
-}
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

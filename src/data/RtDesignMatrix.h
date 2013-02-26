@@ -1,14 +1,26 @@
-/******************************************************************************
- * RtDesignMatrix.h declares a class that represents a model's basis
- * functions
+/*=========================================================================
+ *  RtDesignMatrix.h declares a class that represents a model's basis
+ *  functions
  *
- * NOTE: much of the funcitonality is inhereted from vnl_matrix, so see this
- * help page for usage of this class: 
- * http://public.kitware.com/vxl/doc/release/core/vnl/html/classvnl__matrix.html
+ *  NOTE: much of the funcitonality is inhereted from vnl_matrix, so see this
+ *  help page for usage of this class:
+ *  http://public.kitware.com/vxl/doc/release/core/vnl/html/classvnl__matrix.html
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-01-21
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTDESIGNMATRIX_H
 #define RTDESIGNMATRIX_H
@@ -27,16 +39,12 @@
 
 using namespace std;
 
-// class declaration
-
 class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
  public:
 
   //*** constructors/destructors  ***//
 
   RtDesignMatrix();
-
-  // destructor
 
   virtual ~RtDesignMatrix() {
   };
@@ -71,8 +79,6 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   void setTR(double _tr) {
     tr = _tr;
   }
-
-  //unsigned int getNumMeas() { return numMeas; }
 
   // build the design matrix from the configuration
   virtual bool build();
@@ -168,7 +174,7 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 
   // save the design to a text file
   bool save(string const& filename) const;
-  
+
   // serialize the data as xml for transmission or saving to a file
   TiXmlElement *serializeAsXML(TiXmlElement *requestElement);
 
@@ -204,32 +210,6 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   unsigned int addColumn(const vnl_vector<double> &vals,
                          string name,
                          bool interest = false);
-
-  //  // set the values of a column
-  //  //  in
-  //  //   c:        index of the column to set
-  //  //   vals:     desired values
-  //  //   interest: whether this column is a basis function representing neural
-  //  //             activation of interest
-  //  //  out
-  //  //   true if assigned
-  //  //   false if index out of bounds
-  //  bool setColumn(unsigned int c,
-  //     double const * const vals,
-  //     bool interest = false);
-  //
-  //  // set the values of a column
-  //  //  in
-  //  //   c:        index of the column to set
-  //  //   vals:     desired values
-  //  //   interest: whether this column is a basis function representing neural
-  //  //             activation of interest
-  //  //  out
-  //  //   true if assigned
-  //  //   false if index out of bounds
-  //  bool setColumn(unsigned int c,
-  //     const vnl_vector<double> &vals,
-  //     bool interest = false);
 
   // loads an hrf vector from a file
   virtual bool loadHrfFile(vnl_vector<double> &hrf, string filename);
@@ -345,14 +325,3 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

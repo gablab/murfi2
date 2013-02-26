@@ -1,4 +1,3 @@
-// Oliver Hinds <ohinds@mit.edu> 2008-03-21
 // threshold a nifti file
 
 #include<nifti1_io.h>
@@ -28,7 +27,7 @@ int thresholdDouble(nifti_image *img, double thresh) {
 
   img->data = (void*) mask;
   free(data);
-  
+
   return sum;
 }
 
@@ -52,7 +51,7 @@ int thresholdFloat(nifti_image *img, double thresh) {
 
   img->data = (void*) mask;
   free(data);
-  
+
   return sum;
 }
 
@@ -76,7 +75,7 @@ int thresholdShort(nifti_image *img, double thresh) {
 
   img->data = (void*) mask;
   free(data);
-  
+
   return sum;
 }
 
@@ -100,7 +99,7 @@ int thresholdUnsignedShort(nifti_image *img, double thresh) {
 
   img->data = (void*) mask;
   free(data);
-  
+
   return sum;
 }
 
@@ -147,7 +146,7 @@ int main(int argc, char **argv) {
   cout << "threshold got " << sum << " voxels" << endl;
 
   // modify the header to change the filename
-  strcpy(img->fname, outfile.c_str());  
+  strcpy(img->fname, outfile.c_str());
 
   // change the datatype
   img->datatype = DT_SIGNED_SHORT;

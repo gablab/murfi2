@@ -1,11 +1,21 @@
-/******************************************************************************
- * RtOutputfile.cpp defines a class that implements output operations
+/*=========================================================================
+ *  RtOutputfile.cpp defines a class that implements output operations
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
- *****************************************************************************/
-static char *VERSION = "$Id$";
-
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtOutputFile.h"
 #include"RtExperiment.h"
@@ -34,7 +44,7 @@ bool RtOutputFile::open(RtConfig &config) {
   if(config.get("study:log:disabled")==true) {
     return true;
   }
-  
+
   // open the file for output
   string logname = config.get("study:log:filename");
 
@@ -45,29 +55,28 @@ bool RtOutputFile::open(RtConfig &config) {
   else if(logname.substr(0,1) != "/") {
     stringstream fs;
     fs << getExperimentConfig().get("study:log:directory") << "/"  << logname;
-  
+
     logname = fs.str();
   }
 
   cout << "opening logfile " << logname << endl;
   outfp.open(logname.c_str(), fstream::out | fstream::app);
 
-  // check 
+  // check
   if(outfp.fail()) {
-    cerr << "ERROR: could not open log file " << logname << " for output" << endl;
+    cerr << "ERROR: could not open log file " << logname << " for output"
+         << endl;
     return false;
   }
 
   // write a header
   ACE_Mutex mutx;
   mutx.acquire();
-  
+
   outfp << "################################################################"
-	<< endl << endl
-	<< "# realtime system log file" << endl
-	<< "# " << getVersionString() << endl
-	<< "# " << config.getVersionString() << endl
-	<< "created ";
+        << endl << endl
+        << "# realtime system log file" << endl
+        << "created ";
   printNow();
   outfp  << endl << endl;
 
@@ -114,7 +123,7 @@ bool RtOutputFile::close() {
   outfp << endl;
 
   outfp << "################################################################"
-	<< endl << endl;
+        << endl << endl;
 
   outfp.close();
 
@@ -138,29 +147,10 @@ void RtOutputFile::writeConfig(RtConfig &config) {
   // make sure noone else writes while we are
   mutx.acquire();
 
-  outfp << "configuration:" << endl 
-	<< "--------------" << endl;
+  outfp << "configuration:" << endl
+        << "--------------" << endl;
   config.dumpConfig(outfp);
   outfp << "--------------" << endl << endl;
 
   mutx.release();
 }
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtOutputFile::getVersionString() {
-  return VERSION;
-}
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

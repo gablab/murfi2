@@ -1,11 +1,22 @@
-/******************************************************************************
- * RtInputScannerImages.cpp defines a class that implements scanner
- * image communication operations
+/*=========================================================================
+ *  RtInputScannerImages.cpp defines a class that implements scanner
+ *  image communication operations
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
-static char *VERSION = "$Id$";
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtInputScannerImages.h"
 
@@ -25,8 +36,6 @@ using namespace std;
 
 // defaults
 static const int    DEFAULT_PORT = 15000;
-//static const char*  DEFAULT_SAVESTEM = "img";
-//static const char*  DEFAULT_SAVEEXT  = "nii";
 
 // increase this size for highres acquisitions
 #define MAX_BUFSIZ 256*256*256*2
@@ -70,8 +79,6 @@ RtInputScannerImages::~RtInputScannerImages() {
 bool RtInputScannerImages::open(RtConfig &config) {
   RtInput::open(config);
 
-  // scopic Alan: check for enabled/disabled (another way scanner is always
-  // disabled by default if we use frontend gui)
   if(config.isSet("scanner:disabled")
      && config.get("scanner:disabled")==false) {
     initialized = true;
@@ -86,7 +93,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
 
   // build the address
   ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
-  
+
   if(acceptor.open(address,1) == -1) {
     cerr << "failed to open acceptor for scanner images on port "
          << port << endl;
@@ -200,7 +207,7 @@ bool RtInputScannerImages::init(RtConfigFmriRun &config) {
   numDiscarded = 0;
   if(config.isSet("scanner:discard")) {
     num2Discard = config.get("scanner:discard");
-  } 
+  }
   else {
     num2Discard = 0;
   }
@@ -225,7 +232,8 @@ int RtInputScannerImages::svc() {
           && acceptor.accept(stream) != -1;) {
 
     if(!initialized) {
-      cerr << "ERROR: accepting images when scanner image input not initialized!" << endl;
+      cerr << "ERROR: accepting images when scanner input not initialized!"
+           << endl;
       continue;
     }
 
@@ -233,9 +241,10 @@ int RtInputScannerImages::svc() {
       cout << "connection accepted" << endl;
     }
 
-    if(getExperimentConfig().get("study:timeComputations") == true 
+    if(getExperimentConfig().get("study:timeComputations") == true
        && !startComputeTimer()) {
-      cout << "warning: compute timer already started, timing will be inaccurate" 
+      cout << "warning: compute timer already started, "
+           << "timing will be inaccurate"
            << endl;
     }
     else {
@@ -254,10 +263,6 @@ int RtInputScannerImages::svc() {
     if(verbose) {
       cout << "image info received" << endl;
     }
-    // DEBUGGING
-    //cout << "----------------- PW 2012/10/11 DEBUG ----------------" << endl;
-    //ei->displayImageInfo();
-    //cout << "------------------------------------------------------" << endl;    
 
     // get the image
     img = receiveImage(stream, *ei);
@@ -286,14 +291,14 @@ int RtInputScannerImages::svc() {
     rti = new RtMRIImage(*ei,img);
 
     if(unmosaicInputImages) {
-      cout << "Source image is mosaic'd; unmosaicing..." << endl;
+      cout << "Source image is mosaic'd; unmosaicing." << endl;
       rti->unmosaic();
     } else {
-      cout << "Source image is not mosaic'd; no need for unmosaicing..." << endl;
+      cout << "Source image is not mosaic'd; no need for unmosaicing." << endl;
     }
 
     // if its the first image in a series save it no matter what
-    if(!haveSeriesRefVol) { // && isFirstInSeries(*ei)) {
+    if(!haveSeriesRefVol) {
       rti->write(getExperimentConfig()
                  .getSeriesRefVolFilename(rti->getDataID().getSeriesNum()));
       haveSeriesRefVol = true;
@@ -329,22 +334,8 @@ int RtInputScannerImages::svc() {
       getDataStore().setData(mot);
     }
 
-    // set the image id for handling
-    //rti->addToID("scanner");
-
-    // PW 2012/11/26: Debug
-    cout << "---------------------------------------------" << endl;
-    cout << "getDataStore().getAvailableData():" << endl;    
-    getDataStore().getAvailableData();
-    cout << "---------------------------------------------" << endl;
-
     // append this to a vector of gathered images
     getDataStore().setData(rti);
-
-    // signal that we got an image
-    //cout << "sending event with code number " << codeNum << endl;
-
-    //rti->printInfo(cout);
 
     // if its the first epi image in an experiment save it no matter what
     if(!haveStudyRefVol
@@ -361,10 +352,13 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    // PW 2012/10/12: If it's not a mosaic'd image (ie MPRAGE) don't fire off
-    //                the murfi processing pipeline (segfault are bad, m'kay?)
+    // If it's not a mosaic'd image (eg MPRAGE) don't fire off the murfi
+    // processing pipeline.
+    //
+    // TODO make this a dedicated flag?
     if (ei->iNoOfImagesInMosaic==0) {
-      cout << "MPRAGE received.  Not going to do all that murfi sillyness, just saving the file. (TODO: fix!)" << endl;
+      cout << "Non-mosaic image (eg MPRAGE) received. refusing to process it."
+           << endl;
     } else {
       cout << "Sending code..." << endl;
       sendCode(rti);
@@ -379,21 +373,16 @@ int RtInputScannerImages::svc() {
 
     // log that we received the image
     infos.str("");
-    infos << "received image from scanner: series " 
+    infos << "received image from scanner: series "
           << rti->getDataID().getSeriesNum()
           << " acquisition " << ei->iAcquisitionNumber << endl;
     log(infos);
 
     if(print) {
-      cout << "received image from scanner: series " 
+      cout << "received image from scanner: series "
            << rti->getDataID().getSeriesNum()
            << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
-
-
-    //    cout << "started processing image at ";
-    //    printNow(cout);
-    //    cout << endl;
 
     // clean up
     cout << "Cleaning up..." << endl;
@@ -406,15 +395,10 @@ int RtInputScannerImages::svc() {
       sendCode(NULL);
       initialized = false;
     }
-
-    //delete rti;
-
-    //cout << "waiting for another image" << endl;
   }
 
   return 0;
 }
-
 
 // read the scanner image info from a socket stream
 // NOTE: performes blocking read
@@ -422,45 +406,26 @@ int RtInputScannerImages::svc() {
 //   stream: a socket stream to receive on
 //  out
 //   image info struct on successful read (NULL otherwise)
-RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &stream) {
+RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
+    ACE_SOCK_Stream &stream) {
   int rec, rec_delta;
-
-  //static int acnum = 1;
-  //acnum++;
-
   // read until we have all the bytes we need
-  // ADD ERROR HANDLING HERE!!!
-
-  // PW 2012/11/21: Zeroing the buffer before reading header.  Trying to track down
-  // annoying os-dependent bug
-  memset(buffer, 0, MAX_BUFSIZ);
+  // TODO add error handling here
 
   for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
     rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
-    rec += rec_delta; 
+    rec += rec_delta;
     if(rec_delta <= 0) break;
   }
-  //rec += stream.recv_n(buffer, EXTERNALSENDERSIZEOF);
+  // TODO validate that the correct number of bytes was received.
 
-  // arbitrary limit
+  // arbitrary lower limit
   if(rec < 100) {
     return NULL;
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
-  //cout << "received header of size " << rec << endl;
-
   RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
-
-  //info->iAcquisitionNumber = acnum++;
-
-  // if this is the first acquisition, get the series number
-  //if(isFirstInSeries(*info)) {
-  //  seriesNum = getNextSeriesNum();
-  //}
-
-  //ACE_DEBUG((LM_DEBUG, "received info for %d:%d\n", seriesNum, info->iAcquisitionNumber));
-
   return info;
 }
 
@@ -474,13 +439,14 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(ACE_SOCK_Stream &str
 short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
                                           const RtExternalImageInfo &info) {
 
-  ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum, info.iAcquisitionNumber));
+  ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum,
+             info.iAcquisitionNumber));
 
-  // PW 2012/10/11: Modified to grab numPix from header (to support MEMPRAGE)
-  //int numPix = (int) pow((double)info.iMosaicGridSize,2) * info.nLin * info.nCol;
+  // grab numPix from header (to support MEMPRAGE)
   long numPix = info.lNumberOfPixels;
   if(verbose) {
-    cout << "receiving image " << info.iAcquisitionNumber << " (" << numPix << " pixels; " << numPix*sizeof(short) << "bytes)..." << endl;
+    cout << "receiving image " << info.iAcquisitionNumber << " ("
+         << numPix << " pixels; " << numPix*sizeof(short) << "bytes)" << endl;
   }
 
   for(unsigned int rec = 0; rec < numPix*sizeof(short);
@@ -497,9 +463,6 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
 //  in
 //   img: image to save
 bool RtInputScannerImages::saveImage(RtMRIImage &img) {
-
-  //cout << "writing image number " << img.getDataID().getSeriesNum() << ":" << img.getDataID().getTimePoint() << endl;
-
   return img.write(getExperimentConfig().getVolFilename(
                        img.getDataID().getSeriesNum(),
                        img.getDataID().getTimePoint()));
@@ -514,21 +477,3 @@ bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
   return (unsigned int) info.iAcquisitionNumber == SERIES_FIRST_ACQ_NUM;
 }
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtInputScannerImages::getVersionString() {
-  return VERSION;
-}
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

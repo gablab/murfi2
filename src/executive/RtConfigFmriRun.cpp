@@ -1,12 +1,22 @@
-/******************************************************************************
- * RtConfigFmriRun.cpp defines a class that controls configuration of
- * a single real-time fMRI experimental run.
+/*=========================================================================
+ *  RtConfigFmriRun.cpp defines a class that controls configuration of
+ *  a single real-time fMRI experimental run.
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-01-11
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
-
-static char *VERSION = "$Id: RtConfig.cpp 268 2008-10-13 19:54:35Z ohinds $";
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtConfigFmriRun.h"
 #include"RtLimit.h"
@@ -42,7 +52,7 @@ bool RtConfigFmriRun::validateConfig() {
 
   // check image receiver
   if(get("scanner:disabled")==false) {
-    if((unsigned int) get("scanner:port") < 1 
+    if((unsigned int) get("scanner:port") < 1
        || (unsigned int) get("scanner:port") > MAX_TCPIP_PORT_NUM) {
       cerr << "WARNING: invalid port number for receiving scanner images"
            << endl;
@@ -88,7 +98,7 @@ bool RtConfigFmriRun::validateConfig() {
   if(!isSet("study:xfm:referenceVol")) {
     path p;
     p.operator=(get("study:xfm:directory").filepath()
-                / (DEFAULT_STUDYREFNAME + "." 
+                / (DEFAULT_STUDYREFNAME + "."
                    + get("study:volumeFormat").str()));
     cout << "using default study reference volume name " << p.string() << endl;
     set("study:xfm:referenceVol",p.string());
@@ -96,21 +106,3 @@ bool RtConfigFmriRun::validateConfig() {
 
   return valid;
 }
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtConfigFmriRun::getVersionString() {
-  return VERSION;
-}
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

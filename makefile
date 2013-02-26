@@ -2,8 +2,6 @@
 #
 # master makefile for the real-time fMRI system murfi
 #
-# Oliver Hinds <ohinds@mit.edu> 2007-08-14
-#
 ##########################################################################
 
 
@@ -18,13 +16,10 @@ OS=linux
 PROJECT = murfi
 
 # whether to compile with various guis
-export APP = 0
-export FRONTEND = 0
-export OLDFRONTEND = 1
+export FRONTEND = 1
 
 # directories
 export SRC_DIR = $(PWD)/src
-export FSRC_DIR = $(PWD)/src/frontend
 export BIN_DIR = $(PWD)/bin
 export OBJ_DIR = $(PWD)/obj
 INSTALL_DIR = /usr/local/bin/
@@ -42,17 +37,15 @@ MTRACE = 0
 
 # directories containing code and headers
 SUB_DIRS = executive \
-	   app \
 	   data \
 	   io \
 	   stream \
 	   stream/analysis \
 	   stream/preprocess \
 	   stream/postprocess \
-	   util \
-	   frontend
+	   util
 
-ifeq ($(OLDFRONTEND),1)
+ifeq ($(FRONTEND),1)
   SUB_DIRS += display
 endif
 
@@ -76,9 +69,6 @@ NIFTI_HOME=/usr
 # vtk
 VTK_HOME = /usr
 
-# qt
-QT_HOME = /usr
-
 # ace
 ACE_NTRACE   = 1
 ACE_NDEBUG   = 0
@@ -101,16 +91,8 @@ SVM_HOME = $(PWD)/util/svm
 ################################ FLAG ################################
 
 # build with frontend flag
-ifeq ($(APP),1)
-	APP_FLAG = -DUSE_APP
-endif
-
 ifeq ($(FRONTEND),1)
 	FRONT_FLAG = -DUSE_FRONTEND
-endif
-
-ifeq ($(OLDFRONTEND),1)
-	OLDFRONT_FLAG = -DUSE_OLDFRONTEND
 endif
 
 # debug flag
@@ -201,8 +183,8 @@ NIFTI_LIB=-lniftiio -lznz -lz -L/$(NIFTI_HOME)/lib
 
 GL_LIB=-lGL -lGLU
 
-# oldgui libs
-ifeq ($(OLDFRONTEND),1)
+# gui libs
+ifeq ($(FRONTEND),1)
   GLUT_LIB=-lglut
   GLUT_INC=-I/usr/include/GL
 endif
@@ -211,46 +193,6 @@ endif
 VTK_INC = $(VTK_HOME)/include/vtk
 VTK_LIB = -lglut -L$(VTK_HOME)/lib/vtk \
 	-lvtkGraphics -lvtkRendering -lvtkftgl -lvtkImaging -lvtkFiltering -lvtkCommon
-#scopic Alex: the order is important for me because of I use VTK as static libs
-#	-lvtkCommon \
-#	-lvtkIO \
-#	-lvtkftgl \
-#	-lvtkGraphics \
-#	-lvtkImaging \
-#	-lvtkRendering \
-#	-lvtksys \
-#	-lvtkDICOMParser \
-#	-lvtkNetCDF \
-#	-lvtkWidgets \
-#	-lvtkHybrid \
-#	-lvtkexoIIc \
-#	-lQVTK \
-#	-lvtkverdict \
-#	-lvtkfreetype \
-#	-lvtksqlite \
-#	-lvtkjpeg \
-#	-lvtkexpat \
-#	-lvtkmetaio \
-#	-lvtkQtChart \
-#	-lvtkViews \
-#	-lvtkInfovis \
-#	-lvtklibxml2 \
-#	-lvtkalglib \
-
-# qt
-ifeq ($(FRONTEND),1)
-	QT_INC = \
-		-I$(QT_HOME)/include/qt4 \
-		-I$(QT_HOME)/include/qwt-qt4 \
-		-I$(QT_HOME)/include/qt4/Qt \
-		-I$(QT_HOME)/include/qt4/QtCore \
-		-I$(QT_HOME)/include/qt4/QtGui \
-
-	QT_LIB = -lQtCore -lQtGui -lQtXml -lqwt-qt4
-else
-	QT_INC=-I$(QT_HOME)/include/qt3
-	QT_LIB=-lqt-mt
-endif
 
 # build compiler flags
 
@@ -267,9 +209,7 @@ C_INC = -I$(SRC_DIR) \
 
 C_FLAGS = -Wall \
 	-Wno-write-strings \
-	$(APP_FLAG) \
 	$(FRONT_FLAG) \
-	$(OLDFRONT_FLAG) \
 	$(MTRACE_FLAG) \
 	$(PROF_FLAG) \
 	$(DEBUG_FLAG) \
@@ -285,39 +225,6 @@ C_LIB = $(MATH_LIB) \
 	$(VXL_LIB) \
 	$(NIFTI_LIB) \
 	$(BOOST_LIB)
-
-# add qt app includes
-ifeq ($(APP),1)
-	C_INC += $(QT_INC)
-	C_LIB += $(QT_LIB) $(GL_LIB)
-endif
-
-# add gui libs if building frontend
-ifeq ($(FRONTEND),1)
-	FRONT_DIR = $(SRC_DIR)/frontend/
-	FRONT_SUB_DIRS = \
-                Actors \
-		Commands \
-		Commands/MaskCommands \
-		Controllers \
-		Document \
-		Filters \
-		FrApplication \
-		FrMainWindow \
-		Layers \
-		Qwt \
-		Tools \
-		Utils \
-		Views \
-		Widgets
-
-	FRONT_INC_SUB_DIRS += $(FRONT_SUB_DIRS:%=-I$(FRONT_DIR)/%)
-
-	FRONT_INC = $(FRONT_INC_SUB_DIRS) -I/usr/include -I/$(VTK_INC) $(QT_INC)
-
-	C_INC += $(FRONT_INC) $(FRONT_FLAG)
-	C_LIB += $(QT_LIB) $(VTK_LIB)
-endif
 
 LDFLAGS = $(PROF_FLAG) $(C_LIB)
 
@@ -335,7 +242,6 @@ OBJ_FILES = $(wildcard $(OBJ_DIR)/*.o)
 ############################## TARGETS ###############################
 
 default: $(PROJECT)
-all:     $(PROJECT)
 
 install:
 	install $(INSTALL_BINARY) $(INSTALL_DIR)
@@ -353,26 +259,11 @@ dirs:
 $(PROJECT): dirs $(OBJ_FILES)
 	@$(ECHO) 'make: building $@ for $(OS)...'
 	cd $(SRC_DIR) && $(MAKE)
+	cd util/scanner_sim && $(MAKE)
 	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS)
 	@$(ECHO) '############################################'
 	@$(ECHO) 'make: built [$@] successfully!'
 	@$(ECHO) '############################################'
-
-# make the project with frontend support
-front:
-	$(MAKE) FRONTEND=1 go_front
-
-
-# make the project with frontend support
-go_front:
-	@$(ECHO) 'make: building $@ for $(OS)...'
-	cd $(SRC_DIR) && $(MAKE)
-	cd $(SRC_DIR)/frontend && $(MAKE) front
-	$(CC) $(CFLAGS) $(OBJ_DIR)/*.o -o $(BIN_DIR)/$(PROJECT) $(LDFLAGS)
-	@$(ECHO) '############################################'
-	@$(ECHO) 'make: built [$@] successfully!'
-	@$(ECHO) '############################################'
-
 
 ############################### CLEAN ################################
 
@@ -380,6 +271,7 @@ clean:
 	@$(ECHO) 'make: removing object and autosave files'
 	-cd $(SRC_DIR) && $(MAKE) clean
 	-cd $(OBJ_DIR) && $(RM) -f *.o *~
+	-cd util/scanner_sim && $(MAKE) clean
 
 ######################################################################
 ### $Source$

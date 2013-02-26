@@ -1,12 +1,22 @@
-/******************************************************************************
- * RtConfigFmriExperiment.cpp defines a class that controls configuration of
- * an entire real-time fMRI experimental session.
+/*=========================================================================
+ *  RtConfigFmriExperiment.cpp defines a class that controls configuration of
+ *  an entire real-time fMRI experimental session.
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-01-11
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
-
-static char *VERSION = "$Id: RtConfig.cpp 268 2008-10-13 19:54:35Z ohinds $";
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtConfigFmriExperiment.h"
 
@@ -50,18 +60,14 @@ static const string DEFAULT_SERIESXFMMOD(  "series");
 static const unsigned int DEFAULT_INFOSERVERPORT(15001);
 
 // copy constructor (called often)
-RtConfigFmriExperiment::RtConfigFmriExperiment(const RtConfigFmriExperiment &other) 
+RtConfigFmriExperiment::RtConfigFmriExperiment(
+    const RtConfigFmriExperiment &other)
     : RtConfig(other) {
 }
 
 // set default config info
-// doesn't work
 void RtConfigFmriExperiment::setDefaults() {
-  //set("study:softwareDir", DEFAULT_SOFTWAREDIR);
-  //set("study:siteID",      SITE_ID_NUMBER);
-  //set("study:id",          getExperimentStudyID());
-  //set("gui:disabled",      true);
-  //set("oldgui:disabled",   true);
+  // nothing to do here.
 }
 
 // validate the configuration
@@ -89,12 +95,12 @@ bool RtConfigFmriExperiment::validateConfig() {
   }
 
   // check for existance of studyDir
-  p.operator=(get("study:subjectsDir").filepath() 
+  p.operator=(get("study:subjectsDir").filepath()
               / get("study:subject:name").str());
   set("study:directory",p.string());
   path studyDir(p); // for local use
 
-  if(!( exists(p) && is_directory(p) )) { 
+  if(!( exists(p) && is_directory(p) )) {
     cerr << "ERROR: study directory " << p.string() << " is bad" << endl;
     valid = false;
   }
@@ -116,27 +122,22 @@ bool RtConfigFmriExperiment::validateConfig() {
     set("study:siteID", SITE_ID_NUMBER);
   }
 
-  // gui 
+  // gui
   if(!isSet("gui:disabled")) { // not set, make default
     set("gui:disabled", true);
-  }
-
-  // old gui 
-  if(!isSet("oldgui:disabled")) { // not set, make default
-    set("oldgui:disabled", true);
   }
 
   // volume directory
   if(!isSet("study:volumeDir")) { // not set, make default
     p.operator=(studyDir / DEFAULT_VOLUMEDIR);
     set("study:volumeDir",p.string());
-  }      
+  }
   else {
     p.operator=(get("study:volumeDir").filepath());
   }
 
   // create volume directory if it doesn't exist
-  if(!( exists(p) && is_directory(p) )) { 
+  if(!( exists(p) && is_directory(p) )) {
     cout << "creating volume directory: " << p.string() << endl;
     create_directory(p);
   }
@@ -146,13 +147,13 @@ bool RtConfigFmriExperiment::validateConfig() {
   if(!isSet("study:maskDir")) { // not set, make default
     p.operator=(studyDir / DEFAULT_MASKDIR);
     set("study:maskDir",p.string());
-  }      
+  }
   else {
     p.operator=(get("study:maskDir").filepath());
   }
-  
+
   // create mask directory if it doesn't exist
-  if(!( exists(p) && is_directory(p) )) { 
+  if(!( exists(p) && is_directory(p) )) {
     cout << "creating mask directory: " << p.string() << endl;
     create_directory(p);
   }
@@ -162,13 +163,13 @@ bool RtConfigFmriExperiment::validateConfig() {
   if(!isSet("study:xfm:directory")) { // not set, make default
     p.operator=(studyDir / DEFAULT_XFMDIR);
     set("study:xfm:directory",p.string());
-  }      
+  }
   else {
     p.operator=(get("study:xfm:directory").filepath());
   }
-  
+
   // create xfm directory if it doesn't exist
-  if(!( exists(p) && is_directory(p) )) { 
+  if(!( exists(p) && is_directory(p) )) {
     cout << "creating xfm directory: " << p.string() << endl;
     create_directory(p);
   }
@@ -178,13 +179,13 @@ bool RtConfigFmriExperiment::validateConfig() {
   if(!isSet("study:confDir")) { // not set, make default
     p.operator=(studyDir / DEFAULT_CONFDIR);
     set("study:confDir",p.string());
-  }      
+  }
   else {
     p.operator=(get("study:confDir").filepath());
   }
-  
+
   // create conf directory if it doesn't exist
-  if(!( exists(p) && is_directory(p) )) { 
+  if(!( exists(p) && is_directory(p) )) {
     cout << "creating conf directory: " << p.string() << endl;
     create_directory(p);
   }
@@ -194,20 +195,20 @@ bool RtConfigFmriExperiment::validateConfig() {
   if(!isSet("study:log:directory")) { // not set, make default
     p.operator=(studyDir / DEFAULT_LOGDIR);
     set("study:log:directory",p.string());
-  }      
+  }
   else {
     p.operator=(get("study:log:directory").filepath());
   }
-  
+
   // create log directory if it doesn't exist
-  if(!( exists(p) && is_directory(p) )) { 
+  if(!( exists(p) && is_directory(p) )) {
     cout << "creating log directory: " << p.string() << endl;
     create_directory(p);
   }
 
 
   // formats
-  
+
   // set the default volume format if its not been set
   string volumeFormat;
   if(!isSet("study:volumeFormat")) { // not set, make default
@@ -215,7 +216,7 @@ bool RtConfigFmriExperiment::validateConfig() {
   }
   else { // check that the secified format is valid
     if(get("study:volumeFormat").str() != DEFAULT_VOLUMEFORMAT) {
-      cerr << "ERROR: unsupported volume format " 
+      cerr << "ERROR: unsupported volume format "
            << get("study:volumeFormat") << endl;
       valid = false;
     }
@@ -226,7 +227,7 @@ bool RtConfigFmriExperiment::validateConfig() {
   if(!isSet("study:volumeFileStem")) { // not set, make default
     set("study:volumeFileStem",DEFAULT_VOLUMEFILESTEM);
   }
-  
+
   // filenames
 
   // check logfile name
@@ -242,7 +243,7 @@ bool RtConfigFmriExperiment::validateConfig() {
   // study reference volume
   if(!isSet("study:xfm:referenceVol")) {
     p.operator=(get("study:xfm:directory").filepath()
-                / (DEFAULT_STUDYREFNAME + "." 
+                / (DEFAULT_STUDYREFNAME + "."
                    + get("study:volumeFormat").str()));
     cout << "using default study reference volume name " << p.string() << endl;
     set("study:xfm:referenceVol",p.string());
@@ -256,7 +257,7 @@ bool RtConfigFmriExperiment::validateConfig() {
     if(!isSet("infoserver:port")) {
       set("infoserver:port",DEFAULT_INFOSERVERPORT);
     }
-    if((unsigned int) get("infoserver:port") < 1 
+    if((unsigned int) get("infoserver:port") < 1
        || (unsigned int) get("infoserver:port") > MAX_TCPIP_PORT_NUM) {
       cerr << "WARNING: invalid port number for infoserver, disabling"
            << endl;
@@ -284,7 +285,7 @@ string RtConfigFmriExperiment::getSeriesRefVolFilename(unsigned int series) {
 string RtConfigFmriExperiment::getSeriesXfmFilename(unsigned int series) {
   stringstream ss;
   ss << "series" << series << "." << DEFAULT_XFMFILEEXT;
- 
+
   path xfmFile(get("study:xfm:directory").filepath() / ss.str());
   return xfmFile.string();
 }
@@ -311,9 +312,9 @@ string RtConfigFmriExperiment::getSeriesXfmOutputFilename(unsigned int series,
 string RtConfigFmriExperiment::getSeriesMaskFilename(unsigned int series,
                                                      string roiID) {
   stringstream ss;
-  ss << "series" << series << "_" << roiID << "." 
+  ss << "series" << series << "_" << roiID << "."
      << get("study:volumeFormat").str();
-  
+
   path p(get("study:maskDir").filepath() / ss.str());
   return p.string();
 }
@@ -338,10 +339,10 @@ string RtConfigFmriExperiment::getVolFilename(int _seriesNum,int _timepoint) {
   sprintf(srnum,"%05d",_seriesNum);
   sprintf(acnum,"%05d",_timepoint);
 
-  path p(get("study:volumeDir").filepath() 
+  path p(get("study:volumeDir").filepath()
          / (get("study:volumeFileStem").str()
-            + "-" + srnum 
-            + "-" + acnum 
+            + "-" + srnum
+            + "-" + acnum
             + "." + get("study:volumeFormat").str()));
 
   return p.string();
@@ -357,26 +358,8 @@ string RtConfigFmriExperiment::getDesignFilename(int _seriesNum) {
   char srnum[6];
   sprintf(srnum,"%05d",_seriesNum);
 
-  path p(get("study:volumeDir").filepath() 
+  path p(get("study:volumeDir").filepath()
          / (DESIGN_NAME + "-" + srnum + "." + DESIGN_EXT));
 
   return p.string();
 }
-
-// gets the version
-//  out:
-//   cvs version string for this class
-char *RtConfigFmriExperiment::getVersionString() {
-  return VERSION;
-}
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

@@ -7,7 +7,7 @@
 
 class timer
 {
- friend std::ostream& operator<<(std::ostream& os, timer& t);
+  friend std::ostream& operator<<(std::ostream& os, timer& t);
 
  private:
   bool running;
@@ -117,11 +117,10 @@ inline void timer::check(const char* msg)
 inline std::ostream& operator<<(std::ostream& os, timer& t)
 {
   os << std::setprecision(2) << std::setiosflags(std::ios::fixed)
-    << t.acc_time + (t.running ? t.elapsed_time() : 0);
+     << t.acc_time + (t.running ? t.elapsed_time() : 0);
   return os;
 }
 
 //===========================================================================
 
 #endif // TIMER_H
-

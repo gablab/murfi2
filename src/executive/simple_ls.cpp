@@ -31,61 +31,61 @@ int simple_ls(string dir, string ext)
   unsigned long err_count = 0;
 
   if ( !fs::exists( full_path ) )
-    {
-      std::cout << "\nNot found: " << full_path.string() << std::endl;
-      return 1;
-    }
+  {
+    std::cout << "\nNot found: " << full_path.string() << std::endl;
+    return 1;
+  }
 
   if ( fs::is_directory( full_path ) )
+  {
+    //      std::cout << "\nIn directory: "
+    //    << full_path.directory_string() << "\n\n";
+    fs::directory_iterator end_iter;
+    for ( fs::directory_iterator dir_itr( full_path );
+          dir_itr != end_iter;
+          ++dir_itr )
     {
-//      std::cout << "\nIn directory: "
-//		<< full_path.directory_string() << "\n\n";
-      fs::directory_iterator end_iter;
-      for ( fs::directory_iterator dir_itr( full_path );
-	    dir_itr != end_iter;
-	    ++dir_itr )
-	{
-	  string name = dir_itr->path().string();
-	  if(!ext.empty() 	     
-	     && (name.size() <= ext.size() 
-		 || ext != name.substr(name.size()-ext.size()))	     
-	     ) {
-	    continue;
-	  }
+      string name = dir_itr->path().string();
+      if(!ext.empty()
+         && (name.size() <= ext.size()
+             || ext != name.substr(name.size()-ext.size()))
+         ) {
+        continue;
+      }
 
-	  try
-	    {
-	      if ( fs::is_directory( dir_itr->status() ) )
-		{
-		  ++dir_count;
-		  std::cout << name << " [directory]\n";
-		}
-	      else if ( fs::is_regular( dir_itr->status() ) )
-		{
-		  ++file_count;
-		  std::cout << name << "\n";
-		}
-	      else
-		{
-		  ++other_count;
-		  std::cout << name << " [other]\n";
-		}
+      try
+      {
+        if ( fs::is_directory( dir_itr->status() ) )
+        {
+          ++dir_count;
+          std::cout << name << " [directory]\n";
+        }
+        else if ( fs::is_regular( dir_itr->status() ) )
+        {
+          ++file_count;
+          std::cout << name << "\n";
+        }
+        else
+        {
+          ++other_count;
+          std::cout << name << " [other]\n";
+        }
 
-	    }
-	  catch ( const std::exception & ex )
-	    {
-	      ++err_count;
-	      std::cout << dir_itr->path().string() << " " << ex.what() << std::endl;
-	    }
-	}
-//      std::cout << "\n" << file_count << " files\n"
-//		<< dir_count << " directories\n"
-//		<< other_count << " others\n"
-//		<< err_count << " errors\n";
+      }
+      catch ( const std::exception & ex )
+      {
+        ++err_count;
+        std::cout << dir_itr->path().string() << " " << ex.what() << std::endl;
+      }
     }
+    //      std::cout << "\n" << file_count << " files\n"
+    //    << dir_count << " directories\n"
+    //    << other_count << " others\n"
+    //    << err_count << " errors\n";
+  }
   else // must be a file
-    {
-      std::cout << "\nFound: " << full_path.string() << "\n";    
-    }
+  {
+    std::cout << "\nFound: " << full_path.string() << "\n";
+  }
   return 0;
 }

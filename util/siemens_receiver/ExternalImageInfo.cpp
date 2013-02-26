@@ -1,9 +1,7 @@
 /******************************************************************************
  * implementation of member functions to receive and send siemens
  * external sender data
- *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14
- *****************************************************************************/
+ * ***************************************************************************/
 
 #include"ExternalImageInfo.h"
 
@@ -80,9 +78,9 @@ ExternalImageInfo::ExternalImageInfo()
 }
 
 // constructor for data from physical scanner
-// this function does selective memcpy through the passed data because the 
-// scanner sends packed data with a few trash spots, which were identified 
-// manually with plenty of frustration. 
+// this function does selective memcpy through the passed data because the
+// scanner sends packed data with a few trash spots, which were identified
+// manually with plenty of frustration.
 ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   char trash[TRASHSIZE];
   char *readptr = data;
@@ -95,7 +93,7 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(chID, readptr, 4*CHARSIZE);
   readptr += 4*CHARSIZE;
-  
+
   memcpy(&iVersion, readptr, INTSIZE);
   readptr += INTSIZE;
 
@@ -226,7 +224,7 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(cSeriesInstanceUID, readptr, 65*CHARSIZE);
   readptr += 65*CHARSIZE;
-    
+
 
   memcpy(&bSwapReadPhase, readptr, sizeof(bool));
   readptr += sizeof(bool);
@@ -234,7 +232,7 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
   memcpy(trash, readptr, 2);
   readptr += 2;
 
- 
+
   memcpy(&iAcquisitionNumber, readptr, INTSIZE);
   readptr += INTSIZE;
 
@@ -263,16 +261,16 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(chAcquisitionDate, readptr, ACQUISITION_DATE_LEN*CHARSIZE);
   readptr += ACQUISITION_DATE_LEN*CHARSIZE;
-  
+
   memcpy(chAcquisitionTime, readptr, ACQUISITION_TIME_LEN*CHARSIZE);
   readptr += ACQUISITION_TIME_LEN*CHARSIZE;
-  
+
   memcpy(&iSliceIndex, readptr, INTSIZE);
   readptr += INTSIZE;
-  
+
   memcpy(&iNumTrackCha, readptr, INTSIZE);
   readptr += INTSIZE;
-  
+
   memcpy(&iCurrentTrackCha, readptr, INTSIZE);
   readptr += INTSIZE;
 
@@ -301,15 +299,15 @@ ExternalImageInfo::ExternalImageInfo(char *data, unsigned int len) {
 
   memcpy(trash, readptr, 16*INTSIZE);
   readptr += 16*INTSIZE;
-  
+
   memcpy(trash, readptr, 16*DOUBLESIZE);
   readptr += 16*DOUBLESIZE;
-  
+
   memcpy(trash, readptr, 32*CHARSIZE);
   readptr += 32*CHARSIZE;
-  
+
   memcpy(trash, readptr, 8*CHARSIZE);
-  readptr += 8*CHARSIZE;  
+  readptr += 8*CHARSIZE;
 
   //displayImageInfo();
   //
@@ -329,7 +327,7 @@ void ExternalImageInfo::displayImageInfo() {
   cout << "Data:"  << sizeof (ExternalImageInfo) << " Bytes used" << endl;
   cout << "-----------------------------" << endl;
   cout << "ID -->" << myID << "<-- Version" << iVersion << endl;
-  cout << "nlin / ncol / FOVread / FOVphase  = " << nLin 
+  cout << "nlin / ncol / FOVread / FOVphase  = " << nLin
        << " / " << nCol << " / " << dFOVread << " / " << dFOVphase << endl;
   cout << "Slice Thickness                   = " << dThick << endl;
   cout << "Slice Position Sag / Cor / Tra    = " << dPosSag
@@ -365,6 +363,3 @@ void ExternalImageInfo::displayImageInfo() {
   cout << "Time Delay                        = " << dTimeDelay << endl;
   cout << endl;
 }
-
-
-

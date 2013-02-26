@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtConfigFmri.h is the header for class that controls xml configuration
- * reading specific to an fmri experiment.
+/*=========================================================================
+ *  RtConfigFmri.h is the header for class that controls xml configuration
+ *  reading specific to an fmri experiment.
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-01-11 
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTCONFIGFMRIEXPERIMENT_H
 #define RTCONFIGFMRIEXPERIMENT_H
@@ -15,12 +27,12 @@
 // class declaration
 class RtConfigFmriExperiment : public RtConfig {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtConfigFmriExperiment() : RtConfig() {}; 
+  RtConfigFmriExperiment() : RtConfig() {};
 
   // copy constructor (called often)
   RtConfigFmriExperiment(const RtConfigFmriExperiment &other);
@@ -37,10 +49,10 @@ public:
   virtual bool validateConfig();
 
 
-//******* computed values must have special functions
+  //******* computed values must have special functions
 
-// get the filename for the transformation file that takes the
-// experiment reference volume into the space of the current series
+  // get the filename for the transformation file that takes the
+  // experiment reference volume into the space of the current series
   string getSeriesXfmFilename(unsigned int series);
 
   // get the filename of a file transformed by using the series xfm on
@@ -64,7 +76,7 @@ public:
   //   timepoint
   //  out
   //   absolute file string
-  string getVolFilename(int _seriesNum,int _timepoint);  
+  string getVolFilename(int _seriesNum,int _timepoint);
 
   // build a filename for a design matrix in this experiment
   //  in
@@ -72,25 +84,7 @@ public:
   //  out
   //   absolute file string
   string getDesignFilename(int _seriesNum);
-
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();  
-
-protected:
-  
 };
 
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

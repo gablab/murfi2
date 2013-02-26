@@ -1,11 +1,23 @@
-/******************************************************************************
- * RtConfig.h is the header for a virtual base class that controls xml
- * configuration reading. this class must be extended for particular types
- * of configuration (setDefaults() and validateConfig() must be implemented). 
+/*=========================================================================
+ *  RtConfig.h is the header for a virtual base class that controls xml
+ *  configuration reading. this class must be extended for particular types
+ *  of configuration (setDefaults() and validateConfig() must be implemented).
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 // TODO: need these functions:
 // 1) set all possible defaults
@@ -36,15 +48,15 @@ class RtConductor;
 // class declaration
 class RtConfig {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtConfig() { }; 
+  RtConfig() { };
 
   // copy constructor (called often)
-  RtConfig(const RtConfig &other); 
+  RtConfig(const RtConfig &other);
 
   // destructor
   virtual ~RtConfig();
@@ -128,17 +140,13 @@ public:
 
   //*** general ***//
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
   // print the name/value pairs to the screen
   void dumpConfig(ostream &os = cout);
 
   // utility function to build a map between attribute names and values
   static map<string,string> getAttributeMap(TiXmlElement &ele);
 
-protected:
+ protected:
 
   // sets some default configuration info
   // MUST OVERRIDE THIS IN SUBCLASS
@@ -162,7 +170,7 @@ protected:
   //**************************************************//
   // stuff to support printing to a stream
   // taken from the tinyXml examples
-  // 
+  //
 
   TiXmlAttribute *getElementAttribute(TiXmlElement *elmt, const string &name);
   const static unsigned int  NUM_INDENTS_PER_SPACE=2;
@@ -175,14 +183,3 @@ protected:
 
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

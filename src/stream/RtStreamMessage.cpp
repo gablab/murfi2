@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtStreamMessage.cpp defines a class that passes messages between stream
- * components.
+/*=========================================================================
+ *  RtStreamMessage.cpp defines a class that passes messages between stream
+ *  components.
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-09-04
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtStreamMessage.h"
 
@@ -18,7 +30,7 @@ bool RtStreamMessage::addData(RtData *_data, bool _makeCurrentData) {
   ACE_TRACE(("RtStreamMessage::addData"));
 
   mut.acquire();
-  
+
   if(numData >= MAX_MSGDATAS) {
     return false;
   }
@@ -26,13 +38,13 @@ bool RtStreamMessage::addData(RtData *_data, bool _makeCurrentData) {
   ACE_DEBUG((LM_DEBUG, "adding data to msg: %d\n", numData));
 
   data[numData++] = _data;
-  
+
   if(_makeCurrentData) {
     this->setLastDataAsCurrent();
   }
-  
+
   mut.release();
-  
+
   return true;
 }
 
@@ -122,12 +134,12 @@ RtData *RtStreamMessage::getData(unsigned int index) const {
 //  out
 //   pointer to the data or NULL, if such data doesnt exist
 RtData *RtStreamMessage::getData(const string &moduleId,
-				 const string &dataName,
-				 const string &roiId) const {
+                                 const string &dataName,
+                                 const string &roiId) const {
   RtDataID idTemplate(DATAID_NUM_WILDCARD_VALUE,DATAID_NUM_WILDCARD_VALUE,
-		      DATAID_NUM_WILDCARD_VALUE,
-		      DATAID_STRING_WILDCARD_VALUE,
-		      moduleId, dataName, roiId);
+                      DATAID_NUM_WILDCARD_VALUE,
+                      DATAID_STRING_WILDCARD_VALUE,
+                      moduleId, dataName, roiId);
   return getData(idTemplate);
 }
 
@@ -137,14 +149,12 @@ RtData *RtStreamMessage::getData(const string &moduleId,
 //  out
 //   pointer to the data or NULL, if such data doesnt exist
 RtData *RtStreamMessage::getData(const RtDataID &idTemplate) const {
-  //cout << "serching for " << idTemplate << endl;
-
   for(unsigned int i = 0; i < numData; i++) {
     if(DEBUG_LEVEL & MODERATE) {
       cout << data[i] << " " << data[i]->getDataID() << endl;
     }
     if(idTemplate == data[i]->getDataID()) {
-       return data[i];
+      return data[i];
     }
   }
 
@@ -167,15 +177,3 @@ void RtStreamMessage::init(RtConductor *_conductor) {
   numData = 0;
   conductor = _conductor;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

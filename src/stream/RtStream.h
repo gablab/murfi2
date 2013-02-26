@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtStream.h is the header for a class that controls execution of a
- * single data processing stream during a real-time fMRI session.
+/*=========================================================================
+ *  RtStream.h is the header for a class that controls execution of a
+ *  single data processing stream during a real-time fMRI session.
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTSTREAM_H
 #define RTSTREAM_H
@@ -14,14 +26,8 @@
 
 #include"ace/Stream.h"
 
-//#include"RtConductor.h"
-//#include"RtCode.h"
-//#include"RtData.h"
-//#include"RtStreamComponent.h"
-//#include"RtStreamMessage.h"
 #include"RtConfig.h"
 #include"RtOutput.h"
-//#include"util/timer/timer.h"
 
 #include<set>
 
@@ -33,18 +39,18 @@ using namespace std;
 // class declaration
 class RtStream : public ACE_Stream<ACE_MT_SYNCH> {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // constructor
-  RtStream(); 
+  RtStream();
 
   // destructor
   virtual ~RtStream();
 
   //*** initialization routines  ***//
-  
+
   // set the conductor for this stream
   //  in
   //   conductor pointer
@@ -55,10 +61,24 @@ public:
   //   true (for success) or false
   bool configure(RtConfig &config);
 
-  // whether this stream is still processing
+  // tell the stream it has begun processing
   //  out:
   //   true  or false
-  bool isProcessing() { return !openMsgs.empty(); };
+  void startProcessing() { processing = true; };
+
+  // tell the stream it is done processing
+  //  out:
+  //   true  or false
+  void doneProcessing() { processing = false; };
+
+  // tell the stream someone is waiting for processing to complete.
+  //  out:
+  //   true  or false
+  void waitForProcessingToComplete() {
+    while(processing) {
+      usleep(1000);
+    }
+  };
 
   // adds all modules to the stream
   //  in
@@ -69,15 +89,15 @@ public:
 
   // adds outputs to a stream component (needs to be here so that we have
   // access to the conductor to get pointers to the outputs)
-  //  in 
+  //  in
   //   config: configuration info
-  virtual void addOutputsToComponent(RtStreamComponent *sc, 
-				     vector<string> &outNames);
+  virtual void addOutputsToComponent(RtStreamComponent *sc,
+                                     vector<string> &outNames);
 
   // build a vector of ids of outputs from an xml node's children
   //  in
   //   module element
-  //  out 
+  //  out
   //   vector of string output ids
   void buildOutputNames(TiXmlElement *module, vector<string> &names);
 
@@ -85,7 +105,7 @@ public:
 
   // accept new data received from an input
   //  in
-  //   data: data 
+  //   data: data
   virtual void setInput(unsigned int code, RtData *data);
 
   // adds all 'module' nodes that are children of the passed node as modules
@@ -100,7 +120,7 @@ public:
   //   out: optional output to pass the result of this module to
   //   text: optional text to be associated with the module
   RtStreamComponent *buildStreamComponent(const string &type,
-					  const string &text = "");
+                                          const string &text = "");
 
   // add a single module to the stack
   //  in
@@ -113,19 +133,15 @@ public:
   //   true for success
   bool pushAllModules();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
+ protected:
 
-protected:
-  
   // superclass
   typedef ACE_Stream<ACE_MT_SYNCH> super;
 
   // processing module
   typedef ACE_Module<ACE_MT_SYNCH> Module;
 
-  // pointer to conductor 
+  // pointer to conductor
   RtConductor *streamConductor;
 
   // stack of moules to be added
@@ -133,18 +149,9 @@ protected:
 
   // map of messages and the completion status
   set<ACE_Message_Block*> openMsgs;
+
+  bool processing;
 };
 
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

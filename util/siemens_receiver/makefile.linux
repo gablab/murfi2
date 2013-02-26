@@ -1,7 +1,5 @@
 ########################################################################
 # makefile for the siemens reciever on linux
-# 
-# Oliver Hinds <ohinds@mit.edu> 2009-06-09
 ########################################################################
 
 CC = g++
@@ -27,4 +25,3 @@ siemens_receiver: siemens_receiver.$(OBJEXT) ExternalImageInfo.$(OBJEXT)
 	$(CC) siemens_receiver.$(OBJEXT)  ExternalImageInfo.$(OBJEXT) $(LFLAGS)
 
 siemens_receiver.$(OBJEXT): siemens_receiver.cpp ExternalImageInfo.cpp ExternalImageInfo.h
-

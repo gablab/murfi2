@@ -1,9 +1,21 @@
-/******************************************************************************
- * RtMRIImage.h declares a class for an MR image
+/*=========================================================================
+ *  RtMRIImage.h declares a class for an MR image
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-10-08
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTMRIIMAGE_H
 #define RTMRIIMAGE_H
@@ -20,32 +32,19 @@
 
 using namespace std;
 
-// class declaration
 class RtMRIImage : public RtDataImage<short> {
 
-public:
+ public:
 
   const static unsigned int MAGIC_NUMBER = 0x5081;
 
   //*** constructors/destructors  ***//
-  
-  // default constructor
-  RtMRIImage(); 
 
-  // destructor
+  RtMRIImage();
   virtual ~RtMRIImage();
 
-//  // constructor with a filename to read the image from
-//  RtMRIImage(const string &filename); 
-//
-//  // construct from raw bytes -- BE CAREFUL WITH THIS
-//  RtMRIImage(char *bytes, unsigned int len);
-//
-//  // construct from an image info struct and (possibly blank) data
-//  RtMRIImage(RtMRIImageInfo &_info, unsigned short  *_data = NULL);
-
   // construct from an external image info struct (siemens) and some image data
-  RtMRIImage(RtExternalImageInfo &info, short *data = NULL); 
+  RtMRIImage(RtExternalImageInfo &info, short *data = NULL);
 
   // construct from another image
   RtMRIImage(RtMRIImage &img);
@@ -67,13 +66,6 @@ public:
   //   _info: struct to copy
   void setInfo(const RtExternalImageInfo &_info);
 
-  // set this image based on a passed image info and data
-  //  in
-  //   info: struct
-  //   data: array (optional, image data will be  allocated and set
-  //         to all zeros if null) 
-  //void setImage(RtMRIImageInfo &_info, short *_data);
-
   // print info about this image
   void printInfo(ostream &os);
 
@@ -81,9 +73,6 @@ public:
 
   // get the acquisition number
   string getCreationTime() const;
-
-//  // get the acquisition number
-//  unsigned int getAcquisitionNum() const;
 
   // set the matrix size
   void setMatrixSize(unsigned int ms);
@@ -97,46 +86,27 @@ public:
   // get the number of slices
   unsigned int getNumSlices();
 
-//  // set the series number
-//  void setSeriesNum(unsigned int);
-//
-//  // get the series number
-//  unsigned int getSeriesNum();
-
-//  // get a motion parameter
-//  double getMotionParameter(MotionDimension d) const;
-//
-//  // set a motion parameter
-//  void setMotionParameter(MotionDimension d, double m);
-
   // get a smart contrast level
   float getAutoContrast();
 
   // get a smart brightness level
   float getAutoBrightness();
 
-protected:
+ protected:
 
-  unsigned long slice;                 // slice index (zero based)
+  unsigned long slice; // slice index (zero based)
 
-  double readFOV;             // mm
-  double phaseFOV;            // mm
-  //  double sliceThick;          // mm
-
+  double readFOV; // mm
+  double phaseFOV; // mm
 
   // imaging parms
-  bool         swapReadPhase;       
-  //unsigned int  seriesNum;           // series number
-  string        seriesInstanceUID;   // series id
-  //unsigned int  acqNum;              // acquisition number
+  bool swapReadPhase;
+  string seriesInstanceUID;   // series id
   double timeAfterStart;      // time after start
   double te;                  // echo time (ms)
   double tr;                  // repetition time (ms)
   double ti;                  // inversion time (ms)
   double triggerTime;         // trigger time (ms)
-
-//  // motion parameters
-//  double motionParameters[NUM_MOTION_DIMENSIONS];
 
   // actual acquision info parms
   ACE_Date_Time time;                // acquisition time
@@ -155,14 +125,3 @@ protected:
 
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

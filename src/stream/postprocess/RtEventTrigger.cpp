@@ -1,9 +1,21 @@
-/******************************************************************************
- * RtEventTrigger.cpp triggers an event based on activation sums
+/*=========================================================================
+ *  RtEventTrigger.cpp triggers an event based on activation sums
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-04-14
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtEventTrigger.h"
 #include"RtDataIDs.h"
@@ -31,11 +43,11 @@ RtEventTrigger::RtEventTrigger() : RtStreamComponent() {
 RtEventTrigger::~RtEventTrigger() {}
 
 // process an option
-//  in 
+//  in
 //   name of the option to process
 //   val  text of the option node
 bool RtEventTrigger::processOption(const string &name, const string &text,
-				   const map<string,string> &attrMap) {
+                                   const map<string,string> &attrMap) {
   if(name == "posRoiID") {
     posRoiID = text;
     return true;
@@ -49,7 +61,7 @@ bool RtEventTrigger::processOption(const string &name, const string &text,
   }
   if(name == "monitorNeg") {
     return RtConfigVal::convert<bool>(monitorNeg,text);
-  }  
+  }
   if(name == "posThresh") {
     return RtConfigVal::convert<double>(posThresh,text);
   }
@@ -63,7 +75,7 @@ bool RtEventTrigger::processOption(const string &name, const string &text,
     return RtConfigVal::convert<int>(initialSkipTRs,text);
   }
   return RtStreamComponent::processOption(name, text, attrMap);
-}  
+}
 
 // validate the configuration
 bool RtEventTrigger::validateComponentConfig() {
@@ -71,14 +83,3 @@ bool RtEventTrigger::validateComponentConfig() {
 
   return  result;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

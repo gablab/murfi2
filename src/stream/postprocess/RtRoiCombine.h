@@ -1,26 +1,27 @@
-/******************************************************************************
- * RtRoiCombine.h is the header for a base class for combining roi
- * activations to result in a feedback signal
+/*=========================================================================
+ *  RtRoiCombine.h is the header for a base class for combining roi
+ *  activations to result in a feedback signal
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-09-15
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTROICOMBINE_H
 #define RTROICOMBINE_H
 
 #include"RtStreamComponent.h"
-
-// scopic alexsid: #define WIN32
-#ifdef WIN32
-    // MS VS2005 provides _isnan function not isnan
-    // as it is in *nix system. So add this fix.
-    #ifndef isnan
-        #define isnan(x) _isnan(x)
-    #endif
-
-    #define isinf(x) (!_finite(3))
-#endif
 
 // how can we combine the data
 enum RtRoiCombineMethod {
@@ -38,7 +39,7 @@ enum RtRoiCombineMethod {
 // class declaration
 class RtRoiCombine : public RtStreamComponent {
 
-public:
+ public:
 
   static string moduleString;
 
@@ -48,16 +49,16 @@ public:
   RtRoiCombine();
 
   // destructor
-  ~RtRoiCombine();
+  virtual ~RtRoiCombine();
 
-protected:
+ protected:
 
   // process an option
   //  in
   //   name of the option to process
   //   attr map bettwen attribute names and values
   virtual bool processOption(const string &name, const string &text,
-			     const map<string,string> &attr);
+                             const map<string,string> &attr);
 
   // make sure we are configured properly
   bool validateComponentConfig();
@@ -88,22 +89,11 @@ protected:
 
   // data
   RtRoiCombineMethod method;
-  
+
   // if its a weighted average we have to retreive the weights
   string weightsModuleID;
   string weightsDataName;
-  
+
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

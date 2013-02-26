@@ -1,0 +1,50 @@
+*************************
+Installation Instructions
+*************************
+
+*************************
+Dependencies:
+*************************
+  -libraries
+    -libace-dev
+    -freeglut3-dev
+    -libgsl0-dev
+    -libxi-dev
+    -libxmu-dev
+    -gnuplot
+    -vxl
+    -libniftiio
+
+*************************
+Compilation:
+*************************
+
+$ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev
+
+then
+
+$ make
+
+*************************
+Installation
+*************************
+
+$ sudo ln -sf bin/murfi /usr/bin
+
+*************************
+Running the example
+*************************
+
+$ cd example_data
+$ murfi -f scripts/neurofeedback.xml
+
+In another terminal:
+
+$ cd example_data/scripts
+$ ./servedata.sh
+
+*************************
+Usage
+*************************
+
+For usage info, see the murfi wiki docs at http://mindhive.mit.edu/realtime.

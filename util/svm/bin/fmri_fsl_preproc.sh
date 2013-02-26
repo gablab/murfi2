@@ -1,6 +1,4 @@
 # preprocess single run fmri data using fsl
-#
-# Oliver Hinds <ohinds@mit.edu> 2009-08-12
 
 usage() {
     echo $0 [options] input_file output_file
@@ -95,31 +93,31 @@ if [ "$skip_feat" == "0" ]; then
     export feat=`tempfile`.fsf
     export scratch=`tempfile`.fsf
     cp $FESTR_HOME/util/svm/bin/feat_template.fsf $feat
-    
+
     to_delete="$to_delete $feat $scratch"
-    
+
     # get tr from input file
     tr=`fslinfo $input_file | sed -n /pixdim4/p | sed "s/.*\s\(.*\)$/\1/"`
     set_feat_var "fmri(tr)" $tr
-    
+
     num_trs=`fslinfo $input_file | sed -n /^dim4/p | sed "s/.*\s\(.*\)$/\1/"`
     set_feat_var "fmri(npts)" $num_trs
-    
+
     set_feat_var "fmri(ndelete)" $num_skip
-    
+
     set_feat_var "fmri(mc)" $motion_correct
-    
+
     set_feat_var "fmri(motionevs)" $regress_motion
-    
+
     set_feat_var "fmri(smooth)" $fwhm
-    
+
     if [ "$trend_method" == "filter" ]; then
 	set_feat_var "fmri(temphp_yn)" 1
 	set_feat_var "fmri(paradigm_hp)" $hpf
     else
 	set_feat_var "fmri(temphp_yn)" 0
     fi
-    
+
     # setup design
     if [ "$trend_method" == "linear" ]; then
 	trend_ev=`tempfile`
@@ -133,7 +131,7 @@ if [ "$skip_feat" == "0" ]; then
     fi
 
     set_feat_var "feat_files(1)" "$PWD/$input_file"
-    
+
     outdir=`echo "$PWD/$input_file" | sed "s/\..*/.preproc/"`
     set_feat_var "fmri(outputdir)"  "$outdir"
     outdir=$outdir.feat
@@ -142,7 +140,7 @@ if [ "$skip_feat" == "0" ]; then
     if [ -d "$outdir" ]; then
 	rm -rf "$outdir"
     fi
-    
+
     # run feat
     echo feat $feat
     feat $feat
@@ -158,7 +156,7 @@ if [ "$out_units" == "z" ]; then # z scores
     fslroi "$outdir"/stats/res4d "$outdir"/stats/baseline 0 $baseline
 
     echo fslmaths "$outdir"/stats/baseline -Tstd "$outdir"/stats/baseline -odt double
-    fslmaths "$outdir"/stats/baseline -Tstd "$outdir"/stats/baseline -odt double    
+    fslmaths "$outdir"/stats/baseline -Tstd "$outdir"/stats/baseline -odt double
 
     # transform to zscores
     echo fslmaths "$outdir"/stats/res4d -div "$outdir"/stats/baseline "$output_file"

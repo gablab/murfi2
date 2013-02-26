@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtIncrementalGLM.h is the implementation of a class that computes 
- * activation at each voxel incrementally using Gentleman's method
+/*=========================================================================
+ *  RtIncrementalGLM.h is the implementation of a class that computes
+ *  activation at each voxel incrementally using Gentleman's method
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-04-01
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtIncrementalGLM.h"
 #include"RtMRIImage.h"
@@ -12,11 +24,11 @@
 string RtIncrementalGLM::moduleString(ID_INCREMENTALGLM);
 
 // default constructor
-RtIncrementalGLM::RtIncrementalGLM() : RtModelFit(), 
+RtIncrementalGLM::RtIncrementalGLM() : RtModelFit(),
                                        numSolvers(0),
                                        solvers (NULL) {
   componentID = moduleString;
-}
+                                       }
 
 // destructor
 RtIncrementalGLM::~RtIncrementalGLM() {
@@ -32,7 +44,7 @@ RtIncrementalGLM::~RtIncrementalGLM() {
 }
 
 // process a configuration option
-//  in 
+//  in
 //   name of the option to process
 //   val  text of the option node
 bool RtIncrementalGLM::processOption(const string &name, const string &text,
@@ -40,12 +52,12 @@ bool RtIncrementalGLM::processOption(const string &name, const string &text,
   // look for known options
 
   return RtModelFit::processOption(name, text, attrMap);
-}  
+}
 
 // validate the configuration
 bool RtIncrementalGLM::validateComponentConfig() {
   bool result = true;
-  
+
   return RtModelFit::validateComponentConfig() && result;
 }
 
@@ -53,7 +65,7 @@ bool RtIncrementalGLM::validateComponentConfig() {
 // initialize the estimation algorithm for a particular image size
 // in
 //  first acquired image to use as a template for parameter inits
-void RtIncrementalGLM::initEstimation(const RtData &dat, 
+void RtIncrementalGLM::initEstimation(const RtData &dat,
                                       RtMaskImage *mask) {
 
   if(mask) { // set the number of solvers (one per voxel)
@@ -106,7 +118,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 
     if(logOutput) {
       stringstream logs("");
-      logs << "RtIncrementalGLM::process: mask is NULL at tr " 
+      logs << "RtIncrementalGLM::process: mask is NULL at tr "
            << dat->getDataID().getTimePoint() << endl;
       log(logs);
     }
@@ -130,7 +142,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
     // setup the data id
     betas[b]->getDataID().setFromInputData(*dat,*this);
     betas[b]->getDataID().setDataName(string(NAME_BETA)
-                                      + "_" + 
+                                      + "_" +
                                       design.getColumnName(b));
     betas[b]->getDataID().setRoiID(mask->getDataID().getRoiID());
     betas[b]->initToNans();
@@ -140,27 +152,22 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   // setup the data id
   residual->getDataID().setFromInputData(*dat,*this);
   residual->getDataID().setDataName(NAME_RESIDUAL_MSE);
-  residual->getDataID().setRoiID(mask->getDataID().getRoiID());  
+  residual->getDataID().setRoiID(mask->getDataID().getRoiID());
   residual->initToNans();
 
 
   //// element independent setup
-  
+
   // get this design matrix row
   vnl_vector<double> row = design.getRow(dat->getDataID().getTimePoint()-1);
 
   //// include this timepoint for each voxel
   vector<unsigned int> inds = mask->getOnVoxelIndices();
   unsigned int curSolver = 0;
-  for(vector<unsigned int>::iterator it = inds.begin(); it != inds.end(); 
+  for(vector<unsigned int>::iterator it = inds.begin(); it != inds.end();
       it++, curSolver++) {
 
     double y = dat->getElement(*it);
-    // debug
-    //    if(curSolver == 0) {
-    //      cout << "pix: " << dat->getPixel(*it) << endl;
-    //    }
-
     solvers[curSolver]->include(&y,row.data_block(),1.0);
 
     // provide betas only after the number of trends has been passed
@@ -174,9 +181,9 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
       residual->setPixel(*it, solvers[curSolver]->getTotalSquaredError(0));
 
       if(dumpAlgoVars && dat->getDataID().getTimePoint() > 2) {
-        dumpFile 
-            << dat->getDataID().getTimePoint() << " " 
-            << *it << " " 
+        dumpFile
+            << dat->getDataID().getTimePoint() << " "
+            << *it << " "
             << y << " "
             << row[0] << " "
             << residual->getPixel(*it) << " ";
@@ -185,12 +192,12 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
         }
         dumpFile << endl;
       }
-    
-      
+
+
       delete beta;
     }
-    
-  }  
+
+  }
 
   // pass our results out
   for(unsigned int j = 0; j < design.getNumColumns(); j++) {
@@ -200,19 +207,19 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
 
   if(printTiming) {
     tim.stop();
-    cout << "RtIncrementalGLM process at tr " 
+    cout << "RtIncrementalGLM process at tr "
          << dat->getDataID().getTimePoint()
          << " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
   }
 
   if(print) {
-    cout << "RtIncrementalGLM: done at tr " 
+    cout << "RtIncrementalGLM: done at tr "
          << dat->getDataID().getTimePoint() << endl;
   }
 
   if(logOutput) {
     stringstream logs("");
-    logs << "RtIncrementalGLM: done at tr " 
+    logs << "RtIncrementalGLM: done at tr "
          << dat->getDataID().getTimePoint() << endl;
     log(logs);
   }
@@ -220,7 +227,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
   return 0;
 }
 
-// start a logfile 
+// start a logfile
 void RtIncrementalGLM::startDumpAlgoVarsFile() {
   dumpFile << "started at ";
   printNow(dumpFile);
@@ -234,15 +241,5 @@ void RtIncrementalGLM::startDumpAlgoVarsFile() {
     dumpFile << "beta[" << b << "] ";
   }
 
-  dumpFile << "end" << endl;  
+  dumpFile << "end" << endl;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-

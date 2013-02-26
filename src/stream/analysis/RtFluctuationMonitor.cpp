@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtFluctuationMonitor.cpp is the implementation of a class that monitors
- * spontaneous fluctuations in the BOLD signal
+/*=========================================================================
+ *  RtFluctuationMonitor.cpp is the implementation of a class that monitors
+ *  spontaneous fluctuations in the BOLD signal
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-01-16
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtFluctuationMonitor.h"
 #include"RtMRIImage.h"
@@ -59,7 +71,7 @@ void RtFluctuationMonitor::receiveStimTriggered() {
 //   name of the option to process
 //   val  text of the option node
 bool RtFluctuationMonitor::processOption(const string &name, const string &text,
-					 const map<string,string> &attrMap) {
+                                         const map<string,string> &attrMap) {
   // look for known options
   if(name == "triggerStim") {
     return RtConfigVal::convert<bool>(triggerStim,text);
@@ -68,7 +80,7 @@ bool RtFluctuationMonitor::processOption(const string &name, const string &text,
     return RtConfigVal::convert<int>(afterTriggerSkip,text);
   }
   if(name == "numDataPointsForErrEst") {
-    return RtConfigVal::convert<unsigned int>(numDataPointsForErrEst,text);    
+    return RtConfigVal::convert<unsigned int>(numDataPointsForErrEst,text);
   }
 
   return RtIncrementalGLM::processOption(name, text, attrMap);
@@ -77,7 +89,7 @@ bool RtFluctuationMonitor::processOption(const string &name, const string &text,
 // validate the configuration
 bool RtFluctuationMonitor::validateComponentConfig() {
   bool result = true;
-  
+
   return result;
 }
 
@@ -116,15 +128,6 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   }
 
-  // ohinds 2009-02-13
-  // removed functionality
-//  // validate sizes
-//  if(dat->getNumEl() != numData) {
-//    ACE_DEBUG((LM_INFO, "RtFluctuationMonitor::process: new data has wrong number of elements\n"));
-//    cout << "RtFluctuationMonitor::process: new data has wrong number of elements" << endl;
-//    return -1;
-//  }
-
   // allocate a new data image for the estimation
   RtActivation *fluct = new RtActivation(*dat);
 
@@ -137,8 +140,9 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   //// element independent setup
 
+  // check for out of error est region
   bool dontInclude = false;
-  if(numTimepoints > numDataPointsForErrEst) { // check for out of error est region
+  if(numTimepoints > numDataPointsForErrEst) {
     dontInclude = true;
   }
   else { // check the time since triggers
@@ -153,13 +157,8 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 
   // increment the number of included points
   if(!dontInclude) {
-    numDataInErrSum++;      
-  }  
-  
-  // set threshold
-//  if(numTimepoints > numTrends+1) {
-//    fluct->setThreshold(getTStatThreshold(1));
-//  }
+    numDataInErrSum++;
+  }
 
   if(isTriggered && numImagesSinceTrigger++ >= afterTriggerSkip) {
     isTriggered = false;
@@ -194,17 +193,17 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
     fluct->setPixel(i, err/stdDev);
 
     if(dumpAlgoVars && numTimepoints > 2) {
-      dumpFile 
-	<< numTimepoints << " " 
-	<< i << " " 
-	<< y << " "
-	<< err << " "
-	<< stdDev << " "
-	<< fluct->getPixel(i) << " "
-	<< isTriggered << " "
-	<< dontInclude;
+      dumpFile
+          << numTimepoints << " "
+          << i << " "
+          << y << " "
+          << err << " "
+          << stdDev << " "
+          << fluct->getPixel(i) << " "
+          << isTriggered << " "
+          << dontInclude;
       for(unsigned int b = 0; b < row.size(); b++) {
-	dumpFile << beta[b] << " ";
+        dumpFile << beta[b] << " ";
       }
       dumpFile << endl;
     }
@@ -218,33 +217,23 @@ int RtFluctuationMonitor::process(ACE_Message_Block *mb) {
 }
 
 
-// start a logfile 
+// start a logfile
 void RtFluctuationMonitor::startDumpAlgoVarsFile() {
   dumpFile << "started at ";
   printNow(dumpFile);
   dumpFile << endl
-	   << "time_point "
-	   << "voxel_index "
-	   << "voxel_intensity "
-	   << "activation_signal "
-	   << "std_dev "
-	   << "fluctuation "
-	   << "trigerred "
-	   << "skipping ";
+           << "time_point "
+           << "voxel_index "
+           << "voxel_intensity "
+           << "activation_signal "
+           << "std_dev "
+           << "fluctuation "
+           << "trigerred "
+           << "skipping ";
   for(unsigned int b = 0; b < design.getNumColumns(); b++) {
     string bstr;
     RtConfigVal::convertToString<int>(bstr,b);
     dumpFile << string("beta") + bstr + " ";
   }
-  dumpFile << "end" << endl;  
+  dumpFile << "end" << endl;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-

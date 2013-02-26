@@ -1,4 +1,3 @@
-// Oliver Hinds <ohinds@mit.edu> 2008-03-21
 // threshold a nifti file
 
 #include<nifti1_io.h>

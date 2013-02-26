@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtDiff.h is the header for a class that computes the difference
- * between two images
+/*=========================================================================
+ *  RtDiff.h is the header for a class that computes the difference
+ *  between two images
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-09-05
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtDiff.h"
 
@@ -42,20 +54,19 @@ int RtDiff::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  if(last == NULL || last->getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
+  if(last == NULL
+     || last->getDataID().getSeriesNum() != img->getDataID().getSeriesNum()) {
     ACE_DEBUG((LM_DEBUG, "differencing found first image\n"));
 
     last = img;
     return 0;
   }
-  
-//  ACE_DEBUG((LM_DEBUG, "differencing images %d and %d\n", 
-//	     img->getAcquisitionNum(), last->getAcquisitionNum()));
-  
+
   // validate sizes
   if(img->getNumPix() != last->getNumPix()) {
-    ACE_DEBUG((LM_INFO, "RtDiff:process: last image is different size than this one\n"));
-    return -1;    
+    ACE_DEBUG((LM_INFO,
+               "RtDiff:process: last image is different size than this one\n"));
+    return -1;
   }
 
   // allocate a new data image for the difference
@@ -69,29 +80,8 @@ int RtDiff::process(ACE_Message_Block *mb) {
   for(unsigned int i = 0; i < img->getNumPix(); i++) {
     unsigned short d = absdiff(img->getPixel(i),last->getPixel(i));
 
-    diff->setPixel(i, d);    
-  }  
-
-  // set the image id for handling
-  //diff->addToID("voxel-difference");
-
-//  string fn;
-//
-//  fn = "/tmp/voxdiff";
-//  //  fn += img->getAcquisitionNum();
-//  fn += ".dat";
-//  diff->write(fn);
-//  
-//  fn = "/tmp/last";
-//  //  fn += last->getAcquisitionNum();
-//  fn += ".dat";
-//  last->write(fn);
-//  
-//  fn = "/tmp/img";
-//  //  fn += img->getAcquisitionNum();
-//  fn += ".dat";
-//  img->write(fn);
-  
+    diff->setPixel(i, d);
+  }
 
   // store this as last image
   last = img;
@@ -100,15 +90,3 @@ int RtDiff::process(ACE_Message_Block *mb) {
 
   return 0;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

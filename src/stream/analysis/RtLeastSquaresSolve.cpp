@@ -1,9 +1,21 @@
-/******************************************************************************
- * c++ adaptation for gentleman's least squares computation
+/*=========================================================================
+ *  c++ adaptation for gentleman's least squares computation
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-03-31
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtLeastSquaresSolve.h"
 #include"debug_levels.h"
@@ -29,7 +41,7 @@ RtLeastSquaresSolve::RtLeastSquaresSolve(unsigned int _numCols) {
 // with the number of columns in the design and the number of
 // observations at each time
 RtLeastSquaresSolve::RtLeastSquaresSolve(unsigned int _numCols,
-					 unsigned int _numMeas) {
+                                         unsigned int _numMeas) {
   numCols = _numCols;
   numMeas = _numMeas;
   init();
@@ -100,8 +112,8 @@ bool RtLeastSquaresSolve::include(double *yelems, double *Xrow, double weight) {
     for(unsigned int j = 0; j < numCols; j++) {
       /*     Skip unnecessary transformations.  Test on exact zeros must */
       /*     be used or stability can be destroyed. */
-      if(weight == 0.0 || xrow[j] == 0.0) { // yes, i know this is stupid, thank you
-	continue;
+      if(weight == 0.0 || xrow[j] == 0.0) {
+        continue;
       }
       xi = xrow[j];
       di = d[i][j];
@@ -111,12 +123,12 @@ bool RtLeastSquaresSolve::include(double *yelems, double *Xrow, double weight) {
       weight = cbar * weight;
       d[i][j] = dpi;
       if(j != numCols-1) {
-	nextr = j*(numCols + numCols - (j+1)) / 2;
-	for(unsigned int k=j+1; k < numCols; k++, nextr++) {
-	  xk = xrow[k];
-	  xrow[k] = xk - xi * rbar[i][nextr];
-	  rbar[i][nextr] = cbar * rbar[i][nextr] + sbar * xk;
-	}
+        nextr = j*(numCols + numCols - (j+1)) / 2;
+        for(unsigned int k=j+1; k < numCols; k++, nextr++) {
+          xk = xrow[k];
+          xrow[k] = xk - xi * rbar[i][nextr];
+          rbar[i][nextr] = cbar * rbar[i][nextr] + sbar * xk;
+        }
       }
 
       xk = y;
@@ -126,20 +138,8 @@ bool RtLeastSquaresSolve::include(double *yelems, double *Xrow, double weight) {
 
     sserr[i] += weight * y * y;
 
-//    if(DEBUG_LEVEL & TEMP) {
-//      cerr << "sserr is " << sserr[i] << endl;
-//    }
-
     delete xrow;
   }
-
-//  cout << thetabar[0][0] << " "
-//       << thetabar[0][1] << " "
-//       << thetabar[0][2] << " "
-//       << rbar[0][0] << " "
-//       << rbar[0][1] << " "
-//       << rbar[0][2] << " " << endl;
-
   return true;
 }
 

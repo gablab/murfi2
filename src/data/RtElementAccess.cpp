@@ -1,17 +1,30 @@
-/******************************************************************************
- * RtElementAccess.cpp defines a class that can retreive and set elements in
- * RtDataImages of double or short template type
+/*=========================================================================
+ *  RtElementAccess.cpp defines a class that can retreive and set elements in
+ *  RtDataImages of double or short template type
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-02-16 
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtElementAccess.h"
 
 
 // setup to access elements of this image
-RtElementAccess::RtElementAccess(RtData *_data) : data(_data), 
-						  mask(NULL) {
+RtElementAccess::RtElementAccess(RtData *_data)
+  : data(_data),
+    mask(NULL) {
   if(data == NULL || data->getElementType() == RT_UNKNOWN_TYPE) { // cant
     return;
   }
@@ -29,19 +42,18 @@ RtElementAccess::RtElementAccess(RtData *_data) : data(_data),
     default:
       return;
   }
-  
 }
 
 // setup to access elements of this image
-RtElementAccess::RtElementAccess(RtData *_data, RtMaskImage *_mask = NULL) 
-  : data(_data), mask(_mask) { }
+RtElementAccess::RtElementAccess(RtData *_data, RtMaskImage *_mask = NULL)
+    : data(_data), mask(_mask) { }
 
 // destructor
 RtElementAccess::~RtElementAccess() {
 
 }
 
-// get an element (double) 
+// get an element (double)
 double RtElementAccess::getDoubleElement(unsigned int index) {
   // get based on type
   switch(data->getElementType()) {
@@ -54,17 +66,17 @@ double RtElementAccess::getDoubleElement(unsigned int index) {
       break;
 
     default:
-        return numeric_limits<double>::quiet_NaN();
+      return numeric_limits<double>::quiet_NaN();
   }
 }
 
-// get an element (short) 
+// get an element (short)
 short RtElementAccess::getShortElement(unsigned int index) {
   // get based on type
   switch(data->getElementType()) {
     case RT_DOUBLE_TYPE:
       return static_cast<short>(
-           rint(static_cast<RtDataImage<double>*>(data)->getElement(index)));
+          rint(static_cast<RtDataImage<double>*>(data)->getElement(index)));
       break;
 
     case RT_SHORT_TYPE:
@@ -72,7 +84,7 @@ short RtElementAccess::getShortElement(unsigned int index) {
       break;
 
     default:
-        return numeric_limits<short>::quiet_NaN();
+      return numeric_limits<short>::quiet_NaN();
   }
 }
 
@@ -85,8 +97,8 @@ void RtElementAccess::setElement(unsigned int index, double val) {
       break;
 
     case RT_SHORT_TYPE:
-      return static_cast<RtDataImage<short>*>(data)->setElement(index, 
-					     static_cast<short>(rint(val)));
+      return static_cast<RtDataImage<short>*>(data)->setElement(
+          index, static_cast<short>(rint(val)));
       break;
 
     default:
@@ -108,7 +120,7 @@ void RtElementAccess::setElement(unsigned int index, short val) {
 
     default:
       break;
-  }  
+  }
 }
 
 // get the element indices (from mask if there is one)
@@ -116,10 +128,10 @@ vector<unsigned int> RtElementAccess::getElementIndices() {
   if(mask == NULL) {
     return elementIndices;
   }
-  
+
   return mask->getOnVoxelIndices();
 }
-  
+
 // build the element indices for a particular datatype by finding
 // non-NaN and non-infinity entries
 template<class T>
@@ -135,14 +147,3 @@ void RtElementAccess::buildElementIndices() {
     }
   }
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

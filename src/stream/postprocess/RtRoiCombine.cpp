@@ -1,35 +1,47 @@
-/******************************************************************************
- * RtRoiCombine.cpp is a base class for methods of transforming roi
- * activations into feedback
+/*=========================================================================
+ *  RtRoiCombine.cpp is a base class for methods of transforming roi
+ *  activations into feedback
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-09-05
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include "RtRoiCombine.h"
 #include "RtDataIDs.h"
 #include "RtElementAccess.h"
-#include <math.h> 
+#include <math.h>
 
 string RtRoiCombine::moduleString(ID_ROICOMBINE);
 
 // default constructor
 RtRoiCombine::RtRoiCombine() : RtStreamComponent(),
-			       method(RT_ROI_UNKNOWN),
-			       weightsModuleID(ID_INCREMENTALGLM),
-			       weightsDataName(NAME_RESIDUAL_MSE) { 
+                               method(RT_ROI_UNKNOWN),
+                               weightsModuleID(ID_INCREMENTALGLM),
+                               weightsDataName(NAME_RESIDUAL_MSE) {
   componentID = moduleString;
-}
+                               }
 
 // destructor
 RtRoiCombine::~RtRoiCombine() {}
 
 // process an option
-//  in 
+//  in
 //   name of the option to process
 //   val  text of the option node
 bool RtRoiCombine::processOption(const string &name, const string &text,
-				    const map<string,string> &attrMap) {
+                                 const map<string,string> &attrMap) {
   if(name == "method") {
     if(text == "mean") {
       method = RT_ROI_MEAN;
@@ -63,12 +75,12 @@ bool RtRoiCombine::processOption(const string &name, const string &text,
   }
 
   return RtStreamComponent::processOption(name, text, attrMap);
-}  
+}
 
 // validate the configuration
 bool RtRoiCombine::validateComponentConfig() {
   bool result = true;
-  
+
   if(method == RT_ROI_UNKNOWN) {
     cerr << "ERROR: roi combination method must be set" << endl;
     result = false;
@@ -83,20 +95,19 @@ int RtRoiCombine::process(ACE_Message_Block *mb) {
 
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
-//  // just get for the ID
-//  RtMRIImage *img = (RtMRIImage*)msg->getCurrentData();
-//
   // find the data with the right ID
-  RtData *dat = msg->getData(inputModuleID, 
-			     inputDataName,
-			     inputRoiID);
+  RtData *dat = msg->getData(inputModuleID,
+                             inputDataName,
+                             inputRoiID);
 
   if(dat == NULL) {
-    cerr << "RtRoiCombine::process: could not find the data for roi combination" << endl;
+    cerr << "RtRoiCombine::process: could not find the data for roi combination"
+         << endl;
 
     if(logOutput) {
       stringstream logs("");
-      logs << "RtRoiCombine::process: could not find the data for roi combination" << endl;
+      logs << "RtRoiCombine::process: could not find data for roi combination"
+           << endl;
       log(logs);
     }
 
@@ -109,8 +120,8 @@ int RtRoiCombine::process(ACE_Message_Block *mb) {
 
     if(logOutput) {
       stringstream logs("");
-      logs << "RtRoiCombine::process: could not find the mask for roi combination at tr " 
-	   << dat->getDataID().getTimePoint() << endl;
+      logs << "RtRoiCombine::process: could not find the mask for roi "
+           << "combination at tr " << dat->getDataID().getTimePoint() << endl;
       log(logs);
     }
 
@@ -131,20 +142,22 @@ int RtRoiCombine::process(ACE_Message_Block *mb) {
       result = getMedian(dat, mask);
       break;
     case RT_ROI_WEIGHTEDAVE:
-      weightedAve = (RtActivation*) msg->getData(weightsModuleID, 
-						 weightsDataName,
-						 inputRoiID);
+      weightedAve = (RtActivation*) msg->getData(weightsModuleID,
+                                                 weightsDataName,
+                                                 inputRoiID);
 
       if(weightedAve == NULL) {
-	cerr << "RtRoiCombine::process: could not find the voxel weights for weighted average roi combination" << endl;
-	if(logOutput) {
-	  stringstream logs("");
-	  logs << "RtRoiCombine::process: could not find the voxel weights for weighted average roi combination at tr "
-	       << dat->getDataID().getTimePoint() << endl;
-	  log(logs);
-	}
+        cerr << "RtRoiCombine::process: could not find the voxel weights for "
+             << "weighted average roi combination" << endl;
+        if(logOutput) {
+          stringstream logs("");
+          logs << "RtRoiCombine::process: could not find the voxel weights for "
+               << "weighted average roi combination at tr "
+               << dat->getDataID().getTimePoint() << endl;
+          log(logs);
+        }
 
-	return 0;
+        return 0;
       }
 
       result = getWeightedAve(dat, weightedAve, mask);
@@ -165,16 +178,16 @@ int RtRoiCombine::process(ACE_Message_Block *mb) {
   setResult(msg, result);
 
   if(print) {
-    cout << "RtRoiCombine: " << mask->getDataID().getRoiID() 
-	 << " at tr " << dat->getDataID().getTimePoint()
-	 << " result is: " << result->getPixel(0) << endl;
+    cout << "RtRoiCombine: " << mask->getDataID().getRoiID()
+         << " at tr " << dat->getDataID().getTimePoint()
+         << " result is: " << result->getPixel(0) << endl;
   }
 
   if(logOutput) {
     stringstream logs("");
-    logs << "RtRoiCombine: " << mask->getDataID().getRoiID() 
-	 << " at tr " << dat->getDataID().getTimePoint()
-	 << " result is: " << result->getPixel(0) << endl;
+    logs << "RtRoiCombine: " << mask->getDataID().getRoiID()
+         << " at tr " << dat->getDataID().getTimePoint()
+         << " result is: " << result->getPixel(0) << endl;
     log(logs);
   }
 
@@ -183,18 +196,18 @@ int RtRoiCombine::process(ACE_Message_Block *mb) {
 
 // compute the mean over the roi
 RtActivation *RtRoiCombine::getMean(RtData *dat, RtMaskImage *mask) {
-  
+
   RtActivation *result = new RtActivation(1);
   result->getDataID().setFromInputData(*dat,*this);
   result->getDataID().setDataName(NAME_ROIMEAN);
   result->getDataID().setRoiID(mask->getDataID().getRoiID());
 
-   
+
   // compute the sum
   double sum = 0;
   RtElementAccess ac(dat, mask);
   vector<unsigned int> indices = ac.getElementIndices();
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
@@ -212,18 +225,18 @@ RtActivation *RtRoiCombine::getMean(RtData *dat, RtMaskImage *mask) {
 
 // compute the variance over the roi
 RtActivation *RtRoiCombine::getVariance(RtData *dat, RtMaskImage *mask) {
-  
+
   RtActivation *result = new RtActivation(1);
   result->getDataID().setFromInputData(*dat,*this);
   result->getDataID().setDataName(NAME_ROIVAR);
   result->getDataID().setRoiID(mask->getDataID().getRoiID());
 
-   
+
   // compute the mean
   double mean = 0;
   RtElementAccess ac(dat, mask);
   vector<unsigned int> indices = ac.getElementIndices();
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
@@ -237,7 +250,7 @@ RtActivation *RtRoiCombine::getVariance(RtData *dat, RtMaskImage *mask) {
 
   // go back through to compute variance
   double sqSum = 0;
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
@@ -256,7 +269,7 @@ RtActivation *RtRoiCombine::getVariance(RtData *dat, RtMaskImage *mask) {
 
 // compute the median over the roi
 RtActivation *RtRoiCombine::getMedian(RtData *dat, RtMaskImage *mask) {
-  
+
   RtActivation *result = new RtActivation(1);
   result->getDataID().setFromInputData(*dat,*this);
   result->getDataID().setDataName(NAME_ROIMEDIAN);
@@ -266,7 +279,7 @@ RtActivation *RtRoiCombine::getMedian(RtData *dat, RtMaskImage *mask) {
   vector<double> roiVals;
   RtElementAccess ac(dat, mask);
   vector<unsigned int> indices = ac.getElementIndices();
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
@@ -282,9 +295,9 @@ RtActivation *RtRoiCombine::getMedian(RtData *dat, RtMaskImage *mask) {
   if(numPix != 0) {
     sort(roiVals.begin(), roiVals.end());
     medVal = (numPix%2 == 0)
-      ? (roiVals[numPix/2] + roiVals[numPix/2-1]) / 2 : roiVals[numPix/2]; 
+        ? (roiVals[numPix/2] + roiVals[numPix/2-1]) / 2 : roiVals[numPix/2];
   }
-   
+
   result->setPixel(0,medVal);
 
   return result;
@@ -293,8 +306,8 @@ RtActivation *RtRoiCombine::getMedian(RtData *dat, RtMaskImage *mask) {
 
 // compute the weighted average over the roi
 RtActivation *RtRoiCombine::getWeightedAve(RtData *dat, RtData *weights,
-					   RtMaskImage *mask) {
-  
+                                           RtMaskImage *mask) {
+
   RtActivation *result = new RtActivation(1);
   result->getDataID().setFromInputData(*dat,*this);
   result->getDataID().setDataName(NAME_ROIWEIGHTEDAVE);
@@ -305,7 +318,7 @@ RtActivation *RtRoiCombine::getWeightedAve(RtData *dat, RtData *weights,
   RtElementAccess ac(dat, mask);
   RtElementAccess wac(weights, mask);
   vector<unsigned int> indices = ac.getElementIndices();
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
@@ -318,8 +331,8 @@ RtActivation *RtRoiCombine::getWeightedAve(RtData *dat, RtData *weights,
       summedWeights += weight;
     }
   }
-   
-  if(fabs(weightedSum) < std::numeric_limits<double>::epsilon() 
+
+  if(fabs(weightedSum) < std::numeric_limits<double>::epsilon()
      || fabs(summedWeights) < std::numeric_limits<double>::epsilon()) {
     result->setPixel(0,0.0);
   }
@@ -331,7 +344,7 @@ RtActivation *RtRoiCombine::getWeightedAve(RtData *dat, RtData *weights,
 
 // compute the sum over the roi
 RtActivation *RtRoiCombine::getSum(RtData *dat, RtMaskImage *mask) {
-  
+
   RtActivation *result = new RtActivation(1);
   result->getDataID().setFromInputData(*dat,*this);
   result->getDataID().setDataName(NAME_ROISUM);
@@ -340,7 +353,7 @@ RtActivation *RtRoiCombine::getSum(RtData *dat, RtMaskImage *mask) {
   double sum = 0;
   RtElementAccess ac(dat, mask);
   vector<unsigned int> indices = ac.getElementIndices();
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
@@ -350,7 +363,7 @@ RtActivation *RtRoiCombine::getSum(RtData *dat, RtMaskImage *mask) {
       sum += pix;
     }
   }
-   
+
   result->setPixel(0,sum);
 
   return result;
@@ -358,7 +371,7 @@ RtActivation *RtRoiCombine::getSum(RtData *dat, RtMaskImage *mask) {
 
 // compute the max over the roi
 RtActivation *RtRoiCombine::getMax(RtData *dat, RtMaskImage *mask) {
-  
+
   RtActivation *result = new RtActivation(1);
   result->getDataID().setFromInputData(*dat,*this);
   result->getDataID().setDataName(NAME_ROIMAX);
@@ -367,18 +380,18 @@ RtActivation *RtRoiCombine::getMax(RtData *dat, RtMaskImage *mask) {
   double max = numeric_limits<double>::min();
   RtElementAccess ac(dat, mask);
   vector<unsigned int> indices = ac.getElementIndices();
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix) 
+    if(!isnan(pix)
        && !isinf(pix)
        && pix < max
        ) {
       max = pix;
     }
   }
-   
+
   result->setPixel(0,max);
 
   return result;
@@ -386,7 +399,7 @@ RtActivation *RtRoiCombine::getMax(RtData *dat, RtMaskImage *mask) {
 
 // compute the min over the roi
 RtActivation *RtRoiCombine::getMin(RtData *dat, RtMaskImage *mask) {
-  
+
   RtActivation *result = new RtActivation(1);
   result->getDataID().setFromInputData(*dat,*this);
   result->getDataID().setDataName(NAME_ROIMIN);
@@ -395,30 +408,19 @@ RtActivation *RtRoiCombine::getMin(RtData *dat, RtMaskImage *mask) {
   double min = numeric_limits<double>::max();
   RtElementAccess ac(dat, mask);
   vector<unsigned int> indices = ac.getElementIndices();
-  for(vector<unsigned int>::iterator i = indices.begin(); 
+  for(vector<unsigned int>::iterator i = indices.begin();
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix) 
+    if(!isnan(pix)
        && !isinf(pix)
        && pix < min
        ) {
       min = pix;
     }
   }
-   
+
   result->setPixel(0,min);
 
   return result;
 }
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

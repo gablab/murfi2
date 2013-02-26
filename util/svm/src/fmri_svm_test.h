@@ -1,6 +1,4 @@
 // classify fmri data using a model trained using svm-light
-//
-// Oliver Hinds <ohinds@mit.edu> 2009-07-15
 
 #ifndef FMRI_SVMLIGHT_TEST
 #define FMRI_SVMLIGHT_TEST

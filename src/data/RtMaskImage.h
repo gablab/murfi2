@@ -1,9 +1,21 @@
-/******************************************************************************
- * RtMaskImage.h declares a class for an MR image
+/*=========================================================================
+ *  RtMaskImage.h declares a class for an MR image
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-10-08
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTMASKIMAGE_H
 #define RTMASKIMAGE_H
@@ -19,14 +31,14 @@ class RtActivation;
 
 // class declaration
 class RtMaskImage : public RtDataImage<short> {
-public:
+ public:
 
   const static unsigned int MAGIC_NUMBER = 0x5084;
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtMaskImage(); 
+  RtMaskImage();
 
   // destructor
   virtual ~RtMaskImage();
@@ -37,14 +49,14 @@ public:
   // construct by thresholding mean intensity of an MRI image
   // in:
   //  img:       image to build mask from
-  //  threshold: mean intensity multiplier to threshold at (set to 
+  //  threshold: mean intensity multiplier to threshold at (set to
   //             zero to leave mask allocated but uninitialized)
   RtMaskImage(RtMRIImage &img, double threshold = 0.0);
 
   // construct by thresholding mean intensity of an activation image
   // in:
   //  img:       image to build mask from
-  //  threshold: mean intensity multiplier to threshold at (set to 
+  //  threshold: mean intensity multiplier to threshold at (set to
   //             zero to leave mask allocated but uninitialized)
   RtMaskImage(RtActivation &img, double threshold = 0.0);
 
@@ -60,7 +72,8 @@ public:
   // in:
   //  img:    image to build mask from
   //  thresh: mean intensity multiplier to threshold at
-  unsigned int initByMeanIntensityThreshold(RtActivation &img, double threshold);
+  unsigned int initByMeanIntensityThreshold(RtActivation &img,
+                                            double threshold);
 
   // set the info based on an activation's image info
   // NOTE: will change mask geometry to match the img
@@ -74,7 +87,7 @@ public:
   //  img:    image to build mask from
   void setInfo(RtMRIImage &img);
 
-  // sets all voxels 
+  // sets all voxels
   // in:
   //  val: value to set all voxels to
   void setAll(short val);
@@ -95,7 +108,7 @@ public:
   //   success or failure
   bool read(const string &_filename);
 
-protected:
+ protected:
 
   // "on" voxel indices
   vector<unsigned int> onIndices;
@@ -104,14 +117,3 @@ protected:
 
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

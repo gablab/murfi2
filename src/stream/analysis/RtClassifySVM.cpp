@@ -1,9 +1,22 @@
-/******************************************************************************
- * RtClassifySVM.cpp is the implementation of a class to classify individual
- * TRs based on an already trained svm model
+/*=========================================================================
+ *  RtClassifySVM.cpp is the implementation of a class to classify individual
+ *  TRs based on an already trained svm model
  *
- * Oliver Hinds <ohinds@mit.edu> 2009-08-24
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include "RtDesignMatrix.h"
 
@@ -38,16 +51,10 @@ RtClassifySVM::~RtClassifySVM() {
   }
 }
 
-// initialize the estimation algorithm for a particular image size
-//
-//void RtClassifySVM::initEstimation(RtMRIImage &dat, RtMaskImage *mask) {
-//
-//}
-
 // process an option in name of the option to process val text of the option
 // node
-bool RtClassifySVM::processOption(const string &name, const string &text, 
-				  const map<string, string> &attrMap) {
+bool RtClassifySVM::processOption(const string &name, const string &text,
+                                  const map<string, string> &attrMap) {
 
   // look for known options
   if(name == "svmModelFile") {
@@ -64,7 +71,6 @@ bool RtClassifySVM::processOption(const string &name, const string &text,
 }
 
 // validate the configuration
-
 bool RtClassifySVM::validateComponentConfig() {
   bool result = true;
 
@@ -72,7 +78,7 @@ bool RtClassifySVM::validateComponentConfig() {
     cerr << "RtClassifySVM::process: svmModelFile is required" << endl;
     result = false;
   }
-  else { // read model 
+  else { // read model
     cout << "reading svm model file...";
     if(!readFmriModel(svmModelFile, svmParms)) {
       cout << "error reading model file" << endl;
@@ -86,8 +92,8 @@ bool RtClassifySVM::validateComponentConfig() {
     svmResultsStream.open(svmResultsFile.c_str());
     if(svmResultsStream.fail()) {
       cerr << "error opening result file " << svmResultsFile << " for writing"
-	   << endl;
-    }    
+           << endl;
+    }
   }
 
   return result;
@@ -106,9 +112,9 @@ int RtClassifySVM::process(ACE_Message_Block *mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
   // get the current image to operate on
-  RtActivation *dat = (RtActivation*) msg->getData(inputModuleID, 
-						   inputDataName,
-						   inputRoiID);
+  RtActivation *dat = (RtActivation*) msg->getData(inputModuleID,
+                                                   inputDataName,
+                                                   inputRoiID);
 
   // check for validity of data
   if (dat == NULL) {
@@ -132,19 +138,13 @@ int RtClassifySVM::process(ACE_Message_Block *mb) {
 
     if(logOutput) {
       stringstream logs("");
-      logs << "RtClassifySVM::process: mask is NULL at tr " 
-	   << dat->getDataID().getTimePoint() << endl;
+      logs << "RtClassifySVM::process: mask is NULL at tr "
+           << dat->getDataID().getTimePoint() << endl;
       log(logs);
     }
 
     return 0;
   }
-
-  // initialize the computation if necessary
-//  if (needsInit) {
-//    initEstimation(*dat, mask);
-//  }
-
 
   // allocate data images for the classification
   RtActivation *bestClass = new RtActivation(1);
@@ -163,14 +163,14 @@ int RtClassifySVM::process(ACE_Message_Block *mb) {
 
   // assign mask voxels to pattern
   PATTERN x = createPattern<double>(1,mask->getNumberOfOnVoxels(),
-				    mask->getNumEl(),
-				    dat->getDataConst(), 
-				    mask->getDataConst());
+                                    mask->getNumEl(),
+                                    dat->getDataConst(),
+                                    mask->getDataConst());
 
 
   // classify the pattern
-  LABEL l = classify_struct_example(x, &svmParms.model, &svmParms.strctParm);  
-  
+  LABEL l = classify_struct_example(x, &svmParms.model, &svmParms.strctParm);
+
   // store the classification in our format
   bestClass->setPixel(0, l.cls);
 
@@ -185,14 +185,14 @@ int RtClassifySVM::process(ACE_Message_Block *mb) {
 
   if(printTiming) {
     tim.stop();
-    cout << "RtClassifySVM process at tr " 
-	 << dat->getDataID().getTimePoint()
-	 << " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
+    cout << "RtClassifySVM process at tr "
+         << dat->getDataID().getTimePoint()
+         << " elapsed time: " << tim.elapsed_time()*1000 << "ms"  << endl;
   }
 
   if(print) {
-    cout << "RtClassifySVM: done at tr " 
-	 << dat->getDataID().getTimePoint() << " class " << l.cls << ":";
+    cout << "RtClassifySVM: done at tr "
+         << dat->getDataID().getTimePoint() << " class " << l.cls << ":";
 
     for(int i = 0; i < svmParms.strctParm.num_classes; i++) {
       cout << " " << l.scores[i];
@@ -202,30 +202,20 @@ int RtClassifySVM::process(ACE_Message_Block *mb) {
 
   if(logOutput) {
     stringstream logs("");
-    logs << "RtClassifySVM: done at tr " 
-	 << dat->getDataID().getTimePoint() << " class " << l.cls << endl;
+    logs << "RtClassifySVM: done at tr "
+         << dat->getDataID().getTimePoint() << " class " << l.cls << endl;
     log(logs);
   }
 
   if(svmResultsStream.is_open()) {
-    svmResultsStream 
-      << dat->getDataID().getTimePoint() << "\t"
-      << l.cls;
-      for(int i = 0; i < svmParms.strctParm.num_classes; i++) {
-	svmResultsStream << "\t" << l.scores[i];
-      }
-      svmResultsStream << endl;
+    svmResultsStream
+        << dat->getDataID().getTimePoint() << "\t"
+        << l.cls;
+    for(int i = 0; i < svmParms.strctParm.num_classes; i++) {
+      svmResultsStream << "\t" << l.scores[i];
+    }
+    svmResultsStream << endl;
   }
 
   return 0;
 }
-
-
-/*****************************************************************************
- * $Source:  $
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/

@@ -1,9 +1,21 @@
-/******************************************************************************
- * RtConfigVar.h is for a single configuration variable
+/*=========================================================================
+ *  RtConfigVar.h is for a single configuration variable
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-14 
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTCONFIGVAL_H
 #define RTCONFIGVAL_H
@@ -22,13 +34,13 @@ using namespace boost::filesystem;
 
 // a single configuration value
 class RtConfigVal {
-  
-public:
+
+ public:
 
   //*** constructor ***/
 
   // leave blank
-  RtConfigVal() : _set(false) { 
+  RtConfigVal() : _set(false) {
   }
 
   // assign it straight off
@@ -56,9 +68,9 @@ public:
   // logical not
   const bool operator!() {
     if(
-       val == "0"
-       || val == "false"
-       || val == ""
+        val == "0"
+        || val == "false"
+        || val == ""
        ) {
       return true;
     }
@@ -92,39 +104,39 @@ public:
     return config.val;
   }
 
-  // comparison 
+  // comparison
   const bool operator==(const string s) {
     return val == s;
   }
 
   const bool operator==(const double d) {
     double dval;
-    return convert<double>(dval,val) 
-      && fabs(d - dval) < dTol;
+    return convert<double>(dval,val)
+        && fabs(d - dval) < dTol;
   }
 
   const bool operator==(const float f) {
     float fval;
-    return convert<float>(fval,val) 
-      && fabsf(f - fval) < fTol;
+    return convert<float>(fval,val)
+        && fabsf(f - fval) < fTol;
   }
 
   const bool operator==(const long l) {
     long lval;
-    return convert<long>(lval,val) 
-      && l == lval;
+    return convert<long>(lval,val)
+        && l == lval;
   }
 
   const bool operator==(const int i) {
     int ival;
-    return convert<int>(ival,val) 
-      && i == ival;
+    return convert<int>(ival,val)
+        && i == ival;
   }
 
   const bool operator==(const bool b) {
     bool bval;
-    bool ret = convert(bval,val) 
-      && bval == b;
+    bool ret = convert(bval,val)
+        && bval == b;
     return ret;
   }
 
@@ -158,12 +170,8 @@ public:
   }
 
   // for conversion of string types to bool
-  inline static bool convert(bool &b, const string& s) {    
-    if(
-       s == "0"
-       || s == "false"
-       || s == ""
-       ) {
+  inline static bool convert(bool &b, const string& s) {
+    if(s == "0" || s == "false" || s == "") {
       b = false;
     }
     else {
@@ -173,15 +181,10 @@ public:
     return true;
   }
 
-private:
+ private:
 
   string val;
   bool _set;
-
-  // tolerances for double and float comparison
-  //static const float fTol = 0.00000000001f;
-  //static const double dTol = 0.00000000001;
-
 };
 
 #endif

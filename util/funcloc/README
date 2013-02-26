@@ -1,9 +1,7 @@
 # README for the functional localizer utility for the murfi realtime
-# fMRI system 
-#
-# Oliver Hinds <ohinds@mit.edu> 2010-07-14
+# fMRI system
 
-The script funcloc.sh will produce mask files for murfi.  
+The script funcloc.sh will produce mask files for murfi.
 
 Before using funcloc.sh, an fsf file must be created using Feat.
 

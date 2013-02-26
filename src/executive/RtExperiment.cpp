@@ -1,9 +1,21 @@
-/******************************************************************************
- * definition of a class that holds information about the loaded experiment 
+/*=========================================================================
+ *  definition of a class that holds information about the loaded experiment
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-09-02 
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtExperiment.h"
 
@@ -11,22 +23,9 @@
 #include"RtConfigFmriExperiment.h"
 #include"RtConfigFmriRun.h"
 
-// app includes
-#ifdef USE_APP
-  #include"RtQtWindow.h"
-#endif
-
-// frontend gui includes
-#ifdef USE_FRONTEND
- #include"FrApplication.h"
- #include"FrMainWindow.h"
- #include"FrMainDocument.h"
- #include"FrMainController.h"
-#endif
-
 // old gui includes
-#ifdef USE_OLDFRONTEND
-    #include"RtDisplayImage.h"
+#ifdef USE_FRONTEND
+#include"RtDisplayImage.h"
 #endif
 
 // site specific defines (siteID, etc)
@@ -70,7 +69,7 @@ static RtConductor *conductor = NULL;
 
 // raw data identifiers that we've seen (need for knowing which data
 // streams are novel)
-static map<string, unsigned int> uids;  
+static map<string, unsigned int> uids;
 
 // number of unique input data series we've seen
 static unsigned int numExistingSeries;
@@ -96,16 +95,16 @@ unsigned int getExperimentStudyID() {
 }
 
 // get the unique ID number for this image series UID
-// checks if this uid exists 
+// checks if this uid exists
 //  if so returns its index+1
 //  if not adds it to the end and returns the length for the list
 unsigned int getSeriesNumFromUID(char *uid) {
   // serach for the uid
   map<string, unsigned int>::iterator i = uids.find(uid);
-  
+
   unsigned int seriesNum = 0;
 
-  if(i == uids.end()) { // not found 
+  if(i == uids.end()) { // not found
     string s(uid);
     uids[s] = uids.size()+1+numExistingSeries;
     seriesNum = uids.size()+numExistingSeries;
@@ -115,7 +114,8 @@ unsigned int getSeriesNumFromUID(char *uid) {
   }
 
   if(DEBUG_LEVEL & ADVANCED) {
-    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end()) << " series num=" << seriesNum << endl; 
+    cerr << "getsernumfromuid: uid=" << uid << " found=" << (i!=uids.end())
+         << " series num=" << seriesNum << endl;
   }
 
   return seriesNum;
@@ -131,7 +131,7 @@ unsigned int getNextUniqueSeriesNum() {
       max = (*i).first;
     }
   }
-  
+
   // add "A" to the max string
   string s(max + "A");
   uids[s] = uids.size()+1+numExistingSeries;
@@ -157,12 +157,12 @@ double stopComputeTimer() {
   computeTimer.stop();
   return computeTimer.elapsed_time();
 }
-  
+
 // get the current experiment elapsed time in ms
 double getExperimentElapsedTime() {
   return 1000*experimentTimer.elapsed_time();
 }
-  
+
 // get the configuration for this experiment
 RtConfigFmriExperiment &getExperimentConfig() {
   return config;
@@ -178,10 +178,15 @@ RtDataStore &getDataStore() {
   return dataStore;
 }
 
+// get the conductor for this experiment
+RtConductor &getConductor() {
+  return *conductor;
+}
+
 // initialize the experiment (call before the first run is prepared)
 // returns true for success
 bool initExperiment() {
-  
+
   cout << "intializing experiment" << endl;
 
   // set the start time of the experiment
@@ -191,7 +196,7 @@ bool initExperiment() {
   ACE_Date_Time t;
   char str[] = "yyyyhhmmss";
   sprintf(str, "%04ld%02ld%02ld%02ld",
-	  t.year(), t.hour(), t.minute(), t.second());
+          t.year(), t.hour(), t.minute(), t.second());
   RtConfigVal::convert<unsigned int>(studyID,str);
 
   // parse the configuration
@@ -223,14 +228,14 @@ bool initExperiment() {
   }
 
   // count existing series for this experiment
-  cout << "searching for existing series... " << endl;  
+  cout << "searching for existing series... " << endl;
   numExistingSeries = -1;
   path p;
   do {
     numExistingSeries++;
     p.operator=(config.getVolFilename(numExistingSeries+1,1));
   } while(exists(p) && is_regular(p)
-	  && numExistingSeries < TOO_MANY_EXISTING_SERIES);
+          && numExistingSeries < TOO_MANY_EXISTING_SERIES);
   cout << "found " << numExistingSeries << " existing series" << endl;
 
 
@@ -298,7 +303,8 @@ int executeRun(RtConfigFmriRun &conf) {
 
   // make sure only one backend is running at a time
   if(conductor != NULL && conductor->isRunning()) {
-    cerr << "an instance of the backend computation is already running. can't start another" << endl;
+    cerr << "an instance of the backend computation is already running. "
+         << "can't start another" << endl;
     return 1;
   }
   else if(conductor != NULL) {
@@ -333,7 +339,8 @@ int executeRunBlocking(RtConfigFmriRun &conf) {
 
   // make sure only one backend is running at a time
   if(conductor != NULL && conductor->isRunning()) {
-    cerr << "an instance of the backend computation is already running. can't start another" << endl;
+    cerr << "an instance of the backend computation is already running. "
+         << "can't start another" << endl;
     return 1;
   }
   else if(conductor != NULL) {
@@ -376,7 +383,7 @@ bool parseArgs(int argc, char **args) {
   // set up short options
   static const ACE_TCHAR options[] = ACE_TEXT (":f:c:s:h?");
   ACE_Get_Opt cmdOpts(argc, args, options, 1, 0,
-		      ACE_Get_Opt::PERMUTE_ARGS, 1);
+                      ACE_Get_Opt::PERMUTE_ARGS, 1);
 
   // set up long options
   cmdOpts.long_option("conffile",   'f', ACE_Get_Opt::ARG_REQUIRED);
@@ -385,10 +392,6 @@ bool parseArgs(int argc, char **args) {
   cmdOpts.long_option("help",       'h', ACE_Get_Opt::NO_ARG);
   cmdOpts.long_option("help",       '?', ACE_Get_Opt::NO_ARG);
 
-// scopic Alan: for MRI testers
-#ifdef MRI_TEST
-    confFilename = "./test_config.xml";
-#else
   // handle options
   for(int option; (option = cmdOpts ()) != EOF; ) {
     if(DEBUG_LEVEL & MODERATE) {
@@ -397,31 +400,29 @@ bool parseArgs(int argc, char **args) {
 
     switch(option) {
 
-    case 'f':
-    case 'c':
-      confFilename = cmdOpts.opt_arg();
-      break;
+      case 'f':
+      case 'c':
+        confFilename = cmdOpts.opt_arg();
+        break;
 
-    case 's':
-      confXmlStr = cmdOpts.opt_arg();
-      break;
+      case 's':
+        confXmlStr = cmdOpts.opt_arg();
+        break;
 
-    case 'h':
-    case '?':
-      cout << "here" << endl;
-      return false; // automatically prints usage
+      case 'h':
+      case '?':
+        return false; // automatically prints usage
 
-    case ':':
-      cerr << "ERROR: -" << cmdOpts.opt_opt() 
-	   << " requires an argument" << endl;
-      return false;
+      case ':':
+        cerr << "ERROR: -" << cmdOpts.opt_opt()
+             << " requires an argument" << endl;
+        return false;
 
-    default:
-      cerr << "ERROR: unknown command line parameter: " << option << endl;
-      return false;
+      default:
+        cerr << "ERROR: unknown command line parameter: " << option << endl;
+        return false;
     }
   }
-#endif
 
   // parse the xml config (file or string)
   if(confFilename.empty() && confXmlStr.empty()) {
@@ -430,13 +431,13 @@ bool parseArgs(int argc, char **args) {
   }
   else if(DEBUG_LEVEL & BASIC) {
     cout << "config file is: " << confFilename << endl
-	 << "config str is: " << confXmlStr << endl;
+         << "config str is: " << confXmlStr << endl;
   }
 
   return true;
 }
 
-// main entry function 
+// main entry function
 int ACE_TMAIN(int argc, char **args) {
   ACE_TRACE(("ACE_TMAIN"));
 
@@ -448,52 +449,20 @@ int ACE_TMAIN(int argc, char **args) {
 
   // initialize experiment
   if(!initExperiment()) {
-    cerr << "ERROR: experiment initialization failed. check your config" 
-	 << endl;
+    cerr << "ERROR: experiment initialization failed. check your config"
+         << endl;
     return 1;
   }
 
   int result = 0;
 
-  // if the app frontend is being used, give it control
-  if(config.isSet("app:disabled") &&
-     config.get("app:disabled")==false) { 
-
-#ifdef USE_APP
-	RtQtWindow::run(argc, args);
-#else
-    cerr << "ERROR: this build does not support the app frontend" << endl;
-#endif
-  }
   // if the gui frontend is being used, give it control (confused yet?)
-  else if(config.isSet("gui:disabled") &&
-     config.get("gui:disabled")==false) { 
+  if((config.isSet("gui:disabled") &&
+      config.get("gui:disabled")==false) ||
+     (config.isSet("oldgui:disabled") && // "backward" compatibility
+      config.get("oldgui:disabled")==false)) {
 
 #ifdef USE_FRONTEND
-    FrApplication application(argc, args);
-
-    // Create main view and document of app
-    FrMainWindow* mainWindow = new FrMainWindow();
-    FrMainDocument* document = new FrMainDocument();
-
-    // Create main controller.
-    FrMainController controller(mainWindow, document);
-    controller.Initialize();
-
-    int result = 0;
-    if(!application.exec()){
-      result = 1;
-    }
-#else
-    cerr << "ERROR: this build does not support the gui frontend" << endl;
-#endif
-  }
-  else if(config.isSet("oldgui:disabled")
-	  && config.get("oldgui:disabled")==false) { 
-    
-// scopic Alan: old image display was removed from Frontend project on windows
-// ohinds: 2009-05-10 used a makefile flag instead of the win32 define
-#ifdef USE_OLDFRONTEND
     // start a display
     RtDisplayImage dispImg;
     if(!dispImg.open(config)) {
@@ -502,7 +471,7 @@ int ACE_TMAIN(int argc, char **args) {
     }
     result = dispImg.svc();
 #else
-    cerr << "ERROR: this build does not support the old gui frontend" << endl;
+    cerr << "ERROR: this build does not support the gui frontend" << endl;
 #endif
 
   }
@@ -527,12 +496,10 @@ int ACE_TMAIN(int argc, char **args) {
 
   // deinitialize experiment
   if(!deinitExperiment()) {
-    cerr << "ERROR: experiment deinitialization failed." 
-	 << endl;
+    cerr << "ERROR: experiment deinitialization failed."
+         << endl;
     result = 1;
   }
 
   return result;
 }
-
-

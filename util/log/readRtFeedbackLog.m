@@ -6,32 +6,30 @@
 % outdir    an optional argument specifying a directory to write
 %           text files of the resulting sessions to
 % outprefix optional prefix for each of the files writen
-%
-% Oliver Hinds <ohinds@mit.edu> 2008-12-05
 
 function log = readRtFeedbackLog(logfile, outdir)
-  
-  if(exist('outdir','var')) 
+
+  if(exist('outdir','var'))
     writeout = true;
-    if(~exist('outprefix','var')) 
+    if(~exist('outprefix','var'))
       outprefix = '';
     end
   else
     writeout = false;
   end
-  
+
   log = [];
   cur_sess = 0;
-  
+
   fp = fopen(logfile);
   if(fp == -1)
     error(['couldnt open logfile: ' logfile]);
   end
-  
+
   % read the sessions
   while(~feof(fp))
     s = fscanf(fp,'%s',1);
-    
+
     if(strcmp(s,'initialization')) % start of new sess
       cur_sess = cur_sess+1;
       log(cur_sess).names = {};
@@ -45,7 +43,7 @@ function log = readRtFeedbackLog(logfile, outdir)
 	log(cur_sess).names{end+1} = roi;
 	roi_ind = strmatch(roi,log(cur_sess).names);
       end
-      
+
       s = fscanf(fp,'%s',1); % at
       s = fscanf(fp,'%s',1); % tr
       s = fscanf(fp,'%s',1); % tr
@@ -58,17 +56,17 @@ function log = readRtFeedbackLog(logfile, outdir)
 
       s = fscanf(fp,'%s',1); % result
       s = fscanf(fp,'%s',1); % is:
-      
+
       % read the activation
       s = fscanf(fp,'%s',1);
       [act ok] = str2num(s);
       if(~ok)
 	error(['error in parsing log file, i thought activation was ' act]);
       end
-      
-      % store it 
+
+      % store it
       log(cur_sess).act(roi_ind,tr) = act;
-    
+
     end
   end
   fclose(fp);
@@ -84,6 +82,5 @@ function log = readRtFeedbackLog(logfile, outdir)
       end
     end
   end
-  
+
 return
-  

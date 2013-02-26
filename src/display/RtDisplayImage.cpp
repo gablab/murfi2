@@ -1,11 +1,23 @@
-/******************************************************************************
- * RtDisplayImage.cpp defines a class for displaying single images
+/*=========================================================================
+ *  RtDisplayImage.cpp defines a class for displaying single images
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-29
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
-#ifdef USE_OLDFRONTEND
+#ifdef USE_FRONTEND
 
 #include"RtDisplayImage.h"
 #include"RtDataIDs.h"
@@ -17,9 +29,8 @@
 
 #include"ace/Mutex.h"
 
-// scopic alexsid: #define WIN32
 #ifndef RT_DISPLAY_IMAGE_TEXTURE
-#ifdef WIN32 
+#ifdef WIN32
 #define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_2D
 #else
 #ifdef GL_TEXTURE_RECTANGLE_EXT
@@ -31,9 +42,6 @@
 #ifndef GL_TEXTURE_RECTANGLE_EXT
 #define GL_TEXTURE_RECTANGLE_EXT GL_TEXTURE_RECTANGLE_NV
 #endif
-//#else
-//#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
-//#define GL_TEXTURE_2D GL_TEXTURE_2D
 #endif
 #endif
 #define RT_DISPLAY_IMAGE_TEXTURE GL_TEXTURE_RECTANGLE_EXT
@@ -42,21 +50,6 @@
 
 // debuging
 #define DISPLAY_THREAD_HACK
-
-//#ifdef GL_TEXTURE_2D
-//#ifndef GL_TEXTURE_RECTANGLE_NV
-//#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
-//#endif
-//#else
-//#ifdef GL_TEXTURE_RECTANGLE_NV
-//#ifndef GL_TEXTURE_2D
-//#define GL_TEXTURE_2D GL_TEXTURE_RECTANGLE_NV
-//#endif
-////#else
-////#define GL_TEXTURE_RECTANGLE_NV GL_TEXTURE_2D
-////#define GL_TEXTURE_2D GL_TEXTURE_2D
-//#endif
-//#endif
 
 // defaults
 #define DEFAULT_X 400
@@ -88,33 +81,33 @@
 RtDisplayImage::RtDisplayImage() {
   initialized = false;
 
-  x = DEFAULT_X; 
-  y = DEFAULT_Y; 
-  width = DEFAULT_W; 
+  x = DEFAULT_X;
+  y = DEFAULT_Y;
+  width = DEFAULT_W;
   height = DEFAULT_H;
 
-  img = NULL; 
-  imageTex = 0; 
+  img = NULL;
+  imageTex = 0;
   imageDisplayType = ID_MOSAIC;
 
   loadInitialImage = false;
   initialImageFilename = "";
 
-  posOverlayTex = 0; 
-  negOverlayTex = 0; 
+  posOverlayTex = 0;
+  negOverlayTex = 0;
   threshold = 4.0;
   thresholdModAmount = 1.2;
 
-  posMaskTex = 0; 
-  negMaskTex = 0; 
-  needsRepaint = true; 
+  posMaskTex = 0;
+  negMaskTex = 0;
+  needsRepaint = true;
 
   newTex = false;
-  newPosOverlay = false; 
-  newNegOverlay = false; 
-  newPosMask = false; 
-  newNegMask = false; 
-  newImageType = true; 
+  newPosOverlay = false;
+  newNegOverlay = false;
+  newPosMask = false;
+  newNegMask = false;
+  newImageType = true;
 
   posOverlayOn = false;
   negOverlayOn = false;
@@ -181,8 +174,8 @@ RtDisplayImage::RtDisplayImage(int _x, int _y,
   newTex = false;
   newPosOverlay = false;
   newNegOverlay = false;
-  newPosMask = false; 
-  newNegMask = false; 
+  newPosMask = false;
+  newNegMask = false;
   newImageType = true;
   posOverlayOn = false;
   negOverlayOn = false;
@@ -220,7 +213,7 @@ RtDisplayImage::~RtDisplayImage() {
   glutDestroyWindow(windowID);
 }
 
-// 
+//
 
 // initialize the display
 //  in
@@ -228,20 +221,20 @@ RtDisplayImage::~RtDisplayImage() {
 bool RtDisplayImage::open(RtConfig &config) {
   ACE_TRACE(("RtDisplayImage::open"));
 
-  x = config.isSet("oldgui:winX")
-      ? config.get("oldgui:winX") : DEFAULT_X;
+  x = config.isSet("gui:winX")
+      ? config.get("gui:winX") : DEFAULT_X;
 
-  y = config.isSet("oldgui:winY")
-      ? config.get("oldgui:winY") : DEFAULT_Y;
+  y = config.isSet("gui:winY")
+      ? config.get("gui:winY") : DEFAULT_Y;
 
-  width = config.isSet("oldgui:winW")
-      ? config.get("oldgui:winW") : DEFAULT_W;
+  width = config.isSet("gui:winW")
+      ? config.get("gui:winW") : DEFAULT_W;
 
-  height = config.isSet("oldgui:winH")
-      ? config.get("oldgui:winH") : DEFAULT_H;
+  height = config.isSet("gui:winH")
+      ? config.get("gui:winH") : DEFAULT_H;
 
-  strcpy(title, config.isSet("oldgui:winTitle")
-         ? config.get("oldgui:winTitle").str().c_str() : DEFAULT_TITLE);
+  strcpy(title, config.isSet("gui:winTitle")
+         ? config.get("gui:winTitle").str().c_str() : DEFAULT_TITLE);
 
 
   return init();
@@ -278,22 +271,15 @@ bool RtDisplayImage::init() {
   glViewport(0, 0, width, height);
   glutMaster.EnableTimerFunction();
   glutMaster.SetTimerToCurrentWindow();
-  //glutMaster.SetTimerPeriod(1000);
+  glutMaster.SetTimerPeriod(100);
 
   // make a menu
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 
   glutAddMenuEntry("'q' quit",'q');
-  glutAddMenuEntry("'r' fmri run", 'r');
-  // glutAddMenuEntry("'s' show live scanner images", 's');
-  // glutAddMenuEntry("'d' show difference images", 'd');
-  // glutAddMenuEntry("'m' show mean image", 'm');
-  // glutAddMenuEntry("'v' show variance image", 'n');
-  // glutAddMenuEntry("'n' show intensity norm image", 'n');
-  // glutAddMenuEntry("'=/+' toggle positive mask visibility", '=');
-  // glutAddMenuEntry("'-/_' toggle negative mask visibility", '-');
-  // glutAddMenuEntry("'z' toggle positive overlay visibility", 'z');
-  // glutAddMenuEntry("'Z' toggle negative overlay visibility", 'Z');
+  glutAddMenuEntry("'s' show live scanner images", 's');
+  glutAddMenuEntry("'t' decrease the z-score threshold for display", 't');
+  glutAddMenuEntry("'T' increase the z-score threshold for display", 'T');
 
   /* erase color */
   glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -301,6 +287,11 @@ bool RtDisplayImage::init() {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0.0, (double) width, 0.0, (double) height, 1.0, -1.0);
+
+  RtConfigFmriRun runConfig;
+  runConfig.parseConfigFile(getExperimentConfigFile());
+  prepareRun(runConfig);
+  executeRun(runConfig);
 
   initialized = true;
 
@@ -310,6 +301,7 @@ bool RtDisplayImage::init() {
 // perpare for a single run
 bool RtDisplayImage::prepareRun(RtConfig &config) {
 
+  // TODO: this needs a serious rethinking
   // configuration
 
   numMeas = config.isSet("scanner:measurements")
@@ -322,96 +314,96 @@ bool RtDisplayImage::prepareRun(RtConfig &config) {
   negtc.set_size(numMeas + 1);
   negtc.fill(0.0);
 
-  if(config.isSet("oldgui:initialImage")) {
-    initialImageFilename = config.get("oldgui:initialImage").str();
+  if(config.isSet("gui:initialImage")) {
+    initialImageFilename = config.get("gui:initialImage").str();
     loadInitialImage = true;
   }
 
-  if(config.isSet("oldgui:displayType")) {
-    imageDisplayType = config.get("oldgui:displayType").str();
+  if(config.isSet("gui:displayType")) {
+    imageDisplayType = config.get("gui:displayType").str();
     cout << "set image display type to " << imageDisplayType << endl;
   }
 
-  if(config.isSet("oldgui:initialPosMask")) {
-    initialPosMaskFilename = config.get("oldgui:initialPosMask").str();
+  if(config.isSet("gui:initialPosMask")) {
+    initialPosMaskFilename = config.get("gui:initialPosMask").str();
     loadInitialPosMask = true;
   }
-  
-  if(config.isSet("oldgui:flipInitialPosMask") 
-     && config.get("oldgui:flipInitialPosMask") == true) {  
+
+  if(config.isSet("gui:flipInitialPosMask")
+     && config.get("gui:flipInitialPosMask") == true) {
     flipInitialPosMask = true;
   }
 
-  if(config.isSet("oldgui:initialNegMask")) {
-    initialNegMaskFilename = config.get("oldgui:initialNegMask").str();
+  if(config.isSet("gui:initialNegMask")) {
+    initialNegMaskFilename = config.get("gui:initialNegMask").str();
     loadInitialNegMask = true;
   }
 
-  if(config.isSet("oldgui:flipInitialNegMask") 
-     && config.get("oldgui:flipInitialNegMask") == true) {  
+  if(config.isSet("gui:flipInitialNegMask")
+     && config.get("gui:flipInitialNegMask") == true) {
     flipInitialNegMask = true;
   }
 
-  if(config.isSet("oldgui:overlayID")) {
-    posOverlayID = config.get("oldgui:overlayID").str();
+  if(config.isSet("gui:overlayID")) {
+    posOverlayID = config.get("gui:overlayID").str();
     posOverlayOn = true;
   }
 
-  if(config.isSet("oldgui:posOverlayID")) {
-    posOverlayID = config.get("oldgui:posOverlayID").str();
+  if(config.isSet("gui:posOverlayID")) {
+    posOverlayID = config.get("gui:posOverlayID").str();
     posOverlayOn = true;
   }
 
-  posOverlayRoiID = config.isSet("oldgui:posOverlayRoiID")
-      ? config.get("oldgui:posOverlayRoiID").str() :DEFAULT_POSOVERLAYROIID;
+  posOverlayRoiID = config.isSet("gui:posOverlayRoiID")
+      ? config.get("gui:posOverlayRoiID").str() :DEFAULT_POSOVERLAYROIID;
 
-  if(config.isSet("oldgui:negOverlayID")) {
-    negOverlayID = config.get("oldgui:negOverlayID").str();
+  if(config.isSet("gui:negOverlayID")) {
+    negOverlayID = config.get("gui:negOverlayID").str();
   }
 
-  negOverlayRoiID = config.isSet("oldgui:negOverlayRoiID")
-      ? config.get("oldgui:negOverlayRoiID").str() :DEFAULT_NEGOVERLAYROIID;
+  negOverlayRoiID = config.isSet("gui:negOverlayRoiID")
+      ? config.get("gui:negOverlayRoiID").str() :DEFAULT_NEGOVERLAYROIID;
 
-  if(config.isSet("oldgui:posMaskID")) {
-    posMaskID = config.get("oldgui:posMaskID").str();
+  if(config.isSet("gui:posMaskID")) {
+    posMaskID = config.get("gui:posMaskID").str();
     posMaskOn = true;
   }
 
-  posMaskRoiID = config.isSet("oldgui:posMaskRoiID")
-      ? config.get("oldgui:posMaskRoiID").str() : DEFAULT_POSMASKROIID;
+  posMaskRoiID = config.isSet("gui:posMaskRoiID")
+      ? config.get("gui:posMaskRoiID").str() : DEFAULT_POSMASKROIID;
 
-  if(config.isSet("oldgui:negMaskID")) {
-    negMaskID = config.get("oldgui:negMaskID").str();
+  if(config.isSet("gui:negMaskID")) {
+    negMaskID = config.get("gui:negMaskID").str();
     negMaskOn = true;
   }
 
-  negMaskRoiID = config.isSet("oldgui:negMaskRoiID")
-      ? config.get("oldgui:negMaskRoiID").str() : DEFAULT_NEGMASKROIID;
+  negMaskRoiID = config.isSet("gui:negMaskRoiID")
+      ? config.get("gui:negMaskRoiID").str() : DEFAULT_NEGMASKROIID;
 
-  posActivationSumID = config.isSet("oldgui:posActivationSumID")
-      ? config.get("oldgui:posActivationSumID").str() 
+  posActivationSumID = config.isSet("gui:posActivationSumID")
+      ? config.get("gui:posActivationSumID").str()
       : DEFAULT_POSACTIVATIONSUMID;
-  posActivationSumRoiID = config.isSet("oldgui:posActivationSumRoiID")
-      ? config.get("oldgui:posActivationSumRoiID").str() 
+  posActivationSumRoiID = config.isSet("gui:posActivationSumRoiID")
+      ? config.get("gui:posActivationSumRoiID").str()
       : DEFAULT_POSACTIVATIONSUMROIID;
 
-  negActivationSumID = config.isSet("oldgui:negActivationSumID")
-      ? config.get("oldgui:negActivationSumID").str() 
+  negActivationSumID = config.isSet("gui:negActivationSumID")
+      ? config.get("gui:negActivationSumID").str()
       : DEFAULT_NEGACTIVATIONSUMID;
-  negActivationSumRoiID = config.isSet("oldgui:negActivationSumRoiID")
-      ? config.get("oldgui:negActivationSumRoiID").str() 
+  negActivationSumRoiID = config.isSet("gui:negActivationSumRoiID")
+      ? config.get("gui:negActivationSumRoiID").str()
       : DEFAULT_NEGACTIVATIONSUMROIID;
 
   // movie stuff
-  if(config.isSet("oldgui:makeMovie") 
-     && config.get("oldgui:makeMovie") == true) {
+  if(config.isSet("gui:makeMovie")
+     && config.get("gui:makeMovie") == true) {
     makeMovie = true;
   }
-  if(config.isSet("oldgui:framePrefix")) {
-    framePrefix = config.get("oldgui:framePrefix").str();
+  if(config.isSet("gui:framePrefix")) {
+    framePrefix = config.get("gui:framePrefix").str();
   }
-  if(config.isSet("oldgui:screenShotCommand")) {
-    screenShotCommand = config.get("oldgui:screenshotCommand").str();
+  if(config.isSet("gui:screenShotCommand")) {
+    screenShotCommand = config.get("gui:screenshotCommand").str();
   }
 
   // display prep
@@ -516,11 +508,11 @@ void RtDisplayImage::notify(const RtDataID &id) {
   }
 
   // handle activation sum
-  if(id.getDataName() == posActivationSumID 
+  if(id.getDataName() == posActivationSumID
      && id.getRoiID() == posActivationSumRoiID) {
 
     if(DEBUG_LEVEL & BASIC) {
-      cout << "display got a pos activation sum: " 
+      cout << "display got a pos activation sum: "
            << ((RtActivation*)getDataStore().getData(id))->getPixel(0)
            << " " << id.getTimePoint() << endl;
     }
@@ -532,17 +524,18 @@ void RtDisplayImage::notify(const RtDataID &id) {
     }
 
     gnuPlot->reset_plot();
-    gnuPlot->plot_x(postc.extract(id.getTimePoint(),1),posActivationSumRoiID.c_str());
+    gnuPlot->plot_x(postc.extract(id.getTimePoint(),1),
+                    posActivationSumRoiID.c_str());
 
     return;
   }
 
-  if(id.getDataName() == negActivationSumID 
+  if(id.getDataName() == negActivationSumID
      && id.getRoiID() == negActivationSumRoiID) {
 
     if(DEBUG_LEVEL & BASIC) {
-      cout << "display got a neg activation sum: " 
-           << ((RtActivation*)getDataStore().getData(id))->getPixel(0) 
+      cout << "display got a neg activation sum: "
+           << ((RtActivation*)getDataStore().getData(id))->getPixel(0)
            << endl;
     }
 
@@ -553,7 +546,8 @@ void RtDisplayImage::notify(const RtDataID &id) {
     }
 
     //gp.reset_plot();
-    gnuPlot->plot_x(negtc.extract(id.getTimePoint(),1),negActivationSumRoiID.c_str());
+    gnuPlot->plot_x(negtc.extract(id.getTimePoint(),1),
+                    negActivationSumRoiID.c_str());
     //numTimepoints++;
     return;
   }
@@ -621,16 +615,16 @@ void RtDisplayImage::notify(const RtDataID &id) {
   // handle background image
   if(id.getModuleID() != imageDisplayType) {
     if(DEBUG_LEVEL & BASIC) {
-      cout << "ignoring image of type " 
-           << id.getModuleID() 
-           << " because its not " 
+      cout << "ignoring image of type "
+           << id.getModuleID()
+           << " because its not "
            << imageDisplayType
            << endl;
     }
     ACE_DEBUG((LM_DEBUG, "ignoring image of type %s\n", id.getModuleID()));
     return;
   }
-  
+
   // MUST BE AN IMAGE?
 
   // delete existing if we loaded it from a file
@@ -641,11 +635,12 @@ void RtDisplayImage::notify(const RtDataID &id) {
 
   img = (RtMRIImage*) getDataStore().getData(id);
 
-  ACE_DEBUG((LM_DEBUG, "display got an image %d\n", img->getDataID().getTimePoint()));
-  //cout << "display got an image " << img->getID() << endl;
+  ACE_DEBUG((LM_DEBUG, "display got an image %d\n",
+             img->getDataID().getTimePoint()));
 
   // set the info strings
-  bottomStr = img->getDataID().getModuleID() + " " + img->getDataID().getDataName();
+  bottomStr = img->getDataID().getModuleID() + " " +
+      img->getDataID().getDataName();
 
   stringstream s;
   s << img->getDataID().getTimePoint();
@@ -678,8 +673,6 @@ void RtDisplayImage::makeTexture() {
     glPixelTransferf(GL_RED_BIAS,   brightness);
     glPixelTransferf(GL_GREEN_BIAS, brightness);
     glPixelTransferf(GL_BLUE_BIAS,  brightness);
-
-    //cout << "image " << img->getID() << " bright: " << brightness << " contrast: " << contrast << endl;
 
     newImageType = false;
   }
@@ -724,7 +717,7 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
 
   GLuint *overlayTex = pos ? &posOverlayTex : &negOverlayTex;
   RtActivation *overlay = pos ? posOverlay : negOverlay;
-  
+
   /* delete the old texture if there is one */
   if(glIsTexture(*overlayTex)) {
     glDeleteTextures(1, overlayTex);
@@ -764,28 +757,28 @@ void RtDisplayImage::makeOverlayTexture(bool pos) {
     }
 
     // use a cheap heat colormap
-    if(!overlay->getScaleIsInverted() 
+    if(!overlay->getScaleIsInverted()
        && imageData[i] > threshold) {
       overlayImg[4*i+0] = SHRT_MAX; // r
-      overlayImg[4*i+1] = (short) rint(min(1,((imageData[i]
-                                               -threshold)/overlay->getCeiling()))
-                                       *SHRT_MAX); // g
+      overlayImg[4*i+1] = (short) rint(
+          min(1, ((imageData[i]-threshold)/overlay->getCeiling()))
+          *SHRT_MAX); // g
       overlayImg[4*i+2] = 0; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
-    else if(!overlay->getScaleIsInverted() 
+    else if(!overlay->getScaleIsInverted()
             && imageData[i] < -threshold) {
       overlayImg[4*i+0] = 0; // r
-      overlayImg[4*i+1] = (short) rint(min(1,-1*((imageData[i]
-                                                  +threshold)/overlay->getCeiling()))
-                                       *SHRT_MAX); // g
+      overlayImg[4*i+1] = (short) rint(
+          min(1,-1*((imageData[i]+threshold)/overlay->getCeiling()))
+          *SHRT_MAX); // g
       overlayImg[4*i+2] = SHRT_MAX; // b
       overlayImg[4*i+3] = SHRT_MAX; // a
     }
-    else if(overlay->getScaleIsInverted() 
+    else if(overlay->getScaleIsInverted()
             && fabs(imageData[i]) < threshold) {
       overlayImg[4*i+0] = SHRT_MAX; // r
-      overlayImg[4*i+1] = (short) 
+      overlayImg[4*i+1] = (short)
           (1 - (fabs(imageData[i])/threshold))
           *SHRT_MAX; // g
       overlayImg[4*i+2] = 0; // b
@@ -831,7 +824,7 @@ void RtDisplayImage::makePosMaskTexture() {
   // mosaic if needed
   short *imageData;
   int numImageData;
-  if(!posMask->isMosaic()) {    
+  if(!posMask->isMosaic()) {
     imageData = posMask->getMosaicedCopy();
     imageW = posMask->getMosaicedWidth();
     imageH = posMask->getMosaicedHeight();
@@ -890,7 +883,7 @@ void RtDisplayImage::makeNegMaskTexture() {
   // mosaic if needed
   short *imageData;
   int numImageData;
-  if(!negMask->isMosaic()) {    
+  if(!negMask->isMosaic()) {
     imageData = negMask->getMosaicedCopy();
     imageW = negMask->getMosaicedWidth();
     imageH = negMask->getMosaicedHeight();
@@ -937,49 +930,6 @@ void RtDisplayImage::makeNegMaskTexture() {
   needsRepaint = true;
 }
 
-// debug
-// GLuint tex;
-// 
-// /**
-//  * makes the textures for display from the current volume 
-//  */
-// void makeTextures(int width, int height) {
-//   GLuint format = GL_LUMINANCE;
-//   GLenum type = GL_SHORT;
-//   int bpp = 8*sizeof(short);
-// 
-//   /* delete the old texture if there is one */
-//   if(tex != 0) {
-//     return;
-//     //glDeleteTextures(1, &tex);
-//   }
-// 
-//   short *img = (short*) malloc(width*height*sizeof(short));
-//   for(int i = 0; i < width*height; i++) {
-//     img[i] = i;
-//   }
-// 
-//   /* perform texture init */
-//   glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-//     
-// 
-//   /* get the id for the textures */
-//   glGenTextures(1, &tex);
-// 
-//   if(!glIsTexture(tex)) {
-//     printf("texture id %d\n",tex);
-//   }
-//   
-//   /* create the image texture */
-//   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//   glTexParameteri(RT_DISPLAY_IMAGE_TEXTURE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//   glTexImage2D(RT_DISPLAY_IMAGE_TEXTURE, 0, 1, width, height, 0, format, type, img); 
-//   free(img);
-// }
-
 void RtDisplayImage::CallBackDisplayFunc(void) {
   ACE_TRACE(("RtDisplayImage::CallBackDisplayFunc"));
 
@@ -989,12 +939,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   glDepthFunc(GL_LEQUAL);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
-
-  //glAlphaFunc(GL_GREATER,0.1);
-  //glEnable(GL_ALPHA_TEST);
-  //glEnable(GL_CULL_FACE);
-
-  //glClear(GL_COLOR_BUFFER_BIT);
 
   /* gl init stuff */
   glPushMatrix();
@@ -1012,51 +956,15 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
   // if there is no image yet, draw a message and return
   if(!glIsTexture(imageTex) || img == NULL) {
     drawString(10,10,"no image loaded",1,0,0);
-
-    // debug
-    //    makeTextures(width,height);
-    //    
-    //  /* turn on texture mapping */
-    //  glEnable(RT_DISPLAY_IMAGE_TEXTURE);
-    //
-    //  /* draw the main texture */
-    //  glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, tex);
-    //
-    //  int w = width;
-    //  int h = height;
-    //  double tw = width;
-    //  double th = height;
-    //
-    //  /* make a quadrilateral and provide texture coords */
-    //  glBegin(GL_QUADS); {
-    //    glTexCoord2d(0.0,0.0);
-    //    glVertex3f(0, h, 0.0);
-    //    glTexCoord2d(tw,0.0);
-    //    glVertex3f(w, h, 0.0);
-    //    glTexCoord2d(tw,th);
-    //    glVertex3f(w, 0, 0.0);
-    //    glTexCoord2d(0,th);
-    //    glVertex3f(0, 0, 0.0);
-    //  } glEnd();
-    //
-    //  glDisable(RT_DISPLAY_IMAGE_TEXTURE);
-
     glutSwapBuffers();
     return;
   }
-
-  //  ACE_DEBUG((LM_DEBUG, "showing image %d\n", img->getAcquisitionNum()));
-
-  //  int imgw = img->getDim(1);
-  //  int imgh = img->getDim(0);
 
   /* turn on texture mapping */
   glEnable(RT_DISPLAY_IMAGE_TEXTURE);
 
   /* draw the main texture */
   glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, imageTex);
-
-  //cout << "drawing image tex: " << imageTex << endl;
 
   /* make a quadrilateral and provide texture coords */
   glBegin(GL_QUADS); {
@@ -1073,8 +981,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the negMask texture */
   if(negMaskOn && glIsTexture(negMaskTex)) {
-    //cout << "drawing neg mask tex: " << negMaskTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negMaskTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1093,8 +999,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the posMask texture */
   if(posMaskOn && glIsTexture(posMaskTex)) {
-    //cout << "drawing pos mask tex: " << posMaskTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posMaskTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1113,8 +1017,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the pos overlay texture */
   if(posOverlayOn && glIsTexture(posOverlayTex)) {
-    //cout << "drawing pos overlay tex: " << posOverlayTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, posOverlayTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1133,8 +1035,6 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
 
   /* draw the neg overlay texture */
   if(negOverlayOn && glIsTexture(negOverlayTex)) {
-    //cout << "drawing neg overlay tex: " << negOverlayTex << endl;
-
     glBindTexture(RT_DISPLAY_IMAGE_TEXTURE, negOverlayTex);
 
     /* make a quadrilateral and provide texture coords */
@@ -1170,7 +1070,7 @@ void RtDisplayImage::CallBackDisplayFunc(void) {
     cmd << curFrame++;
 
     //cout << cmd.str();
-    
+
     // PLATFORM DEPENDENT
     system(cmd.str().c_str());
   }
@@ -1181,15 +1081,6 @@ void RtDisplayImage::CallBackReshapeFunc(int w, int h){
   if(width != w || height != h) {
     glutReshapeWindow(width,height);
   }
-  //
-  //   width = w;
-  //   height= h;
-  //
-  //   cout << w << " " << h << endl;
-  //
-  //   glViewport(0, 0, width, height);
-  //
-  //   CallBackDisplayFunc();
 }
 
 
@@ -1240,54 +1131,14 @@ void RtDisplayImage::action(int code) {
   string oldImageDisplayType = imageDisplayType;
 
   // for running
-  RtConfigFmriRun runConfig;
   string response;
 
   switch(code) {
     case 'q': // quit
       glutMaster.CallGlutLeaveMainLoop();
       break;
-    case 'r': // run
-      // REMOVED SASEN@MIT.EDU 08/02/2012, NOT NEEDED FOR TEXAS PROJECT
-      // JUST WANT TO RUN THE CONFIG WE PASSED IN, BUT STILL HAVE DISPLAY.
-      //
-      // cout << endl;
-      // simple_ls(getExperimentConfig().get("study:confDir").str(),".xml");
-      // cout << endl;
-
-      // // ask for a config file name 
-      // cout << "enter the config file name for the fmri run (q to quit): ";
-      // cin >> response;
-      // runConfig.parseConfigFile(getExperimentConfig().get("study:confDir").str() 
-      //                           + response);
-      cout << getExperimentConfigFile();
-      cout << endl; 
-      runConfig.parseConfigFile(getExperimentConfigFile());
-      prepareRun(runConfig);
-      executeRun(runConfig);    
-      break;
     case 's': // scanner image
       imageDisplayType = ID_MOSAIC;
-      break;
-    case 'd': // difference image
-      imageDisplayType = ID_TEMPDIFF;
-      break;
-    case 'm': // mean image
-      imageDisplayType = ID_TEMPMEAN;
-      break;
-    case '=': // pos mask
-    case '+':
-        posMaskOn = !posMaskOn;
-    break;
-    case '-': // neg mask
-    case '_':
-        negMaskOn = !negMaskOn;
-    break;
-    case 'n': // inorm
-      imageDisplayType = ID_SPATIALINTENSITYNORM;
-      break;
-    case 'v': // variance image
-      imageDisplayType = ID_TEMPVAR;
       break;
     case 't': // threshold val down
       threshold /= thresholdModAmount;
@@ -1296,12 +1147,6 @@ void RtDisplayImage::action(int code) {
     case 'T': // threshold val up
       threshold *= thresholdModAmount;
       cout << "new display stat threshold " << threshold << endl;
-      break;
-    case 'z': // positive overlay
-      posOverlayOn = !posOverlayOn;
-      break;
-    case 'Z': // negative overlay
-      negOverlayOn = !negOverlayOn;
       break;
   }
 
@@ -1330,7 +1175,8 @@ void RtDisplayImage::drawBlackBoxForString(const char *str, GLint x, GLint y) {
 }
 
 //draws a string at the specified coordinates
-void RtDisplayImage::drawString(GLint x, GLint y, const char* s, float r, float g, float b) {
+void RtDisplayImage::drawString(
+    GLint x, GLint y, const char* s, float r, float g, float b) {
   unsigned int lines, i;
 
   glMatrixMode(GL_PROJECTION);
@@ -1359,34 +1205,4 @@ void RtDisplayImage::drawString(GLint x, GLint y, const char* s, float r, float 
 }
 
 
-// NOTE: when we build app using frontend 
-// main is defined there
-//#ifndef USE_FRONTEND
-//
-//// main function for the realtime system
-//// very simple
-//int ACE_TMAIN(int argc, char **args) {
-//  ACE_TRACE(("ACE_TMAIN"));
-//
-//  RtDisplayImage di;
-//  runBackend(argc, args);
-//  return
-//}
-//
-//#endif
-
-/*************
- * ohinds: 2009-01-18
- **************/
 #endif //#ifndef USE_FRONTEND
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

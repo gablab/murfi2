@@ -1,10 +1,23 @@
-/******************************************************************************
- * class to support interaction with the FSL tools
+/*=========================================================================
+ *  class to support interaction with the FSL tools
  *
- * WARNING! platform specific code in here....
- * 
- * Oliver Hinds <ohinds@mit.edu> 2008-09-23
- *****************************************************************************/
+ *  WARNING! platform specific code in here....
+ *
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtFSLInterface.h"
 #include"RtExperiment.h"
@@ -16,8 +29,8 @@
 class SystemCommand : public ACE_Task_Base {
  public:
 
-  SystemCommand(string _command) { 
-    command = _command; 
+  SystemCommand(string _command) {
+    command = _command;
     started = false;
     running = false;
     success = false;
@@ -30,7 +43,7 @@ class SystemCommand : public ACE_Task_Base {
     // here is the system call!!
     if(system(NULL)) { // check for availability
       running = true;
-      success = (system(command.c_str()) == 0);    
+      success = (system(command.c_str()) == 0);
       running = false;
     }
     else {
@@ -46,7 +59,7 @@ class SystemCommand : public ACE_Task_Base {
   bool   getRunning() { return running; }
   bool   getSuccess() { return success; }
 
- private:  
+ private:
   string command;
   bool   started;
   bool   running;
@@ -62,25 +75,26 @@ FslJobID RtFSLInterface::runCommand(string command) {
   FslJobID ret = FSL_NO_SUCH_JOB;
 
   // if NOT windoze
-#ifndef WIN32 
-  
-    // start the job
+#ifndef WIN32
 
-    ACE_Mutex mut;
-    mut.acquire();
+  // start the job
 
-    FslJobID newID = RtFSLInterface::getNextJobID();
-    SystemCommand *syscmd = new SystemCommand(command);    
-    
-    cmdMap[newID] = syscmd;
-    syscmd->activate();
-    ret = newID;
+  ACE_Mutex mut;
+  mut.acquire();
 
-    mut.release();
+  FslJobID newID = RtFSLInterface::getNextJobID();
+  SystemCommand *syscmd = new SystemCommand(command);
+
+  cmdMap[newID] = syscmd;
+  syscmd->activate();
+  ret = newID;
+
+  mut.release();
 
 #else
-  
-  cout << "RtFSLInterface::runCommand: fsl system calls are unavailable on windows" << endl;
+
+  cout << "RtFSLInterface::runCommand: fsl system calls "
+       << "are unavailable on windows" << endl;
 
 #endif
 
@@ -94,15 +108,16 @@ FslJobStatus RtFSLInterface::runCommandBlocking(string command) {
   FslJobStatus ret = FSL_JOB_ERROR;
 
   // if NOT windoze
-#ifndef WIN32 
-  
-    // start the job
-    SystemCommand *syscmd = new SystemCommand(command);    
-    syscmd->svc();
-    ret = (syscmd->getSuccess() ? FSL_JOB_FINISHED : FSL_JOB_ERROR);
+#ifndef WIN32
+
+  // start the job
+  SystemCommand *syscmd = new SystemCommand(command);
+  syscmd->svc();
+  ret = (syscmd->getSuccess() ? FSL_JOB_FINISHED : FSL_JOB_ERROR);
 #else
-  
-  cout << "RtFSLInterface::runCommand: fsl system calls are unavailable on windows" << endl;
+
+  cout << "RtFSLInterface::runCommand: fsl system calls "
+       << "are unavailable on windows" << endl;
 
 #endif
 
@@ -115,20 +130,20 @@ FslJobStatus RtFSLInterface::runCommandBlocking(string command) {
 //  target  image that will be registered to
 //  movable image that will be registered
 //  xfmFile file to save the transformation in (if empty a temp file
-//          is created) 
-FslJobID RtFSLInterface::registerSameSubjEPI(string target, string movable, 
-					     string xfmFile, bool block) {
-  string command = getExperimentConfig().get("study:softwareDir"); 
-    command 
+//          is created)
+FslJobID RtFSLInterface::registerSameSubjEPI(string target, string movable,
+                                             string xfmFile, bool block) {
+  string command = getExperimentConfig().get("study:softwareDir");
+  command
       += string("/scripts/fsl_reg_subj_epi.sh ")
       + " -t " + target
       + " -m " + movable
       + " -s " + xfmFile;
 
-  return (block ? 
-	  RtFSLInterface::runCommandBlocking(command) :
-	  RtFSLInterface::runCommand(command)
-	  );
+  return (block ?
+          RtFSLInterface::runCommandBlocking(command) :
+          RtFSLInterface::runCommand(command)
+          );
 }
 
 // apply a pre-computed transformation to a file
@@ -138,42 +153,42 @@ FslJobID RtFSLInterface::registerSameSubjEPI(string target, string movable,
 //  input   image to be transformed
 //  output  image filename to save to
 //  xfmFile file to save the transformation in (if empty a temp file
-//          is created) 
-FslJobID RtFSLInterface::applyTransform(string target, string movable, 
-					string input,  string output,
-					string xfmFile, bool block) {
-  string command = getExperimentConfig().get("study:softwareDir"); 
-    
-  command 
-    += string("/scripts/fsl_reg_subj_epi.sh ")
-    + " -t " + target
-    + " -m " + movable
-    + " -i " + input
-    + " -o " + output
-    + " -r " + xfmFile;
+//          is created)
+FslJobID RtFSLInterface::applyTransform(string target, string movable,
+                                        string input,  string output,
+                                        string xfmFile, bool block) {
+  string command = getExperimentConfig().get("study:softwareDir");
 
-  return (block ? 
-	  RtFSLInterface::runCommandBlocking(command) :
-	  RtFSLInterface::runCommand(command)
-	  );
+  command
+      += string("/scripts/fsl_reg_subj_epi.sh ")
+      + " -t " + target
+      + " -m " + movable
+      + " -i " + input
+      + " -o " + output
+      + " -r " + xfmFile;
+
+  return (block ?
+          RtFSLInterface::runCommandBlocking(command) :
+          RtFSLInterface::runCommand(command)
+          );
 }
 
 // make a brain mask out of an epi volume
 // in:
 //  filename of the volume to base the mask off of
-FslJobID RtFSLInterface::makeBrainMask(string brainVolume, 
-				       string maskFilename,
-				       string betOptions, 
-				       bool block) {
+FslJobID RtFSLInterface::makeBrainMask(string brainVolume,
+                                       string maskFilename,
+                                       string betOptions,
+                                       bool block) {
   string command = "../scripts/make_bet_mask.sh "
-    + brainVolume + " " 
-    + maskFilename + " " 
-    + betOptions;
+      + brainVolume + " "
+      + maskFilename + " "
+      + betOptions;
 
-  return (block ? 
-	  RtFSLInterface::runCommandBlocking(command) :
-	  RtFSLInterface::runCommand(command)
-	  );
+  return (block ?
+          RtFSLInterface::runCommandBlocking(command) :
+          RtFSLInterface::runCommand(command)
+          );
 }
 
 // run a block design analysis
@@ -182,9 +197,9 @@ FslJobID RtFSLInterface::makeBrainMask(string brainVolume,
 //  runNum        series number of the images to include
 //  blockLength   number of seconds per block
 //  numConditions number of stimulus conditions (including rest)
-FslJobID RtFSLInterface::runAnalysis(string filePrefix, unsigned int runNum, 
-				     float blockLength, 
-				     unsigned int numConditions) {
+FslJobID RtFSLInterface::runAnalysis(string filePrefix, unsigned int runNum,
+                                     float blockLength,
+                                     unsigned int numConditions) {
   cout << "RtFSLInterface::runAnalysis() is not yet implemented" << endl;
   return cmdMap.size();
 }
@@ -217,8 +232,6 @@ FslJobStatus RtFSLInterface::getJobStatus(FslJobID jobID) {
   else if(cmd->getStarted() && !cmd->getRunning() && !cmd->getSuccess()) {
     return FSL_JOB_ERROR;
   }
-  
+
   return FSL_JOB_UNKNOWN_STATE;
 }
-
-

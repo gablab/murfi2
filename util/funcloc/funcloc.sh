@@ -1,7 +1,6 @@
 #!/bin/bash
 # script to facilitate making ROIs from a functional localizer task
 # run from the subject directory with the name of the localizer (e.g., mid)
-# Oliver Hinds <ohinds@mit.edu> 2010-07-01
 
 function usage() {
     echo "$0 <funcloc_name> [options]"

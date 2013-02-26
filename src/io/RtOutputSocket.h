@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtOutputSocket.h declares a class that implements output operations on a
- * socket
+/*=========================================================================
+ *  RtOutputSocket.h declares a class that implements output operations on a
+ *  socket
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-01-27
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTOUTPUTSOCKET_H
 #define RTOUTPUTSOCKET_H
@@ -18,12 +30,12 @@ using namespace std;
 // class declaration
 class RtOutputSocket : public RtOutput {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
-  
+
   // default constructor
-  RtOutputSocket(); 
+  RtOutputSocket();
 
   // destructor
   virtual ~RtOutputSocket();
@@ -37,12 +49,7 @@ public:
   // close and clean up
   bool close();
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
-
-protected:
+ protected:
 
   // client address
   ACE_INET_Addr address;
@@ -52,18 +59,7 @@ protected:
 
   // connector
   ACE_SOCK_Connector connector;
-  
+
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

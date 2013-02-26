@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtPasser.h is the header for a class that passes data from an
- * stream to output
+/*=========================================================================
+ *  RtPasser.h is the header for a class that passes data from an
+ *  stream to output
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-09-05
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTPASSER_H
 #define RTPASSER_H
@@ -16,21 +28,15 @@
 // class declaration
 class RtPasser: public RtStreamComponent  {
 
-public:
+ public:
 
   static string moduleString;
 
   //*** constructors/destructors  ***//
 
   // default constructor
-  // all data that 
+  // all data that
   RtPasser();
-
-  // string with id constructor
-  //  in
-  //   dataID is a string that constrains what type of data we send, if its
-  //   empty we send all the data
-  //RtPasser(string _dataID);
 
   // id constructor
   //  in
@@ -39,14 +45,8 @@ public:
   //   the outputs or not. Empty fields are not matched and filled fields are
   RtPasser(const RtDataID &idTemplate);
 
-  // char* with id constructor
-  //  in
-  //   dataID is a string that constrains what type of data we send, if its
-  //   empty we send all the data
-  //RtPasser(char *_dataID);
-
   // destructor
-  ~RtPasser();
+  virtual ~RtPasser();
 
   //*** initialization routines  ***//
   void addOutput(RtOutput *out);
@@ -54,7 +54,7 @@ public:
   // process a single acquisition
   void sendToOutputs(RtData *d);
 
-protected:
+ protected:
 
   // validation configuration
   bool validateComponentConfig() { return true; }
@@ -67,18 +67,7 @@ protected:
 
   // only pass data of this id
   RtDataID passDataID;
-  
+
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

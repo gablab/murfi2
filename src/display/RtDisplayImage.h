@@ -1,9 +1,21 @@
-/******************************************************************************
- * RtDisplayImage.h declares a class for displaying single images
+/*=========================================================================
+ *  RtDisplayImage.h declares a class for displaying single images
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-08-29
- * 
- *****************************************************************************/
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTDISPLAYIMAGE_H
 #define RTDISPLAYIMAGE_H
@@ -20,18 +32,17 @@
 
 #include"ace/Task.h"
 #include"ace/Asynch_IO.h"
-//#include "add_functions.h"
 
 class Gnuplot;
 
 // class declaration
-class RtDisplayImage 
-  : public GlutWindow, 
-    public RtDataListener, 
-    public ACE_Task_Base, 
-    public ACE_Service_Handler {
+class RtDisplayImage
+    : public GlutWindow,
+      public RtDataListener,
+      public ACE_Task_Base,
+      public ACE_Service_Handler {
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
 
@@ -42,9 +53,9 @@ public:
   RtDisplayImage(const RtConfig &config);
 
   // constructor with stuff
-  RtDisplayImage(int _x, int _y, 
-		 int _w, int _h, 
-		 char *_title);
+  RtDisplayImage(int _x, int _y,
+                 int _w, int _h,
+                 char *_title);
 
   // destructor
   virtual ~RtDisplayImage();
@@ -90,12 +101,12 @@ public:
   // callbacks for opengl
   void action(int code);
   void CallBackDisplayFunc(void);
-  void CallBackReshapeFunc(int w, int h);   
+  void CallBackReshapeFunc(int w, int h);
   void CallBackTimerFunc(int, int);
   void CallBackKeyboardFunc(unsigned char key, int x, int y);
   void CallBackMenuFunc(int code);
 
-protected:
+ protected:
 
   bool initialized;
 
@@ -107,7 +118,7 @@ protected:
   string bottomStr;
   string topStr;
 
-  // data 
+  // data
   RtMRIImage *img;
   bool loadInitialImage;
   string initialImageFilename;
@@ -182,14 +193,3 @@ protected:
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

@@ -1,10 +1,23 @@
-/******************************************************************************
- * class to support interaction with the FSL tools
+/*=========================================================================
+ *  class to support interaction with the FSL tools
  *
- * WARNING! platform specific code in here....
- * 
- * Oliver Hinds <ohinds@mit.edu> 2008-09-23
- *****************************************************************************/
+ *  WARNING! platform specific code in here....
+ *
+ *  Copyright 2007-2013, the MURFI dev team.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #ifndef RTFSLINTERFACE_H
 #define RTFSLINTERFACE_H
@@ -34,7 +47,7 @@ class RtFSLInterface {
 
  public:
 
-  
+
   // execute a command string in the system environment
   static FslJobID runCommand(string command);
 
@@ -48,10 +61,11 @@ class RtFSLInterface {
   //  target  image that will be registered to
   //  movable image that will be registered
   //  xfmFile file to save the transformation in (if empty a temp file
-  //          is created) 
-  static FslJobID registerSameSubjEPI(string target, string movable, 
-				string xfmFile = string(tempnam(NULL,"rtreg")),
-				bool block = false);
+  //          is created)
+  static FslJobID registerSameSubjEPI(string target, string movable,
+                                      string xfmFile = string(tempnam(NULL,
+                                                                      "rtreg")),
+                                      bool block = false);
 
 
 
@@ -62,19 +76,19 @@ class RtFSLInterface {
   //  input   image to be transformed
   //  output  image filename to save to
   //  xfmFile file to save the transformation in (if empty a temp file
-  //          is created) 
-  static FslJobID applyTransform(string target, string movable, 
-				 string input,  string output,
-				 string xfmFile, bool block = false);
+  //          is created)
+  static FslJobID applyTransform(string target, string movable,
+                                 string input,  string output,
+                                 string xfmFile, bool block = false);
 
 
   // make a brain mask out of an epi volume
   // in:
   //  filename of the volume to base the mask off of
-  static FslJobID makeBrainMask(string brainVolume, 
-				string maskFilename,
-				string betOptions, 
-				bool block = false);
+  static FslJobID makeBrainMask(string brainVolume,
+                                string maskFilename,
+                                string betOptions,
+                                bool block = false);
 
   // run a block design analysis
   // in:
@@ -82,8 +96,8 @@ class RtFSLInterface {
   //  runNum        series number of the images to include
   //  blockLength   number of seconds per block
   //  numConditions number of stimulus conditions (including rest)
-  static FslJobID runAnalysis(string filePrefix, unsigned int runNum, 
-			      float blockLength, unsigned int numConditions);
+  static FslJobID runAnalysis(string filePrefix, unsigned int runNum,
+                              float blockLength, unsigned int numConditions);
 
   // get a job status
   static FslJobStatus getJobStatus(FslJobID jobID);

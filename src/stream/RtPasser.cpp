@@ -1,10 +1,22 @@
-/******************************************************************************
- * RtPasser.cpp implements a class that passes data from an
- * analysis stream to output
+/*=========================================================================
+ *  RtPasser.cpp implements a class that passes data from an
+ *  analysis stream to output
  *
- * Oliver Hinds <ohinds@mit.edu> 2007-09-05
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
 #include"RtPasser.h"
 #include"RtData.h"
@@ -15,25 +27,6 @@ string RtPasser::moduleString("passer");
 RtPasser::RtPasser() : RtStreamComponent() {
   componentID = moduleString;
 }
-
-// string with id constructor
-//  in
-//   dataID is a string that constrains what type of data we send, if its
-//   empty we send all the data
-//RtPasser::RtPasser(string _dataID) 
-//  : RtStreamComponent(), dataID(_dataID) {
-//  componentID = moduleString;
-//}
-
-// char* with id constructor
-//  in
-//   dataID is a string that constrains what type of data we send, if its
-//   empty we send all the data
-//RtPasser::RtPasser(char *_dataID) 
-//  : RtStreamComponent(), dataID(_dataID) {
-//  componentID = moduleString;
-//}
-
 
 // id constructor
 //  in
@@ -60,16 +53,13 @@ void RtPasser::sendToOutputs(RtData *d) {
   ACE_TRACE(("RtPasser::sendToOutputs"));
 
   // check if this data is our type
-  if(d == NULL || d->getDataID() != passDataID) {	
+  if(d == NULL || d->getDataID() != passDataID) {
     return;
   }
 
-  //      ACE_DEBUG((LM_DEBUG, "passing image %d\n", ((RtDataImage*)msg->getLastData())->getAcquisitionNum()));
-
-
   // set to all outputs
-  for(vector<RtOutput*>::iterator j = outputs.begin(); j != outputs.end(); j++) {
-    //cout << "sending " << d->getID() << " to " << (*j)->getID() << endl;
+  for(vector<RtOutput*>::iterator j = outputs.begin();
+      j != outputs.end(); j++) {
     (*j)->setData(d);
   }
 
@@ -80,22 +70,6 @@ void RtPasser::sendToOutputs(RtData *d) {
 int RtPasser::process(ACE_Message_Block* mb) {
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
   RtData *img = msg->getCurrentData();
-//  cout << "passer got msg " << msg 
-//       << " with curdata " << img
-//       << endl;
-
   sendToOutputs(img);
   return 0;
 }
-
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

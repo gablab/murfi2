@@ -1,9 +1,22 @@
-/******************************************************************************
- * RtDataStore.h declares a class for data storage and retreival
+/*=========================================================================
+ *  RtDataStore.h declares a class for data storage and retreival
  *
- * Oliver Hinds <ohinds@mit.edu> 2008-08-13
+ *  Copyright 2007-2013, the MURFI dev team.
  *
- *****************************************************************************/
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+
 #ifndef RTDATASTORE_H
 #define RTDATASTORE_H
 
@@ -20,11 +33,8 @@ using namespace std;
 
 // class declaration
 class RtDataStore : public RtOutput  {
-#if USE_FRONTEND // Need to access stuff from frontend
-  friend class FrDataStore;
-#endif
 
-public:
+ public:
 
   //*** constructors/destructors  ***//
 
@@ -43,7 +53,7 @@ public:
   virtual void setData(RtData *data);
 
   // get data by id
-  // 
+  //
   // NOTE: this function is much more efficient if the requested data is
   // specified fully, i.e. there are no wildcards in the dataID (see
   // RtDataID.h) avoid using wildcards if possible
@@ -52,15 +62,11 @@ public:
   // get latest data
   virtual RtData *getLatestData(RtDataID id);
 
-  // get the version
-  //  out: char array that represents the cvs version
-  virtual char *getVersionString();
-
   // get a list of the available data in the data store
-  // note: this returns a list of the unique data ids excepting timepoint. 
+  // note: this returns a list of the unique data ids excepting timepoint.
   set<RtDataID>::const_iterator getAvailableData();
 
-  protected:
+ protected:
 
   // list of outputs to be notified when new data arrives
   vector<RtDataListener*> notifyList;
@@ -68,7 +74,7 @@ public:
   // hash map to store pointers to acquired data
   map<RtDataID,RtData*,RtDataIDCompare> store;
 
-  // list of the data ids we currently have in the data 
+  // list of the data ids we currently have in the data
   // store (excepting timepoiint)
   set<RtDataID> availableData;
 
@@ -84,14 +90,3 @@ public:
 };
 
 #endif
-
-/*****************************************************************************
- * $Source$
- * Local Variables:
- * mode: c++
- * fill-column: 76
- * comment-column: 0
- * End:
- *****************************************************************************/
-
-

@@ -16,597 +16,299 @@
  *
  *=========================================================================*/
 
-#include<RtExternalSenderImageInfo.h>
+#include <RtExternalSenderImageInfo.h>
+#include <math.h>
 
 RtExternalImageInfo::RtExternalImageInfo()
     :
-    lVersion(0),
-    iSizeOfRtExternalImageInfo(EXTERNALSENDERSIZEOF),
-    dFOVread(200),
-    dFOVphase(200),
-    dThick(5),
-    nCol(256),
-    nLin(256),
-    nSli(1),
-    lImageDataLength(294912),
-    lNumberOfPixels(147456),
-    lBytesPerPixel(2),
-    dPosSag(0),
-    dPosCor(0),
-    dPosTra(0),
-    dNorSag(0),
-    dNorCor(0),
-    dNorTra(0),
-    dPhaSag(0),
-    dPhaCor(0),
-    dPhaTra(0),
-    dRowSag(0),
-    dRowCor(0),
-    dRowTra(0),
-    dColSag(0),
-    dColCor(0),
-    dColTra(0),
-    dMoCoTransX(0.0),
-    dMoCoTransY(0.0),
-    dMoCoTransZ(0.0),
-    dMoCoRotX(0.0),
-    dMoCoRotY(0.0),
-    dMoCoRotZ(0.0),
-    bIsMoCo(false),
-    iNoOfImagesInMosaic(1),
-    iMosaicGridSize(1),
-    bSwapReadPhase(0),
-    iAcquisitionNumber(1),
-    dTimeAfterStart(0),
-    dTE(30),
-    dTR(3000),
-    dTI(0),
-    dTriggerTime(0),
-    lSliceIndex(0),
-    lNumTrackCha(0),
-    lCurrentTrackCha(0),
-    iWindowCenter(737),
-    iWindowWidth(1694),
-    lAbsTablePosition(0),
-    iDataSource(0),
-    dTimeDelay(0)
-{
-  strcpy((char*) chID, "IFEI");
-
-  chAcquisitionDate[0] = '\0';
-  strcpy(chAcquisitionTime,"123456.789101");
-
-  chImageTypeValue4[0][0] = '\0';
-
-  strcpy(chframeOfReference,"123456.789101");
-
-
-  lReserved[0] = 0;
-  dReserved[0] = 0;
-  chReserved[0] = '\0';
-  cSeriesInstanceUID[0] = '\0';
+    headerVersion(EXTERNALSENDER_VERSION),
+    isLittleEndian(false),
+    isMosaic(false),
+    pixelSpacingReadMM(0.0),
+    pixelSpacingPhaseMM(0.0),
+    pixelSpacingSliceMM(0.0),
+    sliceGapMM(0.0),      
+    numPixelsRead(0),
+    numPixelsPhase(0),
+    numSlices(0),
+    repetitionTimeMS(0),
+    repetitionDelayMS(0),
+    currentTR(0),
+    totalTR(0),
+    isMotionCorrected(false),
+    mcTranslationXMM(0.0),
+    mcTranslationYMM(0.0),
+    mcTranslationZMM(0.0),
+    mcRotationXRAD(0.0),
+    mcRotationYRAD(0.0),
+    mcRotationZRAD(0.0) {
+  strcpy((char*) magic, EXTERNALSENDER_MAGIC);
+  scanType[0] = '\0';
+  strcpy((char*) imageType,EXTERNALSENDER_IMGTYPE);
+  note[0] = '\0';
+  datatype[0] = '\0';
+  voxelToWorldMatrix[0][0] = '\0';
+  mcOrder[0] = '\0';
 }
-
-// constructor for data
-RtExternalImageInfo::RtExternalImageInfo(char *data) {
-  memcpy(this,data,sizeof(RtExternalImageInfo));
-}
-
-//#include<fstream>
-//using namespace std;
 
 // constructor for data from physical scanner
-// this function does selective memcpy through the passed data because the
-// scanner sends packed data with a few trash spots, which were identified
-// manually with plenty of frustration.
 //  in
 //   data: byte data to read the structure from
 //   len:  number of bytes we have
 RtExternalImageInfo::RtExternalImageInfo(char *data, unsigned int len) {
-  char trash[TRASHSIZE];
   char *readptr = data;
 
-  // long's are sent as 'uint32_t so read them into a temporary placeholder,
-  // before casting them to the proper place in the structure Ideally, the
-  // actual class should change long->uint32_t, but then you'd need to hunt down
-  // all the references all over the code and cast accordingly
-  int32_t longtemp;
-
-  // check that we have enough data to read iSizeOfExternalImageInfo
-  if(len < 4*CHARSIZE + LONGSIZE + INTSIZE) {
-    return;
-  }
-
-  memcpy(chID, readptr, 4*CHARSIZE);
-  readptr += 4*CHARSIZE;
-
-  //memcpy(&lVersion, readptr, LONGSIZE);
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lVersion = long(longtemp);
-  readptr += LONGSIZE;
-
-  memcpy(&iSizeOfRtExternalImageInfo, readptr, INTSIZE);
-  readptr += INTSIZE;
-
   // test that we have enough data
-  if(len < (unsigned int) iSizeOfRtExternalImageInfo) {
+  if(len < getHeaderSize()) {
     return;
   }
-
-  memcpy(trash, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(&dFOVread, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dFOVphase, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dThick, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&nCol, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(&nLin, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(&nSli, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lImageDataLength = long(longtemp);
-  readptr += LONGSIZE;
-
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lNumberOfPixels = long(longtemp);
-  readptr += LONGSIZE;
-
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lBytesPerPixel = long(longtemp);
-  readptr += LONGSIZE;
-
-  memcpy(trash, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(&dPosSag, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dPosCor, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dPosTra, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dNorSag, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dNorCor, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dNorTra, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dPhaSag, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dPhaCor, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dPhaTra, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dRowSag, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dRowCor, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dRowTra, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dColSag, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dColCor, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dColTra, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-
-  memcpy(&dMoCoTransX, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dMoCoTransY, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dMoCoTransZ, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dMoCoRotX, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dMoCoRotY, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(&dMoCoRotZ, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-
-  memcpy(&bIsMoCo, readptr, sizeof(bool));
+  
+  memcpy(magic, readptr, 5*sizeof(char));
+  readptr += 5*sizeof(char);
+  
+  memcpy(&headerVersion, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
+  
+  memcpy(scanType, readptr, 64*sizeof(char));
+  readptr += 64*sizeof(char);
+  
+  memcpy(imageType, readptr, 16*sizeof(char));
+  readptr += 16*sizeof(char);
+  
+  memcpy(note, readptr, 256*sizeof(char));
+  readptr += 256*sizeof(char);
+  
+  memcpy(datatype, readptr, 16*sizeof(char));
+  readptr += 16*sizeof(char);
+  
+  memcpy(&isLittleEndian, readptr, sizeof(bool));
   readptr += sizeof(bool);
-
-  memcpy(trash, readptr, 3);
-  readptr += 3;
-
-  memcpy(&iNoOfImagesInMosaic, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(&iMosaicGridSize, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(cSeriesInstanceUID, readptr, 65*CHARSIZE);
-  readptr += 65*CHARSIZE;
-
-
-  memcpy(&bSwapReadPhase, readptr, sizeof(bool));
+  
+  memcpy(&isMosaic, readptr, sizeof(bool));
   readptr += sizeof(bool);
+  
+  memcpy(&pixelSpacingReadMM, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+  
+  memcpy(&pixelSpacingPhaseMM, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+	
+  memcpy(&pixelSpacingSliceMM, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+  
+  memcpy(&sliceGapMM, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+	
+  memcpy(&numPixelsRead, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
+  
+  memcpy(&numPixelsPhase, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
+  
+  memcpy(&numSlices, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
 
-  memcpy(trash, readptr, 2);
-  readptr += 2;
-
-
-  memcpy(&iAcquisitionNumber, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(trash, readptr, 4);
-  readptr += 4;
-
-
-  memcpy(&dTimeAfterStart, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dTE, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dTR, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dTI, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-
-  memcpy(&dTriggerTime, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(chAcquisitionDate, readptr, ACQUISITION_DATE_LEN*CHARSIZE);
-  readptr += ACQUISITION_DATE_LEN*CHARSIZE;
-
-  memcpy(chAcquisitionTime, readptr, ACQUISITION_TIME_LEN*CHARSIZE);
-  readptr += ACQUISITION_TIME_LEN*CHARSIZE;
-
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lSliceIndex = long(longtemp);
-  readptr += LONGSIZE;
-
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lNumTrackCha = long(longtemp);
-  readptr += LONGSIZE;
-
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lCurrentTrackCha = long(longtemp);
-  readptr += LONGSIZE;
-
-  memcpy(trash, readptr, 3);
-  readptr += 3;
-
-  memcpy(&iWindowCenter, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(&iWindowWidth, readptr, INTSIZE);
-  readptr += INTSIZE;
-
-  memcpy(chImageTypeValue4, readptr, _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
-  readptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
-
-  memcpy(&longtemp, readptr, LONGSIZE);
-  lAbsTablePosition = (long)longtemp;
-  readptr += LONGSIZE;
-
-  memcpy(chframeOfReference, readptr, FOR_ARRAY_LEN*CHARSIZE);
-  readptr += FOR_ARRAY_LEN*CHARSIZE;
-
-  memcpy(&dTimeDelay, readptr, DOUBLESIZE);
-  readptr += DOUBLESIZE;
-
-  memcpy(trash, readptr, 16*LONGSIZE);
-  readptr += 16*LONGSIZE;
-
-  memcpy(trash, readptr, 16*DOUBLESIZE);
-  readptr += 16*DOUBLESIZE;
-
-  memcpy(trash, readptr, 32*CHARSIZE);
-  readptr += 32*CHARSIZE;
-
+  for (int ii=0; ii<4; ii++) {
+    for (int jj=0; jj<4; jj++) {
+      memcpy(&voxelToWorldMatrix[ii][jj], readptr, sizeof(float32_t));
+      readptr += sizeof(float32_t);
+    }
+  }
+  
+  memcpy(&repetitionTimeMS, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
+  
+  memcpy(&repetitionDelayMS, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
+  
+  memcpy(&currentTR, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
+  
+  memcpy(&totalTR, readptr, sizeof(int32_t));
+  readptr += sizeof(int32_t);
+  
+  memcpy(&isMotionCorrected, readptr, sizeof(bool));
+  readptr += sizeof(bool);
+  
+  memcpy(mcOrder, readptr, 5*sizeof(char));
+  readptr += 5*sizeof(char);
+  
+  memcpy(&mcTranslationXMM, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+  
+  memcpy(&mcTranslationYMM, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+  
+  memcpy(&mcTranslationZMM, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+  
+  memcpy(&mcRotationXRAD, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+  
+  memcpy(&mcRotationYRAD, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
+  
+  memcpy(&mcRotationZRAD, readptr, sizeof(float64_t));
+  readptr += sizeof(float64_t);
 }
 
-// build data to send as the physical scanner would
-// this function does selective memcpy through the passed data because the
-// scanner sends packed data with a few trash spots, which were identified
-// manually with plenty of frustration.
-//  out
-//   array of data that conforms to the ExternalImageSender format
-char *RtExternalImageInfo::convertToScannerDataArray() {
-  char *data = (char*) calloc(EXTERNALSENDERSIZEOF,1);
-  char *writeptr = data;
-  char *trash = (char*) calloc(TRASHSIZE,1);
-
-  memcpy(writeptr, chID, 4*CHARSIZE);
-  writeptr += 4*CHARSIZE;
-
-  memcpy(writeptr, &lVersion, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &iSizeOfRtExternalImageInfo, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, trash, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &dFOVread, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dFOVphase, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dThick, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &nCol, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &nLin, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &nSli, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &lImageDataLength, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &lNumberOfPixels, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &lBytesPerPixel, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, trash, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &dPosSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dPosCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dPosTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dNorSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dNorCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dNorTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dPhaSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dPhaCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dPhaTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dRowSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dRowCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dRowTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dColSag, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dColCor, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dColTra, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dMoCoTransX, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoTransY, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoTransZ, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoRotX, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoRotY, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, &dMoCoRotZ, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-
-  memcpy(writeptr, &bIsMoCo, sizeof(bool));
-  writeptr += sizeof(bool);
-
-  memcpy(writeptr, trash, 3);
-  writeptr += 3;
-
-  memcpy(writeptr, &iNoOfImagesInMosaic, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &iMosaicGridSize, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, cSeriesInstanceUID, 65*CHARSIZE);
-  writeptr += 65*CHARSIZE;
-
-
-  memcpy(writeptr, &bSwapReadPhase, sizeof(bool));
-  writeptr += sizeof(bool);
-
-  memcpy(writeptr, trash, 2);
-  writeptr += 2;
-
-
-  memcpy(writeptr, &iAcquisitionNumber, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, trash, 4);
-  writeptr += 4;
-
-  memcpy(writeptr, &dTimeAfterStart, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTE, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTR, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTI, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-
-  memcpy(writeptr, &dTriggerTime, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, chAcquisitionDate, ACQUISITION_DATE_LEN*CHARSIZE);
-  writeptr += ACQUISITION_DATE_LEN*CHARSIZE;
-
-  memcpy(writeptr, chAcquisitionTime, ACQUISITION_TIME_LEN*CHARSIZE);
-  writeptr += ACQUISITION_TIME_LEN*CHARSIZE;
-
-  memcpy(writeptr, &lSliceIndex, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &lNumTrackCha, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, &lCurrentTrackCha, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, trash, 3);
-  writeptr += 3;
-
-
-  memcpy(writeptr, &iWindowCenter, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, &iWindowWidth, INTSIZE);
-  writeptr += INTSIZE;
-
-  memcpy(writeptr, chImageTypeValue4,
-         _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE);
-  writeptr += _NO_OF_V4_ENTRIES*IMAGETYPE_V4_LEN*CHARSIZE;
-
-
-  memcpy(writeptr, &lAbsTablePosition, LONGSIZE);
-  writeptr += LONGSIZE;
-
-  memcpy(writeptr, chframeOfReference, FOR_ARRAY_LEN*CHARSIZE);
-  writeptr += FOR_ARRAY_LEN*CHARSIZE;
-
-  memcpy(writeptr, &dTimeDelay, DOUBLESIZE);
-  writeptr += DOUBLESIZE;
-
-  memcpy(writeptr, trash, 16*LONGSIZE);
-  writeptr += 16*LONGSIZE;
-
-  memcpy(writeptr, trash, 16*DOUBLESIZE);
-  writeptr += 16*DOUBLESIZE;
-
-  memcpy(writeptr, trash, 32*CHARSIZE);
-  writeptr += 32*CHARSIZE;
-
-  free(trash);
-  return data;
-}
-
-// print info about a received image
-//  in
-//   info:   the last read image info struct
+//  Dumps all fields to STDOUT
 void RtExternalImageInfo::displayImageInfo() const {
-  char myID[5];
-  memcpy (myID, chID, 4);
-  myID[4] = '\0';
   cout << "-----------------------------" << endl;
   cout << "Dumping RtExternalImageInfo         " << endl;
   cout << "Data:"  << sizeof (RtExternalImageInfo) << " Bytes used" << endl;
   cout << "-----------------------------" << endl;
-  cout << "sID:                                    " << myID << endl
-       << "lVersion:                               " << lVersion << endl
-       << "nlin / ncol / nsli / FOVread / FOVphase " << nLin << " / " << nCol << " / " << nSli << " / " << dFOVread << " / " << dFOVphase << endl
-       << "Slice Thickness                         " << dThick << endl
-       << "Slice Position Sag / Cor / Tra          " << dPosSag << " / " << dPosCor << " / " << dPosTra << endl
-       << "Slice Normal   Sag / Cor / Tra          " << dNorSag << " / " << dNorCor << " / " << dNorTra << endl
-       << "Slice Phase En Sag / Cor / Tra          " << dPhaSag << " / " << dPhaCor << " / " << dPhaTra << endl
-       << "Slice Row Vect Sag / Cor / Tra          " << dRowSag << " / " << dRowCor << " / " << dRowTra << endl
-       << "Slice Col Vect Sag / Cor / Tra          " << dColSag << " / " << dColCor << " / " << dColTra << endl
-       << "isMoCo                                  " << bIsMoCo << endl
-       << "MoCoTrans        X / Y / Z              " << dMoCoTransX << " / " << dMoCoTransY << " / " << dMoCoTransZ << endl
-       << "MoCoRot          X / Y / Z              " << dMoCoRotX << " / " << dMoCoRotY << " / " << dMoCoRotZ << endl
-       << "numMosaicImages / mosaicGridSize        " << iNoOfImagesInMosaic << " / " << iMosaicGridSize << endl
-       << "seriesInstanceUID                       " << cSeriesInstanceUID << endl
-       << "AcqNo / TimeAfterStart / TrigTi         " << iAcquisitionNumber << " / " << dTimeAfterStart << " / " << dTriggerTime << endl
-       << "TE / TR / TI                            " << dTE << " / " << dTR << " / " << dTI << endl
-       << "AcquisitionDate                         " << chAcquisitionDate << endl
-       << "AcquisitionTime                         " << chAcquisitionTime << endl
-       << "Header Size                             " << iSizeOfRtExternalImageInfo << endl
-       << "Number of pixels / dataLength           " << lNumberOfPixels   << " / " << lImageDataLength << endl
-       << "Bytes per pixel                         " << lBytesPerPixel << endl
-       << "Current Slice Index                     " << lSliceIndex <<  endl
-       << "Window Width                            " << iWindowWidth << endl
-       << "Window Center                           " << iWindowCenter << endl
-       << "ImageTypeValue4[0]                      " << chImageTypeValue4[0] << endl
-       << "AbsTablePosition                        " << lAbsTablePosition << endl
-       << "Data Source                             " << iDataSource << endl
-       << "Frame Of Reference                      " << chframeOfReference << endl
-       << "Time Delay                              " << dTimeDelay << endl
-       << "SwapReadPhase                           " << bSwapReadPhase << endl
-       << "SliceIndex                              " << lSliceIndex << endl;
+  cout << "Functor Code / Header Version:          " << magic << " / " << headerVersion << endl
+       << "scanType:                               " << scanType << endl
+       << "imageType / isMosaic:                   " << imageType << " / " << isMosaic << endl
+       << "datatype / isLittleEndian:              " << datatype << " / " << isLittleEndian << endl
+       << "note:                                   " << note << endl
+       << "numPixels*:  Read / Phase / Slice       " << numPixelsRead << " / " << numPixelsPhase << " / " << numSlices << endl
+       << "pixelSpacing*MM:  Read / Phase          " << pixelSpacingReadMM << " / " << pixelSpacingPhaseMM << endl
+       << "Slice Thickness / Gap (mm):             " << pixelSpacingSliceMM << " / " << sliceGapMM << endl
+       << "isMotionCorrected / mcOrder:            " << isMotionCorrected << " / " << mcOrder << endl
+       << "mcTranslation*MM:  X / Y / Z            " << mcTranslationXMM << " / " << mcTranslationYMM << " / " << mcTranslationZMM << endl
+       << "mcRotation*MM:  X / Y / Z               " << mcRotationXRAD << " / " << mcRotationYRAD << " / " << mcRotationZRAD << endl
+       << "repetitionTimeMS / repetitionDelayMS    " << repetitionTimeMS << " / " << repetitionDelayMS << endl
+       << "currentTR / totalTR                     " << currentTR << " / " << totalTR << endl
+       << "voxelToWorldMatrix                      " << voxelToWorldMatrix[0][0] << " " << voxelToWorldMatrix[0][1] << " " << voxelToWorldMatrix[0][2] << " " << voxelToWorldMatrix[0][3] << endl    
+       << "                                        " << voxelToWorldMatrix[1][0] << " " << voxelToWorldMatrix[1][1] << " " << voxelToWorldMatrix[1][2] << " " << voxelToWorldMatrix[1][3] << endl    
+       << "                                        " << voxelToWorldMatrix[2][0] << " " << voxelToWorldMatrix[2][1] << " " << voxelToWorldMatrix[2][2] << " " << voxelToWorldMatrix[2][3] << endl    
+       << "                                        " << voxelToWorldMatrix[3][0] << " " << voxelToWorldMatrix[3][1] << " " << voxelToWorldMatrix[3][2] << " " << voxelToWorldMatrix[3][3] << endl;    
+}
+
+// Returns the size (in bytes) of the header
+int32_t RtExternalImageInfo::getHeaderSize() const {
+	return (int32_t)sizeof(RtExternalImageInfo);
+}
+
+// Returns the size (in bytes) per pixel, specified by datatype
+int32_t RtExternalImageInfo::getBytesPerPix() const {
+	if (strcmp(datatype, "int16_t\0")) {
+		return sizeof(int16_t);
+	} else {
+		cout << "WARNING!!! TODO! assuming datatype is int16_t" << endl; // TODO(murfidev) fill in other supported datatypes
+		return sizeof(int16_t);
+	}
+}
+
+// Returns the size (in bytes) of the data blob
+int32_t RtExternalImageInfo::getDataSize() const {
+	return getBytesPerPix()*getNumVoxels();
+}
+
+// Returns the size (in voxels) of the data blob
+int32_t RtExternalImageInfo::getNumVoxels() const {
+	if (isMosaic)
+		// If it's mosaiced then the number of voxels in the data blob
+		// is potentially larger than the number of voxels in the volume.
+		// Example: a 72x72x31 volume has 160704 voxels, but creates a 6x6
+		// (ceil(sqrt(numSlices))) mosaic, and therefore sends 72x72x36 = 186624
+		// voxels
+		return (int32_t) numPixelsRead*numPixelsPhase*pow(getMosaicSize(),2);
+	else
+		return (int32_t) numPixelsRead*numPixelsPhase*numSlices;
+}
+
+// Returns mosaic grid size (in mosaic cells)
+int32_t RtExternalImageInfo::getMosaicSize() const {
+  if (isMosaic)
+    return (int32_t) ceil(sqrt((double)numSlices));
+  else
+    return 1;
+}
+
+void* RtExternalImageInfo::serialize() const {
+	char *data = (char*) calloc(getHeaderSize(),1);
+	char *writeptr = data;
+	
+	memcpy(writeptr, magic, 5*sizeof(char));
+    writeptr += 5*sizeof(char);
+
+	memcpy(writeptr, &headerVersion, sizeof(int32_t));
+    writeptr += sizeof(int32_t);
+	
+	memcpy(writeptr, scanType, 64*sizeof(char));
+    writeptr += 64*sizeof(char);
+
+	memcpy(writeptr, imageType, 16*sizeof(char));
+    writeptr += 16*sizeof(char);
+	
+	memcpy(writeptr, note, 256*sizeof(char));
+    writeptr += 256*sizeof(char);
+	
+	memcpy(writeptr, datatype, 16*sizeof(char));
+    writeptr += 16*sizeof(char);
+	
+	memcpy(writeptr, &isLittleEndian, sizeof(bool));
+    writeptr += sizeof(bool);
+
+	memcpy(writeptr, &isMosaic, sizeof(bool));
+    writeptr += sizeof(bool);
+	
+	memcpy(writeptr, &pixelSpacingReadMM, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &pixelSpacingPhaseMM, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &pixelSpacingSliceMM, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &sliceGapMM, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &numPixelsRead, sizeof(int32_t));
+	writeptr += sizeof(int32_t);
+
+	memcpy(writeptr, &numPixelsPhase, sizeof(int32_t));
+	writeptr += sizeof(int32_t);
+
+	memcpy(writeptr, &numSlices, sizeof(int32_t));
+	writeptr += sizeof(int32_t);
+
+	for (int ii=0; ii<4; ii++) {
+		for (int jj=0; jj<4; jj++) {
+			memcpy(writeptr, &voxelToWorldMatrix[ii][jj], sizeof(float32_t));
+			writeptr += sizeof(float32_t);
+		}
+	}
+
+	memcpy(writeptr, &repetitionTimeMS, sizeof(int32_t));
+	writeptr += sizeof(int32_t);
+
+	memcpy(writeptr, &repetitionDelayMS, sizeof(int32_t));
+	writeptr += sizeof(int32_t);
+
+	memcpy(writeptr, &currentTR, sizeof(int32_t));
+	writeptr += sizeof(int32_t);
+
+	memcpy(writeptr, &totalTR, sizeof(int32_t));
+	writeptr += sizeof(int32_t);
+	
+	memcpy(writeptr, &isMotionCorrected, sizeof(bool));
+    writeptr += sizeof(bool);
+	
+	memcpy(writeptr, mcOrder, 5*sizeof(char));
+    writeptr += 5*sizeof(char);
+	
+	memcpy(writeptr, &mcTranslationXMM, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &mcTranslationYMM, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &mcTranslationZMM, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &mcRotationXRAD, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &mcRotationYRAD, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	memcpy(writeptr, &mcRotationZRAD, sizeof(float64_t));
+	writeptr += sizeof(float64_t);
+	
+	return (void*)data;
 }

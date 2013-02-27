@@ -127,41 +127,42 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     unsigned int mosaicSide = (int) sqrt(matrixSize*matrixSize
                                          *pow(ceil(sqrt((double)numSlices)),2));
-    ei->nCol = matrixSize;
-    ei->nLin = matrixSize;
+    ei->numPixelsPhase = matrixSize;
+    ei->numPixelsRead = matrixSize;
 
     unsigned int numPix = mosaicSide*mosaicSide;
 
-    ei->iNoOfImagesInMosaic = numSlices;
-    ei->iMosaicGridSize = ceil(sqrt(numSlices));
+    ei->numSlices = numSlices;
+//    ei->iMosaicGridSize = ceil(sqrt(numSlices));  // TODO(murfidev) fill this in!
 
-    ei->dThick = vols->pixdim[3]/1.1;
+    ei->pixelSpacingSliceMM = vols->pixdim[3]/1.1;  // TODO(murfidev) equivalent? what's the 1.1?
 
     cout
-        << "nCol " <<  ei->nCol << " "
-        << "nLin " <<  ei->nLin << " "
-        << "iNoOfImagesInMosaic " <<  ei->iNoOfImagesInMosaic << " "
-        << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl;
+        << "numPixelsPhase " <<  ei->numPixelsPhase << " "
+        << "numPixelsRead " <<  ei->numPixelsRead << " "
+        << "numSlices " <<  ei->numSlices << " "
+//        << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl;  // TODO(murfidev) fix!
+        << "iMosaicGridSize (not defined)" << endl;
 
-    ei->dRowSag = rotMat[0][0];
-    ei->dRowCor = rotMat[0][1];
-    ei->dRowTra = rotMat[0][2];
+    ei->voxelToWorldMatrix[0][0] = rotMat[0][0];
+    ei->voxelToWorldMatrix[1][0] = rotMat[0][1];
+    ei->voxelToWorldMatrix[2][0] = rotMat[0][2];
 
-    ei->dColSag = rotMat[1][0];
-    ei->dColCor = rotMat[1][1];
-    ei->dColTra = rotMat[1][2];
+    ei->voxelToWorldMatrix[0][1] = rotMat[1][0];
+    ei->voxelToWorldMatrix[1][1] = rotMat[1][1];
+    ei->voxelToWorldMatrix[2][1] = rotMat[1][2];
 
-    ei->dNorSag = rotMat[2][0];
-    ei->dNorCor = rotMat[2][1];
-    ei->dNorTra = rotMat[2][2];
+    ei->voxelToWorldMatrix[0][2] = rotMat[2][0];
+    ei->voxelToWorldMatrix[1][2] = rotMat[2][1];
+    ei->voxelToWorldMatrix[2][2] = rotMat[2][2];
 
-    ei->dPosSag = vols->qto_xyz.m[0][3];
+    ei->voxelToWorldMatrix[0][3] = vols->qto_xyz.m[0][3];
     cout << "dPosSag " << vols->qto_xyz.m[0][3] << endl;
-    ei->dPosCor = vols->qto_xyz.m[1][3];
-    ei->dPosTra = vols->qto_xyz.m[2][3];
+    ei->voxelToWorldMatrix[1][3] = vols->qto_xyz.m[1][3];
+    ei->voxelToWorldMatrix[2][3] = vols->qto_xyz.m[2][3];
 
-    ei->lImageDataLength = vols->nbyper*numPix;
-    ei->lNumberOfPixels = numPix;
+/*    ei->lImageDataLength = vols->nbyper*numPix;
+    ei->lNumberOfPixels = numPix; */  // TODO(murfidev) removed?
 
 
     // mosaic
@@ -191,14 +192,14 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     }
 
 
-    ei->iAcquisitionNumber = i+1;
+    ei->currentTR = i+1;
 
     //// send nonmoco image
-    cout << "sending img  " << ei->iAcquisitionNumber << endl;
+    cout << "sending img  " << ei->currentTR << endl;
 
-    char *data = new char[ei->iSizeOfRtExternalImageInfo];
-    ei->bIsMoCo = false;
-    data = ei->convertToScannerDataArray();
+/*    char *data = new char[2000]; // [ei->iSizeOfRtExternalImageInfo];  // TODO(murfidev) figure this out!
+    ei->isMotionCorrected = false;
+    data = ei; // ei->convertToScannerDataArray();
     cout << "sending info of size " << ei->iSizeOfRtExternalImageInfo << endl;
     stream.send_n (data, ei->iSizeOfRtExternalImageInfo);
 
@@ -206,7 +207,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     int sent = stream.send_n(newdata, ei->lImageDataLength);
 
-    cout << "sent " << sent << endl;
+    cout << "sent " << sent << endl;  */ // TODO(murfidev) lots to do here!
 
     stream.close();
 
@@ -215,10 +216,10 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
       break;
     }
 
-    cout << "sending moco img  " << ei->iAcquisitionNumber << endl;
+    cout << "sending moco img  " << ei->currentTR << endl;
 
-    ei->bIsMoCo = true;
-    data = ei->convertToScannerDataArray();
+    ei->isMotionCorrected = true;
+/*    data = ei->convertToScannerDataArray();
     cout << "sending info of size " << ei->iSizeOfRtExternalImageInfo << endl;
     stream.send_n (data, ei->iSizeOfRtExternalImageInfo);
     delete data;
@@ -227,7 +228,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     sent = stream.send_n(newdata, ei->lImageDataLength);
 
-    cout << "sent " << sent << endl;
+    cout << "sent " << sent << endl;   */ // TODO(murfidev) lots to do here!
 
     stream.close();
 

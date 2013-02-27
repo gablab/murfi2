@@ -110,25 +110,25 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     cout << "made connection, loading image" << endl;
     RtExternalImageInfo *ei = new RtExternalImageInfo();
 
-    ei->nCol = img->dim[1];
-    ei->nLin = img->dim[2];
+    ei->numPixelsPhase = img->dim[1];
+    ei->numPixelsRead = img->dim[2];
 
-    ei->bIsMoCo = true;
+    ei->isMotionCorrected = true;
 
-    ei->iNoOfImagesInMosaic = numSlices;
-    ei->iMosaicGridSize = ceil(sqrt(numSlices));
+    ei->numSlices = numSlices;
+//    ei->iMosaicGridSize = ceil(sqrt(numSlices));  // TODO(murfidev) fix
 
-    ei->nCol = img->dim[1]/ei->iMosaicGridSize;
+/*    ei->nCol = img->dim[1]/ei->iMosaicGridSize;
     ei->nLin = img->dim[2]/ei->iMosaicGridSize;
-    ei->dThick = 3.5;
+    ei->dThick = 3.5; */ // TODO(murfidev) what the heck is going on here?
 
     cout 
-      << "nCol " <<  ei->nCol << " "
-      << "nLin " <<  ei->nLin << " "
-      << "iNoOfImagesInMosaic " <<  ei->iNoOfImagesInMosaic << " "
-      << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl;
+      << "nCol " <<  ei->numPixelsPhase << " "
+      << "nLin " <<  ei->numPixelsRead << " "
+      << "iNoOfImagesInMosaic " <<  ei->numSlices << endl; // " "
+//      << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl; // TODO(murfidev) fix
 
-    ei->dPosSag = 2.50517;
+/*    ei->dPosSag = 2.50517;
     ei->dPosCor = -29.9335;
     ei->dPosTra = -75.1856;
 
@@ -142,16 +142,16 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     ei->dColSag = 0.000227022;
     ei->dColCor = 0.941172;
-    ei->dColTra = -0.337928;
+    ei->dColTra = -0.337928; */ // TODO(murfidev) are you kidding me?
 
 
-    ei->lImageDataLength = img->nbyper*img->nvox;
-    ei->lNumberOfPixels = img->nvox;
+/*    ei->lImageDataLength = img->nbyper*img->nvox;
+    ei->lNumberOfPixels = img->nvox; */ // TODO(murfidev) fix
 
-    ei->iAcquisitionNumber = i+1;
-    cout << "sending img  " << ei->iAcquisitionNumber << endl;
+    ei->currentTR = i+1;
+    cout << "sending img  " << ei->currentTR << endl;
 
-    char *data = new char[ei->iSizeOfRtExternalImageInfo];
+/*    char *data = new char[ei->iSizeOfRtExternalImageInfo];
     data = ei->convertToScannerDataArray();
     cout << "sending info of size " << ei->iSizeOfRtExternalImageInfo << endl;
     stream.send_n (data, ei->iSizeOfRtExternalImageInfo);
@@ -159,7 +159,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     cout << "sending img of size " << ei->lImageDataLength << endl;
 
-    stream.send_n(img->data, ei->lImageDataLength);
+    stream.send_n(img->data, ei->lImageDataLength); */ // TODO(murfidev) fix
 
   // Find the window which has the current keyboard focus.
   XGetInputFocus(display, &winFocus, &revert);

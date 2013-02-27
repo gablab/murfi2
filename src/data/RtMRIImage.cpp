@@ -54,9 +54,10 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   dataID.setDataName(NAME_SCANNERIMG_EPI);
 
   dataID.setStudyNum(getExperimentStudyID());
-  dataID.setSeriesNum
-      (getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
-  dataID.setTimePoint(extinfo.iAcquisitionNumber);
+/*  dataID.setSeriesNum
+      (getSeriesNumFromUID(extinfo.cSeriesInstanceUID)); */  // TODO(murfidev) fill this in!
+  dataID.setSeriesNum(17);
+  dataID.setTimePoint(extinfo.currentTR);
 
   // setup geometry
   if(getExperimentConfig().isSet("scanner:matrixSize")) {
@@ -74,10 +75,12 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   if(getExperimentConfig().isSet("scanner:voxdim3")) {
     double sliceDist = getExperimentConfig().get("scanner:voxdim3");
     if(getExperimentConfig().isSet("scanner:sliceGap")) {
-      sliceDist
-          += static_cast<double>(getExperimentConfig().get("scanner:sliceGap"));
+      sliceGap
+          = static_cast<double>(getExperimentConfig().get("scanner:sliceGap"));
+      cout << "RTMRIIMAGE: sliceGap from XML: " << sliceGap << endl;
     }
     setPixDim(2,sliceDist);
+    cout << "RTMRIIMAGE: sliceDist: " << sliceDist << endl;
   }
 
   // allocate and copy the img data
@@ -270,30 +273,32 @@ RtMRIImage::~RtMRIImage() {
 //   _info: struct to copy
 void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
 
-  if (info.iNoOfImagesInMosaic == 0) {
+  if (!info.isMosaic) {
     // volume is not mosaiced
     dims.resize(3);
-    dims[0] = info.nLin;
-    dims[1] = info.nCol;
-    dims[2] = info.nSli;
+    dims[0] = info.numPixelsRead;
+    dims[1] = info.numPixelsPhase;
+    dims[2] = info.numSlices;
   } else {
     // determine the dimensions and voxel size
     dims.resize(2);
-    dims[0] = info.nLin*info.iMosaicGridSize;
-    dims[1] = info.nCol*info.iMosaicGridSize;
+    dims[0] = info.numPixelsRead*info.getMosaicSize();
+    dims[1] = info.numPixelsPhase*info.getMosaicSize();
   }
 
+  cout << "RTMRIIMAGE/SETINFO: Existing value of sliceGap: " << sliceGap << endl;
   // TODO This is most definitly the WRONG place to put this... But for some
   // reason the constructor was getting called *after* setInfo(), so sliceGap
   // wasn't being set correctly.
   if(getExperimentConfig().isSet("scanner:sliceGap")) {
     sliceGap = getExperimentConfig().get("scanner:sliceGap");
+    cout << "RTMRIIMAGE/SETINFO: sliceGap: " << sliceGap << endl;
   }
 
   pixdims.resize(3);
-  pixdims[0] = info.dFOVread / info.nLin;
-  pixdims[1] = info.dFOVphase / info.nCol;
-  pixdims[2] = info.dThick / info.nSli * (1+sliceGap);
+  pixdims[0] = info.pixelSpacingReadMM;
+  pixdims[1] = info.pixelSpacingPhaseMM;
+  pixdims[2] = info.pixelSpacingSliceMM;  // TODO(murfidev) equivalent?: info.dThick / info.nSli * (1+sliceGap)
 
   // set geometry info
   setPixDim(0,pixdims[0]);
@@ -313,77 +318,47 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   scaleMat.set_identity();
   scaleMat.put(0,0, pixdims[0]);
   scaleMat.put(1,1, pixdims[1]);
-  scaleMat.put(2,2, pixdims[2]);
+  scaleMat.put(2,2, pixdims[2]); // TODO(murfidev) why isn't this value propagated to the niftiheader?
+  cout << "RTMRIIMAGE/SETINFO: pixdims[2]: " << pixdims[2] << endl;
 
-  // rotation matrix
-  vnl_matrix_fixed<double,4,4> rotMat;
-  rotMat.set_identity();
+  vxl2ras.set_identity();
+  vxl2ras.put(0,0, info.voxelToWorldMatrix[0][0]);
+  vxl2ras.put(1,0, info.voxelToWorldMatrix[1][0]);
+  vxl2ras.put(2,0, info.voxelToWorldMatrix[2][0]);
 
-  rotMat.put(0,0, info.dRowSag);
-  rotMat.put(1,0, info.dRowCor);
-  rotMat.put(2,0, info.dRowTra);
+  vxl2ras.put(0,1, info.voxelToWorldMatrix[0][1]);
+  vxl2ras.put(1,1, info.voxelToWorldMatrix[1][1]);
+  vxl2ras.put(2,1, info.voxelToWorldMatrix[2][1]);
 
-  rotMat.put(0,1, info.dColSag);
-  rotMat.put(1,1, info.dColCor);
-  rotMat.put(2,1, info.dColTra);
+  vxl2ras.put(0,2, info.voxelToWorldMatrix[0][2]);
+  vxl2ras.put(1,2, info.voxelToWorldMatrix[1][2]);
+  vxl2ras.put(2,2, info.voxelToWorldMatrix[2][2]);
 
-  rotMat.put(0,2, info.dNorSag);
-  rotMat.put(1,2, info.dNorCor);
-  rotMat.put(2,2, info.dNorTra);
-
-  // Seimens' logical coordinate system is LPS we want coords in RAS
-  vnl_matrix_fixed<double,4,4> lps2ras;
-  lps2ras.set_identity();
-  lps2ras.put(0,0,-1);
-  lps2ras.put(1,1,-1);
-
-  vxl2ras = (lps2ras*rotMat)*scaleMat;
-
-  // Calculate the offset to center of k-space
-  // See
-  // http://www.nmr.mgh.harvard.edu/~rudolph/software/vox2ras/download/vox2ras_ksolve.html
-  // With a slight modification.  Since info.dPos.. is the offset to slice
-  // #zero, we don't need to traverse in the slice direction (we are already
-  // there) only in the phase encode and readout directions This should
-  // probably tested with a few more volumes (and definitly with patient
-  // orientations other than HFS)
-  vnl_matrix_fixed<double,3,1> Vc_x = vxl2ras.extract(3,1,0,0);
-  vnl_matrix_fixed<double,3,1> Vc_y = vxl2ras.extract(3,1,0,1);
-  vnl_matrix_fixed<double,3,1> Vc_z = vxl2ras.extract(3,1,0,2);
-  vnl_matrix_fixed<double,3,1> Vc_Ps;
-  double xoff = info.nLin / 2.0;
-  double yoff = info.nCol / 2.0;
-  //double zoff = info.iMosaicGridSize / 2.0;
-  Vc_Ps.put(0,0, info.dPosSag);
-  Vc_Ps.put(1,0, info.dPosCor);
-  Vc_Ps.put(2,0, info.dPosTra);
-  vnl_matrix_fixed<double,3,1> Vc_Pe1 =
-      lps2ras.extract(3,3)*(Vc_Ps + (xoff*Vc_x + yoff*Vc_y));
-  vnl_matrix_fixed<double,3,1> Vc_Pe2 =
-      lps2ras.extract(3,3)*(Vc_Ps - (xoff*Vc_x + yoff*Vc_y));
-  vxl2ras.put(0,3, Vc_Pe1.get(0,0));
-  vxl2ras.put(1,3, Vc_Pe1.get(1,0));
-  vxl2ras.put(2,3, Vc_Pe2.get(2,0));
+  vxl2ras.put(0,3, info.voxelToWorldMatrix[0][3]);
+  vxl2ras.put(1,3, info.voxelToWorldMatrix[1][3]);
+  vxl2ras.put(2,3, info.voxelToWorldMatrix[2][3]);
+  cout << "RTMRIIMAGE VXL2RAS: " << vxl2ras << endl;
 
   // build RAS 2 REF transformation matrix
   // TODO set this properly
   ras2ref.set_identity();
 
   // image info
-  slice = info.lSliceIndex;
-  readFOV = info.dFOVread;
-  phaseFOV = info.dFOVphase;
-  matrixSize = info.nCol;
-  numSlices = info.iNoOfImagesInMosaic;
-  sliceThick = info.dThick;
-  seriesInstanceUID = info.cSeriesInstanceUID;
+//  slice = info.lSliceIndex;  // TODO(murfidev) fill this in!
+  readFOV =  info.numPixelsRead*info.pixelSpacingReadMM;
+  phaseFOV = info.numPixelsPhase*info.pixelSpacingPhaseMM;
+  matrixSize = info.numPixelsPhase; // TODO(murfidev) equivalent?: info.nCol;
+  numSlices = info.numSlices;
+  sliceThick = info.pixelSpacingSliceMM - info.sliceGapMM;
+//  seriesInstanceUID = info.cSeriesInstanceUID;  // TODO(murfidev) fill this in!
+  seriesInstanceUID = "17";  // workaround/hack
 
-  swapReadPhase = info.bSwapReadPhase;
-  dataID.setTimePoint(info.iAcquisitionNumber);
-  timeAfterStart = info.dTimeAfterStart;
-  te = info.dTE;
-  tr = info.dTR;
-  ti = info.dTI;
+//  swapReadPhase = info.bSwapReadPhase;  // TODO(murfidev) fill this in!
+  dataID.setTimePoint(info.currentTR);
+/*  timeAfterStart = info.dTimeAfterStart;
+  te = info.dTE; */  // TODO(murfidev) fill these in!
+  tr = info.repetitionTimeMS;
+/*  ti = info.dTI;
   triggerTime = info.dTriggerTime;
 
   // actual acquision info parms
@@ -392,11 +367,11 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   reconDelay = info.dTimeDelay;
 
   // scanner online post-processing parms
-  distCorrect2D = false;
-  moco = info.bIsMoCo;
+  distCorrect2D = false; */ // TODO(murfidev) fill these in!
+  moco = info.isMotionCorrected;
 
   // received data parms
-  fromScanner = info.iDataSource == 0;
+//  fromScanner = info.iDataSource == 0;  // TODO(murfidev) fill this in!
 }
 
 // set the matrix size

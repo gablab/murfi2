@@ -8,20 +8,31 @@ software, or indicated in the image headers received from the scanner
 will result in an informative assertion and exit.
 
 * Removing ability to spec in the conf file
-** RtInputScannerImages.cpp
-*** RtInputScannerImages::init
-- remove setting of numImagesExpected and initialized
 
-
-* Add ability to set
 ** RtInputScannerImages.cpp
-*** RtInputScannerImages::init
-- remove setting of numImagesExpected and initialized
+- remove setting of numImagesExpected member
+- add a setter for numImagesExpected for use from infoclient/server
+  and RtExperiment.
+- check imageNumber and numImagesExpected within svc, assigned from
+  image header
+- check tr info against experiment config values. if they aren't the
+  same, assert
+- while at it, remove all geom and timing members, unneeded.
 
 * Adding ability to spec on the command line
+** RtExperiment.cpp
+- add options in parseArgs
+- add static vars to store values
+- add vars to the experiment conf
 
 * Adding ability to spec from the infoclient
+- add check for setting tr info in receiveMessage
+- when msg received, check that tr spec matches, if set via command line
+- if not set via command line, set info in experiment conf, trigger
+  design matrix build.
 
 * Adding ability to spec from the infoserver
-
-* Validating against values in the image header
+- add check for setting tr info in receiveMessage
+- when msg received, check that tr spec matches, if set via command line
+- if not set via command line, set info in experiment conf, trigger
+  design matrix build.

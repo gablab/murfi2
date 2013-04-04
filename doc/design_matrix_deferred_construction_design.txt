@@ -15,8 +15,8 @@ will result in an informative assertion and exit.
   and RtExperiment.
 - check imageNumber and numImagesExpected within svc, assigned from
   image header
-- check tr info against experiment config values. if they aren't the
-  same, assert
+- check tr info against experiment config values. if the TR is
+  different or the number of scanner TRs is fewer, assert
 - while at it, remove all geom and timing members, unneeded.
 
 * Adding ability to spec on the command line

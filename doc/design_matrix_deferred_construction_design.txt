@@ -1,0 +1,27 @@
+This is a design for modifying murfi to defer the construction of the
+model design matrix. The goal is to allow the number and length of TRs
+to be specified by the stimulus software or by the user explicitly on
+the command line. There will no longer be a way to set this
+information in the configuration file. In addition, mismatch between
+these values as specified on the command line, by the stimulus
+software, or indicated in the image headers received from the scanner
+will result in an informative assertion and exit.
+
+* Removing ability to spec in the conf file
+** RtInputScannerImages.cpp
+*** RtInputScannerImages::init
+- remove setting of numImagesExpected and initialized
+
+
+* Add ability to set
+** RtInputScannerImages.cpp
+*** RtInputScannerImages::init
+- remove setting of numImagesExpected and initialized
+
+* Adding ability to spec on the command line
+
+* Adding ability to spec from the infoclient
+
+* Adding ability to spec from the infoserver
+
+* Validating against values in the image header

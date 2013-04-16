@@ -123,7 +123,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     cout << "made connection, sending image " << i+1 << endl;
     // mosaic and send
 
-    RtExternalImageInfo *ei = new RtExternalImageInfo();
+    RtExternalImageInfo* ei = new RtExternalImageInfo();
 
     unsigned int mosaicSide = (int) sqrt(matrixSize*matrixSize
                                          *pow(ceil(sqrt((double)numSlices)),2));
@@ -197,17 +197,16 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     //// send nonmoco image
     cout << "sending img  " << ei->currentTR << endl;
 
-/*    char *data = new char[2000]; // [ei->iSizeOfRtExternalImageInfo];  // TODO(murfidev) figure this out!
+    char *header_data = new char[ei->getHeaderSize()];
     ei->isMotionCorrected = false;
-    data = ei; // ei->convertToScannerDataArray();
-    cout << "sending info of size " << ei->iSizeOfRtExternalImageInfo << endl;
-    stream.send_n (data, ei->iSizeOfRtExternalImageInfo);
+    cout << "sending info of size " << ei->getHeaderSize()
+         << endl;
+    stream.send_n(reinterpret_cast<char*>(ei), ei->getHeaderSize());
 
-    cout << "sending img of size " << ei->lImageDataLength << endl;
+    cout << "sending img of size " << ei->getDataSize() << endl;
+    size_t sent = stream.send_n(newdata, ei->getDataSize());
 
-    int sent = stream.send_n(newdata, ei->lImageDataLength);
-
-    cout << "sent " << sent << endl;  */ // TODO(murfidev) lots to do here!
+    cout << "sent " << sent << endl;
 
     stream.close();
 

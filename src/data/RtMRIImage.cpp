@@ -128,15 +128,11 @@ bool RtMRIImage::writeInfo(ostream &os) {
   }
 
   // write mri fields
-  os.write((char*) &slice,      sizeof(unsigned long));
   os.write((char*) &readFOV,    sizeof(double));
   os.write((char*) &phaseFOV,   sizeof(double));
   os.write((char*) &sliceThick, sizeof(double));
 
   char boolcon;
-
-  boolcon = (char) swapReadPhase;
-  os.write((char*) &boolcon, sizeof(char));
 
   unsigned int uint_tmp;
 
@@ -146,11 +142,7 @@ bool RtMRIImage::writeInfo(ostream &os) {
   uint_tmp = dataID.getTimePoint();
   os.write((char*) uint_tmp, sizeof(unsigned int));
 
-  os.write((char*) &timeAfterStart, sizeof(double));
-  os.write((char*) &te,             sizeof(double));
   os.write((char*) &tr,             sizeof(double));
-  os.write((char*) &ti,             sizeof(double));
-  os.write((char*) &triggerTime,    sizeof(double));
 
   char t[] = "hhmmss.xxxxxx";
   string tm = ACE_Date_Time2SiemensTime(time);
@@ -160,11 +152,6 @@ bool RtMRIImage::writeInfo(ostream &os) {
   tm = ACE_Date_Time2SiemensTime(refFrameTime);
   strcpy(t,tm.c_str());
   os.write(t, SIEMENS_TIMESTR_LEN*sizeof(char));
-
-  os.write((char*) &reconDelay, sizeof(double));
-
-  boolcon = (char) distCorrect2D;
-  os.write((char*) &boolcon, sizeof(char));
 
   boolcon = (char) moco;
   os.write((char*) &boolcon, sizeof(char));
@@ -188,15 +175,9 @@ bool RtMRIImage::readInfo(istream &is) {
   }
 
   // read mri fields
-  is.read((char*) &slice,      sizeof(unsigned long));
   is.read((char*) &readFOV,    sizeof(double));
   is.read((char*) &phaseFOV,   sizeof(double));
   is.read((char*) &sliceThick, sizeof(double));
-
-  char boolcon;
-
-  is.read((char*) &boolcon, sizeof(char));
-  swapReadPhase = (bool) boolcon;
 
   unsigned int uint_tmp = 0;
 
@@ -206,25 +187,16 @@ bool RtMRIImage::readInfo(istream &is) {
   is.read((char*) uint_tmp, sizeof(unsigned int));
   dataID.setTimePoint(uint_tmp);
 
-  is.read((char*) &timeAfterStart, sizeof(double));
-  is.read((char*) &te,             sizeof(double));
   is.read((char*) &tr,             sizeof(double));
-  is.read((char*) &ti,             sizeof(double));
-  is.read((char*) &triggerTime,    sizeof(double));
 
   char t[] = "hhmmss.xxxxxx";
 
   is.read(t, SIEMENS_TIMESTR_LEN*sizeof(char));
   time = siemensTime2ACE_Date_Time(t);
 
-  is.read(t, SIEMENS_TIMESTR_LEN*sizeof(char));
   refFrameTime = siemensTime2ACE_Date_Time(t);
 
-  is.read((char*) &reconDelay, sizeof(double));
-
-  is.read((char*) &boolcon, sizeof(char));
-  distCorrect2D = (bool) boolcon;
-
+  bool boolcon;
   is.read((char*) &boolcon, sizeof(char));
   moco = (bool) boolcon;
 
@@ -243,19 +215,11 @@ void RtMRIImage::printInfo(ostream &os) {
 
   os << setiosflags(ios::left);
 
-  os << setw(wid) << "slice" << slice << endl
-     << setw(wid) << "readFOV phaseFOV" << readFOV << " " << phaseFOV << endl
+  os << setw(wid) << "readFOV phaseFOV" << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
-     << setw(wid) << "swapReadPhase" << swapReadPhase << endl
      << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
-     << setw(wid) << "timeAfterStart" << timeAfterStart << endl
-     << setw(wid) << "te / tr / ti" << te << " / " << tr << " / " << ti << endl
-     << setw(wid) << "triggerTime" << triggerTime << endl
-     << setw(wid) << "time" << ACE_Date_Time2SiemensTime(time) << endl
+     << setw(wid) << "tr" << tr << endl
      << setw(wid) << "refFrameTime" << ACE_Date_Time2SiemensTime(refFrameTime)
-     << endl
-     << setw(wid) << "reconDelay" << reconDelay << endl
-     << setw(wid) << "distCorrect2D" << distCorrect2D << endl
      << setw(wid) << "moco" << moco << endl
      << setw(wid) << "fromScanner" << fromScanner << endl
      << setw(wid) << "MatrixSize" << getMatrixSize() << endl
@@ -286,19 +250,10 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
     dims[1] = info.numPixelsPhase*info.getMosaicSize();
   }
 
-  cout << "RTMRIIMAGE/SETINFO: Existing value of sliceGap: " << sliceGap << endl;
-  // TODO This is most definitly the WRONG place to put this... But for some
-  // reason the constructor was getting called *after* setInfo(), so sliceGap
-  // wasn't being set correctly.
-  if(getExperimentConfig().isSet("scanner:sliceGap")) {
-    sliceGap = getExperimentConfig().get("scanner:sliceGap");
-    cout << "RTMRIIMAGE/SETINFO: sliceGap: " << sliceGap << endl;
-  }
-
   pixdims.resize(3);
   pixdims[0] = info.pixelSpacingReadMM;
   pixdims[1] = info.pixelSpacingPhaseMM;
-  pixdims[2] = info.pixelSpacingSliceMM;  // TODO(murfidev) equivalent?: info.dThick / info.nSli * (1+sliceGap)
+  pixdims[2] = info.pixelSpacingSliceMM;
 
   // set geometry info
   setPixDim(0,pixdims[0]);
@@ -318,8 +273,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   scaleMat.set_identity();
   scaleMat.put(0,0, pixdims[0]);
   scaleMat.put(1,1, pixdims[1]);
-  scaleMat.put(2,2, pixdims[2]); // TODO(murfidev) why isn't this value propagated to the niftiheader?
-  cout << "RTMRIIMAGE/SETINFO: pixdims[2]: " << pixdims[2] << endl;
+  scaleMat.put(2,2, pixdims[2]);
 
   vxl2ras.set_identity();
   vxl2ras.put(0,0, info.voxelToWorldMatrix[0][0]);
@@ -337,41 +291,25 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   vxl2ras.put(0,3, info.voxelToWorldMatrix[0][3]);
   vxl2ras.put(1,3, info.voxelToWorldMatrix[1][3]);
   vxl2ras.put(2,3, info.voxelToWorldMatrix[2][3]);
-  cout << "RTMRIIMAGE VXL2RAS: " << vxl2ras << endl;
 
   // build RAS 2 REF transformation matrix
   // TODO set this properly
   ras2ref.set_identity();
 
   // image info
-//  slice = info.lSliceIndex;  // TODO(murfidev) fill this in!
   readFOV =  info.numPixelsRead*info.pixelSpacingReadMM;
   phaseFOV = info.numPixelsPhase*info.pixelSpacingPhaseMM;
-  matrixSize = info.numPixelsPhase; // TODO(murfidev) equivalent?: info.nCol;
+  matrixSize = info.numPixelsPhase;
   numSlices = info.numSlices;
   sliceThick = info.pixelSpacingSliceMM - info.sliceGapMM;
-//  seriesInstanceUID = info.cSeriesInstanceUID;  // TODO(murfidev) fill this in!
+  //  seriesInstanceUID = info.cSeriesInstanceUID;  // TODO(murfidev) fill this in!
   seriesInstanceUID = "17";  // workaround/hack
 
-//  swapReadPhase = info.bSwapReadPhase;  // TODO(murfidev) fill this in!
+  //  swapReadPhase = info.bSwapReadPhase;  // TODO(murfidev) fill this in!
   dataID.setTimePoint(info.currentTR);
-/*  timeAfterStart = info.dTimeAfterStart;
-  te = info.dTE; */  // TODO(murfidev) fill these in!
   tr = info.repetitionTimeMS;
-/*  ti = info.dTI;
-  triggerTime = info.dTriggerTime;
-
-  // actual acquision info parms
-  time = siemensTime2ACE_Date_Time(info.chAcquisitionTime);
-  refFrameTime = siemensTime2ACE_Date_Time(info.chframeOfReference);
-  reconDelay = info.dTimeDelay;
-
-  // scanner online post-processing parms
-  distCorrect2D = false; */ // TODO(murfidev) fill these in!
   moco = info.isMotionCorrected;
-
-  // received data parms
-//  fromScanner = info.iDataSource == 0;  // TODO(murfidev) fill this in!
+  fromScanner = !strcmp(info.magic, EXTERNALSENDER_MAGIC);
 }
 
 // set the matrix size

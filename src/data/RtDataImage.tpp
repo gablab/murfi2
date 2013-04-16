@@ -940,7 +940,6 @@ bool RtDataImage<T>::unmosaicUnlocked() {
   // build a new pixdim
   if(pixdims.size() == 2) pixdims.push_back(0);
   pixdims[2] = sliceThick + sliceGap;
-  cout << "RTDATAIMAGE: sliceThick / sliceGap / pixdims[2]: " << sliceThick << " / " << sliceGap << " / " << pixdims[2] << endl;
 
   // reshape the data
   numPix = matrixSize*matrixSize*numSlices;

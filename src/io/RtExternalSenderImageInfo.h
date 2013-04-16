@@ -16,7 +16,7 @@
  *
  *=========================================================================*/
 #ifndef RtExternalImageInfo_h
-#define RtExternalImageInfo_h 1
+#define RtExternalImageInfo_h
 
 #include <iostream>
 #include <fstream>
@@ -30,21 +30,19 @@ using namespace std;
 
 const char EXTERNALSENDER_MAGIC[5] = "ERTI";  // ERTI = External RealTime Info
 const int EXTERNALSENDER_VERSION = 4;
-const char EXTERNALSENDER_IMGTYPE[16] = "3D";
-const int EXTERNALSENDER_SIZEOF = 552;
 
-class RtExternalImageInfo {
+struct RtExternalImageInfo {
  public:
-  RtExternalImageInfo();             // default constructor
-  RtExternalImageInfo(char *data, unsigned int len);  // extract header from received image
+  RtExternalImageInfo();
+
   void displayImageInfo() const;     // print info about a received image
   void* serialize() const;           // create header for sending an image
-  int32_t getHeaderSize() const;
+  static size_t getHeaderSize();
   int32_t getBytesPerPix() const;
   int32_t getDataSize() const;
   int32_t getNumVoxels() const;
   int32_t getMosaicSize() const;
-  
+
   char       magic[5];       // Must be "ERTI"
   int32_t    headerVersion;  // Version of this header
   char       scanType[64];   // Type of scan, e.g., "MPRAGE" or "EPI"
@@ -53,45 +51,45 @@ class RtExternalImageInfo {
                              // 2Dzt: Multi-volume, 1 slice at a time
                              // 3D: Single volume all at once
                              // 3Dt: Multi-volume, 1 volume at a time
-  char       note[256];      // Text. Suggested contents: scanner make & 
+  char       note[256];      // Text. Suggested contents: scanner make &
                              //   model, pulse sequence name, version of
                              //   image-sending software used, etc.
-  char       datatype[16];   // Of image data. Valid (OS-independent) types:
-                             // - char   , c_char   , uchar   , c_uchar   
+  char       dataType[16];   // Of image data. Valid (OS-independent) types:
+                             // - char   , c_char   , uchar   , c_uchar
                              // - int16_t, c_int16_t, uint16_t, c_uint16_t
                              // - int32_t, c_int32_t, uint32_t, c_uint32_t
-                             // - float32_t, c_float32_t, float64_t, c_float64_t   
-  bool       isLittleEndian; // True if image data uses little endian byte order.
-  bool       isMosaic;       // True if 3D or 3Dt images are mosaiced.
-  
-  float64_t     pixelSpacingReadMM;  // Pixel dimension (mm) in each
-  float64_t     pixelSpacingPhaseMM; //   acquisition direction: read, phase,
-  float64_t     pixelSpacingSliceMM; //   & slice.
-  float64_t     sliceGapMM;          // Gap between slice excitations (mm)
-  
+                             // - float32_t, c_float32_t, float64_t, c_float64_t
+  bool       isLittleEndian; // true if image data uses little endian byte order
+  bool       isMosaic;       // true if 3D or 3Dt images are mosaiced.
+
+  float64_t  pixelSpacingReadMM;  // Pixel dimension (mm) in each
+  float64_t  pixelSpacingPhaseMM; //   acquisition direction: read, phase,
+  float64_t  pixelSpacingSliceMM; //   & slice.
+  float64_t  sliceGapMM;          // Gap between slice excitations (mm)
+
   int32_t    numPixelsRead;   // Number of pixels in read-direction
   int32_t    numPixelsPhase;  // Number of pixels in phase-direction
   int32_t    numSlices;       // Number of slices
-  
-  float32_t  voxelToWorldMatrix[4][4];  // Transforms voxel indices to world coordinates
-  
+
+  float32_t  voxelToWorldMatrix[4][4];  // Voxel indices -> world coordinates
+
   int32_t    repetitionTimeMS;  // Time (ms) of one volume acquisition
   int32_t    repetitionDelayMS; // Time (ms) between acquisitions
   int32_t    currentTR;         // Current TR number
   int32_t    totalTR;           // Expected number of TRs
-  
+
   bool       isMotionCorrected; // True if this data has MC applied
   char       mcOrder[5];        // Order of MC operations. Eg "TZYX" or "YXZT"
                                 //   T: Translation
                                 //   X, Y, Z: Rotation in X, Y, Z
-  
-  float64_t     mcTranslationXMM;  // Translation (mm) that was applied
-  float64_t     mcTranslationYMM;  //   by motion correction along each
-  float64_t     mcTranslationZMM;  //   axis
-  
-  float64_t     mcRotationXRAD;    // Rotation (radians) that was applied
-  float64_t     mcRotationYRAD;    //   by motion correction along each
-  float64_t     mcRotationZRAD;    //   axis
+
+  float64_t  mcTranslationXMM;  // Translation (mm) that was applied
+  float64_t  mcTranslationYMM;  //   by motion correction along each
+  float64_t  mcTranslationZMM;  //   axis
+
+  float64_t  mcRotationXRAD;    // Rotation (radians) that was applied
+  float64_t  mcRotationYRAD;    //   by motion correction along each
+  float64_t  mcRotationZRAD;    //   axis
 
 };
 #endif

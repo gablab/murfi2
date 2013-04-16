@@ -251,6 +251,10 @@ int RtInputScannerImages::svc() {
     // get the info
     ei = receiveImageInfo(stream);
     if(ei == NULL) {
+      if(verbose) {
+        cout << "couldn't parse image, discarding." << endl;
+      }
+
       stream.close();
       continue;
     }
@@ -409,27 +413,22 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
   // read until we have all the bytes we need
   // TODO add error handling here
 
-  for(rec = 0; rec < EXTERNALSENDER_SIZEOF;){
-    rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDER_SIZEOF);
+  for(rec = 0; rec < RtExternalImageInfo::getHeaderSize();){
+    rec_delta = stream.recv_n(buffer + rec,
+                              RtExternalImageInfo::getHeaderSize());
     rec += rec_delta;
     if(rec_delta <= 0) break;
   }
-  // TODO validate that the correct number of bytes was received.
 
   // arbitrary lower limit
-  if(rec < 100) {
+  if(rec != RtExternalImageInfo::getHeaderSize()) {
     return NULL;
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
-  RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
-  if (verbose) {
-    cout << "header size rec was " << rec << endl;
-    info->displayImageInfo();
-    cout << "computed hdr size: " << info->getHeaderSize() << endl;
-    cout << "computed img size: " << info->getDataSize() << endl;
-  }
-  return info;
+  // TODO implement this in a portable way
+  return new RtExternalImageInfo(
+      *reinterpret_cast<RtExternalImageInfo*>(buffer));
 }
 
 // read an image info from a socket stream
@@ -457,7 +456,8 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
       rec += stream.recv_n (buffer+rec, imageSizeInBytes-rec)) {
   }
 
-  short *img = new short[numPix];  // TODO(murfidev) should probably use correct datatype from info
+  // TODO support other datatypes
+  short *img = new short[numPix];
   memcpy(img,buffer,imageSizeInBytes);
 
   return img;

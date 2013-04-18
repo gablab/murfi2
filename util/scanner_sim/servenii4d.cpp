@@ -125,6 +125,16 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     RtExternalImageInfo* ei = new RtExternalImageInfo();
 
+    strcpy(ei->magic, "SIMU");
+
+    strcpy(ei->imageType, "EPI");
+    strcpy(ei->scanType, "3D");
+    strcpy(ei->dataType, "uint16_t");
+
+    ei->isLittleEndian = true;
+    ei->isMosaic = true;
+
+
     unsigned int mosaicSide = (int) sqrt(matrixSize*matrixSize
                                          *pow(ceil(sqrt((double)numSlices)),2));
     ei->numPixelsPhase = matrixSize;
@@ -133,16 +143,9 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     unsigned int numPix = mosaicSide*mosaicSide;
 
     ei->numSlices = numSlices;
-//    ei->iMosaicGridSize = ceil(sqrt(numSlices));  // TODO(murfidev) fill this in!
+    int gridSize = ceil(sqrt(numSlices));
 
-    ei->pixelSpacingSliceMM = vols->pixdim[3]/1.1;  // TODO(murfidev) equivalent? what's the 1.1?
-
-    cout
-        << "numPixelsPhase " <<  ei->numPixelsPhase << " "
-        << "numPixelsRead " <<  ei->numPixelsRead << " "
-        << "numSlices " <<  ei->numSlices << " "
-//        << "iMosaicGridSize " <<  ei->iMosaicGridSize << endl;  // TODO(murfidev) fix!
-        << "iMosaicGridSize (not defined)" << endl;
+    ei->pixelSpacingSliceMM = vols->pixdim[3];
 
     ei->voxelToWorldMatrix[0][0] = rotMat[0][0];
     ei->voxelToWorldMatrix[1][0] = rotMat[0][1];
@@ -157,13 +160,8 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     ei->voxelToWorldMatrix[2][2] = rotMat[2][2];
 
     ei->voxelToWorldMatrix[0][3] = vols->qto_xyz.m[0][3];
-    cout << "dPosSag " << vols->qto_xyz.m[0][3] << endl;
     ei->voxelToWorldMatrix[1][3] = vols->qto_xyz.m[1][3];
     ei->voxelToWorldMatrix[2][3] = vols->qto_xyz.m[2][3];
-
-/*    ei->lImageDataLength = vols->nbyper*numPix;
-    ei->lNumberOfPixels = numPix; */  // TODO(murfidev) removed?
-
 
     // mosaic
     short *newdata = new short[numPix];
@@ -207,27 +205,6 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     size_t sent = stream.send_n(newdata, ei->getDataSize());
 
     cout << "sent " << sent << endl;
-
-    stream.close();
-
-    // send moco image
-    if(connector.connect (stream, my_addr)) {
-      break;
-    }
-
-    cout << "sending moco img  " << ei->currentTR << endl;
-
-    ei->isMotionCorrected = true;
-/*    data = ei->convertToScannerDataArray();
-    cout << "sending info of size " << ei->iSizeOfRtExternalImageInfo << endl;
-    stream.send_n (data, ei->iSizeOfRtExternalImageInfo);
-    delete data;
-
-    cout << "sending img of size " << ei->lImageDataLength << endl;
-
-    sent = stream.send_n(newdata, ei->lImageDataLength);
-
-    cout << "sent " << sent << endl;   */ // TODO(murfidev) lots to do here!
 
     stream.close();
 

@@ -15,8 +15,6 @@ void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
   ei->numPixelsPhase = img->dim[1];
   ei->numPixelsRead = img->dim[2];
 
-  ei->isMotionCorrected = true;
-
   int gridSize = ceil(sqrt(numSlices));
   ei->pixelSpacingReadMM = img->pixdim[1];
   ei->pixelSpacingPhaseMM = img->pixdim[2];

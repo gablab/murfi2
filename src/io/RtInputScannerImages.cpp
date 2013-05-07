@@ -28,6 +28,7 @@
 #include"RtDataIDs.h"
 #include"RtDesignMatrix.h"
 #include"RtExperiment.h"
+#include"RtExternalSenderImageInfo.h"
 
 #include<vnl/vnl_matrix_fixed.h>
 #include<vnl/vnl_vector.h>
@@ -148,10 +149,6 @@ bool RtInputScannerImages::open(RtConfig &config) {
     print = true;
   }
 
-  if(config.get("study:teminal:verbose")==true) {
-    verbose = true;
-  }
-
   // see if we should align the series to a reference
   if(config.isSet("scanner:alignSeries")
      && config.get("scanner:alignSeries")==true) {
@@ -254,10 +251,14 @@ int RtInputScannerImages::svc() {
     // get the info
     ei = receiveImageInfo(stream);
     if(ei == NULL) {
+      if(verbose) {
+        cout << "couldn't parse image, discarding." << endl;
+      }
+
       stream.close();
       continue;
     }
-    ei->iAcquisitionNumber = std::max(ei->iAcquisitionNumber-num2Discard,
+    ei->currentTR = std::max(ei->currentTR-num2Discard,
                                       (unsigned int) 1);
 
     if(verbose) {
@@ -274,11 +275,11 @@ int RtInputScannerImages::svc() {
     stream.close();
 
 
-    if(onlyReadMoCo && !ei->bIsMoCo) {
+    if(onlyReadMoCo && !ei->isMotionCorrected) {
       cout << "ignoring non-MoCo image." << endl;
       continue;
     }
-    else if(!ei->bIsMoCo) {
+    else if(!ei->isMotionCorrected) {
       cout << "got non-MoCo image." << endl;
     }
     else {
@@ -324,13 +325,13 @@ int RtInputScannerImages::svc() {
 
 
     // if there is motion info add it
-    if(ei->bIsMoCo) {
-      RtMotion *mot = new RtMotion(ei->dMoCoTransX,
-                                   ei->dMoCoTransY,
-                                   ei->dMoCoTransZ,
-                                   ei->dMoCoRotX,
-                                   ei->dMoCoRotY,
-                                   ei->dMoCoRotZ);
+    if(ei->isMotionCorrected) {
+      RtMotion *mot = new RtMotion(ei->mcTranslationXMM,
+                                   ei->mcTranslationYMM,
+                                   ei->mcTranslationZMM,
+                                   ei->mcRotationXRAD,
+                                   ei->mcRotationYRAD,
+                                   ei->mcRotationZRAD);
       getDataStore().setData(mot);
     }
 
@@ -356,7 +357,7 @@ int RtInputScannerImages::svc() {
     // processing pipeline.
     //
     // TODO make this a dedicated flag?
-    if (ei->iNoOfImagesInMosaic==0) {
+    if (!ei->isMosaic) {
       cout << "Non-mosaic image (eg MPRAGE) received. refusing to process it."
            << endl;
     } else {
@@ -375,7 +376,7 @@ int RtInputScannerImages::svc() {
     infos.str("");
     infos << "received image from scanner: series "
           << rti->getDataID().getSeriesNum()
-          << " acquisition " << ei->iAcquisitionNumber << endl;
+          << " acquisition " << ei->currentTR << endl;
     log(infos);
 
     if(print) {
@@ -412,21 +413,22 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
   // read until we have all the bytes we need
   // TODO add error handling here
 
-  for(rec = 0; rec < EXTERNALSENDERSIZEOF;){
-    rec_delta = stream.recv_n (buffer+rec, EXTERNALSENDERSIZEOF);
+  for(rec = 0; rec < RtExternalImageInfo::getHeaderSize();){
+    rec_delta = stream.recv_n(buffer + rec,
+                              RtExternalImageInfo::getHeaderSize());
     rec += rec_delta;
     if(rec_delta <= 0) break;
   }
-  // TODO validate that the correct number of bytes was received.
 
   // arbitrary lower limit
-  if(rec < 100) {
+  if(rec != RtExternalImageInfo::getHeaderSize()) {
     return NULL;
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
-  RtExternalImageInfo *info = new RtExternalImageInfo(buffer, rec);
-  return info;
+  // TODO implement this in a portable way
+  return new RtExternalImageInfo(
+      *reinterpret_cast<RtExternalImageInfo*>(buffer));
 }
 
 // read an image info from a socket stream
@@ -440,21 +442,23 @@ short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
                                           const RtExternalImageInfo &info) {
 
   ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum,
-             info.iAcquisitionNumber));
+             info.currentTR));
 
   // grab numPix from header (to support MEMPRAGE)
-  long numPix = info.lNumberOfPixels;
+  long numPix = info.getNumVoxels();
+  long imageSizeInBytes = info.getDataSize();
   if(verbose) {
-    cout << "receiving image " << info.iAcquisitionNumber << " ("
-         << numPix << " pixels; " << numPix*sizeof(short) << "bytes)" << endl;
+    cout << "receiving image " << info.currentTR << " ("
+         << numPix << " pixels; " << imageSizeInBytes << " bytes)" << endl;
   }
 
-  for(unsigned int rec = 0; rec < numPix*sizeof(short);
-      rec += stream.recv_n (buffer+rec, numPix*sizeof(short)-rec)) {
+  for(unsigned int rec = 0; rec < imageSizeInBytes;
+      rec += stream.recv_n (buffer+rec, imageSizeInBytes-rec)) {
   }
 
+  // TODO support other datatypes
   short *img = new short[numPix];
-  memcpy(img,buffer,numPix*sizeof(short));
+  memcpy(img,buffer,imageSizeInBytes);
 
   return img;
 };
@@ -475,5 +479,5 @@ bool RtInputScannerImages::saveImage(RtMRIImage &img) {
 //  out
 //   true if this image is the first in a series
 bool RtInputScannerImages::isFirstInSeries(const RtExternalImageInfo &info) {
-  return (unsigned int) info.iAcquisitionNumber == SERIES_FIRST_ACQ_NUM;
+  return (unsigned int) info.currentTR == SERIES_FIRST_ACQ_NUM;
 }

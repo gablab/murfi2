@@ -1,0 +1,38 @@
+#ifndef COMMON_H
+#define COMMON_H
+
+void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
+                      RtExternalImageInfo* ei) {
+  strcpy(ei->magic, "SIMU");
+
+  strcpy(ei->imageType, "EPI");
+  strcpy(ei->scanType, "3D");
+  strcpy(ei->dataType, "uint16_t");
+
+  ei->isLittleEndian = true;
+  ei->isMosaic = true;
+
+  ei->numPixelsPhase = img->dim[1];
+  ei->numPixelsRead = img->dim[2];
+
+  int gridSize = ceil(sqrt(numSlices));
+  ei->pixelSpacingReadMM = img->pixdim[1];
+  ei->pixelSpacingPhaseMM = img->pixdim[2];
+  ei->pixelSpacingSliceMM = img->pixdim[3];
+  ei->sliceGapMM = 0;
+
+  ei->numPixelsRead = img->dim[1] / gridSize;
+  ei->numPixelsPhase = img->dim[2] / gridSize;
+  ei->numSlices = numSlices;
+
+  // TODO set the voxelToWorldMatrix
+
+  ei->repetitionTimeMS = img->pixdim[4];
+  ei->repetitionDelayMS = 0;
+  ei->currentTR = repetition;
+  ei->totalTR = img->dim[4];
+
+  ei->isMotionCorrected = false;
+}
+
+#endif

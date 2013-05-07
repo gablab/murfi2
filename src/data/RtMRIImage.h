@@ -94,24 +94,16 @@ class RtMRIImage : public RtDataImage<short> {
 
  protected:
 
-  unsigned long slice; // slice index (zero based)
-
   double readFOV; // mm
   double phaseFOV; // mm
 
   // imaging parms
-  bool swapReadPhase;
   string seriesInstanceUID;   // series id
-  double timeAfterStart;      // time after start
-  double te;                  // echo time (ms)
   double tr;                  // repetition time (ms)
-  double ti;                  // inversion time (ms)
-  double triggerTime;         // trigger time (ms)
 
   // actual acquision info parms
   ACE_Date_Time time;                // acquisition time
   ACE_Date_Time refFrameTime;        // acquisition time of frame of reference
-  double        reconDelay;          // time delay of the reconstruction (ms)
 
 
   // scanner online post-processing parms

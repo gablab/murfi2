@@ -55,18 +55,11 @@ RtInputScannerImages::RtInputScannerImages()
   print = true;
   unmosaicInputImages = true;
   onlyReadMoCo = false;
-  matrixSize = 64;
-  numSlices = 32;
-  sliceGap = 0.1;
-  voxDim[0] = voxDim[1] = voxDim[2] = 1.0;
-
   alignSeries = false;
 
   num2Discard = 0;
 
   initialized = false;
-  imageNum = 0;
-  numImagesExpected = 0;
   haveStudyRefVol = false;
   haveSeriesRefVol = false;
 
@@ -103,27 +96,6 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
 
   isOpen = true;
-
-
-  // set image params
-  if(config.isSet("scanner:matrixSize")) {
-    matrixSize = config.get("scanner:matrixSize");
-  }
-  if(config.isSet("scanner:slices")) {
-    numSlices = config.get("scanner:slices");
-  }
-  if(config.isSet("scanner:sliceGap")) {
-    sliceGap = config.get("scanner:sliceGap");
-  }
-  if(config.isSet("scanner:voxdim1")) {
-    voxDim[0] = config.get("scanner:voxdim1");
-  }
-  if(config.isSet("scanner:voxdim2")) {
-    voxDim[1] = config.get("scanner:voxdim2");
-  }
-  if(config.isSet("scanner:voxdim3")) {
-    voxDim[2] = config.get("scanner:voxdim3");
-  }
 
   // see if we should only read moco images
   if(config.isSet("scanner:onlyReadMoCo")
@@ -199,8 +171,6 @@ bool RtInputScannerImages::init(RtConfigFmriRun &config) {
   haveStudyRefVol = false;
   haveSeriesRefVol = false;
 
-  imageNum = 0;
-
   numDiscarded = 0;
   if(config.isSet("scanner:discard")) {
     num2Discard = config.get("scanner:discard");
@@ -209,7 +179,6 @@ bool RtInputScannerImages::init(RtConfigFmriRun &config) {
     num2Discard = 0;
   }
 
-  numImagesExpected = config.get("scanner:measurements");
   initialized = true;
 
   return true;
@@ -258,6 +227,7 @@ int RtInputScannerImages::svc() {
       stream.close();
       continue;
     }
+
     ei->currentTR = std::max(ei->currentTR-num2Discard,
                                       (unsigned int) 1);
 
@@ -286,10 +256,8 @@ int RtInputScannerImages::svc() {
       cout << "got MoCo image." << endl;
     }
 
-    imageNum++;
-
     // build data class
-    rti = new RtMRIImage(*ei,img);
+    rti = new RtMRIImage(*ei, img);
 
     if(unmosaicInputImages) {
       cout << "Source image is mosaic'd; unmosaicing." << endl;
@@ -319,10 +287,10 @@ int RtInputScannerImages::svc() {
 
     if(numDiscarded < num2Discard) {
       numDiscarded++;
-      cout << "discarding image " << numDiscarded << " of " << num2Discard << endl;
+      cout << "discarding image " << numDiscarded
+           << " of " << num2Discard << endl;
       continue;
     }
-
 
     // if there is motion info add it
     if(ei->isMotionCorrected) {
@@ -353,23 +321,20 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    // If it's not a mosaic'd image (eg MPRAGE) don't fire off the murfi
-    // processing pipeline.
+    // If it's not an EPI don't fire off the murfi processing pipeline.
     //
-    // TODO make this a dedicated flag?
-    if (!ei->isMosaic) {
-      cout << "Non-mosaic image (eg MPRAGE) received. refusing to process it."
-           << endl;
-    } else {
-      cout << "Sending code..." << endl;
+    // TODO: This will need to be changed in order to process other types of
+    // data.
+    if(!strcmp(ei->scanType, "EPI")) {
       sendCode(rti);
-      cout << "   ...done!" << endl;
+    } else {
+      cout << "Non-EPI volume received, skipping stream processing."
+           << endl;
     }
 
     if(saveImagesToFile) {
-      cout << "Saving image to file..." << endl;
       saveImage(*rti);
-      cout << "   ...done!" << endl;
+      cout << "Saved image to file." << endl;
     }
 
     // log that we received the image
@@ -386,13 +351,11 @@ int RtInputScannerImages::svc() {
     }
 
     // clean up
-    cout << "Cleaning up..." << endl;
     delete ei;
     delete [] img;
-    cout << "   ... done!" << endl;
 
-    if(imageNum == numImagesExpected) {
-      cout << "received last image" << endl;
+    if(ei->currentTR == ei->totalTR) {
+      cout << "received last image." << endl;
       sendCode(NULL);
       initialized = false;
     }
@@ -426,6 +389,11 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
+
+  ofstream out("/tmp/tmp.bin");
+  out.write(buffer, RtExternalImageInfo::getHeaderSize());
+  out.close();
+
   // TODO implement this in a portable way
   return new RtExternalImageInfo(
       *reinterpret_cast<RtExternalImageInfo*>(buffer));

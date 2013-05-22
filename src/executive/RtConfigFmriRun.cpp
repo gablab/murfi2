@@ -60,11 +60,6 @@ bool RtConfigFmriRun::validateConfig() {
     }
   }
 
-  // check optional acquisition parameters
-  if(!isSet("scanner:imageType")==false) {
-    set("scanner:imageType",DEFAULT_IMAGETYPE);
-  }
-
   // check required acquisition parameters
   if(!isSet("scanner:tr")) {
     cerr << "ERROR: tr must be set!" << endl;

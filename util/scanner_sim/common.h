@@ -2,12 +2,12 @@
 #define COMMON_H
 
 void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
-                      RtExternalImageInfo* ei) {
+                      int totalReps, RtExternalImageInfo* ei) {
   strcpy(ei->magic, "SIMU");
 
-  strcpy(ei->imageType, "EPI");
-  strcpy(ei->scanType, "3D");
-  strcpy(ei->dataType, "uint16_t");
+  strcpy(ei->scanType, "EPI");
+  strcpy(ei->imageType, "3D");
+  strcpy(ei->dataType, "int16_t");
 
   ei->isLittleEndian = true;
   ei->isMosaic = true;
@@ -30,7 +30,7 @@ void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
   ei->repetitionTimeMS = img->pixdim[4];
   ei->repetitionDelayMS = 0;
   ei->currentTR = repetition;
-  ei->totalTR = img->dim[4];
+  ei->totalTR = totalReps;
 
   ei->isMotionCorrected = false;
 }

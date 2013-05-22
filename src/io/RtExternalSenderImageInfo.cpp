@@ -111,10 +111,11 @@ size_t RtExternalImageInfo::getHeaderSize() {
 
 // Returns the size (in bytes) per pixel, specified by dataType
 int32_t RtExternalImageInfo::getBytesPerPix() const {
-  if (strcmp(dataType, "int16_t\0")) {
+  if (!strcmp(dataType, "int16_t")) {
     return sizeof(int16_t);
   } else {
-    cout << "WARNING!!! TODO! assuming dataType is int16_t" << endl; // TODO(murfidev) fill in other supported dataTypes
+    cout << "WARNING! Header indicates that an unsupported dataType ("
+         << dataType << "} was received. Assuming int16_t" << endl;
     return sizeof(int16_t);
   }
 }

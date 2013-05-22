@@ -69,7 +69,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     cout << "made connection, loading image" << endl;
 
     RtExternalImageInfo ei;
-    fillExternalInfo(img, numSlices, i+1, &ei);
+    fillExternalInfo(img, numSlices, i+1, numImgs, &ei);
 
     cout << "sending img  " << ei.currentTR << endl;
 

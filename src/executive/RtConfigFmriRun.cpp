@@ -69,26 +69,6 @@ bool RtConfigFmriRun::validateConfig() {
     cerr << "ERROR: number of measurements must be set!" << endl;
   }
 
-  if(!isSet("scanner:matrixSize")) {
-    cerr << "ERROR: matrix size must be set!" << endl;
-  }
-
-  if(!isSet("scanner:slices")) {
-    cerr << "ERROR: slices must be set!" << endl;
-  }
-
-  if(!isSet("scanner:voxdim1")) {
-    cerr << "ERROR: voxdim1 must be set!" << endl;
-  }
-
-  if(!isSet("scanner:voxdim2")) {
-    cerr << "ERROR: voxdim2 must be set!" << endl;
-  }
-
-  if(!isSet("scanner:voxdim3")) {
-    cerr << "ERROR: voxdim3 must be set!" << endl;
-  }
-
   // study reference volume
   if(!isSet("study:xfm:referenceVol")) {
     path p;

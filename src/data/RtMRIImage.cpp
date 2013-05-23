@@ -52,8 +52,8 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   // fill fields of data id
   dataID.setModuleID(ID_SCANNERIMG);
   dataID.setDataName(NAME_SCANNERIMG_EPI);
-  dataID.setSeriesNum(
-      getSeriesNumFromUID(extinfo.cSeriesInstanceUID)); */  // TODO(murfidev) fill this in!
+  dataID.setSeriesNum(17);
+      //getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
   dataID.setTimePoint(extinfo.currentTR);
 
   // allocate and copy the img data
@@ -226,12 +226,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   pixdims.resize(3);
   pixdims[0] = info.pixelSpacingReadMM;
   pixdims[1] = info.pixelSpacingPhaseMM;
-  pixdims[2] = info.pixelSpacingSliceMM - info.sliceGapMM;
-
-  // set geometry info
-  setPixDim(0,pixdims[0]);
-  setPixDim(1,pixdims[1]);
-  setPixDim(2,pixdims[2]);
+  pixdims[2] = info.pixelSpacingSliceMM + info.sliceGapMM;
 
   // calculate image size
   imgDataLen = bytesPerPix;
@@ -274,7 +269,8 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   phaseFOV = info.numPixelsPhase*info.pixelSpacingPhaseMM;
   matrixSize = info.numPixelsPhase;
   numSlices = info.numSlices;
-  sliceThick = info.pixelSpacingSliceMM + info.sliceGapMM;
+  sliceThick = info.pixelSpacingSliceMM;
+  sliceGap = info.sliceGapMM;
   seriesInstanceUID = "17";
 
   dataID.setTimePoint(info.currentTR);

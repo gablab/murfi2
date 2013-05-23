@@ -122,12 +122,6 @@ class RtInputScannerImages : public RtInput {
   bool   saveImagesToFile;
   bool unmosaicInputImages;
 
-  // scanner parms
-  unsigned int matrixSize;
-  unsigned int numSlices;
-  double sliceGap;
-  double voxDim[3];
-
   // current series number
   unsigned int seriesNum;
 
@@ -137,9 +131,6 @@ class RtInputScannerImages : public RtInput {
 
   // run specific info
   bool initialized;
-
-  unsigned int imageNum;
-  unsigned int numImagesExpected;
 
   unsigned int num2Discard;
   unsigned int numDiscarded;

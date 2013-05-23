@@ -36,10 +36,6 @@
     <option name="saveImages">    false </option>
     <option name="print"> true </option>
 
-
-    <!-- acquisition type -->
-    <option name="imageType">     epi </option>
-
     <!-- receiving parameters -->
     <option name="port">          15000 </option>
     <option name="onlyReadMoco">  true </option>
@@ -48,11 +44,6 @@
     <!-- acquistion parameters -->
     <option name="tr"> 3.0 </option>
     <option name="measurements">   85  </option>
-    <option name="matrixSize">      64 </option>
-    <option name="slices">          35 </option>
-    <option name="voxdim1">       3.4375 </option>
-    <option name="voxdim2">       3.4375 </option>
-    <option name="voxdim3">       4.0  </option>
 
 </scanner>
 

@@ -52,36 +52,9 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   // fill fields of data id
   dataID.setModuleID(ID_SCANNERIMG);
   dataID.setDataName(NAME_SCANNERIMG_EPI);
-
-  dataID.setStudyNum(getExperimentStudyID());
-/*  dataID.setSeriesNum
-      (getSeriesNumFromUID(extinfo.cSeriesInstanceUID)); */  // TODO(murfidev) fill this in!
   dataID.setSeriesNum(17);
+      //getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
   dataID.setTimePoint(extinfo.currentTR);
-
-  // setup geometry
-  if(getExperimentConfig().isSet("scanner:matrixSize")) {
-    matrixSize = getExperimentConfig().get("scanner:matrixSize");
-  }
-  if(getExperimentConfig().isSet("scanner:slices")) {
-    numSlices = getExperimentConfig().get("scanner:slices");
-  }
-  if(getExperimentConfig().isSet("scanner:voxdim1")) {
-    setPixDim(0,getExperimentConfig().get("scanner:voxdim1"));
-  }
-  if(getExperimentConfig().isSet("scanner:voxdim2")) {
-    setPixDim(1,getExperimentConfig().get("scanner:voxdim2"));
-  }
-  if(getExperimentConfig().isSet("scanner:voxdim3")) {
-    double sliceDist = getExperimentConfig().get("scanner:voxdim3");
-    if(getExperimentConfig().isSet("scanner:sliceGap")) {
-      sliceGap
-          = static_cast<double>(getExperimentConfig().get("scanner:sliceGap"));
-      cout << "RTMRIIMAGE: sliceGap from XML: " << sliceGap << endl;
-    }
-    setPixDim(2,sliceDist);
-    cout << "RTMRIIMAGE: sliceDist: " << sliceDist << endl;
-  }
 
   // allocate and copy the img data
   if(DEBUG_LEVEL & ALLOC) {
@@ -253,12 +226,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   pixdims.resize(3);
   pixdims[0] = info.pixelSpacingReadMM;
   pixdims[1] = info.pixelSpacingPhaseMM;
-  pixdims[2] = info.pixelSpacingSliceMM;
-
-  // set geometry info
-  setPixDim(0,pixdims[0]);
-  setPixDim(1,pixdims[1]);
-  setPixDim(2,pixdims[2]);
+  pixdims[2] = info.pixelSpacingSliceMM + info.sliceGapMM;
 
   // calculate image size
   imgDataLen = bytesPerPix;
@@ -301,11 +269,10 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   phaseFOV = info.numPixelsPhase*info.pixelSpacingPhaseMM;
   matrixSize = info.numPixelsPhase;
   numSlices = info.numSlices;
-  sliceThick = info.pixelSpacingSliceMM - info.sliceGapMM;
-  //  seriesInstanceUID = info.cSeriesInstanceUID;  // TODO(murfidev) fill this in!
-  seriesInstanceUID = "17";  // workaround/hack
+  sliceThick = info.pixelSpacingSliceMM;
+  sliceGap = info.sliceGapMM;
+  seriesInstanceUID = "17";
 
-  //  swapReadPhase = info.bSwapReadPhase;  // TODO(murfidev) fill this in!
   dataID.setTimePoint(info.currentTR);
   tr = info.repetitionTimeMS;
   moco = info.isMotionCorrected;

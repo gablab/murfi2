@@ -45,6 +45,7 @@ struct RtExternalImageInfo {
 
   char       magic[5];       // Must be "ERTI"
   int32_t    headerVersion;  // Version of this header
+  char       seriesUID[64];  // The DICOM unique ID of this series
   char       scanType[64];   // Type of scan, e.g., "MPRAGE" or "EPI"
   char       imageType[16];  // Valid types: {"2Dz", "2Dzt", "3D", "3Dt"}
                              // 2Dz: Single volume, 1 slice at a time

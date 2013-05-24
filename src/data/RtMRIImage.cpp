@@ -52,8 +52,7 @@ RtMRIImage::RtMRIImage(RtExternalImageInfo &extinfo, short *bytes)
   // fill fields of data id
   dataID.setModuleID(ID_SCANNERIMG);
   dataID.setDataName(NAME_SCANNERIMG_EPI);
-  dataID.setSeriesNum(17);
-      //getSeriesNumFromUID(extinfo.cSeriesInstanceUID));
+  dataID.setSeriesNum(getSeriesNumFromUID(extinfo.seriesUID));
   dataID.setTimePoint(extinfo.currentTR);
 
   // allocate and copy the img data
@@ -271,7 +270,7 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   numSlices = info.numSlices;
   sliceThick = info.pixelSpacingSliceMM;
   sliceGap = info.sliceGapMM;
-  seriesInstanceUID = "17";
+  seriesInstanceUID = info.seriesUID;
 
   dataID.setTimePoint(info.currentTR);
   tr = info.repetitionTimeMS;

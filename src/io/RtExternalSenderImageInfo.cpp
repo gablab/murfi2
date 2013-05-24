@@ -42,6 +42,7 @@ RtExternalImageInfo::RtExternalImageInfo() :
     mcRotationYRAD(0.0),
     mcRotationZRAD(0.0) {
   strcpy((char*) magic, EXTERNALSENDER_MAGIC);
+  seriesUID[0] = '\0';
   scanType[0] = '\0';
   imageType[0] = '\0';
   note[0] = '\0';
@@ -64,6 +65,8 @@ void RtExternalImageInfo::displayImageInfo() const {
   cout << "-----------------------------" << endl;
   cout << "Functor Code / Header Version:          "
        << magic << " / " << headerVersion << endl
+       << "seriesUID:                              "
+       << seriesUID << endl
        << "scanType:                               "
        << scanType << endl
        << "imageType / isMosaic:                   "

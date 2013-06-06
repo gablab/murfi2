@@ -117,13 +117,13 @@ bool RtMRIImage::writeInfo(ostream &os) {
   os.write((char*) &tr,             sizeof(double));
 
   char t[] = "hhmmss.xxxxxx";
-  string tm = ACE_Date_Time2SiemensTime(time);
+  string tm = ACE_Date_Time2TimeStr(time);
   strcpy(t,tm.c_str());
-  os.write(t, SIEMENS_TIMESTR_LEN*sizeof(char));
+  os.write(t, TIMESTR_LEN*sizeof(char));
 
-  tm = ACE_Date_Time2SiemensTime(refFrameTime);
+  tm = ACE_Date_Time2TimeStr(refFrameTime);
   strcpy(t,tm.c_str());
-  os.write(t, SIEMENS_TIMESTR_LEN*sizeof(char));
+  os.write(t, TIMESTR_LEN*sizeof(char));
 
   boolcon = (char) moco;
   os.write((char*) &boolcon, sizeof(char));
@@ -163,10 +163,10 @@ bool RtMRIImage::readInfo(istream &is) {
 
   char t[] = "hhmmss.xxxxxx";
 
-  is.read(t, SIEMENS_TIMESTR_LEN*sizeof(char));
-  time = siemensTime2ACE_Date_Time(t);
+  is.read(t, TIMESTR_LEN*sizeof(char));
+  time = timeStr2ACE_Date_Time(t);
 
-  refFrameTime = siemensTime2ACE_Date_Time(t);
+  refFrameTime = timeStr2ACE_Date_Time(t);
 
   bool boolcon;
   is.read((char*) &boolcon, sizeof(char));
@@ -191,7 +191,7 @@ void RtMRIImage::printInfo(ostream &os) {
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
      << setw(wid) << "tr" << tr << endl
-     << setw(wid) << "refFrameTime" << ACE_Date_Time2SiemensTime(refFrameTime)
+     << setw(wid) << "refFrameTime" << ACE_Date_Time2TimeStr(refFrameTime)
      << setw(wid) << "moco" << moco << endl
      << setw(wid) << "fromScanner" << fromScanner << endl
      << setw(wid) << "MatrixSize" << getMatrixSize() << endl

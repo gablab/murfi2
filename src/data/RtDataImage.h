@@ -338,11 +338,11 @@ class RtDataImage : public RtData {
 
   //************** time conversion functions ******************//
 
-  // convert a siemens hhmmss.xxxxxx time string to an ACE_Date_Time type
-  static ACE_Date_Time siemensTime2ACE_Date_Time(const char *tc);
+  // convert a hhmmss.xxxxxx time string to an ACE_Date_Time type
+  static ACE_Date_Time timeStr2ACE_Date_Time(const char *tc);
 
-  // convert an ACE_Date_Time type to  siemens hhmmss.xxxxxx time string
-  static string ACE_Date_Time2SiemensTime(const ACE_Date_Time &t);
+  // convert an ACE_Date_Time type to  hhmmss.xxxxxx time string
+  static string ACE_Date_Time2TimeStr(const ACE_Date_Time &t);
 
  protected:
 

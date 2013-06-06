@@ -43,7 +43,7 @@ class RtMRIImage : public RtDataImage<short> {
   RtMRIImage();
   virtual ~RtMRIImage();
 
-  // construct from an external image info struct (siemens) and some image data
+  // construct from an external image info struct and some image data
   RtMRIImage(RtExternalImageInfo &info, short *data = NULL);
 
   // construct from another image

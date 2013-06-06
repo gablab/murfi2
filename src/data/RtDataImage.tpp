@@ -1486,9 +1486,9 @@ void RtDataImage<T>::get2Dfrom2D(
 
 }
 
-// convert a siemens hhmmss.xxxxxx time string to an ACE_Date_Time type
+// convert a hhmmss.xxxxxx time string to an ACE_Date_Time type
 template<class T>
-ACE_Date_Time RtDataImage<T>::siemensTime2ACE_Date_Time(const char *tc) {
+ACE_Date_Time RtDataImage<T>::timeStr2ACE_Date_Time(const char *tc) {
   string timeStr = tc;
   ACE_Date_Time t;
   t.hour(atol(timeStr.substr(0,2).c_str()));
@@ -1498,10 +1498,10 @@ ACE_Date_Time RtDataImage<T>::siemensTime2ACE_Date_Time(const char *tc) {
   return t;
 }
 
-#define SIEMENS_TIMESTR_LEN 13
-// convert an ACE_Date_Time type to  siemens hhmmss.xxxxxx time string
+#define TIMESTR_LEN 13
+// convert an ACE_Date_Time type to hhmmss.xxxxxx time string
 template<class T>
-string RtDataImage<T>::ACE_Date_Time2SiemensTime(const ACE_Date_Time &t) {
+string RtDataImage<T>::ACE_Date_Time2TimeStr(const ACE_Date_Time &t) {
   char str[] = "hhmmss.xxxxxx";
   sprintf(str,"%02ld%02ld%02ld.%06ld",
           t.hour(), t.minute(), t.second(), t.microsec());

@@ -84,7 +84,8 @@ class InfoClient(object):
             pass
         finally:
             sock.close()
-        print e
+        if e:
+            print e
         if e and "Connection refused" in e:
             raise IOError(e)
         #print "Sent:     {}".format(message)
@@ -171,6 +172,32 @@ struct_def = [('magic', '5s'), # char       magic[5];       // Must be "ERTI"
            ('mcRotationZRAD', 'd'), #float64_t  mcRotationZRAD;    //   axis
            ]
 
+def do_mosaic(data):
+    x, y, z = data.shape
+    n = np.ceil(np.sqrt(z))
+    X = np.zeros((n*x, n*y), dtype=data.dtype)
+    for idx in range(z):
+        x_idx = int(np.floor(idx/n)) * x
+        y_idx = int(idx % n) * y
+        # print x_idx, y_idx
+        # print data.shape
+        X[x_idx:x_idx + x, y_idx:y_idx + y] = data[..., idx]
+    #import pylab
+    #pylab.imshow(X, interpolation='nearest')
+    return X
+
+def demosaic(mosaic, x, y, z):
+    data = np.zeros((x, y, z), dtype=mosaic.dtype)
+    x,y,z = data.shape
+    n = np.ceil(np.sqrt(z))
+    dim = np.sqrt(np.prod(mosaic.shape))
+    mosaic = mosaic.reshape(dim, dim)
+    for idx in range(z):
+        x_idx = int(np.floor(idx/n)) * x
+        y_idx = int(idx % n) * y
+        data[..., idx] = mosaic[x_idx:x_idx + x, y_idx:y_idx + y]
+    return data
+
 class ExternalImage(object):
 
     def __init__(self, typename, format_defn):
@@ -209,7 +236,7 @@ class ExternalImage(object):
                 values.append(val)
         return self.struct.pack(*values)
 
-    def create_header(self, img, idx, nt):
+    def create_header(self, img, idx, nt, mosaic):
         x ,y, z, t = img.shape
         sx, sy, sz, tr = img.get_header().get_zooms()
         affine = img.get_affine().flatten().tolist()
@@ -222,7 +249,7 @@ class ExternalImage(object):
                           note='some note to leave',
                           dataType='int16_t',
                           isLittleEndian=True,
-                          isMosaic=False,
+                          isMosaic=mosaic,
                           pixelSpacingReadMM=sx,
                           pixelSpacingPhaseMM=sy,
                           pixelSpacingSliceMM=sz,
@@ -245,25 +272,31 @@ class ExternalImage(object):
                           mcRotationZRAD=0.0001)
         return infotuple
 
-    def from_image(self, img, idx, nt):
-        hdrinfo = self.create_header(img, idx, nt)
+    def from_image(self, img, idx, nt, mosaic=True):
+        hdrinfo = self.create_header(img, idx, nt, mosaic)
         if idx is not None:
             data = img.get_data()[..., idx]
         else:
             data = img.get_data()
-        num_elem = np.prod(data.shape)
+        if mosaic:
+            data = do_mosaic(data)
+        data = data.flatten().tolist()
+        num_elem = len(data)
         return self.hdr_to_bytes(hdrinfo), struct.pack('%dH' % num_elem,
-                                                       *(data.flatten().tolist()))
+                                                       *data)
 
     def make_img(self, in_bytes):
-        print len(in_bytes)
         h = self.hdr
         if h.dataType != 'int16_t':
             raise ValueError('Unsupported data type')
-        num_elem = h.numPixelsRead * h.numPixelsPhase * h.numSlices
+        num_elem = self.num_bytes/2 #h.numPixelsRead * h.numPixelsPhase * h.numSlices
         data = struct.unpack('%dH' % num_elem, in_bytes)
-        data = np.array(data).reshape((h.numPixelsRead, h.numPixelsPhase,
-                                       h.numSlices))
+        if h.isMosaic:
+            data = demosaic(np.array(data), h.numPixelsRead, h.numPixelsPhase,
+                             h.numSlices )
+        else:
+            data = np.array(data).reshape((h.numPixelsRead, h.numPixelsPhase,
+                                           h.numSlices))
         affine = np.array(h.voxelToWorldMatrix).reshape((4, 4))
         img = nb.Nifti1Image(data, affine)
         img_hdr = img.get_header()
@@ -279,7 +312,11 @@ class ExternalImage(object):
             self.hdr = self.hdr_from_bytes(in_bytes)
             h = self.hdr
             print "header received: TR=%d" % self.hdr.currentTR
-            self.num_bytes = 2 * h.numPixelsRead * h.numPixelsPhase * h.numSlices
+            if self.hdr.isMosaic:
+                nrows = int(np.ceil(np.sqrt(h.numSlices)))
+                self.num_bytes = 2 * h.numPixelsRead * h.numPixelsPhase * nrows * nrows
+            else:
+                self.num_bytes = 2 * h.numPixelsRead * h.numPixelsPhase * h.numSlices
             print "Requires: %d bytes" % self.num_bytes
             return self.hdr
         else:
@@ -301,23 +338,25 @@ class ExternalImage(object):
             self.num_bytes = None
             return self.img
 
-
 def serve_files(filenames, tr):
     ic = InfoClient('localhost', 15000, 'localhost', 15001)
     for idx, filename in enumerate(filenames):
         img = nb.load(filename)
         if len(img.shape) == 4:
             for i in range(img.shape[3]):
-                hdr_bytes, data_bytes = ic.ei.from_image(img, i, nt=img.shape[3])
-                print len(hdr_bytes)
+                hdr_bytes, data_bytes = ic.ei.from_image(img, i,
+                                                         nt=img.shape[3],
+                                                         mosaic=True)
                 ic.send(hdr_bytes)
                 sleep(.05)
                 ic.send(data_bytes)
                 sleep(tr)
         else:
             hdr_bytes, data_bytes = ic.ei.from_image(img, idx,
-                                                     nt=len(filename))
+                                                     nt=len(filename),
+                                                     mosaic=True)
             ic.send(hdr_bytes)
+            sleep(.05)
             ic.send(data_bytes)
             sleep(tr)
     ic.send('<rt:done>')
@@ -325,7 +364,7 @@ def serve_files(filenames, tr):
 
 def receive(save_location):
     ic = InfoClient('localhost', 15001, 'localhost', 15000,
-                    save_location='/mindhive/scratch/Thu/satra/')
+                    save_location=save_location)
     ic.start()
     print "started"
     while(ic._is_running):

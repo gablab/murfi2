@@ -127,9 +127,9 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     strcpy(ei->magic, "SIMU");
 
-    strcpy(ei->imageType, "EPI");
-    strcpy(ei->scanType, "3D");
-    strcpy(ei->dataType, "uint16_t");
+    strcpy(ei->imageType, "3D");
+    strcpy(ei->scanType, "EPI");
+    strcpy(ei->dataType, "int16_t");
 
     ei->isLittleEndian = true;
     ei->isMosaic = true;
@@ -191,6 +191,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
 
     ei->currentTR = i+1;
+    ei->totalTR = numImgs;
 
     //// send nonmoco image
     cout << "sending img  " << ei->currentTR << endl;

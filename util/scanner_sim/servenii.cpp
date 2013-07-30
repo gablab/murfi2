@@ -4,6 +4,7 @@
 #include"ace/SOCK_Stream.h"
 #include<strstream>
 #include<iostream>
+#include<ctime>
 
 #include"nifti1_io.h"
 
@@ -62,6 +63,11 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   // Initialize the connector.
   ACE_SOCK_Connector connector;
 
+  char uid[64];
+  time_t tm;
+  time(&tm);
+  strftime(uid, 64, "%Y%m%d%H%M%S", localtime(&tm));
+
   // keep making new connections while we havent sent the whole series
   nifti_image* img;
   for(int i = 0; i < numImgs && (img = loadNextInSeries(niiStem,series)) != NULL
@@ -70,6 +76,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     RtExternalImageInfo ei;
     fillExternalInfo(img, numSlices, i+1, numImgs, &ei);
+    strcpy(ei.seriesUID, uid);
 
     cout << "sending img  " << ei.currentTR << endl;
 
@@ -79,9 +86,9 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     cout << "sending img of size " << ei.getDataSize() << endl;
     stream.send_n(img->data, ei.getDataSize());
 
-    usleep(tr);
-
     stream.close();
+
+    usleep(tr);
 
     nifti_image_free(img);
   }

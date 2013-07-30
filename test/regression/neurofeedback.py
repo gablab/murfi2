@@ -14,6 +14,7 @@ def run(v):
     proc = subprocess.Popen(cmd, cwd=cwd,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = proc.communicate()
+    print out
     return out
 
 
@@ -28,7 +29,7 @@ def main():
     runs += [[["../bin/murfi",
                "-f" "scripts/neurofeedback_nodisplay.xml"],
               "../../example_data"]]
-    runs += [[["./servedata.sh", "100", "15000", "localhost", "2"],
+    runs += [[["./servedata.sh", "100", "15000", "", "2"],
               "../../example_data/scripts"]]
 
     pool = multiprocessing.Pool(2)

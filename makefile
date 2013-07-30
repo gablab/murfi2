@@ -221,6 +221,7 @@ C_LIB = $(MATH_LIB) \
 	$(SVM_LIB) \
 	$(GSL_LIB) \
 	$(ACE_LIB) \
+	$(GL_LIB) \
 	$(GLUT_LIB) \
 	$(VXL_LIB) \
 	$(NIFTI_LIB) \

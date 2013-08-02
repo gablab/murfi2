@@ -19,7 +19,7 @@ Dependencies:
 Compilation:
 *************************
 
-$ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev
+$ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev
 
 then
 

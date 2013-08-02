@@ -96,9 +96,7 @@ void RtInfoServer::setData(RtData *data) {
   else if (data->getDataID().getDataName() == NAME_EVENTTRIGGER_GOOD) {
     lastGoodTriggerTR = data->getDataID().getTimePoint();
   }
-  else {
-    cout << "infoserver: ignoring a " << data->getDataID() << endl;
-  }
+  // ignore.
 }
 
 // receive an XML message

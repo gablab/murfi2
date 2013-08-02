@@ -41,7 +41,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   string niifile(argv[arg++]);
   string host(argc > arg ? argv[arg++] : "localhost");
   int port = argc > arg ? atoi(argv[arg++]) : 15000;
-  float inputTr = (argc > arg ? atof(argv[arg++]) : -1);
+  float inputTr = (argc > arg ? atof(argv[arg++]) : 1);
 
   // Local server address.
   ACE_INET_Addr my_addr (port, host.c_str());

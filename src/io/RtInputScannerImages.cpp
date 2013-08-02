@@ -354,7 +354,7 @@ int RtInputScannerImages::svc() {
     delete ei;
     delete [] img;
 
-    if(ei->currentTR == ei->totalTR) {
+    if(ei->currentTR + num2Discard == ei->totalTR) {
       cout << "received last image." << endl;
       sendCode(NULL);
       initialized = false;
@@ -389,10 +389,6 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
   }
 
   ACE_DEBUG((LM_TRACE, ACE_TEXT("received header of size %d\n"), rec));
-
-  ofstream out("/tmp/tmp.bin");
-  out.write(buffer, RtExternalImageInfo::getHeaderSize());
-  out.close();
 
   // TODO implement this in a portable way
   return new RtExternalImageInfo(

@@ -110,7 +110,7 @@ class ExternalImage(object):
         sx, sy, sz, tr = img.get_header().get_zooms()
         affine = img.get_affine().flatten().tolist()
         EInfo = self.named_tuple_class
-        infotuple = EInfo(magic='IFEI'.encode('ascii'),
+        infotuple = EInfo(magic='ERTI'.encode('ascii'),
                           headerVersion=1,
                           seriesUID='someuid',
                           scanType="EPI",

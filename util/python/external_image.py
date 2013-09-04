@@ -185,7 +185,7 @@ class ExternalImage(object):
 
     def process_header(self, in_bytes):
         magic = struct.unpack('4s', in_bytes[:4])[0]
-        if magic == 'ERTI' or magic == 'SIMU' or magic == "IFEI":
+        if magic == 'ERTI' or magic == 'SIMU':
             # header
             self.hdr = self.hdr_from_bytes(in_bytes)
             h = self.hdr

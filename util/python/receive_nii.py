@@ -36,6 +36,7 @@ def handler_factory(callback, infoclient):
     return createHandler
 
 def process_data_callback(infoclient, sock):
+    print "received info"
     infoclient.process_data(sock)
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
@@ -104,10 +105,11 @@ class ImageReceiver(object):
         print "processing %d header data bytes" % len(in_bytes)
 
         hdr = self.ei.process_header(in_bytes)
+        print hdr
 
         # validation
         if self.current_uid != hdr.seriesUID:
-            assert hdr.currentTR == 1
+            #assert hdr.currentTR == 1
             self.current_uid = hdr.seriesUID
             self.current_series_hdr = hdr
 
@@ -115,8 +117,10 @@ class ImageReceiver(object):
         while len(img_data) < self.ei.get_image_size():
             in_bytes = sock.recv(4096)
             img_data += in_bytes
-            if len(in_bytes) < 4096:
-                break
+
+        '''Uncommenting the following line will make things work
+        '''
+        # img_data = img_data[:self.ei.get_image_size()]
 
         if len(img_data) != self.ei.get_image_size():
             raise ValueError(

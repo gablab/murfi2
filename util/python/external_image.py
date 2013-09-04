@@ -110,7 +110,7 @@ class ExternalImage(object):
         sx, sy, sz, tr = img.get_header().get_zooms()
         affine = img.get_affine().flatten().tolist()
         EInfo = self.named_tuple_class
-        infotuple = EInfo(magic='ERTI'.encode('ascii'),
+        infotuple = EInfo(magic='IFEI'.encode('ascii'),
                           headerVersion=1,
                           seriesUID='someuid',
                           scanType="EPI",
@@ -185,7 +185,7 @@ class ExternalImage(object):
 
     def process_header(self, in_bytes):
         magic = struct.unpack('4s', in_bytes[:4])[0]
-        if magic == 'ERTI' or magic == 'SIMU':
+        if magic == 'ERTI' or magic == 'SIMU' or magic == "IFEI":
             # header
             self.hdr = self.hdr_from_bytes(in_bytes)
             h = self.hdr

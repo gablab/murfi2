@@ -115,8 +115,6 @@ class ImageReceiver(object):
         while len(img_data) < self.ei.get_image_size():
             in_bytes = sock.recv(4096)
             img_data += in_bytes
-            if len(in_bytes) < 4096:
-                break
 
         if len(img_data) != self.ei.get_image_size():
             raise ValueError(

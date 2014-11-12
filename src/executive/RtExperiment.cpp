@@ -23,11 +23,6 @@
 #include"RtConfigFmriExperiment.h"
 #include"RtConfigFmriRun.h"
 
-// old gui includes
-#ifdef USE_FRONTEND
-#include"RtDisplayImage.h"
-#endif
-
 // site specific defines (siteID, etc)
 #include"site_config.h"
 
@@ -424,26 +419,34 @@ bool parseArgs(int argc, char **args) {
     }
   }
 
-  // parse the xml config (file or string)
-  if(confFilename.empty() && confXmlStr.empty()) {
-    cerr << "ERROR: no configuration specified" << endl;
+  // // parse the xml config (file or string)
+  // if(confFilename.empty() && confXmlStr.empty()) {
+  //   cerr << "ERROR: no configuration specified" << endl;
+  //   return false;
+  // }
+  // else if(DEBUG_LEVEL & BASIC) {
+  //   cout << "config file is: " << confFilename << endl
+  //        << "config str is: " << confXmlStr << endl;
+  // }
+
+  return true;
+}
+
+bool initializeSystem(int argc, char** args) {
+  // setup arguments
+  if(!parseArgs(argc, args)) {
+    printUsage();
     return false;
-  }
-  else if(DEBUG_LEVEL & BASIC) {
-    cout << "config file is: " << confFilename << endl
-         << "config str is: " << confXmlStr << endl;
   }
 
   return true;
 }
 
-// main entry function
-int ACE_TMAIN(int argc, char **args) {
+int murfi(int argc, char** args) {
   ACE_TRACE(("ACE_TMAIN"));
 
-  // setup arguments
-  if(!parseArgs(argc,args)) {
-    printUsage();
+  // initialize the system
+  if (!initializeSystem(argc, args)) {
     return 1;
   }
 
@@ -451,7 +454,7 @@ int ACE_TMAIN(int argc, char **args) {
   if(!initExperiment()) {
     cerr << "ERROR: experiment initialization failed. check your config"
          << endl;
-    return 1;
+    return false;
   }
 
   int result = 0;
@@ -462,18 +465,12 @@ int ACE_TMAIN(int argc, char **args) {
      (config.isSet("oldgui:disabled") && // "backward" compatibility
       config.get("oldgui:disabled")==false)) {
 
-#ifdef USE_FRONTEND
-    // start a display
-    RtDisplayImage dispImg;
-    if(!dispImg.open(config)) {
-      cerr << "ERROR: could not open display" << endl;
-      result = 1;
-    }
-    result = dispImg.svc();
-#else
+#ifndef USE_FRONTEND
     cerr << "ERROR: this build does not support the gui frontend" << endl;
+    return 1;
 #endif
 
+    return 0;
   }
   else { // just run once in the terminal with the passed config
     RtConfigFmriRun runConf;
@@ -503,3 +500,10 @@ int ACE_TMAIN(int argc, char **args) {
 
   return result;
 }
+
+// main entry function
+#ifndef USE_FRONTEND
+int ACE_TMAIN(int argc, char **args) {
+  return murfi(argc, args);
+}
+#endif

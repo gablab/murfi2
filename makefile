@@ -46,7 +46,7 @@ SUB_DIRS = executive \
 	   util
 
 ifeq ($(FRONTEND),1)
-  SUB_DIRS += display
+  SUB_DIRS += qt
 endif
 
 
@@ -181,12 +181,16 @@ TINYXML_FLAGS=-DTIXML_USE_STL
 NIFTI_INC=-I/$(NIFTI_HOME)/include/nifti
 NIFTI_LIB=-lniftiio -lznz -lz -L/$(NIFTI_HOME)/lib
 
-GL_LIB=-lGL -lGLU
-
 # gui libs
 ifeq ($(FRONTEND),1)
-  GLUT_LIB=-lglut
-  GLUT_INC=-I/usr/include/GL
+  QT_LIB = -L/usr/X11R6/lib64 \
+           -lQt5Widgets \
+           -L/usr/lib/x86_64-linux-gnu \
+           -lQt5Gui \
+           -lQt5Core \
+           -lGL \
+           -lpthread \
+           -m64
 endif
 
 # vtk
@@ -199,9 +203,9 @@ VTK_LIB = -lglut -L$(VTK_HOME)/lib/vtk \
 C_INC = -I$(SRC_DIR) \
 	$(SVM_INC) \
 	$(INC_SUB_DIRS) \
-	$(GLUT_INC) \
 	$(GSL_INC) \
-	$(ACE_INC) $(ACE_FLAGS) \
+	$(ACE_INC) \
+	$(ACE_FLAGS) \
 	$(TINYXML_FLAGS) \
 	$(VXL_INC) \
 	$(NIFTI_INC) \
@@ -221,8 +225,7 @@ C_LIB = $(MATH_LIB) \
 	$(SVM_LIB) \
 	$(GSL_LIB) \
 	$(ACE_LIB) \
-	$(GL_LIB) \
-	$(GLUT_LIB) \
+	$(QT_LIB) \
 	$(VXL_LIB) \
 	$(NIFTI_LIB) \
 	$(BOOST_LIB)
@@ -234,7 +237,6 @@ export C_FLAGS
 export C_INC
 export C_LIB
 export LD_FLAGS
-
 
 ############################### SUFFIXES ##############################
 

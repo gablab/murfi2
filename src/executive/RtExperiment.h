@@ -1,5 +1,6 @@
 /*=========================================================================
- *  header file for the top level and main function for a real-time
+ *  header file for the top level and
+ *  main function for a real-time
  *  experiment
  *
  *  Copyright 2007-2013, the MURFI dev team.
@@ -25,6 +26,9 @@
 #include"RtConfigFmriRun.h"
 #include"RtDataStore.h"
 #include"RtInfoServer.h"
+
+// initialize the entire murfi system
+bool initializeSystem(int argc, char** args);
 
 // initialize the experiment (call before the first run is prepared)
 // returns true for success

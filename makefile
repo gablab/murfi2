@@ -188,6 +188,7 @@ ifeq ($(FRONTEND),1)
            -L/usr/lib/x86_64-linux-gnu \
            -lQt5Gui \
            -lQt5Core \
+           -lQt5OpenGL \
            -lGL \
            -lpthread \
            -m64

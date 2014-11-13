@@ -9,6 +9,7 @@ QT_INC =  -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 \
           -I/usr/include/qt5/QtWidgets \
           -I/usr/include/qt5/QtGui \
           -I/usr/include/qt5/QtCore \
+          -I/usr/include/qt5/QtOpenGL \
           -I.
 
 MOC_INC = -I/usr/include/c++/4.8 \
@@ -42,13 +43,21 @@ SRC_FILES = $(wildcard ./*.cpp)
 TMP_FILES = $(patsubst ./%,$(OBJ_DIR)/%,$(SRC_FILES))
 OBJ_FILES = $(TMP_FILES:.cpp=.o)
 
+TO_MOC = $(patsubst %,moc_%,$(HDR_FILES))
+MOC_FILES = $(patsubst %.h,%.cpp,$(TO_MOC))
+
 ui_MainWindow.h: MainWindow.h MainWindow.ui
 	$(QT_BIN)/uic ./MainWindow.ui -o ui_MainWindow.h
 
-moc_MainWindow.cpp: MainWindow.h MainWindow.cpp MainWindow.ui
-	$(QT_BIN)/moc $(QT_DEF) $(QT_INC) ./MainWindow.h -o moc_MainWindow.cpp
+moc_%.cpp: %.h
+	$(QT_BIN)/moc $(QT_DEF) $(QT_INC) $< -o $@
+	sed -i 's/#include "PIE"/#include "$<"/' $@
 
-$(TARGET): ui_MainWindow.h moc_MainWindow.cpp $(OBJ_FILES)
+# moc_MainWindow.cpp: MainWindow.h MainWindow.cpp MainWindow.ui
+#       $(QT_BIN)/moc $(QT_DEF) $(QT_INC) ./MainWindow.h -o moc_MainWindow.cpp
+
+$(TARGET): ui_MainWindow.h $(MOC_FILES) $(OBJ_FILES)
+	echo $(MOC_FILES)
 
 clean:
 	-rm ui_* *.o

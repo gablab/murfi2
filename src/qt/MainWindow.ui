@@ -13,17 +13,15 @@
   <property name="windowTitle">
    <string>murfi</string>
   </property>
-  <widget class="QWidget" name="imageWidget">
-   <widget class="QGraphicsView" name="imageView">
+  <widget class="ImageWidget" name="imageWidget">
     <property name="geometry">
      <rect>
       <x>2</x>
       <y>1</y>
       <width>796</width>
-      <height>731</height>
+      <height>796</height>
      </rect>
     </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -31,7 +29,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>200</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

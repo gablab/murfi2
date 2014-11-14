@@ -40,47 +40,72 @@ using namespace boost::filesystem;
 #include"util/timer/timer.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// experiment data (all at static file scope)
+// experiment data
 //////////////////////////////////////////////////////////////////////////////
 
+namespace {
 // experiment configuration
-static RtConfigFmriExperiment config;
+RtConfigFmriExperiment config;
 
 // one or the other of these should be set to read the configuration
-static string confFilename;
-static string confXmlStr;
+string confFilename;
+string confXmlStr;
+
+string defaultConfigXML(
+  "<?xml version='1.0' encoding='UTF-8'?>"
+  "<study name='STUDY_NAME'>"
+  "  <option name='subjectsDir'>/tmp</option>"
+  "  <subject>"
+  "    <option name='name'>murfi</option>"
+  "  </subject>"
+  "</study>"
+  "<scanner>"
+  "  <option name='disabled'>      false </option>"
+  "  <option name='receiveImages'> true </option>"
+  "  <option name='saveImages'>    true </option>"
+  "  <option name='port'>          15000 </option>"
+  "  <option name='onlyReadMoCo'>  false </option>"
+  "  <option name='unmosaic'>      true </option>"
+  "  <option name='tr'> 2.0 </option>"
+  "</scanner>"
+  "<infoserver>"
+  "    <option name='disabled'> false </option>"
+  "    <option name='port'> 15001 </option>"
+  "</infoserver>"
+);
 
 // store and allow access to collected and computed data
-static RtDataStore dataStore;
+RtDataStore dataStore;
 
 // tcpip interface to experiment information
-static RtInfoServer *infoServer = NULL;
+RtInfoServer *infoServer = NULL;
 
 // tcpip interface to scanner input
-static RtInputScannerImages scannerInput;
+RtInputScannerImages scannerInput;
 
 // conductor to execute fmri runs
-static RtConductor *conductor = NULL;
+RtConductor *conductor = NULL;
 
 // raw data identifiers that we've seen (need for knowing which data
 // streams are novel)
-static map<string, unsigned int> uids;
+map<string, unsigned int> uids;
 
 // number of unique input data series we've seen
-static unsigned int numExistingSeries;
+unsigned int numExistingSeries;
 
 // unique id for this study (date and time of first initialization)
-static unsigned int studyID;
+unsigned int studyID;
 
 // list of mask filenames to align
-static vector<string> masksToAlign;
+vector<string> masksToAlign;
 
 // timers
-static timer experimentTimer;
-static timer computeTimer;
+timer experimentTimer;
+timer computeTimer;
 
-static string execName;
+string execName;
 
+} // anonymous namespace
 
 //* methods for retreiving info about the the experiment *//
 
@@ -206,7 +231,11 @@ bool initExperiment() {
 
     cout << "done" << endl;
   }
-  else if(!confXmlStr.empty()) { // next look to a string
+  else { // next look to a string
+    if(confXmlStr.empty()) {
+      confXmlStr = defaultConfigXML;
+    }
+
     cout << "parsing config xml string...";
 
     if(!config.parseConfigStr(confXmlStr)) {
@@ -216,10 +245,6 @@ bool initExperiment() {
     }
 
     cout << "done" << endl;
-  }
-  else { // error, no config
-    cerr << "ERROR: no experiment configuration provided" << endl;
-    return false;
   }
 
   // count existing series for this experiment

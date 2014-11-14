@@ -277,6 +277,9 @@ clean:
 	-cd $(OBJ_DIR) && $(RM) -f *.o *~
 	-cd util/scanner_sim && $(MAKE) clean
 
+clean_qt:
+	-cd src/qt && make clean
+
 ######################################################################
 ### $Source$
 ### Local Variables:

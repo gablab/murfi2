@@ -13,56 +13,30 @@
   <property name="windowTitle">
    <string>murfi</string>
   </property>
-  <widget class="ImageWidget" name="imageWidget">
-    <property name="geometry">
-     <rect>
-      <x>2</x>
-      <y>1</y>
-      <width>796</width>
-      <height>796</height>
-     </rect>
-    </property>
-  </widget>
+  <widget class="ImageWidget" name="imageWidget"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>200</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuNew">
+    <widget class="QMenu" name="menuNewRun">
      <property name="title">
-      <string>New</string>
+      <string>New run</string>
      </property>
-     <widget class="QMenu" name="menuUnivariate">
-      <property name="title">
-       <string>Univariate</string>
-      </property>
-      <widget class="QMenu" name="menuBlock_design">
-       <property name="title">
-        <string>Block design</string>
-       </property>
-       <addaction name="actionThermometer"/>
-       <addaction name="actionBlock_summary"/>
-      </widget>
-      <addaction name="menuBlock_design"/>
-     </widget>
-     <widget class="QMenu" name="menuMultivariate">
-      <property name="title">
-       <string>Multivariate</string>
-      </property>
-      <addaction name="actionSVM"/>
-     </widget>
-     <addaction name="menuUnivariate"/>
-     <addaction name="menuMultivariate"/>
+     <addaction name="actionUnivariate"/>
+     <addaction name="actionMultivariate"/>
+     <addaction name="actionLocalizer"/>
     </widget>
-    <addaction name="menuNew"/>
+    <addaction name="actionNewExperiment"/>
+    <addaction name="menuNewRun"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSaveAs"/>
@@ -88,19 +62,27 @@
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionThermometer">
+  <action name="actionNewExperiment">
    <property name="text">
-    <string>Thermometer</string>
+    <string>New experiment</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionBlock_summary">
+  <action name="actionUnivariate">
    <property name="text">
-    <string>Block summary</string>
+    <string>Univariate</string>
    </property>
   </action>
-  <action name="actionSVM">
+  <action name="actionMultivariate">
    <property name="text">
-    <string>SVM</string>
+    <string>Multivariate</string>
+   </property>
+  </action>
+  <action name="actionLocalizer">
+   <property name="text">
+    <string>Localizer</string>
    </property>
   </action>
   <action name="actionOpen">
@@ -113,7 +95,7 @@
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save run config</string>
+    <string>Save run</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -121,7 +103,7 @@
   </action>
   <action name="actionSaveAs">
    <property name="text">
-    <string>Save run config As</string>
+    <string>Save run As</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -147,6 +129,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ImageWidget</class>
+   <extends>QWidget</extends>
+   <header>ImageWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -154,6 +144,12 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
+  </connection>
+  <connection>
+   <sender>actionNewExperiment</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>newExperiment()</slot>
   </connection>
  </connections>
 </ui>

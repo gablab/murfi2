@@ -34,7 +34,7 @@ QT_DEF = -D_REENTRANT \
 .SUFFIXES:
 .SUFFIXES:  .o .cpp
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJ_DIR)/%.o: %.cpp ui_MainWindow.h
 	@$(ECHO) '[make: building $@]'
 	$(CC) $(C_FLAGS) -o $@ -c -m64 -pipe -Wall $(QT_DEF) $(QT_INC) $<
 
@@ -49,12 +49,9 @@ MOC_FILES = $(patsubst %.h,%.cpp,$(TO_MOC))
 ui_MainWindow.h: MainWindow.h MainWindow.ui
 	$(QT_BIN)/uic ./MainWindow.ui -o ui_MainWindow.h
 
-moc_%.cpp: %.h
+moc_%.cpp: %.h ui_MainWindow.h
 	$(QT_BIN)/moc $(QT_DEF) $(QT_INC) $< -o $@
 	sed -i 's/#include "PIE"/#include "$<"/' $@
-
-# moc_MainWindow.cpp: MainWindow.h MainWindow.cpp MainWindow.ui
-#       $(QT_BIN)/moc $(QT_DEF) $(QT_INC) ./MainWindow.h -o moc_MainWindow.cpp
 
 $(TARGET): ui_MainWindow.h $(MOC_FILES) $(OBJ_FILES)
 	echo $(MOC_FILES)

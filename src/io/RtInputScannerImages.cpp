@@ -40,15 +40,13 @@ static const int    DEFAULT_PORT = 15000;
 
 // increase this size for highres acquisitions
 #define MAX_BUFSIZ 256*256*256*2
-#define MAX_SERIESNUM 99999
 static char buffer[MAX_BUFSIZ];
 
 static bool verbose = false;
 
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
-    :  port(DEFAULT_PORT),
-       seriesNum(1)
+    :  port(DEFAULT_PORT)
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
@@ -165,19 +163,21 @@ bool RtInputScannerImages::close() {
   return ret;
 }
 
-// initialize a series run
-// call this before each run
 bool RtInputScannerImages::init(RtConfigFmriRun &config) {
+  bool ret = init();
+  if(config.isSet("scanner:discard")) {
+    num2Discard = config.get("scanner:discard");
+  }
+
+  return ret;
+}
+
+bool RtInputScannerImages::init() {
   haveStudyRefVol = false;
   haveSeriesRefVol = false;
 
   numDiscarded = 0;
-  if(config.isSet("scanner:discard")) {
-    num2Discard = config.get("scanner:discard");
-  }
-  else {
-    num2Discard = 0;
-  }
+  num2Discard = 0;
 
   initialized = true;
 
@@ -194,8 +194,7 @@ int RtInputScannerImages::svc() {
   cout << "listening for images on port " << port << endl;
 
   // continuously try to accept connections
-  for(; isOpen
-          && acceptor.accept(stream) != -1;) {
+  for(; isOpen && acceptor.accept(stream) != -1;) {
 
     if(!initialized) {
       cerr << "ERROR: accepting images when scanner input not initialized!"
@@ -205,16 +204,6 @@ int RtInputScannerImages::svc() {
 
     if(verbose) {
       cout << "connection accepted" << endl;
-    }
-
-    if(getExperimentConfig().get("study:timeComputations") == true
-       && !startComputeTimer()) {
-      cout << "warning: compute timer already started, "
-           << "timing will be inaccurate"
-           << endl;
-    }
-    else {
-      cout << "started compute timer" << endl;
     }
 
     // get the info
@@ -357,7 +346,7 @@ int RtInputScannerImages::svc() {
     if(ei->currentTR + num2Discard == ei->totalTR) {
       cout << "received last image." << endl;
       sendCode(NULL);
-      initialized = false;
+      init();
     }
   }
 
@@ -404,9 +393,6 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
 //   image data on successful read (NULL otherwise)
 short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
                                           const RtExternalImageInfo &info) {
-
-  ACE_DEBUG((LM_DEBUG, "receiving data for %d:%d\n", seriesNum,
-             info.currentTR));
 
   // grab numPix from header (to support MEMPRAGE)
   long numPix = info.getNumVoxels();

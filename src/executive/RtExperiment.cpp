@@ -66,7 +66,6 @@ string defaultConfigXML(
   "  <option name='port'>          15000 </option>"
   "  <option name='onlyReadMoCo'>  false </option>"
   "  <option name='unmosaic'>      true </option>"
-  "  <option name='tr'> 2.0 </option>"
   "</scanner>"
   "<infoserver>"
   "    <option name='disabled'> false </option>"

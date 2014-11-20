@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtOpenGL>
-#include "RtMRIImage.h"
+#include "RtData.h"
 
 #ifndef TEXTURE_TYPE
 #ifdef WIN32
@@ -27,23 +27,22 @@ class Image {
 
   Image();
 
-  ~Image() {}
+  virtual ~Image() {}
 
-  void setData(RtMRIImage *img);
+  void setData(RtData *img);
 
   void paint();
 
- private:
+ protected:
 
-  void updateTexture();
+  virtual void updateTexture() = 0;
 
-  RtMRIImage *data;
+  RtData *data;
   bool needs_update;
+  bool have_data;
 
   GLuint texture_id;
-  bool first_image;
 
   int image_width;
   int image_height;
-
 };

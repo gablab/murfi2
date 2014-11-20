@@ -1,10 +1,13 @@
 #pragma once
 
-#include <vector>
+#include <map>
+#include <string>
 
 #include <QtWidgets>
 #include <QGLWidget>
 #include <QOpenGLFunctions>
+
+#include "RtMRIImage.h"
 
 #include "Image.h"
 
@@ -18,7 +21,7 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
 
-  void addImage(RtMRIImage *img);
+  void addImage(RtData *img);
 
  signals:
   void clicked();
@@ -34,5 +37,5 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
  private:
   void makeObject();
 
-  std::vector<Image> images;
+  std::map<string, Image*> layers;
 };

@@ -5,17 +5,36 @@
 #include <QtWidgets>
 //#include <QtOpenGL>
 
+#include "RtDataIDs.h"
+
+#include "ActivationImage.h"
+#include "MRImage.h"
+
 using std::cout;
 using std::endl;
-using std::vector;
+using std::map;
+using std::string;
+
+namespace {
+  typedef std::pair<string, Image*> Layer;
+
+  const string MR_LAYER = "MRI";
+  const string ACTIVATION_LAYER = "Activation";
+} // anonymous namespace
 
 ImageWidget::ImageWidget(QWidget *parent)
   : QGLWidget(parent)
 {
+  layers.insert(Layer(ACTIVATION_LAYER, new ActivationImage()));
+  layers.insert(Layer(MR_LAYER, new MRImage()));
 }
 
 ImageWidget::~ImageWidget()
 {
+  for (map<string, Image*>::iterator it = layers.begin();
+       it != layers.end(); ++it) {
+    delete it->second;
+  }
 }
 
 QSize ImageWidget::minimumSizeHint() const {
@@ -26,14 +45,17 @@ QSize ImageWidget::sizeHint() const {
   return QSize(200, 200);
 }
 
-void ImageWidget::addImage(RtMRIImage *img) {
-  if (images.empty()) {
-    images.push_back(Image());
+void ImageWidget::addImage(RtData *img) {
+
+  if (img->getDataID().getModuleID() == ID_CURRENTACTIVATION) {
+    layers[ACTIVATION_LAYER]->setData(img);
   }
-  images.back().setData(img);
+  else if (img->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
+    layers[MR_LAYER]->setData(img);
+  }
+
   QMetaObject::invokeMethod(this, "updateGL", Qt::AutoConnection);
 }
-
 
 void ImageWidget::initializeGL() {
   initializeOpenGLFunctions();
@@ -65,15 +87,13 @@ void ImageWidget::paintGL() {
 
   glEnable(TEXTURE_TYPE);
 
-  for (vector<Image>::iterator it = images.begin(); it != images.end();
-       ++it) {
-    it->paint();
-  }
+  // paint the layers in order
+  layers[MR_LAYER]->paint();
+  layers[ACTIVATION_LAYER]->paint();
 
   glDisable(TEXTURE_TYPE);
 
   glFlush();
-
 }
 
 void ImageWidget::resizeGL(int width, int height) {

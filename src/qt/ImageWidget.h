@@ -18,6 +18,8 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
 
+  void addImage(RtMRIImage *img);
+
  signals:
   void clicked();
 

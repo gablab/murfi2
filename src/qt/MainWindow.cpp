@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "RtDataID.h"
+#include "RtDataIDs.h"
 
 //
 #include"RtExperiment.h"
@@ -26,7 +27,10 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::notify(const RtDataID &id) {
-  cout << "got data: " << id << endl;
+  if (id.getDataName() == NAME_SCANNERIMG_EPI) {
+    ui->imageWidget->addImage(static_cast<RtMRIImage*>(
+                                getDataStore().getData(id)));
+  }
 }
 
 void MainWindow::newExperiment() {

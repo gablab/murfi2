@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow, public RtDataListener {
  private slots:
   void newExperiment();
   void newRun();
-  // void openRun();
+  void openRun();
   // bool saveRun();
   // bool saveRunAs();
   // void runAgain();

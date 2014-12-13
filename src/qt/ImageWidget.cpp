@@ -8,6 +8,7 @@
 #include "RtDataIDs.h"
 
 #include "ActivationImage.h"
+#include "MaskImage.h"
 #include "MRImage.h"
 
 using std::cout;
@@ -20,6 +21,7 @@ namespace {
 
   const string MR_LAYER = "MRI";
   const string ACTIVATION_LAYER = "Activation";
+  const string MASK_LAYER = "Mask";
 } // anonymous namespace
 
 ImageWidget::ImageWidget(QWidget *parent)
@@ -27,6 +29,7 @@ ImageWidget::ImageWidget(QWidget *parent)
 {
   layers.insert(Layer(ACTIVATION_LAYER, new ActivationImage()));
   layers.insert(Layer(MR_LAYER, new MRImage()));
+  layers.insert(Layer(MASK_LAYER, new MaskImage()));
 }
 
 ImageWidget::~ImageWidget()
@@ -52,6 +55,12 @@ void ImageWidget::addImage(RtData *img) {
   }
   else if (img->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
     layers[MR_LAYER]->setData(img);
+  }
+  else if (img->getDataID().getDataName() == NAME_MASK) {
+    layers[MASK_LAYER]->setData(img);
+  }
+  else {
+    return;
   }
 
   QMetaObject::invokeMethod(this, "updateGL", Qt::AutoConnection);
@@ -90,6 +99,7 @@ void ImageWidget::paintGL() {
   // paint the layers in order
   layers[MR_LAYER]->paint();
   layers[ACTIVATION_LAYER]->paint();
+  layers[MASK_LAYER]->paint();
 
   glDisable(TEXTURE_TYPE);
 

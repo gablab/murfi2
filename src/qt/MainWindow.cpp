@@ -27,10 +27,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::notify(const RtDataID &id) {
-  if (id.getDataName() == NAME_SCANNERIMG_EPI) {
-    ui->imageWidget->addImage(static_cast<RtMRIImage*>(
-                                getDataStore().getData(id)));
-  }
+  ui->imageWidget->addImage(getDataStore().getData(id));
 }
 
 void MainWindow::newExperiment() {
@@ -38,4 +35,20 @@ void MainWindow::newExperiment() {
 }
 
 void MainWindow::newRun() {
+}
+
+void MainWindow::openRun() {
+  string filename = QFileDialog::getOpenFileName(
+    this, tr("Open run config"), "", tr("Files (*.xml)")).toStdString();
+
+  if (filename.empty()) {
+    return;
+  }
+
+  RtConfigFmriRun run_config;
+  run_config.parseConfigFile(filename);
+
+  // TODO validation
+
+  executeRun(run_config);
 }

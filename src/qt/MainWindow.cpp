@@ -20,6 +20,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
   // register me to get the data
   getDataStore().addListener(this);
+
+  // let the image widget handle plotting data, too.
+  ui->imageWidget->setRoiWidget(ui->roiPlotWidget);
+  ui->imageWidget->setMotionWidget(ui->motionPlotWidget);
 }
 
 MainWindow::~MainWindow() {
@@ -27,7 +31,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::notify(const RtDataID &id) {
-  ui->imageWidget->addImage(getDataStore().getData(id));
+  ui->imageWidget->handleData(getDataStore().getData(id));
 }
 
 void MainWindow::newExperiment() {
@@ -47,6 +51,8 @@ void MainWindow::openRun() {
 
   RtConfigFmriRun run_config;
   run_config.parseConfigFile(filename);
+
+  ui->imageWidget->initRun(run_config);
 
   // TODO validation
 

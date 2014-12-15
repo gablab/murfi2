@@ -29,6 +29,8 @@
 #include<sstream>
 #include<cstdlib>
 
+typedef pair<string, string> StringPair;
+
 const RtConfigVal RtConfig::unset;
 
 //*** constructors/destructors  ***//
@@ -269,6 +271,59 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
   return NULL;
 }
 
+// get all the option text values for the processing modules with a
+// specified name.
+//
+// in
+//  module_name is a string representing the module name attribute.
+//  option_name is a string representing the option name attribute required.
+// out
+//  a list of the matching subnode option names.
+vector<string> RtConfig::getProcessingModuleNames(const string &module_name,
+                                                  const string &option_name) {
+  vector<string> matches;
+
+  TiXmlNode* node = getNode("processor");
+  if (node == NULL) {
+    return matches;
+  }
+
+  TiXmlNode *child = NULL;
+  while((child = node->ToElement()->IterateChildren(child))) {
+    TiXmlElement *el = child->ToElement();
+    if (el == NULL) {
+      continue;
+    }
+
+    string name;
+    el->QueryValueAttribute("name",&name);
+
+    if (name != module_name) {
+      continue;
+    }
+
+    TiXmlNode *subchild = NULL;
+    while((subchild = el->IterateChildren("option", subchild))) {
+      TiXmlElement *subel = subchild->ToElement();
+      if (subel == NULL) {
+        continue;
+      }
+
+      string subname;
+      subel->QueryValueAttribute("name",&subname);
+
+      if (subname != option_name) {
+        continue;
+      }
+
+      matches.push_back(subchild->FirstChild()->ValueStr());
+      break;
+    }
+  }
+
+  return matches;
+}
+
 // determine if there is a value set for a particular config variable
 //  in
 //   the variable name to check
@@ -277,7 +332,6 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
 bool RtConfig::isSet(const string &name) {
   return get(name,&parms).isSet();
 }
-
 
 // sets a parm value starting from a specified xml node
 // children are created appropritately

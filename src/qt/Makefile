@@ -10,6 +10,7 @@ QT_INC =  -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 \
           -I/usr/include/qt5/QtGui \
           -I/usr/include/qt5/QtCore \
           -I/usr/include/qt5/QtOpenGL \
+          -I/usr/include/qt5/QtPrintSupport \
           -I.
 
 MOC_INC = -I/usr/include/c++/4.8 \

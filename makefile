@@ -189,6 +189,7 @@ ifeq ($(FRONTEND),1)
            -lQt5Gui \
            -lQt5Core \
            -lQt5OpenGL \
+           -lQt5PrintSupport \
            -lGL \
            -lpthread \
            -m64
@@ -214,6 +215,7 @@ C_INC = -I$(SRC_DIR) \
 
 C_FLAGS = -Wall \
 	-Wno-write-strings \
+	-std=c++11 \
 	$(FRONT_FLAG) \
 	$(MTRACE_FLAG) \
 	$(PROF_FLAG) \

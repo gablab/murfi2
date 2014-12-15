@@ -5,6 +5,8 @@
 #include <QtWidgets>
 //#include <QtOpenGL>
 
+#include "qcustomplot.h"
+
 #include "RtDataIDs.h"
 
 #include "ActivationImage.h"
@@ -14,26 +16,49 @@
 using std::cout;
 using std::endl;
 using std::map;
+using std::mutex;
 using std::string;
+using std::vector;
 
 namespace {
   typedef std::pair<string, Image*> Layer;
 
   const string MR_LAYER = "MRI";
   const string ACTIVATION_LAYER = "Activation";
-  const string MASK_LAYER = "Mask";
 } // anonymous namespace
 
 ImageWidget::ImageWidget(QWidget *parent)
   : QGLWidget(parent)
-{
-  layers.insert(Layer(ACTIVATION_LAYER, new ActivationImage()));
-  layers.insert(Layer(MR_LAYER, new MRImage()));
-  layers.insert(Layer(MASK_LAYER, new MaskImage()));
-}
+  , roiPlotWidget(NULL)
+  , motionPlotWidget(NULL)
+  , num_mask_images(0)
+{}
 
 ImageWidget::~ImageWidget()
 {
+  deinitRun();
+}
+
+void ImageWidget::initRun(RtConfigFmriRun &config) {
+  deinitRun();
+
+  draw_order.push_back(MR_LAYER);
+  layers.insert(Layer(MR_LAYER, new MRImage()));
+
+  layers.insert(Layer(ACTIVATION_LAYER, new ActivationImage()));
+  draw_order.push_back(ACTIVATION_LAYER);
+
+  vector<string> masks = config.getProcessingModuleNames("mask-load", "roiID");
+  for (vector<string>::iterator it = masks.begin(); it != masks.end(); ++it) {
+    cout << "it: " << *it << endl;
+    layers.insert(Layer(*it, new MaskImage(num_mask_images)));
+    draw_order.push_back(*it);
+    num_mask_images++;
+  }
+}
+
+void ImageWidget::deinitRun() {
+  draw_order.clear();
   for (map<string, Image*>::iterator it = layers.begin();
        it != layers.end(); ++it) {
     delete it->second;
@@ -48,16 +73,26 @@ QSize ImageWidget::sizeHint() const {
   return QSize(200, 200);
 }
 
-void ImageWidget::addImage(RtData *img) {
-
+void ImageWidget::handleData(RtData *img) {
   if (img->getDataID().getModuleID() == ID_CURRENTACTIVATION) {
+    draw_mutex.lock();
     layers[ACTIVATION_LAYER]->setData(img);
+    draw_mutex.unlock();
   }
   else if (img->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
+    draw_mutex.lock();
     layers[MR_LAYER]->setData(img);
+    draw_mutex.unlock();
   }
   else if (img->getDataID().getDataName() == NAME_MASK) {
-    layers[MASK_LAYER]->setData(img);
+    string roi_name = img->getDataID().getRoiID();
+    if (layers.find(roi_name) == layers.end()) {
+      return;
+    }
+
+    draw_mutex.lock();
+    layers[roi_name]->setData(img);
+    draw_mutex.unlock();
   }
   else {
     return;
@@ -96,10 +131,13 @@ void ImageWidget::paintGL() {
 
   glEnable(TEXTURE_TYPE);
 
+  draw_mutex.lock();
   // paint the layers in order
-  layers[MR_LAYER]->paint();
-  layers[ACTIVATION_LAYER]->paint();
-  layers[MASK_LAYER]->paint();
+  for (vector<string>::const_iterator it = draw_order.begin();
+       it != draw_order.end(); ++it) {
+    layers[*it]->paint();
+  }
+  draw_mutex.unlock();
 
   glDisable(TEXTURE_TYPE);
 

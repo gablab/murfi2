@@ -211,9 +211,7 @@ RtActivation *RtRoiCombine::getMean(RtData *dat, RtMaskImage *mask) {
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix)
-       && !isinf(pix)
-       ) {
+    if(!std::isnan(pix) && !std::isinf(pix)) {
       sum += pix;
     }
   }
@@ -240,9 +238,7 @@ RtActivation *RtRoiCombine::getVariance(RtData *dat, RtMaskImage *mask) {
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix)
-       && !isinf(pix)
-       ) {
+    if(!std::isnan(pix) && !std::isinf(pix)) {
       mean += pix;
     }
   }
@@ -254,9 +250,7 @@ RtActivation *RtRoiCombine::getVariance(RtData *dat, RtMaskImage *mask) {
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix)
-       && !isinf(pix)
-       ) {
+    if(!std::isnan(pix) && !std::isinf(pix)) {
       sqSum = (pix-mean)*(pix-mean);
     }
   }
@@ -283,9 +277,7 @@ RtActivation *RtRoiCombine::getMedian(RtData *dat, RtMaskImage *mask) {
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix)
-       && !isinf(pix)
-       ) {
+    if(!std::isnan(pix) && !std::isinf(pix)) {
       roiVals.push_back(pix);
     }
   }
@@ -324,8 +316,8 @@ RtActivation *RtRoiCombine::getWeightedAve(RtData *dat, RtData *weights,
     double pix = ac.getDoubleElement(*i);
     double weight = wac.getDoubleElement(*i);
 
-    if(!isnan(pix) && !isinf(pix)
-       && !isnan(weight) && !isinf(weight)) {
+    if(!std::isnan(pix) && !std::isinf(pix)
+       && !std::isnan(weight) && !std::isinf(weight)) {
 
       weightedSum += weight*pix;
       summedWeights += weight;
@@ -357,8 +349,8 @@ RtActivation *RtRoiCombine::getSum(RtData *dat, RtMaskImage *mask) {
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix)
-       && !isinf(pix)
+    if(!std::isnan(pix)
+       && !std::isinf(pix)
        ) {
       sum += pix;
     }
@@ -384,8 +376,8 @@ RtActivation *RtRoiCombine::getMax(RtData *dat, RtMaskImage *mask) {
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix)
-       && !isinf(pix)
+    if(!std::isnan(pix)
+       && !std::isinf(pix)
        && pix < max
        ) {
       max = pix;
@@ -412,8 +404,8 @@ RtActivation *RtRoiCombine::getMin(RtData *dat, RtMaskImage *mask) {
       i != indices.end(); i++) {
 
     double pix = ac.getDoubleElement(*i);
-    if(!isnan(pix)
-       && !isinf(pix)
+    if(!std::isnan(pix)
+       && !std::isinf(pix)
        && pix < min
        ) {
       min = pix;

@@ -8,6 +8,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class PlotController;
+
 class MainWindow : public QMainWindow, public RtDataListener {
   Q_OBJECT
 
@@ -27,7 +29,6 @@ class MainWindow : public QMainWindow, public RtDataListener {
 
  private:
 
-
-
   Ui::MainWindow *ui;
+  PlotController *plot_controller;
 };

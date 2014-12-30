@@ -29,8 +29,6 @@ namespace {
 
 ImageWidget::ImageWidget(QWidget *parent)
   : QGLWidget(parent)
-  , roiPlotWidget(NULL)
-  , motionPlotWidget(NULL)
   , num_mask_images(0)
 {}
 

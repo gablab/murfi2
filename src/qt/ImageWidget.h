@@ -30,14 +30,6 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
 
   void handleData(RtData *img);
 
-  void setRoiWidget(QCustomPlot *widget) {
-    roiPlotWidget = widget;
-  }
-
-  void setMotionWidget(QCustomPlot *widget) {
-    motionPlotWidget = widget;
-  }
-
  signals:
   void clicked();
 
@@ -56,9 +48,6 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
 
   std::map<string, Image*> layers;
   std::vector<string> draw_order;
-
-  QCustomPlot* roiPlotWidget;
-  QCustomPlot* motionPlotWidget;
 
   int num_mask_images;
 };

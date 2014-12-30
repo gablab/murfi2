@@ -53,12 +53,6 @@ string confXmlStr;
 
 string defaultConfigXML(
   "<?xml version='1.0' encoding='UTF-8'?>"
-  "<study name='STUDY_NAME'>"
-  "  <option name='subjectsDir'>/tmp</option>"
-  "  <subject>"
-  "    <option name='name'>murfi</option>"
-  "  </subject>"
-  "</study>"
   "<scanner>"
   "  <option name='disabled'>      false </option>"
   "  <option name='receiveImages'> true </option>"
@@ -103,6 +97,9 @@ timer experimentTimer;
 timer computeTimer;
 
 string execName;
+
+string subjectName;
+string subjectsDir;
 
 } // anonymous namespace
 
@@ -228,12 +225,24 @@ bool initExperiment() {
       return false;
     }
 
+    // TODO: what to do when subject or subjects dir is set in the config file?
+    if (config.isSet("study:subjectsDir")) {
+      cout << "WARNING!!!! A subjects dir was provided in the config file."
+           << " It will be IGNORED" << endl;
+    }
+    config.set("study:subjectsDir", subjectsDir);
+
     cout << "done" << endl;
   }
   else { // next look to a string
     if(confXmlStr.empty()) {
       confXmlStr = defaultConfigXML;
     }
+
+    // TODO: what to do when subject or subjects dir is set in the
+    // config string?
+    config.set("study:subject:name", subjectName);
+    config.set("study:subjectsDir", subjectsDir);
 
     cout << "parsing config xml string...";
 
@@ -457,6 +466,18 @@ bool parseArgs(int argc, char **args) {
 }
 
 bool initializeSystem(int argc, char** args) {
+  // get subject's directory
+  if (getenv("MURFI_SUBJECT_NAME") == NULL ||
+      getenv("MURFI_SUBJECTS_DIR") == NULL) {
+    cout << "ERROR: The environment variables MURFI_SUBJECT_NAME and "
+         << "MURFI_SUBJECTS_DIR must be set."
+         << endl;
+    return false;
+  }
+
+  subjectName = getenv("MURFI_SUBJECT_NAME");
+  subjectsDir = getenv("MURFI_SUBJECTS_DIR");
+
   // setup arguments
   if(!parseArgs(argc, args)) {
     printUsage();

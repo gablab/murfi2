@@ -569,12 +569,16 @@ unsigned int RtDesignMatrix::getNumNuisanceBases() {
 // retreive a vector of the indices of columns identified as representing
 // neural signals of interest
 vnl_vector<unsigned int> RtDesignMatrix::getColumnOfInterestIndices() {
-  vnl_vector<unsigned int> inds;
+  vnl_vector<unsigned int> inds(columnOfInterestIndicator.size() -
+                                getNumNuisanceBases());
+
+  int filled = 0;
   int ind = 0;
   for (vector<bool>::iterator i = columnOfInterestIndicator.begin();
        i != columnOfInterestIndicator.end(); ind++, i++) {
     if (*i) {
-      inds.put(inds.size(), ind);
+      inds.put(filled, ind);
+      filled++;
     }
   }
 

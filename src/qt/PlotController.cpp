@@ -2,6 +2,8 @@
 
 #include "qcustomplot.h"
 
+#include<vnl/vnl_vector.h>
+
 #include "RtData.h"
 #include "RtDataIDs.h"
 #include "RtDesignMatrix.h"
@@ -13,8 +15,22 @@ using std::vector;
 namespace {
 
 void plotDesign(QCustomPlot *plot, RtDesignMatrix* design) {
-  // TODO
-  cout << "plotting design" << endl;
+  for (size_t graph = 0; graph < design->getNumColumns(); graph++) {
+    if (!design->isColumnOfInterest(graph)) {
+      continue;
+    }
+
+    plot->addGraph();
+
+    vnl_vector<double> col = design->getColumn(graph);
+    for (size_t tr = 0; tr < col.size(); tr++) {
+      plot->graph(graph)->addData(tr, col[tr]);
+    }
+
+  }
+
+  plot->rescaleAxes();
+  plot->replot();
 }
 
 void plotMotion(QCustomPlot *plot, RtMotion* motion) {
@@ -42,7 +58,12 @@ void PlotController::addRoi(const string &name) {
 void PlotController::handleData(RtData *data) {
   RtDataID id = data->getDataID();
   if (id.getDataName() == NAME_DESIGN) {
-    plotDesign(design_plot, static_cast<RtDesignMatrix*>(data));
+    RtDesignMatrix *design = static_cast<RtDesignMatrix*>(data);
+    plotDesign(design_plot, design);
+    roi_plot->xAxis->setRange(0, design->getNumRows());
+    roi_plot->replot();
+    motion_plot->xAxis->setRange(0, design->getNumRows());
+    motion_plot->replot();
   }
   else if (id.getModuleID() == ID_ROICOMBINE) {
     for (size_t i = 0; i < roi_names.size(); i++) {

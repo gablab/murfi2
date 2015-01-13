@@ -2,24 +2,11 @@
 
 #include "RtMaskImage.h"
 
-namespace {
-float color_table[][3] =
-  {
-    {0.0f, 1.0f, 0.0f},
-    {1.0f, 0.0f, 1.0f},
-    {1.0f, 1.0f, 0.0f},
-    {0.0f, 1.0f, 1.0f}
-  };
-} // anonymous namespace
-
-MaskImage::MaskImage(int color_index)
+MaskImage::MaskImage(const QColor &color)
   : Image()
+  , color(color)
   , opacity(0.5f)
-{
-  for (int i = 0; i < 3; i++) {
-    rgb[i] = color_table[color_index][i];
-  }
-}
+{}
 
 void MaskImage::updateTexture() {
   have_data = false;
@@ -56,9 +43,9 @@ void MaskImage::updateTexture() {
 
   for(int i = 0; i < image_width * image_height; i++) {
     // rgb
-    for (int j = 0; j < 3; j++) {
-      overlay_data[4*i+j] = data_ptr[i] * SHRT_MAX * rgb[j];
-    }
+    overlay_data[4*i+0] = data_ptr[i] * SHRT_MAX * color.redF();
+    overlay_data[4*i+1] = data_ptr[i] * SHRT_MAX * color.greenF();
+    overlay_data[4*i+2] = data_ptr[i] * SHRT_MAX * color.blueF();
     overlay_data[4*i+3] = data_ptr[i] * SHRT_MAX * opacity; // a
   }
   delete [] data_ptr;

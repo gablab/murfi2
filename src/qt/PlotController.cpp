@@ -4,12 +4,14 @@
 
 #include<vnl/vnl_vector.h>
 
+#include "RtActivation.h"
 #include "RtData.h"
 #include "RtDataIDs.h"
 #include "RtDesignMatrix.h"
 #include "RtExperiment.h"
 #include "RtMotion.h"
 
+using std::pair;
 using std::string;
 using std::vector;
 
@@ -42,10 +44,12 @@ void plotMotion(QCustomPlot *plot, RtMotion* motion) {
 } // anonymous namespace
 
 
-PlotController::PlotController(QCustomPlot *design_plot,
+PlotController::PlotController(MainWindow *main_window,
+                               QCustomPlot *design_plot,
                                QCustomPlot *roi_plot,
                                QCustomPlot *motion_plot)
-  : design_plot(design_plot)
+  : main_window(main_window)
+  , design_plot(design_plot)
   , roi_plot(roi_plot)
   , motion_plot(motion_plot)
   , design_tr_indicator(new QCPItemLine(design_plot))
@@ -54,8 +58,11 @@ PlotController::PlotController(QCustomPlot *design_plot,
   , current_tr(0)
 {
   design_plot->addItem(design_tr_indicator);
+  roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);
+  roi_plot->yAxis->setRange(-3, 3);
   motion_plot->addItem(motion_tr_indicator);
+  motion_plot->yAxis->setRange(-2, 2);
   updateTRIndicators();
 }
 
@@ -63,10 +70,6 @@ PlotController::~PlotController() {
   delete design_tr_indicator;
   delete roi_tr_indicator;
   delete motion_tr_indicator;
-}
-
-void PlotController::addRoi(const string &name) {
-  roi_names.push_back(name);
 }
 
 void PlotController::handleData(QString qid) {
@@ -85,17 +88,19 @@ void PlotController::handleData(QString qid) {
     motion_plot->replot();
   }
   else if (id.getModuleID() == ID_ROICOMBINE) {
-    for (size_t i = 0; i < roi_names.size(); i++) {
-      if (roi_names[i] == id.getRoiID()) {
-        cout << "got a new value for roi " << roi_names[i] << endl;
-        //plotRoi(roi_plot,
-        break;
-      }
+    map<string, int>::const_iterator it = roi_graphs.find(id.getRoiID());
+    if (it == roi_graphs.end()) {
+      it = roi_graphs.insert(
+        pair<string, int>(id.getRoiID(), roi_plot->graphCount())).first;
+      roi_plot->addGraph();
+      roi_plot->graph(it->second)->setPen(QPen(main_window->getColorForName(
+                                                 id.getRoiID())));
     }
 
-    // not found, add to the names and setup a new plot
-    roi_names.push_back(id.getRoiID());
-    // TODO: setup new plot
+    RtActivation *val = static_cast<RtActivation*>(getDataStore().getData(id));
+    roi_plot->graph(roi_graphs[id.getRoiID()])->addData(id.getTimePoint(),
+                                                        val->getPixel(0));
+    roi_plot->replot();
   }
   else if (id.getModuleID() == ID_MOTION) {
     // TODO

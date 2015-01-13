@@ -1,11 +1,14 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 
 #include "QObject"
 
 #include "RtDataID.h"
+
+#include "MainWindow.h"
 
 class QCPItemLine;
 class QCustomPlot;
@@ -15,15 +18,12 @@ class PlotController : public QObject {
 
  public:
 
-  PlotController(QCustomPlot *design_plot,
+  PlotController(MainWindow *main_window,
+                 QCustomPlot *design_plot,
                  QCustomPlot *roi_plot,
                  QCustomPlot *motion_plot);
 
   ~PlotController();
-
-  // add an roi to the list of names to listen for. does not do
-  // redundancy checking.
-  void addRoi(const std::string &name);
 
  public slots:
 
@@ -33,7 +33,9 @@ class PlotController : public QObject {
 
   void updateTRIndicators();
 
-  std::vector<std::string> roi_names;
+  MainWindow *main_window;
+
+  std::map<std::string, int> roi_graphs;
 
   QCustomPlot *design_plot;
   QCustomPlot *roi_plot;

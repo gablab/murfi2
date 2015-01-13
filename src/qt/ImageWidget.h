@@ -13,6 +13,7 @@
 #include "RtMRIImage.h"
 
 #include "Image.h"
+#include "MainWindow.h"
 
 class QCustomPlot;
 
@@ -22,6 +23,10 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
  public:
   explicit ImageWidget(QWidget *parent=0);
   ~ImageWidget();
+
+  void setMainWindow(MainWindow* mw) {
+    main_window = mw;
+  }
 
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
@@ -44,6 +49,8 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
 
  private:
   void makeObject();
+
+  MainWindow *main_window;
 
   std::mutex draw_mutex;
 

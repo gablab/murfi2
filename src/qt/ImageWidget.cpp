@@ -11,6 +11,7 @@
 #include "RtExperiment.h"
 
 #include "ActivationImage.h"
+#include "MainWindow.h"
 #include "MaskImage.h"
 #include "MRImage.h"
 
@@ -30,6 +31,7 @@ namespace {
 
 ImageWidget::ImageWidget(QWidget *parent)
   : QGLWidget(parent)
+  , main_window(NULL)
   , num_mask_images(0)
 {}
 
@@ -49,8 +51,8 @@ void ImageWidget::initRun(RtConfigFmriRun &config) {
 
   vector<string> masks = config.getProcessingModuleNames("mask-load", "roiID");
   for (vector<string>::iterator it = masks.begin(); it != masks.end(); ++it) {
-    cout << "it: " << *it << endl;
-    layers.insert(Layer(*it, new MaskImage(num_mask_images)));
+    layers.insert(
+      Layer(*it, new MaskImage(main_window->getColorForName(*it))));
     draw_order.push_back(*it);
     num_mask_images++;
   }

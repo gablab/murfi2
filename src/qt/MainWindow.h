@@ -1,6 +1,8 @@
 #pragma once
 
+#include <QColor>
 #include <QMainWindow>
+#include <QString>
 
 #include "RtDataListener.h"
 
@@ -18,6 +20,7 @@ class MainWindow : public QMainWindow, public RtDataListener {
   ~MainWindow();
 
   void notify(const RtDataID&);
+  QColor getColorForName(const std::string &name);
 
  signals:
   void dataReady(QString);
@@ -34,4 +37,6 @@ class MainWindow : public QMainWindow, public RtDataListener {
 
   Ui::MainWindow *ui;
   PlotController *plot_controller;
+
+  map<std::string, QColor> name_colors;
 };

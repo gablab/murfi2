@@ -1,12 +1,13 @@
 #pragma once
 
+#include <QColor>
 #include <QtOpenGL>
 #include "Image.h"
 
 class MaskImage : public Image {
  public:
 
-  MaskImage(int color_index);
+  MaskImage(const QColor &color);
 
   virtual ~MaskImage() {}
 
@@ -14,6 +15,6 @@ class MaskImage : public Image {
 
   void updateTexture();
 
-  float rgb[3];
+  QColor color;
   float opacity;
 };

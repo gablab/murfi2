@@ -289,6 +289,8 @@ int RtInputScannerImages::svc() {
                                    ei->mcRotationXRAD,
                                    ei->mcRotationYRAD,
                                    ei->mcRotationZRAD);
+      mot->getDataID().setSeriesNum(rti->getDataID().getSeriesNum());
+      mot->getDataID().setTimePoint(rti->getDataID().getTimePoint());
       getDataStore().setData(mot);
     }
 

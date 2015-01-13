@@ -20,6 +20,9 @@ class MainWindow : public QMainWindow, public RtDataListener {
   ~MainWindow();
 
   void notify(const RtDataID&);
+
+  QColor getColor(int index);
+
   QColor getColorForName(const std::string &name);
 
  signals:

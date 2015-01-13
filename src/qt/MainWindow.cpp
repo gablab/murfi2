@@ -14,6 +14,17 @@
 using std::cout;
 using std::endl;
 
+namespace {
+const int NUM_COLORS = 4;
+static int color_table[NUM_COLORS][3] =
+{
+  {  0, 255,   0},
+  {255,   0, 255},
+  {255, 255,   0},
+  {  0, 255, 255}
+};
+} // anonymous namespace
+
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
@@ -69,15 +80,14 @@ void MainWindow::openRun() {
   executeRun(run_config);
 }
 
+QColor MainWindow::getColor(int color) {
+  int color_ind = color % NUM_COLORS;
+  return QColor(color_table[color_ind][0],
+                color_table[color_ind][1],
+                color_table[color_ind][2]);
+}
+
 QColor MainWindow::getColorForName(const string &name) {
-  const int NUM_COLORS = 4;
-  static int color_table[NUM_COLORS][3] =
-  {
-    {  0, 255,   0},
-    {255,   0, 255},
-    {255, 255,   0},
-    {  0, 255, 255}
-  };
 
   map<string, QColor>::const_iterator it = name_colors.find(name);
   if (it == name_colors.end()) {

@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+
 void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
                       int totalReps, RtExternalImageInfo* ei) {
   strcpy(ei->magic, "SIMU");
@@ -32,7 +33,15 @@ void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
   ei->currentTR = repetition;
   ei->totalTR = totalReps;
 
-  ei->isMotionCorrected = false;
+  ei->isMotionCorrected = true;
+
+  srand(time(NULL));
+  ei->mcTranslationXMM = rand()/static_cast<double>(RAND_MAX);
+  ei->mcTranslationYMM = rand()/static_cast<double>(RAND_MAX);
+  ei->mcTranslationZMM = rand()/static_cast<double>(RAND_MAX);
+  ei->mcRotationXRAD = rand()/static_cast<double>(RAND_MAX);
+  ei->mcRotationYRAD = rand()/static_cast<double>(RAND_MAX);
+  ei->mcRotationZRAD = rand()/static_cast<double>(RAND_MAX);
 }
 
 #endif

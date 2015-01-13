@@ -37,8 +37,24 @@ void plotDesign(QCustomPlot *plot, RtDesignMatrix* design) {
 }
 
 void plotMotion(QCustomPlot *plot, RtMotion* motion) {
-  // TODO
-  cout << "plotting motion" << endl;
+  plot->graph(TRANSLATION_X)->addData(motion->getDataID().getTimePoint(),
+                                      motion->getMotionDimension(TRANSLATION_X));
+
+  plot->graph(TRANSLATION_Y)->addData(motion->getDataID().getTimePoint(),
+                                      motion->getMotionDimension(TRANSLATION_Y));
+
+  plot->graph(TRANSLATION_Z)->addData(motion->getDataID().getTimePoint(),
+                                      motion->getMotionDimension(TRANSLATION_Z));
+
+  plot->graph(ROTATION_X)->addData(motion->getDataID().getTimePoint(),
+                                      motion->getMotionDimension(ROTATION_X));
+
+  plot->graph(ROTATION_Y)->addData(motion->getDataID().getTimePoint(),
+                                      motion->getMotionDimension(ROTATION_Y));
+
+  plot->graph(ROTATION_Z)->addData(motion->getDataID().getTimePoint(),
+                                      motion->getMotionDimension(ROTATION_Z));
+
 }
 
 } // anonymous namespace
@@ -58,11 +74,18 @@ PlotController::PlotController(MainWindow *main_window,
   , current_tr(0)
 {
   design_plot->addItem(design_tr_indicator);
+
   roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);
   roi_plot->yAxis->setRange(-3, 3);
+
   motion_plot->addItem(motion_tr_indicator);
   motion_plot->yAxis->setRange(-2, 2);
+  for (int i = 0; i < 6; i++) {
+    motion_plot->addGraph();
+    motion_plot->graph(i)->setPen(QPen(main_window->getColor(i)));
+  }
+
   updateTRIndicators();
 }
 
@@ -77,7 +100,6 @@ void PlotController::handleData(QString qid) {
   id.setFromString(qid.toStdString());
 
   if (id.getDataName() == NAME_DESIGN) {
-
     RtDesignMatrix *design =
       static_cast<RtDesignMatrix*>(getDataStore().getData(id));
     updateTRIndicators();
@@ -103,8 +125,7 @@ void PlotController::handleData(QString qid) {
     roi_plot->replot();
   }
   else if (id.getModuleID() == ID_MOTION) {
-    // TODO
-    //plotMotion(motion_plot, static_cast<RtMotion*>(data));
+    plotMotion(motion_plot, static_cast<RtMotion*>(getDataStore().getData(id)));
   }
 
   if (id.getTimePoint() != DATAID_NUM_UNSET_VALUE &&

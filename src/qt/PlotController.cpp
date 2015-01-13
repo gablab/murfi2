@@ -7,6 +7,7 @@
 #include "RtData.h"
 #include "RtDataIDs.h"
 #include "RtDesignMatrix.h"
+#include "RtExperiment.h"
 #include "RtMotion.h"
 
 using std::string;
@@ -47,18 +48,36 @@ PlotController::PlotController(QCustomPlot *design_plot,
   : design_plot(design_plot)
   , roi_plot(roi_plot)
   , motion_plot(motion_plot)
-{}
+  , design_tr_indicator(new QCPItemLine(design_plot))
+  , roi_tr_indicator(new QCPItemLine(roi_plot))
+  , motion_tr_indicator(new QCPItemLine(motion_plot))
+  , current_tr(0)
+{
+  design_plot->addItem(design_tr_indicator);
+  roi_plot->addItem(roi_tr_indicator);
+  motion_plot->addItem(motion_tr_indicator);
+  updateTRIndicators();
+}
 
-PlotController::~PlotController() {}
+PlotController::~PlotController() {
+  delete design_tr_indicator;
+  delete roi_tr_indicator;
+  delete motion_tr_indicator;
+}
 
 void PlotController::addRoi(const string &name) {
   roi_names.push_back(name);
 }
 
-void PlotController::handleData(RtData *data) {
-  RtDataID id = data->getDataID();
+void PlotController::handleData(QString qid) {
+  RtDataID id;
+  id.setFromString(qid.toStdString());
+
   if (id.getDataName() == NAME_DESIGN) {
-    RtDesignMatrix *design = static_cast<RtDesignMatrix*>(data);
+
+    RtDesignMatrix *design =
+      static_cast<RtDesignMatrix*>(getDataStore().getData(id));
+    updateTRIndicators();
     plotDesign(design_plot, design);
     roi_plot->xAxis->setRange(0, design->getNumRows());
     roi_plot->replot();
@@ -79,6 +98,28 @@ void PlotController::handleData(RtData *data) {
     // TODO: setup new plot
   }
   else if (id.getModuleID() == ID_MOTION) {
-    plotMotion(motion_plot, static_cast<RtMotion*>(data));
+    // TODO
+    //plotMotion(motion_plot, static_cast<RtMotion*>(data));
   }
+
+  if (id.getTimePoint() != DATAID_NUM_UNSET_VALUE &&
+      id.getTimePoint() > current_tr) {
+    current_tr = id.getTimePoint();
+    updateTRIndicators();
+  }
+}
+
+void PlotController::updateTRIndicators() {
+  // TODO get ranges automatically
+  design_tr_indicator->start->setCoords(current_tr, 1000);
+  design_tr_indicator->end->setCoords(current_tr, -1000);
+  design_plot->replot();
+
+  roi_tr_indicator->start->setCoords(current_tr, 1000);
+  roi_tr_indicator->end->setCoords(current_tr, -1000);
+  roi_plot->replot();
+
+  motion_tr_indicator->start->setCoords(current_tr, 1000);
+  motion_tr_indicator->end->setCoords(current_tr, -1000);
+  motion_plot->replot();
 }

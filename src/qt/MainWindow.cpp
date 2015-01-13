@@ -26,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
 
   // register me to get the data
   getDataStore().addListener(this);
+
+  QObject::connect(this, SIGNAL(dataReady(const QString &)),
+                   plot_controller, SLOT(handleData(const QString &)),
+                   Qt::QueuedConnection);
 }
 
 MainWindow::~MainWindow() {
@@ -34,10 +38,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::notify(const RtDataID &id) {
-  RtData *data = getDataStore().getData(id);
-
-  ui->imageWidget->handleData(data);
-  plot_controller->handleData(data);
+  ui->imageWidget->handleData(id);
+  emit dataReady(QString(id.toString().c_str()));
 }
 
 void MainWindow::newExperiment() {

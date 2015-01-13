@@ -9,6 +9,7 @@
 #include <QOpenGLFunctions>
 
 #include "RtConfigFmriRun.h"
+#include "RtDataID.h"
 #include "RtMRIImage.h"
 
 #include "Image.h"
@@ -28,7 +29,7 @@ class ImageWidget : public QGLWidget, protected QOpenGLFunctions {
   void initRun(RtConfigFmriRun &config);
   void deinitRun();
 
-  void handleData(RtData *img);
+  void handleData(const RtDataID &id);
 
  signals:
   void clicked();

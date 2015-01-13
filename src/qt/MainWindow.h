@@ -19,6 +19,9 @@ class MainWindow : public QMainWindow, public RtDataListener {
 
   void notify(const RtDataID&);
 
+ signals:
+  void dataReady(QString);
+
  private slots:
   void newExperiment();
   void newRun();

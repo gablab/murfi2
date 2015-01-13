@@ -3,10 +3,16 @@
 #include <string>
 #include <vector>
 
-class QCustomPlot;
-class RtData;
+#include "QObject"
 
-class PlotController {
+#include "RtDataID.h"
+
+class QCPItemLine;
+class QCustomPlot;
+
+class PlotController : public QObject {
+  Q_OBJECT
+
  public:
 
   PlotController(QCustomPlot *design_plot,
@@ -19,9 +25,13 @@ class PlotController {
   // redundancy checking.
   void addRoi(const std::string &name);
 
-  void handleData(RtData *data);
+ public slots:
+
+  void handleData(QString qid);
 
  private:
+
+  void updateTRIndicators();
 
   std::vector<std::string> roi_names;
 
@@ -29,4 +39,9 @@ class PlotController {
   QCustomPlot *roi_plot;
   QCustomPlot *motion_plot;
 
+  QCPItemLine *design_tr_indicator;
+  QCPItemLine *roi_tr_indicator;
+  QCPItemLine *motion_tr_indicator;
+
+  unsigned int current_tr;
 };

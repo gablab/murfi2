@@ -8,6 +8,7 @@
 #include "qcustomplot.h"
 
 #include "RtDataIDs.h"
+#include "RtExperiment.h"
 
 #include "ActivationImage.h"
 #include "MaskImage.h"
@@ -71,25 +72,25 @@ QSize ImageWidget::sizeHint() const {
   return QSize(200, 200);
 }
 
-void ImageWidget::handleData(RtData *img) {
-  if (img->getDataID().getModuleID() == ID_CURRENTACTIVATION) {
+void ImageWidget::handleData(const RtDataID &id) {
+  if (id.getModuleID() == ID_CURRENTACTIVATION) {
     draw_mutex.lock();
-    layers[ACTIVATION_LAYER]->setData(img);
+    layers[ACTIVATION_LAYER]->setData(getDataStore().getData(id));
     draw_mutex.unlock();
   }
-  else if (img->getDataID().getDataName() == NAME_SCANNERIMG_EPI) {
+  else if (id.getDataName() == NAME_SCANNERIMG_EPI) {
     draw_mutex.lock();
-    layers[MR_LAYER]->setData(img);
+    layers[MR_LAYER]->setData(getDataStore().getData(id));
     draw_mutex.unlock();
   }
-  else if (img->getDataID().getDataName() == NAME_MASK) {
-    string roi_name = img->getDataID().getRoiID();
+  else if (id.getDataName() == NAME_MASK) {
+    string roi_name = id.getRoiID();
     if (layers.find(roi_name) == layers.end()) {
       return;
     }
 
     draw_mutex.lock();
-    layers[roi_name]->setData(img);
+    layers[roi_name]->setData(getDataStore().getData(id));
     draw_mutex.unlock();
   }
   else {

@@ -31,6 +31,14 @@ MainWindow::MainWindow(QWidget *parent)
   QObject::connect(this, SIGNAL(dataReady(const QString &)),
                    plot_controller, SLOT(handleData(const QString &)),
                    Qt::QueuedConnection);
+
+  if (!getExperimentConfigFile().empty()) {
+    initExperiment();
+    RtConfigFmriRun run_config;
+    run_config.parseConfigFile(getExperimentConfigFile());
+    ui->imageWidget->initRun(run_config);
+    executeRun(run_config);
+  }
 }
 
 MainWindow::~MainWindow() {

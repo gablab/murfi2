@@ -14,25 +14,13 @@
 using std::cout;
 using std::endl;
 
-namespace {
-const int NUM_COLORS = 4;
-static int color_table[NUM_COLORS][3] =
-{
-  {  0, 255,   0},
-  {255,   0, 255},
-  {255, 255,   0},
-  {  0, 255, 255}
-};
-} // anonymous namespace
-
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
   , plot_controller()
 {
   ui->setupUi(this);
-  plot_controller = new PlotController(this,
-                                       ui->designPlotWidget,
+  plot_controller = new PlotController(ui->designPlotWidget,
                                        ui->roiPlotWidget,
                                        ui->motionPlotWidget);
   ui->imageWidget->setMainWindow(this);
@@ -80,24 +68,6 @@ void MainWindow::openRun() {
   executeRun(run_config);
 }
 
-QColor MainWindow::getColor(int color) {
-  int color_ind = color % NUM_COLORS;
-  return QColor(color_table[color_ind][0],
-                color_table[color_ind][1],
-                color_table[color_ind][2]);
-}
-
-QColor MainWindow::getColorForName(const string &name) {
-
-  map<string, QColor>::const_iterator it = name_colors.find(name);
-  if (it == name_colors.end()) {
-    int color_ind = name_colors.size() % NUM_COLORS;
-    it = name_colors.insert(
-      pair<string, QColor>(name, QColor(color_table[color_ind][0],
-                                        color_table[color_ind][1],
-                                        color_table[color_ind][2]
-                                        ))).first;
-  }
-
-  return it->second;
+const QColor& MainWindow::getColorForName(const string &name) {
+  return plot_controller->getColorForName(name);
 }

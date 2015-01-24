@@ -15,59 +15,15 @@ using std::pair;
 using std::string;
 using std::vector;
 
-namespace {
-
-void plotDesign(QCustomPlot *plot, RtDesignMatrix* design) {
-  for (size_t graph = 0; graph < design->getNumColumns(); graph++) {
-    if (!design->isColumnOfInterest(graph)) {
-      continue;
-    }
-
-    plot->addGraph();
-
-    vnl_vector<double> col = design->getColumn(graph);
-    for (size_t tr = 0; tr < col.size(); tr++) {
-      plot->graph(graph)->addData(tr, col[tr]);
-    }
-
-  }
-
-  plot->rescaleAxes();
-  plot->replot();
-}
-
-void plotMotion(QCustomPlot *plot, RtMotion* motion) {
-  plot->graph(TRANSLATION_X)->addData(motion->getDataID().getTimePoint(),
-                                      motion->getMotionDimension(TRANSLATION_X));
-
-  plot->graph(TRANSLATION_Y)->addData(motion->getDataID().getTimePoint(),
-                                      motion->getMotionDimension(TRANSLATION_Y));
-
-  plot->graph(TRANSLATION_Z)->addData(motion->getDataID().getTimePoint(),
-                                      motion->getMotionDimension(TRANSLATION_Z));
-
-  plot->graph(ROTATION_X)->addData(motion->getDataID().getTimePoint(),
-                                      motion->getMotionDimension(ROTATION_X));
-
-  plot->graph(ROTATION_Y)->addData(motion->getDataID().getTimePoint(),
-                                      motion->getMotionDimension(ROTATION_Y));
-
-  plot->graph(ROTATION_Z)->addData(motion->getDataID().getTimePoint(),
-                                      motion->getMotionDimension(ROTATION_Z));
-
-}
-
-} // anonymous namespace
-
-
-PlotController::PlotController(MainWindow *main_window,
-                               QCustomPlot *design_plot,
+PlotController::PlotController(QCustomPlot *design_plot,
                                QCustomPlot *roi_plot,
                                QCustomPlot *motion_plot)
-  : main_window(main_window)
-  , design_plot(design_plot)
+  : design_plot(design_plot)
+  , design_colormap(Colormap::ColormapType::DESIGN)
   , roi_plot(roi_plot)
+  , roi_colormap(Colormap::ColormapType::ROI)
   , motion_plot(motion_plot)
+  , motion_colormap(Colormap::ColormapType::MOTION)
   , design_tr_indicator(new QCPItemLine(design_plot))
   , roi_tr_indicator(new QCPItemLine(roi_plot))
   , motion_tr_indicator(new QCPItemLine(motion_plot))
@@ -78,12 +34,13 @@ PlotController::PlotController(MainWindow *main_window,
   roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);
   roi_plot->yAxis->setRange(-3, 3);
+  roi_plot->legend->setVisible(true);
 
   motion_plot->addItem(motion_tr_indicator);
   motion_plot->yAxis->setRange(-2, 2);
   for (int i = 0; i < 6; i++) {
     motion_plot->addGraph();
-    motion_plot->graph(i)->setPen(QPen(main_window->getColor(i)));
+    motion_plot->graph(i)->setPen(QPen(motion_colormap.getColor(i)));
   }
 
   updateTRIndicators();
@@ -95,6 +52,10 @@ PlotController::~PlotController() {
   delete motion_tr_indicator;
 }
 
+const QColor& PlotController::getColorForName(const string &name) {
+  return roi_colormap.getColorForName(name);
+}
+
 void PlotController::handleData(QString qid) {
   RtDataID id;
   id.setFromString(qid.toStdString());
@@ -103,7 +64,7 @@ void PlotController::handleData(QString qid) {
     RtDesignMatrix *design =
       static_cast<RtDesignMatrix*>(getDataStore().getData(id));
     updateTRIndicators();
-    plotDesign(design_plot, design);
+    plotDesign(design);
     roi_plot->xAxis->setRange(0, design->getNumRows());
     roi_plot->replot();
     motion_plot->xAxis->setRange(0, design->getNumRows());
@@ -115,8 +76,9 @@ void PlotController::handleData(QString qid) {
       it = roi_graphs.insert(
         pair<string, int>(id.getRoiID(), roi_plot->graphCount())).first;
       roi_plot->addGraph();
-      roi_plot->graph(it->second)->setPen(QPen(main_window->getColorForName(
+      roi_plot->graph(it->second)->setPen(QPen(roi_colormap.getColorForName(
                                                  id.getRoiID())));
+      roi_plot->graph(it->second)->setName(QString(id.getRoiID().c_str()));
     }
 
     RtActivation *val = static_cast<RtActivation*>(getDataStore().getData(id));
@@ -125,7 +87,7 @@ void PlotController::handleData(QString qid) {
     roi_plot->replot();
   }
   else if (id.getModuleID() == ID_MOTION) {
-    plotMotion(motion_plot, static_cast<RtMotion*>(getDataStore().getData(id)));
+    plotMotion(static_cast<RtMotion*>(getDataStore().getData(id)));
   }
 
   if (id.getTimePoint() != DATAID_NUM_UNSET_VALUE &&
@@ -148,4 +110,51 @@ void PlotController::updateTRIndicators() {
   motion_tr_indicator->start->setCoords(current_tr, 1000);
   motion_tr_indicator->end->setCoords(current_tr, -1000);
   motion_plot->replot();
+}
+
+void PlotController::plotDesign(RtDesignMatrix* design) {
+  for (size_t graph = 0; graph < design->getNumColumns(); graph++) {
+    if (!design->isColumnOfInterest(graph)) {
+      continue;
+    }
+
+    design_plot->addGraph();
+
+    vnl_vector<double> col = design->getColumn(graph);
+    for (size_t tr = 0; tr < col.size(); tr++) {
+      design_plot->graph(graph)->addData(tr, col[tr]);
+      design_plot->graph(graph)->setPen(
+        QPen(design_colormap.getColor(graph)));
+    }
+
+  }
+
+  design_plot->rescaleAxes();
+  design_plot->replot();
+}
+
+void PlotController::plotMotion(RtMotion* motion) {
+  motion_plot->graph(TRANSLATION_X)->addData(
+    motion->getDataID().getTimePoint(),
+    motion->getMotionDimension(TRANSLATION_X));
+
+  motion_plot->graph(TRANSLATION_Y)->addData(
+    motion->getDataID().getTimePoint(),
+    motion->getMotionDimension(TRANSLATION_Y));
+
+  motion_plot->graph(TRANSLATION_Z)->addData(
+    motion->getDataID().getTimePoint(),
+    motion->getMotionDimension(TRANSLATION_Z));
+
+  motion_plot->graph(ROTATION_X)->addData(
+    motion->getDataID().getTimePoint(),
+    motion->getMotionDimension(ROTATION_X));
+
+  motion_plot->graph(ROTATION_Y)->addData(
+    motion->getDataID().getTimePoint(),
+    motion->getMotionDimension(ROTATION_Y));
+
+  motion_plot->graph(ROTATION_Z)->addData(
+    motion->getDataID().getTimePoint(),
+    motion->getMotionDimension(ROTATION_Z));
 }

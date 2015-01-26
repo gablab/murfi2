@@ -1,5 +1,7 @@
 #include "DesignEditor.h"
 
+#include <iostream>
+
 #include <QWizardPage>
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -8,11 +10,15 @@
 
 #include "RtDesignMatrix.h"
 
+using std::cout;
+using std::endl;
+
 DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   : QWizard(parent)
   , design(design)
   , edit_plot(new QCustomPlot)
-  , selected_column(0)
+  , condition_names(NULL)
+  , selected_column(-1)
 {
   edit_plot->xAxis->setRange(0, design->getNumRows());
   edit_plot->yAxis->setRange(-1, 1);
@@ -29,8 +35,15 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
 DesignEditor::~DesignEditor() {}
 
 void DesignEditor::addCondition(QString name) {
-  design->addCondition(name.toStdString(), true);
   selected_column = design->getNumInputConditions();
+
+  if (selected_column == 0) {
+    condition_names->removeItem(1);
+  }
+
+  design->addCondition(name.toStdString(), true);
+
+  condition_names->addItem(name);
 
   edit_plot->addGraph();
   edit_plot->graph(selected_column)->setName(name);
@@ -38,9 +51,15 @@ void DesignEditor::addCondition(QString name) {
   // TODO set the color
 
   edit_plot->replot();
+
+  condition_names->setCurrentIndex(selected_column + 1);
 }
 
 void DesignEditor::handleConditionClick(QMouseEvent *event) {
+  if (selected_column < 0) {
+    return;
+  }
+
   double x = edit_plot->xAxis->pixelToCoord(event->pos().x());
   double y = edit_plot->yAxis->pixelToCoord(event->pos().y());
 
@@ -75,15 +94,41 @@ QWizardPage* DesignEditor::createMeasPage() {
 
 QWizardPage* DesignEditor::createEditPage() {
   QWizardPage *page = new QWizardPage;
-  page->setTitle("Edit condtion vectors");
+  page->setTitle("Edit condition vectors");
+
+  condition_names = new QComboBox;
+  condition_names->setDuplicatesEnabled(false);
+
+  condition_names->addItem("Add new condition");
+
+  if (design->getNumColumns() == 0) {
+    condition_names->addItem("No conditions");
+    condition_names->setCurrentIndex(1);
+  }
+
+  connect(condition_names, SIGNAL(currentIndexChanged(int)),
+          this, SLOT(setSelectedColumn(int)));
 
   QVBoxLayout *layout = new QVBoxLayout;
-  layout->addWidget(edit_plot);
-
-  QComboBox *conditionNames = new QComboBox;
-  conditionNames->addItem("New condition");
-  layout->addWidget(conditionNames);
+  layout->addWidget(condition_names, 1);
+  layout->addWidget(edit_plot, 10);
 
   page->setLayout(layout);
   return page;
+}
+
+void DesignEditor::setSelectedColumn(int col) {
+  if (col == 0) {
+    bool ok;
+    QString text = QInputDialog::getText(
+      this, "Enter condition name", "Condition name: ",
+      QLineEdit::Normal, "", &ok);
+
+    if (ok && !text.isEmpty()) {
+      addCondition(text);
+    }
+  }
+  else {
+    selected_column = col - 1;
+  }
 }

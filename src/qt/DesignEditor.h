@@ -2,6 +2,7 @@
 
 #include <QWizard>
 
+class QComboBox;
 class QCustomPlot;
 class RtDesignMatrix;
 
@@ -15,15 +16,19 @@ class DesignEditor : public QWizard {
 
  public slots:
 
-  void addCondition(QString name);
-
   void handleConditionClick(QMouseEvent*);
 
+  void setSelectedColumn(int col);
+
  private:
+  void addCondition(QString name);
+
   QWizardPage *createMeasPage();
   QWizardPage *createEditPage();
 
   RtDesignMatrix *design;
   QCustomPlot *edit_plot;
+
+  QComboBox *condition_names;
   int selected_column;
 };

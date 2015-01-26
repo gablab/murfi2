@@ -5,10 +5,12 @@
 
 #include "RtDataID.h"
 #include "RtDataIDs.h"
+#include "RtDesignMatrix.h"
 
 //
 #include"RtExperiment.h"
 
+#include "DesignEditor.h"
 #include "PlotController.h"
 
 using std::cout;
@@ -78,4 +80,45 @@ void MainWindow::openRun() {
 
 const QColor& MainWindow::getColorForName(const string &name) {
   return plot_controller->getColorForName(name);
+}
+
+void MainWindow::editDesign() {
+
+  // get the design to edit
+  RtDataID any_design;
+  any_design.setDataName(NAME_DESIGN);
+  RtDesignMatrix *design = static_cast<RtDesignMatrix*>(
+    getDataStore().getData(any_design));
+
+  // create a new design if none exists
+  if (design == NULL) {
+    design = new RtDesignMatrix();
+
+    // get the tr
+    bool ok = false;
+    int tr = 2000;
+
+    while (!ok) {
+      tr = QInputDialog::getInt(
+        this, "Repetition time", "Repetition time (ms):",
+        tr, 0, 10000, 1, &ok);
+    }
+
+    design->setTR(tr);
+
+    // get num meas
+    ok = false;
+    int num_meas = 0;
+
+    while (!ok) {
+      num_meas = QInputDialog::getInt(
+        this, "Number of measurements", "Number of measurements:",
+        num_meas, 1, 10000, 1, &ok);
+    }
+
+    design->setNumMeas(num_meas);
+  }
+
+  DesignEditor design_editor(this, design);
+  design_editor.show();
 }

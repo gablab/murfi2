@@ -80,6 +80,12 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
     tr = _tr;
   }
 
+  // add an empty condition and set it to all zeros
+  void addCondition(const string &name, bool of_interest);
+
+  // set the value of one TR for a condition
+  void setConditionValueAtTR(size_t tr, size_t condition, double val);
+
   // build the design matrix from the configuration
   virtual bool build();
 
@@ -106,6 +112,10 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 
   // get a design matrix column index
   unsigned int getColumnIndex(const string &name);
+
+  size_t getNumInputConditions() const {
+    return numInputConditions;
+  }
 
   // get event duration
 

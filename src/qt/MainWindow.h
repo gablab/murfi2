@@ -10,6 +10,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class DesignEditor;
 class PlotController;
 
 class MainWindow : public QMainWindow, public RtDataListener {
@@ -32,9 +33,11 @@ class MainWindow : public QMainWindow, public RtDataListener {
   // bool saveRun();
   // bool saveRunAs();
   // void runAgain();
+  void editDesign();
 
  private:
 
   Ui::MainWindow *ui;
   PlotController *plot_controller;
+  DesignEditor *design_editor;
 };

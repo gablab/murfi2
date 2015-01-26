@@ -216,5 +216,11 @@
    <receiver>MainWindow</receiver>
    <slot>openRun()</slot>
   </connection>
+  <connection>
+   <sender>actionDesign</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>editDesign()</slot>
+  </connection>
  </connections>
 </ui>

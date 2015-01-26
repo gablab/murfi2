@@ -17,7 +17,12 @@ class DesignEditor : public QWizard {
 
   void addCondition(QString name);
 
+  void handleConditionClick(QMouseEvent*);
+
  private:
+  QWizardPage *createMeasPage();
+  QWizardPage *createEditPage();
+
   RtDesignMatrix *design;
   QCustomPlot *edit_plot;
   int selected_column;

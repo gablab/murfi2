@@ -18,7 +18,11 @@ class DesignEditor : public QWizard {
 
   void handleConditionClick(QMouseEvent*);
 
-  void setSelectedColumn(int col);
+  void setRepTime(int);
+
+  void setNumMeas(int);
+
+  void setSelectedColumn(int);
 
  private:
   void addCondition(QString name);

@@ -293,6 +293,10 @@ void RtDesignMatrix::setConditionValueAtTR(size_t row, size_t col, double val) {
   inputConditions(row, col) = val;
 }
 
+double RtDesignMatrix::getConditionValueAtTR(size_t row, size_t col) {
+  return inputConditions(row, col);
+}
+
 bool RtDesignMatrix::buildDesignMatrix() {
 
   // TODO this will need to get called by unserializeXML as well

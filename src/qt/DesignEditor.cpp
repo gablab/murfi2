@@ -13,6 +13,15 @@
 using std::cout;
 using std::endl;
 
+namespace {
+void plotDesignColumn(RtDesignMatrix *design, int col, QCPGraph *graph) {
+  graph->clearData();
+  for (int i = 0; i < design->getNumMeas(); i++) {
+    graph->addData(i, design->getConditionValueAtTR(i, col));
+  }
+}
+} // anonymous namespace
+
 DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   : QWizard(parent)
   , design(design)
@@ -21,7 +30,7 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   , selected_column(-1)
 {
   edit_plot->xAxis->setRange(0, design->getNumRows());
-  edit_plot->yAxis->setRange(-1, 1);
+  edit_plot->yAxis->setRange(-1.2, 1.2);
   edit_plot->legend->setVisible(true);
 
   connect(edit_plot, SIGNAL(mousePress(QMouseEvent*)),
@@ -49,6 +58,7 @@ void DesignEditor::addCondition(QString name) {
   edit_plot->graph(selected_column)->setName(name);
 
   // TODO set the color
+  plotDesignColumn(design, selected_column, edit_plot->graph(selected_column));
 
   edit_plot->replot();
 
@@ -65,7 +75,8 @@ void DesignEditor::handleConditionClick(QMouseEvent *event) {
 
   int tr = rint(x);
   design->setConditionValueAtTR(tr, selected_column, y);
-
+  plotDesignColumn(design, selected_column, edit_plot->graph(selected_column));
+  edit_plot->replot();
 }
 
 QWizardPage* DesignEditor::createMeasPage() {
@@ -76,11 +87,19 @@ QWizardPage* DesignEditor::createMeasPage() {
   QSpinBox *rep_time = new QSpinBox;
   rep_time->setRange(1, 10000);
   rep_time->setValue(2000);
+  setRepTime(2000);
+
+  connect(rep_time, SIGNAL(valueChanged(int)),
+          this, SLOT(setRepTime(int)));
 
   QLabel *num_meas_label = new QLabel("Number of measurements:");
   QSpinBox *num_meas = new QSpinBox;
   num_meas->setRange(1, 10000);
   num_meas->setValue(100);
+  setNumMeas(100);
+
+  connect(num_meas, SIGNAL(valueChanged(int)),
+          this, SLOT(setNumMeas(int)));
 
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(rep_time_label, 0, 0);
@@ -115,6 +134,16 @@ QWizardPage* DesignEditor::createEditPage() {
 
   page->setLayout(layout);
   return page;
+}
+
+void DesignEditor::setRepTime(int rep_time) {
+  design->setTR(rep_time);
+}
+
+void DesignEditor::setNumMeas(int num_meas) {
+  design->setNumMeas(num_meas);
+  edit_plot->xAxis->setRange(0, num_meas);
+  edit_plot->replot();
 }
 
 void DesignEditor::setSelectedColumn(int col) {

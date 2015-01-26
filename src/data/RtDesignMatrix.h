@@ -86,8 +86,15 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // set the value of one TR for a condition
   void setConditionValueAtTR(size_t tr, size_t condition, double val);
 
+  // get the value of one TR for a condition
+  double getConditionValueAtTR(size_t tr, size_t condition);
+
   // build the design matrix from the configuration
   virtual bool build();
+
+  int getNumMeas() const {
+    return numMeas;
+  }
 
   // get the number of design matrix rows
 

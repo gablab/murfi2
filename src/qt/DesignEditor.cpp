@@ -1,10 +1,13 @@
 #include "DesignEditor.h"
 
 //
-//#include <iostream>
+#include <iostream>
+#include <sstream>
 
 #include <QWizardPage>
 #include <QGridLayout>
+#include <QLabel>
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 
 #include "qcustomplot.h"
@@ -30,15 +33,24 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   , condition_colormap(Colormap::ColormapType::DESIGN)
   , condition_names(NULL)
   , selected_column(-1)
+  , mouse_pos_label(NULL)
+  , condition_pos_label(NULL)
   , max_y(1.0)
   , min_y(0.0)
+  , mouse_down(false)
 {
   edit_plot->xAxis->setRange(0, design->getNumRows());
   edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
   edit_plot->legend->setVisible(true);
 
   connect(edit_plot, SIGNAL(mousePress(QMouseEvent*)),
-          this, SLOT(handleConditionClick(QMouseEvent*)));
+          this, SLOT(handleMouseDown(QMouseEvent*)));
+
+  connect(edit_plot, SIGNAL(mouseRelease(QMouseEvent*)),
+          this, SLOT(handleMouseUp(QMouseEvent*)));
+
+  connect(edit_plot, SIGNAL(mouseMove(QMouseEvent*)),
+          this, SLOT(handleMouseMove(QMouseEvent*)));
 
   addPage(createMeasPage());
   addPage(createEditPage());
@@ -66,7 +78,9 @@ void DesignEditor::addCondition(QString name, bool existing) {
   condition_names->setCurrentIndex(selected_column + 1);
 }
 
-void DesignEditor::handleConditionClick(QMouseEvent *event) {
+void DesignEditor::handleMouseDown(QMouseEvent *event) {
+  mouse_down = true;
+
   if (selected_column < 0) {
     return;
   }
@@ -85,6 +99,43 @@ void DesignEditor::handleConditionClick(QMouseEvent *event) {
   }
 
   int tr = rint(x);
+  design->setConditionValueAtTR(tr, selected_column, y);
+  plotDesignColumn(design, selected_column, edit_plot->graph(selected_column));
+  edit_plot->replot();
+
+  setLabels(tr, design->getConditionValueAtTR(tr, selected_column), y);
+}
+
+void DesignEditor::handleMouseUp(QMouseEvent *event) {
+  mouse_down = false;
+}
+
+void DesignEditor::handleMouseMove(QMouseEvent *event) {
+
+  double x = edit_plot->xAxis->pixelToCoord(event->pos().x());
+  double y = edit_plot->yAxis->pixelToCoord(event->pos().y());
+
+  int tr = rint(x);
+  setLabels(tr, design->getConditionValueAtTR(tr, selected_column), y);
+
+  if (!mouse_down) {
+    return;
+  }
+
+  if (selected_column < 0) {
+    return;
+  }
+
+  if (y > max_y) {
+    max_y = y;
+    edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
+  }
+
+  if (y < min_y) {
+    min_y = y;
+    edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
+  }
+
   design->setConditionValueAtTR(tr, selected_column, y);
   plotDesignColumn(design, selected_column, edit_plot->graph(selected_column));
   edit_plot->replot();
@@ -159,8 +210,18 @@ QWizardPage* DesignEditor::createEditPage() {
   connect(condition_names, SIGNAL(currentIndexChanged(int)),
           this, SLOT(setSelectedColumn(int)));
 
+  tr_label = new QLabel("TR: ");
+  condition_pos_label = new QLabel("Y: ");
+  mouse_pos_label = new QLabel("Mouse: ");
+
+  QHBoxLayout *header = new QHBoxLayout;
+  header->addWidget(condition_names, 3);
+  header->addWidget(tr_label, 1);
+  header->addWidget(condition_pos_label, 1);
+  header->addWidget(mouse_pos_label, 1);
+
   QVBoxLayout *layout = new QVBoxLayout;
-  layout->addWidget(condition_names, 1);
+  layout->addLayout(header, 1);
   layout->addWidget(edit_plot, 10);
 
   page->setLayout(layout);
@@ -197,4 +258,20 @@ void DesignEditor::setSelectedColumn(int col) {
   else {
     selected_column = col - 1;
   }
+}
+
+void DesignEditor::setLabels(int tr, double cond, double mouse) {
+  stringstream str;
+
+  str << "TR: " << tr;
+  tr_label->setText(QString(str.str().c_str()));
+
+  str.str("");
+  str << "Y: " << cond;
+  condition_pos_label->setText(QString(str.str().c_str()));
+
+  str.str("");
+  str << "Mouse: " << mouse;
+  mouse_pos_label->setText(QString(str.str().c_str()));
+
 }

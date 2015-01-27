@@ -27,11 +27,14 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   : QWizard(parent)
   , design(design)
   , edit_plot(new QCustomPlot)
+  , condition_colormap(Colormap::ColormapType::DESIGN)
   , condition_names(NULL)
   , selected_column(-1)
+  , max_y(1.0)
+  , min_y(0.0)
 {
   edit_plot->xAxis->setRange(0, design->getNumRows());
-  edit_plot->yAxis->setRange(-1.2, 1.2);
+  edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
   edit_plot->legend->setVisible(true);
 
   connect(edit_plot, SIGNAL(mousePress(QMouseEvent*)),
@@ -53,8 +56,9 @@ void DesignEditor::addCondition(QString name, bool existing) {
 
   edit_plot->addGraph();
   edit_plot->graph(selected_column)->setName(name);
+  edit_plot->graph(selected_column)->setPen(
+        QPen(condition_colormap.getColor(selected_column)));
 
-  // TODO set the color
   plotDesignColumn(design, selected_column, edit_plot->graph(selected_column));
 
   edit_plot->replot();
@@ -69,6 +73,16 @@ void DesignEditor::handleConditionClick(QMouseEvent *event) {
 
   double x = edit_plot->xAxis->pixelToCoord(event->pos().x());
   double y = edit_plot->yAxis->pixelToCoord(event->pos().y());
+
+  if (y > max_y) {
+    max_y = y;
+    edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
+  }
+
+  if (y < min_y) {
+    min_y = y;
+    edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
+  }
 
   int tr = rint(x);
   design->setConditionValueAtTR(tr, selected_column, y);

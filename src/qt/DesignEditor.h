@@ -2,6 +2,8 @@
 
 #include <QWizard>
 
+#include "Colormap.h"
+
 class QComboBox;
 class QCustomPlot;
 class RtDesignMatrix;
@@ -33,6 +35,12 @@ void addCondition(QString name, bool existing);
   RtDesignMatrix *design;
   QCustomPlot *edit_plot;
 
+  Colormap condition_colormap;
+
   QComboBox *condition_names;
   int selected_column;
+
+  double max_y;
+  double min_y;
+
 };

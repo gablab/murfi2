@@ -80,6 +80,22 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
     tr = _tr;
   }
 
+  // tools for outside manipulation before build
+
+  // get the name of a condition
+  string getConditionName(size_t index) {
+    if (index >= numInputConditions) {
+      return "";
+    }
+
+    return conditionNames[index];
+  }
+
+  // get the number of existing input conditions
+  size_t getNumInputConditions() {
+    return numInputConditions;
+  }
+
   // add an empty condition and set it to all zeros
   void addCondition(const string &name, bool of_interest);
 

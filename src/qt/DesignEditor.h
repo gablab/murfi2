@@ -25,7 +25,7 @@ class DesignEditor : public QWizard {
   void setSelectedColumn(int);
 
  private:
-  void addCondition(QString name);
+void addCondition(QString name, bool existing);
 
   QWizardPage *createMeasPage();
   QWizardPage *createEditPage();

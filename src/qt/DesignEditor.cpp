@@ -44,14 +44,10 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
 
 DesignEditor::~DesignEditor() {}
 
-void DesignEditor::addCondition(QString name) {
-  selected_column = design->getNumInputConditions();
-
-  if (selected_column == 0) {
-    condition_names->removeItem(1);
+void DesignEditor::addCondition(QString name, bool existing) {
+  if (!existing) {
+    design->addCondition(name.toStdString(), true);
   }
-
-  design->addCondition(name.toStdString(), true);
 
   condition_names->addItem(name);
 
@@ -135,9 +131,15 @@ QWizardPage* DesignEditor::createEditPage() {
 
   condition_names->addItem("Add new condition");
 
-  if (design->getNumColumns() == 0) {
+  if (design->getNumInputConditions() == 0) {
     condition_names->addItem("No conditions");
     condition_names->setCurrentIndex(1);
+  }
+  else {
+    for (size_t cond = 0; cond < design->getNumInputConditions(); cond++) {
+      selected_column = cond;
+      addCondition(QString(design->getConditionName(cond).c_str()), true);
+    }
   }
 
   connect(condition_names, SIGNAL(currentIndexChanged(int)),
@@ -169,7 +171,13 @@ void DesignEditor::setSelectedColumn(int col) {
       QLineEdit::Normal, "", &ok);
 
     if (ok && !text.isEmpty()) {
-      addCondition(text);
+      addCondition(text, false);
+
+      selected_column = design->getNumInputConditions();
+
+      if (selected_column == 0) {
+        condition_names->removeItem(1);
+      }
     }
   }
   else {

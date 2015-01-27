@@ -18,7 +18,7 @@ class DesignEditor : public QWizard {
 
   void handleConditionClick(QMouseEvent*);
 
-  void setRepTime(int);
+  void setRepTime(double);
 
   void setNumMeas(int);
 

@@ -92,6 +92,10 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // build the design matrix from the configuration
   virtual bool build();
 
+  double getTR() const {
+    return tr;
+  }
+
   int getNumMeas() const {
     return numMeas;
   }

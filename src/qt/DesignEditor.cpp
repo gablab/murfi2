@@ -1,6 +1,7 @@
 #include "DesignEditor.h"
 
-#include <iostream>
+//
+//#include <iostream>
 
 #include <QWizardPage>
 #include <QGridLayout>
@@ -84,19 +85,33 @@ QWizardPage* DesignEditor::createMeasPage() {
   page->setTitle("Setup measurement details");
 
   QLabel *rep_time_label = new QLabel("Repetition time (ms):");
-  QSpinBox *rep_time = new QSpinBox;
-  rep_time->setRange(1, 10000);
-  rep_time->setValue(2000);
-  setRepTime(2000);
+  QDoubleSpinBox *rep_time = new QDoubleSpinBox;
+  rep_time->setRange(0, 10);
 
-  connect(rep_time, SIGNAL(valueChanged(int)),
-          this, SLOT(setRepTime(int)));
+  if (design->getTR() > 0) {
+    rep_time->setValue(design->getTR());
+    setRepTime(design->getTR());
+  }
+  else {
+    rep_time->setValue(2);
+    setRepTime(2);
+  }
+
+  connect(rep_time, SIGNAL(valueChanged(double)),
+          this, SLOT(setRepTime(double)));
 
   QLabel *num_meas_label = new QLabel("Number of measurements:");
   QSpinBox *num_meas = new QSpinBox;
   num_meas->setRange(1, 10000);
-  num_meas->setValue(100);
-  setNumMeas(100);
+
+  if (design->getTR() > 0) {
+    num_meas->setValue(design->getNumMeas());
+    setNumMeas(design->getNumMeas());
+  }
+  else {
+    num_meas->setValue(100);
+    setNumMeas(100);
+  }
 
   connect(num_meas, SIGNAL(valueChanged(int)),
           this, SLOT(setNumMeas(int)));
@@ -136,7 +151,7 @@ QWizardPage* DesignEditor::createEditPage() {
   return page;
 }
 
-void DesignEditor::setRepTime(int rep_time) {
+void DesignEditor::setRepTime(double rep_time) {
   design->setTR(rep_time);
 }
 

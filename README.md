@@ -8,9 +8,49 @@ https://github.com/gablab/murfi2/blob/master/src/io/RtExternalSenderImageInfo.h
 
 If you use MURFI in your own research, please cite:
 
-Oliver Hinds, Satrajit Ghosh, Todd W Thompson, Julie J Yoo, Susan Whitfield-Gabrieli, Christina Triantafyllou, John D E Gabrieli (2011)  Computing moment-to-moment BOLD activation for real-time neurofeedback.   Neuroimage 54: 1. 361-368 Jan  
+Oliver Hinds, Satrajit Ghosh, Todd W Thompson, Julie J Yoo, Susan Whitfield-Gabrieli, Christina Triantafyllou, John D E Gabrieli (2011)  Computing moment-to-moment BOLD activation for real-time neurofeedback.   Neuroimage 54: 1. 361-368 Jan
 
 http://dx.doi.org/10.1016/j.neuroimage.2010.07.060
+
+Installation
+------------
+
+## Dependencies:
+  -libraries
+    -libace-dev
+    -freeglut3-dev
+    -libgsl0-dev
+    -libxi-dev
+    -libxmu-dev
+    -gnuplot
+    -vxl
+    -libniftiio
+
+On recent Ubuntu distros, the following command will install all dependencies:
+$ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev
+
+## Compilation:
+
+$ cd <path to toplevel murfi directory>
+$ make -j 8
+
+## Installation (optional)
+
+$ sudo ln -sf bin/murfi /usr/bin
+
+Running the example
+-------------------
+
+$ wget https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz
+$ tar -xzvf murfi_example_data.tgz
+$ export MURFI_SUBJECTS_DIR=$PWD
+$ export MURFI_SUBJECT_NAME=murfi_example_data
+$ murfi -f murfi_example_data/scripts/neurofeedback.xml
+
+In another terminal:
+
+$ cd murfi_example_data/scripts
+$ ./servedata.sh
 
 Funding
 -------

@@ -15,26 +15,27 @@ http://dx.doi.org/10.1016/j.neuroimage.2010.07.060
 Installation
 ------------
 
-### Dependencies:
+#### Dependencies:
 
 1. libace-dev
 1. freeglut3-dev
 1. libgsl0-dev
 1. libxi-dev
 1. libxmu-dev
-1. gnuplot
 1. vxl
+1. qt5
 1. libniftiio
 
 On recent Ubuntu distros, the following command will install all dependencies:
-$ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev
 
-### Compilation:
+    $ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev qt5-default libqt5*-dev
+
+#### Compilation:
 
     $ cd <path to toplevel murfi directory>
     $ make -j 8
 
-### Installation (optional)
+#### Installation (optional):
 
     $ sudo ln -sf bin/murfi /usr/bin
 

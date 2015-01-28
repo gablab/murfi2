@@ -29,6 +29,8 @@ class PlotController : public QObject {
 
   const QColor& getColorForName(const std::string &name);
 
+  void replotDesign(RtDesignMatrix *design);
+
  public slots:
 
   void handleData(QString qid);

@@ -29,6 +29,8 @@ class DesignEditor : public QWizard {
 
   void setSelectedColumn(int);
 
+  void finish();
+
  private:
 void addCondition(QString name, bool existing);
 

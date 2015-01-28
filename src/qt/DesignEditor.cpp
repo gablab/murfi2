@@ -1,6 +1,7 @@
 #include "DesignEditor.h"
 
 //
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -55,6 +56,9 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   addPage(createMeasPage());
   addPage(createEditPage());
   setWindowTitle("Design editor");
+
+  connect(this->button(QWizard::FinishButton), SIGNAL(clicked()),
+          this, SLOT(finish()));
 }
 
 DesignEditor::~DesignEditor() {}
@@ -86,6 +90,12 @@ void DesignEditor::handleMouseDown(QMouseEvent *event) {
   }
 
   double x = edit_plot->xAxis->pixelToCoord(event->pos().x());
+
+  int tr = rint(x);
+  if (tr < 0 || tr >= design->getNumMeas()) {
+    return;
+  }
+
   double y = edit_plot->yAxis->pixelToCoord(event->pos().y());
 
   if (y > max_y) {
@@ -98,7 +108,6 @@ void DesignEditor::handleMouseDown(QMouseEvent *event) {
     edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
   }
 
-  int tr = rint(x);
   design->setConditionValueAtTR(tr, selected_column, y);
   plotDesignColumn(design, selected_column, edit_plot->graph(selected_column));
   edit_plot->replot();
@@ -116,6 +125,10 @@ void DesignEditor::handleMouseMove(QMouseEvent *event) {
   double y = edit_plot->yAxis->pixelToCoord(event->pos().y());
 
   int tr = rint(x);
+  if (tr < 0 || tr >= design->getNumMeas()) {
+    return;
+  }
+
   setLabels(tr, design->getConditionValueAtTR(tr, selected_column), y);
 
   if (!mouse_down) {
@@ -139,6 +152,10 @@ void DesignEditor::handleMouseMove(QMouseEvent *event) {
   design->setConditionValueAtTR(tr, selected_column, y);
   plotDesignColumn(design, selected_column, edit_plot->graph(selected_column));
   edit_plot->replot();
+}
+
+void DesignEditor::finish() {
+  design->buildDesignMatrix();
 }
 
 QWizardPage* DesignEditor::createMeasPage() {
@@ -167,6 +184,7 @@ QWizardPage* DesignEditor::createMeasPage() {
 
   if (design->getTR() > 0) {
     num_meas->setValue(design->getNumMeas());
+    num_meas->setReadOnly(true);
     setNumMeas(design->getNumMeas());
   }
   else {
@@ -246,9 +264,9 @@ void DesignEditor::setSelectedColumn(int col) {
       QLineEdit::Normal, "", &ok);
 
     if (ok && !text.isEmpty()) {
-      addCondition(text, false);
-
       selected_column = design->getNumInputConditions();
+
+      addCondition(text, false);
 
       if (selected_column == 0) {
         condition_names->removeItem(1);

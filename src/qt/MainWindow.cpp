@@ -97,4 +97,5 @@ void MainWindow::editDesign() {
 
   DesignEditor design_editor(this, design);
   design_editor.exec();
+  plot_controller->replotDesign(design);
 }

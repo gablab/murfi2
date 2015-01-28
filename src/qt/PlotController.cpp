@@ -113,20 +113,22 @@ void PlotController::updateTRIndicators() {
 }
 
 void PlotController::plotDesign(RtDesignMatrix* design) {
-  for (size_t graph = 0; graph < design->getNumColumns(); graph++) {
-    if (!design->isColumnOfInterest(graph)) {
+
+  size_t graph = 0;
+  for (size_t col_ind = 0; col_ind < design->getNumColumns(); col_ind++) {
+    if (!design->isColumnOfInterest(col_ind)) {
       continue;
     }
 
     design_plot->addGraph();
 
-    vnl_vector<double> col = design->getColumn(graph);
+    vnl_vector<double> col = design->getColumn(col_ind);
     for (size_t tr = 0; tr < col.size(); tr++) {
       design_plot->graph(graph)->addData(tr, col[tr]);
       design_plot->graph(graph)->setPen(
         QPen(design_colormap.getColor(graph)));
     }
-
+    graph++;
   }
 
   design_plot->rescaleAxes();
@@ -157,4 +159,9 @@ void PlotController::plotMotion(RtMotion* motion) {
   motion_plot->graph(ROTATION_Z)->addData(
     motion->getDataID().getTimePoint(),
     motion->getMotionDimension(ROTATION_Z));
+}
+
+void PlotController::replotDesign(RtDesignMatrix *design) {
+  design_plot->clearPlottables();
+  plotDesign(design);
 }

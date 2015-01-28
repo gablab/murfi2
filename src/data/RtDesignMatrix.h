@@ -221,6 +221,9 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // dummy stub
   virtual char* ditherTo8Bpp() { return NULL; }
 
+  // do the actual design matrix construction
+  bool buildDesignMatrix();
+
  protected:
 
   // sets the size (old data lost)
@@ -263,9 +266,6 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 
   // read design matrix information from a text file
   bool loadDesignMatrixFile(string filename);
-
-  // do the actual design matrix construction
-  bool buildDesignMatrix();
 
   // data members
   bool isBuilt;

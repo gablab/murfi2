@@ -279,12 +279,7 @@ bool RtDesignMatrix::processOption(const string &name,
 }
 
 void RtDesignMatrix::addCondition(const string &name, bool of_interest) {
-  inputConditions.set_size(numMeas, inputConditions.columns() + 1);
-  for (size_t i = 0; i < numMeas; i++) {
-    inputConditions(i, inputConditions.columns() - 1) = 0.0;
-  }
   numInputConditions++;
-
   conditionNames.push_back(name);
   conditionInterestIndicator.push_back(of_interest);
 }
@@ -298,6 +293,7 @@ double RtDesignMatrix::getConditionValueAtTR(size_t row, size_t col) {
 }
 
 bool RtDesignMatrix::buildDesignMatrix() {
+  numAddedColumns = 0;
 
   // TODO this will need to get called by unserializeXML as well
 

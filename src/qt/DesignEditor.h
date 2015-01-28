@@ -24,20 +24,20 @@ class DesignEditor : public QWizard {
   void handleMouseUp(QMouseEvent*);
 
   void setRepTime(double);
-
   void setNumMeas(int);
-
   void setSelectedColumn(int);
 
   void finish();
 
  private:
-void addCondition(QString name, bool existing);
+  void addCondition(QString name, bool existing);
 
   QWizardPage *createMeasPage();
   QWizardPage *createEditPage();
 
   void setLabels(int tr, double cond, double mouse);
+
+  void getTrAndYFromMousePos(QMouseEvent *event, int *tr, double *y);
 
   RtDesignMatrix *design;
   QCustomPlot *edit_plot;
@@ -50,6 +50,7 @@ void addCondition(QString name, bool existing);
   QLabel *tr_label;
   QLabel *mouse_pos_label;
   QLabel *condition_pos_label;
+  double condition_increment;
 
   double max_y;
   double min_y;

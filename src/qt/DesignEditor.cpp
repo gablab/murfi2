@@ -36,6 +36,7 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   , selected_column(-1)
   , mouse_pos_label(NULL)
   , condition_pos_label(NULL)
+  , condition_increment(0.05)
   , max_y(1.0)
   , min_y(0.0)
   , mouse_down(false)
@@ -89,14 +90,13 @@ void DesignEditor::handleMouseDown(QMouseEvent *event) {
     return;
   }
 
-  double x = edit_plot->xAxis->pixelToCoord(event->pos().x());
+  int tr;
+  double y;
+  getTrAndYFromMousePos(event, &tr, &y);
 
-  int tr = rint(x);
   if (tr < 0 || tr >= design->getNumMeas()) {
     return;
   }
-
-  double y = edit_plot->yAxis->pixelToCoord(event->pos().y());
 
   if (y > max_y) {
     max_y = y;
@@ -121,10 +121,10 @@ void DesignEditor::handleMouseUp(QMouseEvent *event) {
 
 void DesignEditor::handleMouseMove(QMouseEvent *event) {
 
-  double x = edit_plot->xAxis->pixelToCoord(event->pos().x());
-  double y = edit_plot->yAxis->pixelToCoord(event->pos().y());
+  int tr;
+  double y;
+  getTrAndYFromMousePos(event, &tr, &y);
 
-  int tr = rint(x);
   if (tr < 0 || tr >= design->getNumMeas()) {
     return;
   }
@@ -289,7 +289,16 @@ void DesignEditor::setLabels(int tr, double cond, double mouse) {
   condition_pos_label->setText(QString(str.str().c_str()));
 
   str.str("");
-  str << "Mouse: " << mouse;
+  str.precision(2);
+  str << "Mouse: " << fixed << setw(7) << mouse;
   mouse_pos_label->setText(QString(str.str().c_str()));
 
+}
+
+void DesignEditor::getTrAndYFromMousePos(QMouseEvent* event,
+                                         int *tr, double *y) {
+  *tr = rint(edit_plot->xAxis->pixelToCoord(event->pos().x()));
+  *y = condition_increment *
+    round(1 / condition_increment *
+          edit_plot->yAxis->pixelToCoord(event->pos().y()));
 }

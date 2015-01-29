@@ -50,23 +50,15 @@ bool RtConfigFmriRun::validateConfig() {
   bool valid = true;
   stringstream ss;
 
-  // check image receiver
-  if(get("scanner:disabled")==false) {
-    if((unsigned int) get("scanner:port") < 1
-       || (unsigned int) get("scanner:port") > MAX_TCPIP_PORT_NUM) {
-      cerr << "WARNING: invalid port number for receiving scanner images"
-           << endl;
-      set("scanner:receiveImages",false);
-    }
-  }
-
   // check required acquisition parameters
   if(!isSet("scanner:tr")) {
     cerr << "ERROR: tr must be set!" << endl;
+    valid = false;
   }
 
   if(!isSet("scanner:measurements")) {
     cerr << "ERROR: number of measurements must be set!" << endl;
+    valid = false;
   }
 
   // study reference volume

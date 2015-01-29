@@ -225,12 +225,17 @@ bool initExperiment() {
       return false;
     }
 
-    // TODO: what to do when subject or subjects dir is set in the config file?
     if (config.isSet("study:subjectsDir")) {
       cout << "WARNING!!!! A subjects dir was provided in the config file."
            << " It will be IGNORED" << endl;
     }
     config.set("study:subjectsDir", subjectsDir);
+
+    if (config.isSet("study:subject:name")) {
+      cout << "WARNING!!!! A subject name was provided in the config file."
+           << " It will be IGNORED" << endl;
+    }
+    config.set("study:subject:name", subjectName);
 
     cout << "done" << endl;
   }

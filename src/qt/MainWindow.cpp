@@ -69,7 +69,10 @@ void MainWindow::openRun() {
   }
 
   RtConfigFmriRun run_config;
-  run_config.parseConfigFile(filename);
+  if (!run_config.parseConfigFile(filename)) {
+    cerr << "ERROR: Failed to parse config file" << endl;
+    return;
+  }
 
   ui->imageWidget->initRun(run_config);
 

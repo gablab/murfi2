@@ -52,6 +52,7 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
   numInputConditions = 0;
   numAddedColumns = 0;
   numMeas = 0;
+  tr = 2.0;
 
   // neural signal bases
   conditionShift = 20;

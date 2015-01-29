@@ -26,10 +26,10 @@ INSTALL_DIR = /usr/local/bin/
 INSTALL_BINARY = ./bin/$(PROJECT)
 
 # whether to compile with debug, optimize flags
-DEBUG = 1
+DEBUG = 0
 PROF = 0
-OPTIM = 0
-STRIP = 0
+OPTIM = 1
+STRIP = 1
 BLANK :=
 
 # for memory leak tracing

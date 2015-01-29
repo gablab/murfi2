@@ -19,6 +19,7 @@
  *=========================================================================*/
 
 #include"RtConfigFmriRun.h"
+#include"RtExperiment.h"
 #include"RtLimit.h"
 
 #include"ace/Trace.h"
@@ -49,6 +50,10 @@ bool RtConfigFmriRun::validateConfig() {
 
   bool valid = true;
   stringstream ss;
+
+  if(!isSet("study:log:filename")) {
+    set("study:log:filename", getExperimentConfig().get("study:log:filename"));
+  }
 
   // check required acquisition parameters
   if(!isSet("scanner:tr")) {

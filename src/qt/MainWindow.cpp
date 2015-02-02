@@ -94,11 +94,23 @@ void MainWindow::editDesign() {
     getDataStore().getData(any_design));
 
   // create a new design if none exists
+  bool new_design = false;
   if (design == NULL) {
     design = new RtDesignMatrix();
+    new_design = true;
   }
 
   DesignEditor design_editor(this, design);
   design_editor.exec();
-  plot_controller->replotDesign(design);
+
+  if (!design_editor.hasFinished()) {
+    return;
+  }
+
+  if (new_design) {
+    getDataStore().setData(design);
+  }
+  else {
+    plot_controller->replotDesign(design);
+  }
 }

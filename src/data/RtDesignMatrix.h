@@ -69,9 +69,7 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // set the number of measurements
   // NOTE: must be called before build()
 
-  void setNumMeas(unsigned int _numMeas) {
-    numMeas = _numMeas;
-  }
+  void setNumMeas(unsigned int _numMeas);
 
   // set the tr
   // NOTE: must be called before build()
@@ -107,6 +105,10 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 
   // build the design matrix from the configuration
   virtual bool build();
+
+  bool isBuilt() const {
+    return built;
+  }
 
   double getTR() const {
     return tr;
@@ -268,7 +270,7 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   bool loadDesignMatrixFile(string filename);
 
   // data members
-  bool isBuilt;
+  bool built;
   unsigned int numAddedColumns; // number of columns filled in
   vector<bool> columnOfInterestIndicator; // columns of interest are true
   vector<string> columnNames; // vector of column names
@@ -359,6 +361,7 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // unnecessary columns will slow down
   // estimation a lil.
   unsigned int numArtifacts; // so far
+
 };
 
 #endif

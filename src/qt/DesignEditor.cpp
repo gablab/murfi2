@@ -34,12 +34,14 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   , condition_colormap(Colormap::ColormapType::DESIGN)
   , condition_names(NULL)
   , selected_column(-1)
+  , current_num_meas(-1)
   , mouse_pos_label(NULL)
   , condition_pos_label(NULL)
   , condition_increment(0.05)
   , max_y(1.0)
   , min_y(0.0)
   , mouse_down(false)
+  , finished(false)
 {
   edit_plot->xAxis->setRange(0, design->getNumRows());
   edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
@@ -57,6 +59,9 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   addPage(createMeasPage());
   addPage(createEditPage());
   setWindowTitle("Design editor");
+
+  connect(this->button(QWizard::NextButton), SIGNAL(clicked()),
+          this, SLOT(assignNumMeas()));
 
   connect(this->button(QWizard::FinishButton), SIGNAL(clicked()),
           this, SLOT(finish()));
@@ -125,7 +130,7 @@ void DesignEditor::handleMouseMove(QMouseEvent *event) {
   double y;
   getTrAndYFromMousePos(event, &tr, &y);
 
-  if (tr < 0 || tr >= design->getNumMeas()) {
+  if (selected_column < 0 || tr < 0 || tr >= design->getNumMeas()) {
     return;
   }
 
@@ -156,6 +161,7 @@ void DesignEditor::handleMouseMove(QMouseEvent *event) {
 
 void DesignEditor::finish() {
   design->buildDesignMatrix();
+  finished = true;
 }
 
 QWizardPage* DesignEditor::createMeasPage() {
@@ -166,7 +172,7 @@ QWizardPage* DesignEditor::createMeasPage() {
   QDoubleSpinBox *rep_time = new QDoubleSpinBox;
   rep_time->setRange(0, 10);
 
-  if (design->getTR() > 0) {
+  if (design->isBuilt()) {
     rep_time->setValue(design->getTR());
     setRepTime(design->getTR());
   }
@@ -182,18 +188,19 @@ QWizardPage* DesignEditor::createMeasPage() {
   QSpinBox *num_meas = new QSpinBox;
   num_meas->setRange(1, 10000);
 
-  if (design->getTR() > 0) {
-    num_meas->setValue(design->getNumMeas());
-    num_meas->setReadOnly(true);
-    setNumMeas(design->getNumMeas());
+  if (design->isBuilt()) {
+    current_num_meas = design->getNumMeas();
+    num_meas->setValue(current_num_meas);
+    setNumMeas(current_num_meas);
   }
   else {
-    num_meas->setValue(100);
-    setNumMeas(100);
+    current_num_meas = 100;
+    num_meas->setValue(current_num_meas);
+    setNumMeas(current_num_meas);
   }
 
   connect(num_meas, SIGNAL(valueChanged(int)),
-          this, SLOT(setNumMeas(int)));
+          this, SLOT(setCurrentNumMeas(int)));
 
   QGridLayout *layout = new QGridLayout;
   layout->addWidget(rep_time_label, 0, 0);
@@ -202,6 +209,7 @@ QWizardPage* DesignEditor::createMeasPage() {
   layout->addWidget(num_meas, 1, 1);
 
   page->setLayout(layout);
+
   return page;
 }
 
@@ -275,6 +283,13 @@ void DesignEditor::setSelectedColumn(int col) {
   }
   else {
     selected_column = col - 1;
+  }
+}
+
+void DesignEditor::assignNumMeas() {
+  // TODO hack that assumes there are only 2 pages in this wizard
+  if (currentPage()->nextId() == -1) {
+    setNumMeas(current_num_meas);
   }
 }
 

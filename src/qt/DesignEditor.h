@@ -24,10 +24,15 @@ class DesignEditor : public QWizard {
   void handleMouseUp(QMouseEvent*);
 
   void setRepTime(double);
+  void setCurrentNumMeas(int num) { current_num_meas = num; }
   void setNumMeas(int);
   void setSelectedColumn(int);
 
+  void assignNumMeas();
   void finish();
+  bool hasFinished() const {
+    return finished;
+  }
 
  private:
   void addCondition(QString name, bool existing);
@@ -47,6 +52,8 @@ class DesignEditor : public QWizard {
   QComboBox *condition_names;
   int selected_column;
 
+  int current_num_meas;
+
   QLabel *tr_label;
   QLabel *mouse_pos_label;
   QLabel *condition_pos_label;
@@ -56,5 +63,5 @@ class DesignEditor : public QWizard {
   double min_y;
 
   bool mouse_down;
-
+  bool finished;
 };

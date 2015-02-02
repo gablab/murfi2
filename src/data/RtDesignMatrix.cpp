@@ -47,7 +47,7 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
 
   vnl_matrix<double>::set_size(0, 0);
 
-  isBuilt = false;
+  built = false;
 
   numInputConditions = 0;
   numAddedColumns = 0;
@@ -55,7 +55,7 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
   tr = 2.0;
 
   // neural signal bases
-  conditionShift = 20;
+  conditionShift = 0;
   modelEachBlock = false;
   blockLen = 0;
 
@@ -140,14 +140,7 @@ bool RtDesignMatrix::processOption(const string &name,
   if (name == "condition") { // load the condition vector
     numInputConditions++;
 
-    if (numInputConditions == 1) { // allocate condition matrix
-      inputConditions.clear();
-      inputConditions.set_size(numMeas, MAX_CONDITIONS);
-      inputConditions.fill(0);
-      conditionNames.reserve(MAX_CONDITIONS);
-      conditionInterestIndicator.reserve(MAX_CONDITIONS);
-    }
-    else if (numInputConditions > MAX_CONDITIONS) {
+    if (numInputConditions > MAX_CONDITIONS) {
       cerr << "warning: max number of conditions exceeded." << endl;
       return false;
     }
@@ -277,6 +270,28 @@ bool RtDesignMatrix::processOption(const string &name,
 
   cout << "WARNING: option " << name << " unrecognized and ignored" << endl;
   return true;
+}
+
+void RtDesignMatrix::setNumMeas(unsigned int _numMeas) {
+  unsigned int oldNumMeas = numMeas;
+  numMeas = _numMeas;
+
+  vnl_matrix<double> oldInputConditions(inputConditions);
+  inputConditions.set_size(numMeas, MAX_CONDITIONS);
+  inputConditions.fill(0);
+
+  if (numInputConditions == 0) {
+    conditionNames.reserve(MAX_CONDITIONS);
+    conditionInterestIndicator.reserve(MAX_CONDITIONS);
+    return;
+  }
+
+  // copy existing conditions
+  for (size_t c = 0; c < numInputConditions; c++) {
+    for (size_t r = 0; r < oldNumMeas && r < numMeas; r++) {
+      inputConditions(r, c) = oldInputConditions(r, c);
+    }
+  }
 }
 
 void RtDesignMatrix::addCondition(const string &name, bool of_interest) {
@@ -445,11 +460,11 @@ bool RtDesignMatrix::buildDesignMatrix() {
 
   }
 
-  isBuilt = true;
-
   if (DEBUG_LEVEL & MODERATE) {
     print();
   }
+
+  built = true;
 
   return true;
 }
@@ -924,7 +939,7 @@ vnl_vector<double> RtDesignMatrix::getArtifactTimepoints() {
 //   tr of the timepoint to update for
 bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 
-  if (!isBuilt) {
+  if (!isBuilt()) {
     cerr << "WARNING: can't update() a design matrix that hasn't been build()t."
          << endl;
     return false;

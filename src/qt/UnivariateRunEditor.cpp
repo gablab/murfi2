@@ -4,6 +4,7 @@
 
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QFormLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QString>
@@ -63,46 +64,25 @@ void UnivariateRunEditor::removeMaskRow() {
 }
 
 void UnivariateRunEditor::handleNextButton() {
-  int page = currentPage()->nextId() - 1;
+  int page = currentPage()->nextId();
 
-  if (page == 1) { // mask setup
-    mask_config.str("");
-
-    if (brain_mask_checkbox->isChecked()) {
-      mask_config
-        << "<module name=\"mask-gen\">"
-        << "  <option name=\"makeavail\">true</option>"
-        << "  <option name=\"roiID\"> brain </option>"
-        << "  <option name=\"threshold\"> 0.5 </option>"
-        << "  <option name=\"save\"> true </option>"
-        << "</module>";
-    }
-
-    for (int mask = 0; mask < mask_table->rowCount(); mask++) {
-      mask_config
-        << "<module name=\"mask-load\">"
-        << "  <option name=\"makeavail\">true</option>"
-        << "  <option name=\"roiID\"> "
-        << mask_table->item(mask, NAME_COL)->text().toStdString()
-        << " </option>"
-        << "  <option name=\"filename\"> "
-        << static_cast<FileButton*>(
-          mask_table->cellWidget(mask, FILE_COL))->getPath()
-        << " </option>"
-        << "  <option name=\"align\"> "
-        << (static_cast<QCheckBox*>(
-          mask_table->cellWidget(
-            mask, ALIGN_COL))->isChecked() ? "true" : "false")
-        << " </option>"
-        << "  <option name=\"save\"> true </option>"
-        << "</module>";
-    }
+  if (page == 1) {
+    makeMaskConfig();
   }
-
+  else if (page == 2) {
+    makeGLMConfig();
+  }
+  else if (page == -1) {
+    makeROIConfig();
+  }
 }
 
 void UnivariateRunEditor::finish() {
-  finished = true;
+  mask_config << glm_config.str() << roi_config.str();
+
+  if (run_config->parseConfigStr(mask_config.str())) {
+    finished = true;
+  }
 }
 
 QWizardPage* UnivariateRunEditor::createMaskPage() {
@@ -142,6 +122,8 @@ QWizardPage* UnivariateRunEditor::createGLMPage() {
   QWizardPage *page = new QWizardPage;
   page->setTitle("GLM setup");
 
+  QFormLayout *layout = new QFormLayout;
+
   return page;
 }
 
@@ -150,4 +132,82 @@ QWizardPage* UnivariateRunEditor::createROICombinePage() {
   page->setTitle("ROI combination setup");
 
   return page;
+}
+
+void UnivariateRunEditor::makeMaskConfig() {
+  mask_config.str("");
+
+  if (brain_mask_checkbox->isChecked()) {
+    mask_config
+      << "<module name=\"mask-gen\">"
+      << "  <option name=\"makeavail\">true</option>"
+      << "  <option name=\"roiID\"> brain </option>"
+      << "  <option name=\"threshold\"> 0.5 </option>"
+      << "  <option name=\"save\"> true </option>"
+      << "</module>";
+  }
+
+  for (int mask = 0; mask < mask_table->rowCount(); mask++) {
+    mask_config
+      << "<module name=\"mask-load\">"
+      << "  <option name=\"makeavail\">true</option>"
+      << "  <option name=\"roiID\"> "
+      << mask_table->item(mask, NAME_COL)->text().toStdString()
+      << " </option>"
+      << "  <option name=\"filename\"> "
+      << static_cast<FileButton*>(
+        mask_table->cellWidget(mask, FILE_COL))->getPath()
+      << " </option>"
+      << "  <option name=\"align\"> "
+      << (static_cast<QCheckBox*>(
+            mask_table->cellWidget(
+              mask, ALIGN_COL))->isChecked() ? "true" : "false")
+      << " </option>"
+      << "  <option name=\"save\"> true </option>"
+      << "</module>";
+  }
+}
+
+void UnivariateRunEditor::makeGLMConfig() {
+  glm_config.str("");
+
+  glm_config
+    << "  <module name=\"incremental-glm\">"
+    << "    <option name=\"makeavail\">true</option>"
+    << "    <option name=\"maskRoiID\">brain</option>"
+    << "    <design>"
+    << "      <option name=\"condition\" conditionName=\"on\">"
+    << "        0 0 0 0 0"
+    << "        1 1 1 1 1"
+    << "      </option>"
+    << "      <option name=\"maxTrendOrder\"> 1 </option>"
+    << "      <option name=\"modelMotionParameters\"> false </option>"
+    << "      <option name=\"modelTemporalDerivatives\"> false </option>"
+    << "    </design>"
+    << "  </module>"
+    << "  <module name=\"current-activation\">"
+    << "    <option name=\"makeavail\">true</option>"
+    << "    <option name=\"modelFitModuleID\"> incremental-glm </option>"
+    << "    <option name=\"modelFitRoiID\"> brain </option>"
+    << "    <option name=\"maskRoiID\"> brain </option>"
+    << "    <option name=\"numDataPointsForErrEst\">20</option>"
+    << "  </module>";
+}
+
+void UnivariateRunEditor::makeROIConfig() {
+  roi_config.str("");
+
+  roi_config
+    << "  <module name=\"roi-combine\">"
+    << "    <option name=\"makeavail\">true</option>"
+    << "    <output>infoserver</output>"
+    << "    <output>infoclient</output>"
+    << "    <option name=\"method\"> weighted-ave </option>"
+    << "    <option name=\"maskRoiID\"> active </option>"
+    << "    <option name=\"inputModuleID\"> current-activation </option>"
+    << "    <option name=\"inputDataName\"> activation-img </option>"
+    << "    <option name=\"inputRoiID\"> brain </option>"
+    << "    <option name=\"weightModuleID\"> incremental-glm </option>"
+    << "    <option name=\"weightDataName\"> residual_mse-img </option>"
+    << "  </module>";
 }

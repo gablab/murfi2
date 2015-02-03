@@ -35,6 +35,10 @@ class UnivariateRunEditor : public QWizard {
 
  private:
 
+  void makeMaskConfig();
+  void makeGLMConfig();
+  void makeROIConfig();
+
   QWizardPage *createMaskPage();
   QWizardPage *createGLMPage();
   QWizardPage *createROICombinePage();

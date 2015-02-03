@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[7];
-    char stringdata[63];
+    char stringdata[73];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,12 +33,12 @@ QT_MOC_LITERAL(0, 0, 10),
 QT_MOC_LITERAL(1, 11, 9),
 QT_MOC_LITERAL(2, 21, 0),
 QT_MOC_LITERAL(3, 22, 13),
-QT_MOC_LITERAL(4, 36, 6),
-QT_MOC_LITERAL(5, 43, 7),
-QT_MOC_LITERAL(6, 51, 10)
+QT_MOC_LITERAL(4, 36, 16),
+QT_MOC_LITERAL(5, 53, 7),
+QT_MOC_LITERAL(6, 61, 10)
     },
     "MainWindow\0dataReady\0\0newExperiment\0"
-    "newRun\0openRun\0editDesign\0"
+    "newUnivariateRun\0openRun\0editDesign\0"
 };
 #undef QT_MOC_LITERAL
 
@@ -83,7 +83,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->dataReady((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 1: _t->newExperiment(); break;
-        case 2: _t->newRun(); break;
+        case 2: _t->newUnivariateRun(); break;
         case 3: _t->openRun(); break;
         case 4: _t->editDesign(); break;
         default: ;

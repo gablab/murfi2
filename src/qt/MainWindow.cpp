@@ -12,6 +12,7 @@
 
 #include "DesignEditor.h"
 #include "PlotController.h"
+#include "UnivariateRunEditor.h"
 
 using std::cout;
 using std::endl;
@@ -57,9 +58,6 @@ void MainWindow::newExperiment() {
   initExperiment();
 }
 
-void MainWindow::newRun() {
-}
-
 void MainWindow::openRun() {
   string filename = QFileDialog::getOpenFileName(
     this, tr("Open run config"), "", tr("Files (*.xml)")).toStdString();
@@ -76,13 +74,23 @@ void MainWindow::openRun() {
 
   ui->imageWidget->initRun(run_config);
 
-  // TODO validation
+  run_config.dumpConfig();
 
   executeRun(run_config);
 }
 
 const QColor& MainWindow::getColorForName(const string &name) {
   return plot_controller->getColorForName(name);
+}
+
+void MainWindow::newUnivariateRun() {
+  RtConfigFmriRun run_config;
+  UnivariateRunEditor editor(this, &run_config);
+  editor.exec();
+
+  if (editor.hasFinished()) {
+    executeRun(run_config);
+  }
 }
 
 void MainWindow::editDesign() {

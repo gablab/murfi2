@@ -211,6 +211,12 @@
    <slot>newExperiment()</slot>
   </connection>
   <connection>
+   <sender>actionUnivariate</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>newUnivariateRun()</slot>
+  </connection>
+  <connection>
    <sender>actionOpen</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>

@@ -28,11 +28,8 @@ class MainWindow : public QMainWindow, public RtDataListener {
 
  private slots:
   void newExperiment();
-  void newRun();
+  void newUnivariateRun();
   void openRun();
-  // bool saveRun();
-  // bool saveRunAs();
-  // void runAgain();
   void editDesign();
 
  private:

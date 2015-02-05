@@ -3,10 +3,13 @@
 #include <string>
 
 #include <QCheckBox>
+#include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QString>
 #include <QStringList>
 #include <QTableWidget>
@@ -16,6 +19,7 @@
 #include "RtConfigFmriRun.h"
 
 #include "FileButton.h"
+#include "GLMWizardPage.h"
 
 using std::string;
 
@@ -36,7 +40,8 @@ UnivariateRunEditor::UnivariateRunEditor(QWidget *parent,
   , finished(false) {
 
   addPage(createMaskPage());
-  addPage(createGLMPage());
+  glm_page = new GLMWizardPage(this);
+  addPage(glm_page);
   addPage(createROICombinePage());
 
   connect(this->button(QWizard::NextButton), SIGNAL(clicked()),
@@ -66,19 +71,20 @@ void UnivariateRunEditor::removeMaskRow() {
 void UnivariateRunEditor::handleNextButton() {
   int page = currentPage()->nextId();
 
-  if (page == 1) {
-    makeMaskConfig();
-  }
-  else if (page == 2) {
-    makeGLMConfig();
-  }
-  else if (page == -1) {
-    makeROIConfig();
+  // tell the glm wizard about the roi names
+  if (page == 2) {
+    QStringList rois;
+    for (int mask = 0; mask < mask_table->rowCount(); mask++) {
+      rois << mask_table->item(mask, NAME_COL)->text();
+    }
+    glm_page->addROIS(rois);
   }
 }
 
 void UnivariateRunEditor::finish() {
-  mask_config << glm_config.str() << roi_config.str();
+  makeMaskConfig();
+  makeROIConfig();
+  mask_config << glm_page->getConfigString() << roi_config.str();
 
   if (run_config->parseConfigStr(mask_config.str())) {
     finished = true;
@@ -114,15 +120,6 @@ QWizardPage* UnivariateRunEditor::createMaskPage() {
 
   connect(addMask, SIGNAL(clicked()), this, SLOT(insertMaskRow()));
   connect(removeMask, SIGNAL(clicked()), this, SLOT(removeMaskRow()));
-
-  return page;
-}
-
-QWizardPage* UnivariateRunEditor::createGLMPage() {
-  QWizardPage *page = new QWizardPage;
-  page->setTitle("GLM setup");
-
-  QFormLayout *layout = new QFormLayout;
 
   return page;
 }
@@ -166,32 +163,6 @@ void UnivariateRunEditor::makeMaskConfig() {
       << "  <option name=\"save\"> true </option>"
       << "</module>";
   }
-}
-
-void UnivariateRunEditor::makeGLMConfig() {
-  glm_config.str("");
-
-  glm_config
-    << "  <module name=\"incremental-glm\">"
-    << "    <option name=\"makeavail\">true</option>"
-    << "    <option name=\"maskRoiID\">brain</option>"
-    << "    <design>"
-    << "      <option name=\"condition\" conditionName=\"on\">"
-    << "        0 0 0 0 0"
-    << "        1 1 1 1 1"
-    << "      </option>"
-    << "      <option name=\"maxTrendOrder\"> 1 </option>"
-    << "      <option name=\"modelMotionParameters\"> false </option>"
-    << "      <option name=\"modelTemporalDerivatives\"> false </option>"
-    << "    </design>"
-    << "  </module>"
-    << "  <module name=\"current-activation\">"
-    << "    <option name=\"makeavail\">true</option>"
-    << "    <option name=\"modelFitModuleID\"> incremental-glm </option>"
-    << "    <option name=\"modelFitRoiID\"> brain </option>"
-    << "    <option name=\"maskRoiID\"> brain </option>"
-    << "    <option name=\"numDataPointsForErrEst\">20</option>"
-    << "  </module>";
 }
 
 void UnivariateRunEditor::makeROIConfig() {

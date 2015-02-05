@@ -6,6 +6,7 @@
 
 #include "Colormap.h"
 
+class GLMWizardPage;
 class QCheckBox;
 class QTableWidget;
 class QWizardPage;
@@ -36,12 +37,12 @@ class UnivariateRunEditor : public QWizard {
  private:
 
   void makeMaskConfig();
-  void makeGLMConfig();
   void makeROIConfig();
 
   QWizardPage *createMaskPage();
-  QWizardPage *createGLMPage();
   QWizardPage *createROICombinePage();
+
+  GLMWizardPage *glm_page;
 
   RtConfigFmriRun *run_config;
 

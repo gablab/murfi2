@@ -1,9 +1,7 @@
 bin/murfi
 util/scanner_sim/servenii
 util/scanner_sim/servenii4d
+src/qt/ui_MainWindow.h
 *~
 *.o
-example_data/img/*
-example_data/log/*
-example_data/mask/*
-example_data/xfm/*
+*example_data*

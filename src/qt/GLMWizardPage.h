@@ -8,6 +8,7 @@ class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
 class QSpinBox;
+class RtDesignMatrix;
 
 // qwizard page for GLM configuration
 class GLMWizardPage : public QWizardPage {
@@ -21,6 +22,10 @@ class GLMWizardPage : public QWizardPage {
 
   std::string getConfigString() const;
 
+ public slots:
+
+  void editDesign();
+
  private:
 
   QComboBox *mask_combo;
@@ -30,5 +35,7 @@ class GLMWizardPage : public QWizardPage {
   QCheckBox *model_motion_box;
   QCheckBox *model_temp_deriv_box;
   QSpinBox *num_points_for_err_est;
+
+  RtDesignMatrix *design;
 
 };

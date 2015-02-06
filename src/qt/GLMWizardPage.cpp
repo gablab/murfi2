@@ -7,14 +7,19 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
+#include <QPushButton>
 #include <QSpinBox>
+
+#include "DesignEditor.h"
+#include "RtDesignMatrix.h"
 
 using std::endl;
 using std::string;
 using std::stringstream;
 
 GLMWizardPage::GLMWizardPage(QWidget *parent)
-  : QWizardPage(parent) {
+  : QWizardPage(parent)
+  , design(NULL) {
 
   QFormLayout *layout = new QFormLayout;
 
@@ -60,6 +65,11 @@ GLMWizardPage::GLMWizardPage(QWidget *parent)
   layout->addRow("Number of measurements to use in error est",
                  num_points_for_err_est);
 
+  QPushButton *design_button = new QPushButton("Edit", this);
+  connect(design_button, SIGNAL(clicked()), this, SLOT(editDesign()));
+
+  layout->addRow("Design matrix", design_button);
+
   setLayout(layout);
 }
 
@@ -68,6 +78,26 @@ void GLMWizardPage::addROIS(const QStringList &rois) {
   // fill the combo box with the ROI names
   for (int roi = 0; roi < rois.size(); roi++) {
     mask_combo->addItem(rois[roi]);
+  }
+}
+
+void GLMWizardPage::editDesign() {
+
+  RtDesignMatrix *local_design = new RtDesignMatrix();
+
+  if (design != NULL) {
+    *local_design = *design;
+  }
+
+  local_design->setNumMeas(num_meas_box->value());
+  local_design->setTR(rep_time_box->value());
+
+  DesignEditor design_editor(this, local_design);
+  design_editor.exec();
+
+  if (design_editor.hasFinished()) {
+    delete design;
+    design = local_design;
   }
 }
 

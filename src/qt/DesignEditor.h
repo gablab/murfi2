@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QWizard>
+#include <QDialog>
 
 #include "Colormap.h"
 
@@ -9,7 +9,7 @@ class QCustomPlot;
 class QLabel;
 class RtDesignMatrix;
 
-class DesignEditor : public QWizard {
+class DesignEditor : public QDialog {
   Q_OBJECT
 
  public:
@@ -17,28 +17,23 @@ class DesignEditor : public QWizard {
   DesignEditor(QWidget *parent, RtDesignMatrix*);
   virtual ~DesignEditor();
 
+  bool hasFinished() const {
+    return finished;
+  }
+
  public slots:
 
   void handleMouseDown(QMouseEvent*);
   void handleMouseMove(QMouseEvent*);
   void handleMouseUp(QMouseEvent*);
 
-  void setRepTime(double);
-  void setCurrentNumMeas(int num) { current_num_meas = num; }
-  void setNumMeas(int);
   void setSelectedColumn(int);
 
-  void assignNumMeas();
+  void cancel();
   void finish();
-  bool hasFinished() const {
-    return finished;
-  }
 
  private:
   void addCondition(QString name, bool existing);
-
-  QWizardPage *createMeasPage();
-  QWizardPage *createEditPage();
 
   void setLabels(int tr, double cond, double mouse);
 
@@ -51,8 +46,6 @@ class DesignEditor : public QWizard {
 
   QComboBox *condition_names;
   int selected_column;
-
-  int current_num_meas;
 
   QLabel *tr_label;
   QLabel *mouse_pos_label;

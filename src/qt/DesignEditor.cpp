@@ -5,10 +5,10 @@
 #include <iostream>
 #include <sstream>
 
-#include <QWizardPage>
 #include <QGridLayout>
-#include <QLabel>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 #include "qcustomplot.h"
@@ -28,13 +28,12 @@ void plotDesignColumn(RtDesignMatrix *design, int col, QCPGraph *graph) {
 } // anonymous namespace
 
 DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
-  : QWizard(parent)
+  : QDialog(parent)
   , design(design)
   , edit_plot(new QCustomPlot)
   , condition_colormap(Colormap::ColormapType::DESIGN)
   , condition_names(NULL)
   , selected_column(-1)
-  , current_num_meas(-1)
   , mouse_pos_label(NULL)
   , condition_pos_label(NULL)
   , condition_increment(0.05)
@@ -43,6 +42,51 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   , mouse_down(false)
   , finished(false)
 {
+  setMinimumSize(640, 480);
+
+  condition_names = new QComboBox;
+  condition_names->setDuplicatesEnabled(false);
+
+  condition_names->addItem("Add new condition");
+
+  if (design->getNumInputConditions() == 0) {
+    condition_names->addItem("No conditions");
+    condition_names->setCurrentIndex(1);
+  }
+  else {
+    for (size_t cond = 0; cond < design->getNumInputConditions(); cond++) {
+      selected_column = cond;
+      addCondition(QString(design->getConditionName(cond).c_str()), true);
+    }
+  }
+
+  connect(condition_names, SIGNAL(currentIndexChanged(int)),
+          this, SLOT(setSelectedColumn(int)));
+
+  tr_label = new QLabel("TR: ");
+  condition_pos_label = new QLabel("Y: ");
+  mouse_pos_label = new QLabel("Mouse: ");
+
+  QHBoxLayout *header = new QHBoxLayout;
+  header->addWidget(condition_names, 3);
+  header->addWidget(tr_label, 1);
+  header->addWidget(condition_pos_label, 1);
+  header->addWidget(mouse_pos_label, 1);
+
+  QVBoxLayout *layout = new QVBoxLayout;
+  layout->addLayout(header, 1);
+  layout->addWidget(edit_plot, 10);
+
+  QPushButton *finish_button = new QPushButton("Finish");
+  QPushButton *cancel_button = new QPushButton("Cancel");
+  QHBoxLayout *footer = new QHBoxLayout;
+
+  footer->addWidget(cancel_button);
+  footer->addWidget(finish_button);
+  layout->addLayout(footer, 1);
+
+  setLayout(layout);
+
   edit_plot->xAxis->setRange(0, design->getNumRows());
   edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
   edit_plot->legend->setVisible(true);
@@ -56,15 +100,10 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   connect(edit_plot, SIGNAL(mouseMove(QMouseEvent*)),
           this, SLOT(handleMouseMove(QMouseEvent*)));
 
-  addPage(createMeasPage());
-  addPage(createEditPage());
   setWindowTitle("Design editor");
 
-  connect(this->button(QWizard::NextButton), SIGNAL(clicked()),
-          this, SLOT(assignNumMeas()));
-
-  connect(this->button(QWizard::FinishButton), SIGNAL(clicked()),
-          this, SLOT(finish()));
+  connect(finish_button, SIGNAL(clicked()), this, SLOT(finish()));
+  connect(cancel_button, SIGNAL(clicked()), this, SLOT(cancel()));
 }
 
 DesignEditor::~DesignEditor() {}
@@ -162,106 +201,12 @@ void DesignEditor::handleMouseMove(QMouseEvent *event) {
 void DesignEditor::finish() {
   design->buildDesignMatrix();
   finished = true;
+  done(0);
 }
 
-QWizardPage* DesignEditor::createMeasPage() {
-  QWizardPage *page = new QWizardPage;
-  page->setTitle("Setup measurement details");
-
-  QLabel *rep_time_label = new QLabel("Repetition time (ms):");
-  QDoubleSpinBox *rep_time = new QDoubleSpinBox;
-  rep_time->setRange(0, 10);
-
-  if (design->isBuilt()) {
-    rep_time->setValue(design->getTR());
-    setRepTime(design->getTR());
-  }
-  else {
-    rep_time->setValue(2);
-    setRepTime(2);
-  }
-
-  connect(rep_time, SIGNAL(valueChanged(double)),
-          this, SLOT(setRepTime(double)));
-
-  QLabel *num_meas_label = new QLabel("Number of measurements:");
-  QSpinBox *num_meas = new QSpinBox;
-  num_meas->setRange(1, 10000);
-
-  if (design->isBuilt()) {
-    current_num_meas = design->getNumMeas();
-    num_meas->setValue(current_num_meas);
-    setNumMeas(current_num_meas);
-  }
-  else {
-    current_num_meas = 100;
-    num_meas->setValue(current_num_meas);
-    setNumMeas(current_num_meas);
-  }
-
-  connect(num_meas, SIGNAL(valueChanged(int)),
-          this, SLOT(setCurrentNumMeas(int)));
-
-  QGridLayout *layout = new QGridLayout;
-  layout->addWidget(rep_time_label, 0, 0);
-  layout->addWidget(rep_time, 0, 1);
-  layout->addWidget(num_meas_label, 1, 0);
-  layout->addWidget(num_meas, 1, 1);
-
-  page->setLayout(layout);
-
-  return page;
-}
-
-QWizardPage* DesignEditor::createEditPage() {
-  QWizardPage *page = new QWizardPage;
-  page->setTitle("Edit condition vectors");
-
-  condition_names = new QComboBox;
-  condition_names->setDuplicatesEnabled(false);
-
-  condition_names->addItem("Add new condition");
-
-  if (design->getNumInputConditions() == 0) {
-    condition_names->addItem("No conditions");
-    condition_names->setCurrentIndex(1);
-  }
-  else {
-    for (size_t cond = 0; cond < design->getNumInputConditions(); cond++) {
-      selected_column = cond;
-      addCondition(QString(design->getConditionName(cond).c_str()), true);
-    }
-  }
-
-  connect(condition_names, SIGNAL(currentIndexChanged(int)),
-          this, SLOT(setSelectedColumn(int)));
-
-  tr_label = new QLabel("TR: ");
-  condition_pos_label = new QLabel("Y: ");
-  mouse_pos_label = new QLabel("Mouse: ");
-
-  QHBoxLayout *header = new QHBoxLayout;
-  header->addWidget(condition_names, 3);
-  header->addWidget(tr_label, 1);
-  header->addWidget(condition_pos_label, 1);
-  header->addWidget(mouse_pos_label, 1);
-
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->addLayout(header, 1);
-  layout->addWidget(edit_plot, 10);
-
-  page->setLayout(layout);
-  return page;
-}
-
-void DesignEditor::setRepTime(double rep_time) {
-  design->setTR(rep_time);
-}
-
-void DesignEditor::setNumMeas(int num_meas) {
-  design->setNumMeas(num_meas);
-  edit_plot->xAxis->setRange(0, num_meas);
-  edit_plot->replot();
+void DesignEditor::cancel() {
+  finished = false;
+  done(0);
 }
 
 void DesignEditor::setSelectedColumn(int col) {
@@ -283,13 +228,6 @@ void DesignEditor::setSelectedColumn(int col) {
   }
   else {
     selected_column = col - 1;
-  }
-}
-
-void DesignEditor::assignNumMeas() {
-  // TODO hack that assumes there are only 2 pages in this wizard
-  if (currentPage()->nextId() == -1) {
-    setNumMeas(current_num_meas);
   }
 }
 

@@ -86,7 +86,17 @@ void UnivariateRunEditor::finish() {
   makeROIConfig();
   mask_config << glm_page->getConfigString() << roi_config.str();
 
-  if (run_config->parseConfigStr(mask_config.str())) {
+  stringstream config;
+  config
+    << "<processor> "
+    << "<module name=\"mosaic\">"
+    << "  <output>display</output>"
+    << "  <output>log</output>"
+    << "</module>"
+    << mask_config.str()
+    << "</processor>";
+
+  if (run_config->parseConfigStr(config.str())) {
     finished = true;
   }
 }
@@ -107,14 +117,9 @@ QWizardPage* UnivariateRunEditor::createMaskPage() {
   header << "ROI name" << "File" << "Align";
   mask_table->setHorizontalHeaderLabels(header);
 
-  brain_mask_checkbox = new QCheckBox(
-    "Only compute GLM within brain mask", this);
-  brain_mask_checkbox->setChecked(true);
-
   QVBoxLayout *layout = new QVBoxLayout;
   layout->addLayout(addRemoveLayout, 1);
   layout->addWidget(mask_table, 9);
-  layout->addWidget(brain_mask_checkbox, 1);
 
   page->setLayout(layout);
 
@@ -133,16 +138,6 @@ QWizardPage* UnivariateRunEditor::createROICombinePage() {
 
 void UnivariateRunEditor::makeMaskConfig() {
   mask_config.str("");
-
-  if (brain_mask_checkbox->isChecked()) {
-    mask_config
-      << "<module name=\"mask-gen\">"
-      << "  <option name=\"makeavail\">true</option>"
-      << "  <option name=\"roiID\"> brain </option>"
-      << "  <option name=\"threshold\"> 0.5 </option>"
-      << "  <option name=\"save\"> true </option>"
-      << "</module>";
-  }
 
   for (int mask = 0; mask < mask_table->rowCount(); mask++) {
     mask_config

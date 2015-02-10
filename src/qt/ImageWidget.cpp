@@ -80,9 +80,10 @@ void ImageWidget::handleData(const RtDataID &id) {
     layers[ACTIVATION_LAYER]->setData(getDataStore().getData(id));
     draw_mutex.unlock();
   }
-  else if (id.getDataName() == NAME_SCANNERIMG_EPI) {
+  else if (id.getModuleID() == ID_MOSAIC) {
     draw_mutex.lock();
-    layers[MR_LAYER]->setData(getDataStore().getData(id));
+    RtMRIImage *img = static_cast<RtMRIImage*>(getDataStore().getData(id));
+    layers[MR_LAYER]->setData(img);
     draw_mutex.unlock();
   }
   else if (id.getDataName() == NAME_MASK) {

@@ -54,10 +54,6 @@ void MainWindow::notify(const RtDataID &id) {
   emit dataReady(QString(id.toString().c_str()));
 }
 
-void MainWindow::newExperiment() {
-  initExperiment();
-}
-
 void MainWindow::openRun() {
   string filename = QFileDialog::getOpenFileName(
     this, tr("Open run config"), "", tr("Files (*.xml)")).toStdString();
@@ -66,6 +62,9 @@ void MainWindow::openRun() {
     return;
   }
 
+  deinitExperiment();
+  initExperiment();
+
   RtConfigFmriRun run_config;
   if (!run_config.parseConfigFile(filename)) {
     cerr << "ERROR: Failed to parse config file" << endl;
@@ -73,8 +72,6 @@ void MainWindow::openRun() {
   }
 
   ui->imageWidget->initRun(run_config);
-
-  run_config.dumpConfig();
 
   executeRun(run_config);
 }
@@ -89,6 +86,8 @@ void MainWindow::newUnivariateRun() {
   editor.exec();
 
   if (editor.hasFinished()) {
+    deinitExperiment();
+    initExperiment();
     executeRun(run_config);
   }
 }

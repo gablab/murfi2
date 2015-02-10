@@ -27,7 +27,6 @@ class MainWindow : public QMainWindow, public RtDataListener {
   void dataReady(QString);
 
  private slots:
-  void newExperiment();
   void newUnivariateRun();
   void openRun();
   void editDesign();

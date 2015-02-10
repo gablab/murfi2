@@ -73,6 +73,10 @@ GLMWizardPage::GLMWizardPage(QWidget *parent)
   setLayout(layout);
 }
 
+GLMWizardPage::~GLMWizardPage() {
+  delete design;
+}
+
 void GLMWizardPage::addROIS(const QStringList &rois) {
 
   // fill the combo box with the ROI names
@@ -101,8 +105,14 @@ void GLMWizardPage::editDesign() {
   }
 }
 
-string GLMWizardPage::getConfigString() const {
+string GLMWizardPage::getConfigString() {
   stringstream config;
+
+  if (design == NULL) {
+    design = new RtDesignMatrix();
+    design->setTR(rep_time_box->value());
+    design->setNumMeas(num_meas_box->value());
+  }
 
   bool use_brain_mask = mask_combo->currentIndex() == 1;
   if (use_brain_mask) {
@@ -128,8 +138,31 @@ string GLMWizardPage::getConfigString() const {
            << "</option>";
   }
 
-  // TODO add design matrix config
+  config << "  <option name=\"tr\"> " << design->getTR() << " </option>";
+  config << "  <option name=\"measurements\"> " << design->getNumMeas()
+         << " </option>";
 
+  config << "<design>";
+
+  for (size_t cond = 0; cond < design->getNumInputConditions(); cond++) {
+    config
+      << "<option name=\"condition\" conditionName=\""
+      << design->getConditionName(cond) << "\">";
+    for (size_t tr = 0; tr < design->getNumMeas(); tr++) {
+      config << design->getConditionValueAtTR(tr, cond) << " ";
+    }
+
+    config << "</option>";
+  }
+
+  config << "<option name=\"maxTrendOrder\"> "
+         << num_trend_box->value() << "</option>";
+  config << "<option name=\"modelMotionParameters\"> "
+         << (model_motion_box->isChecked() ? "true" : "false") << "</option>";
+  config << "<option name=\"modelTemporalDerivatives\"> "
+         << (model_temp_deriv_box->isChecked() ? "true" : "false")
+         << "</option>";
+  config << "  </design>";
   config << "</module>";
 
   config << endl;

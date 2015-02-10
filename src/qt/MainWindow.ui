@@ -94,7 +94,6 @@
      <addaction name="actionMultivariate"/>
      <addaction name="actionLocalizer"/>
     </widget>
-    <addaction name="actionNewExperiment"/>
     <addaction name="menuNewRun"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
@@ -121,14 +120,6 @@
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionNewExperiment">
-   <property name="text">
-    <string>New experiment</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-  </action>
   <action name="actionUnivariate">
    <property name="text">
     <string>Univariate</string>
@@ -203,12 +194,6 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
-  </connection>
-  <connection>
-   <sender>actionNewExperiment</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>newExperiment()</slot>
   </connection>
   <connection>
    <sender>actionUnivariate</sender>

@@ -18,9 +18,11 @@ class GLMWizardPage : public QWizardPage {
 
   explicit GLMWizardPage(QWidget *);
 
+  virtual ~GLMWizardPage();
+
   void addROIS(const QStringList &rois);
 
-  std::string getConfigString() const;
+  std::string getConfigString();
 
  public slots:
 

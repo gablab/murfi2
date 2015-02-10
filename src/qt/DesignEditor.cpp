@@ -87,7 +87,7 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
 
   setLayout(layout);
 
-  edit_plot->xAxis->setRange(0, design->getNumRows());
+  edit_plot->xAxis->setRange(0, design->getNumMeas());
   edit_plot->yAxis->setRange(min_y - 0.2, max_y + 0.2);
   edit_plot->legend->setVisible(true);
 

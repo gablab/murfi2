@@ -169,7 +169,8 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     rest = name.substr(delind+1);
   }
 
-  // look for child with name or "option" child with correct "name" attribute
+  // look for child with name, or a 'module', or "option"
+  // child with correct "name" attribute
   TiXmlNode *child = 0;
   while((child = elmt->IterateChildren(childName, child))) {
     string val = get(rest,child);
@@ -177,6 +178,20 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     // TODO figure out what to do if we're empty (could mean to be empty)
     if(!val.empty()) {
       return RtConfigVal(val);
+    }
+  }
+
+  while((child = elmt->IterateChildren("module", child))) {
+    if(child->ToElement() != NULL
+       && TIXML_SUCCESS
+       == child->ToElement()->QueryValueAttribute("name",&optionName)
+       && optionName == childName) {
+      string val = get(rest,child);
+
+      // TODO figure out what to do if we're empty (could mean to be empty)
+      if(!val.empty()) {
+        return RtConfigVal(val);
+      }
     }
   }
 

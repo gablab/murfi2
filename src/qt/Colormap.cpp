@@ -20,7 +20,6 @@ namespace {
     colors->push_back(new QColor(  0, 255,   0));
     colors->push_back(new QColor(255,   0, 255));
     colors->push_back(new QColor(  0, 255,   0));
-    colors->push_back(new QColor(255, 255,   0));
     colors->push_back(new QColor(  0, 255, 255));
     colors->push_back(new QColor(  0, 127, 127));
     colors->push_back(new QColor(127, 127,   0));

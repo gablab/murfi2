@@ -1,16 +1,16 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'UnivariateRunEditor.h'
+** Meta object code from reading C++ file 'MaskWizardPage.h'
 **
 ** Created by: The Qt Meta Object Compiler version 67 (Qt 5.2.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "UnivariateRunEditor.h"
+#include "MaskWizardPage.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'UnivariateRunEditor.h' doesn't include <QObject>."
+#error "The header file 'MaskWizardPage.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
 #error "This file was generated using the moc from 5.2.1. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -18,28 +18,28 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-struct qt_meta_stringdata_UnivariateRunEditor_t {
+struct qt_meta_stringdata_MaskWizardPage_t {
     QByteArrayData data[4];
-    char stringdata[46];
+    char stringdata[45];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    offsetof(qt_meta_stringdata_UnivariateRunEditor_t, stringdata) + ofs \
+    offsetof(qt_meta_stringdata_MaskWizardPage_t, stringdata) + ofs \
         - idx * sizeof(QByteArrayData) \
     )
-static const qt_meta_stringdata_UnivariateRunEditor_t qt_meta_stringdata_UnivariateRunEditor = {
+static const qt_meta_stringdata_MaskWizardPage_t qt_meta_stringdata_MaskWizardPage = {
     {
-QT_MOC_LITERAL(0, 0, 19),
-QT_MOC_LITERAL(1, 20, 16),
-QT_MOC_LITERAL(2, 37, 0),
-QT_MOC_LITERAL(3, 38, 6)
+QT_MOC_LITERAL(0, 0, 14),
+QT_MOC_LITERAL(1, 15, 13),
+QT_MOC_LITERAL(2, 29, 0),
+QT_MOC_LITERAL(3, 30, 13)
     },
-    "UnivariateRunEditor\0handleNextButton\0"
-    "\0finish\0"
+    "MaskWizardPage\0insertMaskRow\0\0"
+    "removeMaskRow\0"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_UnivariateRunEditor[] = {
+static const uint qt_meta_data_MaskWizardPage[] = {
 
  // content:
        7,       // revision
@@ -63,41 +63,41 @@ static const uint qt_meta_data_UnivariateRunEditor[] = {
        0        // eod
 };
 
-void UnivariateRunEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void MaskWizardPage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        UnivariateRunEditor *_t = static_cast<UnivariateRunEditor *>(_o);
+        MaskWizardPage *_t = static_cast<MaskWizardPage *>(_o);
         switch (_id) {
-        case 0: _t->handleNextButton(); break;
-        case 1: _t->finish(); break;
+        case 0: _t->insertMaskRow(); break;
+        case 1: _t->removeMaskRow(); break;
         default: ;
         }
     }
     Q_UNUSED(_a);
 }
 
-const QMetaObject UnivariateRunEditor::staticMetaObject = {
-    { &QWizard::staticMetaObject, qt_meta_stringdata_UnivariateRunEditor.data,
-      qt_meta_data_UnivariateRunEditor,  qt_static_metacall, 0, 0}
+const QMetaObject MaskWizardPage::staticMetaObject = {
+    { &QWizardPage::staticMetaObject, qt_meta_stringdata_MaskWizardPage.data,
+      qt_meta_data_MaskWizardPage,  qt_static_metacall, 0, 0}
 };
 
 
-const QMetaObject *UnivariateRunEditor::metaObject() const
+const QMetaObject *MaskWizardPage::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *UnivariateRunEditor::qt_metacast(const char *_clname)
+void *MaskWizardPage::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_UnivariateRunEditor.stringdata))
-        return static_cast<void*>(const_cast< UnivariateRunEditor*>(this));
-    return QWizard::qt_metacast(_clname);
+    if (!strcmp(_clname, qt_meta_stringdata_MaskWizardPage.stringdata))
+        return static_cast<void*>(const_cast< MaskWizardPage*>(this));
+    return QWizardPage::qt_metacast(_clname);
 }
 
-int UnivariateRunEditor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int MaskWizardPage::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QWizard::qt_metacall(_c, _id, _a);
+    _id = QWizardPage::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

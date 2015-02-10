@@ -7,9 +7,8 @@
 #include "Colormap.h"
 
 class GLMWizardPage;
-class QCheckBox;
-class QTableWidget;
-class QWizardPage;
+class MaskWizardPage;
+class ROICombineWizardPage;
 
 class RtConfigFmriRun;
 
@@ -27,31 +26,17 @@ class UnivariateRunEditor : public QWizard {
 
  public slots:
 
-  void insertMaskRow();
-  void removeMaskRow();
-
   void handleNextButton();
 
   void finish();
 
  private:
 
-  void makeMaskConfig();
-  void makeROIConfig();
-
-  QWizardPage *createMaskPage();
-  QWizardPage *createROICombinePage();
-
+  MaskWizardPage *mask_page;
   GLMWizardPage *glm_page;
+  ROICombineWizardPage *roi_page;
 
   RtConfigFmriRun *run_config;
-
-  std::stringstream mask_config;
-  std::stringstream glm_config;
-  std::stringstream roi_config;
-
-  QTableWidget *mask_table;
-  QCheckBox *brain_mask_checkbox;
 
   bool finished;
 };

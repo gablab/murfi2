@@ -20,7 +20,7 @@ class GLMWizardPage : public QWizardPage {
 
   virtual ~GLMWizardPage();
 
-  void addROIS(const QStringList &rois);
+  void addMaskNames(const QStringList &masks);
 
   std::string getConfigString();
 

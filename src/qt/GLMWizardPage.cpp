@@ -77,11 +77,11 @@ GLMWizardPage::~GLMWizardPage() {
   delete design;
 }
 
-void GLMWizardPage::addROIS(const QStringList &rois) {
+void GLMWizardPage::addMaskNames(const QStringList &masks) {
 
-  // fill the combo box with the ROI names
-  for (int roi = 0; roi < rois.size(); roi++) {
-    mask_combo->addItem(rois[roi]);
+  // fill the combo box with the mask names
+  for (int mask = 0; mask < masks.size(); mask++) {
+    mask_combo->addItem(masks[mask]);
   }
 }
 

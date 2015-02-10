@@ -1034,26 +1034,22 @@ bool RtDataImage<T>::mosaicUnlocked() {
   numPix = dims[0]*dims[1];
 
   // reshape the data
-  T *newdata = new T[numPix];
+  T *newdata = new T[numPix]();
   imgDataLen = numPix*sizeof(T);
 
-  unsigned int newrow, newcol, oldslc, newind;
-  unsigned int sqMatrixSize = matrixSize*matrixSize;
-  for(unsigned int i = 0; i < numPix; i++) {
-    oldslc = i/sqMatrixSize;
+  size_t num_slices_on_row = ceil(sqrt(numSlices));
+  for (size_t slice = 0; slice < numSlices; slice++) {
+    size_t col_start = matrixSize * (slice % num_slices_on_row);
+    size_t row_start = matrixSize * (slice / num_slices_on_row);
+    for (size_t slice_col = 0; slice_col < matrixSize; slice_col++) {
+      for (size_t slice_row = 0; slice_row < matrixSize; slice_row++) {
+        size_t row = row_start + slice_row;
+        size_t col = col_start + slice_col;
 
-    // these expressions are bracketed carefully to truncate
-    // DO NOT SIMPLIFY THESE EXPRESSIONS
-    newrow = (i/matrixSize)%matrixSize + matrixSize*(i/(dims[0]*matrixSize));
-    newcol = (matrixSize*(i/sqMatrixSize) + (i%matrixSize))%dims[1];
-    newind = newrow*dims[1]+newcol;
-
-    // copy if within slices
-    if(oldslc < numSlices) {
-      newdata[newind] = data[i];
-    }
-    else { // fill the blank panels with zeros
-      newdata[newind] = 0;
+        newdata[row * getMosaicedWidth() + col] =
+          data[(matrixSize * matrixSize * slice) +
+               (slice_row * matrixSize) + slice_col];
+      }
     }
   }
 

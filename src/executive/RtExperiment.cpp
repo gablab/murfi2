@@ -219,23 +219,14 @@ bool initExperiment() {
   if(!confFilename.empty()) { // look first to a file
     cout << "parsing config file...";
 
+    config.set("study:subject:name", subjectName);
+    config.set("study:subjectsDir", subjectsDir);
+
     if(!config.parseConfigFile(confFilename)) {
       cout << "failed" << endl;
       cerr << "ERROR: failed to parse config file: " << confFilename << endl;
       return false;
     }
-
-    if (config.isSet("study:subjectsDir")) {
-      cout << "WARNING!!!! A subjects dir was provided in the config file."
-           << " It will be IGNORED" << endl;
-    }
-    config.set("study:subjectsDir", subjectsDir);
-
-    if (config.isSet("study:subject:name")) {
-      cout << "WARNING!!!! A subject name was provided in the config file."
-           << " It will be IGNORED" << endl;
-    }
-    config.set("study:subject:name", subjectName);
 
     cout << "done" << endl;
   }
@@ -273,26 +264,19 @@ bool initExperiment() {
 
 
   // start info server
-  if(config.isSet("infoserver:disabled")
-     && config.get("infoserver:disabled")==false) {
-    infoServer = new RtInfoServer();
-    if(!infoServer->open(config)) {
-      cerr << "ERROR: could not initialize info server" << endl;
-    }
-    else {
-      infoServer->activate(); // start the info server thread
-    }
+  infoServer = new RtInfoServer();
+  if(!infoServer->open(config)) {
+    cerr << "ERROR: could not initialize info server" << endl;
+  }
+  else {
+    infoServer->activate(); // start the info server thread
   }
 
-  // start scanner listener
-  if(config.isSet("scanner:disabled")
-     && config.get("scanner:disabled")==false) {
-    if(!scannerInput.open(config)) {
-      cerr << "ERROR: could not add scanner input" << endl;
-    }
-    else {
-      scannerInput.activate(); // start the scanner input thread
-    }
+  if(!scannerInput.open(config)) {
+    cerr << "ERROR: could not add scanner input" << endl;
+  }
+  else {
+    scannerInput.activate(); // start the scanner input thread
   }
 
   return true;

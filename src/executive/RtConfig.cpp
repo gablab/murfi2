@@ -55,12 +55,30 @@ bool RtConfig::parseConfigFile(const string &filename) {
 
   setDefaults();
 
+  string study_name;
+  if (isSet("study:subject:name")) {
+    study_name = get("study:subject:name").str();
+  }
+
+  string subjects_dir;
+  if (isSet("study:subjectsDir")) {
+    subjects_dir = get("study:subjectsDir").str();
+  }
+
   // try to read file
   if(!parms.LoadFile(filename)) {
     cout << parms.ErrorDesc() << endl;
     parms.Clear();
     parms.ClearError();
     return false;
+  }
+
+  if (!study_name.empty()) {
+    set("study:subject:name", study_name);
+  }
+
+  if (!subjects_dir.empty()) {
+    set("study:subjectsDir", subjects_dir);
   }
 
   return validateConfig();

@@ -59,6 +59,9 @@ double getExperimentElapsedTime();
 // get the configuration for this experiment
 RtConfigFmriExperiment &getExperimentConfig();
 
+// get the configuration for the current run (or NULL)
+RtConfigFmriRun* getRunConfig();
+
 // get the configuration filename for this experiment
 string getExperimentConfigFile();
 
@@ -73,5 +76,7 @@ unsigned int getSeriesNumFromUID(char *uid);
 
 // get a new unique series number
 unsigned int getNextUniqueSeriesNum();
+
+unsigned int getNumDataPointsForErrEst();
 
 #endif

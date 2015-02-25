@@ -12,6 +12,7 @@
 #include "Colormap.h"
 
 class QCPItemLine;
+class QCPItemRect;
 class QCustomPlot;
 class RtDesignMatrix;
 class RtMotion;
@@ -55,6 +56,7 @@ class PlotController : public QObject {
   Colormap motion_colormap;
 
   QCPItemLine *design_tr_indicator;
+  QCPItemRect *baseline_box;
   QCPItemLine *roi_tr_indicator;
   QCPItemLine *motion_tr_indicator;
 

@@ -5,6 +5,7 @@
 #include "Colormap.h"
 
 class QComboBox;
+class QCPItemRect;
 class QCustomPlot;
 class QLabel;
 class RtDesignMatrix;
@@ -51,6 +52,8 @@ class DesignEditor : public QDialog {
   QLabel *mouse_pos_label;
   QLabel *condition_pos_label;
   double condition_increment;
+
+  QCPItemRect *baseline_box;
 
   double max_y;
   double min_y;

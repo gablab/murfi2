@@ -101,6 +101,8 @@ string execName;
 string subjectName;
 string subjectsDir;
 
+unsigned int numDataPointsForErrEst = 0;
+
 } // anonymous namespace
 
 //* methods for retreiving info about the the experiment *//
@@ -197,6 +199,10 @@ RtDataStore &getDataStore() {
 // get the conductor for this experiment
 RtConductor &getConductor() {
   return *conductor;
+}
+
+unsigned int getNumDataPointsForErrEst() {
+  return numDataPointsForErrEst;
 }
 
 // initialize the experiment (call before the first run is prepared)
@@ -317,6 +323,9 @@ bool deinitExperiment() {
 
 // initialize and run the backend computation system
 int executeRun(RtConfigFmriRun &conf) {
+
+  numDataPointsForErrEst = conf.get(
+    "processor:current-activation:numDataPointsForErrEst");
 
   // make sure only one backend is running at a time
   if(conductor != NULL && conductor->isRunning()) {

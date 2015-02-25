@@ -29,7 +29,21 @@ PlotController::PlotController(QCustomPlot *design_plot,
   , motion_tr_indicator(new QCPItemLine(motion_plot))
   , current_tr(0)
 {
+  baseline_box = new QCPItemRect(design_plot);
+  baseline_box->setPen(QPen(QColor(178, 178, 178)));
+  baseline_box->setBrush(QBrush(QColor(178, 178, 178)));
+  baseline_box->topLeft->setCoords(0, 0);
+  baseline_box->bottomRight->setCoords(0, 0);
+
+  design_plot->addItem(baseline_box);
   design_plot->addItem(design_tr_indicator);
+
+  design_plot->xAxis->setRange(0, 100);
+  design_plot->yAxis->setRange(0, 1);
+  roi_plot->xAxis->setRange(0, 100);
+  roi_plot->yAxis->setRange(0, 1);
+  motion_plot->xAxis->setRange(0, 100);
+  motion_plot->yAxis->setRange(0, 1);
 
   roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);
@@ -47,9 +61,6 @@ PlotController::PlotController(QCustomPlot *design_plot,
 }
 
 PlotController::~PlotController() {
-  delete design_tr_indicator;
-  delete roi_tr_indicator;
-  delete motion_tr_indicator;
 }
 
 const QColor& PlotController::getColorForName(const string &name) {
@@ -61,10 +72,14 @@ void PlotController::handleData(QString qid) {
   id.setFromString(qid.toStdString());
 
   if (id.getDataName() == NAME_DESIGN) {
+    baseline_box->topLeft->setCoords(0, 10);
+    baseline_box->bottomRight->setCoords(getNumDataPointsForErrEst(), -10);
+
     RtDesignMatrix *design =
       static_cast<RtDesignMatrix*>(getDataStore().getData(id));
     updateTRIndicators();
     plotDesign(design);
+
     roi_plot->xAxis->setRange(0, design->getNumRows());
     roi_plot->replot();
     motion_plot->xAxis->setRange(0, design->getNumRows());

@@ -14,6 +14,7 @@
 #include "qcustomplot.h"
 
 #include "RtDesignMatrix.h"
+#include "RtExperiment.h"
 
 using std::cout;
 using std::endl;
@@ -44,6 +45,11 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
 {
   setMinimumSize(640, 480);
 
+  baseline_box = new QCPItemRect(edit_plot);
+  baseline_box->setPen(QPen(QColor(178, 178, 178)));
+  baseline_box->setBrush(QBrush(QColor(178, 178, 178)));
+  edit_plot->addItem(baseline_box);
+
   condition_names = new QComboBox;
   condition_names->setDuplicatesEnabled(false);
 
@@ -59,6 +65,9 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
       addCondition(QString(design->getConditionName(cond).c_str()), true);
     }
   }
+
+  baseline_box->topLeft->setCoords(0, max_y);
+  baseline_box->bottomRight->setCoords(getNumDataPointsForErrEst(), min_y);
 
   connect(condition_names, SIGNAL(currentIndexChanged(int)),
           this, SLOT(setSelectedColumn(int)));
@@ -106,7 +115,8 @@ DesignEditor::DesignEditor(QWidget *parent, RtDesignMatrix *design)
   connect(cancel_button, SIGNAL(clicked()), this, SLOT(cancel()));
 }
 
-DesignEditor::~DesignEditor() {}
+DesignEditor::~DesignEditor() {
+}
 
 void DesignEditor::addCondition(QString name, bool existing) {
   if (!existing) {

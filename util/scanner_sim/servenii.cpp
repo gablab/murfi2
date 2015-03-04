@@ -67,6 +67,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   time_t tm;
   time(&tm);
   strftime(uid, 64, "%Y%m%d%H%M%S", localtime(&tm));
+  unsigned int numPix, numData;
 
   // keep making new connections while we havent sent the whole series
   nifti_image* img;
@@ -77,20 +78,50 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     RtExternalImageInfo ei;
     fillExternalInfo(img, numSlices, i+1, numImgs, &ei);
     strcpy(ei.seriesUID, uid);
-
+    
     cout << "sending img  " << ei.currentTR << endl;
 
     cout << "sending info of size " << ei.getHeaderSize() << endl;
     stream.send_n(reinterpret_cast<char*>(&ei), ei.getHeaderSize());
 
     cout << "sending img of size " << ei.getDataSize() << endl;
-    stream.send_n(img->data, ei.getDataSize());
+
+    numPix = ei.getNumVoxels();
+    numData = ei.numPixelsRead * ei.numPixelsPhase * ei.numSlices;
+    short *newdata = new short[numPix];
+    short *imgdata = (short*) img->data;
+
+    unsigned int matrixSize = img->dim[1];
+    unsigned int mosaicSide = (int) sqrt(matrixSize*matrixSize
+                                         *pow(ceil(sqrt((double)numSlices)),2));
+    unsigned int newrow, newcol, oldslc, newind;
+    unsigned int sqMatrixSize = matrixSize*matrixSize;
+    for(unsigned int p = 0; p < numPix; p++) {
+      oldslc = p/sqMatrixSize;
+
+      // these expressions are bracketed carefully to truncate
+      // DO NOT SIMPLIFY THESE EXPRESSIONS
+      newrow = (p/matrixSize)%matrixSize +
+          matrixSize*(p/(mosaicSide*matrixSize));
+      newcol = (matrixSize*(p/sqMatrixSize) + (p%matrixSize))%mosaicSide;
+      newind = newrow*mosaicSide+newcol;
+
+      // copy if within slices
+      if(oldslc < numSlices) {
+        newdata[newind] = imgdata[p];
+      }
+      else { // fill the blank panels with zeros
+        newdata[newind] = 0;
+      }
+    }
+    stream.send_n(newdata, ei.getDataSize());
 
     stream.close();
 
     usleep(tr);
 
     nifti_image_free(img);
+    delete [] newdata;
   }
 
   if(img == NULL) {

@@ -8,7 +8,7 @@
 CFLAGS += $(FRONT_FLAG)
 
 ifeq ($(FRONTEND),1)
-  MAKE_FRONT=cd ./display && $(MAKE)
+  MAKE_FRONT=cd ./qt && $(MAKE)
 else
   MAKE_FRONT=echo not compiling frontend
 endif
@@ -29,7 +29,7 @@ clean:
 	cd ./util &&      $(MAKE) clean
 	cd ./data &&      $(MAKE) clean
 	cd ./stream &&    $(MAKE) clean
-	cd ./display &&   $(MAKE) clean
+	cd ./qt &&   $(MAKE) clean
 
 
 

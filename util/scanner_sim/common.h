@@ -24,6 +24,13 @@ void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
       ei->voxelToWorldMatrix[r][c] = img->qto_xyz.m[r][c];
     }
   }
+<<<<<<< HEAD
+=======
+
+  ei->numPixelsRead = img->dim[1] / gridSize;
+  ei->numPixelsPhase = img->dim[2] / gridSize;
+  ei->numSlices = numSlices;
+>>>>>>> ohinds/qt
 
   ei->numPixelsRead = img->dim[1];
   ei->numPixelsPhase = img->dim[2];

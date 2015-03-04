@@ -29,6 +29,8 @@
 #include<sstream>
 #include<cstdlib>
 
+typedef pair<string, string> StringPair;
+
 const RtConfigVal RtConfig::unset;
 
 //*** constructors/destructors  ***//
@@ -53,12 +55,30 @@ bool RtConfig::parseConfigFile(const string &filename) {
 
   setDefaults();
 
+  string study_name;
+  if (isSet("study:subject:name")) {
+    study_name = get("study:subject:name").str();
+  }
+
+  string subjects_dir;
+  if (isSet("study:subjectsDir")) {
+    subjects_dir = get("study:subjectsDir").str();
+  }
+
   // try to read file
   if(!parms.LoadFile(filename)) {
     cout << parms.ErrorDesc() << endl;
     parms.Clear();
     parms.ClearError();
     return false;
+  }
+
+  if (!study_name.empty()) {
+    set("study:subject:name", study_name);
+  }
+
+  if (!subjects_dir.empty()) {
+    set("study:subjectsDir", subjects_dir);
   }
 
   return validateConfig();
@@ -167,7 +187,8 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     rest = name.substr(delind+1);
   }
 
-  // look for child with name or "option" child with correct "name" attribute
+  // look for child with name, or a 'module', or "option"
+  // child with correct "name" attribute
   TiXmlNode *child = 0;
   while((child = elmt->IterateChildren(childName, child))) {
     string val = get(rest,child);
@@ -175,6 +196,20 @@ RtConfigVal RtConfig::get(const string &name, TiXmlNode *node) {
     // TODO figure out what to do if we're empty (could mean to be empty)
     if(!val.empty()) {
       return RtConfigVal(val);
+    }
+  }
+
+  while((child = elmt->IterateChildren("module", child))) {
+    if(child->ToElement() != NULL
+       && TIXML_SUCCESS
+       == child->ToElement()->QueryValueAttribute("name",&optionName)
+       && optionName == childName) {
+      string val = get(rest,child);
+
+      // TODO figure out what to do if we're empty (could mean to be empty)
+      if(!val.empty()) {
+        return RtConfigVal(val);
+      }
     }
   }
 
@@ -269,6 +304,59 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
   return NULL;
 }
 
+// get all the option text values for the processing modules with a
+// specified name.
+//
+// in
+//  module_name is a string representing the module name attribute.
+//  option_name is a string representing the option name attribute required.
+// out
+//  a list of the matching subnode option names.
+vector<string> RtConfig::getProcessingModuleNames(const string &module_name,
+                                                  const string &option_name) {
+  vector<string> matches;
+
+  TiXmlNode* node = getNode("processor");
+  if (node == NULL) {
+    return matches;
+  }
+
+  TiXmlNode *child = NULL;
+  while((child = node->ToElement()->IterateChildren(child))) {
+    TiXmlElement *el = child->ToElement();
+    if (el == NULL) {
+      continue;
+    }
+
+    string name;
+    el->QueryValueAttribute("name",&name);
+
+    if (name != module_name) {
+      continue;
+    }
+
+    TiXmlNode *subchild = NULL;
+    while((subchild = el->IterateChildren("option", subchild))) {
+      TiXmlElement *subel = subchild->ToElement();
+      if (subel == NULL) {
+        continue;
+      }
+
+      string subname;
+      subel->QueryValueAttribute("name",&subname);
+
+      if (subname != option_name) {
+        continue;
+      }
+
+      matches.push_back(subchild->FirstChild()->ValueStr());
+      break;
+    }
+  }
+
+  return matches;
+}
+
 // determine if there is a value set for a particular config variable
 //  in
 //   the variable name to check
@@ -277,7 +365,6 @@ TiXmlNode *RtConfig::getNode(const string &name, TiXmlNode *node) {
 bool RtConfig::isSet(const string &name) {
   return get(name,&parms).isSet();
 }
-
 
 // sets a parm value starting from a specified xml node
 // children are created appropritately

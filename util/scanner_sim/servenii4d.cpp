@@ -3,6 +3,8 @@
 #include"ace/SOCK_Stream.h"
 #include"ace/SOCK_Connector.h"
 #include"ace/SOCK_Stream.h"
+#include<cctype>
+#include<cstdlib>
 #include<strstream>
 #include<iostream>
 
@@ -58,6 +60,17 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     usage(argv[0]);
     return 1;
   }
+
+  // generate a random series UID
+  srand(time(NULL));
+  char seriesUID[64];
+  for (int i = 0; i < 63; i++) {
+    char c;
+    while (!std::isalnum(c = static_cast<char>(std::rand())));
+    seriesUID[i] = c;
+  }
+  seriesUID[63] = '\0';
+  cout << seriesUID << endl;
 
   // get info from the header
   unsigned int ndim = vols->dim[0];
@@ -130,6 +143,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     strcpy(ei->imageType, "3D");
     strcpy(ei->scanType, "EPI");
     strcpy(ei->dataType, "int16_t");
+    strcpy(ei->seriesUID, seriesUID);
 
     ei->isLittleEndian = true;
     ei->isMosaic = true;

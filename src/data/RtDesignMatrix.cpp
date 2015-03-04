@@ -47,14 +47,15 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
 
   vnl_matrix<double>::set_size(0, 0);
 
-  isBuilt = false;
+  built = false;
 
   numInputConditions = 0;
   numAddedColumns = 0;
   numMeas = 0;
+  tr = 2.0;
 
   // neural signal bases
-  conditionShift = 20;
+  conditionShift = 0;
   modelEachBlock = false;
   blockLen = 0;
 
@@ -139,14 +140,7 @@ bool RtDesignMatrix::processOption(const string &name,
   if (name == "condition") { // load the condition vector
     numInputConditions++;
 
-    if (numInputConditions == 1) { // allocate condition matrix
-      inputConditions.clear();
-      inputConditions.set_size(numMeas, MAX_CONDITIONS);
-      inputConditions.fill(0);
-      conditionNames.reserve(MAX_CONDITIONS);
-      conditionInterestIndicator.reserve(MAX_CONDITIONS);
-    }
-    else if (numInputConditions > MAX_CONDITIONS) {
+    if (numInputConditions > MAX_CONDITIONS) {
       cerr << "warning: max number of conditions exceeded." << endl;
       return false;
     }
@@ -278,7 +272,44 @@ bool RtDesignMatrix::processOption(const string &name,
   return true;
 }
 
+void RtDesignMatrix::setNumMeas(unsigned int _numMeas) {
+  unsigned int oldNumMeas = numMeas;
+  numMeas = _numMeas;
+
+  vnl_matrix<double> oldInputConditions(inputConditions);
+  inputConditions.set_size(numMeas, MAX_CONDITIONS);
+  inputConditions.fill(0);
+
+  if (numInputConditions == 0) {
+    conditionNames.reserve(MAX_CONDITIONS);
+    conditionInterestIndicator.reserve(MAX_CONDITIONS);
+    return;
+  }
+
+  // copy existing conditions
+  for (size_t c = 0; c < numInputConditions; c++) {
+    for (size_t r = 0; r < oldNumMeas && r < numMeas; r++) {
+      inputConditions(r, c) = oldInputConditions(r, c);
+    }
+  }
+}
+
+void RtDesignMatrix::addCondition(const string &name, bool of_interest) {
+  numInputConditions++;
+  conditionNames.push_back(name);
+  conditionInterestIndicator.push_back(of_interest);
+}
+
+void RtDesignMatrix::setConditionValueAtTR(size_t row, size_t col, double val) {
+  inputConditions(row, col) = val;
+}
+
+double RtDesignMatrix::getConditionValueAtTR(size_t row, size_t col) {
+  return inputConditions(row, col);
+}
+
 bool RtDesignMatrix::buildDesignMatrix() {
+  numAddedColumns = 0;
 
   // TODO this will need to get called by unserializeXML as well
 
@@ -429,11 +460,11 @@ bool RtDesignMatrix::buildDesignMatrix() {
 
   }
 
-  isBuilt = true;
-
   if (DEBUG_LEVEL & MODERATE) {
     print();
   }
+
+  built = true;
 
   return true;
 }
@@ -569,12 +600,16 @@ unsigned int RtDesignMatrix::getNumNuisanceBases() {
 // retreive a vector of the indices of columns identified as representing
 // neural signals of interest
 vnl_vector<unsigned int> RtDesignMatrix::getColumnOfInterestIndices() {
-  vnl_vector<unsigned int> inds;
+  vnl_vector<unsigned int> inds(columnOfInterestIndicator.size() -
+                                getNumNuisanceBases());
+
+  int filled = 0;
   int ind = 0;
   for (vector<bool>::iterator i = columnOfInterestIndicator.begin();
        i != columnOfInterestIndicator.end(); ind++, i++) {
     if (*i) {
-      inds.put(inds.size(), ind);
+      inds.put(filled, ind);
+      filled++;
     }
   }
 
@@ -904,7 +939,7 @@ vnl_vector<double> RtDesignMatrix::getArtifactTimepoints() {
 //   tr of the timepoint to update for
 bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 
-  if (!isBuilt) {
+  if (!isBuilt()) {
     cerr << "WARNING: can't update() a design matrix that hasn't been build()t."
          << endl;
     return false;

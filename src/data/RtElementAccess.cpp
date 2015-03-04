@@ -142,7 +142,7 @@ void RtElementAccess::buildElementIndices() {
 
   // go through pixels looking for non-nan entries
   for(unsigned int i = 0; i < img->getNumEl(); i++) {
-    if(!isnan(img->getElement(i))) {
+    if(!std::isnan(img->getElement(i))) {
       elementIndices.push_back(i);
     }
   }

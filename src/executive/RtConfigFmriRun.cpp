@@ -19,6 +19,7 @@
  *=========================================================================*/
 
 #include"RtConfigFmriRun.h"
+#include"RtExperiment.h"
 #include"RtLimit.h"
 
 #include"ace/Trace.h"
@@ -50,23 +51,44 @@ bool RtConfigFmriRun::validateConfig() {
   bool valid = true;
   stringstream ss;
 
-  // check image receiver
-  if(get("scanner:disabled")==false) {
-    if((unsigned int) get("scanner:port") < 1
-       || (unsigned int) get("scanner:port") > MAX_TCPIP_PORT_NUM) {
-      cerr << "WARNING: invalid port number for receiving scanner images"
-           << endl;
-      set("scanner:receiveImages",false);
+  if(!isSet("study:log:filename")) {
+    set("study:log:filename", getExperimentConfig().get("study:log:filename"));
+  }
+
+  // if tr and scan length are set in the design, copy that over
+  if (isSet("processor:incremental-glm:tr")) {
+    if (isSet("scanner:tr")) {
+      cerr << "ERROR: TR is set both in the scanner section and in the "
+           << "GLM setup, please only specify it in one place" << endl;
+      valid = false;
+    }
+    else {
+      set("scanner:tr", get("processor:incremental-glm:tr"));
+    }
+  }
+
+  if (isSet("processor:incremental-glm:measurements")) {
+    if (isSet("scanner:measurements")) {
+      cerr << "ERROR: The number of measurements is set both in the scanner"
+           << " section and in the GLM setup, please only specify it in "
+           << "one place" << endl;
+      valid = false;
+    }
+    else {
+      set("scanner:measurements",
+          get("processor:incremental-glm:measurements"));
     }
   }
 
   // check required acquisition parameters
   if(!isSet("scanner:tr")) {
     cerr << "ERROR: tr must be set!" << endl;
+    valid = false;
   }
 
   if(!isSet("scanner:measurements")) {
     cerr << "ERROR: number of measurements must be set!" << endl;
+    valid = false;
   }
 
   // study reference volume

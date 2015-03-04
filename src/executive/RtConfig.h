@@ -36,6 +36,8 @@
 #include"tinyxml/tinyxml.h"
 #include"RtConfigVal.h"
 #include<map>
+#include<string>
+#include<vector>
 
 using namespace std;
 
@@ -98,6 +100,18 @@ class RtConfig {
   //  out
   //   string representing the value
   TiXmlNode *getNode(const string &name, TiXmlNode *node = NULL);
+
+  // get all the option text values for the processing modules with a
+  // specified name.
+  //
+  // in
+  //  module_name is a string representing the module name attribute.
+  //  option_name is a string representing the option name attribute required.
+  // out
+  //  a list of the matching subnode option names.
+  vector<string> getProcessingModuleNames(const string &module_name,
+                                          const string &option_name);
+
 
   // determine if there is a value set for a particular config variable
   //  in

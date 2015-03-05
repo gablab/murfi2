@@ -28,7 +28,7 @@ Installation
 
 On recent Ubuntu distros, the following command will install all dependencies:
 
-    $ sudo apt-get install build-essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot-x11 libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev qt5-default libqt5*-dev
+    $ sudo apt-get install build-essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev qt5-default libqt5*-dev
 
 #### Compilation:
 

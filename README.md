@@ -28,7 +28,7 @@ Installation
 
 On recent Ubuntu distros, the following command will install all dependencies:
 
-    $ sudo apt-get install build_essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev qt5-default libqt5*-dev
+    $ sudo apt-get install build-essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev gnuplot-x11 libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev qt5-default libqt5*-dev
 
 #### Compilation:
 
@@ -49,6 +49,25 @@ Running the example
     $ murfi -f murfi_example_data/scripts/neurofeedback.xml
 
 In another terminal:
+
+    $ cd murfi_example_data/scripts
+    $ ./servedata.sh
+
+Using Vagrant
+-------------
+
+Download and install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/). Then download this [archive](https://github.com/gablab/murfi2/archive/master.zip). Requires an X-server installed locally.
+
+Unzip the archive and using a terminal change to the unzipped directory.
+
+    $ vagrant up
+    $ vagrant -X ssh
+    $ cd /vagrant
+    $ source murfi_vagrant.sh
+
+Then follow the [Running the example] section above.
+
+On another terminal from the same unzipped directory do:
 
     $ cd murfi_example_data/scripts
     $ ./servedata.sh

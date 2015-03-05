@@ -78,40 +78,6 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   unsigned int numSlices = vols->dim[3];
   unsigned int numImgs = vols->dim[4];
 
-  float voxDim[3];
-  voxDim[0] = vols->pixdim[1];
-  voxDim[1] = vols->pixdim[2];
-  voxDim[2] = vols->pixdim[3];
-
-  // AK: extracting rotation matrix
-
-  // scaling matrix
-  vnl_matrix_fixed<double,4,4> InvscaleMat;
-  InvscaleMat.set_identity();
-  InvscaleMat.put(0,0, -1/voxDim[0]);
-  InvscaleMat.put(1,1, -1/voxDim[1]);
-  InvscaleMat.put(2,2, 1/voxDim[2]);
-
-
-  // rotation matrix
-  vnl_matrix_fixed<double,4,4> vxl2rasMat;
-  vxl2rasMat.set_identity();
-
-  vxl2rasMat.put(0,0, vols->qto_xyz.m[0][0]);
-  vxl2rasMat.put(0,1, vols->qto_xyz.m[0][1]);
-  vxl2rasMat.put(0,2, vols->qto_xyz.m[0][2]);
-
-  vxl2rasMat.put(1,0, vols->qto_xyz.m[1][0]);
-  vxl2rasMat.put(1,1, vols->qto_xyz.m[1][1]);
-  vxl2rasMat.put(1,2, vols->qto_xyz.m[1][2]);
-
-  vxl2rasMat.put(2,0, vols->qto_xyz.m[2][0]);
-  vxl2rasMat.put(2,1, vols->qto_xyz.m[2][1]);
-  vxl2rasMat.put(2,2, vols->qto_xyz.m[2][2]);
-
-  vnl_matrix_fixed<double,4,4> rotMat;
-  rotMat = InvscaleMat*vxl2rasMat;
-
   float tr = (inputTr < 0) ? vols->pixdim[4] : inputTr;
 
   // validate
@@ -159,23 +125,15 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     ei->numSlices = numSlices;
     int gridSize = ceil(sqrt(numSlices));
 
+    ei->pixelSpacingReadMM = vols->pixdim[1];
+    ei->pixelSpacingPhaseMM = vols->pixdim[2];
     ei->pixelSpacingSliceMM = vols->pixdim[3];
 
-    ei->voxelToWorldMatrix[0][0] = rotMat[0][0];
-    ei->voxelToWorldMatrix[1][0] = rotMat[0][1];
-    ei->voxelToWorldMatrix[2][0] = rotMat[0][2];
-
-    ei->voxelToWorldMatrix[0][1] = rotMat[1][0];
-    ei->voxelToWorldMatrix[1][1] = rotMat[1][1];
-    ei->voxelToWorldMatrix[2][1] = rotMat[1][2];
-
-    ei->voxelToWorldMatrix[0][2] = rotMat[2][0];
-    ei->voxelToWorldMatrix[1][2] = rotMat[2][1];
-    ei->voxelToWorldMatrix[2][2] = rotMat[2][2];
-
-    ei->voxelToWorldMatrix[0][3] = vols->qto_xyz.m[0][3];
-    ei->voxelToWorldMatrix[1][3] = vols->qto_xyz.m[1][3];
-    ei->voxelToWorldMatrix[2][3] = vols->qto_xyz.m[2][3];
+    for (int r = 0; r < 4; r++) {
+      for (int c = 0; c < 4; c++) {
+	ei->voxelToWorldMatrix[r][c] = vols->qto_xyz.m[r][c];
+      }
+    }
 
     // mosaic
     short *newdata = new short[numPix];

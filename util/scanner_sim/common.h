@@ -13,9 +13,6 @@ void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
   ei->isLittleEndian = true;
   ei->isMosaic = true;
 
-  ei->numPixelsPhase = img->dim[1];
-  ei->numPixelsRead = img->dim[2];
-
   int gridSize = ceil(sqrt(numSlices));
   ei->pixelSpacingReadMM = img->pixdim[1];
   ei->pixelSpacingPhaseMM = img->pixdim[2];
@@ -28,11 +25,9 @@ void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
     }
   }
 
-  ei->numPixelsRead = img->dim[1] / gridSize;
-  ei->numPixelsPhase = img->dim[2] / gridSize;
+  ei->numPixelsRead = img->dim[1];
+  ei->numPixelsPhase = img->dim[2];
   ei->numSlices = numSlices;
-
-  // TODO set the voxelToWorldMatrix
 
   ei->repetitionTimeMS = img->pixdim[4];
   ei->repetitionDelayMS = 0;

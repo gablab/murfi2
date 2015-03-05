@@ -69,9 +69,7 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // set the number of measurements
   // NOTE: must be called before build()
 
-  void setNumMeas(unsigned int _numMeas) {
-    numMeas = _numMeas;
-  }
+  void setNumMeas(unsigned int _numMeas);
 
   // set the tr
   // NOTE: must be called before build()
@@ -80,8 +78,45 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
     tr = _tr;
   }
 
+  // tools for outside manipulation before build
+
+  // get the name of a condition
+  string getConditionName(size_t index) {
+    if (index >= numInputConditions) {
+      return "";
+    }
+
+    return conditionNames[index];
+  }
+
+  // get the number of existing input conditions
+  size_t getNumInputConditions() {
+    return numInputConditions;
+  }
+
+  // add an empty condition and set it to all zeros
+  void addCondition(const string &name, bool of_interest);
+
+  // set the value of one TR for a condition
+  void setConditionValueAtTR(size_t tr, size_t condition, double val);
+
+  // get the value of one TR for a condition
+  double getConditionValueAtTR(size_t tr, size_t condition);
+
   // build the design matrix from the configuration
   virtual bool build();
+
+  bool isBuilt() const {
+    return built;
+  }
+
+  double getTR() const {
+    return tr;
+  }
+
+  int getNumMeas() const {
+    return numMeas;
+  }
 
   // get the number of design matrix rows
 
@@ -106,6 +141,10 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 
   // get a design matrix column index
   unsigned int getColumnIndex(const string &name);
+
+  size_t getNumInputConditions() const {
+    return numInputConditions;
+  }
 
   // get event duration
 
@@ -184,6 +223,9 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // dummy stub
   virtual char* ditherTo8Bpp() { return NULL; }
 
+  // do the actual design matrix construction
+  bool buildDesignMatrix();
+
  protected:
 
   // sets the size (old data lost)
@@ -227,11 +269,8 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // read design matrix information from a text file
   bool loadDesignMatrixFile(string filename);
 
-  // do the actual design matrix construction
-  bool buildDesignMatrix();
-
   // data members
-  bool isBuilt;
+  bool built;
   unsigned int numAddedColumns; // number of columns filled in
   vector<bool> columnOfInterestIndicator; // columns of interest are true
   vector<string> columnNames; // vector of column names
@@ -322,6 +361,7 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // unnecessary columns will slow down
   // estimation a lil.
   unsigned int numArtifacts; // so far
+
 };
 
 #endif

@@ -64,6 +64,9 @@ const string NAME_TEMPVAR_IMG = "var-img";
 const string ID_SPATIALINTENSITYNORM = "spatial-intensity-norm";
 const string NAME_SPATIALINTENSITYNORM_IMG = "inorm-img";
 
+const string ID_MOTION = "motion";
+const string NAME_MOTION = "motion";
+
 // model fit ids
 const string ID_MODEL_FIT = "model-fit";
 const string ID_ACCUMCOR = "accumcor";

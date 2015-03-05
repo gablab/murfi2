@@ -1,5 +1,6 @@
 /*=========================================================================
- *  header file for the top level and main function for a real-time
+ *  header file for the top level and
+ *  main function for a real-time
  *  experiment
  *
  *  Copyright 2007-2013, the MURFI dev team.
@@ -25,6 +26,9 @@
 #include"RtConfigFmriRun.h"
 #include"RtDataStore.h"
 #include"RtInfoServer.h"
+
+// initialize the entire murfi system
+bool initializeSystem(int argc, char** args);
 
 // initialize the experiment (call before the first run is prepared)
 // returns true for success
@@ -55,6 +59,9 @@ double getExperimentElapsedTime();
 // get the configuration for this experiment
 RtConfigFmriExperiment &getExperimentConfig();
 
+// get the configuration for the current run (or NULL)
+RtConfigFmriRun* getRunConfig();
+
 // get the configuration filename for this experiment
 string getExperimentConfigFile();
 
@@ -69,5 +76,7 @@ unsigned int getSeriesNumFromUID(char *uid);
 
 // get a new unique series number
 unsigned int getNextUniqueSeriesNum();
+
+unsigned int getNumDataPointsForErrEst();
 
 #endif

@@ -14,7 +14,18 @@ import external_image
 import nibabel as nb
 import numpy as np
 
+from sklearn.externals import joblib
+
 SocketServer.TCPServer.allow_reuse_address = True
+
+import matplotlib.pyplot as plt
+mask = nb.load('rtsatra/merged_brain_mask.nii.gz').get_data()
+clf2 = joblib.load('rtsatra/model.pkl')
+img = plt.imread('AF02_AN/morph%03d.png' % 0)
+plt.clf()
+plt.imshow(img)
+plt.title('make her angry')
+plt.show(block=False)
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     def __init__(self, callback, infoclient, *args, **keys):
@@ -36,6 +47,7 @@ def handler_factory(callback, infoclient):
     return createHandler
 
 def process_data_callback(infoclient, sock):
+    print "received info"
     infoclient.process_data(sock)
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
@@ -104,10 +116,11 @@ class ImageReceiver(object):
         print "processing %d header data bytes" % len(in_bytes)
 
         hdr = self.ei.process_header(in_bytes)
+        print hdr
 
         # validation
         if self.current_uid != hdr.seriesUID:
-            assert hdr.currentTR == 1
+            #assert hdr.currentTR == 1
             self.current_uid = hdr.seriesUID
             self.current_series_hdr = hdr
 
@@ -115,6 +128,10 @@ class ImageReceiver(object):
         while len(img_data) < self.ei.get_image_size():
             in_bytes = sock.recv(4096)
             img_data += in_bytes
+
+        '''Uncommenting the following line will make things work
+        '''
+        img_data = img_data[:self.ei.get_image_size()]
 
         if len(img_data) != self.ei.get_image_size():
             raise ValueError(
@@ -130,6 +147,20 @@ class ImageReceiver(object):
                 self.imagestore.append(new_ei)
                 if not self.save_4d:
                     self.save_nifti(new_ei)
+                TRs = len(self.imagestore)
+                if TRs % 2 == 0:
+                    data = new_ei.get_data()
+                    probs = clf2.predict_proba(data[mask>0][None, :])
+                    picture_index = int(100*probs[0][0])
+                    img = plt.imread('AF02_AN/morph%03d.png' % picture_index)
+                    print picture_index
+                    plt.clf()
+                    plt.imshow(img)
+                    if int(TRs/30.) % 2 == 0:
+                        plt.title('make her angry: %d' % picture_index)
+                    else:
+                        plt.title('make her calm: %d' % picture_index)
+                    plt.draw()
 
             if hdr.currentTR + 1 == hdr.totalTR:
                 if self.save_4d:
@@ -143,9 +174,13 @@ class ImageReceiver(object):
     def save_nifti(self, img):
         if len(img.get_shape()) == 3 or img.get_shape()[3] == 1:
             index = len(self.imagestore) - 1
+            if index % 2 == 0:
+                imgtype = 'pro'
+            else:
+                imgtype = 'ret'
             filename = os.path.join(
                 self.save_location,
-                'img-%s-%05d.nii.gz' % (self.current_uid, index))
+                'img-%s-%s-%05d.nii.gz' % (self.current_uid, imgtype, index))
         else:
             filename = os.path.join(self.save_location,
                                     'img-%s.nii.gz' % self.current_uid)

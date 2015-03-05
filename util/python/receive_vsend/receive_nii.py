@@ -154,7 +154,7 @@ class ImageReceiver(object):
                 imgtype = 'ret'
             filename = os.path.join(
                 self.save_location,
-                'img-%s-%s-%05d.nii.gz' % (self.current_uid, imgtype, index))
+                'img-%s-%s-%05d.nii.gz' % (imgtype, self.current_uid, index))
         else:
             filename = os.path.join(self.save_location,
                                     'img-%s.nii.gz' % self.current_uid)

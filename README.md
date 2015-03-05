@@ -69,6 +69,7 @@ Then follow the [Running the example] section above.
 
 On another terminal from the same unzipped directory do:
 
+    $ vagrant ssh
     $ cd murfi_example_data/scripts
     $ ./servedata.sh
 

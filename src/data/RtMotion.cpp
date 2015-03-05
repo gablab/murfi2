@@ -19,12 +19,15 @@
 
 #include"RtMotion.h"
 
+#include "RtDataIDs.h"
+
 //*** constructors/destructors  ***//
 
 RtMotion::RtMotion() : RtData() {
   ACE_TRACE(("RtMRIImage::RtMotion()"));
 
-  dataID.setModuleID("motion");
+  dataID.setModuleID(ID_MOTION);
+  dataID.setDataName(NAME_MOTION);
 
   motion[TRANSLATION_X] = motion[TRANSLATION_Y] = motion[TRANSLATION_Z] =
       motion[ROTATION_X] = motion[ROTATION_Y] = motion[ROTATION_Z] = 0.0;

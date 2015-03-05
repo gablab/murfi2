@@ -50,6 +50,7 @@ class RtInputScannerImages : public RtInput {
 
   // initialize a series run
   // call this before each run
+  bool init();
   bool init(RtConfigFmriRun &config);
 
   // close and clean up
@@ -121,9 +122,6 @@ class RtInputScannerImages : public RtInput {
   // parms for image saving to disk
   bool   saveImagesToFile;
   bool unmosaicInputImages;
-
-  // current series number
-  unsigned int seriesNum;
 
   // whether alignment to previous series should be performed
   bool alignSeries;

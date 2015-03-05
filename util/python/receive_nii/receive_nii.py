@@ -117,7 +117,6 @@ class ImageReceiver(object):
         while len(img_data) < self.ei.get_image_size():
             in_bytes = sock.recv(4096)
             img_data += in_bytes
-
         '''Uncommenting the following line will make things work
         '''
         img_data = img_data[:self.ei.get_image_size()]

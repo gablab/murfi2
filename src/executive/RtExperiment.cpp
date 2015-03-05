@@ -23,11 +23,6 @@
 #include"RtConfigFmriExperiment.h"
 #include"RtConfigFmriRun.h"
 
-// old gui includes
-#ifdef USE_FRONTEND
-#include"RtDisplayImage.h"
-#endif
-
 // site specific defines (siteID, etc)
 #include"site_config.h"
 
@@ -45,47 +40,70 @@ using namespace boost::filesystem;
 #include"util/timer/timer.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// experiment data (all at static file scope)
+// experiment data
 //////////////////////////////////////////////////////////////////////////////
 
+namespace {
 // experiment configuration
-static RtConfigFmriExperiment config;
+RtConfigFmriExperiment config;
 
 // one or the other of these should be set to read the configuration
-static string confFilename;
-static string confXmlStr;
+string confFilename;
+string confXmlStr;
+
+string defaultConfigXML(
+  "<?xml version='1.0' encoding='UTF-8'?>"
+  "<scanner>"
+  "  <option name='disabled'>      false </option>"
+  "  <option name='receiveImages'> true </option>"
+  "  <option name='saveImages'>    true </option>"
+  "  <option name='port'>          15000 </option>"
+  "  <option name='onlyReadMoCo'>  false </option>"
+  "  <option name='unmosaic'>      true </option>"
+  "</scanner>"
+  "<infoserver>"
+  "    <option name='disabled'> false </option>"
+  "    <option name='port'> 15001 </option>"
+  "</infoserver>"
+);
 
 // store and allow access to collected and computed data
-static RtDataStore dataStore;
+RtDataStore dataStore;
 
 // tcpip interface to experiment information
-static RtInfoServer *infoServer = NULL;
+RtInfoServer *infoServer = NULL;
 
 // tcpip interface to scanner input
-static RtInputScannerImages scannerInput;
+RtInputScannerImages scannerInput;
 
 // conductor to execute fmri runs
-static RtConductor *conductor = NULL;
+RtConductor *conductor = NULL;
 
 // raw data identifiers that we've seen (need for knowing which data
 // streams are novel)
-static map<string, unsigned int> uids;
+map<string, unsigned int> uids;
 
 // number of unique input data series we've seen
-static unsigned int numExistingSeries;
+unsigned int numExistingSeries;
 
 // unique id for this study (date and time of first initialization)
-static unsigned int studyID;
+unsigned int studyID;
 
 // list of mask filenames to align
-static vector<string> masksToAlign;
+vector<string> masksToAlign;
 
 // timers
-static timer experimentTimer;
-static timer computeTimer;
+timer experimentTimer;
+timer computeTimer;
 
-static string execName;
+string execName;
 
+string subjectName;
+string subjectsDir;
+
+unsigned int numDataPointsForErrEst = 0;
+
+} // anonymous namespace
 
 //* methods for retreiving info about the the experiment *//
 
@@ -183,6 +201,10 @@ RtConductor &getConductor() {
   return *conductor;
 }
 
+unsigned int getNumDataPointsForErrEst() {
+  return numDataPointsForErrEst;
+}
+
 // initialize the experiment (call before the first run is prepared)
 // returns true for success
 bool initExperiment() {
@@ -203,6 +225,9 @@ bool initExperiment() {
   if(!confFilename.empty()) { // look first to a file
     cout << "parsing config file...";
 
+    config.set("study:subject:name", subjectName);
+    config.set("study:subjectsDir", subjectsDir);
+
     if(!config.parseConfigFile(confFilename)) {
       cout << "failed" << endl;
       cerr << "ERROR: failed to parse config file: " << confFilename << endl;
@@ -211,7 +236,16 @@ bool initExperiment() {
 
     cout << "done" << endl;
   }
-  else if(!confXmlStr.empty()) { // next look to a string
+  else { // next look to a string
+    if(confXmlStr.empty()) {
+      confXmlStr = defaultConfigXML;
+    }
+
+    // TODO: what to do when subject or subjects dir is set in the
+    // config string?
+    config.set("study:subject:name", subjectName);
+    config.set("study:subjectsDir", subjectsDir);
+
     cout << "parsing config xml string...";
 
     if(!config.parseConfigStr(confXmlStr)) {
@@ -221,10 +255,6 @@ bool initExperiment() {
     }
 
     cout << "done" << endl;
-  }
-  else { // error, no config
-    cerr << "ERROR: no experiment configuration provided" << endl;
-    return false;
   }
 
   // count existing series for this experiment
@@ -240,26 +270,19 @@ bool initExperiment() {
 
 
   // start info server
-  if(config.isSet("infoserver:disabled")
-     && config.get("infoserver:disabled")==false) {
-    infoServer = new RtInfoServer();
-    if(!infoServer->open(config)) {
-      cerr << "ERROR: could not initialize info server" << endl;
-    }
-    else {
-      infoServer->activate(); // start the info server thread
-    }
+  infoServer = new RtInfoServer();
+  if(!infoServer->open(config)) {
+    cerr << "ERROR: could not initialize info server" << endl;
+  }
+  else {
+    infoServer->activate(); // start the info server thread
   }
 
-  // start scanner listener
-  if(config.isSet("scanner:disabled")
-     && config.get("scanner:disabled")==false) {
-    if(!scannerInput.open(config)) {
-      cerr << "ERROR: could not add scanner input" << endl;
-    }
-    else {
-      scannerInput.activate(); // start the scanner input thread
-    }
+  if(!scannerInput.open(config)) {
+    cerr << "ERROR: could not add scanner input" << endl;
+  }
+  else {
+    scannerInput.activate(); // start the scanner input thread
   }
 
   return true;
@@ -300,6 +323,9 @@ bool deinitExperiment() {
 
 // initialize and run the backend computation system
 int executeRun(RtConfigFmriRun &conf) {
+
+  numDataPointsForErrEst = conf.get(
+    "processor:current-activation:numDataPointsForErrEst");
 
   // make sure only one backend is running at a time
   if(conductor != NULL && conductor->isRunning()) {
@@ -424,26 +450,46 @@ bool parseArgs(int argc, char **args) {
     }
   }
 
-  // parse the xml config (file or string)
-  if(confFilename.empty() && confXmlStr.empty()) {
-    cerr << "ERROR: no configuration specified" << endl;
+  // // parse the xml config (file or string)
+  // if(confFilename.empty() && confXmlStr.empty()) {
+  //   cerr << "ERROR: no configuration specified" << endl;
+  //   return false;
+  // }
+  // else if(DEBUG_LEVEL & BASIC) {
+  //   cout << "config file is: " << confFilename << endl
+  //        << "config str is: " << confXmlStr << endl;
+  // }
+
+  return true;
+}
+
+bool initializeSystem(int argc, char** args) {
+  // get subject's directory
+  if (getenv("MURFI_SUBJECT_NAME") == NULL ||
+      getenv("MURFI_SUBJECTS_DIR") == NULL) {
+    cout << "ERROR: The environment variables MURFI_SUBJECT_NAME and "
+         << "MURFI_SUBJECTS_DIR must be set."
+         << endl;
     return false;
   }
-  else if(DEBUG_LEVEL & BASIC) {
-    cout << "config file is: " << confFilename << endl
-         << "config str is: " << confXmlStr << endl;
+
+  subjectName = getenv("MURFI_SUBJECT_NAME");
+  subjectsDir = getenv("MURFI_SUBJECTS_DIR");
+
+  // setup arguments
+  if(!parseArgs(argc, args)) {
+    printUsage();
+    return false;
   }
 
   return true;
 }
 
-// main entry function
-int ACE_TMAIN(int argc, char **args) {
+int murfi(int argc, char** args) {
   ACE_TRACE(("ACE_TMAIN"));
 
-  // setup arguments
-  if(!parseArgs(argc,args)) {
-    printUsage();
+  // initialize the system
+  if (!initializeSystem(argc, args)) {
     return 1;
   }
 
@@ -451,7 +497,7 @@ int ACE_TMAIN(int argc, char **args) {
   if(!initExperiment()) {
     cerr << "ERROR: experiment initialization failed. check your config"
          << endl;
-    return 1;
+    return false;
   }
 
   int result = 0;
@@ -462,18 +508,12 @@ int ACE_TMAIN(int argc, char **args) {
      (config.isSet("oldgui:disabled") && // "backward" compatibility
       config.get("oldgui:disabled")==false)) {
 
-#ifdef USE_FRONTEND
-    // start a display
-    RtDisplayImage dispImg;
-    if(!dispImg.open(config)) {
-      cerr << "ERROR: could not open display" << endl;
-      result = 1;
-    }
-    result = dispImg.svc();
-#else
+#ifndef USE_FRONTEND
     cerr << "ERROR: this build does not support the gui frontend" << endl;
+    return 1;
 #endif
 
+    return 0;
   }
   else { // just run once in the terminal with the passed config
     RtConfigFmriRun runConf;
@@ -503,3 +543,10 @@ int ACE_TMAIN(int argc, char **args) {
 
   return result;
 }
+
+// main entry function
+#ifndef USE_FRONTEND
+int ACE_TMAIN(int argc, char **args) {
+  return murfi(argc, args);
+}
+#endif

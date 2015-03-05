@@ -100,6 +100,12 @@ bool RtConfigFmriExperiment::validateConfig() {
   set("study:directory",p.string());
   path studyDir(p); // for local use
 
+  // create the study directory if it does not exist
+  if(!exists(studyDir)) {
+    cout << "creating study directory: " << studyDir.string() << endl;
+    create_directory(studyDir);
+  }
+
   if(!( exists(p) && is_directory(p) )) {
     cerr << "ERROR: study directory " << p.string() << " is bad" << endl;
     valid = false;

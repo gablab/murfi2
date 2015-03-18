@@ -64,6 +64,7 @@ Unzip the archive and using a terminal change to the unzipped directory.
     $ vagrant -X ssh
     $ cd /vagrant
     $ source murfi_vagrant.sh
+    $ make -j2 # first time only to compile murfi
 
 Then follow the [Running the example] section above.
 

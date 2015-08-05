@@ -30,6 +30,7 @@ RtMaskLoad::RtMaskLoad() : RtStreamComponent(),
                            align(true),
                            mosaic(false),
                            unmosaic(true),
+                           flipLR(false),
                            dynamic(false),
                            save(true),
                            maskLoad(NULL) {

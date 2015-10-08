@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "QColor"
+#include "QMouseEvent"
 #include "QObject"
 
 #include "RtDataID.h"
@@ -36,6 +37,13 @@ class PlotController : public QObject {
 
   void handleData(QString qid);
 
+ private slots:
+
+  void mouseMoveSignal(QMouseEvent *event);
+  void mousePressSignal(QMouseEvent *event);
+  void mouseReleaseSignal(QMouseEvent *event);
+  void beforeReplot();
+
  private:
 
   void updateTRIndicators();
@@ -61,4 +69,8 @@ class PlotController : public QObject {
   QCPItemLine *motion_tr_indicator;
 
   unsigned int current_tr;
+
+  bool dragging_legend;
+  QPointF drag_legend_origin;
+
 };

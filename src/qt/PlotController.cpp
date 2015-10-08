@@ -28,6 +28,7 @@ PlotController::PlotController(QCustomPlot *design_plot,
   , roi_tr_indicator(new QCPItemLine(roi_plot))
   , motion_tr_indicator(new QCPItemLine(motion_plot))
   , current_tr(0)
+  , dragging_legend(false)
 {
   baseline_box = new QCPItemRect(design_plot);
   baseline_box->setPen(QPen(QColor(178, 178, 178)));
@@ -48,7 +49,9 @@ PlotController::PlotController(QCustomPlot *design_plot,
   roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);
   roi_plot->yAxis->setRange(-3, 3);
-  roi_plot->legend->setVisible(true);
+
+  roi_plot->axisRect()->insetLayout()->setInsetPlacement(
+    0, QCPLayoutInset::ipFree);
 
   motion_plot->addItem(motion_tr_indicator);
   motion_plot->yAxis->setRange(-2, 2);
@@ -58,6 +61,15 @@ PlotController::PlotController(QCustomPlot *design_plot,
   }
 
   updateTRIndicators();
+
+  connect(roi_plot, SIGNAL(mouseMove(QMouseEvent*)),
+          this, SLOT(mouseMoveSignal(QMouseEvent*)));
+  connect(roi_plot, SIGNAL(mousePress(QMouseEvent*)),
+          this, SLOT(mousePressSignal(QMouseEvent*)));
+  connect(roi_plot, SIGNAL(mouseRelease(QMouseEvent*)),
+          this, SLOT(mouseReleaseSignal(QMouseEvent*)));
+  connect(roi_plot, SIGNAL(beforeReplot()),
+          this, SLOT(beforeReplot()));
 }
 
 PlotController::~PlotController() {
@@ -94,6 +106,7 @@ void PlotController::handleData(QString qid) {
       roi_plot->graph(it->second)->setPen(QPen(roi_colormap.getColorForName(
                                                  id.getRoiID())));
       roi_plot->graph(it->second)->setName(QString(id.getRoiID().c_str()));
+      roi_plot->legend->setVisible(true);
     }
 
     RtActivation *val = static_cast<RtActivation*>(getDataStore().getData(id));
@@ -179,4 +192,42 @@ void PlotController::plotMotion(RtMotion* motion) {
 void PlotController::replotDesign(RtDesignMatrix *design) {
   design_plot->clearPlottables();
   plotDesign(design);
+}
+
+void PlotController::mouseMoveSignal(QMouseEvent *event) {
+  if (dragging_legend) {
+    QRectF rect = roi_plot->axisRect()->insetLayout()->insetRect(0);
+
+    QPointF mousePoint((event->pos().x() - roi_plot->axisRect()->left()) /
+                       (double) roi_plot->axisRect()->width(),
+                       (event->pos().y() - roi_plot->axisRect()->top()) /
+                       (double) roi_plot->axisRect()->height());
+    rect.moveTopLeft(mousePoint - drag_legend_origin);
+    roi_plot->axisRect()->insetLayout()->setInsetRect(0, rect);
+    roi_plot->replot();
+  }
+}
+
+void PlotController::mousePressSignal(QMouseEvent *event) {
+  if (roi_plot->legend->selectTest(event->pos(), false) > 0) {
+    cout << event->pos().x() << " " << event->pos().y() << endl;
+
+    dragging_legend = true;
+
+    QPointF mousePoint((event->pos().x() - roi_plot->axisRect()->left()) /
+                       (double) roi_plot->axisRect()->width(),
+                       (event->pos().y() - roi_plot->axisRect()->top()) /
+                       (double) roi_plot->axisRect()->height());
+    drag_legend_origin =
+      mousePoint - roi_plot->axisRect()->insetLayout()->insetRect(0).topLeft();
+  }
+}
+
+void PlotController::mouseReleaseSignal(QMouseEvent *event) {
+  Q_UNUSED(event)
+  dragging_legend = false;
+}
+
+void PlotController::beforeReplot() {
+  roi_plot->legend->setMaximumSize(roi_plot->legend->minimumSizeHint());
 }

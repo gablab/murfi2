@@ -25,7 +25,7 @@ def demosaic(mosaic, x, y, z):
     data = np.zeros((x, y, z), dtype=mosaic.dtype)
     x,y,z = data.shape
     n = np.ceil(np.sqrt(z))
-    dim = np.sqrt(np.prod(mosaic.shape))
+    dim = int(np.sqrt(np.prod(mosaic.shape)))
     mosaic = mosaic.reshape(dim, dim)
     for idx in range(z):
         x_idx = int(np.floor(idx/n)) * x

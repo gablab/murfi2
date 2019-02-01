@@ -244,7 +244,7 @@ template<class T>
 bool RtDataImage<T>::writeRaw(const string &_filename) {
   ACE_TRACE(("RtDataImage<T>::write"));
 
-  ofstream imgFile(_filename.c_str(), ios::out | ios::binary);
+  std::ofstream imgFile(_filename.c_str(), ios::out | ios::binary);
 
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for writing an image\n"),
@@ -462,7 +462,7 @@ bool RtDataImage<T>::readRaw(const string &_filename) {
     delete [] data;
   }
 
-  ifstream imgFile(_filename.c_str(), ios::in | ios::binary);
+  std::ifstream imgFile(_filename.c_str(), ios::in | ios::binary);
 
   if(imgFile.fail()) {
     ACE_DEBUG((LM_DEBUG, ACE_TEXT("could not open %s for reading an image\n"),

@@ -68,7 +68,7 @@ class RtOutputFile : public RtOutput {
  protected:
 
   //*** private data members  ***//
-  ofstream outfp;
+  std::ofstream outfp;
 
 };
 

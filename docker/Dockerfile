@@ -1,3 +1,18 @@
+# Dockerfile for murfi2. Dependencies are all installed as pre-compiled pacakges.
+#
+# Please note that because murfi has a GUI, the version of OpenGL has to be the
+# same -- similar is probably fine -- on the host and within the container.
+# The root operating system of this container is debian:jessie, which was
+# initially released in April, 2015. If you get output like
+#
+#     X Error of failed request:  GLXBadContext
+#       Major opcode of failed request:  151 (GLX)
+#       Minor opcode of failed request:  6 (X_GLXIsDirect)
+#       Serial number of failed request:  45
+#
+# then please try using the Dockerfile that builds things from source. You can
+# choose a base image that suits your host.
+
 ARG DEBIAN_FRONTEND="noninteractive"
 
 FROM debian:jessie-slim as builder

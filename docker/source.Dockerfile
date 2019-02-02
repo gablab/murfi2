@@ -1,3 +1,17 @@
+# Dockerfile for murfi2. Most dependencies are compiled from source, except Qt5
+# and libace.
+#
+# Please note that because murfi has a GUI, the version of OpenGL has to be the
+# same -- similar is probably fine -- on the host and within the container.
+# The root operating system of this container is ubuntu:18.04, which was
+# released in April, 2018. If you get output like
+#
+#     X Error of failed request:  GLXBadContext
+#       Major opcode of failed request:  151 (GLX)
+#       Minor opcode of failed request:  6 (X_GLXIsDirect)
+#       Serial number of failed request:  45
+#
+# you should choose a different base image that better suits your host.
 
 FROM buildpack-deps:18.04 as builder
 

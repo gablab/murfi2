@@ -1,2 +1,3 @@
-Dockerfile
-source.Dockerfile
+.dockerignore
+docker/source.Dockerfile
+docker/Dockerfile

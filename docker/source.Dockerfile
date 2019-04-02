@@ -99,12 +99,14 @@ RUN ln -sv /src/murfi/bin/murfi \
            /usr/bin/ \
     && apt-get update -qq \
     && apt-get install --yes --no-install-recommends --quiet \
+        iputils-ping \
         libace-6.4.5 \
         libqt5core5a \
         libqt5gui5 \
         libqt5opengl5 \
         libqt5printsupport5 \
         libqt5widgets5 \
+        net-tools \
     && rm -rf /var/lib/apt/lists/*
 
 CMD ["/src/murfi/bin/murfi"]

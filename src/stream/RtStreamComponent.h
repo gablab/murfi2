@@ -224,7 +224,7 @@ class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH>, public RtOutput {
   string maskRoiID;
 
   // file to log processing results to
-  ofstream ofile;
+  std::ofstream ofile;
   string outFilename;
 
   // create mutex for datastore lockdown
@@ -233,7 +233,7 @@ class RtStreamComponent : public ACE_Task<ACE_MT_SYNCH>, public RtOutput {
   // for logging the analysis process
   bool dumpAlgoVars;
   string dumpAlgoVarsFilename;
-  ofstream dumpFile;
+  std::ofstream dumpFile;
 };
 
 #endif

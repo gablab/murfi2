@@ -29,7 +29,8 @@
 #include"RtDataIDs.h"
 #include"RtLimit.h"
 
-#include<vcl_istream.h>
+#include <istream>
+#include <vcl_compiler.h>
 
 #include<algorithm>
 #include<fstream>
@@ -666,7 +667,7 @@ vnl_vector<double> &RtDesignMatrix::getHiresTemporalDerivativeBasis() {
 
 // loads an hrf vector from a file
 bool RtDesignMatrix::loadHrfFile(vnl_vector<double> &hrf, string filename) {
-  vcl_ifstream in(filename.c_str(), ios::in);
+  std::ifstream in(filename.c_str(), ios::in);
   if (in.fail()) {
     return false;
   }
@@ -1036,7 +1037,7 @@ unsigned int RtDesignMatrix::addColumn(const vnl_vector<double> &vals,
 //   file
 bool RtDesignMatrix::loadDesignMatrixFile(string filename) {
   // declare file stream
-  ifstream in(filename.c_str(), ifstream::in);
+  std::ifstream in(filename.c_str(), std::ifstream::in);
 
   // check file
   if (!in.good()) {
@@ -1144,7 +1145,7 @@ void RtDesignMatrix::print() {
 
 // save the matrix to a file
 bool RtDesignMatrix::save(const string& filename) const {
-  ofstream out(filename.c_str());
+  std::ofstream out(filename.c_str());
   if(!out.good()) {
     return false;
   }

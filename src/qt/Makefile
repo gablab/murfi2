@@ -23,7 +23,6 @@ MOC_INC = -I/usr/include/c++/4.8 \
           -I/usr/include
 
 QT_DEF = -D_REENTRANT \
-         -fPIE \
          -DQT_QML_DEBUG \
          -DQT_DECLARATIVE_DEBUG \
          -DQT_WIDGETS_LIB \
@@ -37,7 +36,7 @@ QT_DEF = -D_REENTRANT \
 
 $(OBJ_DIR)/%.o: %.cpp ui_MainWindow.h
 	@$(ECHO) '[make: building $@]'
-	$(CC) $(C_FLAGS) -o $@ -c -m64 -pipe -Wall $(QT_DEF) $(QT_INC) $<
+	$(CC) $(C_FLAGS) -o $@ -c -m64 -pipe -Wall -fPIC $(QT_DEF) $(QT_INC) $<
 
 HDR_FILES = $(wildcard *.h)
 SRC_FILES = $(wildcard ./*.cpp)

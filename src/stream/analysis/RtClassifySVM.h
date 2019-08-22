@@ -43,7 +43,7 @@ class RtClassifySVM : public RtStreamComponent {
 
   // file to save the predictions to
   string svmResultsFile;
-  ofstream svmResultsStream;
+  std::ofstream svmResultsStream;
 
   // svm parameters
   Parms svmParms;

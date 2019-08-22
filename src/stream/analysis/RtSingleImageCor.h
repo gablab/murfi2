@@ -100,7 +100,7 @@ class RtSingleImageCor : public RtIncrementalGLM {
 
   bool dumpAlgoVars;
   string dumpAlgoVarsFilename;
-  ofstream dumpFile;
+  std::ofstream dumpFile;
 };
 
 #endif

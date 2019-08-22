@@ -60,7 +60,7 @@ bool RtOutputFile::open(RtConfig &config) {
   }
 
   cout << "opening logfile " << logname << endl;
-  outfp.open(logname.c_str(), fstream::out | fstream::app);
+  outfp.open(logname.c_str(), std::fstream::out | std::fstream::app);
 
   // check
   if(outfp.fail()) {

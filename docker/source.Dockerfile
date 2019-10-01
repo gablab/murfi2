@@ -62,7 +62,7 @@ RUN curl -fsSL https://versaweb.dl.sourceforge.net/project/niftilib/nifticlib/ni
 
 # Build and install gsl.
 WORKDIR /src/gsl
-RUN curl -fsSL https://mirror.leifrogers.com/gnu/gsl/gsl-2.5.tar.gz \
+RUN curl -fsSL  https://ftpmirror.gnu.org/gsl/gsl-2.5.tar.gz \
     | tar xz --strip-components 1 \
     && ./configure --prefix=/usr \
     && make -j$NPROC \

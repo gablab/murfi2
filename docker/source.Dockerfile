@@ -42,7 +42,7 @@ RUN apt-get update -qq \
 
 # Build and install Boost (filesystem and system).
 WORKDIR /src/boost
-RUN curl -fsSL https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz \
+RUN curl -fsSL https://boostorg.jfrog.io/artifactory/main/release/1.69.0/source/boost_1_69_0.tar.gz \
     | tar xz --strip-components 1 \
     && ./bootstrap.sh \
     && ./b2 -j$NPROC --stagedir=/usr --with-filesystem --with-system \

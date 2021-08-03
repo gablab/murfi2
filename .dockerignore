@@ -1,3 +1,7 @@
 .dockerignore
+.git
+.idea
+.vagrant
 docker/source.Dockerfile
 docker/Dockerfile
+README.md

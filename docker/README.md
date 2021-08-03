@@ -38,7 +38,7 @@ sudo singularity build murfi2.sif docker-daemon://murfi2:latest
 
 Please note the use of `sudo` here. Root access is necessary to interact with the Docker daemon.
 
-## Running the example using the Singularity container
+## Downloading a dataset to run the example
 
 Before running murfi, please download the example data and set environment variables.
 
@@ -47,6 +47,16 @@ curl -fsSL https://dl.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar
 export MURFI_SUBJECTS_DIR="$PWD"
 export MURFI_SUBJECT_NAME=murfi_example_data
 ```
+
+## Running the example using the Docker container
+
+Using the docker image, you can run murfi in a windowed setting or in
+the background.
+
+TODO
+
+
+## Running the example using the Singularity container
 
 Next, you can run murfi. `murfi2.sif` is the path to the Singularity container, which is a file. The `murfi` bit after the path to the container is the command that is executed within the container. Everything after `murfi` is arguments that are passed to `murfi`.
 

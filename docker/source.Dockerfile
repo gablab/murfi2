@@ -109,4 +109,67 @@ RUN ln -sv /src/murfi/bin/murfi \
         net-tools \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get -y update \
+   && DEBIAN_FRONTEND="noninteractive" apt-get install -y dbus-x11 \
+       firefox \
+       xfce4 \
+       xfce4-panel \
+       xfce4-session \
+       xfce4-terminal \
+       xfce4-settings \
+       xorg \
+       xubuntu-icon-theme \
+       wget \
+       curl \
+       python3-distutils \
+       gcc \
+       make \
+       locales \
+    && rm -rf /tmp/* \
+    && rm -rf /var/lib/apt/lists/* \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+ENV LANG en_US.utf8
+
+ARG WEBSOCKIFY_VERSION=0.10.0
+ARG NOVNC_VERSION=1.2.0
+
+RUN curl -fsSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.tar.gz | tar -xzf - -C /opt && \
+    curl -fsSL https://github.com/novnc/websockify/archive/v${WEBSOCKIFY_VERSION}.tar.gz | tar -xzf - -C /opt && \
+    mv /opt/noVNC-${NOVNC_VERSION} /opt/noVNC && \
+    mv /opt/websockify-${WEBSOCKIFY_VERSION} /opt/websockify && \
+    ln -s /opt/noVNC/vnc_lite.html /opt/noVNC/index.html && \
+    cd /opt && curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python3 get-pip.py && \
+    cd /opt/websockify && pip install . && make
+
+# Remove light-locker to prevent screen lock
+ARG TURBOVNC_VERSION=2.2.6
+RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -O turbovnc_${TURBOVNC_VERSION}_amd64.deb && \
+    apt-get install -y -q ./turbovnc_${TURBOVNC_VERSION}_amd64.deb && \
+    apt-get remove -y -q light-locker && \
+    rm ./turbovnc_${TURBOVNC_VERSION}_amd64.deb && \
+    ln -s /opt/TurboVNC/bin/* /usr/local/bin/ && \
+    mkdir -p ~/.vnc && \
+    bash -c "echo 'murfi123' | vncpasswd -f > ~/.vnc/passwd" && \
+    chmod 0600 ~/.vnc/passwd \
+    && rm -rf /tmp/*
+
+RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyter-remote-desktop-proxy/main/jupyter_desktop/share/xstartup -O /opt/xstartup \
+    && chmod +x /opt/xstartup
+
+RUN useradd -m -u 1000 -s /bin/bash murfi && \
+    usermod -aG sudo murfi
+
+USER 1000
+
+RUN mkdir -p ~/.vnc && \
+    bash -c "echo 'murfi123' | vncpasswd -f > ~/.vnc/passwd" && \
+    chmod 0600 ~/.vnc/passwd
+
+WORKDIR /home/murfi
+
 CMD ["/src/murfi/bin/murfi"]
+
+# vncserver -SecurityTypes None -xstartup /opt/xstartup :1
+# /opt/websockify/websockify.py -v --web /opt/noVNC/ --heartbeat 30 8080 localhost:5901

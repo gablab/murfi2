@@ -169,7 +169,7 @@ RUN mkdir -p ~/.vnc && \
 
 WORKDIR /home/murfi
 
-CMD ["/src/murfi/bin/murfi"]
+# CMD ["/src/murfi/bin/murfi"]
 
 # vncserver -SecurityTypes None -xstartup /opt/xstartup :1
 # /opt/websockify/websockify.py -v --web /opt/noVNC/ --heartbeat 30 8080 localhost:5901

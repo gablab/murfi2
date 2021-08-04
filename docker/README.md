@@ -53,8 +53,47 @@ export MURFI_SUBJECT_NAME=murfi_example_data
 Using the docker image, you can run murfi in a windowed setting or in
 the background.
 
-TODO
+```
+docker run -it --rm -v $(pwd):/data --name murfi -p 8080:8080 -p 15000:15000 -p 15001:15001 --hostname murfi satra/murfi2
+```
 
+```
+vncserver -SecurityTypes None -xstartup /opt/xstartup :1
+/opt/websockify/websockify.py -v --web /opt/noVNC/ --heartbeat 30 8080 localhost:5901
+```
+
+Open `loclhost:8080` in your browser. The first time you use it, you will be 
+prompted for a password. The default password in the Dockerfile is `murfi123`. 
+Once you are in accept the default message, and then start a terminal. 
+
+```
+cd /data
+export MURFI_SUBJECTS_DIR="$PWD"
+export MURFI_SUBJECT_NAME=murfi_example_data
+murfi -f murfi_example_data/scripts/neurofeedback.xml
+```
+
+To retrieve data from murfi based on the calculations murfi is doing using the 
+ROIs, you can use the communicator test program. Note this test setup has to be 
+started before the next step of sending data to murfi.
+
+```
+cd util/python/communicator
+python test_murfi_communicator.py
+```
+
+Now start a separate docker instance to mimic the scanner.
+
+```
+docker run -it --rm -v $(pwd):/data --name scanner --hostname scanner  satra/murfi2
+```
+
+and then inside the container instance do:
+
+```
+cd /data/murfi_example_data/scripts
+./servedata.sh 3000 15000 host.docker.internal
+```
 
 ## Running the example using the Singularity container
 

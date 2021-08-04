@@ -8,9 +8,9 @@ from murfi_activation_communicator import MurfiActivationCommunicator
 
 def main(argv):
 
-    roi_names = ['pcc', 'brain-pcc']
+    roi_names = ['active']
     communicator = MurfiActivationCommunicator('localhost',
-                                               15001, 100,
+                                               15001, 85,
                                                roi_names)
 
     while True:
@@ -18,7 +18,7 @@ def main(argv):
 
         for roi in roi_names:
             try:
-                print "%s: %f" % (roi, communicator.get_roi_activation(roi))
+                print(f"{roi}: {communicator.get_roi_activation(roi)}")
             except:
                 pass
 

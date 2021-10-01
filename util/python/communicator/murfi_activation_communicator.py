@@ -32,7 +32,7 @@ class MurfiActivationCommunicator:
         if not self._fake:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self._ip, self._port))
-            sock.send(mesg)
+            sock.send(mesg.encode())
             resp = sock.recv(4096)
             sock.close()
             return resp
@@ -47,7 +47,7 @@ class MurfiActivationCommunicator:
         to_send = self._roi_query
         to_send = to_send.replace('__TR__', str(tr + 1))
         to_send = to_send.replace('__ROI__', roi_name)
-        resp = self._send(to_send)
+        resp = self._send(to_send).decode()
 
         stripped = re.sub("<.*?>", "", resp)
         try:
@@ -70,7 +70,7 @@ class MurfiActivationCommunicator:
         return self._rois[roi_name]['activation'][tr]
 
     def update(self):
-        for roi_name, roi in self._rois.iteritems():
+        for roi_name, roi in self._rois.items():
             if roi['last_tr'] >= self._num_trs:
                 continue
 

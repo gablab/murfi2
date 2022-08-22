@@ -139,7 +139,7 @@ RUN curl -fsSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.tar.gz |
     mv /opt/noVNC-${NOVNC_VERSION} /opt/noVNC && \
     mv /opt/websockify-${WEBSOCKIFY_VERSION} /opt/websockify && \
     ln -s /opt/noVNC/vnc_lite.html /opt/noVNC/index.html && \
-    cd /opt && curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    cd /opt && curl -sSL https://bootstrap.pypa.io/pip/3.6/get-pip.py -o get-pip.py && \
     python3 get-pip.py && \
     cd /opt/websockify && pip install . && make
 

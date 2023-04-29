@@ -962,8 +962,6 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
     motID.setSeriesNum(DATAID_NUM_WILDCARD_VALUE);
     motID.setDataName(DATAID_STRING_UNSET_VALUE);
 
-    cout << motID.toString() << endl;
-
     RtMotion *mot = static_cast<RtMotion*> (getDataStore().getData(motID));
 
     if (mot != NULL) {

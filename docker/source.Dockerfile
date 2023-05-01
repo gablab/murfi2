@@ -18,6 +18,23 @@ FROM buildpack-deps:18.04 as builder
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG NPROC="8"
 
+#-----------------------------------------------------------
+# Install FSL v5.0.10
+# FSL is non-free. If you are considering commerical use
+# of this Docker image, please consult the relevant license:
+# https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+#-----------------------------------------------------------
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends bc dc libfontconfig1 libfreetype6 libgl1-mesa-dev libglu1-mesa-dev libgomp1 libice6 libmng2 libxcursor1 libxft2 libxinerama1 libxrandr2 libxrender1 libxt6 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && echo "Downloading FSL ..." \
+    && curl -sSL --retry 5 https://fsl.fmrib.ox.ac.uk/fsldownloads/fsl-5.0.10-centos6_64.tar.gz \
+    | tar zx -C /opt \
+    && /bin/bash /opt/fsl/etc/fslconf/fslpython_install.sh -q -f /opt/fsl
+
+ENV FSLDIR=/opt/fsl \
+    PATH=/opt/fsl/bin:$PATH
+
 # Build and install CMake.
 WORKDIR /src/cmake
 RUN curl -fsSL https://github.com/Kitware/CMake/releases/download/v3.13.3/cmake-3.13.3.tar.gz \
@@ -77,6 +94,7 @@ RUN apt-get update -qq \
     && rm -rf /var/lib/apt/lists/* \
     && ln -sv /usr/include/x86_64-linux-gnu/qt5 /usr/include/qt5
 
+
 # Build murfi.
 WORKDIR /src/murfi
 COPY [".", "."]
@@ -84,7 +102,13 @@ RUN make clean \
     && make -j8
 
 
+
+
 FROM ubuntu:18.04
+COPY --from=builder /opt/fsl /opt/fsl
+ENV FSLDIR=/opt/fsl \
+        PATH=/opt/fsl/bin:$PATH
+
 COPY --from=builder [ \
     "/usr/lib/libACE-6.4.5.so", \
     "/usr/lib/libniftiio.so.2", \
@@ -108,6 +132,7 @@ RUN ln -sv /src/murfi/bin/murfi \
         libqt5widgets5 \
         net-tools \
     && rm -rf /var/lib/apt/lists/*
+
 
 RUN apt-get -y update \
    && DEBIAN_FRONTEND="noninteractive" apt-get install -y dbus-x11 \
@@ -134,12 +159,14 @@ ENV LANG en_US.utf8
 ARG WEBSOCKIFY_VERSION=0.10.0
 ARG NOVNC_VERSION=1.2.0
 
+
+
 RUN curl -fsSL https://github.com/novnc/noVNC/archive/v${NOVNC_VERSION}.tar.gz | tar -xzf - -C /opt && \
     curl -fsSL https://github.com/novnc/websockify/archive/v${WEBSOCKIFY_VERSION}.tar.gz | tar -xzf - -C /opt && \
     mv /opt/noVNC-${NOVNC_VERSION} /opt/noVNC && \
     mv /opt/websockify-${WEBSOCKIFY_VERSION} /opt/websockify && \
     ln -s /opt/noVNC/vnc_lite.html /opt/noVNC/index.html && \
-    cd /opt && curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    cd /opt && curl -sSL https://bootstrap.pypa.io/pip/3.6/get-pip.py -o get-pip.py && \
     python3 get-pip.py && \
     cd /opt/websockify && pip install . && make
 
@@ -155,7 +182,7 @@ RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}
     chmod 0600 ~/.vnc/passwd \
     && rm -rf /tmp/*
 
-RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyter-remote-desktop-proxy/main/jupyter_desktop/share/xstartup -O /opt/xstartup \
+RUN wget -q https://raw.githubusercontent.com/jupyterhub/jupyter-remote-desktop-proxy/ee28879a7be3e85689f8e65425242d0631f952a8/jupyter_remote_desktop_proxy/share/xstartup -O /opt/xstartup \
     && chmod +x /opt/xstartup
 
 RUN useradd -m -u 1000 -s /bin/bash murfi && \

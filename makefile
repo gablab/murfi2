@@ -155,7 +155,13 @@ GSL_LIB=-lgsl -lgslcblas
 
 
 # computer vision
-VXL_INC=-I$(VXL_HOME)/include/vxl/core -I$(VXL_HOME)/include/vxl/vcl
+VXL_INC=-I$(VXL_HOME)/include/vxlinclude/vxlcoreinclude/vxlvnlinclude/vxlalgo \
+	-I$(VXL_HOME)/include/vxlinclude/vxlcoreinclude/vxlvnl \
+	-I$(VXL_HOME)/include/vxlinclude/vxlcoreinclude \
+	-I$(VXL_HOME)/include/vxl/vcl \
+	-I$(VXL_HOME)/include/vxl/core \
+	-I$(VXL_HOME)/include/vxlinclude/vxlvcl
+
 VXL_LIB=-lvnl_algo -lvcl -lv3p_netlib -lvnl -L$(VXL_HOME)/vxl/lib
 
 # svm

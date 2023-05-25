@@ -1,4 +1,4 @@
-# Dockerfile for murfi2. Dependencies are all installed as pre-compiled pacakges.
+# Dockerfile for murfi2. Dependencies are mostly installed as pre-compiled pacakges.
 #
 # Please note that because murfi has a GUI, the version of OpenGL has to be the
 # same -- similar is probably fine -- on the host and within the container.
@@ -15,42 +15,44 @@
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
-FROM debian:jessie-slim as builder
-RUN apt-get update -qq \
-    && apt-get install --yes --quiet \
-        build-essential \
-        libace-dev \
-        libboost-filesystem-dev \
-        libgsl0-dev \
-        libnifti-dev \
-        libvxl1-dev \
-        qt5-default \
-        zlib1g-dev \
-    && rm -rf /var/apt/lib/lists/* \
-    # Murfi expects qt5 header files here.
-    && ln -s /usr/include/x86_64-linux-gnu/qt5 /usr/include/qt5
+FROM ubuntu:22.04
+RUN apt-get update -qq && \
+    apt-get install -y -q \
+      curl \
+      build-essential \
+      cmake
+
+
+RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
+    && mkdir build \
+    && cd build \
+    && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
+    && make -j 4 \
+    && make install \
+    && rm -rf build
+
+RUN ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
+
+
+RUN apt install -y -q \
+    libace-dev \
+    libgsl-dev \
+    libnifti-dev \
+    libboost-filesystem-dev \
+    qtbase5-dev \
+    qtchooser \
+    qt5-qmake \
+    qtbase5-dev-tools \
+    libqt5opengl5-dev
+
+RUN rm -rf /var/apt/lib/lists/*
+
+
 WORKDIR /opt/murfi
 COPY [".", "."]
-RUN make clean \
-    && make
+RUN make clean && make -j$(nproc)
 
-FROM debian:jessie-slim
-COPY --from=builder ["/opt/murfi/bin", "/opt/murfi/bin"]
-RUN apt-get update -qq \
-    && apt-get install --yes --quiet --no-install-recommends \
-        libace-6.2.8 \
-        libboost-filesystem1.55.0 \
-        libgsl0ldbl \
-        libnifti2 \
-        libqt5core5a \
-        libqt5gui5 \
-        libqt5opengl5 \
-        libqt5printsupport5 \
-        libqt5widgets5 \
-        libvxl1.17 \
-    && rm -rf /var/apt/lib/lists/* \
-    && ln -sv /opt/murfi/bin/murfi /usr/bin/ \
-    && useradd --no-user-group --create-home --shell /bin/bash murfi
+
 USER murfi
 WORKDIR /work
 ENTRYPOINT ["/usr/bin/murfi"]

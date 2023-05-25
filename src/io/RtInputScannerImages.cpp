@@ -30,8 +30,8 @@
 #include"RtExperiment.h"
 #include"RtExternalSenderImageInfo.h"
 
-#include<vnl/vnl_matrix_fixed.h>
-#include<vnl/vnl_vector.h>
+#include<vnl_matrix_fixed.h>
+#include<vnl_vector.h>
 
 using namespace std;
 

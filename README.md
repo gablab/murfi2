@@ -47,7 +47,7 @@ To install vxl, use the following commands:
         && cd build \
         && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
         && make -j 4 \
-        && make install \
+        && sudo make install \
         && rm -rf build \
         && ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
 

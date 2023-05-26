@@ -2,7 +2,7 @@
 
 #include "qcustomplot.h"
 
-#include<vnl/vnl_vector.h>
+#include<vnl_vector.h>
 
 #include "RtActivation.h"
 #include "RtData.h"

@@ -29,8 +29,8 @@
 #include"RtDataIDs.h"
 #include"RtLimit.h"
 
-#include <istream>
-#include <vcl_compiler.h>
+#include<istream>
+#include<vcl_compiler.h>
 
 #include<algorithm>
 #include<fstream>
@@ -39,11 +39,12 @@
 #include<iomanip>
 #include<string>
 
-#include<vnl/algo/vnl_convolve.h>
-#include<vnl/vnl_gamma.h>
-#include<vnl/algo/vnl_svd.h>
+#include<vnl_convolve.h>
+#include<vnl_gamma.h>
+#include<vnl_svd.h>
 
 #include"debug_levels.h"
+
 RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
 
   vnl_matrix<double>::set_size(0, 0);

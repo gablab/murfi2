@@ -55,4 +55,4 @@ RUN make clean && make -j$(nproc)
 
 USER murfi
 WORKDIR /work
-ENTRYPOINT ["/usr/bin/murfi"]
+ENTRYPOINT ["/opt/murfi/bin/murfi"]

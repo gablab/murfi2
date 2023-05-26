@@ -27,7 +27,7 @@
 #include<vector>
 #include<iomanip>
 #include<cmath>
-#include<vnl/vnl_matrix_fixed.h>
+#include<vnl_matrix_fixed.h>
 #include<gsl/gsl_vector.h>
 
 #include"RtData.h"

@@ -5,12 +5,12 @@ default: $(TARGET)
 QT_BIN = /usr/lib/x86_64-linux-gnu/qt5/bin
 
 QT_INC =  -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 \
-          -I/usr/include/qt5 \
-          -I/usr/include/qt5/QtWidgets \
-          -I/usr/include/qt5/QtGui \
-          -I/usr/include/qt5/QtCore \
-          -I/usr/include/qt5/QtOpenGL \
-          -I/usr/include/qt5/QtPrintSupport \
+          -I/usr/include/x86_64-linux-gnu/qt5 \
+          -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets \
+          -I/usr/include/x86_64-linux-gnu/qt5/QtGui \
+          -I/usr/include/x86_64-linux-gnu/qt5/QtCore \
+          -I/usr/include/x86_64-linux-gnu/qt5/QtOpenGL \
+          -I/usr/include/x86_64-linux-gnu/qt5/QtPrintSupport \
           -I.
 
 MOC_INC = -I/usr/include/c++/4.8 \

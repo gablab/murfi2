@@ -25,8 +25,8 @@
 #include"RtElementAccess.h"
 #include"RtLimit.h"
 
-#include"vnl/vnl_matrix.h"
-#include"vnl/algo/vnl_svd.h"
+#include"vnl_matrix.h"
+#include"vnl_svd.h"
 
 string RtContrast::moduleString(ID_CONTRAST);
 

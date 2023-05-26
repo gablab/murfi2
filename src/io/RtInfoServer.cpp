@@ -25,7 +25,7 @@
 
 #include"RtDataIDs.h"
 #include"tinyxml/tinyxml.h"
-#include<vnl/vnl_matrix.h>
+#include<vnl_matrix.h>
 
 const unsigned short DEFAULT_PORT_NUM = 15001;
 

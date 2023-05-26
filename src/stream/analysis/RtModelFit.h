@@ -21,9 +21,9 @@
 #ifndef RTMODELFIT_H
 #define RTMODELFIT_H
 
-#include<vnl/vnl_vector.h>
-#include<vnl/vnl_matrix.h>
-#include<vnl/algo/vnl_convolve.h>
+#include<vnl_vector.h>
+#include<vnl_matrix.h>
+#include<vnl_convolve.h>
 
 #include"RtStreamComponent.h"
 #include"RtExperiment.h"

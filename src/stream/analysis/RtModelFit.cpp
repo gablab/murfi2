@@ -23,10 +23,7 @@
 #include"gsl/gsl_cdf.h"
 
 // for gamma functions
-#include<vnl/vnl_gamma.h>
-
-// for hrf file reading
-//#include<vcl/vcl_istream.h>
+#include<vnl_gamma.h>
 
 #include"debug_levels.h"
 

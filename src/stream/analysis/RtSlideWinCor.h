@@ -7,8 +7,8 @@
 #ifndef RTSLIDEWINCOR_
 #define RTSLIDEWINCOR_
 
-#include<vnl/vnl_vector.h>
-#include<vnl/vnl_matrix.h>
+#include<vnl_vector.h>
+#include<vnl_matrix.h>
 #include<vector>
 
 #include"RtModelFit.h"

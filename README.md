@@ -17,23 +17,45 @@ Installation
 
 #### Dependencies:
 
-1. libace-dev
-1. freeglut3-dev
-1. libgsl0-dev
-1. libxi-dev
-1. libxmu-dev
+1. libace
+1. freeglut
+1. libgsl
 1. vxl
 1. qt5
 1. libniftiio
 
-On recent Ubuntu distros, the following command will install all dependencies:
+On recent Ubuntu distros, the following command will install all dependencies except vxl:
 
-    $ sudo apt-get install build-essential libace-dev freeglut3-dev libgsl0-dev cmake libxi-dev libxmu-dev libboost-filesystem-dev libnifti-dev nifti-bin libqt4-dev libqwt-dev libvtk5-qt4-dev libvxl1-dev qt5-default libqt5*-dev
+    $ sudo apt-get install \
+        build-essential \
+        curl \
+        cmake \
+        libace-dev \
+        libgsl-dev \
+        libnifti-dev \
+        libboost-filesystem-dev \
+        qtbase5-dev \
+        qtchooser \
+        qt5-qmake \
+        qtbase5-dev-tools \
+        libqt5opengl5-dev
+
+To install vxl, use the following commands:
+
+    $ curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
+        && mkdir build \
+        && cd build \
+        && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
+        && make -j 4 \
+        && make install \
+        && rm -rf build \
+        && ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
+
 
 #### Compilation:
 
     $ cd <path to toplevel murfi directory>
-    $ make -j 8
+    $ make -j$(nproc)
 
 #### Installation (optional):
 

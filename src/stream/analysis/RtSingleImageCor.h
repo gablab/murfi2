@@ -22,8 +22,8 @@
 #ifndef RTSINGLEIMAGEECOR_H
 #define RTSINGLEIMAGEECOR_H
 
-#include<vnl/vnl_vector.h>
-#include<vnl/vnl_matrix.h>
+#include<vnl_vector.h>
+#include<vnl_matrix.h>
 
 #include"RtIncrementalGLM.h"
 #include"RtLeastSquaresSolve.h"

@@ -57,7 +57,7 @@ apply_reg() {
     out=$4
 
     # set the desired datatype (short or double or float)
-    dtype=`nifti_tool -quiet -disp_hdr -fields datatype -infiles "$in" | sed "s/.* //"`;
+    dtype=`nifti_tool -quiet -disp_hdr -field datatype -infiles "$in" | sed "s/.* //"`;
     if [ "$dtype" == 16 ]; then
     otype=float
     elif [ "$dtype" == 64 ]; then

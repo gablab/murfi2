@@ -20,7 +20,8 @@ RUN apt-get update -qq && \
     apt-get install -y -q \
       curl \
       build-essential \
-      cmake
+      cmake \
+      python3
 
 
 RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
@@ -34,25 +35,38 @@ RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip
 RUN ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
 
 
+WORKDIR /opt/murfi
+COPY ["docker/fsl_clean.sh", "."]
+
+RUN curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py > fslinstaller.py && \
+    python3 fslinstaller.py -d /opt/fsl && \
+    sh fsl_clean.sh
+
 RUN apt install -y -q \
     libace-dev \
     libgsl-dev \
     libnifti-dev \
+    nifti-bin \
     libboost-filesystem-dev \
     qtbase5-dev \
     qtchooser \
     qt5-qmake \
     qtbase5-dev-tools \
-    libqt5opengl5-dev
+    libqt5opengl5-dev \
+    language-pack-en-base
 
-RUN rm -rf /var/apt/lib/lists/*
+RUN dpkg-reconfigure locales
+
+RUN rm -rf /var/apt/lib/lists/* /var/tmp/* /tmp/* \
+    && apt-get clean
 
 
 WORKDIR /opt/murfi
 COPY [".", "."]
+
+
 RUN make clean && make -j$(nproc)
 
-
-USER murfi
-WORKDIR /work
-ENTRYPOINT ["/opt/murfi/bin/murfi"]
+ENV XDG_RUNTIME_DIR=""
+ENV PATH=${PATH}:/opt/murfi/bin:/opt/murfi/util/scanner_sim
+#ENTRYPOINT ["/opt/murfi/bin/murfi"]

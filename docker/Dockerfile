@@ -53,9 +53,16 @@ RUN apt install -y -q \
     qt5-qmake \
     qtbase5-dev-tools \
     libqt5opengl5-dev \
-    language-pack-en-base
+    libqt5gui5 \
+    language-pack-en-base \
+    yaru-theme-icon \
+    shared-mime-info
 
-RUN dpkg-reconfigure locales
+RUN update-locale "LANG=en_US.UTF-8" && \
+    locale-gen en_US.UTF-8 && \
+    dpkg-reconfigure --frontend noninteractive locales
+
+RUN update-mime-database /usr/share/mime
 
 RUN rm -rf /var/apt/lib/lists/* /var/tmp/* /tmp/* \
     && apt-get clean
@@ -67,6 +74,7 @@ COPY [".", "."]
 
 RUN make clean && make -j$(nproc)
 
-ENV XDG_RUNTIME_DIR=""
+
+ENV XDG_RUNTIME_DIR="/tmp"
 ENV PATH=${PATH}:/opt/murfi/bin:/opt/murfi/util/scanner_sim
-#ENTRYPOINT ["/opt/murfi/bin/murfi"]
+ENTRYPOINT ["/opt/murfi/bin/murfi"]

@@ -15,11 +15,9 @@ http://dx.doi.org/10.1016/j.neuroimage.2010.07.060
 Quickstart
 ----------
 
-Build a singularity image from which to run murfi
+Install murfi from a pre-built docker image:
 
-    $ mkdir murfi && \
-        cd murfi && \
-        curl -fsSL https://github.com/gablab/murfi2/blob/master/scripts/murfi-build-singularity.sh | sh
+    $ sudo singularity build -F murfi.sif docker://ohinds/murfi:latest
 
 This command will take some time, as it downloads a pre-built murfi
 docker image from dockerhub, then builds a singularity image
@@ -28,10 +26,10 @@ docker image from dockerhub, then builds a singularity image
 Running the example
 -------------------
 
-    $ mkdir example_data && \
-        cd example_data && \
+    $ mkdir murfi_example_data && \
+        cd murfi_example_data && \
         curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
-    $ MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=example_data singularity exec murfi.sif -f murfi_example_data/scripts/neurofeedback.xml
+    $ MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=example_data singularity exec murfi.sif murfi -f scripts/neurofeedback.xml
 
 In another terminal:
 

@@ -12,8 +12,34 @@ Oliver Hinds, Satrajit Ghosh, Todd W Thompson, Julie J Yoo, Susan Whitfield-Gabr
 
 http://dx.doi.org/10.1016/j.neuroimage.2010.07.060
 
-Installation
-------------
+Quickstart
+----------
+
+Build a singularity image from which to run murfi
+
+    $ mkdir murfi && \
+        cd murfi && \
+        curl -fsSL https://github.com/gablab/murfi2/blob/master/scripts/murfi-build-singularity.sh | sh
+
+This command will take some time, as it downloads a pre-built murfi
+docker image from dockerhub, then builds a singularity image
+(`murfi.sif`) from the docker image.
+
+Running the example
+-------------------
+
+    $ mkdir example_data && \
+        cd example_data && \
+        curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
+    $ MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=example_data singularity exec murfi.sif -f murfi_example_data/scripts/neurofeedback.xml
+
+In another terminal:
+
+    $ cd murfi_example_data/scripts
+    $ singularity exec ../../murfi.sif ./servedata.sh
+
+Development
+-----------
 
 #### Dependencies:
 
@@ -60,41 +86,6 @@ To install vxl, use the following commands:
 #### Installation (optional):
 
     $ sudo ln -sf bin/murfi /usr/bin
-
-Running the example
--------------------
-
-    $ wget https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz
-    $ tar -xzvf murfi_example_data.tgz
-    $ export MURFI_SUBJECTS_DIR=$PWD
-    $ export MURFI_SUBJECT_NAME=murfi_example_data
-    $ murfi -f murfi_example_data/scripts/neurofeedback.xml
-
-In another terminal:
-
-    $ cd murfi_example_data/scripts
-    $ ./servedata.sh
-
-Using Vagrant
--------------
-
-Download and install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/). Then download this [archive](https://github.com/gablab/murfi2/archive/master.zip). Requires an X-server installed locally.
-
-Unzip the archive and using a terminal change to the unzipped directory.
-
-    $ vagrant up
-    $ vagrant -X ssh
-    $ cd /vagrant
-    $ source murfi_vagrant.sh
-    $ make -j2 # first time only to compile murfi
-
-Then follow the [Running the example] section above.
-
-On another terminal from the same unzipped directory do:
-
-    $ vagrant ssh
-    $ cd murfi_example_data/scripts
-    $ ./servedata.sh
 
 Funding
 -------

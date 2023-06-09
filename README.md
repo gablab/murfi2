@@ -17,7 +17,7 @@ Quickstart
 
 Install murfi from a pre-built docker image:
 
-    $ sudo singularity build -F murfi.sif docker://ohinds/murfi:latest
+    sudo singularity build -F murfi.sif docker://ohinds/murfi:latest
 
 This command will take some time, as it downloads a pre-built murfi
 docker image from dockerhub, then builds a singularity image
@@ -26,15 +26,15 @@ docker image from dockerhub, then builds a singularity image
 Running the example
 -------------------
 
-    $ mkdir murfi_example_data && \
+    mkdir murfi_example_data && \
         cd murfi_example_data && \
         curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
-    $ MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=example_data singularity exec murfi.sif murfi -f scripts/neurofeedback.xml
+    MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=example_data singularity exec murfi.sif murfi -f scripts/neurofeedback.xml
 
 In another terminal:
 
-    $ cd murfi_example_data/scripts
-    $ singularity exec ../../murfi.sif ./servedata.sh
+    cd murfi_example_data/scripts
+    singularity exec ../../murfi.sif ./servedata.sh
 
 Development
 -----------
@@ -50,7 +50,7 @@ Development
 
 On recent Ubuntu distros, the following command will install all dependencies except vxl:
 
-    $ sudo apt-get install \
+    sudo apt-get install \
         build-essential \
         curl \
         cmake \
@@ -66,7 +66,7 @@ On recent Ubuntu distros, the following command will install all dependencies ex
 
 To install vxl, use the following commands:
 
-    $ curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
+    curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
         && mkdir build \
         && cd build \
         && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
@@ -78,12 +78,12 @@ To install vxl, use the following commands:
 
 #### Compilation:
 
-    $ cd <path to toplevel murfi directory>
-    $ make -j$(nproc)
+    cd <path to toplevel murfi directory>
+    make -j$(nproc)
 
 #### Installation (optional):
 
-    $ sudo ln -sf bin/murfi /usr/bin
+    sudo ln -sf bin/murfi /usr/bin
 
 Funding
 -------

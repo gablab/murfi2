@@ -34,7 +34,7 @@ Running the example
 In another terminal:
 
     cd murfi_example_data/scripts
-    singularity exec ../../murfi.sif ./servedata.sh
+    singularity exec ../../murfi.sif ./servedata.sh 3000 15000 $(hostname)
 
 Development
 -----------

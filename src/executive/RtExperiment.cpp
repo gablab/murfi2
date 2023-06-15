@@ -128,7 +128,7 @@ unsigned int getSeriesNumFromUID(char *uid) {
     seriesNum = uids.size()+numExistingSeries;
   }
   else {
-    seriesNum = (*i).second-1;
+    seriesNum = (*i).second;
   }
 
   if(DEBUG_LEVEL & ADVANCED) {

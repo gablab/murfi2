@@ -938,7 +938,7 @@ vnl_vector<double> RtDesignMatrix::getArtifactTimepoints() {
 // datastore for this timepoint. usually this function will be called from
 // RtModelFit::process()
 //  in
-//   tr of the timepoint to update for
+//   tr of the timepoint to update for (one-based)
 bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 
   if (!isBuilt()) {
@@ -948,7 +948,7 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
   }
 
   // check bounds
-  if (thisTr >= numMeas) {
+  if (thisTr > numMeas) {
     cerr
         << "WARNING: RtDesignMatrix::update trying to process tr out of range ("
         << thisTr << ")" << endl;
@@ -959,13 +959,16 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
   if (modelMotionParameters) {
     RtDataID motID(templateDataID);
     motID.setModuleID("motion");
+    motID.setTimePoint(thisTr);
+    motID.setSeriesNum(DATAID_NUM_WILDCARD_VALUE);
+    motID.setDataName(DATAID_STRING_UNSET_VALUE);
 
     RtMotion *mot = static_cast<RtMotion*> (getDataStore().getData(motID));
 
     if (mot != NULL) {
-      unsigned int motionCol = getNumConditionBases() + maxTrendOrder;
+      unsigned int motionCol = getNumConditionBases() + maxTrendOrder + 1;
       vnl_matrix<double> motionMat(mot->getMotion(), 1, NUM_MOTION_DIMENSIONS);
-      update(motionMat, thisTr, motionCol);
+      update(motionMat, thisTr - 1, motionCol);
     }
   }
 

@@ -126,7 +126,7 @@ int RtIncrementalGLM::process(ACE_Message_Block *mb) {
     return 0;
   }
 
-  design.updateAtTr(dat->getDataID().getTimePoint()-1);
+  design.updateAtTr(dat->getDataID().getTimePoint());
 
   // initialize the computation if necessary
   if(needsInit) {

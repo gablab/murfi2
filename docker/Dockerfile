@@ -20,7 +20,8 @@ RUN apt-get update -qq && \
     apt-get install -y -q \
       curl \
       build-essential \
-      cmake
+      cmake \
+      python3
 
 
 RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
@@ -34,25 +35,46 @@ RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip
 RUN ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
 
 
+WORKDIR /opt/murfi
+COPY ["docker/fsl_clean.sh", "."]
+
+RUN curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py > fslinstaller.py && \
+    python3 fslinstaller.py -d /opt/fsl && \
+    sh fsl_clean.sh
+
 RUN apt install -y -q \
     libace-dev \
     libgsl-dev \
     libnifti-dev \
+    nifti-bin \
     libboost-filesystem-dev \
     qtbase5-dev \
     qtchooser \
     qt5-qmake \
     qtbase5-dev-tools \
-    libqt5opengl5-dev
+    libqt5opengl5-dev \
+    libqt5gui5 \
+    language-pack-en-base \
+    yaru-theme-icon \
+    shared-mime-info
 
-RUN rm -rf /var/apt/lib/lists/*
+RUN update-locale "LANG=en_US.UTF-8" && \
+    locale-gen en_US.UTF-8 && \
+    dpkg-reconfigure --frontend noninteractive locales
+
+RUN update-mime-database /usr/share/mime
+
+RUN rm -rf /var/apt/lib/lists/* /var/tmp/* /tmp/* \
+    && apt-get clean
 
 
 WORKDIR /opt/murfi
 COPY [".", "."]
+
+
 RUN make clean && make -j$(nproc)
 
 
-USER murfi
-WORKDIR /work
+ENV XDG_RUNTIME_DIR="/tmp"
+ENV PATH=${PATH}:/opt/murfi/bin:/opt/murfi/util/scanner_sim
 ENTRYPOINT ["/opt/murfi/bin/murfi"]

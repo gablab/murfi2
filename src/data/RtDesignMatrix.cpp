@@ -25,6 +25,7 @@
 #include"RtDesignMatrix.h"
 
 #include"RtExperiment.h"
+#include"RtFramewiseDisplacement.h"
 #include"RtMotion.h"
 #include"RtDataIDs.h"
 #include"RtLimit.h"
@@ -81,6 +82,7 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
   maxTrendOrder = 1;
 
   modelMotionParameters = false;
+  modelFramewiseDisplacement = false;
   modelTemporalDerivatives = false;
 
   modelEvents = false;
@@ -247,6 +249,9 @@ bool RtDesignMatrix::processOption(const string &name,
   }
   if (name == "modelMotionParameters") {
     return RtConfigVal::convert<bool>(modelMotionParameters, text);
+  }
+  if (name == "modelFramewiseDisplacement") {
+    return RtConfigVal::convert<bool>(modelFramewiseDisplacement, text);
   }
   if (name == "modelTemporalDerivatives") {
     return RtConfigVal::convert<bool>(modelTemporalDerivatives, text);
@@ -449,6 +454,10 @@ bool RtDesignMatrix::buildDesignMatrix() {
     addColumn(motStub, "motion_rz", false);
   }
 
+  if (modelFramewiseDisplacement) {
+    vnl_vector<double> fdStub(numMeas, 0);
+    addColumn(fdStub, "fd", false);
+  }
 
   // event and artifact columns will be left blank until they are received
 
@@ -585,6 +594,10 @@ unsigned int RtDesignMatrix::getNumNuisanceBases() {
 
   if (modelMotionParameters) {
     numNuisance += 6;
+  }
+
+  if (modelFramewiseDisplacement) {
+    numNuisance++;
   }
 
   if (modelEvents) {
@@ -958,10 +971,10 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
   // copy the motion parameters
   if (modelMotionParameters) {
     RtDataID motID(templateDataID);
-    motID.setModuleID("motion");
-    motID.setTimePoint(thisTr);
+    motID.setModuleID(ID_MOTION);
+    motID.setDataName(NAME_MOTION);
     motID.setSeriesNum(DATAID_NUM_WILDCARD_VALUE);
-    motID.setDataName(DATAID_STRING_UNSET_VALUE);
+    motID.setTimePoint(thisTr);
 
     RtMotion *mot = static_cast<RtMotion*> (getDataStore().getData(motID));
 
@@ -969,6 +982,30 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
       unsigned int motionCol = getNumConditionBases() + maxTrendOrder + 1;
       vnl_matrix<double> motionMat(mot->getMotion(), 1, NUM_MOTION_DIMENSIONS);
       update(motionMat, thisTr - 1, motionCol);
+    }
+    else {
+      cout << "Failed to find motion data to add to the design matrix" << endl;
+    }
+  }
+
+  if (modelFramewiseDisplacement) {
+    RtDataID fdID(templateDataID);
+    fdID.setModuleID(ID_FRAMEWISE_DISPLACEMENT);
+    fdID.setDataName(NAME_FRAMEWISE_DISPLACEMENT);
+    fdID.setSeriesNum(DATAID_NUM_WILDCARD_VALUE);
+    fdID.setTimePoint(thisTr);
+
+    RtFramewiseDisplacement *fd = static_cast<RtFramewiseDisplacement*>
+      (getDataStore().getData(fdID));
+
+    if (fd != NULL) {
+      unsigned int fdCol = getNumConditionBases() + maxTrendOrder + 1 +
+        (modelMotionParameters ? 6 : 0);
+      put(thisTr - 1, fdCol, fd->getDisplacement());
+    }
+    else {
+      cout << "Failed to find framewise displacement data to add to the "
+           << "design matrix" << endl;
     }
   }
 

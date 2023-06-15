@@ -67,6 +67,9 @@ const string NAME_SPATIALINTENSITYNORM_IMG = "inorm-img";
 const string ID_MOTION = "motion";
 const string NAME_MOTION = "motion";
 
+const string ID_FRAMEWISE_DISPLACEMENT = "framewise-displacement";
+const string NAME_FRAMEWISE_DISPLACEMENT = "framewise-displacement";
+
 // model fit ids
 const string ID_MODEL_FIT = "model-fit";
 const string ID_ACCUMCOR = "accumcor";

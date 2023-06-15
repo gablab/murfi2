@@ -29,6 +29,8 @@
 #include"RtDesignMatrix.h"
 #include"RtExperiment.h"
 #include"RtExternalSenderImageInfo.h"
+#include"RtFramewiseDisplacement.h"
+#include"RtMotion.h"
 
 #include<vnl_matrix_fixed.h>
 #include<vnl_vector.h>
@@ -292,6 +294,23 @@ int RtInputScannerImages::svc() {
       mot->getDataID().setSeriesNum(rti->getDataID().getSeriesNum());
       mot->getDataID().setTimePoint(rti->getDataID().getTimePoint());
       getDataStore().setData(mot);
+
+      // find the last motion for framewise displacement
+      RtDataID lastMotID(mot->getDataID());
+      lastMotID.setTimePoint(rti->getDataID().getTimePoint() - 1);
+      RtMotion *lastMot = static_cast<RtMotion*> (getDataStore().getData(lastMotID));
+
+      RtFramewiseDisplacement *fd = NULL;
+      if (lastMot != NULL) {
+        fd = new RtFramewiseDisplacement(lastMot, mot);
+      }
+      else {
+        fd = new RtFramewiseDisplacement();
+      }
+
+      fd->getDataID().setSeriesNum(rti->getDataID().getSeriesNum());
+      fd->getDataID().setTimePoint(rti->getDataID().getTimePoint());
+      getDataStore().setData(fd);
     }
 
     // append this to a vector of gathered images

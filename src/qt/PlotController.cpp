@@ -42,17 +42,17 @@ PlotController::PlotController(QCustomPlot *design_plot,
   design_plot->xAxis->setRange(0, 100);
   design_plot->xAxis->setLabel("TR");
   design_plot->yAxis->setRange(0, 1);
-  design_plot->yAxis->setLabel("normalized");
+  design_plot->yAxis->setLabel("normalized activation");
 
   roi_plot->xAxis->setRange(0, 100);
   roi_plot->xAxis->setLabel("TR");
   roi_plot->yAxis->setRange(0, 1);
-  roi_plot->yAxis->setLabel("standard dev");
+  roi_plot->yAxis->setLabel("activation (std dev)");
 
   motion_plot->xAxis->setRange(0, 100);
   motion_plot->xAxis->setLabel("TR");
   motion_plot->yAxis->setRange(0, 1);
-  motion_plot->yAxis->setLabel("FD");
+  motion_plot->yAxis->setLabel("FD (mm)");
 
   roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);

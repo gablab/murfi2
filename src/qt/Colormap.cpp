@@ -26,12 +26,12 @@ namespace {
   }
 
   void buildMotionColormap(vector<QColor*> *colors) {
-    colors->push_back(new QColor(  0,   0, 255));
     colors->push_back(new QColor(255,   0,   0));
     colors->push_back(new QColor(  0, 255,   0));
     colors->push_back(new QColor(255,   0, 255));
     colors->push_back(new QColor(255, 255,   0));
     colors->push_back(new QColor(  0, 255, 255));
+    colors->push_back(new QColor(  0,   0, 255));
   }
 } // anonymous namespace
 

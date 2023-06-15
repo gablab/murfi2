@@ -29,7 +29,7 @@ Running the example
     mkdir murfi_example_data && \
         cd murfi_example_data && \
         curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
-    MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=murfi_example_data singularity exec murfi.sif murfi -f scripts/neurofeedback.xml
+    MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=murfi_example_data singularity exec ../murfi.sif murfi -f scripts/neurofeedback.xml
 
 In another terminal:
 

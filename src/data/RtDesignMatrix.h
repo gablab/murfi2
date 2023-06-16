@@ -332,6 +332,7 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
 
   unsigned int maxTrendOrder; // add up to this order temporal trends
   bool modelMotionParameters; // regressors for motion
+  bool modelMotionDerivatives; // regressors for motion derivatives
   bool modelFramewiseDisplacement; // regressors for framewise displacement
   bool modelTemporalDerivatives; // regressors for temporal derivatives
   // (look into adding these as conditions

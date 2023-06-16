@@ -31,6 +31,7 @@
 #include"RtExternalSenderImageInfo.h"
 #include"RtFramewiseDisplacement.h"
 #include"RtMotion.h"
+#include"RtMotionDerivative.h"
 
 #include<vnl_matrix_fixed.h>
 #include<vnl_vector.h>
@@ -295,18 +296,25 @@ int RtInputScannerImages::svc() {
       mot->getDataID().setTimePoint(rti->getDataID().getTimePoint());
       getDataStore().setData(mot);
 
-      // find the last motion for framewise displacement
+      // find the last motion for derivative and framewise displacement
       RtDataID lastMotID(mot->getDataID());
       lastMotID.setTimePoint(rti->getDataID().getTimePoint() - 1);
       RtMotion *lastMot = static_cast<RtMotion*> (getDataStore().getData(lastMotID));
 
+      RtMotionDerivative *md = NULL;
       RtFramewiseDisplacement *fd = NULL;
       if (lastMot != NULL) {
+        md = new RtMotionDerivative(lastMot, mot);
         fd = new RtFramewiseDisplacement(lastMot, mot);
       }
       else {
+        md = new RtMotionDerivative();
         fd = new RtFramewiseDisplacement();
       }
+
+      md->getDataID().setSeriesNum(rti->getDataID().getSeriesNum());
+      md->getDataID().setTimePoint(rti->getDataID().getTimePoint());
+      getDataStore().setData(md);
 
       fd->getDataID().setSeriesNum(rti->getDataID().getSeriesNum());
       fd->getDataID().setTimePoint(rti->getDataID().getTimePoint());

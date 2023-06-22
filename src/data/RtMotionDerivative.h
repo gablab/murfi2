@@ -1,7 +1,8 @@
 /*=========================================================================
- *  RtMotion.h declares a class to store subject head motion
+ *  RtMotion.h declares a class to store subject head motion relative
+ *  to the last acquired volume.
  *
- *  Copyright 2007-2013, the MURFI dev team.
+ *  Copyright 2007-2023, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.

@@ -52,7 +52,7 @@ PlotController::PlotController(QCustomPlot *design_plot,
   motion_plot->xAxis->setRange(0, 100);
   motion_plot->xAxis->setLabel("TR");
   motion_plot->yAxis->setRange(0, 1);
-  motion_plot->yAxis->setLabel("FD (mm)");
+  motion_plot->yAxis->setLabel("framewise displacement (mm)");
 
   roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);

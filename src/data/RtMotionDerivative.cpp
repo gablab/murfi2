@@ -1,6 +1,6 @@
 /*=========================================================================
- *  RtMotionDerivative.cpp defines a class to store subject motion relative to
- *  the last timepoint.
+ *  RtMotionDerivative.cpp defines a class to store subject motion
+ *  relative to the last acquired volume.
  *
  *  Copyright 2007-2023, the MURFI dev team.
  *

@@ -25,7 +25,7 @@
 //*** constructors/destructors  ***//
 
 RtFramewiseDisplacement::RtFramewiseDisplacement() : RtData() {
-  ACE_TRACE(("RtData::RtFramewiseDisplacement()"));
+  ACE_TRACE(("RtFramewiseDisplacement::RtFramewiseDisplacement()"));
 
   dataID.setModuleID(ID_FRAMEWISE_DISPLACEMENT);
   dataID.setDataName(NAME_FRAMEWISE_DISPLACEMENT);
@@ -36,7 +36,7 @@ RtFramewiseDisplacement::RtFramewiseDisplacement() : RtData() {
 // construct with the last two motion objects
 RtFramewiseDisplacement::RtFramewiseDisplacement(RtMotion *lastMotion,
                                                  RtMotion *thisMotion) {
-  ACE_TRACE(("RtData::RtFramewiseDisplacement()"));
+  ACE_TRACE(("RtFramewiseDisplacement::RtFramewiseDisplacement()"));
 
   dataID.setModuleID(ID_FRAMEWISE_DISPLACEMENT);
   dataID.setDataName(NAME_FRAMEWISE_DISPLACEMENT);

@@ -44,12 +44,12 @@ RtMotionDerivative::RtMotionDerivative(RtMotion *lastMotion, RtMotion *thisMotio
             lastMotion->getMotionDimension(TRANSLATION_Y),
             thisMotion->getMotionDimension(TRANSLATION_Z) -
             lastMotion->getMotionDimension(TRANSLATION_Z),
-            50 * thisMotion->getMotionDimension(ROTATION_X) -
-            lastMotion->getMotionDimension(ROTATION_X),
-            50 * thisMotion->getMotionDimension(ROTATION_Y) -
-            lastMotion->getMotionDimension(ROTATION_Y),
-            50 * thisMotion->getMotionDimension(ROTATION_Z) -
-            lastMotion->getMotionDimension(ROTATION_Z));
+            50 * (thisMotion->getMotionDimension(ROTATION_X) -
+                  lastMotion->getMotionDimension(ROTATION_X)),
+            50 * (thisMotion->getMotionDimension(ROTATION_Y) -
+                  lastMotion->getMotionDimension(ROTATION_Y)),
+            50 * (thisMotion->getMotionDimension(ROTATION_Z) -
+                  lastMotion->getMotionDimension(ROTATION_Z)));
 }
 
 RtMotionDerivative::~RtMotionDerivative() {

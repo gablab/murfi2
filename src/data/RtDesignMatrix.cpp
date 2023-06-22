@@ -96,6 +96,8 @@ RtDesignMatrix::RtDesignMatrix() : RtData(), vnl_matrix<double>() {
   maxNumArtifacts = 0;
   numArtifacts = 0;
 
+  saveAfterUpdate = true;
+
   dataID.setDataName(NAME_DESIGN);
 }
 
@@ -278,6 +280,9 @@ bool RtDesignMatrix::processOption(const string &name,
   }
   if (name == "maxTrendOrder") {
     return RtConfigVal::convert<unsigned int>(maxTrendOrder, text);
+  }
+  if (name == "saveAfterUpdate") {
+    return RtConfigVal::convert<bool>(saveAfterUpdate, text);
   }
 
   cout << "WARNING: option " << name << " unrecognized and ignored" << endl;
@@ -980,11 +985,15 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 
   // check bounds
   if (thisTr > numMeas) {
-    cerr
-        << "WARNING: RtDesignMatrix::update trying to process tr out of range ("
-        << thisTr << ")" << endl;
+    cerr << "WARNING: RtDesignMatrix::update trying to process tr out of range ("
+         << thisTr << ")" << endl;
     return false;
   }
+
+  // store the series number when we end up updating some part of the
+  // design matrix dynamically. this is how we know wether we should
+  // save again at the bottom of this function.
+  int seriesNum = -1;
 
   // copy any motion parameters into the design matrix
   unsigned int curCol = getNumConditionBases() + maxTrendOrder + 1;
@@ -1001,6 +1010,7 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
     if (mot != NULL) {
       vnl_matrix<double> motionMat(mot->getMotion(), 1, NUM_MOTION_DIMENSIONS);
       update(motionMat, thisTr - 1, curCol);
+      seriesNum = mot->getDataID().getSeriesNum();
     }
     else {
       cout << "Failed to find motion data to add to the design matrix" << endl;
@@ -1022,6 +1032,7 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
     if (motDiff != NULL) {
       vnl_matrix<double> motionMat(motDiff->getMotion(), 1, NUM_MOTION_DIMENSIONS);
       update(motionMat, thisTr - 1, curCol);
+      seriesNum = motDiff->getDataID().getSeriesNum();
     }
     else {
       cout << "Failed to find motion derivative data to add to the design matrix"
@@ -1043,6 +1054,7 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
 
     if (fd != NULL) {
       put(thisTr - 1, curCol, fd->getDisplacement());
+      seriesNum = fd->getDataID().getSeriesNum();
     }
     else {
       cout << "Failed to find framewise displacement data to add to the "
@@ -1050,6 +1062,16 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
     }
 
     curCol++;
+  }
+
+  if (saveAfterUpdate) {
+    if (seriesNum > 0) {
+      save(getExperimentConfig().getDesignFilename(seriesNum));
+    }
+    else {
+      cout << "Refusing to save design matrix when it seems it's unchanged."
+           << endl;
+    }
   }
 
   return true;

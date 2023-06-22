@@ -364,6 +364,8 @@ class RtDesignMatrix : public RtData, protected vnl_matrix<double> {
   // estimation a lil.
   unsigned int numArtifacts; // so far
 
+  // whether to save the design matrix after each updateAtTr
+  bool saveAfterUpdate;
 };
 
 #endif

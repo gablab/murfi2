@@ -86,7 +86,7 @@ void RtExternalImageInfo::displayImageInfo() const {
        << "mcTranslation[X / Y / Z]:               "
        << mcTranslationXMM << " / " << mcTranslationYMM << " / "
        << mcTranslationZMM << endl
-       << "mcRotationMM[X / Y / Z]:                "
+       << "mcRotationRAD[X / Y / Z]:                "
        << mcRotationXRAD << " / " << mcRotationYRAD << " / "
        << mcRotationZRAD << endl
        << "repetitionTimeMS / repetitionDelayMS    "

@@ -37,12 +37,12 @@ void fillExternalInfo(nifti_image* img, int numSlices, int repetition,
   ei->isMotionCorrected = true;
 
   srand(time(NULL));
-  ei->mcTranslationXMM = 5 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
-  ei->mcTranslationYMM = 5 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
-  ei->mcTranslationZMM = 5 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
-  ei->mcRotationXRAD = 0.1 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
-  ei->mcRotationYRAD = 0.1 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
-  ei->mcRotationZRAD = 0.1 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
+  ei->mcTranslationXMM = 2 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
+  ei->mcTranslationYMM = 2 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
+  ei->mcTranslationZMM = 2 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
+  ei->mcRotationXDeg = 2.3 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
+  ei->mcRotationYDeg = 2.3 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
+  ei->mcRotationZDeg = 2.3 * (rand()/static_cast<double>(RAND_MAX) - 0.5);
 }
 
 #endif

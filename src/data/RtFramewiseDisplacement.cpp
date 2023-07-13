@@ -20,6 +20,7 @@
 
 #include"RtFramewiseDisplacement.h"
 
+#include<cmath>
 #include "RtDataIDs.h"
 
 //*** constructors/destructors  ***//
@@ -41,6 +42,9 @@ RtFramewiseDisplacement::RtFramewiseDisplacement(RtMotion *lastMotion,
   dataID.setModuleID(ID_FRAMEWISE_DISPLACEMENT);
   dataID.setDataName(NAME_FRAMEWISE_DISPLACEMENT);
 
+  // rotations are in degrees, and we project onto an arc at radius
+  // 50mm to convert angles to mm so everything is in the same units.
+  double arc_project = 50 * M_PI / 180;
   displacement =
     abs(lastMotion->getMotionDimension(TRANSLATION_X) -
         thisMotion->getMotionDimension(TRANSLATION_X)) +
@@ -48,12 +52,12 @@ RtFramewiseDisplacement::RtFramewiseDisplacement(RtMotion *lastMotion,
         thisMotion->getMotionDimension(TRANSLATION_Y)) +
     abs(lastMotion->getMotionDimension(TRANSLATION_Z) -
         thisMotion->getMotionDimension(TRANSLATION_Z)) +
-    50 * abs(lastMotion->getMotionDimension(ROTATION_X) -
-             thisMotion->getMotionDimension(ROTATION_X)) +
-    50 * abs(lastMotion->getMotionDimension(ROTATION_Y) -
-             thisMotion->getMotionDimension(ROTATION_Y)) +
-    50 * abs(lastMotion->getMotionDimension(ROTATION_Z) -
-             thisMotion->getMotionDimension(ROTATION_Z));
+    abs(arc_project * (lastMotion->getMotionDimension(ROTATION_X) -
+                       thisMotion->getMotionDimension(ROTATION_X))) +
+    abs(arc_project * (lastMotion->getMotionDimension(ROTATION_Y) -
+                       thisMotion->getMotionDimension(ROTATION_Y))) +
+    abs(arc_project * (lastMotion->getMotionDimension(ROTATION_Z) -
+                       thisMotion->getMotionDimension(ROTATION_Z)));
 }
 
 RtFramewiseDisplacement::~RtFramewiseDisplacement() {

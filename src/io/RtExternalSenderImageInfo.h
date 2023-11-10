@@ -88,9 +88,9 @@ struct RtExternalImageInfo {
   float64_t  mcTranslationYMM;  //   by motion correction along each
   float64_t  mcTranslationZMM;  //   axis
 
-  float64_t  mcRotationXRAD;    // Rotation (radians) that was applied
-  float64_t  mcRotationYRAD;    //   by motion correction along each
-  float64_t  mcRotationZRAD;    //   axis
+  float64_t  mcRotationXDeg;    // Rotation (degrees) that was applied
+  float64_t  mcRotationYDeg;    //   by motion correction along each
+  float64_t  mcRotationZDeg;    //   axis
 
 };
 #endif

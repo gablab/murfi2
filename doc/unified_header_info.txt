@@ -96,10 +96,10 @@ mcTranslationYMM: float64_t
 mcTranslationZMM: float64_t
 Translation that was applied by motion correction, in millimeters.
 
-mcRotationXRAD: float64_t
-mcRotationYRAD: float64_t
-mcRotationZRAD: float64_t
-Rotation that was applied by motion correction, in radians.
+mcRotationXDeg: float64_t
+mcRotationYDeg: float64_t
+mcRotationZDeg: float64_t
+Rotation that was applied by motion correction, in degrees.
 
 mcOrder: char8_t[5]
 String indicating the order in which the rotations and translation

@@ -64,9 +64,9 @@ class ExternalImage(object):
                   ('mcTranslationXMM', 'd'),
                   ('mcTranslationYMM', 'd'),
                   ('mcTranslationZMM', 'd'),
-                  ('mcRotationXRAD', 'd'),
-                  ('mcRotationYRAD', 'd'),
-                  ('mcRotationZRAD', 'd'),
+                  ('mcRotationXDeg', 'd'),
+                  ('mcRotationYDeg', 'd'),
+                  ('mcRotationZDeg', 'd'),
                   ]
 
     def __init__(self, typename, format_def=struct_def):
@@ -136,9 +136,9 @@ class ExternalImage(object):
                           mcTranslationXMM=0.1,
                           mcTranslationYMM=0.2,
                           mcTranslationZMM=0.01,
-                          mcRotationXRAD=0.001,
-                          mcRotationYRAD=0.002,
-                          mcRotationZRAD=0.0001)
+                          mcRotationXDeg=0.05,
+                          mcRotationYDeg=0.1,
+                          mcRotationZDeg=0.005)
         return infotuple
 
     def get_header_size(self):

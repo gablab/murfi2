@@ -367,6 +367,13 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
   // read until we have all the bytes we need
   // TODO add error handling here
 
+  // first 8 bytes are size of header, size of data
+  int size_of_header = 0;
+  stream.recv_n(&size_of_header, sizeof(int));
+
+  int size_of_data = 0;
+  stream.recv_n(&size_of_data, sizeof(int));
+
   for(rec = 0; rec < RtExternalImageInfo::getHeaderSize();){
     rec_delta = stream.recv_n(buffer + rec,
                               RtExternalImageInfo::getHeaderSize());

@@ -9,7 +9,7 @@
 #include "RtDataIDs.h"
 #include "RtDesignMatrix.h"
 #include "RtExperiment.h"
-#include "RtMotion.h"
+#include "RtFramewiseDisplacement.h"
 
 using std::pair;
 using std::string;
@@ -42,17 +42,17 @@ PlotController::PlotController(QCustomPlot *design_plot,
   design_plot->xAxis->setRange(0, 100);
   design_plot->xAxis->setLabel("TR");
   design_plot->yAxis->setRange(0, 1);
-  design_plot->yAxis->setLabel("normalized");
+  design_plot->yAxis->setLabel("normalized activation");
 
   roi_plot->xAxis->setRange(0, 100);
   roi_plot->xAxis->setLabel("TR");
   roi_plot->yAxis->setRange(0, 1);
-  roi_plot->yAxis->setLabel("standard dev");
+  roi_plot->yAxis->setLabel("activation (std dev)");
 
   motion_plot->xAxis->setRange(0, 100);
   motion_plot->xAxis->setLabel("TR");
   motion_plot->yAxis->setRange(0, 1);
-  motion_plot->yAxis->setLabel("mm / radians");
+  motion_plot->yAxis->setLabel("framewise displacement (mm)");
 
   roi_plot->yAxis->setRange(0, 1);
   roi_plot->addItem(roi_tr_indicator);
@@ -62,11 +62,8 @@ PlotController::PlotController(QCustomPlot *design_plot,
     0, QCPLayoutInset::ipFree);
 
   motion_plot->addItem(motion_tr_indicator);
-  motion_plot->yAxis->setRange(-2, 2);
-  for (int i = 0; i < 6; i++) {
-    motion_plot->addGraph();
-    motion_plot->graph(i)->setPen(QPen(motion_colormap.getColor(i)));
-  }
+  motion_plot->addGraph();
+  motion_plot->graph(0)->setPen(QPen(motion_colormap.getColor(0)));
 
   updateTRIndicators();
 
@@ -122,8 +119,8 @@ void PlotController::handleData(QString qid) {
                                                         val->getPixel(0));
     roi_plot->replot();
   }
-  else if (id.getModuleID() == ID_MOTION) {
-    plotMotion(static_cast<RtMotion*>(getDataStore().getData(id)));
+  else if (id.getModuleID() == ID_FRAMEWISE_DISPLACEMENT) {
+    plotMotion(static_cast<RtFramewiseDisplacement*>(getDataStore().getData(id)));
   }
 
   if (id.getTimePoint() != DATAID_NUM_UNSET_VALUE &&
@@ -171,30 +168,13 @@ void PlotController::plotDesign(RtDesignMatrix* design) {
   design_plot->replot();
 }
 
-void PlotController::plotMotion(RtMotion* motion) {
-  motion_plot->graph(TRANSLATION_X)->addData(
-    motion->getDataID().getTimePoint(),
-    motion->getMotionDimension(TRANSLATION_X));
+void PlotController::plotMotion(RtFramewiseDisplacement* fd) {
+  double displacement = fd->getDisplacement();
+  motion_plot->graph(0)->addData(fd->getDataID().getTimePoint(), displacement);
 
-  motion_plot->graph(TRANSLATION_Y)->addData(
-    motion->getDataID().getTimePoint(),
-    motion->getMotionDimension(TRANSLATION_Y));
-
-  motion_plot->graph(TRANSLATION_Z)->addData(
-    motion->getDataID().getTimePoint(),
-    motion->getMotionDimension(TRANSLATION_Z));
-
-  motion_plot->graph(ROTATION_X)->addData(
-    motion->getDataID().getTimePoint(),
-    motion->getMotionDimension(ROTATION_X));
-
-  motion_plot->graph(ROTATION_Y)->addData(
-    motion->getDataID().getTimePoint(),
-    motion->getMotionDimension(ROTATION_Y));
-
-  motion_plot->graph(ROTATION_Z)->addData(
-    motion->getDataID().getTimePoint(),
-    motion->getMotionDimension(ROTATION_Z));
+  if (!motion_plot->yAxis->range().contains(displacement)) {
+    motion_plot->yAxis->setRange(0, displacement + 1);
+  }
 }
 
 void PlotController::replotDesign(RtDesignMatrix *design) {

@@ -38,9 +38,9 @@ RtExternalImageInfo::RtExternalImageInfo() :
     mcTranslationXMM(0.0),
     mcTranslationYMM(0.0),
     mcTranslationZMM(0.0),
-    mcRotationXRAD(0.0),
-    mcRotationYRAD(0.0),
-    mcRotationZRAD(0.0) {
+    mcRotationXDeg(0.0),
+    mcRotationYDeg(0.0),
+    mcRotationZDeg(0.0) {
   strcpy((char*) magic, EXTERNALSENDER_MAGIC);
   seriesUID[0] = '\0';
   scanType[0] = '\0';
@@ -86,9 +86,9 @@ void RtExternalImageInfo::displayImageInfo() const {
        << "mcTranslation[X / Y / Z]:               "
        << mcTranslationXMM << " / " << mcTranslationYMM << " / "
        << mcTranslationZMM << endl
-       << "mcRotationMM[X / Y / Z]:                "
-       << mcRotationXRAD << " / " << mcRotationYRAD << " / "
-       << mcRotationZRAD << endl
+       << "mcRotationDeg[X / Y / Z]:                "
+       << mcRotationXDeg << " / " << mcRotationYDeg << " / "
+       << mcRotationZDeg << endl
        << "repetitionTimeMS / repetitionDelayMS    "
        << repetitionTimeMS << " / " << repetitionDelayMS << endl
        << "currentTR / totalTR                     "

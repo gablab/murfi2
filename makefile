@@ -223,7 +223,7 @@ C_INC = -I$(SRC_DIR) \
 
 C_FLAGS = -Wall \
 	-Wno-write-strings \
-	-std=c++11 \
+	-std=c++14 \
 	$(FRONT_FLAG) \
 	$(MTRACE_FLAG) \
 	$(PROF_FLAG) \

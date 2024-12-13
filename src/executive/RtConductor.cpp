@@ -318,6 +318,11 @@ int RtConductor::svc() {
 
   deconfigure();
 
+  if(config.get("study:shutdownAfterRun")) {
+    cout << "shutting down the conductor..." << endl;
+    exit(0);
+  }
+
   return true;
 }
 

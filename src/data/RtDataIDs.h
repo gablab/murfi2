@@ -38,6 +38,7 @@ const string NAME_SCANNERIMG_T1EPI = "t1wepi";
 const string ID_MASK = "mask";
 const string ID_MASKLOAD = "mask-load";
 const string ID_MASKGEN = "mask-gen";
+const string ID_WEIGHTEDMASKLOAD = "weighted-mask-load";
 const string NAME_MASK = "mask-img";
 
 const string ID_MOSAIC = "mosaic";

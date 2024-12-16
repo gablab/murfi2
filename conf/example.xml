@@ -143,6 +143,39 @@
   </module>
 
 
+  <!-- weighted roi mask loading -->
+  <module name="weighted-mask-load">
+    <option name="disabled"> false </option>
+
+    <!-- the roi name this mask can be referenced by in later modules
+         and the data store -->
+    <option name="roiID"> roi1 </option>
+
+    <!-- filename to load the mask from relative to subject mask directory
+	 (if present, overrides generation parms below) -->
+    <option name="filename"> active_weighted_mask.nii </option>
+
+    <!-- whether to align the mask to the series reference after
+         reading it in -->
+    <option name="align"> true </option>
+
+    <!-- whether to unmosaic the mask after reading it in -->
+    <option name="unmosaic"> true </option>
+
+    <!-- whether to mosaic the mask after reading it in -->
+    <option name="mosaic"> false </option>
+
+    <!-- whether to flip the mask L/R after reading it in -->
+    <option name="flipLR"> false </option>
+
+    <!-- whether to update the mask with each incoming image or to
+         keep constant over the run -->
+    <option name="dynamic"> false </option>
+
+    <!-- whether to save the mask to a file (good idea) -->
+    <option name="save"> true </option>
+  </module>
+
 
   <!-- intensity normalization-->
   <module name="spatial-intensity-norm">

@@ -290,6 +290,11 @@ clean:
 clean_qt:
 	-cd src/qt && make clean
 
+clean_build_artifacts:
+	@$(ECHO) 'make: removing object and autosave files'
+	-cd $(SRC_DIR) && $(MAKE) clean
+	-cd $(OBJ_DIR) && $(RM) -f *.o *~
+
 ######################################################################
 ### $Source$
 ### Local Variables:

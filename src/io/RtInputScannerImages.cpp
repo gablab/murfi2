@@ -339,16 +339,8 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    // If it's not an EPI don't fire off the murfi processing pipeline.
-    //
-    // TODO: This will need to be changed in order to process other types of
-    // data.
-    if(!strcmp(ei->scanType, "EPI")) {
-      sendCode(rti);
-    } else {
-      cout << "Non-EPI volume received, skipping stream processing."
-           << endl;
-    }
+    // fire off the processing pipeline
+    sendCode(rti);
 
     if(saveImagesToFile) {
       saveImage(*rti);

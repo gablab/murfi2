@@ -28,7 +28,7 @@ RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip
     && mkdir build \
     && cd build \
     && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
-    && make -j 4 \
+    && make -j $(nproc) \
     && make install \
     && rm -rf build
 
@@ -69,10 +69,18 @@ RUN rm -rf /var/apt/lib/lists/* /var/tmp/* /tmp/* \
 
 
 WORKDIR /opt/murfi
-COPY [".", "."]
+COPY ["./conf", "conf"]
+COPY ["./doc", "docs"]
+COPY ["./scripts", "scripts"]
+COPY ["./src", "src"]
+COPY ["./util", "util"]
+COPY ["./LICENSE", "LICENSE"]
+COPY ["./makefile", "makefile"]
+#COPY ["./README.md", "README.md"]
 
+RUN echo $PWD && ls -la
 
-RUN make clean && make -j$(nproc)
+RUN make clean && make -j$(nproc) && make clean_build_artifacts
 
 
 ENV XDG_RUNTIME_DIR="/tmp"

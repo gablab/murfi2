@@ -49,8 +49,9 @@ void ImageWidget::initRun(RtConfigFmriRun &config) {
   layers.insert(Layer(ACTIVATION_LAYER, new ActivationImage()));
   draw_order.push_back(ACTIVATION_LAYER);
 
-  vector<string> masks = config.getProcessingModuleNames("mask-load", "roiID") +
-    config.getProcessingModuleNames("weighted-mask-load", "roiID");
+  vector<string> masks = config.getProcessingModuleNames("mask-load", "roiID");
+  vector<string> weighted_masks = config.getProcessingModuleNames("weighted-mask-load", "roiID");
+  masks.insert(masks.end(), weighted_masks.begin(), weighted_masks.end());
   for (vector<string>::iterator it = masks.begin(); it != masks.end(); ++it) {
     layers.insert(
       Layer(*it, new MaskImage(main_window->getColorForName(*it))));

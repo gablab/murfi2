@@ -20,14 +20,29 @@
 #include"RtDataStore.h"
 
 #define INITIAL_NOTIFY_LIST_LEN 128
+#define DEFAULT_NUM_PREVIOUS_TO_KEEP 10
 
-RtDataStore::RtDataStore() {
+RtDataStore::RtDataStore() :
+  purgeOldData(false),
+  numOldDataToKeep(DEFAULT_NUM_PREVIOUS_TO_KEEP),
+  storedBytes(0) {
   notifyList.reserve(INITIAL_NOTIFY_LIST_LEN);
 }
 
 // destructor
 RtDataStore::~RtDataStore() {
 
+}
+
+// set options based on configuration
+void RtDataStore::configure(RtConfigFmriExperiment& config) {
+  if(config.isSet("datastore:purgeOldData")) {
+    purgeOldData = config.get("datastore:purgeOldData");
+  }
+
+  if(config.isSet("datastore:numOldDataToKeep")) {
+    numOldDataToKeep = config.get("datastore:numOldDataToKeep");
+  }
 }
 
 // add an output to be notified when new data arrives
@@ -77,6 +92,18 @@ void RtDataStore::setData(RtData *data) {
   for(vector<RtDataListener*>::iterator i = notifyList.begin();
       i != notifyList.end(); i++) {
     (*i)->notify(data->getDataID());
+  }
+
+  // purge old data if necessary
+  if(purgeOldData) {
+    RtDataID previous(insert);
+    previous.setTimePoint(insert.getTimePoint() - numOldDataToKeep);
+    auto previousIt = store.find(previous);
+    if(previousIt != store.end() && !previousIt->second->isProtectedFromPurge()) {
+      store.erase(previousIt);
+      RtData* previousData = (RtData*) previousIt->second;
+      delete previousData;
+    }
   }
 }
 

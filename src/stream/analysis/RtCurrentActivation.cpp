@@ -196,6 +196,7 @@ int RtCurrentActivation::process(ACE_Message_Block *mb) {
   else {
     // post-numDataPointsForErrEst, use saved residual
     residual = steadyStateResidual;
+    residual->protectFromPurge();
   }
 
   // check that residual is not null

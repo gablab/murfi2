@@ -14,7 +14,8 @@ jobs:
       - name: deps
         run: |
           sudo apt update -qq
-          sudo apt install apptainer
+      - name: singularity install
+        uses: singularityhub/install-singularity@main
       - name: build-headless
         run: sh build_singularity.sh MAKE_TARGET=headless
       - name: test

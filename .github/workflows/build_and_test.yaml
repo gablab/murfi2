@@ -17,7 +17,7 @@ jobs:
       - name: singularity install
         uses: singularityhub/install-singularity@main
       - name: build-headless
-        run: sh build-singularity.sh MAKE_TARGET=headless
+        run: bash build-singularity.sh MAKE_TARGET=headless
       - name: test
         run: |
           mkdir example_data

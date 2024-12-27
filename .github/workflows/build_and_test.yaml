@@ -1,0 +1,26 @@
+name: build-and-test
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  image-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: deps
+        run: |
+          apt update -qq
+          apt install apptainer
+      - name: build
+        run: sh build_singularity.sh
+      - name: test
+        run: |
+          mkdir example_data
+          cd example_data
+          curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
+          cd ..
+          python test/regression/neurofeedback.py

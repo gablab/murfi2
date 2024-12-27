@@ -1,4 +1,4 @@
-bin/murfi
+bin/murfi*
 util/scanner_sim/servenii
 util/scanner_sim/servenii4d
 src/qt/ui_MainWindow.h

@@ -14,6 +14,8 @@ jobs:
       - name: deps
         run: |
           sudo apt update -qq
+          sudo apt search singularity
+          sudo apt search apptainer
           sudo apt install singularity-container
       - name: build-headless
         run: |

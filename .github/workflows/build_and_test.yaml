@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 jobs:
-  image-build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,8 +15,8 @@ jobs:
         run: |
           apt update -qq
           apt install apptainer
-      - name: build
-        run: sh build_singularity.sh
+      - name: build-headless
+        run: sh build_singularity.sh MAKE_TARGET=headless
       - name: test
         run: |
           mkdir example_data

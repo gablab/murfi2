@@ -17,6 +17,7 @@ jobs:
           sudo apt install singularity-container
       - name: build-headless
         run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           bash build-singularity.sh MAKE_TARGET=headless
       - name: test
         run: |

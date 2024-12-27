@@ -24,8 +24,7 @@
 
 RtDataStore::RtDataStore() :
   purgeOldData(false),
-  numOldDataToKeep(DEFAULT_NUM_PREVIOUS_TO_KEEP),
-  storedBytes(0) {
+  numOldDataToKeep(DEFAULT_NUM_PREVIOUS_TO_KEEP) {
   notifyList.reserve(INITIAL_NOTIFY_LIST_LEN);
 }
 

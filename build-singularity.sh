@@ -3,7 +3,11 @@
 set -xe
 
 args=${@:1}
-build_args=( "${args[@]/#/--build-arg }" )
+if [[ ${args} ]]; then
+    build_args=( "${args[@]/#/--build-arg }" )
+else
+    build_args=""
+fi
 
 docker build -t murfi:latest ${build_args} -f docker/Dockerfile .
 

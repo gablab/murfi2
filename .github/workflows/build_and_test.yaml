@@ -14,20 +14,9 @@ jobs:
       - name: deps
         run: |
           sudo apt update -qq
-      - name: docker install
-        uses: docker/setup-buildx-action@v3
-      - name: docker unmask
-        run: |
-          sudo systemctl unmask docker
-          sudo service docker start
-          sudo docker info
-      - name: singularity install
-        uses: singularityhub/install-singularity@main
+          sudo apt install singularity-container
       - name: build-headless
         run: |
-          sudo systemctl unmask docker
-          sudo service docker start
-          sudo docker info
           bash build-singularity.sh MAKE_TARGET=headless
       - name: test
         run: |

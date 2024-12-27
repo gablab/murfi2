@@ -81,9 +81,6 @@ class RtData {
   // get the creation time
   //ACE_Date_Time getCreationTime() const;
 
-  // compute the size of this data in bytes
-  virtual unsigned long long int getStoredBytes() const;
-
   // mark as protected from purge
   void protectFromPurge();
 

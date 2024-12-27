@@ -14,6 +14,7 @@
 # choose a base image that suits your host.
 
 ARG DEBIAN_FRONTEND="noninteractive"
+ARG MAKE_TARGET=
 
 FROM ubuntu:22.04
 RUN apt-get update -qq && \
@@ -28,7 +29,7 @@ RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip
     && mkdir build \
     && cd build \
     && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
-    && make -j 4 \
+    && make -j$(nproc) \
     && make install \
     && rm -rf build
 
@@ -72,7 +73,7 @@ WORKDIR /opt/murfi
 COPY [".", "."]
 
 
-RUN make clean && make -j$(nproc)
+RUN make clean && make -j$(nproc) $MAKE_TARGET
 
 
 ENV XDG_RUNTIME_DIR="/tmp"

@@ -13,8 +13,8 @@ jobs:
           fetch-depth: 1
       - name: deps
         run: |
-          apt update -qq
-          apt install apptainer
+          sudo apt update -qq
+          sudo apt install apptainer
       - name: build-headless
         run: sh build_singularity.sh MAKE_TARGET=headless
       - name: test

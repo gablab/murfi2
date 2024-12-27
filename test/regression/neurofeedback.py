@@ -107,6 +107,7 @@ class RunParams:
 def run_cmd(params: RunParams) -> str:
     proc = subprocess.Popen(params.cmd, cwd=params.cwd, env=params.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = proc.communicate()
+    print(f"job finished: {params}")
     return out
 
 

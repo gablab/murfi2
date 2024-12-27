@@ -15,7 +15,7 @@ OS=linux
 # project name
 PROJECT = murfi
 
-# whether to compile with various guis
+# whether to compile with gui
 export FRONTEND = 1
 
 # directories
@@ -265,6 +265,9 @@ debug:
 
 profile:
 	$(MAKE) DEBUG=1 PROF=1 OPTIM=0 STRIP=0 $(PROJECT)
+
+headless:
+	$(MAKE) FRONTEND=0 $(PROJECT)
 
 dirs:
 	mkdir -p $(OBJ_DIR)

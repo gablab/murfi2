@@ -6,18 +6,14 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: deps
         run: |
-          wget -O- http://neuro.debian.net/lists/jammy.us-ca.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
-          sudo apt-key adv --recv-keys --keyserver hkps://keyserver.ubuntu.com 0xA5D32F012649A5A9
           sudo apt update -qq
-          apt search singularity
-          apt search apptainer
           sudo apt install singularity-container
       - name: build-headless
         run: |

@@ -25,7 +25,9 @@ jobs:
         uses: singularityhub/install-singularity@main
       - name: build-headless
         run: |
+          sudo systemctl unmask docker
           sudo service docker start
+          sudo docker info
           bash build-singularity.sh MAKE_TARGET=headless
       - name: test
         run: |

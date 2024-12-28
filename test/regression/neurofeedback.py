@@ -116,7 +116,7 @@ def regression_test():
 
     murfi_params = RunParams(
         cmd=[
-            "apptainer",
+            "singularity",
             "exec",
             sif_path,
             "murfi",
@@ -133,7 +133,7 @@ def regression_test():
 
     serve_params = RunParams(
         cmd=[
-            "apptainer",
+            "singularity",
             "exec",
             sif_path,
             "bash",

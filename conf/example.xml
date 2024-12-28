@@ -72,6 +72,11 @@
 
 </gui>
 
+<datastore>
+  <option name="purgeOldData">     true </option>
+  <option name="numOldDataToKeep"> 10 </option>
+</datastore>
+
 <infoserver>
   <option name="disabled"> false </option>
   <option name="port">     15001 </option>
@@ -92,7 +97,7 @@
     <option name="roiID"> roi1 </option>
 
     <!-- filename to load the mask from relative to subject mask directory
-	 (if present, overrides generation parms below) -->
+         (if present, overrides generation parms below) -->
     <option name="filename"> active_mask.nii </option>
 
     <!-- whether to align the mask to the series reference after
@@ -208,15 +213,15 @@
            only one cycle's worth needs to be specified, the program
            will repeat that pattern until the end of the scan. -->
       <option name="condition" conditionName="descriptive_name_1">
-	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0
-	0 0 0 0 0 0 0 0
+        1 1 1 1 1 1 1 1
+        0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0
       </option>
 
       <option name="condition" conditionName="descriptive_name_2">
-	0 0 0 0 0 0 0 0
-	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0
+        1 1 1 1 1 1 1 1
+        0 0 0 0 0 0 0 0
       </option>
 
       <!-- number of trs to shift start of experiment by. this is
@@ -345,15 +350,15 @@
            only one cycle's worth needs to be specified, the program
            will repeat that pattern until the end of the scan. -->
       <option name="condition" conditionName="descriptive_name_1">
-	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0
-	0 0 0 0 0 0 0 0
+        1 1 1 1 1 1 1 1
+        0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0
       </option>
 
       <option name="condition" conditionName="descriptive_name_2">
-	0 0 0 0 0 0 0 0
-	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0
+        1 1 1 1 1 1 1 1
+        0 0 0 0 0 0 0 0
       </option>
 
       <!-- number of trs to shift start of experiment by. this is
@@ -446,15 +451,15 @@
            only one cycle's worth needs to be specified, the program
            will repeat that pattern until the end of the scan. -->
       <option name="condition" conditionName="descriptive_name_1">
-	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0
-	0 0 0 0 0 0 0 0
+        1 1 1 1 1 1 1 1
+        0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0
       </option>
 
       <option name="condition" conditionName="descriptive_name_2">
-	0 0 0 0 0 0 0 0
-	1 1 1 1 1 1 1 1
-	0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0
+        1 1 1 1 1 1 1 1
+        0 0 0 0 0 0 0 0
       </option>
 
       <!-- number of trs to shift start of experiment by. this is

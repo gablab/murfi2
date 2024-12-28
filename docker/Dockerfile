@@ -13,10 +13,11 @@
 # then please try using the Dockerfile that builds things from source. You can
 # choose a base image that suits your host.
 
-ARG DEBIAN_FRONTEND="noninteractive"
-ARG MAKE_TARGET=
-
 FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG MAKE_TARGET
+
 RUN apt-get update -qq && \
     apt-get install -y -q \
       curl \
@@ -35,10 +36,13 @@ RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip
 
 RUN ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
 
-
 WORKDIR /opt/murfi
-COPY ["docker/fsl_clean.sh", "."]
 
+# RUN  wget -O- http://neuro.debian.net/lists/jammy.us-ca.full | tee /etc/apt/sources.list.d/neurodebian.sources.list && \
+#      apt-key adv --recv-keys --keyserver hkps://keyserver.ubuntu.com 0xA5D32F012649A5A9 && \
+#      apt update
+
+COPY ["docker/fsl_clean.sh", "."]
 RUN curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py > fslinstaller.py && \
     python3 fslinstaller.py -d /opt/fsl && \
     sh fsl_clean.sh
@@ -72,8 +76,8 @@ RUN rm -rf /var/apt/lib/lists/* /var/tmp/* /tmp/* \
 WORKDIR /opt/murfi
 COPY [".", "."]
 
-
-RUN make clean && make -j$(nproc) $MAKE_TARGET
+RUN echo ${MAKE_TARGET}
+RUN make clean && make -j$(nproc) ${MAKE_TARGET}
 
 
 ENV XDG_RUNTIME_DIR="/tmp"

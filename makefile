@@ -60,10 +60,8 @@ export MOC = /usr/bin/moc-qt3
 ### LIBS AND LIB CONFIG
 
 # global package directory
-#export PKG_DIR = /software/fastr/packages
 export PKG_DIR = /usr/local/
 
-#NIFTI_HOME=/software/fastr/packages/nifticlib-1.1.0
 NIFTI_HOME=/usr
 
 # vtk

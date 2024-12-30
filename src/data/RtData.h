@@ -46,7 +46,7 @@ class RtData {
   RtData();
 
   // destructor
-  ~RtData();
+  virtual ~RtData();
 
   // gets and sets
 
@@ -81,6 +81,12 @@ class RtData {
   // get the creation time
   //ACE_Date_Time getCreationTime() const;
 
+  // mark as protected from purge
+  void protectFromPurge();
+
+  // determine if this data is protected from purge
+  bool isProtectedFromPurge() const;
+
  protected:
 
   //*** data members  ***//
@@ -92,6 +98,8 @@ class RtData {
 
   RtElementType elType;
 
+  // indicate that this data can be purged or not
+  bool protectedFromPurge;
 };
 
 #endif

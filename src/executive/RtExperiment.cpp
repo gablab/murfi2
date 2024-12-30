@@ -268,6 +268,8 @@ bool initExperiment() {
           && numExistingSeries < TOO_MANY_EXISTING_SERIES);
   cout << "found " << numExistingSeries << " existing series" << endl;
 
+  // configure datastore
+  dataStore.configure(config);
 
   // start info server
   infoServer = new RtInfoServer();

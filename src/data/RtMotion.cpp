@@ -24,7 +24,7 @@
 //*** constructors/destructors  ***//
 
 RtMotion::RtMotion() : RtData() {
-  ACE_TRACE(("RtMRIImage::RtMotion()"));
+  ACE_TRACE(("RtMotion::RtMotion()"));
 
   dataID.setModuleID(ID_MOTION);
   dataID.setDataName(NAME_MOTION);
@@ -36,9 +36,10 @@ RtMotion::RtMotion() : RtData() {
 // construct with motion
 RtMotion::RtMotion(double tx, double ty, double tz,
                    double rx, double ry, double rz) {
-  ACE_TRACE(("RtMRIImage::RtMotion()"));
+  ACE_TRACE(("RtMotion::RtMotion()"));
 
-  dataID.setModuleID("motion");
+  dataID.setModuleID(ID_MOTION);
+  dataID.setDataName(NAME_MOTION);
 
   setMotion(tx, ty, tz, rx, ry, rz);
 }

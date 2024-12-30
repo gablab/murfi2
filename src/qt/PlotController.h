@@ -16,7 +16,7 @@ class QCPItemLine;
 class QCPItemRect;
 class QCustomPlot;
 class RtDesignMatrix;
-class RtMotion;
+class RtFramewiseDisplacement;
 
 class PlotController : public QObject {
   Q_OBJECT
@@ -50,7 +50,7 @@ class PlotController : public QObject {
 
   void plotDesign(RtDesignMatrix* design);
 
-  void plotMotion(RtMotion* motion);
+  void plotMotion(RtFramewiseDisplacement* fd);
 
   std::map<std::string, int> roi_graphs;
 

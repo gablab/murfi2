@@ -20,6 +20,8 @@
 #ifndef RTDATASTORE_H
 #define RTDATASTORE_H
 
+#include"RtConfigFmriExperiment.h"
+
 #include"RtDataID.h"
 #include"RtDataListener.h"
 #include"RtData.h"
@@ -44,6 +46,9 @@ class RtDataStore : public RtOutput  {
   // destructor
   virtual ~RtDataStore();
 
+  // setup options from the configuration
+  virtual void configure(RtConfigFmriExperiment& config);
+
   // add listener to be notified when new data arrives
   virtual void addListener(RtDataListener *lis);
 
@@ -67,6 +72,10 @@ class RtDataStore : public RtOutput  {
   set<RtDataID>::const_iterator getAvailableData();
 
  protected:
+
+  // old image purging to save memory
+  bool purgeOldData;
+  int numOldDataToKeep;
 
   // list of outputs to be notified when new data arrives
   vector<RtDataListener*> notifyList;

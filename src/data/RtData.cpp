@@ -21,7 +21,10 @@
 
 
 // default constructor
-RtData::RtData() : numEl(0), elType(RT_UNKNOWN_TYPE) {}
+RtData::RtData() :
+  numEl(0),
+  elType(RT_UNKNOWN_TYPE),
+  protectedFromPurge(false) {}
 
 // destructor
 RtData::~RtData() {
@@ -48,8 +51,17 @@ void RtData::setDataID(const RtDataID &id) {
   dataID = id;
 }
 
-
 // get the number of elements in this datatype
 unsigned int RtData::getNumEl() const {
   return numEl;
+}
+
+// mark as protected from purge
+void RtData::protectFromPurge() {
+  protectedFromPurge = true;
+}
+
+// determine if this data is protected from purge
+bool RtData::isProtectedFromPurge() const {
+  return protectedFromPurge;
 }

@@ -15,7 +15,7 @@ OS=linux
 # project name
 PROJECT = murfi
 
-# whether to compile with various guis
+# whether to compile with gui
 export FRONTEND = 1
 
 # directories
@@ -60,10 +60,8 @@ export MOC = /usr/bin/moc-qt3
 ### LIBS AND LIB CONFIG
 
 # global package directory
-#export PKG_DIR = /software/fastr/packages
 export PKG_DIR = /usr/local/
 
-#NIFTI_HOME=/software/fastr/packages/nifticlib-1.1.0
 NIFTI_HOME=/usr
 
 # vtk
@@ -223,7 +221,7 @@ C_INC = -I$(SRC_DIR) \
 
 C_FLAGS = -Wall \
 	-Wno-write-strings \
-	-std=c++11 \
+	-std=c++14 \
 	$(FRONT_FLAG) \
 	$(MTRACE_FLAG) \
 	$(PROF_FLAG) \
@@ -265,6 +263,9 @@ debug:
 
 profile:
 	$(MAKE) DEBUG=1 PROF=1 OPTIM=0 STRIP=0 $(PROJECT)
+
+headless:
+	$(MAKE) FRONTEND=0 $(PROJECT)
 
 dirs:
 	mkdir -p $(OBJ_DIR)

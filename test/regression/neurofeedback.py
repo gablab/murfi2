@@ -1,11 +1,15 @@
 from dataclasses import dataclass
-from functools import partial
+import logging
 import multiprocessing
 import os
 from pathlib import Path
 import re
 import subprocess
 import sys
+
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
 
 EXPECTED_OUTPUT = [
@@ -107,7 +111,7 @@ class RunParams:
 def run_cmd(params: RunParams) -> str:
     proc = subprocess.Popen(params.cmd, cwd=params.cwd, env=params.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = proc.communicate()
-    print(f"job finished: {params}")
+    logging.info(f"job finished: {params}")
     return out
 
 
@@ -149,21 +153,21 @@ def regression_test():
         },
     )
 
-    print("running test...")
+    logging.info("running test...")
     pool = multiprocessing.Pool(2)
     out = pool.map(run_cmd, [murfi_params, serve_params])
 
     # get results by TR
     tr_data = re.compile(r"RtRoiCombine: active at tr (\d+) result is: ([-\d.]+)").findall(out[0].decode())
     if len(EXPECTED_OUTPUT) != len(tr_data):
-        print("ERROR: new and old data have different lengths (%d != %d)" % (len(tr_data), len(EXPECTED_OUTPUT)))
+        logging.error("ERROR: new and old data have different lengths (%d != %d)" % (len(tr_data), len(EXPECTED_OUTPUT)))
         return 1
 
     expected = list(zip(map(str, range(1, len(EXPECTED_OUTPUT) + 1)), EXPECTED_OUTPUT))
     if expected != tr_data:
         raise ValueError("TEST FAILURE: mismatch between expected and measured data")
 
-    print("passed")
+    logging.info("passed")
     return 0
 
 

@@ -339,16 +339,8 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    // If it's not an EPI don't fire off the murfi processing pipeline.
-    //
-    // TODO: This will need to be changed in order to process other types of
-    // data.
-    if(!strcmp(ei->scanType, "EPI")) {
-      sendCode(rti);
-    } else {
-      cout << "Non-EPI volume received, skipping stream processing."
-           << endl;
-    }
+    // fire off the murfi processing pipeline.
+    sendCode(rti);
 
     if(saveImagesToFile) {
       saveImage(*rti);
@@ -396,10 +388,10 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
 
   // first 8 bytes are size of header, size of data
   int size_of_header = 0;
-  stream.recv_n(&size_of_header, sizeof(int));
+  stream.recv_n(&size_of_header, 4);
 
   int size_of_data = 0;
-  stream.recv_n(&size_of_data, sizeof(int));
+  stream.recv_n(&size_of_data, 4);
 
   for(rec = 0; rec < RtExternalImageInfo::getHeaderSize();){
     rec_delta = stream.recv_n(buffer + rec,

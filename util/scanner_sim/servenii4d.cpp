@@ -172,6 +172,15 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
     ei->isMotionCorrected = false;
     cout << "sending info of size " << ei->getHeaderSize()
          << endl;
+
+    int size_of_header = ei->getHeaderSize();
+    cout << "sending info of size " << ei->getHeaderSize() << endl;
+    stream.send_n(reinterpret_cast<char*>(&size_of_header), 4);
+
+    int size_of_data = ei->getDataSize();
+    cout << "sending img of size " << ei->getDataSize() << endl;
+    stream.send_n(reinterpret_cast<char*>(&size_of_data), 4);
+
     stream.send_n(reinterpret_cast<char*>(ei), ei->getHeaderSize());
 
     cout << "sending img of size " << ei->getDataSize() << endl;

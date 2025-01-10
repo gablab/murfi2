@@ -112,10 +112,11 @@ def run_cmd(params: RunParams) -> str:
     proc = subprocess.Popen(params.cmd, cwd=params.cwd, env=params.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = proc.communicate()
     logging.info(f"job finished: {params}")
+    logging.debug(out)
     return out
 
 
-def regression_test():
+def regression_test(include_pre_header=False):
     sif_path = Path(os.getcwd()) / "bin" / "murfi.sif"
 
     murfi_params = RunParams(
@@ -125,7 +126,7 @@ def regression_test():
             sif_path,
             "murfi",
             "-f",
-            "scripts/neurofeedback.xml",
+            "scripts/neurofeedback-preheader.xml" if include_pre_header else "scripts/neurofeedback.xml",
         ],
         cwd=str(Path("example_data")),
         env={
@@ -146,6 +147,7 @@ def regression_test():
             "15000",
             os.uname().nodename,
             "2",
+            "1" if include_pre_header else "0"
         ],
         cwd=str(Path("example_data") / "scripts"),
         env={
@@ -172,4 +174,4 @@ def regression_test():
 
 
 if __name__ == "__main__":
-    sys.exit(regression_test())
+    sys.exit(regression_test(include_pre_header=True) or regression_test(include_pre_header=False))

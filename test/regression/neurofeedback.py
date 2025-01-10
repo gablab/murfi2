@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
+
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -177,4 +179,4 @@ def run(no_image):
 
 
 if __name__ == "__main__":
-    run()
+    sys.exit(run())

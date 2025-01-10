@@ -46,7 +46,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   long tr = 1000*(argc > 6 ? atof(argv[6]) : 1000);
   int port = argc > 7 ? atoi(argv[7]) : 15000;
   string host(argc > 8 ? argv[8] : "localhost");
-  bool preHeader = argc > 9 ? argv[9] != "0" : false;
+  bool preHeader = argc > 9 ? strcmp(argv[9], "0") : false;
 
   cout << "1 using niiStem=" << niiStem << endl;
   cout << "2 using series=" << series << endl;

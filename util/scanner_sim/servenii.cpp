@@ -46,6 +46,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   long tr = 1000*(argc > 6 ? atof(argv[6]) : 1000);
   int port = argc > 7 ? atoi(argv[7]) : 15000;
   string host(argc > 8 ? argv[8] : "localhost");
+  bool preHeader = argc > 9 ? argv[9] != "0" : false;
 
   cout << "1 using niiStem=" << niiStem << endl;
   cout << "2 using series=" << series << endl;
@@ -55,6 +56,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   cout << "6 using tr=" << tr << endl;
   cout << "7 using port=" << port << endl;
   cout << "8 using host=" << host << endl;
+  cout << "9 using preHeader=" << preHeader << endl;
 
   // Local server address.
   ACE_INET_Addr my_addr (port, host.c_str());
@@ -83,11 +85,14 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     int size_of_header = ei.getHeaderSize();
     cout << "sending info of size " << ei.getHeaderSize() << endl;
-    stream.send_n(reinterpret_cast<char*>(&size_of_header), 4);
 
     int size_of_data = ei.getDataSize();
     cout << "sending img of size " << ei.getDataSize() << endl;
-    stream.send_n(reinterpret_cast<char*>(&size_of_data), 4);
+
+    if(preHeader) {
+      stream.send_n(reinterpret_cast<char*>(&size_of_header), 4);
+      stream.send_n(reinterpret_cast<char*>(&size_of_data), 4);
+    }
 
     stream.send_n(reinterpret_cast<char*>(&ei), size_of_header);
 

@@ -27,6 +27,7 @@ void usage(char *execname) {
        << "host "
        << "port "
        << "tr (seconds)"
+       << "preHeader (0 for no preHeader, which is the default)"
        << "]"
        << endl;
 }
@@ -44,6 +45,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   string host(argc > arg ? argv[arg++] : "localhost");
   int port = argc > arg ? atoi(argv[arg++]) : 15000;
   float inputTr = (argc > arg ? atof(argv[arg++]) : 1);
+  bool preHeader = (argc > arg ? argv[arg++] != "0": false);
 
   // Local server address.
   ACE_INET_Addr my_addr (port, host.c_str());
@@ -131,7 +133,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     for (int r = 0; r < 4; r++) {
       for (int c = 0; c < 4; c++) {
-	ei->voxelToWorldMatrix[r][c] = vols->qto_xyz.m[r][c];
+        ei->voxelToWorldMatrix[r][c] = vols->qto_xyz.m[r][c];
       }
     }
 
@@ -175,11 +177,14 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     int size_of_header = ei->getHeaderSize();
     cout << "sending info of size " << ei->getHeaderSize() << endl;
-    stream.send_n(reinterpret_cast<char*>(&size_of_header), 4);
 
     int size_of_data = ei->getDataSize();
     cout << "sending img of size " << ei->getDataSize() << endl;
-    stream.send_n(reinterpret_cast<char*>(&size_of_data), 4);
+
+    if(preHeader) {
+      stream.send_n(reinterpret_cast<char*>(&size_of_header), 4);
+      stream.send_n(reinterpret_cast<char*>(&size_of_data), 4);
+    }
 
     stream.send_n(reinterpret_cast<char*>(ei), ei->getHeaderSize());
 

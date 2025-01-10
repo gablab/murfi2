@@ -49,7 +49,8 @@ static bool verbose = false;
 
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
-    :  port(DEFAULT_PORT)
+    :  port(DEFAULT_PORT),
+       preHeader(false)
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
@@ -110,6 +111,12 @@ bool RtInputScannerImages::open(RtConfig &config) {
   // see if we should unmosaic the images
   if(config.isSet("scanner:unmosaic")) {
     unmosaicInputImages = (bool) config.get("scanner:unmosaic");
+  }
+
+  // whether to receive the siemens preHeader bytes
+  if(config.isSet("scanner:preHeader")
+     && config.get("scanner:preHeader")==true) {
+    preHeader = true;
   }
 
   // see if we should save images to a file
@@ -386,12 +393,15 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
   // read until we have all the bytes we need
   // TODO add error handling here
 
-  // first 8 bytes are size of header, size of data
-  int size_of_header = 0;
-  stream.recv_n(&size_of_header, 4);
+  // sometimes siemens sends a pre-header
+  if(preHeader) {
+    // first 8 bytes are size of header, size of data
+    int size_of_header = 0;
+    stream.recv_n(&size_of_header, 4);
 
-  int size_of_data = 0;
-  stream.recv_n(&size_of_data, 4);
+    int size_of_data = 0;
+    stream.recv_n(&size_of_data, 4);
+  }
 
   for(rec = 0; rec < RtExternalImageInfo::getHeaderSize();){
     rec_delta = stream.recv_n(buffer + rec,

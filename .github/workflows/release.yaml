@@ -16,10 +16,31 @@ jobs:
         run: |
           sudo apt update -qq
           sudo apt install singularity-container
-      - name: Login to GitHub Container Registry
+      - name: docker login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USER }}
+          password: ${{ secrets.GHCR_PAT }}
+      - name: refresh-base
+        run: |
+          docker build -t ghcr.io/gablab/murfi2-base:latest -f docker/Dockerfile.base .
+          docker push ghcr.io/gablab/murfi2-base:latest
+      - name: build
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          bash build-singularity.sh
+      - name: test
+        run: |
+          mkdir example_data
+          cd example_data
+          curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
+          cd ..
+          python test/regression/neurofeedback.py
+      - name: singularity login
         run: |
           echo ${{ secrets.GHCR_PAT }} | singularity registry login -u ${{ secrets.GHCR_USER }} --password-stdin docker://ghcr.io
       - name: release
         run: |
           bash build-singularity.sh
-          singularity push bin/murfi.sif oras://ghcr.io/gablab/murfi2:latest
+          singularity push bin/murfi.sif oras://ghcr.io/gablab/murfi2-sif:latest

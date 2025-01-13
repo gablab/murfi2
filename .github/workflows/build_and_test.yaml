@@ -32,10 +32,3 @@ jobs:
           curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
           cd ..
           python test/regression/neurofeedback.py
-      - name: Login to GitHub Container Registry - delete me
-        run: |
-          echo ${{ secrets.GHCR_PAT }} | singularity registry login -u ${{ secrets.GHCR_USER }} --password-stdin docker://ghcr.io
-      - name: build-release
-        run: |
-          bash build-singularity.sh
-          singularity push bin/murfi.sif oras://ghcr.io/gablab/murfi2:latest

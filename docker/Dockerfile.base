@@ -1,0 +1,28 @@
+# Dockerfile for the base image for building murfi2.
+
+FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND="noninteractive"
+
+RUN apt-get update -qq && \
+    apt-get install -y -q \
+      curl \
+      build-essential \
+      cmake \
+      python3
+
+
+RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
+    && mkdir build \
+    && cd build \
+    && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
+    && make -j$(nproc) \
+    && make install \
+    && rm -rf build
+
+RUN ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
+
+COPY ["docker/fsl_clean.sh", "."]
+RUN curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py > fslinstaller.py && \
+    python3 fslinstaller.py -d /opt/fsl && \
+    sh fsl_clean.sh

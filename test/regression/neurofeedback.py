@@ -10,7 +10,7 @@ import sys
 
 
 logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 EXPECTED_OUTPUT = [

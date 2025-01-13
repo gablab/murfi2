@@ -117,6 +117,9 @@ class RtInputScannerImages : public RtInput {
   // whether to only read moco images
   bool onlyReadMoCo;
 
+  // whether to receive the siemsens pre-header
+  bool preHeader;
+
   bool print;
 
   // parms for image saving to disk

@@ -20,7 +20,8 @@ RUN apt install -y -q \
     libqt5gui5 \
     language-pack-en-base \
     yaru-theme-icon \
-    shared-mime-info
+    shared-mime-info \
+    python3-pip
 
 RUN update-locale "LANG=en_US.UTF-8" && \
     locale-gen en_US.UTF-8 && \
@@ -31,6 +32,7 @@ RUN update-mime-database /usr/share/mime
 RUN rm -rf /var/apt/lib/lists/* /var/tmp/* /tmp/* \
     && apt-get clean
 
+RUN pip install click
 
 WORKDIR /opt/murfi
 COPY [".", "."]

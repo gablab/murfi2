@@ -1,3 +1,4 @@
+import click
 from dataclasses import dataclass
 import logging
 import multiprocessing
@@ -109,23 +110,24 @@ class RunParams:
 
 
 def run_cmd(params: RunParams) -> str:
+    logging.info(f"running job: {params}")
     proc = subprocess.Popen(params.cmd, cwd=params.cwd, env=params.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = proc.communicate()
     logging.info(f"job finished: {params}")
+    logging.debug(f"stdout: {out}")
+    logging.debug(f"stderr: {err}")
     return out
 
 
-def regression_test():
-    sif_path = Path(os.getcwd()) / "bin" / "murfi.sif"
+def regression_test(no_image, include_pre_header):
+    base_exec_path = Path(os.getcwd()) / "bin" / "murfi"
+    base_cmd = [] if no_image else ["singularity", "exec", base_exec_path.with_suffix(".sif")]
 
+    murfi_exec = [base_exec_path] if no_image else base_cmd + ["murfi"]
     murfi_params = RunParams(
-        cmd=[
-            "singularity",
-            "exec",
-            sif_path,
-            "murfi",
+        cmd=murfi_exec + [
             "-f",
-            "scripts/neurofeedback.xml",
+            "scripts/neurofeedback-preheader.xml" if include_pre_header else "scripts/neurofeedback.xml",
         ],
         cwd=str(Path("example_data")),
         env={
@@ -136,20 +138,19 @@ def regression_test():
     )
 
     serve_params = RunParams(
-        cmd=[
-            "singularity",
-            "exec",
-            sif_path,
+        cmd=base_cmd + [
             "bash",
             "servedata.sh",
             "100",
             "15000",
             os.uname().nodename,
             "2",
+            "1" if include_pre_header else "0"
         ],
         cwd=str(Path("example_data") / "scripts"),
         env={
             "QT_QPA_PLATFORM": "offscreen",
+            "PATH": str(Path("/") / "opt" / "murfi" / "util" / "scanner_sim") + ":" + os.environ["PATH"],
         },
     )
 
@@ -171,5 +172,11 @@ def regression_test():
     return 0
 
 
+@click.command()
+@click.option("--no-image", is_flag=True, help="Run from a non-sif environment locally")
+def run(no_image):
+    return regression_test(no_image, include_pre_header=True) or regression_test(no_image, include_pre_header=False)
+
+
 if __name__ == "__main__":
-    sys.exit(regression_test())
+    sys.exit(run())

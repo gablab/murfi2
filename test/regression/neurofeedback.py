@@ -5,7 +5,7 @@ import multiprocessing
 import os
 from pathlib import Path
 import re
-import subprocess
+from subprocess import PIPE, Popen, TimeoutExpired
 import sys
 
 
@@ -111,9 +111,17 @@ class RunParams:
 
 def run_cmd(params: RunParams) -> str:
     logging.info(f"running job: {params}")
-    proc = subprocess.Popen(params.cmd, cwd=params.cwd, env=params.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = proc.communicate()
-    logging.info(f"job finished: {params}")
+    proc = Popen(params.cmd, cwd=params.cwd, env=params.env, stdout=PIPE, stderr=PIPE)
+
+    finished = False
+    try:
+        out, err = proc.communicate(timeout=60)
+        finished = True
+    except TimeoutExpired:
+        proc.kill()
+        out, err = proc.communicate()
+
+    logging.info(f"{'' if finished else 'did not'} finish: {params}")
     logging.debug(f"stdout: {out}")
     logging.debug(f"stderr: {err}")
     return out

@@ -1,51 +1,10 @@
-# Dockerfile for murfi2. Dependencies are mostly installed as pre-compiled pacakges.
-#
-# Please note that because murfi has a GUI, the version of OpenGL has to be the
-# same -- similar is probably fine -- on the host and within the container.
-# The root operating system of this container is debian:jessie, which was
-# initially released in April, 2015. If you get output like
-#
-#     X Error of failed request:  GLXBadContext
-#       Major opcode of failed request:  151 (GLX)
-#       Minor opcode of failed request:  6 (X_GLXIsDirect)
-#       Serial number of failed request:  45
-#
-# then please try using the Dockerfile that builds things from source. You can
-# choose a base image that suits your host.
-
-FROM ubuntu:22.04
+# Dockerfile for murfi2.
+FROM ghcr.io/gablab/murfi2-base:latest
 
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG MAKE_TARGET
 
-RUN apt-get update -qq && \
-    apt-get install -y -q \
-      curl \
-      build-essential \
-      cmake \
-      python3
-
-
-RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \
-    && mkdir build \
-    && cd build \
-    && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
-    && make -j$(nproc) \
-    && make install \
-    && rm -rf build
-
-RUN ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
-
 WORKDIR /opt/murfi
-
-# RUN  wget -O- http://neuro.debian.net/lists/jammy.us-ca.full | tee /etc/apt/sources.list.d/neurodebian.sources.list && \
-#      apt-key adv --recv-keys --keyserver hkps://keyserver.ubuntu.com 0xA5D32F012649A5A9 && \
-#      apt update
-
-COPY ["docker/fsl_clean.sh", "."]
-RUN curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py > fslinstaller.py && \
-    python3 fslinstaller.py -d /opt/fsl && \
-    sh fsl_clean.sh
 
 RUN apt install -y -q \
     libace-dev \

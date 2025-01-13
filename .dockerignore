@@ -1,7 +1,12 @@
 .dockerignore
 .git
+.github
 .idea
 .vagrant
 docker/source.Dockerfile
 docker/Dockerfile
 README.md
+example_data
+bin
+obj
+build_singularity.sh

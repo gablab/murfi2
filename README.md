@@ -15,26 +15,23 @@ http://dx.doi.org/10.1016/j.neuroimage.2010.07.060
 Quickstart
 ----------
 
-Install murfi from a pre-built docker image:
+Download murfi as a pre-built singularity image:
 
-    sudo singularity build -F murfi.sif docker://ohinds/murfi:latest
-
-This command will take some time, as it downloads a pre-built murfi
-docker image from dockerhub, then builds a singularity image
-(`murfi.sif`) from the docker image.
+    singularity pull oras://ghcr.io/gablab/murfi2-sif:latest
 
 Running the example
 -------------------
 
     mkdir murfi_example_data && \
         cd murfi_example_data && \
-        curl -fsSL https://www.dropbox.com/s/1vvrz2g4tbzoh5c/murfi_example_data.tgz | tar -xz --strip-components 1
-    MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=murfi_example_data singularity exec ../murfi.sif murfi -f scripts/neurofeedback.xml
+        curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/61krbyoj293qpeaxcs9zl/murfi_example_data.tgz?rlkey=paljzpw3f9pbpirbdu8fcrhdm&st=jm686tif&dl=1' && \
+        tar xzvf murfi_example_data.tgz
+    MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=murfi_example_data singularity run ../murfi2-sif_latest.sif murfi -f scripts/neurofeedback.xml
 
 In another terminal:
 
     cd murfi_example_data/scripts
-    singularity exec ../../murfi.sif ./servedata.sh 3000 15000 $(hostname)
+    singularity exec ../../murfi2-sif_latest.sif bash servedata.sh 3000 15000 $(hostname)
 
 Development
 -----------
@@ -70,7 +67,7 @@ To install vxl, use the following commands:
         && mkdir build \
         && cd build \
         && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
-        && make -j 4 \
+        && make -j $(nproc) \
         && sudo make install \
         && rm -rf build \
         && ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl

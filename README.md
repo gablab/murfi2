@@ -16,9 +16,10 @@ Quickstart
 ----------
 
 1. Install apptainer >= 1.3.0 or SingularityCE >= 4.0.0
+
 1. Download murfi as a pre-built singularity image:
 
-    singularity pull oras://ghcr.io/gablab/murfi2-sif:latest
+        singularity pull oras://ghcr.io/gablab/murfi2-sif:latest
     
 Running the example
 -------------------

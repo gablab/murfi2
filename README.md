@@ -15,10 +15,11 @@ http://dx.doi.org/10.1016/j.neuroimage.2010.07.060
 Quickstart
 ----------
 
-Download murfi as a pre-built singularity image:
+1. Install apptainer >= 1.3.0 or SingularityCE >= 4.0.0
+1. Download murfi as a pre-built singularity image:
 
     singularity pull oras://ghcr.io/gablab/murfi2-sif:latest
-
+    
 Running the example
 -------------------
 

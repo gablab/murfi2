@@ -20,7 +20,7 @@ RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip
     && make install \
     && rm -rf build
 
-RUN ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl
+RUN if [ -d /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ ]; then ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl; fi
 
 COPY ["docker/fsl_clean.sh", "."]
 RUN curl https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py > fslinstaller.py && \

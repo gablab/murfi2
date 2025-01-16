@@ -275,7 +275,18 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   dataID.setTimePoint(info.currentTR);
   tr = info.repetitionTimeMS;
   moco = info.isMotionCorrected;
+  mcTranslationXMM = info.mcTranslationXMM;
+  mcTranslationYMM = info.mcTranslationYMM;
+  mcTranslationZMM = info.mcTranslationZMM;
+  mcRotationXDeg = info.mcRotationXDeg;
+  mcRotationYDeg = info.mcRotationYDeg;
+  mcRotationZDeg = info.mcRotationZDeg;
+
   fromScanner = !strcmp(info.magic, EXTERNALSENDER_MAGIC);
+}
+
+int RtMRIImage::getTotalRepetitions() const {
+  return totalRepetitions;
 }
 
 // set the matrix size
@@ -309,7 +320,6 @@ float RtMRIImage::getAutoContrast() {
   return SHRT_MAX/(float) maxVal;
 }
 
-
 // get a smart brightness level
 float RtMRIImage::getAutoBrightness() {
   ACE_TRACE(("RtMRIImage::getAutoBrightness"));
@@ -320,4 +330,34 @@ float RtMRIImage::getAutoBrightness() {
 
   return (float) minVal;
 
+}
+
+// get whether this is a moco volume
+bool RtMRIImage::getMoco() {
+  return moco;
+}
+
+// get motion parameters
+float64_t RtMRIImage::getTranslationX() {
+  return mcTranslationXMM;
+}
+
+float64_t RtMRIImage::getTranslationY() {
+  return mcTranslationYMM;
+}
+
+float64_t RtMRIImage::getTranslationZ() {
+  return mcTranslationZMM;
+}
+
+float64_t RtMRIImage::getRotationX() {
+  return mcRotationXDeg;
+}
+
+float64_t RtMRIImage::getRotationY() {
+  return mcRotationYDeg;
+}
+
+float64_t RtMRIImage::getRotationZ() {
+  return mcRotationZDeg;
 }

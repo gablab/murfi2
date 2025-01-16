@@ -61,6 +61,9 @@ class RtInputScannerImages : public RtInput {
 
  protected:
 
+  // read an MRI image from a socket stream
+  RtMRIImage* receiveImageFromSocket();
+
   // read the scanner image info from a socket stream
   // NOTE: performes blocking read
   //  in
@@ -76,8 +79,8 @@ class RtInputScannerImages : public RtInput {
   //   info:   the last read image info struct
   //  out
   //   image data on successful read (NULL otherwise)
-  short *receiveImage(ACE_SOCK_Stream &stream,
-                      const RtExternalImageInfo &info);
+  short *receiveImageData(ACE_SOCK_Stream &stream,
+                          const RtExternalImageInfo &info);
 
   // saves an image
   //  in
@@ -117,7 +120,7 @@ class RtInputScannerImages : public RtInput {
   // whether to only read moco images
   bool onlyReadMoCo;
 
-  // whether to receive the siemsens pre-header
+  // whether to receive the siemens pre-header
   bool preHeader;
 
   bool print;

@@ -196,67 +196,33 @@ bool RtInputScannerImages::init() {
 
 // run the scanner input
 int RtInputScannerImages::svc() {
-  RtExternalImageInfo *ei;
-  short *img;
   RtMRIImage *rti;
   stringstream infos;
 
   cout << "listening for images on port " << port << endl;
 
   // continuously try to accept connections
-  for(; isOpen && acceptor.accept(stream) != -1;) {
+  while(isOpen) {
 
     if(!initialized) {
-      cerr << "ERROR: accepting images when scanner input not initialized!"
-           << endl;
       continue;
     }
 
-    if(verbose) {
-      cout << "connection accepted" << endl;
+    rti = receiveImageFromSocket();
+    if(rti == NULL) {
+      break;
     }
 
-    // get the info
-    ei = receiveImageInfo(stream);
-    if(ei == NULL) {
-      if(verbose) {
-        cout << "couldn't parse image, discarding." << endl;
-      }
-
-      stream.close();
-      continue;
-    }
-
-    ei->currentTR = std::max(ei->currentTR-num2Discard,
-                                      (unsigned int) 1);
-
-    if(verbose) {
-      cout << "image info received" << endl;
-    }
-
-    // get the image
-    img = receiveImage(stream, *ei);
-    if(verbose) {
-      cout << "image received" << endl;
-    }
-
-    // close the stream (scanner connects anew for each image)
-    stream.close();
-
-
-    if(onlyReadMoCo && !ei->isMotionCorrected) {
+    if(onlyReadMoCo && !rti->getMoco()) {
       cout << "ignoring non-MoCo image." << endl;
       continue;
     }
-    else if(!ei->isMotionCorrected) {
+    else if(!rti->getMoco()) {
       cout << "got non-MoCo image." << endl;
     }
     else {
       cout << "got MoCo image." << endl;
     }
-
-    // build data class
-    rti = new RtMRIImage(*ei, img);
 
     if(unmosaicInputImages) {
       cout << "Source image is mosaic'd; unmosaicing." << endl;
@@ -292,13 +258,13 @@ int RtInputScannerImages::svc() {
     }
 
     // if there is motion info add it
-    if(ei->isMotionCorrected) {
-      RtMotion *mot = new RtMotion(ei->mcTranslationXMM,
-                                   ei->mcTranslationYMM,
-                                   ei->mcTranslationZMM,
-                                   ei->mcRotationXDeg,
-                                   ei->mcRotationYDeg,
-                                   ei->mcRotationZDeg);
+    if(rti->getMoco()) {
+      RtMotion *mot = new RtMotion(rti->getTranslationX(),
+                                   rti->getTranslationY(),
+                                   rti->getTranslationZ(),
+                                   rti->getRotationX(),
+                                   rti->getRotationY(),
+                                   rti->getRotationZ());
       mot->getDataID().setSeriesNum(rti->getDataID().getSeriesNum());
       mot->getDataID().setTimePoint(rti->getDataID().getTimePoint());
       getDataStore().setData(mot);
@@ -358,7 +324,7 @@ int RtInputScannerImages::svc() {
     infos.str("");
     infos << "received image from scanner: series "
           << rti->getDataID().getSeriesNum()
-          << " acquisition " << ei->currentTR << endl;
+          << " acquisition " << rti->getDataID().getTimePoint() << endl;
     log(infos);
 
     if(print) {
@@ -367,11 +333,7 @@ int RtInputScannerImages::svc() {
            << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
 
-    // clean up
-    delete ei;
-    delete [] img;
-
-    if(ei->currentTR + num2Discard == ei->totalTR) {
+    if(rti->getDataID().getTimePoint() + num2Discard == rti->getTotalRepetitions()) {
       cout << "received last image." << endl;
       sendCode(NULL);
       init();
@@ -379,6 +341,49 @@ int RtInputScannerImages::svc() {
   }
 
   return 0;
+}
+
+// receive an image from the scanner
+RtMRIImage* RtInputScannerImages::receiveImageFromSocket() {
+  if(acceptor.accept(stream) == -1) {
+    return NULL;
+  }
+
+  if(verbose) {
+    cout << "connection accepted" << endl;
+  }
+
+  // get the info
+  RtExternalImageInfo* ei = receiveImageInfo(stream);
+  if(ei == NULL) {
+    if(verbose) {
+      cout << "couldn't parse image, discarding." << endl;
+    }
+
+    stream.close();
+    return NULL;
+  }
+
+  ei->currentTR = std::max(ei->currentTR-num2Discard,
+                                    (unsigned int) 1);
+
+  if(verbose) {
+    cout << "image info received" << endl;
+  }
+
+  // get the image
+  short *img = receiveImageData(stream, *ei);
+  if(verbose) {
+    cout << "image received" << endl;
+  }
+
+  // close the stream (scanner connects anew for each image)
+  stream.close();
+
+  delete ei;
+  delete [] img;
+
+  return new RtMRIImage(*ei, img);
 }
 
 // read the scanner image info from a socket stream
@@ -429,8 +434,8 @@ RtExternalImageInfo *RtInputScannerImages::receiveImageInfo(
 //   info:   the last read image info struct
 //  out
 //   image data on successful read (NULL otherwise)
-short *RtInputScannerImages::receiveImage(ACE_SOCK_Stream &stream,
-                                          const RtExternalImageInfo &info) {
+short *RtInputScannerImages::receiveImageData(ACE_SOCK_Stream &stream,
+                                             const RtExternalImageInfo &info) {
 
   // grab numPix from header (to support MEMPRAGE)
   long numPix = info.getNumVoxels();

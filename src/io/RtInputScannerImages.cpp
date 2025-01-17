@@ -380,10 +380,12 @@ RtMRIImage* RtInputScannerImages::receiveImageFromSocket() {
   // close the stream (scanner connects anew for each image)
   stream.close();
 
+  RtMRIImage *rti = new RtMRIImage(*ei, img);
+
   delete ei;
   delete [] img;
 
-  return new RtMRIImage(*ei, img);
+  return rti;
 }
 
 // read the scanner image info from a socket stream

@@ -83,9 +83,13 @@ void RtDataStore::setData(RtData *data) {
 
   mut.release();
 
-  //debug
-  //  set<RtDataID>::const_iterator it = getAvailableData();
-  //endebug
+  // // debug
+  // set<RtDataID>::const_iterator it = getAvailableData();
+  // while(it != availableData.end()) {
+  //   cout << (*it).toString() << endl;
+  //   ++it;
+  // }
+  // // endebug
 
   // notify listeners
   for(vector<RtDataListener*>::iterator i = notifyList.begin();

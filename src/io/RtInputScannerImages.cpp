@@ -20,7 +20,10 @@
 
 #include"RtInputScannerImages.h"
 
+#include <cstdio>
+#include<filesystem>
 #include<fstream>
+#include<set>
 
 #include"site_config.h"
 
@@ -64,7 +67,6 @@ RtInputScannerImages::RtInputScannerImages()
   initialized = false;
   haveStudyRefVol = false;
   haveSeriesRefVol = false;
-
 }
 
 // destructor
@@ -83,18 +85,46 @@ bool RtInputScannerImages::open(RtConfig &config) {
     initialized = false;
   }
 
-  // get port from the config and try to open the socket
-  port = config.isSet("scanner:port")
-      ? config.get("scanner:port") : DEFAULT_PORT;
+  if(config.isSet("scanner:imageSource")) {
+     if(config.get("scanner:imageSource") == "DICOM") {
+       source = DICOM;
+     }
+     else if(config.get("scanner:imageSource") == "VSEND") {
+       source = VSEND;
+     }
+     else {
+       cerr << "unknown image source: " << config.get("scanner:imageSource")
+            << ", assuming VSEND" << endl;
+       source = VSEND;
+     }
+  }
+  else {
+    cerr << "image source not set, assuming VSEND" << endl;
+    source = VSEND;
+  }
 
-  // build the address
-  ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
+  if(source == DICOM) {
+    if(!config.isSet("scanner:inputDicomDir")) {
+      cerr << "DICOM image source specified but no inputDicomDir" << endl;
+      isOpen = false;
+      return false;
+    }
+    dicomDir = config.get("scanner:inputDicomDir").str();
+  }
+  else {
+    // get port from the config and try to open the socket
+    port = config.isSet("scanner:port")
+        ? config.get("scanner:port") : DEFAULT_PORT;
 
-  if(acceptor.open(address,1) == -1) {
-    cerr << "failed to open acceptor for scanner images on port "
-         << port << endl;
-    isOpen = false;
-    return false;
+    // build the address
+    ACE_INET_Addr address(port,(ACE_UINT32)INADDR_ANY);
+
+    if(acceptor.open(address,1) == -1) {
+      cerr << "failed to open acceptor for scanner images on port "
+           << port << endl;
+      isOpen = false;
+      return false;
+    }
   }
 
   isOpen = true;
@@ -457,6 +487,44 @@ short *RtInputScannerImages::receiveImageData(ACE_SOCK_Stream &stream,
 
   return img;
 };
+
+// read the next unread image from disk
+RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
+  static set<string> alreadyRead;
+
+  string toRead;
+  for(const auto &entry: directory_iterator(dicomDir)) {
+    if(entry.is_directory()) {
+      continue;
+    }
+
+    string filename = entry.path().string();
+    if(alreadyRead.contains(filename)) {
+      continue;
+    }
+
+    toRead = filename;
+    break;
+  }
+
+  if(toRead.empty()) {
+    return NULL;
+  }
+
+  string niiFile = tmpnam(NULL);
+  string cmd = "dcm2niix -s y " + toRead + " " + niiFile;
+  cout << "executing: " << cmd << endl;
+  if(system(cmd.c_str())) {
+    cerr << "failed." << endl;
+  }
+
+  RtMRIImage *rti = new RtMRIImage(niiFile);
+  remove(niiFile.c_str());
+
+  alreadyRead.insert(toRead);
+
+  return rti;
+}
 
 // saves an image
 //  in

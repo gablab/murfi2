@@ -87,6 +87,10 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
   memcpy(data, img.data, imgDataLen);
 }
 
+// construct by reading a nifti file
+RtMRIImage::RtMRIImage(const string& filename) :
+  RtDataImage<short>(filename) {}
+
 // write the info (all but data) to a stream
 //  in
 //   stream to write to

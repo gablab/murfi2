@@ -49,6 +49,9 @@ class RtMRIImage : public RtDataImage<short> {
   // construct from another image
   RtMRIImage(RtMRIImage &img);
 
+  // construct by reading a nifti file
+  RtMRIImage(const string &filename);
+
   //  in
   //   filename: string filename
   //  out
@@ -120,7 +123,6 @@ class RtMRIImage : public RtDataImage<short> {
   ACE_Date_Time time;                // acquisition time
   ACE_Date_Time refFrameTime;        // acquisition time of frame of reference
 
-
   // scanner online post-processing parms
   bool distCorrect2D;           // 2d distortion correction
   bool moco;                    // motion correction
@@ -131,7 +133,6 @@ class RtMRIImage : public RtDataImage<short> {
   float64_t  mcRotationXDeg;    // Rotation (degrees) that was applied
   float64_t  mcRotationYDeg;    //   by motion correction along each
   float64_t  mcRotationZDeg;    //   axis
-
 
   // received data parms
   bool fromScanner;

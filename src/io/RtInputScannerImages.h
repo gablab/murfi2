@@ -29,6 +29,11 @@
 #include"RtServerSocket.h"
 #include"RtFSLInterface.h"
 
+enum InputSource {
+  VSEND = 0,
+  DICOM = 1
+};
+
 // controls input operations to receive scanner images
 class RtInputScannerImages : public RtInput {
 
@@ -82,6 +87,9 @@ class RtInputScannerImages : public RtInput {
   short *receiveImageData(ACE_SOCK_Stream &stream,
                           const RtExternalImageInfo &info);
 
+  // read an MRI image from a folder containing dicoms
+  RtMRIImage* readImageFromDICOMFolder();
+
   // saves an image
   //  in
   //   img: image to save
@@ -111,6 +119,7 @@ class RtInputScannerImages : public RtInput {
   bool isFirstInSeries(const RtExternalImageInfo &info);
 
   //*** private data members  ***//
+  InputSource source;
 
   // port to listen on
   unsigned short port;
@@ -123,10 +132,13 @@ class RtInputScannerImages : public RtInput {
   // whether to receive the siemens pre-header
   bool preHeader;
 
+  // params for reading dicoms from a folder
+  string dicomDir;
+
   bool print;
 
   // parms for image saving to disk
-  bool   saveImagesToFile;
+  bool saveImagesToFile;
   bool unmosaicInputImages;
 
   // whether alignment to previous series should be performed

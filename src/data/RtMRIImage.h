@@ -50,7 +50,7 @@ class RtMRIImage : public RtDataImage<short> {
   RtMRIImage(RtMRIImage &img);
 
   // construct by reading a nifti file
-  RtMRIImage(const string &filename);
+  RtMRIImage(const string &filename, int series=0, int tr=0);
 
   //  in
   //   filename: string filename
@@ -97,6 +97,9 @@ class RtMRIImage : public RtDataImage<short> {
 
   // get a smart brightness level
   float getAutoBrightness();
+
+  // set whether this is a moco image
+  void setMoco(bool);
 
   // get whether this is a moco image
   bool getMoco();

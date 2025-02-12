@@ -20,9 +20,10 @@
 
 #include"RtInputScannerImages.h"
 
-#include <cstdio>
+#include<cstdio>
 #include<filesystem>
 #include<fstream>
+#include<regex>
 #include<set>
 
 #include"site_config.h"
@@ -84,6 +85,19 @@ bool RtInputScannerImages::open(RtConfig &config) {
   else {
     initialized = false;
   }
+
+  if(!config.isSet("scanner:tr")) {
+    cerr << "The scanner TR must be set in the configuration" << endl;
+    return false;
+  }
+  tr = (float) config.get("scanner:tr");
+
+  if(!config.isSet("scanner:measurements")) {
+    cerr << "The number of measurements must be set in the configuration"
+         << endl;
+    return false;
+  }
+  numMeasurements = (int) config.get("scanner:measurements");
 
   if(config.isSet("scanner:imageSource")) {
      if(config.get("scanner:imageSource") == "DICOM") {
@@ -150,7 +164,7 @@ bool RtInputScannerImages::open(RtConfig &config) {
   }
 
   // see if we should save images to a file
-  if(config.get("scanner:saveImages")==true) {
+  if(config.get("scanner:save")==true) {
     saveImagesToFile = true;
   }
 
@@ -229,7 +243,12 @@ int RtInputScannerImages::svc() {
   RtMRIImage *rti;
   stringstream infos;
 
-  cout << "listening for images on port " << port << endl;
+  if(source == DICOM) {
+    cout << "watching for images in DICOM folder " << dicomDir << endl;
+  }
+  else {
+    cout << "listening for images on port " << port << endl;
+  }
 
   // continuously try to accept connections
   while(isOpen) {
@@ -238,10 +257,20 @@ int RtInputScannerImages::svc() {
       continue;
     }
 
-    rti = receiveImageFromSocket();
-    if(rti == NULL) {
-      break;
+    if(source == DICOM) {
+      rti = readImageFromDICOMFolder();
+      if(rti == NULL) {
+        continue;
+      }
     }
+    else {
+      rti = receiveImageFromSocket();
+      if(rti == NULL) {
+        break;
+      }
+    }
+
+    rti->printInfo(cout);
 
     if(onlyReadMoCo && !rti->getMoco()) {
       cout << "ignoring non-MoCo image." << endl;
@@ -363,7 +392,7 @@ int RtInputScannerImages::svc() {
            << " acquisition " << rti->getDataID().getTimePoint() << endl;
     }
 
-    if(rti->getDataID().getTimePoint() + num2Discard == rti->getTotalRepetitions()) {
+    if(rti->getDataID().getTimePoint() + num2Discard == numMeasurements) {
       cout << "received last image." << endl;
       sendCode(NULL);
       init();
@@ -492,6 +521,21 @@ short *RtInputScannerImages::receiveImageData(ACE_SOCK_Stream &stream,
 RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   static set<string> alreadyRead;
 
+  // first time we are called, mark all previously existing files as read
+  static bool firstCall = true;
+  if(firstCall) {
+    for(const auto &entry: directory_iterator(dicomDir)) {
+      if(entry.is_directory()) {
+        continue;
+      }
+
+      alreadyRead.insert(entry.path().string());
+    }
+    firstCall = false;
+    return NULL;
+  }
+
+  // list the files in the dir, skip the ones we already read
   string toRead;
   for(const auto &entry: directory_iterator(dicomDir)) {
     if(entry.is_directory()) {
@@ -511,17 +555,67 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
     return NULL;
   }
 
-  string niiFile = tmpnam(NULL);
-  string cmd = "dcm2niix -s y " + toRead + " " + niiFile;
+  // even though we may fail to read the image, we don't want to try again
+  // because we have no reason to think it will succeed in the future
+  alreadyRead.insert(toRead);
+
+  // sometimes we find the image before it is fully written, so wait for a small
+  // amount of time
+  // TODO: is there a better way to do this?
+  //this_thread::sleep_for(chrono::milliseconds(20));
+
+  // create a temporary dir to store the nifti file
+  path tmp_dir_path {tmpnam(NULL)};
+  create_directories(tmp_dir_path);
+
+  // invoke dcm2niix to convert the single image in verbose mode to /tmp
+  string cmd = "dcm2niix -v y -s y -o " + tmp_dir_path.string() + " " + toRead;
   cout << "executing: " << cmd << endl;
-  if(system(cmd.c_str())) {
+
+  FILE *pipe = popen(cmd.c_str(), "r");
+  if(!pipe) {
     cerr << "failed." << endl;
   }
+  char buffer[128];
+  stringstream ss;
+  while(fgets(buffer, sizeof(buffer), pipe) != NULL) {
+    ss << buffer;
+  }
+  pclose(pipe);
 
-  RtMRIImage *rti = new RtMRIImage(niiFile);
-  remove(niiFile.c_str());
+  // extract some info from the dcm2niix output
 
-  alreadyRead.insert(toRead);
+  // nifti filename
+  string output = ss.str();
+  regex filenameRegex("Convert 1 DICOM as (.*) ");
+  smatch match;
+  regex_search(output, match, filenameRegex);
+  if(match.size() < 2) {
+    cerr << "failed to parse filename from dcm2niix output." << endl;
+    return NULL;
+  }
+  string niiFile = match[1].str() + ".nii";
+
+  // acquisition and series number
+  regex acqSerRegex(" acq ([0-9]+) img [0-9]+ ser ([0-9]+)");
+  regex_search(output, match, acqSerRegex);
+  if(match.size() < 3) {
+    cerr << "failed to parse acq and series numbers from dcm2niix output." << endl;
+    return NULL;
+  }
+  int acqNum = stoi(match[1].str());
+  int serNum = stoi(match[2].str());
+
+  cout << "reading series " << serNum << " image " << acqNum << " from " << niiFile << endl;
+  acqNum = std::max(acqNum-num2Discard, (unsigned int) 1);
+
+  RtMRIImage *rti = new RtMRIImage(niiFile, serNum, acqNum);
+
+  // TODO: how do we handle MOCO images?
+  rti->setMoco(false);
+
+  cout << "removing " << niiFile << " after read" << endl;
+  remove_all(tmp_dir_path);
 
   return rti;
 }

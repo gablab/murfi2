@@ -15,6 +15,8 @@ OS=linux
 # project name
 PROJECT = murfi
 
+MAKEFLAGS := --jobs=$(shell nproc) --output-sync=target
+
 # whether to compile with gui
 export FRONTEND = 1
 

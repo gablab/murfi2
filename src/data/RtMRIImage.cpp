@@ -88,8 +88,18 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
 }
 
 // construct by reading a nifti file
-RtMRIImage::RtMRIImage(const string& filename) :
-  RtDataImage<short>(filename) {}
+RtMRIImage::RtMRIImage(const string& filename, int series, int tr) :
+  RtDataImage<short>(filename) {
+
+  magicNumber = MAGIC_NUMBER;
+
+  elType = RT_SHORT_TYPE;
+
+  dataID.setModuleID(ID_SCANNERIMG);
+  dataID.setDataName(NAME_SCANNERIMG_EPI);
+  dataID.setSeriesNum(series);
+  dataID.setTimePoint(tr);
+}
 
 // write the info (all but data) to a stream
 //  in
@@ -195,7 +205,7 @@ void RtMRIImage::printInfo(ostream &os) {
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
      << setw(wid) << "tr" << tr << endl
-     << setw(wid) << "refFrameTime" << ACE_Date_Time2TimeStr(refFrameTime)
+     << setw(wid) << "refFrameTime" << ACE_Date_Time2TimeStr(refFrameTime) << endl
      << setw(wid) << "moco" << moco << endl
      << setw(wid) << "fromScanner" << fromScanner << endl
      << setw(wid) << "MatrixSize" << getMatrixSize() << endl
@@ -334,6 +344,11 @@ float RtMRIImage::getAutoBrightness() {
 
   return (float) minVal;
 
+}
+
+// set whether this is a moco volume
+void RtMRIImage::setMoco(bool m) {
+  moco = m;
 }
 
 // get whether this is a moco volume

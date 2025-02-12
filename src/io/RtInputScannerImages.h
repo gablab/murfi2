@@ -21,6 +21,8 @@
 #ifndef RTINPUTSCANNERIMAGES_H
 #define RTINPUTSCANNERIMAGES_H
 
+#include<string>
+
 #include"RtInput.h"
 #include"RtConfig.h"
 #include"RtConfigFmriRun.h"
@@ -117,6 +119,12 @@ class RtInputScannerImages : public RtInput {
   //  out
   //   true if this image is the first in a series
   bool isFirstInSeries(const RtExternalImageInfo &info);
+
+  // repetition time
+  float tr;
+
+  // number of measurements we are expecting
+  int numMeasurements;
 
   //*** private data members  ***//
   InputSource source;

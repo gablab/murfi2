@@ -76,10 +76,10 @@ void RtDataStore::setData(RtData *data) {
   }
 
   // put data into datastore with its dataID as the key
-  store[data->getDataID()] = data;
+  store[insert] = data;
 
   // add to availableData (needs a hard copy of the dataID)
-  setAvailableData(data->getDataID());
+  setAvailableData(insert);
 
   mut.release();
 

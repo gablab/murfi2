@@ -58,7 +58,7 @@ def regression_test(no_image, sender="vsend", include_pre_header=False):
             "-f",
             str(conf_file),
         ],
-        cwd=str(Path("example_data")),
+        cwd=str(Path("murfi_example_data")),
         env={
             "QT_QPA_PLATFORM": "offscreen",
             "MURFI_SUBJECTS_DIR": ".",
@@ -80,12 +80,12 @@ def regression_test(no_image, sender="vsend", include_pre_header=False):
             "servedicoms",
             "dcm",
             str(DICOM_PATH),
-            "100"
+            "200"
         ]
 
     serve_params = RunParams(
         cmd=cmd,
-        cwd=str(Path("example_data")),
+        cwd=str(Path("murfi_example_data")),
         env={
             "QT_QPA_PLATFORM": "offscreen",
             "PATH": str(Path("/") / "opt" / "murfi" / "util" / "scanner_sim") + ":" + os.environ["PATH"],

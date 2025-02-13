@@ -105,8 +105,8 @@ def regression_test(no_image, sender="vsend", include_pre_header=False):
 
     expected = list(zip(map(str, range(1, len(EXPECTED_OUTPUT) + 1)), EXPECTED_OUTPUT))
     if expected != tr_data:
-        breakpoint()
-        raise ValueError("TEST FAILURE: mismatch between expected and measured data")
+        raise ValueError(
+            f"TEST FAILURE: mismatch between expected and measured data\nexpected: {expected}\nmeasured: {tr_data}")
 
     logging.info("passed")
     return 0

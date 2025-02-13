@@ -43,7 +43,7 @@
 using namespace std;
 
 // defaults
-static const int    DEFAULT_PORT = 15000;
+static const int DEFAULT_PORT = 15000;
 
 // increase this size for highres acquisitions
 #define MAX_BUFSIZ 256*256*256*2
@@ -524,7 +524,7 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   // first time we are called, mark all previously existing files as read
   static bool firstCall = true;
   if(firstCall) {
-    for(const auto &entry: directory_iterator(dicomDir)) {
+    for(const auto &entry: std::filesystem::directory_iterator(dicomDir)) {
       if(entry.is_directory()) {
         continue;
       }
@@ -537,7 +537,7 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
 
   // list the files in the dir, skip the ones we already read
   string toRead;
-  for(const auto &entry: directory_iterator(dicomDir)) {
+  for(const auto &entry: std::filesystem::directory_iterator(dicomDir)) {
     if(entry.is_directory()) {
       continue;
     }

@@ -76,16 +76,20 @@ void RtDataStore::setData(RtData *data) {
   }
 
   // put data into datastore with its dataID as the key
-  store[data->getDataID()] = data;
+  store[insert] = data;
 
   // add to availableData (needs a hard copy of the dataID)
-  setAvailableData(data->getDataID());
+  setAvailableData(insert);
 
   mut.release();
 
-  //debug
-  //  set<RtDataID>::const_iterator it = getAvailableData();
-  //endebug
+  // // debug
+  // set<RtDataID>::const_iterator it = getAvailableData();
+  // while(it != availableData.end()) {
+  //   cout << (*it).toString() << endl;
+  //   ++it;
+  // }
+  // // endebug
 
   // notify listeners
   for(vector<RtDataListener*>::iterator i = notifyList.begin();

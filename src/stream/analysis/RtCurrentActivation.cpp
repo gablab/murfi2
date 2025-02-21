@@ -53,7 +53,7 @@ bool RtCurrentActivation::processOption(const string &name, const string &text,
     return RtConfigVal::convert<unsigned int>(numDataPointsForErrEst, text);
   }
 
-  if (name == "saveResult") {
+  if (name == "save") {
     return RtConfigVal::convert<bool>(saveResult, text);
   }
 

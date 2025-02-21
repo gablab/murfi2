@@ -26,7 +26,7 @@ void usage(char *execname) {
        << " ["
        << "host "
        << "port "
-       << "tr (seconds)"
+       << "tr (seconds) "
        << "preHeader (0 for no preHeader, which is the default)"
        << "]"
        << endl;
@@ -45,7 +45,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   string host(argc > arg ? argv[arg++] : "localhost");
   int port = argc > arg ? atoi(argv[arg++]) : 15000;
   float inputTr = (argc > arg ? atof(argv[arg++]) : 1);
-  bool preHeader = (argc > arg ? argv[arg++] != "0": false);
+  bool preHeader = (argc > arg ? strcmp(argv[arg++], "0"): false);
 
   // Local server address.
   ACE_INET_Addr my_addr (port, host.c_str());
@@ -172,14 +172,11 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
 
     char *header_data = new char[ei->getHeaderSize()];
     ei->isMotionCorrected = false;
-    cout << "sending info of size " << ei->getHeaderSize()
-         << endl;
 
     int size_of_header = ei->getHeaderSize();
     cout << "sending info of size " << ei->getHeaderSize() << endl;
 
     int size_of_data = ei->getDataSize();
-    cout << "sending img of size " << ei->getDataSize() << endl;
 
     if(preHeader) {
       stream.send_n(reinterpret_cast<char*>(&size_of_header), 4);

@@ -21,7 +21,9 @@ RUN apt install -y -q \
     language-pack-en-base \
     yaru-theme-icon \
     shared-mime-info \
-    python3-pip
+    python3-pip \
+    python3-setuptools \
+    dcm2niix
 
 RUN update-locale "LANG=en_US.UTF-8" && \
     locale-gen en_US.UTF-8 && \

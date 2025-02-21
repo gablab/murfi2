@@ -1064,14 +1064,8 @@ bool RtDesignMatrix::updateAtTr(unsigned int thisTr) {
     curCol++;
   }
 
-  if (saveAfterUpdate) {
-    if (seriesNum > 0) {
-      save(getExperimentConfig().getDesignFilename(seriesNum));
-    }
-    else {
-      cout << "Refusing to save design matrix when it seems it's unchanged."
-           << endl;
-    }
+  if (saveAfterUpdate and seriesNum > 0) {
+    save(getExperimentConfig().getDesignFilename(seriesNum));
   }
 
   return true;

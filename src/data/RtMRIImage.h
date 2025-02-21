@@ -49,6 +49,9 @@ class RtMRIImage : public RtDataImage<short> {
   // construct from another image
   RtMRIImage(RtMRIImage &img);
 
+  // construct by reading a nifti file
+  RtMRIImage(const string &filename, int series=0, int tr=0);
+
   //  in
   //   filename: string filename
   //  out
@@ -74,6 +77,9 @@ class RtMRIImage : public RtDataImage<short> {
   // get the acquisition number
   string getCreationTime() const;
 
+  // get the total number of repetitions expected
+  int getTotalRepetitions() const;
+
   // set the matrix size
   void setMatrixSize(unsigned int ms);
 
@@ -92,6 +98,20 @@ class RtMRIImage : public RtDataImage<short> {
   // get a smart brightness level
   float getAutoBrightness();
 
+  // set whether this is a moco image
+  void setMoco(bool);
+
+  // get whether this is a moco image
+  bool getMoco();
+
+  // ge tmotion parameters
+  float64_t getTranslationX();
+  float64_t getTranslationY();
+  float64_t getTranslationZ();
+  float64_t getRotationX();
+  float64_t getRotationY();
+  float64_t getRotationZ();
+
  protected:
 
   double readFOV; // mm
@@ -100,15 +120,22 @@ class RtMRIImage : public RtDataImage<short> {
   // imaging parms
   string seriesInstanceUID;   // series id
   double tr;                  // repetition time (ms)
+  int totalRepetitions;
 
   // actual acquision info parms
   ACE_Date_Time time;                // acquisition time
   ACE_Date_Time refFrameTime;        // acquisition time of frame of reference
 
-
   // scanner online post-processing parms
-  bool distCorrect2D;         // 2d distortion correction
-  bool moco;                  // motion correction
+  bool distCorrect2D;           // 2d distortion correction
+  bool moco;                    // motion correction
+  float64_t  mcTranslationXMM;  // Translation (mm) that was applied
+  float64_t  mcTranslationYMM;  //   by motion correction along each
+  float64_t  mcTranslationZMM;  //   axis
+
+  float64_t  mcRotationXDeg;    // Rotation (degrees) that was applied
+  float64_t  mcRotationYDeg;    //   by motion correction along each
+  float64_t  mcRotationZDeg;    //   axis
 
   // received data parms
   bool fromScanner;

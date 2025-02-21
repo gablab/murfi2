@@ -87,6 +87,20 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
   memcpy(data, img.data, imgDataLen);
 }
 
+// construct by reading a nifti file
+RtMRIImage::RtMRIImage(const string& filename, int series, int tr) :
+  RtDataImage<short>(filename) {
+
+  magicNumber = MAGIC_NUMBER;
+
+  elType = RT_SHORT_TYPE;
+
+  dataID.setModuleID(ID_SCANNERIMG);
+  dataID.setDataName(NAME_SCANNERIMG_EPI);
+  dataID.setSeriesNum(series);
+  dataID.setTimePoint(tr);
+}
+
 // write the info (all but data) to a stream
 //  in
 //   stream to write to
@@ -191,7 +205,7 @@ void RtMRIImage::printInfo(ostream &os) {
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
      << setw(wid) << "tr" << tr << endl
-     << setw(wid) << "refFrameTime" << ACE_Date_Time2TimeStr(refFrameTime)
+     << setw(wid) << "refFrameTime" << ACE_Date_Time2TimeStr(refFrameTime) << endl
      << setw(wid) << "moco" << moco << endl
      << setw(wid) << "fromScanner" << fromScanner << endl
      << setw(wid) << "MatrixSize" << getMatrixSize() << endl
@@ -275,7 +289,18 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   dataID.setTimePoint(info.currentTR);
   tr = info.repetitionTimeMS;
   moco = info.isMotionCorrected;
+  mcTranslationXMM = info.mcTranslationXMM;
+  mcTranslationYMM = info.mcTranslationYMM;
+  mcTranslationZMM = info.mcTranslationZMM;
+  mcRotationXDeg = info.mcRotationXDeg;
+  mcRotationYDeg = info.mcRotationYDeg;
+  mcRotationZDeg = info.mcRotationZDeg;
+
   fromScanner = !strcmp(info.magic, EXTERNALSENDER_MAGIC);
+}
+
+int RtMRIImage::getTotalRepetitions() const {
+  return totalRepetitions;
 }
 
 // set the matrix size
@@ -309,7 +334,6 @@ float RtMRIImage::getAutoContrast() {
   return SHRT_MAX/(float) maxVal;
 }
 
-
 // get a smart brightness level
 float RtMRIImage::getAutoBrightness() {
   ACE_TRACE(("RtMRIImage::getAutoBrightness"));
@@ -320,4 +344,39 @@ float RtMRIImage::getAutoBrightness() {
 
   return (float) minVal;
 
+}
+
+// set whether this is a moco volume
+void RtMRIImage::setMoco(bool m) {
+  moco = m;
+}
+
+// get whether this is a moco volume
+bool RtMRIImage::getMoco() {
+  return moco;
+}
+
+// get motion parameters
+float64_t RtMRIImage::getTranslationX() {
+  return mcTranslationXMM;
+}
+
+float64_t RtMRIImage::getTranslationY() {
+  return mcTranslationYMM;
+}
+
+float64_t RtMRIImage::getTranslationZ() {
+  return mcTranslationZMM;
+}
+
+float64_t RtMRIImage::getRotationX() {
+  return mcRotationXDeg;
+}
+
+float64_t RtMRIImage::getRotationY() {
+  return mcRotationYDeg;
+}
+
+float64_t RtMRIImage::getRotationZ() {
+  return mcRotationZDeg;
 }

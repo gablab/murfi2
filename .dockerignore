@@ -6,7 +6,7 @@
 docker/source.Dockerfile
 docker/Dockerfile
 README.md
-example_data
+murfi_example_data
 bin
 obj
 build_singularity.sh

@@ -524,7 +524,7 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   // first time we are called, mark all previously existing files as read
   static bool firstCall = true;
   if(firstCall) {
-    for(const auto &entry: std::filesystem::directory_iterator(dicomDir)) {
+    for(const auto &entry: std::filesystem::recursive_directory_iterator(dicomDir)) {
       if(entry.is_directory()) {
         continue;
       }
@@ -535,25 +535,28 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
     return NULL;
   }
 
-  // list the files in the dir, skip the ones we already read
-  string toRead;
-  for(const auto &entry: std::filesystem::directory_iterator(dicomDir)) {
+  // created a sorted set of the files in the dir
+  set<filesystem::path> files;
+  for(const auto &entry: filesystem::recursive_directory_iterator(dicomDir)) {
     if(entry.is_directory()) {
       continue;
     }
 
-    string filename = entry.path().string();
-    if(alreadyRead.contains(filename)) {
-      continue;
-    }
-
-    toRead = filename;
-    break;
+    files.insert(entry.path());
   }
 
-  if(toRead.empty()) {
+  // get the set difference between the files and the already read files
+  set<filesystem::path> notYetRead;
+  set_difference(files.begin(), files.end(), alreadyRead.begin(), alreadyRead.end(), inserter(notYetRead, notYetRead.begin()));
+
+  // if there are no files to read, return NULL
+  if(notYetRead.empty()) {
     return NULL;
   }
+
+  // get the first file to read
+  string toRead = notYetRead.begin()->string();
+  cout << "found next dicom file to read as input" << toRead << endl;
 
   // even though we may fail to read the image, we don't want to try again
   // because we have no reason to think it will succeed in the future

@@ -6,15 +6,16 @@ import os
 from pathlib import Path
 import re
 from regression_data import EXPECTED_OUTPUT
+import shutil
 from subprocess import PIPE, Popen, TimeoutExpired
 import sys
 import time
 
 logging.basicConfig()
-logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger().setLevel(logging.INFO)
 
 
-DICOM_PATH = Path("/") / "tmp" / "murfi_input"
+DICOM_PATH = "tmp" / "murfi_input"
 
 
 @dataclass
@@ -93,7 +94,7 @@ def regression_test(no_image, sender="vsend", include_pre_header=False):
         sleep=2,
     )
 
-    logging.info("running test...")
+    logging.info("running tests...")
     pool = multiprocessing.Pool(2)
     out = pool.map(run_cmd, [murfi_params, serve_params])
 
@@ -116,9 +117,12 @@ def regression_test(no_image, sender="vsend", include_pre_header=False):
 @click.option("--no-image", is_flag=True, help="Run from a non-sif environment locally")
 @click.option("--target", required=False, help="Run a specific test. Options: [vsend, vsend-preheader, dicom]")
 def run(no_image, target):
-    def remove_files_in_dicom_dir():
-        for f in DICOM_PATH.glob("*"):
-            f.unlink()
+    def prepare_dicom_dir():
+        try:
+            shutil.rmtree(DICOM_PATH)
+        except FileNotFoundError:
+            pass
+        os.makedirs(DICOM_PATH)
 
     if target:
         if target == "vsend":
@@ -126,13 +130,13 @@ def run(no_image, target):
         elif target == "vsend-preheader":
             return regression_test(no_image, sender="vsend", include_pre_header=True)
         elif target == "dicom":
-            remove_files_in_dicom_dir()
+            prepare_dicom_dir()
             return regression_test(no_image, sender="dicom")
         else:
             logging.error(f"Unknown target: {target}")
             return 1
     else:
-        remove_files_in_dicom_dir()
+        prepare_dicom_dir()
         return (
             regression_test(no_image, sender="vsend", include_pre_header=True) or
             regression_test(no_image, sender="vsend", include_pre_header=False) or

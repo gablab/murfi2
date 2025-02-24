@@ -66,6 +66,9 @@ class RtRoiCombine : public RtStreamComponent {
   // process a single acquisition (pure virtual)
   virtual int process(ACE_Message_Block *mb);
 
+  // start a logfile
+  virtual void startDumpAlgoVarsFile();
+
   // compute the mean over the roi
   RtActivation *getMean(RtData *dat, RtMaskImage *mask);
 

@@ -1,0 +1,27 @@
+name: base
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  refresh-base:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: deps
+        run: |
+          sudo apt update -qq
+          sudo apt install singularity-container
+      - name: docker login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USER }}
+          password: ${{ secrets.GHCR_PAT }}
+      - name: refresh-base
+        run: |
+          docker build -t ghcr.io/gablab/murfi2-base:latest -f docker/Dockerfile.base .
+          docker push ghcr.io/gablab/murfi2-base:latest

@@ -45,6 +45,7 @@ using namespace std;
 
 // defaults
 static const int DEFAULT_PORT = 15000;
+static const int MAX_DCM2NIIX_TRIES = 10;
 
 // increase this size for highres acquisitions
 #define MAX_BUFSIZ 256*256*256*2
@@ -563,25 +564,31 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   // because we have no reason to think it will succeed in the future
   alreadyRead.insert(toRead);
 
-  // sometimes we find the image before it is fully written, so wait for a small
-  // amount of time
-  // TODO: is there a better way to do this?
-  this_thread::sleep_for(chrono::milliseconds(100));
-
-  // invoke dcm2niix to convert the single image in verbose mode to /tmp
-  string cmd = "dcm2niix -v y -f '%f_%p_%t_%s_%u' -s y -o /tmp " + toRead;
-  cout << "executing: " << cmd << endl;
-
-  FILE *pipe = popen(cmd.c_str(), "r");
-  if(!pipe) {
-    cerr << "failed." << endl;
-  }
-  char buffer[128];
+  // try to read the image multiple times. this is a hack to deal with the
+  // fact that dcm2niix sometimes isn't finished writing the image before we try
+  // to read it
   stringstream ss;
-  while(fgets(buffer, sizeof(buffer), pipe) != NULL) {
-    ss << buffer;
+  for(int tryNum = 0; tryNum < MAX_DCM2NIIX_TRIES; tryNum++) {
+    // invoke dcm2niix to convert the single image in verbose mode to /tmp
+    string cmd = "dcm2niix -v y -f '%f_%p_%t_%s_%u' -s y -o /tmp " + toRead;
+    cout << "executing: " << cmd << endl;
+
+    FILE *pipe = popen(cmd.c_str(), "r");
+    if(!pipe) {
+      cerr << "failed to create pipe." << endl;
+      continue;
+    }
+    char buffer[128];
+    while(fgets(buffer, sizeof(buffer), pipe) != NULL) {
+      ss << buffer;
+    }
+    if(WEXITSTATUS(pclose(pipe)) == 0) {
+      break;
+    }
+
+    // sleep for a short amount of time to avoid busy-waiting
+    this_thread::sleep_for(chrono::milliseconds(10));
   }
-  pclose(pipe);
 
   // extract some info from the dcm2niix output
 

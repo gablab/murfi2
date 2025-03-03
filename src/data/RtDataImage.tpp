@@ -66,11 +66,6 @@ RtDataImage<T>::RtDataImage(const string &filename)
     bytesPerPix(sizeof(unsigned short)) {
   ACE_TRACE(("RtDataImage<T>::RtDataImage(string)"));
 
-  isMosaiced = false;
-  matrixSize = 64;
-  numSlices = 32;
-  sliceThick = 1;
-  sliceGap = 0.1;
   dims.reserve(4);
   pixdims.reserve(4);
   bytesPerPix = sizeof(T);
@@ -78,9 +73,10 @@ RtDataImage<T>::RtDataImage(const string &filename)
 
   read(filename);
 
-  vxl2ras.set_identity();
-  ras2ref.set_identity();
-
+  matrixSize = dims[0];
+  numSlices = dims[2];
+  sliceThick = pixdims[2];
+  sliceGap = 0;
   isMosaiced = false;
 }
 

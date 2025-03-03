@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtMRIImage.h declares a class for an MR image
  *
- *  Copyright 2007-2013, the MURFI dev team.
+ *  Copyright 2007-2025, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
 }
 
 // construct by reading a nifti file
-RtMRIImage::RtMRIImage(const string& filename, int series, int tr) :
+RtMRIImage::RtMRIImage(const string& filename, int series, int timepoint) :
   RtDataImage<short>(filename) {
 
   magicNumber = MAGIC_NUMBER;
@@ -98,7 +98,11 @@ RtMRIImage::RtMRIImage(const string& filename, int series, int tr) :
   dataID.setModuleID(ID_SCANNERIMG);
   dataID.setDataName(NAME_SCANNERIMG_EPI);
   dataID.setSeriesNum(series);
-  dataID.setTimePoint(tr);
+  dataID.setTimePoint(timepoint);
+  readFOV = pixdims[0]*dims[0];
+  phaseFOV = pixdims[1]*dims[1];
+  tr = 0;
+  fromScanner = true;
 }
 
 // write the info (all but data) to a stream
@@ -192,7 +196,6 @@ bool RtMRIImage::readInfo(istream &is) {
   return is.good();
 }
 
-
 // print info about this image
 void RtMRIImage::printInfo(ostream &os) {
   if(os.fail()) return;
@@ -200,6 +203,8 @@ void RtMRIImage::printInfo(ostream &os) {
   int wid = 30;
 
   os << setiosflags(ios::left);
+
+  RtDataImage<short>::printInfo(os);
 
   os << setw(wid) << "readFOV phaseFOV" << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
@@ -303,6 +308,10 @@ int RtMRIImage::getTotalRepetitions() const {
   return totalRepetitions;
 }
 
+void RtMRIImage::setRepetitionTime(double tr) {
+  this->tr = tr;
+}
+
 // set the matrix size
 void RtMRIImage::setMatrixSize(unsigned int ms) {
   matrixSize = ms;
@@ -349,6 +358,31 @@ float RtMRIImage::getAutoBrightness() {
 // set whether this is a moco volume
 void RtMRIImage::setMoco(bool m) {
   moco = m;
+}
+
+// set the motion parameters
+void RtMRIImage::setTranslationX(float64_t x) {
+  mcTranslationXMM = x;
+}
+
+void RtMRIImage::setTranslationY(float64_t y) {
+  mcTranslationYMM = y;
+}
+
+void RtMRIImage::setTranslationZ(float64_t z) {
+  mcTranslationZMM = z;
+}
+
+void RtMRIImage::setRotationX(float64_t x) {
+  mcRotationXDeg = x;
+}
+
+void RtMRIImage::setRotationY(float64_t y) {
+  mcRotationYDeg = y;
+}
+
+void RtMRIImage::setRotationZ(float64_t z) {
+  mcRotationZDeg = z;
 }
 
 // get whether this is a moco volume

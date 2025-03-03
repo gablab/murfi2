@@ -25,6 +25,7 @@
 #include<fstream>
 #include<regex>
 #include<set>
+#include<thread>
 
 #include"site_config.h"
 
@@ -270,7 +271,7 @@ int RtInputScannerImages::svc() {
       }
     }
 
-    rti->printInfo(cout);
+    //rti->printInfo(cout);
 
     if(onlyReadMoCo && !rti->getMoco()) {
       cout << "ignoring non-MoCo image." << endl;
@@ -556,7 +557,7 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
 
   // get the first file to read
   string toRead = notYetRead.begin()->string();
-  cout << "found next dicom file to read as input" << toRead << endl;
+  cout << "found next dicom file to read as input: " << toRead << endl;
 
   // even though we may fail to read the image, we don't want to try again
   // because we have no reason to think it will succeed in the future
@@ -565,14 +566,10 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   // sometimes we find the image before it is fully written, so wait for a small
   // amount of time
   // TODO: is there a better way to do this?
-  //this_thread::sleep_for(chrono::milliseconds(20));
-
-  // create a temporary dir to store the nifti file
-  path tmp_dir_path {tmpnam(NULL)};
-  create_directories(tmp_dir_path);
+  this_thread::sleep_for(chrono::milliseconds(100));
 
   // invoke dcm2niix to convert the single image in verbose mode to /tmp
-  string cmd = "dcm2niix -v y -s y -o " + tmp_dir_path.string() + " " + toRead;
+  string cmd = "dcm2niix -v y -f '%f_%p_%t_%s_%u' -s y -o /tmp " + toRead;
   cout << "executing: " << cmd << endl;
 
   FILE *pipe = popen(cmd.c_str(), "r");
@@ -598,6 +595,7 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
     return NULL;
   }
   string niiFile = match[1].str() + ".nii";
+  string jsonFile = match[1].str() + ".json";
 
   // acquisition and series number
   regex acqSerRegex(" acq ([0-9]+) img [0-9]+ ser ([0-9]+)");
@@ -613,12 +611,32 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   acqNum = std::max(acqNum-num2Discard, (unsigned int) 1);
 
   RtMRIImage *rti = new RtMRIImage(niiFile, serNum, acqNum);
+  rti->setRepetitionTime(tr);
 
-  // TODO: how do we handle MOCO images?
-  rti->setMoco(false);
+  // Read the JSON file into a string
+  ifstream jsonStream(jsonFile);
+  string jsonStr((istreambuf_iterator<char>(jsonStream)), istreambuf_iterator<char>());
+  jsonStream.close();
+  remove(jsonFile.c_str());
+
+  // Match motion parameters from dcm2niix output
+  regex mocoRegex("Motion: ([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+)");
+  regex_search(jsonStr, match, mocoRegex);
+  if(match.size() < 7) {
+    cerr << "failed to parse motion parameters from dcm2niix output." << endl;
+    rti->setMoco(false);
+  } else {
+    rti->setMoco(true);
+    rti->setTranslationX(stof(match[1].str()));
+    rti->setTranslationY(stof(match[2].str()));
+    rti->setTranslationZ(stof(match[3].str()));
+    rti->setRotationX(stof(match[4].str()));
+    rti->setRotationY(stof(match[5].str()));
+    rti->setRotationZ(stof(match[6].str()));
+  }
 
   cout << "removing " << niiFile << " after read" << endl;
-  remove_all(tmp_dir_path);
+  remove(niiFile.c_str());
 
   return rti;
 }

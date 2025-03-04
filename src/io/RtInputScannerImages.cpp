@@ -621,7 +621,7 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   rti->setRepetitionTime(tr);
 
   // Read the JSON file into a string
-  ifstream jsonStream(jsonFile);
+  std::ifstream jsonStream(jsonFile);
   string jsonStr((istreambuf_iterator<char>(jsonStream)), istreambuf_iterator<char>());
   jsonStream.close();
   remove(jsonFile.c_str());

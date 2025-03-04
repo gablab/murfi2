@@ -15,7 +15,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-DICOM_PATH = "tmp" / "murfi_input"
+DICOM_PATH = Path("tmp") / "murfi_input"
 
 
 @dataclass

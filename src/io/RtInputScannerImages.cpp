@@ -56,7 +56,8 @@ static bool verbose = false;
 // default constructor
 RtInputScannerImages::RtInputScannerImages()
     :  port(DEFAULT_PORT),
-       preHeader(false)
+       preHeader(false),
+       source(VSEND)
 {
   addToID(":scanner:images");
   saveImagesToFile = false;
@@ -102,14 +103,15 @@ bool RtInputScannerImages::open(RtConfig &config) {
   numMeasurements = (int) config.get("scanner:measurements");
 
   if(config.isSet("scanner:imageSource")) {
-     if(config.get("scanner:imageSource") == "DICOM") {
+    cout << "image source: " << config.get("scanner:imageSource").str() << endl;
+     if(config.get("scanner:imageSource").str() == "DICOM") {
        source = DICOM;
      }
-     else if(config.get("scanner:imageSource") == "VSEND") {
+     else if(config.get("scanner:imageSource").str() == "VSEND") {
        source = VSEND;
      }
      else {
-       cerr << "unknown image source: " << config.get("scanner:imageSource")
+       cerr << "unknown image source: " << config.get("scanner:imageSource").str()
             << ", assuming VSEND" << endl;
        source = VSEND;
      }
@@ -262,6 +264,7 @@ int RtInputScannerImages::svc() {
     if(source == DICOM) {
       rti = readImageFromDICOMFolder();
       if(rti == NULL) {
+        this_thread::sleep_for(chrono::milliseconds(1));
         continue;
       }
     }
@@ -571,7 +574,7 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   for(int tryNum = 0; tryNum < MAX_DCM2NIIX_TRIES; tryNum++) {
     // invoke dcm2niix to convert the single image in verbose mode to /tmp
     string cmd = "dcm2niix -v y -f '%f_%p_%t_%s_%u' -s y -o /tmp " + toRead;
-    cout << "executing: " << cmd << endl;
+    cout << "(try number " << tryNum + 1 << " / 10), executing: " << cmd << endl;
 
     FILE *pipe = popen(cmd.c_str(), "r");
     if(!pipe) {

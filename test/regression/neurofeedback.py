@@ -15,7 +15,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-DICOM_PATH = Path("tmp") / "murfi_input"
+DICOM_PATH = Path.cwd() / "murfi_example_data" / "tmp" / "murfi_input" / "dicom"
 
 
 @dataclass
@@ -94,7 +94,7 @@ def regression_test(no_image, sender="vsend", include_pre_header=False):
         sleep=2,
     )
 
-    logging.info("running tests...")
+    logging.info(f"running test with args: no_image={no_image}, sender={sender}, include_pre_header={include_pre_header}")
     pool = multiprocessing.Pool(2)
     out = pool.map(run_cmd, [murfi_params, serve_params])
 
@@ -116,7 +116,11 @@ def regression_test(no_image, sender="vsend", include_pre_header=False):
 @click.command()
 @click.option("--no-image", is_flag=True, help="Run from a non-sif environment locally")
 @click.option("--target", required=False, help="Run a specific test. Options: [vsend, vsend-preheader, dicom]")
-def run(no_image, target):
+@click.option("--verbose", is_flag=True, help="Set log level to debug")
+def run(no_image, target, verbose):
+    if verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+
     def prepare_dicom_dir():
         try:
             shutil.rmtree(DICOM_PATH)

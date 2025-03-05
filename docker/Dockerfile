@@ -25,6 +25,10 @@ RUN apt install -y -q \
     python3-setuptools \
     dcm2niix
 
+RUN if [ "${MAKE_TARGET}" = "debug" ]; then \
+        apt install -y -q gdb; \
+    fi
+
 RUN update-locale "LANG=en_US.UTF-8" && \
     locale-gen en_US.UTF-8 && \
     dpkg-reconfigure --frontend noninteractive locales

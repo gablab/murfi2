@@ -98,6 +98,8 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv[]) {
   // read the volumes
   nifti_image_load(vols);
 
+  cout << "sending " << numImgs << " images" << endl;
+
   // keep making new connections while we havent sent the whole series
   unsigned int i = 0;
   for(; i < numImgs && !connector.connect (stream, my_addr); i++) {

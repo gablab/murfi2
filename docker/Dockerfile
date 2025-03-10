@@ -38,6 +38,7 @@ RUN update-mime-database /usr/share/mime
 RUN rm -rf /var/apt/lib/lists/* /var/tmp/* /tmp/* \
     && apt-get clean
 
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 RUN pip install click
 
 WORKDIR /opt/murfi

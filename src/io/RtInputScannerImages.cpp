@@ -22,6 +22,7 @@
 
 #include<cstdio>
 #include<filesystem>
+#include<format>
 #include<fstream>
 #include<regex>
 #include<set>
@@ -572,21 +573,33 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   // to read it
   stringstream ss;
   for(int tryNum = 0; tryNum < MAX_DCM2NIIX_TRIES; tryNum++) {
+    cout << "dicom read try number " << tryNum + 1 << " / " << MAX_DCM2NIIX_TRIES << endl;
+
+    // compute and print the file size and last modified time using the filesystem library
+    auto last_modified = std::filesystem::last_write_time(toRead);
+    auto now = chrono::system_clock::now();
+    auto file_size = std::filesystem::file_size(toRead);
+    cout << std::format("file size: {} bytes, last modified: {} now: {}", file_size, last_modified, now) << endl;
+
     // invoke dcm2niix to convert the single image in verbose mode to /tmp
     string cmd = "dcm2niix -v y -f '%f_%p_%t_%s_%u' -s y -o /tmp " + toRead;
-    cout << "(try number " << tryNum + 1 << " / 10), executing: " << cmd << endl;
+    cout << "executing: " << cmd << endl;
 
     FILE *pipe = popen(cmd.c_str(), "r");
     if(!pipe) {
-      cerr << "failed to create pipe." << endl;
+      cerr << "failed to create pipe: " << strerror(errno) << " (errno: " << errno << ")" << endl;
       continue;
     }
     char buffer[128];
     while(fgets(buffer, sizeof(buffer), pipe) != NULL) {
       ss << buffer;
     }
-    if(WEXITSTATUS(pclose(pipe)) == 0) {
+
+    int exit_code = WEXITSTATUS(pclose(pipe));
+    if(exit_code == 0) {
       break;
+    } else {
+      cout << "dcm2niix failed with exit code " << exit_code << endl;
     }
 
     // sleep for a short amount of time to avoid busy-waiting
@@ -633,9 +646,10 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   regex mocoRegex("Motion: ([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+)");
   regex_search(jsonStr, match, mocoRegex);
   if(match.size() < 7) {
-    cerr << "failed to parse motion parameters from dcm2niix output." << endl;
+    cout << "no motion parameters from dcm2niix output, assuming non-MoCo image." << endl;
     rti->setMoco(false);
   } else {
+    cout << "got motion parameters from dcm2niix output, assuming MoCo image." << endl;
     rti->setMoco(true);
     rti->setTranslationX(stof(match[1].str()));
     rti->setTranslationY(stof(match[2].str()));

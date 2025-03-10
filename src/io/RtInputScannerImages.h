@@ -142,6 +142,8 @@ class RtInputScannerImages : public RtInput {
 
   // params for reading dicoms from a folder
   string dicomDir;
+  int maxDicomReadTries;
+  int dicomReadTryDelayMs;
 
   bool print;
 

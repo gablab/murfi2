@@ -32,11 +32,8 @@ jobs:
           bash build-singularity.sh
       - name: test
         run: |
-          mkdir example_data
-          cd example_data
           curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/orklnabmriean1piyzbxi/murfi_example_data_v2.tgz?rlkey=eymtgx7f7ni6l6ctcc7a0buk0&st=64y08rmc&dl=0'
           tar xzvf murfi_example_data.tgz
-          cd ..
           python test/regression/neurofeedback.py
       - name: singularity login
         run: |

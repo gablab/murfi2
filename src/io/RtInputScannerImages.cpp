@@ -654,21 +654,33 @@ RtMRIImage* RtInputScannerImages::readImageFromDICOMFolder() {
   jsonStream.close();
   remove(jsonFile.c_str());
 
-  // Match motion parameters from dcm2niix output
-  regex mocoRegex("Motion: ([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+)");
-  regex_search(jsonStr, match, mocoRegex);
-  if(match.size() < 7) {
-    cout << "no motion parameters from dcm2niix output, assuming non-MoCo image." << endl;
-    rti->setMoco(false);
-  } else {
-    cout << "got motion parameters from dcm2niix output, assuming MoCo image." << endl;
+  // Check for moco
+  if (jsonStr.find("Reference volume for motion correction.") != string::npos) {
+    cout << "found MoCo reference volume." << endl;
     rti->setMoco(true);
-    rti->setTranslationX(stof(match[1].str()));
-    rti->setTranslationY(stof(match[2].str()));
-    rti->setTranslationZ(stof(match[3].str()));
-    rti->setRotationX(stof(match[4].str()));
-    rti->setRotationY(stof(match[5].str()));
-    rti->setRotationZ(stof(match[6].str()));
+    rti->setTranslationX(0);
+    rti->setTranslationY(0);
+    rti->setTranslationZ(0);
+    rti->setRotationX(0);
+    rti->setRotationY(0);
+    rti->setRotationZ(0);
+  } else {
+    // Try to match motion parameters
+    regex mocoRegex("Motion: ([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+),([-]?\\d*\\.?\\d+)");
+    regex_search(jsonStr, match, mocoRegex);
+    if(match.size() < 7) {
+      cout << "no motion parameters from dcm2niix output, assuming non-MoCo image." << endl;
+      rti->setMoco(false);
+    } else {
+      cout << "got motion parameters from dcm2niix output, assuming MoCo image." << endl;
+      rti->setMoco(true);
+      rti->setTranslationX(stof(match[1].str()));
+      rti->setTranslationY(stof(match[2].str()));
+      rti->setTranslationZ(stof(match[3].str()));
+      rti->setRotationX(stof(match[4].str()));
+      rti->setRotationY(stof(match[5].str()));
+      rti->setRotationZ(stof(match[6].str()));
+    }
   }
 
   cout << "removing " << niiFile << " after read" << endl;

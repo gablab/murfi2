@@ -21,6 +21,8 @@
 #ifndef RTINPUTSCANNERIMAGES_H
 #define RTINPUTSCANNERIMAGES_H
 
+#include<string>
+
 #include"RtInput.h"
 #include"RtConfig.h"
 #include"RtConfigFmriRun.h"
@@ -28,6 +30,11 @@
 #include"RtMRIImage.h"
 #include"RtServerSocket.h"
 #include"RtFSLInterface.h"
+
+enum InputSource {
+  VSEND = 0,
+  DICOM = 1
+};
 
 // controls input operations to receive scanner images
 class RtInputScannerImages : public RtInput {
@@ -61,6 +68,9 @@ class RtInputScannerImages : public RtInput {
 
  protected:
 
+  // read an MRI image from a socket stream
+  RtMRIImage* receiveImageFromSocket();
+
   // read the scanner image info from a socket stream
   // NOTE: performes blocking read
   //  in
@@ -76,8 +86,11 @@ class RtInputScannerImages : public RtInput {
   //   info:   the last read image info struct
   //  out
   //   image data on successful read (NULL otherwise)
-  short *receiveImage(ACE_SOCK_Stream &stream,
-                      const RtExternalImageInfo &info);
+  short *receiveImageData(ACE_SOCK_Stream &stream,
+                          const RtExternalImageInfo &info);
+
+  // read an MRI image from a folder containing dicoms
+  RtMRIImage* readImageFromDICOMFolder();
 
   // saves an image
   //  in
@@ -107,7 +120,14 @@ class RtInputScannerImages : public RtInput {
   //   true if this image is the first in a series
   bool isFirstInSeries(const RtExternalImageInfo &info);
 
+  // repetition time
+  float tr;
+
+  // number of measurements we are expecting
+  int numMeasurements;
+
   //*** private data members  ***//
+  InputSource source;
 
   // port to listen on
   unsigned short port;
@@ -117,13 +137,18 @@ class RtInputScannerImages : public RtInput {
   // whether to only read moco images
   bool onlyReadMoCo;
 
-  // whether to receive the siemsens pre-header
+  // whether to receive the siemens pre-header
   bool preHeader;
+
+  // params for reading dicoms from a folder
+  string dicomDir;
+  int maxDicomReadTries;
+  int dicomReadTryDelayMs;
 
   bool print;
 
   // parms for image saving to disk
-  bool   saveImagesToFile;
+  bool saveImagesToFile;
   bool unmosaicInputImages;
 
   // whether alignment to previous series should be performed

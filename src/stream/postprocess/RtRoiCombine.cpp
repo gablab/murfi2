@@ -322,6 +322,14 @@ RtActivation *RtRoiCombine::getWeightedAve(RtData *dat, RtData *weights,
       weightedSum += weight*pix;
       summedWeights += weight;
     }
+
+    if (dumpAlgoVars && dat->getDataID().getTimePoint() > 2) {
+      dumpFile
+          << result->getDataID().getTimePoint() << " "
+          << *i << " "
+          << pix << " "
+          << weight << endl;
+    }
   }
 
   if(fabs(weightedSum) < std::numeric_limits<double>::epsilon()
@@ -331,6 +339,15 @@ RtActivation *RtRoiCombine::getWeightedAve(RtData *dat, RtData *weights,
   else {
     result->setPixel(0,weightedSum/summedWeights);
   }
+
+  if (dumpAlgoVars && dat->getDataID().getTimePoint() > 2) {
+    dumpFile
+        << result->getDataID().getTimePoint() << " "
+        << -1 << " "
+        << weightedSum << " "
+        << summedWeights << endl;
+  }
+
   return result;
 }
 
@@ -415,4 +432,18 @@ RtActivation *RtRoiCombine::getMin(RtData *dat, RtMaskImage *mask) {
   result->setPixel(0,min);
 
   return result;
+}
+
+// start a logfile
+void RtRoiCombine::startDumpAlgoVarsFile() {
+  dumpFile << "started at ";
+  printNow(dumpFile);
+  dumpFile << endl
+           << "time_point "
+           << "voxel_index "
+           << "current_activation "
+           << "weight"
+    ;
+
+  dumpFile << "end" << endl;
 }

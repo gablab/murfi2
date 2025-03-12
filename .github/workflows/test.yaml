@@ -27,9 +27,6 @@ jobs:
           bash build-singularity.sh MAKE_TARGET=headless
       - name: test
         run: |
-          mkdir example_data
-          cd example_data
-          curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/61krbyoj293qpeaxcs9zl/murfi_example_data.tgz?rlkey=paljzpw3f9pbpirbdu8fcrhdm&st=jm686tif&dl=1'
+          curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/orklnabmriean1piyzbxi/murfi_example_data_v2.tgz?rlkey=eymtgx7f7ni6l6ctcc7a0buk0&st=64y08rmc&dl=0'
           tar xzvf murfi_example_data.tgz
-          cd ..
           python test/regression/neurofeedback.py

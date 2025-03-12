@@ -20,20 +20,17 @@ Quickstart
 1. Download murfi as a pre-built singularity image:
 
         singularity pull oras://ghcr.io/gablab/murfi2-sif:latest
-    
+
 Running the example
 -------------------
 
-    mkdir murfi_example_data && \
-        cd murfi_example_data && \
-        curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/61krbyoj293qpeaxcs9zl/murfi_example_data.tgz?rlkey=paljzpw3f9pbpirbdu8fcrhdm&st=jm686tif&dl=1' && \
-        tar xzvf murfi_example_data.tgz
-    MURFI_SUBJECTS_DIR=.. MURFI_SUBJECT_NAME=murfi_example_data singularity run ../murfi2-sif_latest.sif murfi -f scripts/neurofeedback.xml
+    curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/orklnabmriean1piyzbxi/murfi_example_data_v2.tgz?rlkey=eymtgx7f7ni6l6ctcc7a0buk0&st=64y08rmc&dl=0'
+    tar xzvf murfi_example_data.tgz
+    MURFI_SUBJECTS_DIR=. MURFI_SUBJECT_NAME=murfi_example_data singularity run murfi2-sif_latest.sif murfi -f murfi_example_data/conf/neurofeedback-vsend.xml
 
-In another terminal:
+In another terminal (in the same directory as the above terminal):
 
-    cd murfi_example_data/scripts
-    singularity exec ../../murfi2-sif_latest.sif bash servedata.sh 3000 15000 $(hostname)
+    singularity exec murfi2-sif_latest.sif servenii4d murfi_example_data/nii/0.nii.gz $(hostname)
 
 Development
 -----------
@@ -71,7 +68,7 @@ To install vxl, use the following commands:
         && cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr .. \
         && make -j $(nproc) \
         && sudo make install \
-        && rm -rf build \ 
+        && rm -rf build \
         && if [ -d /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ ]; then ln -s /usr/include/vxlinclude/vxlcoreinclude/vxlvnl/ /usr/include/vxlinclude/vxlcoreinclude/vnl; fi
 
 

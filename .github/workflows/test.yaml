@@ -24,7 +24,7 @@ jobs:
       - name: build-headless
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-          bash build-singularity.sh MAKE_TARGET=headless
+          python build.py --target singularity --target docker --tag test --build-arg MAKE_TARGET=headless
       - name: test
         run: |
           curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/orklnabmriean1piyzbxi/murfi_example_data_v2.tgz?rlkey=eymtgx7f7ni6l6ctcc7a0buk0&st=64y08rmc&dl=0'

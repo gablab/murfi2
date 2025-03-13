@@ -4,12 +4,13 @@ FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
-RUN apt-get update -qq && \
-    apt-get install -y -q \
+RUN apt update -qq && \
+    apt install -y -q \
       curl \
       build-essential \
       cmake \
       python3
+RUN apt clean
 
 
 RUN curl -fsSL https://github.com/vxl/vxl/archive/v3.5.0.tar.gz | tar xz --strip-components 1 \

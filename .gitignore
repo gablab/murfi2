@@ -1,7 +1,9 @@
 bin/murfi*
 util/scanner_sim/servenii
 util/scanner_sim/servenii4d
+util/scanner_sim/servedicoms
 src/qt/ui_MainWindow.h
 *~
 *.o
 *example_data*
+**/__pycache__

@@ -15,6 +15,8 @@ OS=linux
 # project name
 PROJECT = murfi
 
+MAKEFLAGS := --jobs=$(shell nproc) --output-sync=target
+
 # whether to compile with gui
 export FRONTEND = 1
 
@@ -182,7 +184,6 @@ BOOST_LIB=-L$(BOOST_HOME)/lib -lboost_filesystem -lboost_system
 # xml libs
 TINYXML_FLAGS=-DTIXML_USE_STL
 
-
 # nifti image io libs
 NIFTI_INC=-I/$(NIFTI_HOME)/include/nifti
 NIFTI_LIB=-lniftiio -lznz -lz -L/$(NIFTI_HOME)/lib
@@ -221,7 +222,7 @@ C_INC = -I$(SRC_DIR) \
 
 C_FLAGS = -Wall \
 	-Wno-write-strings \
-	-std=c++14 \
+	-std=c++20 \
 	$(FRONT_FLAG) \
 	$(MTRACE_FLAG) \
 	$(PROF_FLAG) \

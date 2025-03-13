@@ -1,7 +1,7 @@
 /*=========================================================================
  *  RtMRIImage.h declares a class for an MR image
  *
- *  Copyright 2007-2013, the MURFI dev team.
+ *  Copyright 2007-2025, the MURFI dev team.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -85,6 +85,24 @@ RtMRIImage::RtMRIImage(RtMRIImage &img) {
 
   data = new short[numPix];
   memcpy(data, img.data, imgDataLen);
+}
+
+// construct by reading a nifti file
+RtMRIImage::RtMRIImage(const string& filename, int series, int timepoint) :
+  RtDataImage<short>(filename) {
+
+  magicNumber = MAGIC_NUMBER;
+
+  elType = RT_SHORT_TYPE;
+
+  dataID.setModuleID(ID_SCANNERIMG);
+  dataID.setDataName(NAME_SCANNERIMG_EPI);
+  dataID.setSeriesNum(series);
+  dataID.setTimePoint(timepoint);
+  readFOV = pixdims[0]*dims[0];
+  phaseFOV = pixdims[1]*dims[1];
+  tr = 0;
+  fromScanner = true;
 }
 
 // write the info (all but data) to a stream
@@ -178,7 +196,6 @@ bool RtMRIImage::readInfo(istream &is) {
   return is.good();
 }
 
-
 // print info about this image
 void RtMRIImage::printInfo(ostream &os) {
   if(os.fail()) return;
@@ -187,11 +204,13 @@ void RtMRIImage::printInfo(ostream &os) {
 
   os << setiosflags(ios::left);
 
+  RtDataImage<short>::printInfo(os);
+
   os << setw(wid) << "readFOV phaseFOV" << readFOV << " " << phaseFOV << endl
      << setw(wid) << "sliceThick" << sliceThick << endl
      << setw(wid) << "acqNum" << dataID.getTimePoint() << endl
      << setw(wid) << "tr" << tr << endl
-     << setw(wid) << "refFrameTime" << ACE_Date_Time2TimeStr(refFrameTime)
+     << setw(wid) << "refFrameTime" << ACE_Date_Time2TimeStr(refFrameTime) << endl
      << setw(wid) << "moco" << moco << endl
      << setw(wid) << "fromScanner" << fromScanner << endl
      << setw(wid) << "MatrixSize" << getMatrixSize() << endl
@@ -275,7 +294,22 @@ void RtMRIImage::setInfo(const RtExternalImageInfo &info) {
   dataID.setTimePoint(info.currentTR);
   tr = info.repetitionTimeMS;
   moco = info.isMotionCorrected;
+  mcTranslationXMM = info.mcTranslationXMM;
+  mcTranslationYMM = info.mcTranslationYMM;
+  mcTranslationZMM = info.mcTranslationZMM;
+  mcRotationXDeg = info.mcRotationXDeg;
+  mcRotationYDeg = info.mcRotationYDeg;
+  mcRotationZDeg = info.mcRotationZDeg;
+
   fromScanner = !strcmp(info.magic, EXTERNALSENDER_MAGIC);
+}
+
+int RtMRIImage::getTotalRepetitions() const {
+  return totalRepetitions;
+}
+
+void RtMRIImage::setRepetitionTime(double tr) {
+  this->tr = tr;
 }
 
 // set the matrix size
@@ -309,7 +343,6 @@ float RtMRIImage::getAutoContrast() {
   return SHRT_MAX/(float) maxVal;
 }
 
-
 // get a smart brightness level
 float RtMRIImage::getAutoBrightness() {
   ACE_TRACE(("RtMRIImage::getAutoBrightness"));
@@ -320,4 +353,64 @@ float RtMRIImage::getAutoBrightness() {
 
   return (float) minVal;
 
+}
+
+// set whether this is a moco volume
+void RtMRIImage::setMoco(bool m) {
+  moco = m;
+}
+
+// set the motion parameters
+void RtMRIImage::setTranslationX(float64_t x) {
+  mcTranslationXMM = x;
+}
+
+void RtMRIImage::setTranslationY(float64_t y) {
+  mcTranslationYMM = y;
+}
+
+void RtMRIImage::setTranslationZ(float64_t z) {
+  mcTranslationZMM = z;
+}
+
+void RtMRIImage::setRotationX(float64_t x) {
+  mcRotationXDeg = x;
+}
+
+void RtMRIImage::setRotationY(float64_t y) {
+  mcRotationYDeg = y;
+}
+
+void RtMRIImage::setRotationZ(float64_t z) {
+  mcRotationZDeg = z;
+}
+
+// get whether this is a moco volume
+bool RtMRIImage::getMoco() {
+  return moco;
+}
+
+// get motion parameters
+float64_t RtMRIImage::getTranslationX() {
+  return mcTranslationXMM;
+}
+
+float64_t RtMRIImage::getTranslationY() {
+  return mcTranslationYMM;
+}
+
+float64_t RtMRIImage::getTranslationZ() {
+  return mcTranslationZMM;
+}
+
+float64_t RtMRIImage::getRotationX() {
+  return mcRotationXDeg;
+}
+
+float64_t RtMRIImage::getRotationY() {
+  return mcRotationYDeg;
+}
+
+float64_t RtMRIImage::getRotationZ() {
+  return mcRotationZDeg;
 }

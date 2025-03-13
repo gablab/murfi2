@@ -1,9 +1,8 @@
 name: base-image
 
 on:
-  push:
-    branches:
-      - master
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   release:
@@ -24,5 +23,8 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
       - name: refresh-base
         run: |
-          docker build -t ghcr.io/gablab/murfi2-base:latest -f docker/Dockerfile.base .
+          tag=$(date +%Y%m%d)
+          docker build -t ghcr.io/gablab/murfi2-base:${tag} -f docker/Dockerfile.base .
+          docker push ghcr.io/gablab/murfi2-base:${tag}
+          docker tag ghcr.io/gablab/murfi2-base:${tag} ghcr.io/gablab/murfi2-base:latest
           docker push ghcr.io/gablab/murfi2-base:latest

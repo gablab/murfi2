@@ -1,9 +1,9 @@
 name: base-image
 
 on:
-  push:
-    branches:
-      - master
+  schedule:
+    - cron: "0 0 * * *"
+
 
 jobs:
   release:
@@ -26,6 +26,6 @@ jobs:
         run: |
           tag=$(date +%Y%m%d)
           python build.py --target base --tag $tag
-          docker push ghcr.io/gablab/murfi2-base:$tag
-          docker tag ghcr.io/gablab/murfi2-base:$tag ghcr.io/gablab/murfi2-base:latest
-          docker push ghcr.io/gablab/murfi2-base:latest
+          docker push ghcr.io/gablab/murfi-base:$tag
+          docker tag ghcr.io/gablab/murfi-base:$tag ghcr.io/gablab/murfi-base:latest
+          docker push ghcr.io/gablab/murfi-base:latest

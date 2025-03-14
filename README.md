@@ -19,7 +19,7 @@ Quickstart
 
 1. Download murfi as a pre-built singularity image:
 
-        singularity pull oras://ghcr.io/gablab/murfi2-sif:latest
+        singularity pull oras://ghcr.io/gablab/murfi-sif:latest
 
 Running the example
 -------------------

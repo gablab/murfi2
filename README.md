@@ -42,6 +42,12 @@ In another terminal (in the same directory as the above terminal):
 
     singularity exec murfi2-sif_latest.sif servedicoms murfi_example_data/dcm tmp/murfi_input
 
+Releases
+--------
+Versions of murfi are stored as docker and singularity images on ghcr.io. All available versions are listed [here](https://github.com/orgs/gablab/packages/container/murfi-sif/versions).
+
+In addition, the base docker image that contains the OS (currently Ubuntu 24.04) and dependencies that must be compiled from source is built each day and pushed to ghcr.io. Each daily base image (as well as the base image that was used to build released versions) are listed [here](https://github.com/orgs/gablab/packages/container/murfi-base/versions).
+
 Development
 -----------
 

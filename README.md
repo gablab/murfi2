@@ -24,13 +24,23 @@ Quickstart
 Running the example
 -------------------
 
+#### Get the example data
     curl -L -o murfi_example_data.tgz 'https://www.dropbox.com/scl/fi/orklnabmriean1piyzbxi/murfi_example_data_v2.tgz?rlkey=eymtgx7f7ni6l6ctcc7a0buk0&st=64y08rmc&dl=0'
     tar xzvf murfi_example_data.tgz
+
+#### Run the vsend-based example
     MURFI_SUBJECTS_DIR=. MURFI_SUBJECT_NAME=murfi_example_data singularity run murfi2-sif_latest.sif murfi -f murfi_example_data/conf/neurofeedback-vsend.xml
 
 In another terminal (in the same directory as the above terminal):
 
     singularity exec murfi2-sif_latest.sif servenii4d murfi_example_data/nii/0.nii.gz $(hostname)
+
+#### Run the DICOM-based example
+    rm -rf tmp; mkdir -p tmp/murfi_input && MURFI_SUBJECTS_DIR=. MURFI_SUBJECT_NAME=murfi_example_data singularity run murfi2-sif_latest.sif murfi -f murfi_example_data/conf/neurofeedback-dicom.xml
+
+In another terminal (in the same directory as the above terminal):
+
+    singularity exec murfi2-sif_latest.sif servedicoms murfi_example_data/dcm tmp/murfi_input
 
 Development
 -----------

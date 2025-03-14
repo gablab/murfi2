@@ -1,5 +1,6 @@
 # Dockerfile for murfi2.
-FROM ghcr.io/gablab/murfi2-base:latest
+ARG BASE_IMAGE_TAG=latest
+FROM ghcr.io/gablab/murfi2-base:${BASE_IMAGE_TAG}
 
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG MAKE_TARGET
@@ -46,7 +47,6 @@ COPY [".", "."]
 
 RUN echo ${MAKE_TARGET}
 RUN make clean && make -j$(nproc) ${MAKE_TARGET}
-
 
 ENV XDG_RUNTIME_DIR="/tmp"
 ENV PATH=${PATH}:/opt/murfi/bin:/opt/murfi/util/scanner_sim

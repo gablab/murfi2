@@ -1,7 +1,6 @@
 import click
 import os
 from subprocess import Popen, PIPE
-import sys
 
 
 @click.command(help="Build a singularity image from a docker image")
@@ -25,7 +24,7 @@ def main(tag, build_arg, target, base_tag):
     build_args += f" --build-arg BASE_IMAGE_TAG={base_tag}"
 
     if "base" in target:
-        docker_cmd = ["docker", "build", "-t", f"murfi-base:{tag}", "-f", "docker/Dockerfile.base", "."]
+        docker_cmd = ["docker", "build", "-t", f"ghcr.io/gablab/murfi-base:{tag}", "-f", "docker/Dockerfile.base", "."]
         print(docker_cmd)
         proc = Popen(docker_cmd, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
@@ -36,7 +35,7 @@ def main(tag, build_arg, target, base_tag):
             raise Exception("Docker base image build failed")
 
     if "docker" in target:
-        docker_cmd = ["docker", "build", "-t", f"murfi:{tag}"] + build_args.split() + ["-f", "docker/Dockerfile", "."]
+        docker_cmd = ["docker", "build", "-t", f"ghcr.io/gablab/murfi:{tag}"] + build_args.split() + ["-f", "docker/Dockerfile", "."]
         print(docker_cmd)
         proc = Popen(docker_cmd, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
@@ -48,7 +47,7 @@ def main(tag, build_arg, target, base_tag):
 
     if "singularity" in target:
         os.makedirs("bin", exist_ok=True)
-        singularity_cmd = ["singularity", "build", "--fakeroot", "-F", "bin/murfi.sif", f"docker-daemon://murfi:{tag}"]
+        singularity_cmd = ["singularity", "build", "--fakeroot", "-F", "bin/murfi.sif", f"docker-daemon://ghcr.io/gablab/murfi:{tag}"]
         print(singularity_cmd)
         proc = Popen(singularity_cmd, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()

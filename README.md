@@ -2,7 +2,7 @@ MURFI (multivariate and univariate real-time functional imaging) is a software p
 
 This is an open-source release of the MURFI platform (see LICENSE for details).
 
-For using MURFI with Siemens scanners, a proprietary data transfer sequence can be obtained via a C2P agreement. Alternatively, for non-Siemens scanners or for your own Siemens functors, Murfi will accept data over TCPIP conformant with the following structured information:
+For using MURFI with Siemens scanners, a proprietary data transfer sequence called vsend can be obtained via a C2P agreement, or murfi can be configured to read 3D DICOMs exported in real-time to a shared folder. Alternatively, for non-Siemens scanners or for your own Siemens functors, Murfi will accept data over TCPIP conformant with the following structured information:
 
 https://github.com/gablab/murfi2/blob/master/src/io/RtExternalSenderImageInfo.h
 
@@ -29,22 +29,22 @@ Running the example
     tar xzvf murfi_example_data.tgz
 
 #### Run the vsend-based example
-    MURFI_SUBJECTS_DIR=. MURFI_SUBJECT_NAME=murfi_example_data singularity run murfi2-sif_latest.sif murfi -f murfi_example_data/conf/neurofeedback-vsend.xml
+    MURFI_SUBJECTS_DIR=. MURFI_SUBJECT_NAME=murfi_example_data singularity run murfi-sif_latest.sif murfi -f murfi_example_data/conf/neurofeedback-vsend.xml
 
 In another terminal (in the same directory as the above terminal):
 
-    singularity exec murfi2-sif_latest.sif servenii4d murfi_example_data/nii/0.nii.gz $(hostname)
+    singularity exec murfi-sif_latest.sif servenii4d murfi_example_data/nii/0.nii.gz $(hostname)
 
 #### Run the DICOM-based example
-    rm -rf tmp; mkdir -p tmp/murfi_input && MURFI_SUBJECTS_DIR=. MURFI_SUBJECT_NAME=murfi_example_data singularity run murfi2-sif_latest.sif murfi -f murfi_example_data/conf/neurofeedback-dicom.xml
+    rm -rf tmp; mkdir -p tmp/murfi_input && MURFI_SUBJECTS_DIR=. MURFI_SUBJECT_NAME=murfi_example_data singularity run murfi-sif_latest.sif murfi -f murfi_example_data/conf/neurofeedback-dicom.xml
 
 In another terminal (in the same directory as the above terminal):
 
-    singularity exec murfi2-sif_latest.sif servedicoms murfi_example_data/dcm tmp/murfi_input
+    singularity exec murfi-sif_latest.sif servedicoms murfi_example_data/dcm tmp/murfi_input
 
 Releases
 --------
-Versions of murfi are stored as docker and singularity images on ghcr.io. All available versions are listed [here](https://github.com/orgs/gablab/packages/container/murfi-sif/versions).
+Versions of murfi are stored as docker and singularity images on ghcr.io. All available singularity versions are listed [here](https://github.com/orgs/gablab/packages/container/murfi-sif/versions) and the corresponding docker images are [here](https://github.com/orgs/gablab/packages/container/murfi/versions).
 
 In addition, the base docker image that contains the OS (currently Ubuntu 24.04) and dependencies that must be compiled from source is built each day and pushed to ghcr.io. Each daily base image (as well as the base image that was used to build released versions) are listed [here](https://github.com/orgs/gablab/packages/container/murfi-base/versions).
 

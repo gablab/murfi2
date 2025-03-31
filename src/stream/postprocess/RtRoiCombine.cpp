@@ -73,6 +73,9 @@ bool RtRoiCombine::processOption(const string &name, const string &text,
   if(name == "weightsDataName") {
     weightsDataName = text;
   }
+  if(name == "weightsModuleID") {
+    weightsModuleID = text;
+  }
 
   return RtStreamComponent::processOption(name, text, attrMap);
 }

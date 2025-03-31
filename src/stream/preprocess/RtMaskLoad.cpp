@@ -20,6 +20,7 @@
 #include"RtMaskLoad.h"
 #include"RtDataIDs.h"
 #include"RtMaskImage.h"
+#include"RtActivation.h"
 #include"RtExperiment.h"
 
 string RtMaskLoad::moduleString(ID_MASKLOAD);
@@ -27,13 +28,14 @@ string RtMaskLoad::moduleString(ID_MASKLOAD);
 // default constructor
 RtMaskLoad::RtMaskLoad() : RtStreamComponent(),
                            roiID(""),
+                           loadType(LOAD_MASK), // Default to loading standard mask
                            align(true),
                            mosaic(false),
                            unmosaic(true),
                            flipLR(false),
                            dynamic(false),
                            save(true),
-                           maskLoad(NULL) {
+                           loadedData(NULL) {
   componentID = moduleString;
                            }
 
@@ -55,6 +57,20 @@ bool RtMaskLoad::processOption(const string &name, const string &text,
   }
   if(name == "roiID") {
     roiID = text;
+    return true;
+  }
+  if(name == "loadType") {
+    if(text == "mask") {
+      loadType = LOAD_MASK;
+    }
+    else if(text == "activation") {
+      loadType = LOAD_ACTIVATION;
+    }
+    else {
+      cerr << "ERROR: unknown loadType: " << text
+           << " specified for mask-load. Use 'mask' or 'activation'." << endl;
+      return false;
+    }
     return true;
   }
   if(name == "align") {
@@ -100,12 +116,11 @@ bool RtMaskLoad::validateComponentConfig() {
 int RtMaskLoad::process(ACE_Message_Block *mb) {
   ACE_TRACE(("RtMaskLoad::process"));
 
-  // otherwise try to load the mask
   RtStreamMessage *msg = (RtStreamMessage*) mb->rd_ptr();
 
-  // return quickly if we are have done our job already
-  if(!needsInit && !dynamic && maskLoad != NULL) {
-    setResult(msg,maskLoad);
+  // return quickly if we have done our job already (and not dynamic)
+  if(!needsInit && !dynamic && loadedData != NULL) {
+    setResult(msg, loadedData);
     return 0;
   }
 
@@ -114,96 +129,140 @@ int RtMaskLoad::process(ACE_Message_Block *mb) {
 
   if(img == NULL) {
     cout << "RtMaskLoad::process: image passed is NULL" << endl;
-
     ACE_DEBUG((LM_INFO, "RtMaskLoad::process: image passed is NULL\n"));
     return 0;
   }
 
-  // allocate a new mask image
-  maskLoad = new RtMaskImage(*img);
-  maskLoad->getDataID().setFromInputData(*img,*this);
+  // --- Allocate based on loadType ---
+  RtMaskImage* maskImage = NULL;
+  RtActivation* activationImage = NULL;
+  string dataName = NAME_MASK;
 
-  maskLoad->getDataID().setTimePoint(DATAID_NUM_UNSET_VALUE);
-  maskLoad->getDataID().setModuleID(ID_MASK);
-  maskLoad->getDataID().setDataName(NAME_MASK);
-  maskLoad->getDataID().setRoiID(roiID);
-  maskLoad->setFilename(
-      getExperimentConfig().get("study:maskDir").str() + filename);
+  if(loadType == LOAD_MASK) {
+    maskImage = new RtMaskImage(*img);
+    loadedData = maskImage;
+    dataName = NAME_MASK;
+    if(logOutput) { log("RtMaskLoad: Loading as RtMaskImage (short)."); }
+  } else if(loadType == LOAD_ACTIVATION) {
+    activationImage = new RtActivation(*img); // Use RtActivation constructor
+    loadedData = activationImage;
+    dataName = NAME_ACTIVATION;
+    if(logOutput) { log("RtMaskLoad: Loading as RtActivation (double)."); }
+  } else {
+    cerr << "ERROR: unknown loadType: " << loadType
+         << " specified for mask-load. Use 'mask' or 'activation'." << endl;
+    return 1;
+  }
 
-  // align mask before reading it in?
-  unsigned int seriesNum = maskLoad->getDataID().getSeriesNum();
+  // --- Set common properties ---
+  loadedData->getDataID().setFromInputData(*img,*this);
+  loadedData->getDataID().setTimePoint(DATAID_NUM_UNSET_VALUE);
+  loadedData->getDataID().setModuleID(ID_MASK); // Keep module ID as MASK
+  loadedData->getDataID().setDataName(dataName);
+  loadedData->getDataID().setRoiID(roiID);
+
+  string fullPath = getExperimentConfig().get("study:maskDir").str() + filename;
+  // We need to set the filename on the specific type for load() to work
+  if(maskImage) maskImage->setFilename(fullPath);
+  if(activationImage) activationImage->setFilename(fullPath);
+
+  // --- Alignment ---
+  unsigned int seriesNum = loadedData->getDataID().getSeriesNum();
   if(align) {
+    string transformedFilename = getExperimentConfig().getSeriesXfmOutputFilename(
+                                    seriesNum, fullPath);
+
     FslJobID status
         = RtFSLInterface::applyTransform(
             getExperimentConfig().getSeriesRefVolFilename(seriesNum),
             getExperimentConfig().get("study:xfm:referenceVol"),
-            maskLoad->getFilename(),
-            getExperimentConfig().getSeriesXfmOutputFilename(
-                seriesNum,maskLoad->getFilename()),
+            fullPath,
+            transformedFilename,
             getExperimentConfig().getSeriesXfmFilename(seriesNum),
             true);
+
     if(status == FSL_JOB_FINISHED) {
-      maskLoad->setFilename(getExperimentConfig().getSeriesXfmOutputFilename(
-                                seriesNum,
-                                maskLoad->getFilename()));
+      // Update the filename to the transformed version for loading
+      if(maskImage) maskImage->setFilename(transformedFilename);
+      if(activationImage) activationImage->setFilename(transformedFilename);
+      fullPath = transformedFilename; // Update fullPath for logging
     }
     else {
-      cerr << "error aligning mask, just using unaligned version." << endl;
-
+      cerr << "error aligning mask/activation, just using unaligned version." << endl;
       if(logOutput) {
         stringstream logs("");
-        logs << "error aligning mask " << maskLoad->getFilename()
+        logs << "error aligning file " << fullPath
              << " , just using unaligned version." << endl;
         log(logs);
       }
     }
   }
 
-  // try to load the file
-  if(!maskLoad->load()) {
-    cerr << "error loading mask file " << maskLoad->getFilename() << endl;
+  // --- Load the file ---
+  bool loadSuccess = false;
+  if(maskImage) loadSuccess = maskImage->load();
+  if(activationImage) loadSuccess = activationImage->load();
 
+  if(!loadSuccess) {
+    cerr << "error loading mask/activation file " << fullPath << endl;
     if(logOutput) {
       stringstream logs("");
-      logs << "error loading mask file from " << maskLoad->getFilename()
-           << endl;
+      logs << "error loading file from " << fullPath << endl;
       log(logs);
     }
-
+    delete loadedData; // Clean up allocated memory
+    loadedData = NULL;
     return 0;
   }
 
-  // mosaic if we need to
-  if(mosaic) {
-    maskLoad->mosaic();
+  if(maskImage) {
+      if(mosaic) maskImage->mosaic();
+      if(unmosaic) maskImage->unmosaic();
+      if(flipLR) maskImage->flipLR();
+  }
+  if(activationImage) {
+      if(mosaic) activationImage->mosaic();
+      if(unmosaic) activationImage->unmosaic();
+      if(flipLR) activationImage->flipLR();
   }
 
-  // unmosaic if we need to
-  if(unmosaic) {
-    maskLoad->unmosaic();
-  }
+  // --- Set result and potentially save ---
+  setResult(msg, loadedData);
 
-  // flip if we need to
-  if(flipLR) {
-    maskLoad->flipLR();
-  }
-
-  setResult(msg,maskLoad);
-
-  // save to a file if we should
+  // Save only if it's the first time (needsInit) and save is true
   if(needsInit && save) {
-    maskLoad->setFilename(getExperimentConfig().getSeriesMaskFilename(seriesNum,
-                                                                      roiID));
-    maskLoad->save();
+    string savePath = getExperimentConfig().getSeriesMaskFilename(seriesNum, roiID);
+    bool saveSuccess = false;
+    if(maskImage) {
+        maskImage->setFilename(savePath);
+        saveSuccess = maskImage->save();
+    }
+    if(activationImage) {
+        activationImage->setFilename(savePath);
+        saveSuccess = activationImage->save();
+    }
 
     if(logOutput) {
       stringstream logs("");
-      logs << "maskload: loaded mask " << roiID << " of "
-           << maskLoad->getNumberOfOnVoxels() << " voxels and saved to "
-           << maskLoad->getFilename() << endl;
+      unsigned int numVox = 0;
+      // Use correctly typed pointers now
+      if(maskImage) {
+          numVox = maskImage->getNumberOfOnVoxels();
+      }
+      if(activationImage) {
+          // RtActivation doesn't have getNumberOfOnVoxels.
+          // Reporting total elements loaded instead.
+          numVox = activationImage->getNumEl();
+      }
+
+      logs << "maskload: loaded " << roiID << " ("
+           << (loadType == LOAD_MASK ? "mask" : "activation")
+           << ") of " << numVox << " voxels";
+      if(saveSuccess) logs << " and saved to " << savePath;
+      else logs << " (save failed or not requested)";
+      logs << endl;
       log(logs);
     }
-
   }
 
   needsInit = false;

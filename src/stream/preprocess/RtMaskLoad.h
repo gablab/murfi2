@@ -21,6 +21,13 @@
 #define RTMASKLOAD_H
 
 #include"RtStreamComponent.h"
+#include"RtActivation.h"
+
+// Enum to specify the type of data to load
+enum MaskLoadType {
+  LOAD_MASK,       // Load as RtMaskImage (short)
+  LOAD_ACTIVATION  // Load as RtActivation (double)
+};
 
 // class declaration
 class RtMaskLoad : public RtStreamComponent {
@@ -55,6 +62,7 @@ class RtMaskLoad : public RtStreamComponent {
   // data members
   string filename;
   string roiID;
+  MaskLoadType loadType; // Type of data to load
   bool align;
   bool mosaic;
   bool unmosaic;
@@ -62,8 +70,8 @@ class RtMaskLoad : public RtStreamComponent {
   bool dynamic;
   bool save;
 
-  // data
-  RtMaskImage *maskLoad;
+  // data - can hold either RtMaskImage or RtActivation
+  RtData *loadedData;
 };
 
 #endif

@@ -103,6 +103,27 @@
     <option name="save"> true </option>
   </module>
 
+  <!-- load weights volume for roi combine -->
+  <module name="mask-load">
+    <option name="loadType">activation</option>
+    <option name="makeavail">true</option>
+
+    <!-- the roi name this mask can be referenced by in later
+         modules and the data store -->
+    <option name="roiID"> brain </option>
+
+    <!-- float64 nifti volume filename to load the mask from relative
+         to subject mask directory
+     -->
+    <option name="filename"> weights </option>
+
+    <!-- whether to align the mask to the series reference after
+         reading it in -->
+    <option name="align"> true </option>
+
+    <!-- whether to save the mask to a file (good idea) -->
+    <option name="save"> false </option>
+  </module>
 
 
   <module name="mask-gen">
@@ -586,6 +607,26 @@
     <option name="afterTriggerSkipTRs">20</option>
   </module>
 
+  <!-- compute a weighted average within an roi based on the loaded
+       weights file (see above) -->
+  <module name="roi-combine">
+    <option name="makeavail">true</option>
+    <option name="print"> true </option>
+
+    <output>infoserver</output>
+    <output>infoclient</output>
+
+    <option name="method"> weighted-ave </option>
+
+    <option name="maskRoiID"> brain </option>
+
+    <option name="inputModuleID"> current-activation </option>
+    <option name="inputDataName"> activation-img </option>
+    <option name="inputRoiID"> brain </option>
+
+    <option name="weightsModuleID"> mask </option>
+    <option name="weightsDataName"> activation-img </option>
+  </module>
 
 
 </processor>

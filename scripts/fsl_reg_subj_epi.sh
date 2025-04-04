@@ -66,8 +66,8 @@ apply_reg() {
     otype=short
     fi
 
-  echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype short
-  flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype short
+  echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
+  flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
 }
 
 

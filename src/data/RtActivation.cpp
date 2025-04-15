@@ -216,6 +216,7 @@ void RtActivation::setInfo(RtMRIImage &img) {
   ACE_TRACE(("RtDataImage<T>::getAutoContrast"));
 
   dims = img.getDims();
+  pixdims = img.getPixDims();
 
   numPix = img.getNumPix();
   bytesPerPix = sizeof (double);

@@ -94,6 +94,15 @@ RtDataImage<T>::RtDataImage(RtDataImage &img) : RtData() {
 
   ras2ref = img.ras2ref;
 
+  // copy dims and pixdims vectors
+  dims.clear();
+  dims.reserve(img.dims.size());
+  dims.insert(dims.begin(), img.dims.begin(), img.dims.end());
+
+  pixdims.clear();
+  pixdims.reserve(img.pixdims.size());
+  pixdims.insert(pixdims.begin(), img.pixdims.begin(), img.pixdims.end());
+
   // allocate and copy the data
   if(DEBUG_LEVEL & ALLOC) {
     cerr << "1 allocating data for " << this << endl; cerr.flush();
@@ -151,8 +160,9 @@ void RtDataImage<T>::printInfo(ostream &os) {
   for(vector<int>::iterator i = dims.begin(); i != dims.end(); i++) {
     os << *i << " / ";
   }
+  os << endl;
 
-  os << setw(wid) << "pixdim1 / pixdim2... /: ";
+  os << setw(wid) << "npixdims: pixdim1 / pixdim2 /" << pixdims.size() << ": ";
 
   for(vector<double>::iterator i = pixdims.begin(); i != pixdims.end(); i++) {
     os << *i << " / ";

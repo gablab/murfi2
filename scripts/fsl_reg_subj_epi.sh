@@ -12,6 +12,8 @@ usage() {
     echo "  -r xfmfile        use this transformation file"
     echo "  -I interp         interpolation method (nearestneighbour*, trilinear, sinc)"
     echo "  -F fsl_path       path to fsl setup script (fsl.sh)"
+    echo "  -v                verbose mode"
+    echo "  -h                print this help"
 }
 
 
@@ -20,7 +22,7 @@ usage() {
 # in: $@
 parse_args() {
    # get the options
-    while getopts ":t:m:i:o:s:r:h?" Option
+    while getopts ":t:m:i:o:s:r:I:v?h?" Option
     do
     case $Option in
       t ) targ="$OPTARG"
@@ -35,7 +37,11 @@ parse_args() {
         ;;
       r ) xfmfile="$OPTARG"
         ;;
+      I ) interp="$OPTARG"
+        ;;
       F ) fslpath="$OPTARG"
+        ;;
+      v ) verbose=1
         ;;
       * ) usage;
         exit;;
@@ -48,6 +54,7 @@ parse_args() {
 # $2: volume to be transformed
 # $3: target volume for registration
 # $4: output volume
+# $5: verbose flag
 apply_reg() {
     parms="-interp $interp"
 
@@ -55,6 +62,7 @@ apply_reg() {
     in=$2
     ref=$3
     out=$4
+    verbose_flag=$5
 
     # set the desired datatype (short or double or float)
     dtype=`nifti_tool -quiet -disp_hdr -field datatype -infiles "$in" | sed "s/.* //"`;
@@ -66,8 +74,8 @@ apply_reg() {
     otype=short
     fi
 
-  echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
-  flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype
+  echo flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype $verbose_flag
+  flirt $parms -applyxfm -init "$1" -in "$2" -ref "$3" -out "$4" -datatype $otype $verbose_flag
 }
 
 
@@ -78,7 +86,6 @@ fi
 
 ## defaults
 export FSLOUTPUTTYPE=NIFTI
-interp=nearestneighbour
 
 parse_args "$@"
 
@@ -107,6 +114,16 @@ if [ ! "$savexfmfile" ]; then
     savexfmfile=`tempfile`.xfm
 fi
 
+if [ ! "$interp" ]; then
+    interp="nearestneighbour"
+fi
+
+if [ ! "$verbose" ]; then
+    verbose_flag=""
+else
+    verbose_flag="-v"
+fi
+
 # find a good name for the transformed files
 movedir=`echo $move | sed -n "/\//p" | sed "s|\(.*/\).*|\1|"`
 movestem=`echo $move | sed "s|.*/||; s|\(.*.*\)\..*$|\1|"`
@@ -119,14 +136,8 @@ default_options=""
 if [ ! -f "$xfmfile" ]; then
     of="$movedir""$newstem"
 
-    echo flirt $default_options -in "$move" -out "$of" -ref "$targ" -omat "$xfmfile" -dof 6 -datatype short -searchrx -180 180 -searchry -180 180 -searchrz -180 180
-    flirt $default_options -in "$move" -out "$of" -ref "$targ" -omat "$xfmfile" -dof 6 -datatype short -searchrx -180 180 -searchry -180 180 -searchrz -180 180
-
-    #  echo mv "$of".mat/MAT_0000 "$xfmfile"
-    # mv "$of".mat/MAT_0000 "$xfmfile"
-
-    # echo rmdir "$of".mat
-    # rmdir "$of".mat
+    echo flirt $default_options -in "$move" -out "$of" -ref "$targ" -omat "$xfmfile" -dof 6 -datatype short -searchrx -180 180 -searchry -180 180 -searchrz -180 180 $verbose_flag
+    flirt $default_options -in "$move" -out "$of" -ref "$targ" -omat "$xfmfile" -dof 6 -datatype short -searchrx -180 180 -searchry -180 180 -searchrz -180 180 $verbose_flag
 fi
 savexfmfile=$xfmfile
 
@@ -142,5 +153,5 @@ for file in $input; do
     of="$movedir""$ostem"2"$targstem"
     fi
 
-    apply_reg "$savexfmfile" "$file" "$targ" "$of"
+    apply_reg "$savexfmfile" "$file" "$targ" "$of" "$verbose_flag"
 done
